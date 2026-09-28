@@ -32,7 +32,7 @@ impl BinancePublicWebSocket {
     }
 
     /// Profiles: spot, futures_public, futures_market, coin_futures,
-    /// options_public, options_market. Split futures/options connections by feed.
+    /// options_public, options_market, alpha. Split futures/options connections by feed.
     pub fn with_profile(profile: &str, timeout: Duration) -> Result<Self> {
         Self::with_profile_url(profile, None, timeout)
     }
@@ -40,6 +40,7 @@ impl BinancePublicWebSocket {
     pub fn with_profile_url(profile: &str, url: Option<String>, timeout: Duration) -> Result<Self> {
         let default_url = match profile {
             "spot" => SPOT_PUBLIC_WS_URL,
+            "alpha" => "wss://nbstream.binance.com/w3w/wsa/stream/stream",
             "futures_public" | "options_public" => "wss://fstream.binance.com/public/ws",
             "futures_market" | "options_market" => "wss://fstream.binance.com/market/ws",
             "coin_futures" => "wss://dstream.binance.com/ws",

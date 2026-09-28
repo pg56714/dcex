@@ -1,0 +1,2653 @@
+{
+  "commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75",
+  "cases": [
+    {
+      "name": "get_mmp_state",
+      "method": "GET",
+      "path": "/v5/account/mmp-state",
+      "signed": true,
+      "kwargs": {
+        "base_coin": "BTC"
+      },
+      "wire": {
+        "baseCoin": "BTC"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/account/get-mmp-state",
+      "note": "Offline fixture based on official parameter table; no parseable HTTP example."
+    },
+    {
+      "name": "reset_mmp",
+      "method": "POST",
+      "path": "/v5/account/mmp-reset",
+      "signed": true,
+      "kwargs": {
+        "base_coin": "ETH"
+      },
+      "wire": {
+        "baseCoin": "ETH"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/account/reset-mmp",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "set_mmp_config",
+      "method": "POST",
+      "path": "/v5/account/mmp-modify",
+      "signed": true,
+      "kwargs": {
+        "base_coin": "ETH",
+        "window": "5000",
+        "frozen_period": "100000",
+        "qty_limit": "50",
+        "delta_limit": "20"
+      },
+      "wire": {
+        "baseCoin": "ETH",
+        "window": "5000",
+        "frozenPeriod": "100000",
+        "qtyLimit": "50",
+        "deltaLimit": "20"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/account/set-mmp",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_user_aff_customer_info",
+      "method": "GET",
+      "path": "/v5/user/aff-customer-info",
+      "signed": true,
+      "kwargs": {
+        "uid": "1513500"
+      },
+      "wire": {
+        "uid": "1513500"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/affiliate/affiliate-info",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_affiliate_affiliate_sub_list",
+      "method": "GET",
+      "path": "/v5/affiliate/affiliate-sub-list",
+      "signed": true,
+      "kwargs": {
+        "size": 100,
+        "start_date": "2024-01-01",
+        "end_date": "2024-01-31"
+      },
+      "wire": {
+        "size": 100,
+        "startDate": "2024-01-01",
+        "endDate": "2024-01-31"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/affiliate/affiliate-sub-list",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_affiliate_aff_user_list",
+      "method": "GET",
+      "path": "/v5/affiliate/aff-user-list",
+      "signed": true,
+      "kwargs": {
+        "cursor": "0",
+        "size": 2,
+        "need365": true,
+        "need30": true,
+        "need_deposit": true,
+        "start_date": "2025-10-21",
+        "end_date": "2025-10-22"
+      },
+      "wire": {
+        "cursor": "0",
+        "size": 2,
+        "need365": true,
+        "need30": true,
+        "needDeposit": true,
+        "startDate": "2025-10-21",
+        "endDate": "2025-10-22"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/affiliate/affiliate-user-list",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_alpha_lp_order_list",
+      "method": "POST",
+      "path": "/v5/alpha/lp/order-list",
+      "signed": true,
+      "kwargs": {
+        "order_type": 0,
+        "days": 7,
+        "limit": 20,
+        "page_index": 1
+      },
+      "wire": {
+        "orderType": 0,
+        "days": 7,
+        "limit": 20,
+        "pageIndex": 1
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/alpha/lp/order-list",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_alpha_lp_pay_token_list",
+      "method": "POST",
+      "path": "/v5/alpha/lp/pay-token-list",
+      "signed": true,
+      "kwargs": {},
+      "wire": {},
+      "source": "https://bybit-exchange.github.io/docs/v5/alpha/lp/pay-token-list",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_alpha_lp_pay_token_price",
+      "method": "POST",
+      "path": "/v5/alpha/lp/pay-token-price",
+      "signed": true,
+      "kwargs": {
+        "token_code": [
+          "CEX_1",
+          "CEX_2"
+        ]
+      },
+      "wire": {
+        "tokenCode": [
+          "CEX_1",
+          "CEX_2"
+        ]
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/alpha/lp/pay-token-price",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_alpha_lp_pool_info",
+      "method": "POST",
+      "path": "/v5/alpha/lp/pool-info",
+      "signed": true,
+      "kwargs": {
+        "pool_address": "0x1234567890abcdef"
+      },
+      "wire": {
+        "poolAddress": "0x1234567890abcdef"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/alpha/lp/pool-info",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_alpha_lp_pool_list",
+      "method": "POST",
+      "path": "/v5/alpha/lp/pool-list",
+      "signed": true,
+      "kwargs": {
+        "token_symbol": "ETH"
+      },
+      "wire": {
+        "tokenSymbol": "ETH"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/alpha/lp/pool-list",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_alpha_lp_position_list",
+      "method": "POST",
+      "path": "/v5/alpha/lp/position-list",
+      "signed": true,
+      "kwargs": {},
+      "wire": {},
+      "source": "https://bybit-exchange.github.io/docs/v5/alpha/lp/position-list",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "redeem_alpha_lp",
+      "method": "POST",
+      "path": "/v5/alpha/lp/redeem",
+      "signed": true,
+      "kwargs": {
+        "position_id": 12345,
+        "pool_address": "0x1234567890abcdef",
+        "derc_ratio": "0.5"
+      },
+      "wire": {
+        "positionId": 12345,
+        "poolAddress": "0x1234567890abcdef",
+        "dercRatio": "0.5"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/alpha/lp/redeem",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "stake_alpha_lp",
+      "method": "POST",
+      "path": "/v5/alpha/lp/stake",
+      "signed": true,
+      "kwargs": {
+        "position_id": 0,
+        "pool_address": "0x1234567890abcdef",
+        "pay_token_amount": "1000",
+        "pay_token_code": "CEX_1",
+        "range_upper": "2000",
+        "range_lower": "1800"
+      },
+      "wire": {
+        "positionId": 0,
+        "poolAddress": "0x1234567890abcdef",
+        "payTokenAmount": "1000",
+        "payTokenCode": "CEX_1",
+        "rangeUpper": "2000",
+        "rangeLower": "1800"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/alpha/lp/stake",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "buy_alpha_prediction",
+      "method": "POST",
+      "path": "/v5/alpha/prediction/buy",
+      "signed": true,
+      "kwargs": {
+        "token_id": "token_yes_123",
+        "amount": "100",
+        "pay_token_code": "USDC",
+        "order_type": 1,
+        "slippage": "0.05",
+        "event_id": "event_123"
+      },
+      "wire": {
+        "tokenId": "token_yes_123",
+        "amount": "100",
+        "payTokenCode": "USDC",
+        "orderType": 1,
+        "slippage": "0.05",
+        "eventId": "event_123"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/buy",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_alpha_prediction_engine_status",
+      "method": "GET",
+      "path": "/v5/alpha/prediction/engine-status",
+      "signed": true,
+      "kwargs": {},
+      "wire": {},
+      "source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/engine-status",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_alpha_prediction_event_detail",
+      "method": "POST",
+      "path": "/v5/alpha/prediction/event-detail",
+      "signed": true,
+      "kwargs": {
+        "slug": "will-argentina-win-world-cup-2026"
+      },
+      "wire": {
+        "slug": "will-argentina-win-world-cup-2026"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/event-detail",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "request_alpha_prediction_order_book",
+      "method": "POST",
+      "path": "/v5/alpha/prediction/order-book",
+      "signed": true,
+      "kwargs": {
+        "token_ids": [
+          "token_yes_123"
+        ]
+      },
+      "wire": {
+        "tokenIds": [
+          "token_yes_123"
+        ]
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/order-book",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "request_alpha_prediction_order_estimate",
+      "method": "POST",
+      "path": "/v5/alpha/prediction/order-estimate",
+      "signed": true,
+      "kwargs": {
+        "token_id": "token_yes_123",
+        "side": 1,
+        "event_id": "event_123",
+        "amount": "100",
+        "order_type": 1,
+        "pay_token_code": "USDC"
+      },
+      "wire": {
+        "tokenId": "token_yes_123",
+        "side": 1,
+        "eventId": "event_123",
+        "amount": "100",
+        "orderType": 1,
+        "payTokenCode": "USDC"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/order-estimate",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_alpha_prediction_order_list",
+      "method": "POST",
+      "path": "/v5/alpha/prediction/order-list",
+      "signed": true,
+      "kwargs": {
+        "limit": 20,
+        "page_index": 1,
+        "days": 7
+      },
+      "wire": {
+        "limit": 20,
+        "pageIndex": 1,
+        "days": 7
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/order-list",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_alpha_prediction_pay_token_list",
+      "method": "GET",
+      "path": "/v5/alpha/prediction/pay-token-list",
+      "signed": true,
+      "kwargs": {},
+      "wire": {},
+      "source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/pay-token-list",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_alpha_prediction_portfolio_summary",
+      "method": "POST",
+      "path": "/v5/alpha/prediction/portfolio-summary",
+      "signed": true,
+      "kwargs": {},
+      "wire": {},
+      "source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/portfolio-summary",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_alpha_prediction_position_history",
+      "method": "POST",
+      "path": "/v5/alpha/prediction/position-history",
+      "signed": true,
+      "kwargs": {
+        "limit": 20,
+        "page_index": 1,
+        "days": 30
+      },
+      "wire": {
+        "limit": 20,
+        "pageIndex": 1,
+        "days": 30
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/position-history",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_alpha_prediction_position_list",
+      "method": "POST",
+      "path": "/v5/alpha/prediction/position-list",
+      "signed": true,
+      "kwargs": {
+        "limit": 20,
+        "page_index": 1
+      },
+      "wire": {
+        "limit": 20,
+        "pageIndex": 1
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/position-list",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_alpha_prediction_price_history",
+      "method": "POST",
+      "path": "/v5/alpha/prediction/price-history",
+      "signed": true,
+      "kwargs": {
+        "token_id": "token_yes_123",
+        "interval": "1H"
+      },
+      "wire": {
+        "tokenId": "token_yes_123",
+        "interval": "1H"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/price-history",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "sell_alpha_prediction",
+      "method": "POST",
+      "path": "/v5/alpha/prediction/sell",
+      "signed": true,
+      "kwargs": {
+        "token_id": "token_yes_123",
+        "size": "50",
+        "order_type": 1,
+        "slippage": "0.05",
+        "event_id": "event_123",
+        "to_token_code": "USDC"
+      },
+      "wire": {
+        "tokenId": "token_yes_123",
+        "size": "50",
+        "orderType": 1,
+        "slippage": "0.05",
+        "eventId": "event_123",
+        "toTokenCode": "USDC"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/sell",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_alpha_prediction_side_market_list",
+      "method": "POST",
+      "path": "/v5/alpha/prediction/side-market-list",
+      "signed": true,
+      "kwargs": {
+        "event_id": "event_123",
+        "sort_by": "volume",
+        "limit": 20,
+        "page_index": 1
+      },
+      "wire": {
+        "eventId": "event_123",
+        "sortBy": "volume",
+        "limit": 20,
+        "pageIndex": 1
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/side-market-list",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_alpha_prediction_sports_group_stage_detail",
+      "method": "POST",
+      "path": "/v5/alpha/prediction/sports/group-stage-detail",
+      "signed": true,
+      "kwargs": {
+        "event_type": 1,
+        "group_name": "A"
+      },
+      "wire": {
+        "eventType": 1,
+        "groupName": "A"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/sports-group-stage-detail",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_alpha_prediction_sports_match_list",
+      "method": "POST",
+      "path": "/v5/alpha/prediction/sports/match-list",
+      "signed": true,
+      "kwargs": {
+        "event_type": 1,
+        "status": 2,
+        "limit": 20,
+        "page_index": 1
+      },
+      "wire": {
+        "eventType": 1,
+        "status": 2,
+        "limit": 20,
+        "pageIndex": 1
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/sports-match-list",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_alpha_prediction_sports_timeline_stages",
+      "method": "GET",
+      "path": "/v5/alpha/prediction/sports/timeline-stages",
+      "signed": true,
+      "kwargs": {
+        "event_type": 1
+      },
+      "wire": {
+        "eventType": 1
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/sports-timeline-stages",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_alpha_prediction_token_price",
+      "method": "POST",
+      "path": "/v5/alpha/prediction/token-price",
+      "signed": true,
+      "kwargs": {
+        "token_ids": [
+          "token_yes_123",
+          "token_no_123"
+        ]
+      },
+      "wire": {
+        "tokenIds": [
+          "token_yes_123",
+          "token_no_123"
+        ]
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/token-price",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_alpha_trade_asset_detail",
+      "method": "POST",
+      "path": "/v5/alpha/trade/asset-detail",
+      "signed": true,
+      "kwargs": {
+        "chain_code": "ETH",
+        "token_address": "0x6982508145454ce325ddbe47a25d4ec3d2311933"
+      },
+      "wire": {
+        "chainCode": "ETH",
+        "tokenAddress": "0x6982508145454ce325ddbe47a25d4ec3d2311933"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/alpha/trade/asset-detail",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_alpha_trade_asset_list",
+      "method": "POST",
+      "path": "/v5/alpha/trade/asset-list",
+      "signed": true,
+      "kwargs": {},
+      "wire": {},
+      "source": "https://bybit-exchange.github.io/docs/v5/alpha/trade/asset-list",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "request_alpha_trade_biz_token_details",
+      "method": "POST",
+      "path": "/v5/alpha/trade/biz-token-details",
+      "signed": true,
+      "kwargs": {
+        "chain_code": "ETH",
+        "token_address": "0x6982508145454ce325ddbe47a25d4ec3d2311933"
+      },
+      "wire": {
+        "chainCode": "ETH",
+        "tokenAddress": "0x6982508145454ce325ddbe47a25d4ec3d2311933"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/alpha/trade/biz-token-details",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_alpha_trade_biz_token_list",
+      "method": "POST",
+      "path": "/v5/alpha/trade/biz-token-list",
+      "signed": true,
+      "kwargs": {
+        "token_tag": 2
+      },
+      "wire": {
+        "tokenTag": 2
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/alpha/trade/biz-token-list",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_alpha_trade_biz_token_price_list",
+      "method": "POST",
+      "path": "/v5/alpha/trade/biz-token-price-list",
+      "signed": true,
+      "kwargs": {
+        "token_address_info": [
+          {
+            "chainCode": "ETH",
+            "tokenAddress": "0x6982508145454ce325ddbe47a25d4ec3d2311933"
+          },
+          {
+            "chainCode": "SOL",
+            "tokenAddress": "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263"
+          }
+        ]
+      },
+      "wire": {
+        "tokenAddressInfo": [
+          {
+            "chainCode": "ETH",
+            "tokenAddress": "0x6982508145454ce325ddbe47a25d4ec3d2311933"
+          },
+          {
+            "chainCode": "SOL",
+            "tokenAddress": "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263"
+          }
+        ]
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/alpha/trade/biz-token-price-list",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_alpha_trade_order_list",
+      "method": "POST",
+      "path": "/v5/alpha/trade/order-list",
+      "signed": true,
+      "kwargs": {
+        "trade_type": 0,
+        "days": 7,
+        "limit": 20,
+        "page_index": 1
+      },
+      "wire": {
+        "tradeType": 0,
+        "days": 7,
+        "limit": 20,
+        "pageIndex": 1
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/alpha/trade/order-list",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_alpha_trade_pay_token_list",
+      "method": "POST",
+      "path": "/v5/alpha/trade/pay-token-list",
+      "signed": true,
+      "kwargs": {
+        "chain_code": "SOL",
+        "token_address": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB"
+      },
+      "wire": {
+        "chainCode": "SOL",
+        "tokenAddress": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/alpha/trade/pay-token-list",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "purchase_alpha_trade",
+      "method": "POST",
+      "path": "/v5/alpha/trade/purchase",
+      "signed": true,
+      "kwargs": {
+        "from_token_code": "CEX_1",
+        "from_token_amount": "100",
+        "to_token_code": "DEX_123",
+        "slippage": "0.01",
+        "quote_data": "eyJhbGciOiJIUzI1NiJ9...",
+        "gas": "0.0003",
+        "quote_mode": 0,
+        "correcting_code": "a1b2c3d4e5f6"
+      },
+      "wire": {
+        "fromTokenCode": "CEX_1",
+        "fromTokenAmount": "100",
+        "toTokenCode": "DEX_123",
+        "slippage": "0.01",
+        "quoteData": "eyJhbGciOiJIUzI1NiJ9...",
+        "gas": "0.0003",
+        "quoteMode": 0,
+        "correctingCode": "a1b2c3d4e5f6"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/alpha/trade/trade-purchase",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "request_alpha_trade_quote",
+      "method": "POST",
+      "path": "/v5/alpha/trade/quote",
+      "signed": true,
+      "kwargs": {
+        "trade_type": 1,
+        "from_token_code": "CEX_1",
+        "from_token_amount": "100",
+        "to_token_code": "DEX_123",
+        "quote_mode": 0
+      },
+      "wire": {
+        "tradeType": 1,
+        "fromTokenCode": "CEX_1",
+        "fromTokenAmount": "100",
+        "toTokenCode": "DEX_123",
+        "quoteMode": 0
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/alpha/trade/trade-quote",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "redeem_alpha_trade",
+      "method": "POST",
+      "path": "/v5/alpha/trade/redeem",
+      "signed": true,
+      "kwargs": {
+        "from_token_code": "DEX_123",
+        "from_token_amount": "10000000",
+        "to_token_code": "CEX_1",
+        "slippage": "0.01",
+        "quote_data": "eyJhbGciOiJIUzI1NiJ9...",
+        "gas": "0.0003",
+        "quote_mode": 0,
+        "correcting_code": "a1b2c3d4e5f6"
+      },
+      "wire": {
+        "fromTokenCode": "DEX_123",
+        "fromTokenAmount": "10000000",
+        "toTokenCode": "CEX_1",
+        "slippage": "0.01",
+        "quoteData": "eyJhbGciOiJIUzI1NiJ9...",
+        "gas": "0.0003",
+        "quoteMode": 0,
+        "correctingCode": "a1b2c3d4e5f6"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/alpha/trade/trade-redeem",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_fiat_balance_query",
+      "method": "GET",
+      "path": "/v5/fiat/balance-query",
+      "signed": true,
+      "kwargs": {},
+      "wire": {},
+      "source": "https://bybit-exchange.github.io/docs/v5/asset/fiat-convert/balance-query",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "request_fiat_trade_execute",
+      "method": "POST",
+      "path": "/v5/fiat/trade-execute",
+      "signed": true,
+      "kwargs": {
+        "quote_tx_id": "QuoteTaxId123456",
+        "sub_user_id": "43456"
+      },
+      "wire": {
+        "quoteTxId": "QuoteTaxId123456",
+        "subUserId": "43456"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/asset/fiat-convert/confirm-quote",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_fiat_query_coin_list",
+      "method": "GET",
+      "path": "/v5/fiat/query-coin-list",
+      "signed": true,
+      "kwargs": {
+        "side": "0"
+      },
+      "wire": {
+        "side": "0"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/asset/fiat-convert/query-coin-list",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_fiat_query_trade_history",
+      "method": "GET",
+      "path": "/v5/fiat/query-trade-history",
+      "signed": true,
+      "kwargs": {},
+      "wire": {},
+      "source": "https://bybit-exchange.github.io/docs/v5/asset/fiat-convert/query-trade-history",
+      "note": "Offline fixture based on official parameter table; no parseable HTTP example."
+    },
+    {
+      "name": "get_fiat_trade_query",
+      "method": "GET",
+      "path": "/v5/fiat/trade-query",
+      "signed": true,
+      "kwargs": {
+        "trade_no": "TradeNo123456"
+      },
+      "wire": {
+        "tradeNo": "TradeNo123456"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/asset/fiat-convert/query-trade",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "request_fiat_quote_apply",
+      "method": "POST",
+      "path": "/v5/fiat/quote-apply",
+      "signed": true,
+      "kwargs": {
+        "from_coin": "EUR",
+        "from_coin_type": "fiat",
+        "to_coin": "USDT",
+        "to_coin_type": "crypto",
+        "request_amount": "100"
+      },
+      "wire": {
+        "fromCoin": "EUR",
+        "fromCoinType": "fiat",
+        "toCoin": "USDT",
+        "toCoinType": "crypto",
+        "requestAmount": "100"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/asset/fiat-convert/quote-apply",
+      "note": "Offline fixture based on official parameter table; no parseable HTTP example."
+    },
+    {
+      "name": "get_fiat_reference_price",
+      "method": "GET",
+      "path": "/v5/fiat/reference-price",
+      "signed": true,
+      "kwargs": {
+        "symbol": "BTCUSDT"
+      },
+      "wire": {
+        "symbol": "BTCUSDT"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/asset/fiat-convert/reference-price",
+      "note": "Offline fixture based on official parameter table; official HTTP example is absent or inconsistent."
+    },
+    {
+      "name": "cancel_withdrawal",
+      "method": "POST",
+      "path": "/v5/asset/withdraw/cancel",
+      "signed": true,
+      "kwargs": {
+        "id": "10197"
+      },
+      "wire": {
+        "id": "10197"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/asset/withdraw/cancel-withdraw",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "create_withdrawal",
+      "method": "POST",
+      "path": "/v5/asset/withdraw/create",
+      "signed": true,
+      "kwargs": {
+        "coin": "USDT",
+        "chain": "ETH",
+        "address": "0x99ced129603abc771c0dabe935c326ff6c86645d",
+        "amount": "24",
+        "timestamp": 1672196561407,
+        "force_chain": 0,
+        "account_type": "FUND"
+      },
+      "wire": {
+        "coin": "USDT",
+        "chain": "ETH",
+        "address": "0x99ced129603abc771c0dabe935c326ff6c86645d",
+        "amount": "24",
+        "timestamp": 1672196561407,
+        "forceChain": 0,
+        "accountType": "FUND"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/asset/withdraw/withdraw",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "request_dca_close_bot",
+      "method": "POST",
+      "path": "/v5/dca/close-bot",
+      "signed": true,
+      "kwargs": {
+        "bot_id": "612349292702654770",
+        "close_mode": "2"
+      },
+      "wire": {
+        "bot_id": "612349292702654770",
+        "close_mode": "2"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/bot/dca/close",
+      "note": "Official HTTP request example. Numeric example value normalized to the documented string type."
+    },
+    {
+      "name": "request_dca_create_bot",
+      "method": "POST",
+      "path": "/v5/dca/create-bot",
+      "signed": true,
+      "kwargs": {
+        "parameters": {
+          "frequency_in_second": "600",
+          "quote_coin": "USDT",
+          "max_invest_amount": "2000",
+          "pairs": [
+            {
+              "base": "BTC",
+              "amount": "66"
+            },
+            {
+              "base": "ETH",
+              "amount": "88"
+            }
+          ]
+        }
+      },
+      "wire": {
+        "parameters": {
+          "frequency_in_second": "600",
+          "quote_coin": "USDT",
+          "max_invest_amount": "2000",
+          "pairs": [
+            {
+              "base": "BTC",
+              "amount": "66"
+            },
+            {
+              "base": "ETH",
+              "amount": "88"
+            }
+          ]
+        }
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/bot/dca/create",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "close_fcombobot",
+      "method": "POST",
+      "path": "/v5/fcombobot/close",
+      "signed": true,
+      "kwargs": {
+        "bot_id": "612324421335537259"
+      },
+      "wire": {
+        "bot_id": "612324421335537259"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/bot/futures-combo/close",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "create_fcombobot",
+      "method": "POST",
+      "path": "/v5/fcombobot/create",
+      "signed": true,
+      "kwargs": {
+        "leverage": "5",
+        "init_margin": "500",
+        "adjust_position_mode": 3,
+        "adjust_position_percent": "0.05",
+        "adjust_position_time_interval": 3600,
+        "symbol_settings": [
+          {
+            "symbol": "BTCUSDT",
+            "target_position_percent": "0.5",
+            "side": 1
+          },
+          {
+            "symbol": "ETHUSDT",
+            "target_position_percent": "0.5",
+            "side": 2
+          }
+        ],
+        "sl_percent": "0.2",
+        "tp_percent": "0.5"
+      },
+      "wire": {
+        "leverage": "5",
+        "init_margin": "500",
+        "adjust_position_mode": 3,
+        "adjust_position_percent": "0.05",
+        "adjust_position_time_interval": 3600,
+        "symbol_settings": [
+          {
+            "symbol": "BTCUSDT",
+            "target_position_percent": "0.5",
+            "side": 1
+          },
+          {
+            "symbol": "ETHUSDT",
+            "target_position_percent": "0.5",
+            "side": 2
+          }
+        ],
+        "sl_percent": "0.2",
+        "tp_percent": "0.5"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/bot/futures-combo/create",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_fcombobot_detail",
+      "method": "POST",
+      "path": "/v5/fcombobot/detail",
+      "signed": true,
+      "kwargs": {
+        "bot_id": "612324421335537259"
+      },
+      "wire": {
+        "bot_id": "612324421335537259"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/bot/futures-combo/get-detail",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_fcombobot_getlimit",
+      "method": "POST",
+      "path": "/v5/fcombobot/getlimit",
+      "signed": true,
+      "kwargs": {
+        "leverage": "5",
+        "init_margin": "500",
+        "adjust_position_mode": 3,
+        "adjust_position_percent": "0.05",
+        "adjust_position_time_interval": 3600,
+        "symbol_settings": [
+          {
+            "symbol": "BTCUSDT",
+            "target_position_percent": "0.5",
+            "side": 1
+          },
+          {
+            "symbol": "ETHUSDT",
+            "target_position_percent": "0.5",
+            "side": 2
+          }
+        ],
+        "sl_percent": "0.2",
+        "tp_percent": "0.5",
+        "need_to_slippage": false
+      },
+      "wire": {
+        "leverage": "5",
+        "init_margin": "500",
+        "adjust_position_mode": 3,
+        "adjust_position_percent": "0.05",
+        "adjust_position_time_interval": 3600,
+        "symbol_settings": [
+          {
+            "symbol": "BTCUSDT",
+            "target_position_percent": "0.5",
+            "side": 1
+          },
+          {
+            "symbol": "ETHUSDT",
+            "target_position_percent": "0.5",
+            "side": 2
+          }
+        ],
+        "sl_percent": "0.2",
+        "tp_percent": "0.5",
+        "need_to_slippage": false
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/bot/futures-combo/get-limit",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "close_fgridbot",
+      "method": "POST",
+      "path": "/v5/fgridbot/close",
+      "signed": true,
+      "kwargs": {
+        "bot_id": "612330315406398322"
+      },
+      "wire": {
+        "bot_id": "612330315406398322"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/bot/futures-grid/close",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "create_fgridbot",
+      "method": "POST",
+      "path": "/v5/fgridbot/create",
+      "signed": true,
+      "kwargs": {
+        "symbol": "BTCUSDT",
+        "grid_mode": 2,
+        "min_price": "230000",
+        "max_price": "800000",
+        "cell_number": 88,
+        "leverage": "6",
+        "grid_type": 2,
+        "total_investment": "950",
+        "entry_price": "370000",
+        "trailing_stop_per": "0.18",
+        "tp_sl_type": 4,
+        "stop_loss_price": "200000",
+        "take_profit_per": "0.28"
+      },
+      "wire": {
+        "symbol": "BTCUSDT",
+        "grid_mode": 2,
+        "min_price": "230000",
+        "max_price": "800000",
+        "cell_number": 88,
+        "leverage": "6",
+        "grid_type": 2,
+        "total_investment": "950",
+        "entry_price": "370000",
+        "trailing_stop_per": "0.18",
+        "tp_sl_type": 4,
+        "stop_loss_price": "200000",
+        "take_profit_per": "0.28"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/bot/futures-grid/create",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_fgridbot_detail",
+      "method": "POST",
+      "path": "/v5/fgridbot/detail",
+      "signed": true,
+      "kwargs": {
+        "bot_id": "612330315406398322"
+      },
+      "wire": {
+        "bot_id": "612330315406398322"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/bot/futures-grid/get-detail",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "request_fgridbot_validate",
+      "method": "POST",
+      "path": "/v5/fgridbot/validate",
+      "signed": true,
+      "kwargs": {
+        "symbol": "BTCUSDT",
+        "grid_mode": 2,
+        "min_price": "230000",
+        "max_price": "800000",
+        "cell_number": 88,
+        "leverage": "6",
+        "grid_type": 2
+      },
+      "wire": {
+        "symbol": "BTCUSDT",
+        "grid_mode": 2,
+        "min_price": "230000",
+        "max_price": "800000",
+        "cell_number": 88,
+        "leverage": "6",
+        "grid_type": 2
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/bot/futures-grid/validate-input",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "close_fmartingalebot",
+      "method": "POST",
+      "path": "/v5/fmartingalebot/close",
+      "signed": true,
+      "kwargs": {
+        "bot_id": "612335280740902531"
+      },
+      "wire": {
+        "bot_id": "612335280740902531"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/bot/futures-martingale/close",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "create_fmartingalebot",
+      "method": "POST",
+      "path": "/v5/fmartingalebot/create",
+      "signed": true,
+      "kwargs": {
+        "symbol": "MNTUSDT",
+        "martingale_mode": 1,
+        "leverage": "5",
+        "price_float_percent": "0.16",
+        "add_position_percent": "1.8",
+        "add_position_num": 5,
+        "round_tp_percent": "0.1",
+        "init_margin": "650",
+        "sl_percent": "0.5",
+        "entry_price": "0.56",
+        "auto_cycle_toggle": 2
+      },
+      "wire": {
+        "symbol": "MNTUSDT",
+        "martingale_mode": 1,
+        "leverage": "5",
+        "price_float_percent": "0.16",
+        "add_position_percent": "1.8",
+        "add_position_num": 5,
+        "round_tp_percent": "0.1",
+        "init_margin": "650",
+        "sl_percent": "0.5",
+        "entry_price": "0.56",
+        "auto_cycle_toggle": 2
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/bot/futures-martingale/create",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_fmartingalebot_detail",
+      "method": "POST",
+      "path": "/v5/fmartingalebot/detail",
+      "signed": true,
+      "kwargs": {
+        "bot_id": "612335724699611830"
+      },
+      "wire": {
+        "bot_id": "612335724699611830"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/bot/futures-martingale/get-detail",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_fmartingalebot_getlimit",
+      "method": "POST",
+      "path": "/v5/fmartingalebot/getlimit",
+      "signed": true,
+      "kwargs": {
+        "symbol": "MNTUSDT",
+        "martingale_mode": 1,
+        "leverage": "5",
+        "price_float_percent": "0.16",
+        "add_position_percent": "1.8",
+        "add_position_num": 5,
+        "round_tp_percent": "0.1",
+        "init_margin": "1000",
+        "sl_percent": "0.5",
+        "auto_cycle_toggle": 2
+      },
+      "wire": {
+        "symbol": "MNTUSDT",
+        "martingale_mode": 1,
+        "leverage": "5",
+        "price_float_percent": "0.16",
+        "add_position_percent": "1.8",
+        "add_position_num": 5,
+        "round_tp_percent": "0.1",
+        "init_margin": "1000",
+        "sl_percent": "0.5",
+        "auto_cycle_toggle": 2
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/bot/futures-martingale/get-limit",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "request_grid_close_grid",
+      "method": "POST",
+      "path": "/v5/grid/close-grid",
+      "signed": true,
+      "kwargs": {
+        "grid_id": "test-grid",
+        "close_mode": "3"
+      },
+      "wire": {
+        "grid_id": "test-grid",
+        "close_mode": "3"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/bot/spot-grid/close",
+      "note": "Offline fixture based on official parameter table; official HTTP example is absent or inconsistent."
+    },
+    {
+      "name": "request_grid_create_grid",
+      "method": "POST",
+      "path": "/v5/grid/create-grid",
+      "signed": true,
+      "kwargs": {
+        "symbol": "MNTUSDT",
+        "max_price": "1.0968",
+        "min_price": "0.3656",
+        "quote_investment": "200",
+        "base_investment": "",
+        "invest_mode": 0,
+        "cell_number": 50
+      },
+      "wire": {
+        "symbol": "MNTUSDT",
+        "max_price": "1.0968",
+        "min_price": "0.3656",
+        "quote_investment": "200",
+        "base_investment": "",
+        "invest_mode": 0,
+        "cell_number": 50
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/bot/spot-grid/create",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_grid_query_grid_detail",
+      "method": "POST",
+      "path": "/v5/grid/query-grid-detail",
+      "signed": true,
+      "kwargs": {
+        "grid_id": "1234567890"
+      },
+      "wire": {
+        "grid_id": "1234567890"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/bot/spot-grid/get-detail",
+      "note": "Official HTTP request example. Numeric example value normalized to the documented string type."
+    },
+    {
+      "name": "request_grid_validate_input",
+      "method": "POST",
+      "path": "/v5/grid/validate-input",
+      "signed": false,
+      "kwargs": {
+        "symbol": "MNTUSDT",
+        "max_price": "1.2",
+        "min_price": "0.3",
+        "quote_investment": "",
+        "base_investment": "300",
+        "invest_mode": 1,
+        "cell_number": 66,
+        "entry_price": "0.4"
+      },
+      "wire": {
+        "symbol": "MNTUSDT",
+        "max_price": "1.2",
+        "min_price": "0.3",
+        "quote_investment": "",
+        "base_investment": "300",
+        "invest_mode": 1,
+        "cell_number": 66,
+        "entry_price": "0.4"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/bot/spot-grid/validate-input",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_broker_ip_changelog",
+      "method": "GET",
+      "path": "/v5/broker/ip/changelog",
+      "signed": true,
+      "kwargs": {
+        "limit": 3
+      },
+      "wire": {
+        "limit": 3
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/broker/api-broker/ip-changelog",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_broker_whitelist_ip",
+      "method": "GET",
+      "path": "/v5/broker/whitelist/ip",
+      "signed": false,
+      "kwargs": {},
+      "wire": {},
+      "source": "https://bybit-exchange.github.io/docs/v5/broker/api-broker/whitelist-ip",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_broker_account_info",
+      "method": "GET",
+      "path": "/v5/broker/account-info",
+      "signed": true,
+      "kwargs": {},
+      "wire": {},
+      "source": "https://bybit-exchange.github.io/docs/v5/broker/exchange-broker/account-info",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_broker_earnings_info",
+      "method": "GET",
+      "path": "/v5/broker/earnings-info",
+      "signed": true,
+      "kwargs": {
+        "begin": "20231129",
+        "end": "20231129",
+        "uid": "117894077"
+      },
+      "wire": {
+        "begin": "20231129",
+        "end": "20231129",
+        "uid": "117894077"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/broker/exchange-broker/exchange-earning",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_broker_apilimit_query_all",
+      "method": "GET",
+      "path": "/v5/broker/apilimit/query-all",
+      "signed": true,
+      "kwargs": {},
+      "wire": {},
+      "source": "https://bybit-exchange.github.io/docs/v5/broker/exchange-broker/rate-limit/query-all",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_broker_apilimit_query_cap",
+      "method": "GET",
+      "path": "/v5/broker/apilimit/query-cap",
+      "signed": true,
+      "kwargs": {},
+      "wire": {},
+      "source": "https://bybit-exchange.github.io/docs/v5/broker/exchange-broker/rate-limit/query-cap",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "set_broker_apilimit",
+      "method": "POST",
+      "path": "/v5/broker/apilimit/set",
+      "signed": true,
+      "kwargs": {
+        "list_": [
+          {
+            "uids": "290118",
+            "bizType": "SPOT",
+            "rate": 600
+          }
+        ]
+      },
+      "wire": {
+        "list": [
+          {
+            "uids": "290118",
+            "bizType": "SPOT",
+            "rate": 600
+          }
+        ]
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/broker/exchange-broker/rate-limit/set",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_broker_asset_query_sub_member_deposit_record",
+      "method": "GET",
+      "path": "/v5/broker/asset/query-sub-member-deposit-record",
+      "signed": true,
+      "kwargs": {
+        "coin": "USDT",
+        "limit": 1
+      },
+      "wire": {
+        "coin": "USDT",
+        "limit": 1
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/broker/exchange-broker/sub-deposit-record",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "request_broker_award_distribution_record",
+      "method": "POST",
+      "path": "/v5/broker/award/distribution-record",
+      "signed": true,
+      "kwargs": {
+        "account_id": "5714139",
+        "award_id": "189528",
+        "spec_code": "demo000",
+        "with_used_amount": false
+      },
+      "wire": {
+        "accountId": "5714139",
+        "awardId": "189528",
+        "specCode": "demo000",
+        "withUsedAmount": false
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/broker/reward/get-issue-voucher",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "request_broker_award_distribute_award",
+      "method": "POST",
+      "path": "/v5/broker/award/distribute-award",
+      "signed": true,
+      "kwargs": {
+        "account_id": "2846381",
+        "award_id": "123456",
+        "spec_code": "award-001",
+        "amount": "100",
+        "broker_id": "v-28478"
+      },
+      "wire": {
+        "accountId": "2846381",
+        "awardId": "123456",
+        "specCode": "award-001",
+        "amount": "100",
+        "brokerId": "v-28478"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/broker/reward/issue-voucher",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_broker_award_info",
+      "method": "POST",
+      "path": "/v5/broker/award/info",
+      "signed": true,
+      "kwargs": {
+        "id": "80209"
+      },
+      "wire": {
+        "id": "80209"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/broker/reward/voucher",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_card_transaction_query_asset_records",
+      "method": "POST",
+      "path": "/v5/card/transaction/query-asset-records",
+      "signed": true,
+      "kwargs": {},
+      "wire": {},
+      "source": "https://bybit-exchange.github.io/docs/v5/bybit-card/asset-records",
+      "note": "Offline fixture based on official parameter table; no parseable HTTP example."
+    },
+    {
+      "name": "get_card_reward_points_balance",
+      "method": "POST",
+      "path": "/v5/card/reward/points/balance",
+      "signed": true,
+      "kwargs": {},
+      "wire": {},
+      "source": "https://bybit-exchange.github.io/docs/v5/bybit-card/point/balance",
+      "note": "Offline fixture based on official parameter table; no parseable HTTP example."
+    },
+    {
+      "name": "get_card_reward_point_cashback_detail",
+      "method": "POST",
+      "path": "/v5/card/reward/point/cashback/detail",
+      "signed": true,
+      "kwargs": {
+        "biz_txn_id": "test-transaction"
+      },
+      "wire": {
+        "bizTxnId": "test-transaction"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/bybit-card/point/cashback-detail",
+      "note": "Offline fixture based on official parameter table; no parseable HTTP example."
+    },
+    {
+      "name": "get_card_reward_mall_item_list",
+      "method": "POST",
+      "path": "/v5/card/reward/mall/item/list",
+      "signed": true,
+      "kwargs": {},
+      "wire": {},
+      "source": "https://bybit-exchange.github.io/docs/v5/bybit-card/point/item-list",
+      "note": "Offline fixture based on official parameter table; no parseable HTTP example."
+    },
+    {
+      "name": "get_card_reward_points_records",
+      "method": "POST",
+      "path": "/v5/card/reward/points/records",
+      "signed": true,
+      "kwargs": {},
+      "wire": {},
+      "source": "https://bybit-exchange.github.io/docs/v5/bybit-card/point/records",
+      "note": "Offline fixture based on official parameter table; no parseable HTTP example."
+    },
+    {
+      "name": "get_card_reward_points_tier",
+      "method": "POST",
+      "path": "/v5/card/reward/points/tier",
+      "signed": true,
+      "kwargs": {},
+      "wire": {},
+      "source": "https://bybit-exchange.github.io/docs/v5/bybit-card/point/tier",
+      "note": "Offline fixture based on official parameter table; no parseable HTTP example."
+    },
+    {
+      "name": "request_demo_funds",
+      "method": "POST",
+      "path": "/v5/account/demo-apply-money",
+      "signed": true,
+      "kwargs": {
+        "adjust_type": 0,
+        "uta_demo_apply_money": [
+          {
+            "coin": "USDT",
+            "amountStr": "109"
+          },
+          {
+            "coin": "ETH",
+            "amountStr": "1"
+          }
+        ]
+      },
+      "wire": {
+        "adjustType": 0,
+        "utaDemoApplyMoney": [
+          {
+            "coin": "USDT",
+            "amountStr": "109"
+          },
+          {
+            "coin": "ETH",
+            "amountStr": "1"
+          }
+        ]
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/demo",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "create_demo_member",
+      "method": "POST",
+      "path": "/v5/user/create-demo-member",
+      "signed": true,
+      "kwargs": {},
+      "wire": {},
+      "source": "https://bybit-exchange.github.io/docs/v5/demo",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_event_instruments_info",
+      "method": "GET",
+      "path": "/v5/event/instruments-info",
+      "signed": false,
+      "kwargs": {
+        "status": "Trading",
+        "limit": 10
+      },
+      "wire": {
+        "status": "Trading",
+        "limit": 10
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/event/market/instrument-info",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_event_orderbook",
+      "method": "GET",
+      "path": "/v5/event/orderbook",
+      "signed": false,
+      "kwargs": {
+        "symbol": "ETHUSDT-28AUG26-2450-2570-OUT"
+      },
+      "wire": {
+        "symbol": "ETHUSDT-28AUG26-2450-2570-OUT"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/event/market/orderbook",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "cancel_event_quote",
+      "method": "POST",
+      "path": "/v5/event/cancel",
+      "signed": true,
+      "kwargs": {
+        "order_link_id": "xxxxxx",
+        "order_id": "xxxxxxxxxxefffff"
+      },
+      "wire": {
+        "orderLinkId": "xxxxxx",
+        "orderId": "xxxxxxxxxxefffff"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/event/trade/cancel-quote",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_event_trades",
+      "method": "GET",
+      "path": "/v5/event/trades",
+      "signed": true,
+      "kwargs": {
+        "symbol": "ETHUSDT-28AUG26-2450-2570-OUT",
+        "limit": 50
+      },
+      "wire": {
+        "symbol": "ETHUSDT-28AUG26-2450-2570-OUT",
+        "limit": 50
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/event/trade/execution",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_event_order_realtime",
+      "method": "GET",
+      "path": "/v5/event/order-realtime",
+      "signed": true,
+      "kwargs": {
+        "symbol": "ETHUSDT-28AUG26-2450-2570-OUT",
+        "limit": 20
+      },
+      "wire": {
+        "symbol": "ETHUSDT-28AUG26-2450-2570-OUT",
+        "limit": 20
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/event/trade/open-order",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_event_order_list",
+      "method": "GET",
+      "path": "/v5/event/order-list",
+      "signed": true,
+      "kwargs": {
+        "symbol": "ETHUSDT-28AUG26-2450-2570-OUT",
+        "limit": 50
+      },
+      "wire": {
+        "symbol": "ETHUSDT-28AUG26-2450-2570-OUT",
+        "limit": 50
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/event/trade/order-list",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_event_positions",
+      "method": "GET",
+      "path": "/v5/event/positions",
+      "signed": true,
+      "kwargs": {
+        "symbol": "ETHUSDT-28AUG26-2450-2570-OUT",
+        "limit": 20
+      },
+      "wire": {
+        "symbol": "ETHUSDT-28AUG26-2450-2570-OUT",
+        "limit": 20
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/event/trade/position",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_event_settlements",
+      "method": "GET",
+      "path": "/v5/event/settlements",
+      "signed": true,
+      "kwargs": {
+        "symbol": "ETHUSDT-28AUG26-2450-2570-OUT",
+        "limit": 50
+      },
+      "wire": {
+        "symbol": "ETHUSDT-28AUG26-2450-2570-OUT",
+        "limit": 50
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/event/trade/settlement",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "submit_event_quote",
+      "method": "POST",
+      "path": "/v5/event/quotes",
+      "signed": true,
+      "kwargs": {
+        "order_link_id": "xxxx",
+        "symbol": "ETHUSDT-28AUG26-2450-2570-OUT",
+        "gross_payout_ratio": "0.5",
+        "amount": "100"
+      },
+      "wire": {
+        "orderLinkId": "xxxx",
+        "symbol": "ETHUSDT-28AUG26-2450-2570-OUT",
+        "grossPayoutRatio": "0.5",
+        "amount": "100"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/event/trade/submit-quote",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "request_file_get_file_upload_sign",
+      "method": "POST",
+      "path": "/v5/file/get-file-upload-sign",
+      "signed": true,
+      "kwargs": {
+        "file_type": "fiat-image",
+        "file_md5": "2kKrf8GF2KJkDRtNGMDSXA==",
+        "file_len": 67,
+        "file_name": "test.png",
+        "file_mime_type": "image/png"
+      },
+      "wire": {
+        "fileType": "fiat-image",
+        "fileMd5": "2kKrf8GF2KJkDRtNGMDSXA==",
+        "fileLen": 67,
+        "fileName": "test.png",
+        "fileMimeType": "image/png"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/file/file-upload-sign",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "request_file_report_file_upload",
+      "method": "POST",
+      "path": "/v5/file/report-file-upload",
+      "signed": true,
+      "kwargs": {
+        "resource_id": "f1e8a33e-67cb-4683-803f-bb61238e435c"
+      },
+      "wire": {
+        "resourceId": "f1e8a33e-67cb-4683-803f-bb61238e435c"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/file/report-file-upload",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_earn_pwm_asset_manager_all_funds",
+      "method": "GET",
+      "path": "/v5/earn/pwm/asset-manager/all-funds",
+      "signed": true,
+      "kwargs": {},
+      "wire": {},
+      "source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/asset-manager/all-funds",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_earn_pwm_asset_manager_all_order",
+      "method": "GET",
+      "path": "/v5/earn/pwm/asset-manager/all-order",
+      "signed": true,
+      "kwargs": {
+        "fund_id": "100001",
+        "limit": 20
+      },
+      "wire": {
+        "fundId": "100001",
+        "limit": 20
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/asset-manager/all-order",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "request_earn_pwm_asset_manager_create_fund",
+      "method": "POST",
+      "path": "/v5/earn/pwm/asset-manager/create-fund",
+      "signed": true,
+      "kwargs": {
+        "fund_name": "BTC Alpha Fund",
+        "coin": "BTC",
+        "profit_share_rate": "20.00",
+        "management_fee_rate": "2.00",
+        "req_link_id": "create-fund-001"
+      },
+      "wire": {
+        "fundName": "BTC Alpha Fund",
+        "coin": "BTC",
+        "profitShareRate": "20.00",
+        "managementFeeRate": "2.00",
+        "reqLinkId": "create-fund-001"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/asset-manager/create-fund",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "request_earn_pwm_asset_manager_create_investment_plan",
+      "method": "POST",
+      "path": "/v5/earn/pwm/asset-manager/create-investment-plan",
+      "signed": true,
+      "kwargs": {
+        "account_uid": "800001",
+        "plan_name": "Conservative Growth Plan",
+        "plan_type": "stable",
+        "investment_distribution": [
+          {
+            "productId": "12345",
+            "amount": "100000.00"
+          }
+        ],
+        "req_link_id": "create-plan-001"
+      },
+      "wire": {
+        "accountUid": "800001",
+        "planName": "Conservative Growth Plan",
+        "planType": "stable",
+        "investmentDistribution": [
+          {
+            "productId": "12345",
+            "amount": "100000.00"
+          }
+        ],
+        "reqLinkId": "create-plan-001"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/asset-manager/create-investment-plan",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "request_earn_pwm_asset_manager_create_sub_account",
+      "method": "POST",
+      "path": "/v5/earn/pwm/asset-manager/create-sub-account",
+      "signed": true,
+      "kwargs": {
+        "fund_id": "100001",
+        "req_link_id": "create-sub-001"
+      },
+      "wire": {
+        "fundId": "100001",
+        "reqLinkId": "create-sub-001"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/asset-manager/create-sub-account",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_earn_pwm_asset_manager_get_investment_plan",
+      "method": "GET",
+      "path": "/v5/earn/pwm/asset-manager/get-investment-plan",
+      "signed": true,
+      "kwargs": {},
+      "wire": {},
+      "source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/asset-manager/get-investment-plan",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "request_earn_pwm_asset_manager_manage_investment_plan",
+      "method": "POST",
+      "path": "/v5/earn/pwm/asset-manager/manage-investment-plan",
+      "signed": true,
+      "kwargs": {
+        "plan_id": "10088",
+        "update_status": "Closed",
+        "update_funds": [
+          {
+            "fundId": "430",
+            "amount": "100000"
+          },
+          {
+            "fundId": "2005",
+            "amount": "270000"
+          }
+        ],
+        "req_link_id": "manage-plan-001"
+      },
+      "wire": {
+        "planId": "10088",
+        "updateStatus": "Closed",
+        "updateFunds": [
+          {
+            "fundId": "430",
+            "amount": "100000"
+          },
+          {
+            "fundId": "2005",
+            "amount": "270000"
+          }
+        ],
+        "reqLinkId": "manage-plan-001"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/asset-manager/manage-investment-plan",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "request_earn_pwm_asset_manager_manage_order",
+      "method": "POST",
+      "path": "/v5/earn/pwm/asset-manager/manage-order",
+      "signed": true,
+      "kwargs": {
+        "order_id": "500002",
+        "action": "approve",
+        "req_link_id": "manage-order-001"
+      },
+      "wire": {
+        "orderId": "500002",
+        "action": "approve",
+        "reqLinkId": "manage-order-001"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/asset-manager/manage-order",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "request_earn_pwm_asset_manager_settle_profit",
+      "method": "POST",
+      "path": "/v5/earn/pwm/asset-manager/settle-profit",
+      "signed": true,
+      "kwargs": {
+        "fund_id": "12323",
+        "req_link_id": "settle-001"
+      },
+      "wire": {
+        "fundId": "12323",
+        "reqLinkId": "settle-001"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/asset-manager/settle-profit",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "create_earn_pwm_customize_plan",
+      "method": "POST",
+      "path": "/v5/earn/pwm/customize-plan/create",
+      "signed": true,
+      "kwargs": {
+        "account_type": "FUND",
+        "products": [
+          {
+            "category": "equityFund",
+            "productId": "2001",
+            "fundName": "Market Neutral Alpha",
+            "amount": "100000.00"
+          },
+          {
+            "category": "multiCoinEarning",
+            "productId": "430",
+            "fundName": "",
+            "amount": "50000.00"
+          }
+        ]
+      },
+      "wire": {
+        "accountType": "FUND",
+        "products": [
+          {
+            "category": "equityFund",
+            "productId": "2001",
+            "fundName": "Market Neutral Alpha",
+            "amount": "100000.00"
+          },
+          {
+            "category": "multiCoinEarning",
+            "productId": "430",
+            "fundName": "",
+            "amount": "50000.00"
+          }
+        ]
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/customize-plan/create",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_earn_pwm_customize_plan_product",
+      "method": "GET",
+      "path": "/v5/earn/pwm/customize-plan/product",
+      "signed": false,
+      "kwargs": {},
+      "wire": {},
+      "source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/customize-plan/product",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "request_earn_pwm_fund_transfer",
+      "method": "POST",
+      "path": "/v5/earn/pwm/fund-transfer",
+      "signed": true,
+      "kwargs": {
+        "transfer_id": "4fdf-re-4343-frewr",
+        "from_user_id": 800001,
+        "to_user_id": 800002,
+        "amount": "1.00",
+        "coin": "BTC"
+      },
+      "wire": {
+        "transferId": "4fdf-re-4343-frewr",
+        "fromUserId": 800001,
+        "toUserId": 800002,
+        "amount": "1.00",
+        "coin": "BTC"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/fund-transfer",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_earn_pwm_investment_plan_all",
+      "method": "GET",
+      "path": "/v5/earn/pwm/investment-plan/all",
+      "signed": true,
+      "kwargs": {},
+      "wire": {},
+      "source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/investment-plan/all",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_earn_pwm_investment_plan_asset_trend",
+      "method": "GET",
+      "path": "/v5/earn/pwm/investment-plan/asset-trend",
+      "signed": true,
+      "kwargs": {
+        "plan_id": "10001"
+      },
+      "wire": {
+        "planId": "10001"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/investment-plan/asset-trend",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "claim_earn_pwm_investment_plan",
+      "method": "POST",
+      "path": "/v5/earn/pwm/investment-plan/claim",
+      "signed": true,
+      "kwargs": {
+        "plan_id": "10001",
+        "to_account_type": "FUND",
+        "order_link_id": "claim-order-001"
+      },
+      "wire": {
+        "planId": "10001",
+        "toAccountType": "FUND",
+        "orderLinkId": "claim-order-001"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/investment-plan/claim",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_earn_pwm_investment_plan_detail",
+      "method": "GET",
+      "path": "/v5/earn/pwm/investment-plan/detail",
+      "signed": true,
+      "kwargs": {
+        "plan_id": "10001"
+      },
+      "wire": {
+        "planId": "10001"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/investment-plan/detail",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_earn_pwm_investment_plan_fund_nav",
+      "method": "GET",
+      "path": "/v5/earn/pwm/investment-plan/fund-nav",
+      "signed": true,
+      "kwargs": {
+        "fund_id": "2001"
+      },
+      "wire": {
+        "fundId": "2001"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/investment-plan/fund-nav",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "request_earn_pwm_investment_plan_invest_more",
+      "method": "POST",
+      "path": "/v5/earn/pwm/investment-plan/invest-more",
+      "signed": true,
+      "kwargs": {
+        "plan_id": "10001",
+        "account_type": "FUND",
+        "category": "equityFund",
+        "product_id": "2001",
+        "amount": "20000.00",
+        "order_link_id": "xxx"
+      },
+      "wire": {
+        "planId": "10001",
+        "accountType": "FUND",
+        "category": "equityFund",
+        "productId": "2001",
+        "amount": "20000.00",
+        "orderLinkId": "xxx"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/investment-plan/invest-more",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_earn_pwm_investment_plan_new_plan",
+      "method": "GET",
+      "path": "/v5/earn/pwm/investment-plan/new-plan",
+      "signed": true,
+      "kwargs": {
+        "plan_id": "10003"
+      },
+      "wire": {
+        "planId": "10003"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/investment-plan/new-plan",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_earn_pwm_investment_plan_order",
+      "method": "GET",
+      "path": "/v5/earn/pwm/investment-plan/order",
+      "signed": true,
+      "kwargs": {
+        "plan_id": "10001",
+        "limit": 20
+      },
+      "wire": {
+        "planId": "10001",
+        "limit": 20
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/investment-plan/order",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "redeem_earn_pwm_investment_plan",
+      "method": "POST",
+      "path": "/v5/earn/pwm/investment-plan/redeem",
+      "signed": true,
+      "kwargs": {
+        "plan_id": "10001",
+        "category": "equityFund",
+        "product_id": "2001",
+        "shares": "3000",
+        "order_link_id": "xxx"
+      },
+      "wire": {
+        "planId": "10001",
+        "category": "equityFund",
+        "productId": "2001",
+        "shares": "3000",
+        "orderLinkId": "xxx"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/investment-plan/redeem",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "subscribe_earn_pwm_investment_plan",
+      "method": "POST",
+      "path": "/v5/earn/pwm/investment-plan/subscribe",
+      "signed": true,
+      "kwargs": {
+        "plan_id": "10001",
+        "account_type": "FUND",
+        "order_link_id": "xxx"
+      },
+      "wire": {
+        "planId": "10001",
+        "accountType": "FUND",
+        "orderLinkId": "xxx"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/investment-plan/subscribe",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_earn_pwm_query_fund_transfer_result",
+      "method": "GET",
+      "path": "/v5/earn/pwm/query-fund-transfer-result",
+      "signed": true,
+      "kwargs": {
+        "transfer_id": "4fdf-re-4343-frewr"
+      },
+      "wire": {
+        "transferId": "4fdf-re-4343-frewr"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/query-fund-transfer-result",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_ins_ip_changelog",
+      "method": "GET",
+      "path": "/v5/ins/ip/changelog",
+      "signed": true,
+      "kwargs": {
+        "limit": 3
+      },
+      "wire": {
+        "limit": 3
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/institution/ip-changelog",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_ins_whitelist_ip",
+      "method": "GET",
+      "path": "/v5/ins/whitelist/ip",
+      "signed": true,
+      "kwargs": {},
+      "wire": {},
+      "source": "https://bybit-exchange.github.io/docs/v5/institution/whitelist-ip",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_spot_lever_token_info",
+      "method": "GET",
+      "path": "/v5/spot-lever-token/info",
+      "signed": false,
+      "kwargs": {
+        "lt_coin": "BTC3L"
+      },
+      "wire": {
+        "ltCoin": "BTC3L"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/lt/leverage-token-info",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "request_ins_loan_association_uid",
+      "method": "POST",
+      "path": "/v5/ins-loan/association-uid",
+      "signed": true,
+      "kwargs": {
+        "uid": "592324",
+        "operate": "0"
+      },
+      "wire": {
+        "uid": "592324",
+        "operate": "0"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/otc/bind-uid",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_ins_loan_coin_delta_amount",
+      "method": "GET",
+      "path": "/v5/ins-loan/coin-delta-amount",
+      "signed": true,
+      "kwargs": {
+        "coin": "BTC"
+      },
+      "wire": {
+        "coin": "BTC"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/otc/coin-delta-amount",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_ins_loan_delay_liq_status",
+      "method": "GET",
+      "path": "/v5/ins-loan/delay-liq-status",
+      "signed": true,
+      "kwargs": {},
+      "wire": {},
+      "source": "https://bybit-exchange.github.io/docs/v5/otc/delay-liq-status",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_ins_loan_loan_order",
+      "method": "GET",
+      "path": "/v5/ins-loan/loan-order",
+      "signed": true,
+      "kwargs": {},
+      "wire": {},
+      "source": "https://bybit-exchange.github.io/docs/v5/otc/loan-info",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_ins_loan_ltv_convert",
+      "method": "GET",
+      "path": "/v5/ins-loan/ltv-convert",
+      "signed": true,
+      "kwargs": {},
+      "wire": {},
+      "source": "https://bybit-exchange.github.io/docs/v5/otc/ltv-convert",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_ins_loan_ensure_tokens_convert",
+      "method": "GET",
+      "path": "/v5/ins-loan/ensure-tokens-convert",
+      "signed": false,
+      "kwargs": {},
+      "wire": {},
+      "source": "https://bybit-exchange.github.io/docs/v5/otc/margin-coin-convert-info",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_ins_loan_product_infos",
+      "method": "GET",
+      "path": "/v5/ins-loan/product-infos",
+      "signed": false,
+      "kwargs": {
+        "product_id": "91"
+      },
+      "wire": {
+        "productId": "91"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/otc/margin-product-info",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_ins_loan_repaid_history",
+      "method": "GET",
+      "path": "/v5/ins-loan/repaid-history",
+      "signed": true,
+      "kwargs": {},
+      "wire": {},
+      "source": "https://bybit-exchange.github.io/docs/v5/otc/repay-info",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "request_ins_loan_repay_loan",
+      "method": "POST",
+      "path": "/v5/ins-loan/repay-loan",
+      "signed": true,
+      "kwargs": {
+        "token": "USDT",
+        "quantity": "500000"
+      },
+      "wire": {
+        "token": "USDT",
+        "quantity": "500000"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/otc/repay",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "cancel_stock_order",
+      "method": "POST",
+      "path": "/v5/rwa/stocks/order/cancel",
+      "signed": true,
+      "kwargs": {
+        "order_no": "SB227696733955111526412"
+      },
+      "wire": {
+        "orderNo": "SB227696733955111526412"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/stocks/cancel-order",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_rwa_stocks_convert_detail",
+      "method": "GET",
+      "path": "/v5/rwa/stocks/convert/detail",
+      "signed": true,
+      "kwargs": {
+        "order_no": "CVT1755590600987654321"
+      },
+      "wire": {
+        "orderNo": "CVT1755590600987654321"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/stocks/convert-detail",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_rwa_stocks_convert_list",
+      "method": "GET",
+      "path": "/v5/rwa/stocks/convert/list",
+      "signed": true,
+      "kwargs": {},
+      "wire": {},
+      "source": "https://bybit-exchange.github.io/docs/v5/stocks/convert-list",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "submit_rwa_stocks_convert",
+      "method": "POST",
+      "path": "/v5/rwa/stocks/convert/submit",
+      "signed": true,
+      "kwargs": {
+        "convert_type": "MINT",
+        "symbol": "TSLA-US",
+        "input_amount": "1",
+        "front_multiplier": "1",
+        "request_id": "mm-cvt-20260825-0001",
+        "flow": "CEX"
+      },
+      "wire": {
+        "convertType": "MINT",
+        "symbol": "TSLA-US",
+        "inputAmount": "1",
+        "frontMultiplier": "1",
+        "requestId": "mm-cvt-20260825-0001",
+        "flow": "CEX"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/stocks/convert-submit",
+      "note": "Official HTTP example with the missing documented required flow added."
+    },
+    {
+      "name": "get_rwa_stocks_market_session",
+      "method": "GET",
+      "path": "/v5/rwa/stocks/market/session",
+      "signed": true,
+      "kwargs": {
+        "symbol": "TSLA-US"
+      },
+      "wire": {
+        "symbol": "TSLA-US"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/stocks/market-session",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_rwa_stocks_market_get_multiplier_list",
+      "method": "GET",
+      "path": "/v5/rwa/stocks/market/getMultiplierList",
+      "signed": true,
+      "kwargs": {
+        "current": 1,
+        "page_size": 10
+      },
+      "wire": {
+        "current": 1,
+        "pageSize": 10
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/stocks/multiplier-list",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_rwa_stocks_order_detail",
+      "method": "GET",
+      "path": "/v5/rwa/stocks/order/detail",
+      "signed": true,
+      "kwargs": {
+        "order_no": "SB227696733955111526412"
+      },
+      "wire": {
+        "orderNo": "SB227696733955111526412"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/stocks/order-detail",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "place_stock_order",
+      "method": "POST",
+      "path": "/v5/rwa/stocks/order",
+      "signed": true,
+      "kwargs": {
+        "symbol": "TSLA-US",
+        "quote_token": "USDC",
+        "side": "BUY",
+        "order_type": "LIMIT",
+        "qty": "2",
+        "limit_price": "300.00",
+        "time_in_force": "DAY",
+        "trading_session": "RTH",
+        "order_time": 1787656687706,
+        "request_id": "mm-ord-20260819-0007"
+      },
+      "wire": {
+        "symbol": "TSLA-US",
+        "quoteToken": "USDC",
+        "side": "BUY",
+        "type": "LIMIT",
+        "qty": "2",
+        "limitPrice": "300.00",
+        "timeInForce": "DAY",
+        "tradingSession": "RTH",
+        "orderTime": 1787656687706,
+        "requestId": "mm-ord-20260819-0007"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/stocks/place-order",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_rwa_stocks_positions",
+      "method": "GET",
+      "path": "/v5/rwa/stocks/positions",
+      "signed": true,
+      "kwargs": {
+        "show_zero": false
+      },
+      "wire": {
+        "showZero": false
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/stocks/positions",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "commit_compliance_appeal",
+      "method": "POST",
+      "path": "/v5/compliance/appeal/commit",
+      "signed": true,
+      "kwargs": {
+        "appeal_id": "01K599X8PGM0HYJCWFR6CSN3ZD",
+        "decision_type": 0,
+        "items_data": [
+          {
+            "documentCode": "OnchainAttachScreenshot",
+            "resources": [
+              {
+                "resourceId": "1234567890",
+                "fileType": "fiat-image"
+              }
+            ]
+          },
+          {
+            "documentCode": "OnchainWithdrawPurpose",
+            "content": "investment"
+          },
+          {
+            "documentCode": "OnchainTransactionDescription",
+            "content": "Regular withdrawal to my personal cold wallet for long-term holding."
+          }
+        ]
+      },
+      "wire": {
+        "appealId": "01K599X8PGM0HYJCWFR6CSN3ZD",
+        "decisionType": 0,
+        "itemsData": [
+          {
+            "documentCode": "OnchainAttachScreenshot",
+            "resources": [
+              {
+                "resourceId": "1234567890",
+                "fileType": "fiat-image"
+              }
+            ]
+          },
+          {
+            "documentCode": "OnchainWithdrawPurpose",
+            "content": "investment"
+          },
+          {
+            "documentCode": "OnchainTransactionDescription",
+            "content": "Regular withdrawal to my personal cold wallet for long-term holding."
+          }
+        ]
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/tm-onchain/appeal-commit",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_compliance_appeal_detail",
+      "method": "GET",
+      "path": "/v5/compliance/appeal/detail",
+      "signed": true,
+      "kwargs": {
+        "appeal_id": "01K599X8PGM0HYJCWFR6CSN3ZD"
+      },
+      "wire": {
+        "appealId": "01K599X8PGM0HYJCWFR6CSN3ZD"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/tm-onchain/appeal-detail",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_compliance_appeal_list",
+      "method": "GET",
+      "path": "/v5/compliance/appeal/list",
+      "signed": true,
+      "kwargs": {
+        "appeal_types": "TM_Onchain",
+        "page": 1,
+        "page_size": 20
+      },
+      "wire": {
+        "appealTypes": "TM_Onchain",
+        "page": 1,
+        "pageSize": 20
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/tm-onchain/appeal-list",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_user_invitation_referrals",
+      "method": "GET",
+      "path": "/v5/user/invitation/referrals",
+      "signed": true,
+      "kwargs": {
+        "status": "0",
+        "size": "5",
+        "cursor": "6867"
+      },
+      "wire": {
+        "status": "0",
+        "size": "5",
+        "cursor": "6867"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/user/friend-referral",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_user_escrow_sub_members",
+      "method": "GET",
+      "path": "/v5/user/escrow_sub_members",
+      "signed": true,
+      "kwargs": {
+        "page_size": "2"
+      },
+      "wire": {
+        "pageSize": "2"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/user/fund-subuid-list",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_user_invitation_code",
+      "method": "GET",
+      "path": "/v5/user/invitation/code",
+      "signed": true,
+      "kwargs": {},
+      "wire": {},
+      "source": "https://bybit-exchange.github.io/docs/v5/user/referral-code",
+      "note": "Official HTTP request example."
+    }
+  ]
+}

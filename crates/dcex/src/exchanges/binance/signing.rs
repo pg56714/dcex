@@ -20,6 +20,14 @@ impl RequestSigner for BinanceSigner {
         let timestamp_ms = self.adjust_timestamp(timestamp_ms)?;
         let params = match &mut request.body {
             RequestBody::Empty => &mut request.query,
+            RequestBody::Json(_)
+                if matches!(
+                    request.path.as_str(),
+                    "/sapi/v1/fiat/deposit" | "/sapi/v2/fiat/withdraw"
+                ) =>
+            {
+                &mut request.query
+            }
             RequestBody::Form(params) => params,
             _ => {
                 return Err(DcexError::InvalidInput(
@@ -60,34 +68,36 @@ pub(super) struct BinanceResponseValidator;
 impl ResponseValidator for BinanceResponseValidator {
     fn validate(&self, response: &HttpResponse) -> Result<Value> {
         let data = response.json()?;
-        if let Some(object) = data.as_object() {
-            if let Some(code) = object.get("code") {
-                if json_value_string(code) != "200" {
-                    let message = object
-                        .get("msg")
-                        .and_then(Value::as_str)
-                        .unwrap_or("Unknown error");
-                    return Err(DcexError::HttpStatus {
-                        status: response.status,
-                        message: if object.get("data").is_some_and(|v| {
-                            v.get("cancelResult").is_some() || v.get("newOrderResult").is_some()
-                        }) {
-                            format!(
-                                "BINANCE API Error: [{}] {message}; outcomes: {}",
-                                json_value_string(code),
-                                object["data"]
-                            )
-                        } else {
-                            format!("BINANCE API Error: [{}] {message}", json_value_string(code))
-                        },
-                        headers: response
-                            .headers
-                            .iter()
-                            .map(|(key, value)| (key.clone(), value.clone()))
-                            .collect(),
-                    });
-                }
+        if let Some(object) = data.as_object()
+            && let Some(code) = object.get("code")
+            && json_value_string(code) != "200"
+        {
+            let message = object
+                .get("msg")
+                .and_then(Value::as_str)
+                .unwrap_or("Unknown error");
+            let message = format!("BINANCE API Error: [{}] {message}", json_value_string(code));
+            let headers = response
+                .headers
+                .iter()
+                .map(|(k, v)| (k.clone(), v.clone()))
+                .collect();
+            if let Some(outcomes) = object
+                .get("data")
+                .filter(|v| v.get("cancelResult").is_some() || v.get("newOrderResult").is_some())
+            {
+                return Err(DcexError::ExchangeResponse {
+                    status: response.status,
+                    message,
+                    headers,
+                    data: outcomes.clone(),
+                });
             }
+            return Err(DcexError::HttpStatus {
+                status: response.status,
+                message,
+                headers,
+            });
         }
         response.ensure_success()?;
         Ok(data)
@@ -129,18 +139,17 @@ mod partial_order_tests {
         let outcomes = serde_json::json!({"cancelResult":"SUCCESS","newOrderResult":"FAILURE","cancelResponse":{"orderId":123,"status":"CANCELED"},"newOrderResponse":{"code":-2010,"msg":"insufficient balance"}});
         let response=HttpResponse{status:409,headers:std::collections::BTreeMap::from([("x-mbx-used-weight-1m".into(),"12".into())]),body:serde_json::to_vec(&serde_json::json!({"code":-2021,"msg":"Order cancel-replace partially failed.","data":outcomes})).unwrap()};
         let error = BinanceResponseValidator.validate(&response).unwrap_err();
-        let DcexError::HttpStatus {
+        let DcexError::ExchangeResponse {
             status,
-            message,
             headers,
+            data,
+            ..
         } = error
         else {
             panic!("expected exchange error");
         };
         assert_eq!(status, 409);
-        let retained: Value =
-            serde_json::from_str(message.split_once("; outcomes: ").unwrap().1).unwrap();
-        assert_eq!(retained, outcomes);
+        assert_eq!(data, outcomes);
         assert!(
             headers
                 .iter()

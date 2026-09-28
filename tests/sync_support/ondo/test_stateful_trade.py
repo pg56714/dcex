@@ -2,7 +2,7 @@
 
 import os
 import time
-from decimal import Decimal, ROUND_CEILING
+from decimal import ROUND_CEILING, Decimal
 from uuid import uuid4
 
 import pytest

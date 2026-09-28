@@ -1,5 +1,7 @@
 mod account;
 mod client;
+mod completion;
+mod completion_wrappers;
 mod earn;
 mod endpoints;
 mod market;
@@ -15,7 +17,9 @@ mod wrappers;
 mod tests;
 
 pub use client::{KrakenAuth, KrakenClient};
-pub use websocket::{KrakenFuturesWebSocket, KrakenPrivateWebSocket, KrakenPublicWebSocket};
+pub use websocket::{
+    KrakenFuturesWebSocket, KrakenPrivateWebSocket, KrakenPublicWebSocket, KrakenV1WebSocket,
+};
 
 mod risk;
 mod risk_endpoints;

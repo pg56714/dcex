@@ -82,23 +82,23 @@ fn require_strategy_amount(params: &KrakenParams) -> Result<()> {
 }
 
 fn validate_optional_bool(params: &KrakenParams, key: &str) -> Result<()> {
-    if let Some(value) = params.get(key) {
-        if !matches!(value, "true" | "false") {
-            return Err(DcexError::InvalidInput(format!(
-                "{key} must be true or false"
-            )));
-        }
+    if let Some(value) = params.get(key)
+        && !matches!(value, "true" | "false")
+    {
+        return Err(DcexError::InvalidInput(format!(
+            "{key} must be true or false"
+        )));
     }
     Ok(())
 }
 
 fn validate_optional_limit(params: &KrakenParams) -> Result<()> {
-    if let Some(value) = params.get("limit") {
-        if value.parse::<u16>().is_err() {
-            return Err(DcexError::InvalidInput(
-                "limit must be an unsigned 16-bit integer".to_string(),
-            ));
-        }
+    if let Some(value) = params.get("limit")
+        && value.parse::<u16>().is_err()
+    {
+        return Err(DcexError::InvalidInput(
+            "limit must be an unsigned 16-bit integer".to_string(),
+        ));
     }
     Ok(())
 }

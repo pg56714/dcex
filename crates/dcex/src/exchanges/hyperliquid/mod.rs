@@ -1,7 +1,10 @@
 mod account;
 mod asset;
 mod client;
+mod completion;
 mod endpoints;
+mod inventory_completion;
+mod inventory_wrappers;
 mod market;
 mod msgpack;
 mod params;

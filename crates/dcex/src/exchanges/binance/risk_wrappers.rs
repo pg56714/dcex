@@ -27,6 +27,11 @@ get_spot_book_ticker(),
 get_spot_delist_schedule(),
 get_system_status(),
 ]; private [
+place_spot_sor_order(symbol => "symbol", side => "side", order_type => "type", quantity => "quantity"),
+test_spot_sor_order(symbol => "symbol", side => "side", order_type => "type", quantity => "quantity"),
+sign_futures_tradfi_perps_contract(),
+liquidate_margin_account(kind_type => "type"),
+
 place_margin_oco(product_symbol => "product_symbol",side => "side",quantity => "quantity",price => "price",stop_price => "stopPrice"),
 place_margin_oto(product_symbol => "product_symbol",working_type => "workingType",working_side => "workingSide",working_price => "workingPrice",working_quantity => "workingQuantity",working_iceberg_qty => "workingIcebergQty",pending_type => "pendingType",pending_side => "pendingSide",pending_quantity => "pendingQuantity"),
 place_margin_otoco(product_symbol => "product_symbol",working_type => "workingType",working_side => "workingSide",working_price => "workingPrice",working_quantity => "workingQuantity",pending_side => "pendingSide",pending_quantity => "pendingQuantity",pending_above_type => "pendingAboveType"),
@@ -322,3 +327,17 @@ transfer_ldusdt_rwusd_for_portfolio_margin(asset => "asset",transfer_type => "tr
 crate::exchanges::impl_exchange_method_wrappers! {@extend;BinanceClient;public [];private [enable_isolated_margin_account(symbol => "symbol")];}
 
 crate::exchanges::impl_exchange_method_wrappers! {@extend;BinanceClient;public [];private [disable_isolated_margin_account(symbol => "symbol")];}
+
+crate::exchanges::impl_exchange_method_wrappers! {
+    @extend;
+    BinanceClient;
+    public [];
+    private [
+        get_options_cancel_countdown(),
+        set_options_cancel_countdown(underlying => "underlying", countdown_time => "countdownTime"),
+        send_options_cancel_heartbeat(underlyings => "underlyings"),
+        get_options_mmp_config(underlying => "underlying"),
+        reset_options_mmp(underlying => "underlying"),
+        set_options_mmp_config(underlying => "underlying", window_time => "windowTimeInMilliseconds", frozen_time => "frozenTimeInMilliseconds", qty_limit => "qtyLimit", delta_limit => "deltaLimit"),
+    ];
+}

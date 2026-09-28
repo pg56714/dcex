@@ -4,6 +4,27 @@ use crate::exchange::ValidatedResponse;
 use crate::http::HttpMethod;
 use crate::{DcexError, Result};
 use serde_json::Value;
+use std::collections::HashMap;
+use std::sync::{Arc, Mutex, OnceLock};
+
+static SCHEMAS: OnceLock<Mutex<HashMap<&'static str, Arc<Value>>>> = OnceLock::new();
+
+fn cached_schema(raw: &'static str) -> Result<Arc<Value>> {
+    let mut schemas = SCHEMAS
+        .get_or_init(|| Mutex::new(HashMap::new()))
+        .lock()
+        .map_err(|_| invalid("schema cache lock poisoned"))?;
+    if let Some(schema) = schemas.get(raw) {
+        return Ok(Arc::clone(schema));
+    }
+    let schema = Arc::new(
+        serde_json::from_str(raw).map_err(|error| invalid(&format!("invalid schema: {error}")))?,
+    );
+    schemas.insert(raw, Arc::clone(&schema));
+    Ok(schema)
+}
+#[path = "completion_endpoints.rs"]
+mod completion_endpoints;
 #[path = "risk_endpoints.rs"]
 mod endpoints;
 struct RiskEndpoint {
@@ -22,17 +43,14 @@ impl OkxClient {
         p: &OkxParams,
         public: bool,
     ) -> Result<Option<ValidatedResponse>> {
-        let Some(e) = endpoints::endpoint(name) else {
+        let Some(e) = endpoints::endpoint(name).or_else(|| completion_endpoints::endpoint(name))
+        else {
             return Ok(None);
         };
         if public != e.public {
             return Ok(None);
         }
-        let schema = e
-            .schema
-            .map(serde_json::from_str::<Value>)
-            .transpose()
-            .map_err(|error| invalid(&error.to_string()))?;
+        let schema = e.schema.map(cached_schema).transpose()?;
         let pairs = p.without(&[]);
         let mut seen = std::collections::HashSet::new();
         for (key, value) in &pairs {
@@ -189,19 +207,20 @@ fn validate_additional(name: &str, p: &OkxParams, schema: &Value) -> Result<()> 
         data.insert(key, value);
     }
     let data = Value::Object(data);
-    for key in ["lever"] {
+    {
+        let key = "lever";
         positive(p, key)?;
     }
     enumeration(p, "acctLv", &["3", "4"])?;
     enumeration(p, "greeksType", &["BS", "PA", "CASH"])?;
-    if let Some(value) = p.get("idxVol") {
-        if !value.parse::<f64>().is_ok_and(|n| {
+    if let Some(value) = p.get("idxVol")
+        && !value.parse::<f64>().is_ok_and(|n| {
             n.is_finite()
                 && (-0.99..=1.0).contains(&n)
                 && ((n * 100.0).round() - n * 100.0).abs() < 1e-9
-        }) {
-            return Err(invalid("idxVol must be -0.99..1 in 0.01 steps"));
-        }
+        })
+    {
+        return Err(invalid("idxVol must be -0.99..1 in 0.01 steps"));
     }
     for key in ["simPos", "simAsset"] {
         if let Some(items) = data[key].as_array() {
@@ -211,16 +230,13 @@ fn validate_additional(name: &str, p: &OkxParams, schema: &Value) -> Result<()> 
                 } else {
                     &["amt"][..]
                 } {
-                    if let Some(value) = item.get(field) {
-                        if !value
+                    if let Some(value) = item.get(field)
+                        && !value
                             .as_str()
                             .and_then(|v| v.parse::<f64>().ok())
                             .is_some_and(f64::is_finite)
-                        {
-                            return Err(invalid(
-                                "simulated amounts must be finite decimal strings",
-                            ));
-                        }
+                    {
+                        return Err(invalid("simulated amounts must be finite decimal strings"));
                     }
                 }
             }
@@ -368,13 +384,12 @@ fn validate_additional(name: &str, p: &OkxParams, schema: &Value) -> Result<()> 
         }
         "create_sub_account" => enumeration(p, "type", &["1"])?,
         "create_sub_account_api_key" | "modify_sub_account_api_key" => {
-            if let Some(permissions) = p.get("perm") {
-                if permissions
+            if let Some(permissions) = p.get("perm")
+                && permissions
                     .split(',')
                     .any(|v| !matches!(v, "read_only" | "trade"))
-                {
-                    return Err(invalid("invalid API key permission"));
-                }
+            {
+                return Err(invalid("invalid API key permission"));
             }
             if let Some(ips) = p.get("ip") {
                 list_limit(ips, 20)?;
@@ -415,6 +430,16 @@ fn validate_additional(name: &str, p: &OkxParams, schema: &Value) -> Result<()> 
 }
 
 fn validate(name: &str, p: &OkxParams) -> Result<()> {
+    validate_completion(name, p)?;
+    if name == "trading_bot_grid_close_position"
+        && matches!(p.get("mktClose"), Some("false" | "False"))
+    {
+        p.required("sz")?;
+        p.required("px")?;
+    }
+    if name == "trading_bot_signal_sub_order" && p.get("ordType") == Some("limit") {
+        p.required("px")?;
+    }
     if let Some(limit) = p.get("limit") {
         let max = if name == "get_candles_history" {
             300
@@ -461,10 +486,10 @@ fn validate(name: &str, p: &OkxParams) -> Result<()> {
             enumeration(p, "ordType", &["market", "limit", "post_only", "ioc"])?;
             enumeration(p, "state", &["canceled", "filled"])?;
             enumeration(p, "instType", &["SPOT", "FUTURES", "SWAP"])?;
-            if let (Some(begin), Some(end)) = (p.get("begin"), p.get("end")) {
-                if begin.parse::<u64>().ok() > end.parse::<u64>().ok() {
-                    return Err(invalid("begin must not exceed end"));
-                }
+            if let (Some(begin), Some(end)) = (p.get("begin"), p.get("end"))
+                && begin.parse::<u64>().ok() > end.parse::<u64>().ok()
+            {
+                return Err(invalid("begin must not exceed end"));
             }
         }
         "set_isolated_mode" => {
@@ -485,10 +510,10 @@ fn validate(name: &str, p: &OkxParams) -> Result<()> {
             }
         }
         "get_full_orderbook" => {
-            if let Some(v) = p.get("sz") {
-                if !v.parse::<u64>().is_ok_and(|v| (1..=5000).contains(&v)) {
-                    return Err(invalid("book depth must be 1..=5000"));
-                }
+            if let Some(v) = p.get("sz")
+                && !v.parse::<u64>().is_ok_and(|v| (1..=5000).contains(&v))
+            {
+                return Err(invalid("book depth must be 1..=5000"));
             }
         }
         "get_trades_history" => {
@@ -502,10 +527,10 @@ fn validate(name: &str, p: &OkxParams) -> Result<()> {
             any(p, &["ordId", "clOrdId"])?;
             any(p, &["newSz", "newPx"])?;
             positive(p, "newSz")?;
-            if let Some(price) = p.get("newPx") {
-                if !price.parse::<f64>().is_ok_and(f64::is_finite) {
-                    return Err(invalid("spread price must be a finite decimal"));
-                }
+            if let Some(price) = p.get("newPx")
+                && !price.parse::<f64>().is_ok_and(f64::is_finite)
+            {
+                return Err(invalid("spread price must be a finite decimal"));
             }
         }
         "convert_contract_coin" => {
@@ -545,12 +570,12 @@ fn validate(name: &str, p: &OkxParams) -> Result<()> {
     }
     enumeration(p, "convertMode", &["0", "1"])?;
     for key in ["reqId", "clQReqId", "clTReqId"] {
-        if let Some(v) = p.get(key) {
-            if v.len() > 32 || !v.bytes().all(|b| b.is_ascii_alphanumeric()) {
-                return Err(invalid(
-                    "client request ID must be alphanumeric and no longer than 32 characters",
-                ));
-            }
+        if let Some(v) = p.get(key)
+            && (v.len() > 32 || !v.bytes().all(|b| b.is_ascii_alphanumeric()))
+        {
+            return Err(invalid(
+                "client request ID must be alphanumeric and no longer than 32 characters",
+            ));
         }
     }
     for key in ["ccyList", "repayCcyList"] {
@@ -580,6 +605,164 @@ fn validate(name: &str, p: &OkxParams) -> Result<()> {
 fn enumeration(p: &OkxParams, key: &str, values: &[&str]) -> Result<()> {
     if p.get(key).is_some_and(|v| !values.contains(&v)) {
         return Err(invalid(&format!("invalid {key}")));
+    }
+    Ok(())
+}
+
+fn validate_completion(name: &str, p: &OkxParams) -> Result<()> {
+    let integer = |key: &str, maximum: u64| -> Result<()> {
+        if let Some(raw) = p.get(key)
+            && !raw.parse::<u64>().is_ok_and(|n| n <= maximum)
+        {
+            return Err(invalid(&format!(
+                "{key} must be an integer in 0..{maximum}"
+            )));
+        }
+        Ok(())
+    };
+    match name {
+        "reset_mmp" | "mass_cancel_options_orders" => {
+            enumeration(p, "instType", &["OPTION"])?;
+            integer("lockInterval", 10000)?;
+        }
+        "set_mmp_config" => {
+            integer("timeInterval", u64::MAX)?;
+            integer("frozenInterval", u64::MAX)?;
+            if !p
+                .get("qtyLimit")
+                .is_some_and(crate::common::is_positive_plain_decimal)
+            {
+                return Err(invalid("qtyLimit must be a positive plain decimal string"));
+            }
+        }
+        "set_rfq_mmp_config" => {
+            integer("timeInterval", 600000)?;
+            integer("frozenInterval", u64::MAX)?;
+            integer("countLimit", u64::MAX)?;
+        }
+        "set_rfq_cancel_all_after" => {
+            let n = p
+                .required("timeOut")?
+                .parse::<u64>()
+                .map_err(|_| invalid("invalid timeOut"))?;
+            if n != 0 && !(10..=120).contains(&n) {
+                return Err(invalid("timeOut must be 0 or 10..120 seconds"));
+            }
+        }
+        "cancel_rfq_quote" => any(p, &["quoteId", "clQuoteId"])?,
+        "cancel_rfq_batch_quotes" => {
+            any(p, &["quoteIds", "clQuoteIds"])?;
+            for key in ["quoteIds", "clQuoteIds"] {
+                if let Some(raw) = p.get(key) {
+                    let ids: Vec<String> = serde_json::from_str(raw)
+                        .map_err(|_| invalid("quote IDs must be a string array"))?;
+                    if ids.is_empty() || ids.iter().any(|s| s.trim().is_empty()) {
+                        return Err(invalid("quote IDs must not be empty"));
+                    }
+                }
+            }
+        }
+        "create_rfq_quote" => {
+            enumeration(p, "quoteSide", &["buy", "sell"])?;
+            if let Some(raw) = p.get("expiresIn")
+                && !raw.parse::<u64>().is_ok_and(|n| (10..=120).contains(&n))
+            {
+                return Err(invalid("expiresIn must be 10..120 seconds"));
+            }
+            let legs: Value =
+                serde_json::from_str(p.required("legs")?).map_err(|_| invalid("invalid legs"))?;
+            let legs = legs
+                .as_array()
+                .filter(|a| !a.is_empty())
+                .ok_or_else(|| invalid("legs must be a nonempty array"))?;
+            for leg in legs {
+                if !matches!(leg["side"].as_str(), Some("buy" | "sell")) {
+                    return Err(invalid("leg.side must be buy or sell"));
+                }
+                if !leg["sz"]
+                    .as_str()
+                    .is_some_and(crate::common::is_positive_plain_decimal)
+                {
+                    return Err(invalid("leg.sz must be a positive plain decimal string"));
+                }
+            }
+        }
+        "set_rfq_maker_instrument_settings" => {
+            enumeration(p, "instType", &["SPOT", "SWAP", "FUTURES", "OPTION"])?;
+            let items: Value = serde_json::from_str(p.required("data")?)
+                .map_err(|_| invalid("invalid maker settings data"))?;
+            for item in items
+                .as_array()
+                .ok_or_else(|| invalid("data must be an array"))?
+            {
+                let key = if p.get("instType") == Some("SPOT") {
+                    "instId"
+                } else {
+                    "instFamily"
+                };
+                if item[key].as_str().is_none_or(|s| s.trim().is_empty()) {
+                    return Err(invalid(&format!("data item requires {key}")));
+                }
+            }
+        }
+        "create_withdrawal" | "create_fiat_withdrawal" => {
+            let amount = p.required("amt")?;
+            if !crate::common::is_positive_plain_decimal(amount) {
+                return Err(invalid("amt must be a positive plain decimal string"));
+            }
+            if name == "create_fiat_withdrawal" {
+                if amount
+                    .split_once('.')
+                    .is_some_and(|(_, decimal)| decimal.len() > 2)
+                {
+                    return Err(invalid("fiat amt supports at most two decimal places"));
+                }
+                enumeration(
+                    p,
+                    "paymentMethod",
+                    &[
+                        "TR_BANKS", "PIX", "SEPA", "XPULSE", "NPP", "US_WIRE", "SG_FAST",
+                    ],
+                )?;
+            } else {
+                enumeration(p, "dest", &["3", "4"])?;
+                enumeration(p, "toAddrType", &["1", "2"])?;
+                if p.get("toAddrType") == Some("2") && p.get("dest") != Some("3") {
+                    return Err(invalid("toAddrType=2 requires dest=3"));
+                }
+                if let Some(raw) = p.get("rcvrInfo") {
+                    let info: Value =
+                        serde_json::from_str(raw).map_err(|_| invalid("invalid rcvrInfo"))?;
+                    if !matches!(info["walletType"].as_str(), Some("exchange" | "private")) {
+                        return Err(invalid("invalid rcvrInfo.walletType"));
+                    }
+                    if info["walletType"] == "exchange"
+                        && info["exchId"].as_str().is_none_or(|s| s.trim().is_empty())
+                    {
+                        return Err(invalid("exchange wallet requires exchId"));
+                    }
+                }
+            }
+        }
+        "get_glp_historical_performance" => {
+            enumeration(p, "program", &["SPOT", "PERP", "FUT_NTO"])?
+        }
+        "get_mm_instrument_types" => enumeration(p, "instType", &["SPOT", "SWAP"])?,
+        _ => {}
+    }
+    if name.starts_with("get_affiliate_") {
+        if p.get("periodType") == Some("custom") {
+            if name == "get_affiliate_invitee_detail" {
+                return Err(invalid("custom period is unsupported for invitee detail"));
+            }
+            p.required("begin")?;
+            p.required("end")?;
+        }
+        if p.get("joinTimeBegin").is_some() != p.get("joinTimeEnd").is_some() {
+            return Err(invalid(
+                "joinTimeBegin and joinTimeEnd must be provided together",
+            ));
+        }
     }
     Ok(())
 }
@@ -692,5 +875,17 @@ impl OkxClient {
             ));
         }
         Ok(response.body)
+    }
+}
+
+#[cfg(test)]
+mod review_cache_tests {
+    use super::*;
+    #[test]
+    fn schema_is_parsed_once_and_shared_between_requests() {
+        let first = cached_schema(r#"{"type":"object","review_test":true}"#).unwrap();
+        let second = cached_schema(r#"{"type":"object","review_test":true}"#).unwrap();
+        assert!(Arc::ptr_eq(&first, &second));
+        assert!(cached_schema("invalid schema").is_err());
     }
 }

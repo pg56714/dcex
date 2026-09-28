@@ -10,7 +10,27 @@ impl BitgetClient {
         method_name: &str,
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
+        let method_name = match method_name {
+            "convert_classic_asset" => "classic_trade",
+            "convert_uta_small_assets" => "uta_small_assets_trade",
+            "subscribe_classic_elite" => "classic_earn_elite_subscribe",
+            "redeem_classic_elite" => "classic_earn_elite_redeem",
+            "borrow_classic_earn_loan" => "classic_earn_loan_borrow",
+            "repay_classic_earn_loan" => "classic_earn_loan_repay",
+            "delete_uta_subaccount" => "uta_delete_sub",
+            other => other,
+        };
+        let params = super::super::operation_guards::validate("bitget", method_name, params)?;
         let params = BitgetParams::from_pairs(params);
+        if let Some(response) = self.inventory_request(method_name, &params, false).await? {
+            return Ok(response);
+        }
+        if let Some(response) = self
+            .completion_private_request(method_name, &params)
+            .await?
+        {
+            return Ok(response);
+        }
         if let Some(response) = self.batch_controls_request(method_name, &params).await? {
             return Ok(response);
         }

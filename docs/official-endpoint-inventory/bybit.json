@@ -1,0 +1,2944 @@
+{
+  "reviewed": "2026-09-28",
+  "repository": "https://github.com/bybit-exchange/docs",
+  "commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75",
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/v5/lending/account",
+      "title": "Get Lending Account Info",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/abandon/account-info"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/asset/transfer/query-asset-info",
+      "title": "Get Asset Info",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/abandon/asset-info"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/crypto-loan/borrow",
+      "title": "Borrow",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/abandon/borrow"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/lending/redeem-cancel",
+      "title": "Cancel Redeem",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/abandon/cancel-redeem"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/lending/info",
+      "title": "Get Lending Coin Info",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/abandon/coin-info"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/account/contract-transaction-log",
+      "title": "Get Transaction Log",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/abandon/contract-transaction-log"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/position/switch-isolated",
+      "title": "Switch Cross/Isolated Margin",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/abandon/cross-isolate"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/lending/purchase",
+      "title": "Deposit Funds",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/abandon/deposit"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/broker/earning-record",
+      "title": "Get Broker Earning",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/abandon/earning"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/asset/transfer/save-transfer-sub-member",
+      "title": "Enable Universal Transfer for Sub UID",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/abandon/enable-unitransfer-subuid"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/ins-loan/ltv",
+      "title": "Get LTV",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/abandon/ltv"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/ins-loan/ensure-tokens",
+      "title": "Get Margin Coin Info",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/abandon/margin-coin-info"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/lending/history-order",
+      "title": "Get Order Records",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/abandon/order-record"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/lending/redeem",
+      "title": "Redeem Funds",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/abandon/redeem"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/position/set-risk-limit",
+      "title": "Set Risk Limit",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/abandon/set-risk-limit"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/position/set-tpsl-mode",
+      "title": "Set TP/SL Mode",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/abandon/tpsl-mode"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/account/info",
+      "title": "Get Account Info",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/account/account-info"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/account/set-collateral-switch-batch",
+      "title": "Batch Set Collateral Coin",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/account/batch-set-collateral"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/account/borrow-history",
+      "title": "Get Borrow History",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/account/borrow-history"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/account/borrow",
+      "title": "Manual Borrow",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/account/borrow"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/asset/coin-greeks",
+      "title": "Get Coin Greeks",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/account/coin-greeks"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/account/collateral-info",
+      "title": "Get Collateral Info",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/account/collateral-info"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/account/query-dcp-info",
+      "title": "Get DCP Info",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/account/dcp-info"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/account/fee-rate",
+      "title": "Get Fee Rate",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/account/fee-rate"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/account/mmp-state",
+      "title": "Get MMP State",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/account/get-mmp-state"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/account/user-setting-config",
+      "title": "Get Trade Behaviour Config",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/account/get-user-setting-config"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/account/instruments-info",
+      "title": "Get Account Instruments Info",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/account/instrument"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/account/no-convert-repay",
+      "title": "Manual Repay Without Asset Conversion",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/account/no-convert-repay"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/account/option-asset-info",
+      "title": "Get Option Asset Info",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/account/option-asset-info"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/account/pay-info",
+      "title": "Get Pay Info",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/account/pay-info"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/account/quick-repayment",
+      "title": "Repay Liability",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/account/repay-liability"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/account/repay",
+      "title": "Manual Repay",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/account/repay"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/account/mmp-reset",
+      "title": "Reset MMP",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/account/reset-mmp"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/account/set-collateral-switch",
+      "title": "Set Collateral Coin",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/account/set-collateral"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/account/set-delta-mode",
+      "title": "Set Delta Neutral Mode",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/account/set-delta-mode"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/account/set-margin-mode",
+      "title": "Set Margin Mode",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/account/set-margin-mode"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/account/mmp-modify",
+      "title": "Set MMP",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/account/set-mmp"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/account/set-limit-px-action",
+      "title": "Set Price Limit Behaviour",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/account/set-price-limit"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/account/set-hedging-mode",
+      "title": "Set Spot Hedging",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/account/set-spot-hedge"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/account/smp-group",
+      "title": "Get SMP Group ID",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/account/smp-group"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/account/trade-info-for-analysis",
+      "title": "Get Trade Info For Analysis",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/account/trade-info-for-analysis"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/account/transaction-log",
+      "title": "Get Transaction Log",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/account/transaction-log"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/account/withdrawal",
+      "title": "Get Transferable Amount (Unified)",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/account/unified-trans-amnt"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/account/upgrade-to-uta",
+      "title": "Upgrade to Unified Account Pro",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/account/upgrade-unified-account"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/account/wallet-balance",
+      "title": "Get Wallet Balance",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/account/wallet-balance"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/user/aff-customer-info",
+      "title": "Get Affiliate User Info",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/affiliate/affiliate-info"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/affiliate/affiliate-sub-list",
+      "title": "Get Affiliate Sub-Affiliate List",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/affiliate/affiliate-sub-list"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/affiliate/aff-user-list",
+      "title": "Get Affiliate User List",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/affiliate/affiliate-user-list"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/alpha/lp/order-list",
+      "title": "Get LP Order List",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/lp/order-list"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/alpha/lp/pay-token-list",
+      "title": "Get LP Pay Token List",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/lp/pay-token-list"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/alpha/lp/pay-token-price",
+      "title": "Get LP Pay Token Price",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/lp/pay-token-price"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/alpha/lp/pool-info",
+      "title": "Get LP Pool Info",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/lp/pool-info"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/alpha/lp/pool-list",
+      "title": "Get LP Pool List",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/lp/pool-list"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/alpha/lp/position-list",
+      "title": "Get LP Position List",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/lp/position-list"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/alpha/lp/redeem",
+      "title": "Execute LP Redeem",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/lp/redeem"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/alpha/lp/stake",
+      "title": "Execute LP Stake",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/lp/stake"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/alpha/prediction/buy",
+      "title": "Execute Buy",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/buy"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/alpha/prediction/engine-status",
+      "title": "Get Engine Status",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/engine-status"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/alpha/prediction/event-detail",
+      "title": "Get Event Detail",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/event-detail"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/alpha/prediction/order-book",
+      "title": "Get Order Book",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/order-book"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/alpha/prediction/order-estimate",
+      "title": "Get Order Estimate",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/order-estimate"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/alpha/prediction/order-list",
+      "title": "Get Order List",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/order-list"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/alpha/prediction/pay-token-list",
+      "title": "Get Payment Token List",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/pay-token-list"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/alpha/prediction/portfolio-summary",
+      "title": "Get Portfolio Summary",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/portfolio-summary"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/alpha/prediction/position-history",
+      "title": "Get Position History",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/position-history"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/alpha/prediction/position-list",
+      "title": "Get Position List",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/position-list"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/alpha/prediction/price-history",
+      "title": "Get Price History",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/price-history"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/alpha/prediction/sell",
+      "title": "Execute Sell",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/sell"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/alpha/prediction/side-market-list",
+      "title": "Get Side Market List",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/side-market-list"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/alpha/prediction/sports/group-stage-detail",
+      "title": "Get Sports Group Stage Detail",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/sports-group-stage-detail"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/alpha/prediction/sports/match-list",
+      "title": "Get Sports Match List",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/sports-match-list"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/alpha/prediction/sports/timeline-stages",
+      "title": "Get Sports Timeline Stages",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/sports-timeline-stages"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/alpha/prediction/token-price",
+      "title": "Get Token Price",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/token-price"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/alpha/trade/asset-detail",
+      "title": "Get Asset Detail",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/trade/asset-detail"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/alpha/trade/asset-list",
+      "title": "Get Asset List",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/trade/asset-list"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/alpha/trade/biz-token-details",
+      "title": "Get Token Details",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/trade/biz-token-details"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/alpha/trade/biz-token-list",
+      "title": "Get Biz Token List",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/trade/biz-token-list"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/alpha/trade/biz-token-price-list",
+      "title": "Get Token Price List",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/trade/biz-token-price-list"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/alpha/trade/order-list",
+      "title": "Get Order List",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/trade/order-list"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/alpha/trade/pay-token-list",
+      "title": "Get Payment Token List",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/trade/pay-token-list"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/alpha/trade/purchase",
+      "title": "Execute Purchase",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/trade/trade-purchase"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/alpha/trade/quote",
+      "title": "Get Trade Quote",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/trade/trade-quote"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/alpha/trade/redeem",
+      "title": "Execute Redeem",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/trade/trade-redeem"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/announcements/index",
+      "title": "Get Announcement",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/announcement"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/asset/transfer/query-account-coin-balance",
+      "title": "Get Single Coin Balance",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/asset/balance/account-coin-balance"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/asset/transfer/query-account-coins-balance",
+      "title": "Get All Coins Balance",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/asset/balance/all-balance"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/asset/asset-overview",
+      "title": "Asset Overview",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/asset/balance/asset-overview"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/asset/withdraw/withdrawable-amount",
+      "title": "Get Withdrawable Amount",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/asset/balance/delay-amount"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/asset/coin/query-info",
+      "title": "Get Coin Info",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/asset/coin-info"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/asset/exchange/quote-apply",
+      "title": "Request a Quote ",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/asset/convert/apply-quote"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/asset/exchange/convert-execute",
+      "title": "Confirm a Quote ",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/asset/convert/confirm-quote"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/asset/exchange/query-coin-list",
+      "title": "Get Convert Coin List",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/asset/convert/convert-coin-list"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/asset/exchange/query-convert-history",
+      "title": "Get Convert History",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/asset/convert/get-convert-history"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/asset/exchange/convert-result-query",
+      "title": "Get Convert Status ",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/asset/convert/get-convert-result"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/asset/covert/small-balance-execute",
+      "title": "Confirm a Quote ",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/asset/convert-small-balance/confirm-quote"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/asset/covert/small-balance-history",
+      "title": "Get Exchange History",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/asset/convert-small-balance/exchange-history"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/asset/covert/get-quote",
+      "title": "Request a Quote ",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/asset/convert-small-balance/request-quote"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/asset/covert/small-balance-list",
+      "title": "Get Small Balance Coins",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/asset/convert-small-balance/small-balanc-coins"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/asset/delivery-record",
+      "title": "Get Delivery Record",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/asset/delivery"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/asset/deposit/query-record",
+      "title": "Get Deposit Records (on-chain)",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/asset/deposit/deposit-record"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/asset/deposit/query-internal-record",
+      "title": "Get Internal Deposit Records (off-chain)",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/asset/deposit/internal-deposit-record"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/asset/deposit/query-address",
+      "title": "Get Master Deposit Address",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/asset/deposit/master-deposit-addr"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/asset/deposit/deposit-to-account",
+      "title": "Set Deposit Account",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/asset/deposit/set-deposit-acct"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/asset/deposit/query-sub-member-address",
+      "title": "Get Sub Deposit Address",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/asset/deposit/sub-deposit-addr"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/asset/deposit/query-sub-member-record",
+      "title": "Get Sub Deposit Records (on-chain)",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/asset/deposit/sub-deposit-record"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/asset/travel-rule/deposit/submit",
+      "title": "Submit Deposit Originator Info",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/asset/deposit/submit-info"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/asset/exchange/order-record",
+      "title": "Get Coin Exchange Records",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/asset/exchange"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/fiat/balance-query",
+      "title": "Get Balance",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/asset/fiat-convert/balance-query"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/fiat/trade-execute",
+      "title": "Confirm a Quote ",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/asset/fiat-convert/confirm-quote"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/fiat/query-coin-list",
+      "title": "Get Trading Pair List",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/asset/fiat-convert/query-coin-list"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/fiat/query-trade-history",
+      "title": "Get Convert History",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/asset/fiat-convert/query-trade-history"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/fiat/trade-query",
+      "title": "Get Convert Status",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/asset/fiat-convert/query-trade"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/fiat/quote-apply",
+      "title": "Request a Quote ",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/asset/fiat-convert/quote-apply"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/fiat/reference-price",
+      "title": "Get Reference Price",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/asset/fiat-convert/reference-price"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/asset/fundinghistory",
+      "title": "Funding Account Transaction History",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/asset/fund-history"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/asset/portfolio-margin",
+      "title": "Get Portfolio Margin Info",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/asset/portfolio-margin"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/asset/settlement-record",
+      "title": "Get USDC Session Settlement",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/asset/settlement"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/asset/transfer/query-sub-member-list",
+      "title": "Get Sub UID",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/asset/sub-uid-list"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/asset/total-members-assets",
+      "title": "Get Total Members Assets",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/asset/total-members-assets"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/asset/transfer/inter-transfer",
+      "title": "Create Internal Transfer",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/asset/transfer/create-inter-transfer"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/asset/transfer/query-inter-transfer-list",
+      "title": "Get Internal Transfer Records",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/asset/transfer/inter-transfer-list"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/asset/transfer/query-transfer-coin-list",
+      "title": "Get Transferable Coin",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/asset/transfer/transferable-coin"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/asset/transfer/query-universal-transfer-list",
+      "title": "Get Universal Transfer Records",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/asset/transfer/unitransfer-list"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/asset/transfer/universal-transfer",
+      "title": "Create Universal Transfer",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/asset/transfer/unitransfer"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/asset/withdraw/cancel",
+      "title": "Cancel Withdrawal",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/asset/withdraw/cancel-withdraw"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/asset/withdraw/vasp/list",
+      "title": "Get available VASPs",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/asset/withdraw/vasp-list"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/asset/withdraw/query-address",
+      "title": "Get Withdrawal Address List",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/asset/withdraw/withdraw-address"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/asset/withdraw/query-record",
+      "title": "Get Withdrawal Records",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/asset/withdraw/withdraw-record"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/asset/withdraw/create",
+      "title": "Withdraw",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/asset/withdraw/withdraw"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/dca/close-bot",
+      "title": "Close DCA Bot",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/bot/dca/close"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/dca/create-bot",
+      "title": "Create DCA Bot",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/bot/dca/create"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/fcombobot/close",
+      "title": "Close Bot",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/bot/futures-combo/close"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/fcombobot/create",
+      "title": "Create Bot",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/bot/futures-combo/create"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/fcombobot/detail",
+      "title": "Get Bot Detail",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/bot/futures-combo/get-detail"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/fcombobot/getlimit",
+      "title": "Get Bot Parameter Limit",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/bot/futures-combo/get-limit"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/fgridbot/close",
+      "title": "Close Grid Bot",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/bot/futures-grid/close"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/fgridbot/create",
+      "title": "Create Grid Bot",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/bot/futures-grid/create"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/fgridbot/detail",
+      "title": "Get Grid Bot Detail",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/bot/futures-grid/get-detail"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/fgridbot/validate",
+      "title": "Validate Grid Input",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/bot/futures-grid/validate-input"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/fmartingalebot/close",
+      "title": "Close Martingale Bot",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/bot/futures-martingale/close"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/fmartingalebot/create",
+      "title": "Create Martingale Bot",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/bot/futures-martingale/create"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/fmartingalebot/detail",
+      "title": "Get Martingale Bot Detail",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/bot/futures-martingale/get-detail"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/fmartingalebot/getlimit",
+      "title": "Get Bot Parameter Limit",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/bot/futures-martingale/get-limit"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/grid/close-grid",
+      "title": "Close Grid Bot",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/bot/spot-grid/close"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/grid/create-grid",
+      "title": "Create Grid Bot",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/bot/spot-grid/create"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/grid/query-grid-detail",
+      "title": "Get Grid Bot Detail",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/bot/spot-grid/get-detail"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/grid/validate-input",
+      "title": "Validate Grid Input",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/bot/spot-grid/validate-input"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/broker/ip/changelog",
+      "title": "Get Broker IP Change Log",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/broker/api-broker/ip-changelog"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/broker/whitelist/ip",
+      "title": "Get Broker Whitelist IP",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/broker/api-broker/whitelist-ip"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/broker/account-info",
+      "title": "Get Account Info",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/broker/exchange-broker/account-info"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/broker/earnings-info",
+      "title": "Get Earning",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/broker/exchange-broker/exchange-earning"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/broker/apilimit/query-all",
+      "title": "Get All Rate Limits",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/broker/exchange-broker/rate-limit/query-all"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/broker/apilimit/query-cap",
+      "title": "Get Rate Limit Cap",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/broker/exchange-broker/rate-limit/query-cap"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/broker/apilimit/set",
+      "title": "Set Rate Limit",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/broker/exchange-broker/rate-limit/set"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/broker/asset/query-sub-member-deposit-record",
+      "title": "Get Sub Account Deposit Records",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/broker/exchange-broker/sub-deposit-record"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/broker/award/distribution-record",
+      "title": "Get Issued Voucher",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/broker/reward/get-issue-voucher"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/broker/award/distribute-award",
+      "title": "Issue Voucher",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/broker/reward/issue-voucher"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/broker/award/info",
+      "title": "Get Voucher Spec",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/broker/reward/voucher"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/card/transaction/query-asset-records",
+      "title": "Query Asset Records",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/bybit-card/asset-records"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/card/reward/points/balance",
+      "title": "Query Point Balance",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/bybit-card/point/balance"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/card/reward/point/cashback/detail",
+      "title": "Query Cashback Detail",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/bybit-card/point/cashback-detail"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/card/reward/mall/item/list",
+      "title": "Query Mall Item List",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/bybit-card/point/item-list"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/card/reward/points/records",
+      "title": "Query Point Records",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/bybit-card/point/records"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/card/reward/points/tier",
+      "title": "Query Tier Info",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/bybit-card/point/tier"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/crypto-loan/borrowable-collateralisable-number",
+      "title": "Get Account Borrowable/Collateralizable Limit",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/crypto-loan/acct-borrow-collateral"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/crypto-loan/adjust-ltv",
+      "title": "Adjust Collateral Amount",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/crypto-loan/adjust-collateral"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/crypto-loan/collateral-data",
+      "title": "Get Collateral Coins",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/crypto-loan/collateral-coin"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/crypto-loan/borrow-history",
+      "title": "Get Completed Loan History",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/crypto-loan/completed-loan-order"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/crypto-loan/loanable-data",
+      "title": "Get Borrowable Coins",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/crypto-loan/loan-coin"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/crypto-loan/adjustment-history",
+      "title": "Get Loan LTV Adjustment History",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/crypto-loan/ltv-adjust-history"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/crypto-loan/max-collateral-amount",
+      "title": "Get Max. Allowed Collateral Reduction Amount",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/crypto-loan/reduce-max-collateral-amt"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/crypto-loan/repayment-history",
+      "title": "Get Loan Repayment History",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/crypto-loan/repay-transaction"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/crypto-loan/repay",
+      "title": "Repay",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/crypto-loan/repay"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/crypto-loan/ongoing-orders",
+      "title": "Get Unpaid Loans",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/crypto-loan/unpaid-loan-order"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/account/demo-apply-money",
+      "title": "Demo Trading Service",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/demo"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/user/create-demo-member",
+      "title": "Demo Trading Service",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/demo"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/event/instruments-info",
+      "title": "Get Instrument Info",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/event/market/instrument-info"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/event/orderbook",
+      "title": "Get Orderbook",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/event/market/orderbook"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/event/cancel",
+      "title": "Cancel Quote",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/event/trade/cancel-quote"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/event/trades",
+      "title": "Get Event Contract Trade History",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/event/trade/execution"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/event/order-realtime",
+      "title": "Get Event Contract Active Orders",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/event/trade/open-order"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/event/order-list",
+      "title": "Get Event Contract Order History",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/event/trade/order-list"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/event/positions",
+      "title": "Get Event Contract Position Info",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/event/trade/position"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/event/settlements",
+      "title": "Get Event Contract Settlement Records",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/event/trade/settlement"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/event/quotes",
+      "title": "Submit Quote",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/event/trade/submit-quote"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/file/get-file-upload-sign",
+      "title": "Get File Upload Sign",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/file/file-upload-sign"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/file/report-file-upload",
+      "title": "Report File Upload",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/file/report-file-upload"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/earn/advance/place-order",
+      "title": "Place Order",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/advanced-earn/discount-buy/create-order",
+      "alternate_sources": [
+        "https://bybit-exchange.github.io/docs/v5/finance/advanced-earn/double-win/create-order",
+        "https://bybit-exchange.github.io/docs/v5/finance/advanced-earn/smart-lvg/create-order"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/v5/earn/advance/order",
+      "title": "Get Order Info",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/advanced-earn/discount-buy/order",
+      "alternate_sources": [
+        "https://bybit-exchange.github.io/docs/v5/finance/advanced-earn/double-win/order",
+        "https://bybit-exchange.github.io/docs/v5/finance/advanced-earn/smart-lvg/order"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/v5/earn/advance/position",
+      "title": "Get Position Info",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/advanced-earn/discount-buy/position",
+      "alternate_sources": [
+        "https://bybit-exchange.github.io/docs/v5/finance/advanced-earn/double-win/position",
+        "https://bybit-exchange.github.io/docs/v5/finance/advanced-earn/smart-lvg/position"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/v5/earn/advance/product",
+      "title": "Get Product Info",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/advanced-earn/discount-buy/product-info",
+      "alternate_sources": [
+        "https://bybit-exchange.github.io/docs/v5/finance/advanced-earn/double-win/product-info",
+        "https://bybit-exchange.github.io/docs/v5/finance/advanced-earn/smart-lvg/product-info"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/v5/earn/advance/product-extra-info",
+      "title": "Get Product Quote",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/advanced-earn/discount-buy/product-quote",
+      "alternate_sources": [
+        "https://bybit-exchange.github.io/docs/v5/finance/advanced-earn/double-win/product-quote",
+        "https://bybit-exchange.github.io/docs/v5/finance/advanced-earn/smart-lvg/product-quote"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/v5/earn/advance/get-redeem-est-amount-list",
+      "title": "Get Redeem Estimated Amount",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/advanced-earn/double-win/est-redeem",
+      "alternate_sources": [
+        "https://bybit-exchange.github.io/docs/v5/finance/advanced-earn/smart-lvg/est-redeem"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/v5/earn/advance/double-win-leverage",
+      "title": "Get Custom Product Quote",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/advanced-earn/double-win/leverage"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/earn/liquidity-mining/add-liquidity",
+      "title": "Add Liquidity",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/advanced-earn/liquidity-mining/add-liquidity"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/earn/liquidity-mining/add-margin",
+      "title": "Add Margin",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/advanced-earn/liquidity-mining/add-margin"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/earn/liquidity-mining/claim-interest",
+      "title": "Claim Interest",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/advanced-earn/liquidity-mining/claim-interest"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/earn/liquidity-mining/liquidation-records",
+      "title": "Get Liquidation Records",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/advanced-earn/liquidity-mining/liquidation-records"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/earn/liquidity-mining/order",
+      "title": "Get Order Info",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/advanced-earn/liquidity-mining/order"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/earn/liquidity-mining/position",
+      "title": "Get Position Info",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/advanced-earn/liquidity-mining/position"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/earn/liquidity-mining/product",
+      "title": "Get Product Info",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/advanced-earn/liquidity-mining/product-info"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/earn/liquidity-mining/reinvest",
+      "title": "Reinvest",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/advanced-earn/liquidity-mining/reinvest"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/earn/liquidity-mining/remove-liquidity",
+      "title": "Remove Liquidity",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/advanced-earn/liquidity-mining/remove-liquidity"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/earn/liquidity-mining/yield-records",
+      "title": "Get Yield Records",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/advanced-earn/liquidity-mining/yield-records"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/earn/token/history-apr",
+      "title": "Get History APR",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/earn/byusdt/history-apr"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/earn/token/hourly-yield",
+      "title": "Get Hourly Yield Records",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/earn/byusdt/hourly-yield"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/earn/token/order",
+      "title": "Get Order List",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/earn/byusdt/order"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/earn/token/place-order",
+      "title": "Place Order",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/earn/byusdt/place-order"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/earn/token/position",
+      "title": "Get Position Info",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/earn/byusdt/position"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/earn/token/product",
+      "title": "Get Product Info",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/earn/byusdt/product"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/earn/token/yield",
+      "title": "Get Daily Yield Records",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/earn/byusdt/yield"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/earn/apr-history",
+      "title": "Get APR History",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/earn/easy-onchain/apr-history"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/earn/coupons",
+      "title": "Get Coupon List",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/earn/easy-onchain/coupons"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/earn/place-order",
+      "title": "Stake / Redeem",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/earn/easy-onchain/create-order"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/earn/hourly-yield",
+      "title": "Get Hourly Yield History",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/earn/easy-onchain/hourly-yield"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/earn/position/modify",
+      "title": "Modify Position",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/earn/easy-onchain/modify-position"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/earn/order",
+      "title": "Get Stake/Redeem Order History",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/earn/easy-onchain/order-history"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/earn/position",
+      "title": "Get Staked Position",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/earn/easy-onchain/position"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/earn/product",
+      "title": "Get Product Info",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/earn/easy-onchain/product-info"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/earn/yield",
+      "title": "Get Yield History",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/earn/easy-onchain/yield-history"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/earn/fixed-term/order",
+      "title": "Get Order List",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/earn/fixed-saving/order"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/earn/fixed-term/place-order",
+      "title": "Place Order",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/earn/fixed-saving/place-order"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/earn/fixed-term/position",
+      "title": "Get Position Info",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/earn/fixed-saving/position"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/earn/fixed-term/product",
+      "title": "Get Product Info",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/earn/fixed-saving/product"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/earn/fixed-term/redeem",
+      "title": "Redeem",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/earn/fixed-saving/redeem"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/earn/fixed-term/position/auto-invest",
+      "title": "Set Auto-Invest",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/earn/fixed-saving/set-auto-invest"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/earn/hold-to-earn/product",
+      "title": "Get Airdrop Products",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/earn/hold-to-earn/product"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/earn/hold-to-earn/yield-history",
+      "title": "Get Airdrop Daily PnL Records",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/earn/hold-to-earn/yield-history"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/earn/pwm/asset-manager/all-funds",
+      "title": "Get All Funds",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/asset-manager/all-funds"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/earn/pwm/asset-manager/all-order",
+      "title": "Get All Fund Orders",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/asset-manager/all-order"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/earn/pwm/asset-manager/create-fund",
+      "title": "Create Fund (Pending Subscription)",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/asset-manager/create-fund"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/earn/pwm/asset-manager/create-investment-plan",
+      "title": "Create Investment Plan",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/asset-manager/create-investment-plan"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/earn/pwm/asset-manager/create-sub-account",
+      "title": "Create Fund Sub-Account",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/asset-manager/create-sub-account"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/earn/pwm/asset-manager/get-investment-plan",
+      "title": "Get Investment Plans",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/asset-manager/get-investment-plan"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/earn/pwm/asset-manager/manage-investment-plan",
+      "title": "Manage Investment Plan",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/asset-manager/manage-investment-plan"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/earn/pwm/asset-manager/manage-order",
+      "title": "Manage Order",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/asset-manager/manage-order"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/earn/pwm/asset-manager/settle-profit",
+      "title": "Settle Fund Profit",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/asset-manager/settle-profit"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/earn/pwm/customize-plan/create",
+      "title": "Create Customize Investment Plan",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/customize-plan/create"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/earn/pwm/customize-plan/product",
+      "title": "Get Subscribable Product Info",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/customize-plan/product"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/earn/pwm/fund-transfer",
+      "title": "Fund Transfer Between Sub-Accounts",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/fund-transfer"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/earn/pwm/investment-plan/all",
+      "title": "Get All Investment Plans",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/investment-plan/all"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/earn/pwm/investment-plan/asset-trend",
+      "title": "Get Asset Trend",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/investment-plan/asset-trend"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/earn/pwm/investment-plan/claim",
+      "title": "Claim Withdrawable Funds",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/investment-plan/claim"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/earn/pwm/investment-plan/detail",
+      "title": "Get Investment Plan Detail",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/investment-plan/detail"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/earn/pwm/investment-plan/fund-nav",
+      "title": "Get Fund Historical NAV",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/investment-plan/fund-nav"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/earn/pwm/investment-plan/invest-more",
+      "title": "Invest More",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/investment-plan/invest-more"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/earn/pwm/investment-plan/new-plan",
+      "title": "Get Pending Investment Plan Detail",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/investment-plan/new-plan"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/earn/pwm/investment-plan/order",
+      "title": "Get Investment Plan Orders",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/investment-plan/order"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/earn/pwm/investment-plan/redeem",
+      "title": "Redeem",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/investment-plan/redeem"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/earn/pwm/investment-plan/subscribe",
+      "title": "Subscribe Investment Plan",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/investment-plan/subscribe"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/earn/pwm/query-fund-transfer-result",
+      "title": "Get Fund Transfer Records",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/query-fund-transfer-result"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/earn/rwa/nav-chart",
+      "title": "Get NAV Chart",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/rwa/nav-chart"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/earn/rwa/order",
+      "title": "Get Order List",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/rwa/order"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/earn/rwa/place-order",
+      "title": "Place Order",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/rwa/place-order"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/earn/rwa/position",
+      "title": "Get Position List",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/rwa/position"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/earn/rwa/product",
+      "title": "Get Product List",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/rwa/product"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/spot-x/launchpool/user/activity-log",
+      "title": "Get Launchpool User Activity Log",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/spot-x/launchpool/launchpool-activity-log"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/spot-x/launchpool/user/current-staking",
+      "title": "Get Launchpool Current Staking",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/spot-x/launchpool/launchpool-current-staking"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/spot-x/launchpool/project/list",
+      "title": "Get Launchpool Project List",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/spot-x/launchpool/launchpool-project-list"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/spot-x/launchpool/user/history",
+      "title": "Get Launchpool User History",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/spot-x/launchpool/launchpool-user-history"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/spot-x/puzzle/project/list",
+      "title": "Get Puzzle Project List",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/spot-x/puzzle/puzzle-project-list"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/spot-x/token-splash/project/list",
+      "title": "Get Token Splash Project List",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/spot-x/token-splash/token-splash-project-list"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/spot-x/token-splash/user/activity-params",
+      "title": "Get Token Splash User Activity Params",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/finance/spot-x/token-splash/token-splash-user-activity-params"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/ins/ip/changelog",
+      "title": "Get Institution IP Change Log",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/institution/ip-changelog"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/ins/whitelist/ip",
+      "title": "Get Institution Whitelist IP",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/institution/whitelist-ip"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/spot-lever-token/info",
+      "title": "Get Leverage Token Info",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/lt/leverage-token-info"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/spot-lever-token/reference",
+      "title": "Get Leveraged Token Market",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/lt/leverage-token-reference"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/spot-lever-token/order-record",
+      "title": "Get Purchase/Redemption Records",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/lt/order-record"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/spot-lever-token/purchase",
+      "title": "Purchase",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/lt/purchase"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/spot-lever-token/redeem",
+      "title": "Redeem",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/lt/redeem"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/market/adlAlert",
+      "title": "Get ADL Alert",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/market/adl-alert"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/market/delivery-price",
+      "title": "Get Delivery Price",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/market/delivery-price"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/market/fee-group-info",
+      "title": "Get Fee Group Structure",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/market/fee-group-info"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/market/full_orderbook",
+      "title": "Get Full Depth Orderbook",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/market/full-ob"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/market/funding/history",
+      "title": "Get Funding Rate History",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/market/history-fund-rate"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/market/index-price-components",
+      "title": "Get Index Price Components",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/market/index-components",
+      "alternate_sources": [
+        "https://bybit-exchange.github.io/docs/v5/tradfi-integration"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/v5/market/index-price-kline",
+      "title": "Get Index Price Kline",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/market/index-kline"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/market/instruments-info",
+      "title": "Get Instruments Info",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/market/instrument",
+      "alternate_sources": [
+        "https://bybit-exchange.github.io/docs/v5/tradfi-integration"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/v5/market/insurance",
+      "title": "Get Insurance Pool",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/market/insurance"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/market/historical-volatility",
+      "title": "Get Historical Volatility",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/market/iv"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/market/kline",
+      "title": "Get Kline",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/market/kline"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/market/account-ratio",
+      "title": "Get Long Short Ratio",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/market/long-short-ratio"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/market/mark-price-kline",
+      "title": "Get Mark Price Kline",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/market/mark-kline"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/market/new-delivery-price",
+      "title": "Get New Delivery Price",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/market/new-delivery-price"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/market/open-interest",
+      "title": "Get Open Interest",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/market/open-interest"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/market/option-base-coins",
+      "title": "Get Option Base Coins",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/market/option-base-coins",
+      "alternate_sources": [
+        "https://bybit-exchange.github.io/docs/v5/tradfi-integration"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/v5/market/price-limit",
+      "title": "Get Order Price Limit",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/market/order-price-limit"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/market/orderbook",
+      "title": "Get Orderbook",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/market/orderbook"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/market/premium-index-price-kline",
+      "title": "Get Premium Index Price Kline",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/market/premium-index-kline"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/market/recent-trade",
+      "title": "Get Recent Public Trades",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/market/recent-trade"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/market/risk-limit",
+      "title": "Get Risk Limit",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/market/risk-limit"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/market/rpi_orderbook",
+      "title": "Get RPI Orderbook",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/market/rpi-orderbook"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/market/tickers",
+      "title": "Get Tickers",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/market/tickers"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/market/time",
+      "title": "Get Bybit Server Time",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/market/time"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/crypto-loan-common/adjust-ltv",
+      "title": "Adjust Collateral Amount",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/new-crypto-loan/adjust-collateral"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/crypto-loan-common/collateral-data",
+      "title": "Get Collateral Coins",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/new-crypto-loan/collateral-coin"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/crypto-loan-common/position",
+      "title": "Get Crypto Loan Position",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/new-crypto-loan/crypto-loan-position"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/crypto-loan-fixed/available-inventory",
+      "title": "Get Available Inventory",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/new-crypto-loan/fixed/available-inventory"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/crypto-loan-fixed/borrow-contract-info",
+      "title": "Get Borrow Contract Info",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/new-crypto-loan/fixed/borrow-contract"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/crypto-loan-fixed/borrow-order-quote",
+      "title": "Get Borrowing Market",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/new-crypto-loan/fixed/borrow-market"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/crypto-loan-fixed/borrow-order-info",
+      "title": "Get Borrow Order Info",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/new-crypto-loan/fixed/borrow-order"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/crypto-loan-fixed/borrow",
+      "title": "Create Borrow Order",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/new-crypto-loan/fixed/borrow"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/crypto-loan-fixed/borrow-order-cancel",
+      "title": "Cancel Borrow Order",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/new-crypto-loan/fixed/cancel-borrow"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/crypto-loan-fixed/supply-order-cancel",
+      "title": "Cancel Supply Order",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/new-crypto-loan/fixed/cancel-supply"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/crypto-loan-fixed/renew-info",
+      "title": "Get Renew Order Info",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/new-crypto-loan/fixed/renew-order"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/crypto-loan-fixed/renew",
+      "title": "Renew Borrow Order",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/new-crypto-loan/fixed/renew"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/crypto-loan-fixed/repay-collateral",
+      "title": "Collateral Repayment",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/new-crypto-loan/fixed/repay-collateral"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/crypto-loan-fixed/repayment-history",
+      "title": "Get Repayment History",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/new-crypto-loan/fixed/repay-history"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/crypto-loan-fixed/fully-repay",
+      "title": "Repay",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/new-crypto-loan/fixed/repay"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/crypto-loan-fixed/supply-contract-info",
+      "title": "Get Supply Contract Info",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/new-crypto-loan/fixed/supply-contract copy"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/crypto-loan-fixed/supply-order-quote",
+      "title": "Get Lending Market",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/new-crypto-loan/fixed/supply-market"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/crypto-loan-fixed/supply-order-info",
+      "title": "Get Supply Order Info",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/new-crypto-loan/fixed/supply-order"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/crypto-loan-fixed/supply",
+      "title": "Create Supply Order",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/new-crypto-loan/fixed/supply"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/crypto-loan-flexible/available-inventory",
+      "title": "Get Available Inventory",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/new-crypto-loan/flexible/available-inventory"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/crypto-loan-flexible/borrow",
+      "title": "Borrow",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/new-crypto-loan/flexible/borrow"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/crypto-loan-flexible/borrow-history",
+      "title": "Get Borrowing History",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/new-crypto-loan/flexible/loan-orders"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/crypto-loan-flexible/repay-collateral",
+      "title": "Collateral Repayment",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/new-crypto-loan/flexible/repay-collateral"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/crypto-loan-flexible/repayment-history",
+      "title": "Get Repayment History",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/new-crypto-loan/flexible/repay-orders"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/crypto-loan-flexible/repay",
+      "title": "Repay",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/new-crypto-loan/flexible/repay"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/crypto-loan-flexible/ongoing-coin",
+      "title": "Get Flexible Loans",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/new-crypto-loan/flexible/unpaid-loan-order"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/crypto-loan-common/loanable-data",
+      "title": "Get Borrowable Coins",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/new-crypto-loan/loan-coin"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/crypto-loan-common/adjustment-history",
+      "title": "Get Collateral Adjustment History",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/new-crypto-loan/ltv-adjust-history"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/crypto-loan-common/max-loan",
+      "title": "Obtain Max Loan Amount",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/new-crypto-loan/max-loan-amt"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/crypto-loan-common/max-collateral-amount",
+      "title": "Get Max. Allowed Collateral Reduction Amount",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/new-crypto-loan/reduce-max-collateral-amt"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/order/amend",
+      "title": "Amend Order",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/order/amend-order"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/order/amend-batch",
+      "title": "Batch Amend Order",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/order/batch-amend"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/order/cancel-batch",
+      "title": "Batch Cancel Order",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/order/batch-cancel"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/order/create-batch",
+      "title": "Batch Place Order",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/order/batch-place"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/order/cancel-all",
+      "title": "Cancel All Orders",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/order/cancel-all"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/order/cancel",
+      "title": "Cancel Order",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/order/cancel-order"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/order/create",
+      "title": "Place Order",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/order/create-order"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/order/disconnected-cancel-all",
+      "title": "Set Disconnect Cancel All",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/order/dcp"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/execution/list",
+      "title": "Get Trade History",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/order/execution"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/order/realtime",
+      "title": "Get Open & Closed Orders",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/order/open-order"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/order/history",
+      "title": "Get Order History",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/order/order-list"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/order/pre-check",
+      "title": "Pre Check Order",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/order/pre-check-order"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/order/spot-borrow-check",
+      "title": "Get Borrow Quota (Spot)",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/order/spot-borrow-quota"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/ins-loan/association-uid",
+      "title": "Bind Or Unbind UID",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/otc/bind-uid"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/ins-loan/coin-delta-amount",
+      "title": "Get Coin Delta Amount",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/otc/coin-delta-amount"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/ins-loan/delay-liq-status",
+      "title": "Get Delay Liquidation Status",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/otc/delay-liq-status"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/ins-loan/loan-order",
+      "title": "Get Loan Orders",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/otc/loan-info"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/ins-loan/ltv-convert",
+      "title": "Get LTV",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/otc/ltv-convert"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/ins-loan/ensure-tokens-convert",
+      "title": "Get Margin Coin Info",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/otc/margin-coin-convert-info"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/ins-loan/product-infos",
+      "title": "Get Product Info",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/otc/margin-product-info"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/ins-loan/repaid-history",
+      "title": "Get Repayment Orders",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/otc/repay-info"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/ins-loan/repay-loan",
+      "title": "Repay",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/otc/repay"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/position/set-auto-add-margin",
+      "title": "Set Auto Add Margin",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/position/auto-add-margin"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/position/symbol-info",
+      "title": "Get Futures Leverage",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/position/batch-lvg"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/position/closed-pnl",
+      "title": "Get Closed PnL",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/position/close-pnl"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/position/get-closed-positions",
+      "title": "Get Closed Options Positions",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/position/close-position"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/position/confirm-pending-mmr",
+      "title": "Confirm New Risk Limit",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/position/confirm-mmr"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/position/set-leverage",
+      "title": "Set Leverage",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/position/leverage"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/position/add-margin",
+      "title": "Add Or Reduce Margin",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/position/manual-add-margin"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/position/move-history",
+      "title": "Get Move Position History",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/position/move-position-history"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/position/move-positions",
+      "title": "Move Position",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/position/move-position"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/position/switch-mode",
+      "title": "Switch Position Mode",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/position/position-mode"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/position/list",
+      "title": "Get Position Info",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/position/position"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/position/trading-stop",
+      "title": "Set Trading Stop",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/position/trading-stop"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/pre-upgrade/position/closed-pnl",
+      "title": "Get Pre-upgrade Closed PnL",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/pre-upgrade/close-pnl"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/pre-upgrade/asset/delivery-record",
+      "title": "Get Pre-upgrade Delivery Record",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/pre-upgrade/delivery"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/pre-upgrade/execution/list",
+      "title": "Get Pre-upgrade Trade History",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/pre-upgrade/execution"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/pre-upgrade/order/history",
+      "title": "Get Pre-upgrade Order History",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/pre-upgrade/order-list"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/pre-upgrade/asset/settlement-record",
+      "title": "Get Pre-upgrade USDC Session Settlement",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/pre-upgrade/settlement"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/pre-upgrade/account/transaction-log",
+      "title": "Get Pre-upgrade Transaction Log",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/pre-upgrade/transaction-log"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/apilimit/query-all",
+      "title": "Get All Rate Limits",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/rate-limit/rules-for-pros/apilimit-query-all"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/apilimit/query-cap",
+      "title": "Get Rate Limit Cap",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/rate-limit/rules-for-pros/apilimit-query-cap"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/apilimit/query",
+      "title": "Get Rate Limit",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/rate-limit/rules-for-pros/apilimit-query"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/apilimit/set",
+      "title": "Set Rate Limit",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/rate-limit/rules-for-pros/apilimit-set"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/rfq/accept-other-quote",
+      "title": "Accept non-LP Quote",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/rfq/trade/accept-other-quote"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/rfq/cancel-all-quotes",
+      "title": "Cancel All Quotes",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/rfq/trade/cancel-all-quotes"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/rfq/cancel-all-rfq",
+      "title": "Cancel All RFQs",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/rfq/trade/cancel-all-rfq"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/rfq/cancel-quote",
+      "title": "Cancel Quote",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/rfq/trade/cancel-quote"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/rfq/cancel-rfq",
+      "title": "Cancel RFQ",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/rfq/trade/cancel-rfq"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/rfq/create-quote",
+      "title": "Create Quote",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/rfq/trade/create-quote"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/rfq/create-rfq",
+      "title": "Create RFQ",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/rfq/trade/create-rfq"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/rfq/execute-quote",
+      "title": "Execute Quote",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/rfq/trade/execute-quote"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/rfq/public-trades",
+      "title": "Get Public Trades",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/rfq/trade/public-trades"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/rfq/quote-list",
+      "title": "Get Quotes",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/rfq/trade/quote-list"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/rfq/quote-realtime",
+      "title": "Get Quotes (real-time)",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/rfq/trade/quote-realtime"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/rfq/config",
+      "title": "Get RFQ Configuration",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/rfq/trade/rfq-config"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/rfq/rfq-detail-list",
+      "title": "Get RFQ Details",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/rfq/trade/rfq-detail-list"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/rfq/rfq-list",
+      "title": "Get RFQs",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/rfq/trade/rfq-list"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/rfq/rfq-realtime",
+      "title": "Get RFQs (real-time)",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/rfq/trade/rfq-realtime"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/rfq/trade-list",
+      "title": "Get Trade History ",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/rfq/trade/trade-list"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/spot-margin-trade/coinstate",
+      "title": "Get Coin State",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/spot-margin-uta/coinstate"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/spot-margin-trade/currency-data",
+      "title": "Get Currency Data",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/spot-margin-uta/currency-data"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/spot-margin-trade/fixed-available-inventory",
+      "title": "Get Fixed-Rate Available Inventory",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/spot-margin-uta/fixed-available-inventory"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/spot-margin-trade/fixedborrow-contract-info",
+      "title": "Get Fixed-Rate Borrow Contract Info",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/spot-margin-uta/fixedborrow-contract-info"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/spot-margin-trade/fixedborrow-order-info",
+      "title": "Get Fixed-Rate Borrow Order Info",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/spot-margin-uta/fixedborrow-order-info"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/spot-margin-trade/fixedborrow-order-quote",
+      "title": "Get Fixed-Rate Borrow Order Quote",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/spot-margin-uta/fixedborrow-order-quote"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/spot-margin-trade/fixedborrow-renew",
+      "title": "Renew Fixed-Rate Borrow",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/spot-margin-uta/fixedborrow-renew"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/spot-margin-trade/fixedborrow",
+      "title": "Fixed-Rate Borrow",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/spot-margin-uta/fixedborrow"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/spot-margin-trade/flexible-available-inventory",
+      "title": "Get Flexible Available Inventory",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/spot-margin-uta/flexible-available-inventory"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/spot-margin-trade/get-auto-repay-mode",
+      "title": "Get Auto Repay Mode",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/spot-margin-uta/get-auto-repay-mode"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/spot-margin-trade/interest-rate-history",
+      "title": "Get Historical Interest Rate",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/spot-margin-uta/historical-interest"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/spot-margin-trade/liability",
+      "title": "Get Liability Info",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/spot-margin-uta/liability"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/spot-margin-trade/max-borrowable",
+      "title": "Get Max Borrowable Amount",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/spot-margin-uta/max-borrowable"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/spot-margin-trade/position-tiers",
+      "title": "Get Position Tiers",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/spot-margin-uta/position-tiers"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/spot-margin-trade/repayment-available-amount",
+      "title": "Get Available Amount to Repay",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/spot-margin-uta/repayment-available-amount"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/spot-margin-trade/set-auto-repay-mode",
+      "title": "Set Auto Repay Mode",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/spot-margin-uta/set-auto-repay-mode"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/spot-margin-trade/set-leverage",
+      "title": "Set Leverage",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/spot-margin-uta/set-leverage"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/spot-margin-trade/state",
+      "title": "Get Status And Leverage",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/spot-margin-uta/status"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/spot-margin-trade/switch-mode",
+      "title": "Toggle Margin Trade",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/spot-margin-uta/switch-mode"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/spot-margin-trade/collateral",
+      "title": "Get Tiered Collateral Ratio",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/spot-margin-uta/tier-collateral-ratio"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/spot-margin-trade/data",
+      "title": "Get VIP Margin Data",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/spot-margin-uta/vip-margin"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/spread/instrument",
+      "title": "Get Instruments Info",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/spread/market/instrument"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/spread/orderbook",
+      "title": "Get Orderbook",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/spread/market/orderbook"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/spread/recent-trade",
+      "title": "Get Recent Public Trades",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/spread/market/recent-trade"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/spread/tickers",
+      "title": "Get Tickers",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/spread/market/tickers"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/spread/order/amend",
+      "title": "Amend Order",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/spread/trade/amend-order"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/spread/order/cancel-all",
+      "title": "Cancel All Orders",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/spread/trade/cancel-all"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/spread/order/cancel",
+      "title": "Cancel Order",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/spread/trade/cancel-order"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/spread/order/create",
+      "title": "Create Order",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/spread/trade/create-order"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/spread/max-qty",
+      "title": "Get Max Qty",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/spread/trade/max-qty"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/spread/order/realtime",
+      "title": "Get Open Orders",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/spread/trade/open-order"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/spread/order/history",
+      "title": "Get Order History",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/spread/trade/order-history"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/spread/execution/list",
+      "title": "Get Trade History",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/spread/trade/trade-history"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/rwa/stocks/order/cancel",
+      "title": "Cancel Stock Order",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/stocks/cancel-order"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/rwa/stocks/convert/detail",
+      "title": "Get Convert Detail",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/stocks/convert-detail"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/rwa/stocks/convert/list",
+      "title": "Get Convert List",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/stocks/convert-list"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/rwa/stocks/convert/submit",
+      "title": "Submit Convert",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/stocks/convert-submit"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/rwa/stocks/market/session",
+      "title": "Get Market Session",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/stocks/market-session"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/rwa/stocks/market/getMultiplierList",
+      "title": "Get Multiplier List",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/stocks/multiplier-list"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/rwa/stocks/order/detail",
+      "title": "Get Stock Order Detail",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/stocks/order-detail"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/rwa/stocks/order",
+      "title": "Place Stock Order",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/stocks/place-order"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/rwa/stocks/positions",
+      "title": "Get Stock Positions",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/stocks/positions"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/strategy/create",
+      "title": "Create Strategy Order",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/strategy/create-strategy"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/strategy/order-list",
+      "title": "Get Strategy Order List",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/strategy/order-list"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/strategy/stop",
+      "title": "Stop Strategy",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/strategy/stop-strategy"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/strategy/list",
+      "title": "Get Strategy List",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/strategy/strategy-list"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/system/status",
+      "title": "Get System Status",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/system-status"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/compliance/appeal/commit",
+      "title": "Commit Appeal",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/tm-onchain/appeal-commit"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/compliance/appeal/detail",
+      "title": "Get Appeal Detail",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/tm-onchain/appeal-detail"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/compliance/appeal/list",
+      "title": "Get Appeal List",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/tm-onchain/appeal-list"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/user/agreement",
+      "title": "TradFi Integration",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/tradfi-integration",
+      "alternate_sources": [
+        "https://bybit-exchange.github.io/docs/v5/user/sign-agreement"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/v5/user/query-api",
+      "title": "Get API Key Information",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/user/apikey-info"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/user/create-sub-api",
+      "title": "Create Sub UID API Key",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/user/create-subuid-apikey"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/user/create-sub-member",
+      "title": "Create Sub UID",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/user/create-subuid"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/user/invitation/referrals",
+      "title": "Get Friend Referrals",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/user/friend-referral"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/user/frozen-sub-member",
+      "title": "Freeze Sub UID",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/user/froze-subuid"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/user/escrow_sub_members",
+      "title": "Get Fund Custodial Sub Acct",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/user/fund-subuid-list"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/user/sub-apikeys",
+      "title": "Get Sub Account All API Keys",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/user/list-sub-apikeys"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/user/update-api",
+      "title": "Modify Master API Key",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/user/modify-master-apikey"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/user/update-sub-api",
+      "title": "Modify Sub API Key",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/user/modify-sub-apikey"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/user/submembers",
+      "title": "Get Sub UID List (Unlimited)",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/user/page-subuid"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/user/invitation/code",
+      "title": "Get Referral Code",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/user/referral-code"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/user/delete-api",
+      "title": "Delete Master API Key",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/user/rm-master-apikey"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/user/delete-sub-api",
+      "title": "Delete Sub API Key",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/user/rm-sub-apikey"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/user/del-submember",
+      "title": "Delete Sub UID",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/user/rm-subuid"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/user/query-sub-members",
+      "title": "Get Sub UID List (Limited)",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/user/subuid-list"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/user/get-member-type",
+      "title": "Get UID Wallet Type",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/user/wallet-type"
+    },
+    {
+      "method": "WS",
+      "path": "/v5/private",
+      "channel": "dcp",
+      "title": "Dcp",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/websocket/private/dcp"
+    },
+    {
+      "method": "WS",
+      "path": "/v5/private",
+      "channel": "execution",
+      "title": "Execution",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/websocket/private/execution"
+    },
+    {
+      "method": "WS",
+      "path": "/v5/private",
+      "channel": "fast-execution",
+      "title": "Fast Execution",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/websocket/private/fast-execution"
+    },
+    {
+      "method": "WS",
+      "path": "/v5/private",
+      "channel": "greek",
+      "title": "Greek",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/websocket/private/greek"
+    },
+    {
+      "method": "WS",
+      "path": "/v5/private",
+      "channel": "order",
+      "title": "Order",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/websocket/private/order"
+    },
+    {
+      "method": "WS",
+      "path": "/v5/private",
+      "channel": "position",
+      "title": "Position",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/websocket/private/position"
+    },
+    {
+      "method": "WS",
+      "path": "/v5/private",
+      "channel": "strategy",
+      "title": "Strategy",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/websocket/private/strategy"
+    },
+    {
+      "method": "WS",
+      "path": "/v5/private",
+      "channel": "wallet",
+      "title": "Wallet",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/websocket/private/wallet"
+    },
+    {
+      "method": "WS",
+      "path": "/v5/public",
+      "channel": "adl-alert",
+      "title": "ADL Alert",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/websocket/public/adl-alert"
+    },
+    {
+      "method": "WS",
+      "path": "/v5/public",
+      "channel": "all-liquidation",
+      "title": "All Liquidation",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/websocket/public/all-liquidation"
+    },
+    {
+      "method": "WS",
+      "path": "/v5/public",
+      "channel": "full-ob",
+      "title": "Full Orderbook",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/websocket/public/full-ob"
+    },
+    {
+      "method": "WS",
+      "path": "/v5/public",
+      "channel": "insurance-pool",
+      "title": "Insurance Pool",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/websocket/public/insurance-pool"
+    },
+    {
+      "method": "WS",
+      "path": "/v5/public",
+      "channel": "kline",
+      "title": "Kline",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/websocket/public/kline"
+    },
+    {
+      "method": "WS",
+      "path": "/v5/public",
+      "channel": "order-price-limit",
+      "title": "Order Price Limit",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/websocket/public/order-price-limit"
+    },
+    {
+      "method": "WS",
+      "path": "/v5/public",
+      "channel": "orderbook-rpi",
+      "title": "RPI Orderbook",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/websocket/public/orderbook-rpi"
+    },
+    {
+      "method": "WS",
+      "path": "/v5/public",
+      "channel": "orderbook",
+      "title": "Orderbook",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/websocket/public/orderbook"
+    },
+    {
+      "method": "WS",
+      "path": "/v5/public",
+      "channel": "ticker",
+      "title": "Ticker",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/websocket/public/ticker"
+    },
+    {
+      "method": "WS",
+      "path": "/v5/public",
+      "channel": "trade",
+      "title": "Trade",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/websocket/public/trade"
+    },
+    {
+      "method": "WS",
+      "path": "/v5/system",
+      "channel": "system-status",
+      "title": "System Status",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/websocket/system/system-status"
+    },
+    {
+      "method": "WS",
+      "path": "/v5/spread",
+      "channel": "execution",
+      "host": "private",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/spread/websocket/private/execution"
+    },
+    {
+      "method": "WS",
+      "path": "/v5/spread",
+      "channel": "order",
+      "host": "private",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/spread/websocket/private/order"
+    },
+    {
+      "method": "WS",
+      "path": "/v5/spread",
+      "channel": "orderbook",
+      "host": "public",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/spread/websocket/public/orderbook"
+    },
+    {
+      "method": "WS",
+      "path": "/v5/spread",
+      "channel": "ticker",
+      "host": "public",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/spread/websocket/public/ticker"
+    },
+    {
+      "method": "WS",
+      "path": "/v5/spread",
+      "channel": "trade",
+      "host": "public",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/spread/websocket/public/trade"
+    },
+    {
+      "method": "WS",
+      "path": "/v5/rfq",
+      "channel": "inquiry",
+      "host": "private",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/rfq/websocket/private/inquiry"
+    },
+    {
+      "method": "WS",
+      "path": "/v5/rfq",
+      "channel": "quote",
+      "host": "private",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/rfq/websocket/private/quote"
+    },
+    {
+      "method": "WS",
+      "path": "/v5/rfq",
+      "channel": "transaction",
+      "host": "private",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/rfq/websocket/private/transaction"
+    },
+    {
+      "method": "WS",
+      "path": "/v5/rfq",
+      "channel": "public-transaction",
+      "host": "public",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/rfq/websocket/public/public-transaction"
+    }
+  ]
+}

@@ -16,7 +16,8 @@ impl PythonBinanceHttpClient {
         futures_base_url=None,
         options_base_url=None,
         coin_futures_base_url=None,
-        portfolio_margin_base_url=None
+        portfolio_margin_base_url=None,
+        alpha_base_url=None
     ))]
     fn new(
         api_key: Option<String>,
@@ -27,6 +28,7 @@ impl PythonBinanceHttpClient {
         options_base_url: Option<String>,
         coin_futures_base_url: Option<String>,
         portfolio_margin_base_url: Option<String>,
+        alpha_base_url: Option<String>,
     ) -> PyResult<Self> {
         let timeout = http_timeout(timeout)?;
         Ok(Self {
@@ -44,6 +46,9 @@ impl PythonBinanceHttpClient {
             )
             .with_portfolio_margin_base_url(
                 portfolio_margin_base_url.unwrap_or_else(|| "https://papi.binance.com".into()),
+            )
+            .with_alpha_base_url(
+                alpha_base_url.unwrap_or_else(|| "https://www.binance.com".into()),
             ),
         })
     }

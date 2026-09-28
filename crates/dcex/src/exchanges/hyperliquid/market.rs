@@ -13,6 +13,9 @@ impl HyperliquidClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         let params = HyperliquidParams::from_pairs(params);
+        if let Some(response) = self.inventory_request(method_name, &params, true).await? {
+            return Ok(response);
+        }
         let payload = match method_name {
             "get_all_mids" => {
                 params.ensure_allowed(&["dex"])?;
@@ -214,21 +217,21 @@ impl HyperliquidClient {
             "get_l2book" => {
                 params.ensure_allowed(&["product_symbol", "nSigFigs", "mantissa"])?;
                 let n_sig_figs = params.optional_u64("nSigFigs")?;
-                if let Some(value) = n_sig_figs {
-                    if ![2, 3, 4, 5].contains(&value) {
-                        return Err(DcexError::InvalidInput(
-                            "Hyperliquid nSigFigs must be 2, 3, 4, or 5".to_string(),
-                        ));
-                    }
+                if let Some(value) = n_sig_figs
+                    && ![2, 3, 4, 5].contains(&value)
+                {
+                    return Err(DcexError::InvalidInput(
+                        "Hyperliquid nSigFigs must be 2, 3, 4, or 5".to_string(),
+                    ));
                 }
                 let mantissa = params.optional_u64("mantissa")?;
-                if let Some(value) = mantissa {
-                    if n_sig_figs != Some(5) || ![1, 2, 5].contains(&value) {
-                        return Err(DcexError::InvalidInput(
-                            "Hyperliquid mantissa must be 1, 2, or 5 and requires nSigFigs=5"
-                                .to_string(),
-                        ));
-                    }
+                if let Some(value) = mantissa
+                    && (n_sig_figs != Some(5) || ![1, 2, 5].contains(&value))
+                {
+                    return Err(DcexError::InvalidInput(
+                        "Hyperliquid mantissa must be 1, 2, or 5 and requires nSigFigs=5"
+                            .to_string(),
+                    ));
                 }
                 let mut payload = json!({
                     "type": "l2Book",
@@ -314,17 +317,17 @@ fn optional_nonempty<'a>(params: &'a HyperliquidParams, key: &str) -> Result<Opt
 }
 
 fn insert_optional_string(payload: &mut Value, key: &str, value: Option<&str>) {
-    if let Some(value) = value {
-        if let Some(object) = payload.as_object_mut() {
-            object.insert(key.to_string(), Value::String(value.to_string()));
-        }
+    if let Some(value) = value
+        && let Some(object) = payload.as_object_mut()
+    {
+        object.insert(key.to_string(), Value::String(value.to_string()));
     }
 }
 
 fn insert_optional_unsigned(payload: &mut Value, key: &str, value: Option<u64>) {
-    if let Some(value) = value {
-        if let Some(object) = payload.as_object_mut() {
-            object.insert(key.to_string(), Value::Number(value.into()));
-        }
+    if let Some(value) = value
+        && let Some(object) = payload.as_object_mut()
+    {
+        object.insert(key.to_string(), Value::Number(value.into()));
     }
 }

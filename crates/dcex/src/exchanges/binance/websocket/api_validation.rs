@@ -129,9 +129,18 @@ pub(super) fn validate(
             ][..]
         };
         if !types.contains(&kind) {
-            return Err(invalid(
-                "unsupported order type; USD-M conditional orders use algoOrder.place; COIN-M conditional orders use the REST algo endpoint",
-            ));
+            // Current COIN-M order.place documentation also rejects migrated
+            // conditional orders with -4120; do not restore the legacy types.
+            // https://developers.binance.com/docs/derivatives/coin-margined-futures/trade/websocket-api/New-Order
+            return Err(invalid(match market {
+                BinanceWebSocketApiMarket::Futures => {
+                    "unsupported order type; USD-M conditional orders use algoOrder.place"
+                }
+                BinanceWebSocketApiMarket::CoinFutures => {
+                    "unsupported order type; COIN-M conditional orders use REST /dapi/v1/algoOrder after migration"
+                }
+                BinanceWebSocketApiMarket::Spot => "unsupported order type",
+            }));
         }
         any(params, &["quantity", "quoteOrderQty"])?;
         if kind != "MARKET" && params.contains_key("quoteOrderQty") {
@@ -221,10 +230,9 @@ pub(super) fn validate(
     if let (Some(start), Some(end)) = (
         params.get("startTime").and_then(Value::as_u64),
         params.get("endTime").and_then(Value::as_u64),
-    ) {
-        if start > end {
-            return Err(invalid("startTime cannot exceed endTime"));
-        }
+    ) && start > end
+    {
+        return Err(invalid("startTime cannot exceed endTime"));
     }
     if let Some(kind) = method.strip_prefix("orderList.place.") {
         let converted = super::super::params::PublicParams(

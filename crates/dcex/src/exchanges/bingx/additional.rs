@@ -351,7 +351,6 @@ impl BingxClient {
                         .map_err(|_| invalid("permissions must be an integer array"))?;
                     if values.is_empty()
                         || values.iter().any(|v| !matches!(v, 1 | 2 | 3 | 4 | 5 | 7))
-                        || (name == "modify_sub_account_api_key" && values.contains(&5))
                     {
                         return Err(invalid("unsupported API permission code"));
                     }

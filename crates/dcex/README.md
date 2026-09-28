@@ -31,7 +31,7 @@ The examples below use Tokio's `#[tokio::main]` macro.
 - Exchange signing, serialization, and response validation in the Rust core.
 - Product Table lookups between normalized and exchange-native symbols, with trading metadata.
 
-Available endpoints differ by exchange. External withdrawal creation endpoints are not wrapped. The Product Table includes listed options from Binance, Bybit, and OKX; option trading uses exchange-specific APIs.
+Available endpoints differ by exchange. Documented withdrawal, market-maker and partner endpoints are in scope; current coverage and specification gaps are recorded in the endpoint ledger. API withdrawals have no second confirmation; they execute on submit. Trading API keys should not have withdrawal permission. The Product Table includes listed options from Binance, Bybit, and OKX; option trading uses exchange-specific APIs.
 
 ## Supported exchanges
 
@@ -53,7 +53,7 @@ Available endpoints differ by exchange. External withdrawal creation endpoints a
 | Ondo | Yes | Yes | Yes |
 | Arcus | Yes | Yes | Yes |
 
-Private WebSocket support includes authenticated or address-scoped user-data streams. Bybit also exposes an authenticated trade WebSocket for order operations.
+Private WebSocket support includes authenticated or address-scoped user-data streams. Binance, Bybit, Bitget, OKX, KuCoin and Kraken Spot also expose authenticated trading WebSockets.
 
 Lighter supports Mainnet and Robinhood with separate credentials; select the network for each client (Mainnet is the default). Ondo supports perpetual futures only. Arcus Spot uses a separate RFQ router and an externally wallet-signed quote; Arcus Perps is a separate client whose private execution has not yet been live-verified.
 
@@ -94,6 +94,8 @@ async fn main() -> dcex::Result<()> {
 ```
 
 HTTP methods without required parameters need no empty parameter list. Optional parameters use builder setters such as `.limit(100)` or `.param("key", value)`.
+
+Additional profiles cover Binance Alpha, Aster Prediction, KuCoin Classic/Pro and Kraken Spot V1. Bitget SBE returns raw binary frames for caller-side decoding.
 
 Public WebSocket:
 

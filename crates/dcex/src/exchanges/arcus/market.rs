@@ -15,6 +15,9 @@ impl ArcusClient {
         method_name: &str,
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
+        if super::completion::handles(method_name, true) {
+            return self.completion_request(method_name, params).await;
+        }
         if super::metadata::handles(method_name, true) {
             return self.metadata_request(method_name, params).await;
         }

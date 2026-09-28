@@ -160,12 +160,12 @@ pub(crate) fn l2_book_subscription(
 }
 
 fn validate_l2_book_precision(n_sig_figs: Option<u64>, mantissa: Option<u64>) -> Result<()> {
-    if let Some(n_sig_figs) = n_sig_figs {
-        if !matches!(n_sig_figs, 2 | 3 | 4 | 5) {
-            return Err(DcexError::InvalidInput(format!(
-                "Hyperliquid l2Book nSigFigs must be one of 2, 3, 4, or 5; got {n_sig_figs}."
-            )));
-        }
+    if let Some(n_sig_figs) = n_sig_figs
+        && !matches!(n_sig_figs, 2..=5)
+    {
+        return Err(DcexError::InvalidInput(format!(
+            "Hyperliquid l2Book nSigFigs must be one of 2, 3, 4, or 5; got {n_sig_figs}."
+        )));
     }
     if let Some(mantissa) = mantissa {
         if n_sig_figs != Some(5) {

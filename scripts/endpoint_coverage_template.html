@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>dcex endpoint coverage</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+:root{
+  color-scheme:light;
+  --bg:#f2f4f1;--surface:#ffffff;--sunk:#e8ece7;--ink:#16202b;--muted:#5a6672;--line:#d6dcd6;
+  --accent:#23489e;--accent-soft:#e2e8f6;
+  --s-implemented:#1c7a4b;--s-protocol:#3f64c4;--s-unverified:#a86a07;--s-partial:#c2561b;
+  --s-blocked:#b3261e;--s-pending:#6b7280;--s-unavailable:#7b8591;--s-superseded:#8f7aa8;--s-excluded:#a3aab2;--s-other:#6b7280;
+  --sans:"IBM Plex Sans","Noto Sans TC",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --bg:#11161b;--surface:#182028;--sunk:#1f2831;--ink:#e3e8ec;--muted:#98a4af;--line:#2b3641;
+  --accent:#8aa8f0;--accent-soft:#223257;
+  --s-implemented:#55c78c;--s-protocol:#86a4f0;--s-unverified:#e3a948;--s-partial:#ec8a50;
+  --s-blocked:#f0837b;--s-pending:#9aa3ad;--s-unavailable:#8d97a2;--s-superseded:#b7a4d0;--s-excluded:#5f6873;--s-other:#9aa3ad;
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#11161b;--surface:#182028;--sunk:#1f2831;--ink:#e3e8ec;--muted:#98a4af;--line:#2b3641;
+  --accent:#8aa8f0;--accent-soft:#223257;
+  --s-implemented:#55c78c;--s-protocol:#86a4f0;--s-unverified:#e3a948;--s-partial:#ec8a50;
+  --s-blocked:#f0837b;--s-pending:#9aa3ad;--s-unavailable:#8d97a2;--s-superseded:#b7a4d0;--s-excluded:#5f6873;--s-other:#9aa3ad;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.55 var(--sans);padding-inline:16px;padding-block:24px 64px}
+.wrap{max-width:1240px;margin:0 auto;display:flex;flex-direction:column;gap:24px}
+.wrap>*{min-width:0}
+header{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between}
+h1{margin:0;font-size:24px;font-weight:600;letter-spacing:-.01em;text-wrap:balance}
+h2{margin:0 0 12px;font-size:16px;font-weight:600;text-wrap:balance}
+.sub{margin:6px 0 0;color:var(--muted);max-width:72ch}
+.meta{font:12px/1.5 var(--mono);color:var(--muted);margin-top:8px}
+.toggles{display:flex;gap:8px}
+button{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:6px 12px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button:focus-visible,select:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+nav.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);overflow-x:auto}
+nav.tabs button{border:0;border-bottom:2px solid transparent;border-radius:0;background:transparent;padding:10px 14px;color:var(--muted);white-space:nowrap}
+nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent);font-weight:600}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+.kpi b{display:block;font:500 24px/1.2 var(--mono);font-variant-numeric:tabular-nums}
+.kpi span{font-size:12px;color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+th,td{text-align:left;vertical-align:top;padding:8px 10px;border-bottom:1px solid var(--line)}
+th{position:sticky;top:0;background:var(--sunk);color:var(--muted);font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
+td.num{font-family:var(--mono);text-align:right;white-space:nowrap}
+tr.pick{cursor:pointer}
+tr.pick:hover td{background:var(--accent-soft)}
+.exname{font-weight:600;white-space:nowrap}
+.bar{display:flex;height:10px;min-width:160px;border-radius:3px;overflow:hidden;background:var(--sunk)}
+.bar i{display:block;height:100%}
+.legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:10px;font-size:12px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.dot{display:inline-block;width:10px;height:10px;border-radius:2px}
+.filters{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-bottom:12px}
+.filters label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted)}
+select,input[type=search]{font:13px var(--sans);color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:7px 8px;max-width:100%}
+input[type=search]{width:min(340px,86vw)}
+.count{margin-left:auto;font:12px var(--mono);color:var(--muted)}
+.pill{display:inline-flex;align-items:center;gap:6px;font:500 12px var(--mono);white-space:nowrap}
+.pill::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--c)}
+.ep{font:12.5px/1.45 var(--mono);overflow-wrap:anywhere;min-width:220px}
+.ep a{color:inherit;text-decoration-color:var(--line);text-underline-offset:3px}
+.ep a:hover{color:var(--accent)}
+.cat{color:var(--muted);font-size:12.5px;min-width:120px}
+.methods{font:12px/1.5 var(--mono);color:var(--muted);overflow-wrap:anywhere;min-width:160px}
+.flags{font:12px var(--mono);white-space:nowrap;color:var(--muted)}
+.flags .y{color:var(--s-implemented)} .flags .n{color:var(--s-blocked)}
+.note{color:var(--muted);font-size:12.5px;min-width:220px;max-width:52ch;overflow-wrap:anywhere}
+.pager{display:flex;gap:10px;align-items:center;justify-content:center;padding:12px}
+.pager span{font:12px var(--mono);color:var(--muted)}
+.groups{display:flex;flex-direction:column;gap:20px}
+.group h3{display:flex;align-items:center;gap:8px;margin:0 0 8px;font-size:14px}
+.group h3 small{font:12px var(--mono);color:var(--muted);font-weight:400}
+.group p.desc{margin:0 0 10px;color:var(--muted);font-size:13px;max-width:80ch}
+.empty{padding:20px;color:var(--muted);text-align:center}
+.foot{color:var(--muted);font-size:12px;max-width:90ch}
+[hidden]{display:none!important}
+@media (max-width:640px){h1{font-size:20px}.count{margin-left:0;width:100%}}
+@media (prefers-reduced-motion:no-preference){nav.tabs button{transition:color .15s,border-color .15s}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1 data-i18n="title"></h1>
+      <p class="sub" data-i18n="subtitle"></p>
+      <div class="meta" id="meta"></div>
+    </div>
+    <div class="toggles">
+      <button type="button" id="lang" aria-label="Language"></button>
+      <button type="button" id="theme" aria-label="Theme"></button>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button type="button" role="tab" id="tab-overview" aria-controls="panel-overview" data-tab="overview" data-i18n="tabOverview"></button>
+    <button type="button" role="tab" id="tab-endpoints" aria-controls="panel-endpoints" data-tab="endpoints" data-i18n="tabEndpoints"></button>
+    <button type="button" role="tab" id="tab-remaining" aria-controls="panel-remaining" data-tab="remaining" data-i18n="tabRemaining"></button>
+  </nav>
+
+  <section id="panel-overview" role="tabpanel" aria-labelledby="tab-overview">
+    <div class="kpis" id="kpis"></div>
+    <h2 style="margin-top:24px" data-i18n="byExchange"></h2>
+    <div class="card scroll"><table>
+      <thead><tr id="mx-head"></tr></thead>
+      <tbody id="mx"></tbody>
+    </table></div>
+    <div class="legend" id="legend"></div>
+  </section>
+
+  <section id="panel-endpoints" role="tabpanel" aria-labelledby="tab-endpoints" hidden>
+    <div class="filters">
+      <label for="f-ex"><span data-i18n="fExchange"></span><select id="f-ex"></select></label>
+      <label for="f-st"><span data-i18n="fStatus"></span><select id="f-st"></select></label>
+      <label for="f-kind"><span data-i18n="fKind"></span><select id="f-kind"></select></label>
+      <label for="f-verb"><span data-i18n="fVerb"></span><select id="f-verb"></select></label>
+      <label for="f-q"><span data-i18n="fSearch"></span><input type="search" id="f-q"></label>
+      <button type="button" id="reset" data-i18n="reset"></button>
+      <span class="count" id="count"></span>
+    </div>
+    <div class="card scroll"><table>
+      <thead><tr id="rows-head"></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <div class="pager"><button type="button" id="prev"></button><span id="page"></span><button type="button" id="next"></button></div></div>
+  </section>
+
+  <section id="panel-remaining" role="tabpanel" aria-labelledby="tab-remaining" hidden>
+    <div class="groups" id="groups"></div>
+  </section>
+
+  <p class="foot" data-i18n="foot"></p>
+</div>
+
+<script id="data" type="application/json">__DATA__</script>
+<script>
+(() => {
+"use strict";
+const D = JSON.parse(document.getElementById("data").textContent);
+const EX = D.exchanges;
+const NAMES = {binance:"Binance",bybit:"Bybit",okx:"OKX",bitget:"Bitget",bingx:"BingX",kraken:"Kraken",mexc:"MEXC",kucoin:"KuCoin",hyperliquid:"Hyperliquid",lighter:"Lighter",backpack:"Backpack",aster:"Aster",extended:"Extended",ondo:"Ondo",arcus:"Arcus"};
+const exName = e => NAMES[e] || e;
+const R = D.rows.map(r => ({row:r[0], ex:EX[r[1]], kind:r[2], cat:r[3], ep:r[4], st:r[5], methods:r[6], note:r[7], url:r[8], rust:r[9], sync:r[10], async:r[11]}));
+R.forEach(r => { const m = /^(GET|POST|PUT|DELETE|PATCH)\b/.exec(r.ep); r.verb = m ? m[1] : ""; r.hay = (r.ex+" "+r.cat+" "+r.ep+" "+r.methods.join(" ")+" "+r.note).toLowerCase(); });
+
+const ORDER = ["implemented","protocol","unverified","partial","blocked","pending","unavailable","superseded","excluded"];
+const present = [...new Set(R.map(r => r.st))];
+const STATUSES = ORDER.filter(s => present.includes(s)).concat(present.filter(s => !ORDER.includes(s)).sort());
+const SUPPORTED = new Set(["implemented","protocol"]);
+const REMAINING = STATUSES.filter(s => !SUPPORTED.has(s) && s !== "superseded");
+const color = s => `var(--s-${ORDER.includes(s) ? s : "other"})`;
+
+const T = {
+  en: {
+    title:"dcex endpoint coverage",
+    subtitle:"Every row of the endpoint audit, checked against official exchange docs and the Rust crate, Python sync and Python async clients. Rows may group several operations, so counts are not official endpoint totals.",
+    tabOverview:"Overview", tabEndpoints:"Endpoints", tabRemaining:"Remaining",
+    byExchange:"By exchange", exchange:"Exchange", total:"Rows", dist:"Distribution",
+    fExchange:"Exchange", fStatus:"Status", fKind:"Type", fVerb:"HTTP method", fSearch:"Search", all:"All",
+    searchPh:"Path, method name, note", reset:"Clear filters",
+    cRow:"#", cEx:"Exchange", cCat:"Category", cEp:"Endpoint", cSt:"Status", cMethods:"Methods", cFlags:"Rust · Sync · Async", cNote:"Note",
+    rows:n=>`${n} rows`, page:(a,b)=>`Page ${a} / ${b}`, prev:"Previous", next:"Next", empty:"No rows match these filters.",
+    kSupported:"Supported rows", kRemaining:"Remaining rows", kExchanges:"Exchanges", kRust:"Rust tests passed", kPy:"Python tests passed",
+    reviewed:"Reviewed", langBtn:"中文", themeLight:"Light", themeDark:"Dark", themeAuto:"Auto",
+    foot:"Supported means a wrapper with route evidence and an offline test; it is not a live-exchange certification. Protocol means generic WebSocket subscribe/transport support rather than a typed helper for every topic.",
+    st:{implemented:"Implemented", protocol:"Protocol", unverified:"Unverified", partial:"Partial", blocked:"Blocked", pending:"Pending", unavailable:"Unavailable", superseded:"Superseded", excluded:"Excluded"},
+    stDesc:{
+      unverified:"A wrapper exists, but part of the official specification remains incomplete. Not verified against the live exchange.",
+      pending:"Documented operation awaiting implementation or dedicated endpoint verification.",
+      partial:"A grouped row where some operations are done and others still have a gap.",
+      blocked:"Cannot be implemented until the exchange publishes the missing signing or parameter spec.",
+      unavailable:"Discontinued, deprecated or under maintenance on the exchange side.",
+      excluded:"Out of scope."
+    },
+    none:"Nothing in this state."
+  },
+  zh: {
+    title:"dcex 端點覆蓋表",
+    subtitle:"端點盤點的每一列，都依交易所官方文件與 Rust crate、Python sync、Python async 封裝逐列核對。部分列合併多個操作，列數不等於官方端點數。",
+    tabOverview:"總覽", tabEndpoints:"端點明細", tabRemaining:"剩餘項目",
+    byExchange:"各交易所", exchange:"交易所", total:"列數", dist:"分布",
+    fExchange:"交易所", fStatus:"狀態", fKind:"類型", fVerb:"HTTP 方法", fSearch:"搜尋", all:"全部",
+    searchPh:"路徑、方法名稱、備註", reset:"清除篩選",
+    cRow:"#", cEx:"交易所", cCat:"分類", cEp:"端點", cSt:"狀態", cMethods:"方法", cFlags:"Rust · Sync · Async", cNote:"備註",
+    rows:n=>`${n} 列`, page:(a,b)=>`第 ${a} / ${b} 頁`, prev:"上一頁", next:"下一頁", empty:"沒有符合篩選條件的列。",
+    kSupported:"已支援列數", kRemaining:"剩餘列數", kExchanges:"交易所", kRust:"Rust 測試通過", kPy:"Python 測試通過",
+    reviewed:"核對日期", langBtn:"EN", themeLight:"淺色", themeDark:"深色", themeAuto:"自動",
+    foot:"「已實作」表示有封裝、路由證據與離線測試，不代表已在真實交易所驗證。「協定」表示共用的 WebSocket 訂閱與傳輸支援，不是每個主題都有專用方法。",
+    st:{implemented:"已實作", protocol:"協定", unverified:"未驗證", partial:"部分完成", blocked:"受阻", pending:"待處理", unavailable:"停用", superseded:"已取代", excluded:"排除"},
+    stDesc:{
+      unverified:"已有封裝，但部分官方規格仍不完整，尚未在真實交易所驗證。",
+      pending:"已列入官方清冊，仍待實作或逐端點驗證。",
+      partial:"合併列中部分操作已完成，仍有明確缺口。",
+      blocked:"交易所補上缺少的簽章或參數規格之前無法實作。",
+      unavailable:"交易所端已停用、棄用或維護中。",
+      excluded:"不在範圍內。"
+    },
+    none:"目前沒有這個狀態的項目。"
+  }
+};
+
+const store = { get(k){ try { return localStorage.getItem(k); } catch(e) { return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch(e) {} } };
+let lang = store.get("dcex-cov-lang") || ((navigator.language || "").toLowerCase().startsWith("zh") ? "zh" : "en");
+let theme = store.get("dcex-cov-theme") || "auto";
+let tab = ["overview","endpoints","remaining"].includes(location.hash.slice(1)) ? location.hash.slice(1) : "overview";
+let page = 1;
+const PAGE = 200;
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const t = k => T[lang][k];
+const stLabel = s => (T[lang].st[s] || s);
+const safeUrl = u => /^https?:\/\//.test(u) ? u : "";
+
+function applyTheme(){
+  if (theme === "auto") document.documentElement.removeAttribute("data-theme");
+  else document.documentElement.setAttribute("data-theme", theme);
+  $("theme").textContent = theme === "auto" ? t("themeAuto") : theme === "dark" ? t("themeDark") : t("themeLight");
+}
+
+function renderStatic(){
+  document.documentElement.lang = lang === "zh" ? "zh-Hant" : "en";
+  document.title = t("title");
+  document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = t(el.dataset.i18n); });
+  $("lang").textContent = t("langBtn");
+  $("f-q").placeholder = t("searchPh");
+  $("prev").textContent = t("prev");
+  $("next").textContent = t("next");
+  $("meta").textContent = `${t("reviewed")} ${D.reviewed}`;
+  applyTheme();
+}
+
+function counts(rows){ const c = {}; rows.forEach(r => { c[r.st] = (c[r.st]||0)+1; }); return c; }
+
+function renderOverview(){
+  const c = counts(R), v = D.verification || {};
+  const supported = R.filter(r => SUPPORTED.has(r.st)).length;
+  const remaining = R.filter(r => REMAINING.includes(r.st)).length;
+  const k = [[supported, t("kSupported")], [remaining, t("kRemaining")], [EX.length, t("kExchanges")]];
+  if (Number.isFinite(v.rust_passed)) k.push([v.rust_passed, t("kRust")]);
+  if (Number.isFinite(v.python_full_collection)) k.push([v.python_full_collection, t("kPy")]);
+  $("kpis").innerHTML = k.map(([n,l]) => `<div class="kpi"><b>${n.toLocaleString()}</b><span>${esc(l)}</span></div>`).join("");
+  $("mx-head").innerHTML = `<th>${t("exchange")}</th>` + STATUSES.map(s => `<th class="num">${esc(stLabel(s))}</th>`).join("") + `<th class="num">${t("total")}</th><th>${t("dist")}</th>`;
+  $("mx").innerHTML = EX.map(ex => {
+    const rs = R.filter(r => r.ex === ex), cc = counts(rs), n = rs.length || 1;
+    const bar = STATUSES.map(s => cc[s] ? `<i style="width:${(cc[s]/n*100).toFixed(2)}%;background:${color(s)}"></i>` : "").join("");
+    return `<tr class="pick" tabindex="0" data-ex="${ex}"><td class="exname">${exName(ex)}</td>` +
+      STATUSES.map(s => `<td class="num">${cc[s] || ""}</td>`).join("") +
+      `<td class="num">${rs.length}</td><td><div class="bar" role="img" aria-label="${exName(ex)}">${bar}</div></td></tr>`;
+  }).join("");
+  $("legend").innerHTML = STATUSES.map(s => `<span><i class="dot" style="background:${color(s)}"></i>${esc(stLabel(s))} ${c[s]}</span>`).join("");
+  document.querySelectorAll("#mx tr.pick").forEach(tr => {
+    const go = () => { $("f-ex").value = tr.dataset.ex; $("f-st").value = ""; page = 1; setTab("endpoints"); };
+    tr.addEventListener("click", go);
+    tr.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } });
+  });
+}
+
+function fillSelect(id, values, label){
+  const el = $(id), cur = el.value;
+  el.innerHTML = `<option value="">${t("all")}</option>` + values.map(v => `<option value="${esc(v)}">${esc(label ? label(v) : v)}</option>`).join("");
+  el.value = values.includes(cur) ? cur : "";
+}
+
+function renderFilters(){
+  fillSelect("f-ex", EX, exName);
+  fillSelect("f-st", STATUSES, stLabel);
+  fillSelect("f-kind", ["REST","WS"]);
+  fillSelect("f-verb", ["GET","POST","PUT","DELETE","PATCH"]);
+}
+
+const flag = v => v === 1 ? `<span class="y">✓</span>` : v === 0 ? `<span class="n">✗</span>` : "–";
+
+function renderRows(){
+  const ex = $("f-ex").value, st = $("f-st").value, kind = $("f-kind").value, verb = $("f-verb").value;
+  const q = $("f-q").value.trim().toLowerCase();
+  const rows = R.filter(r => (!ex || r.ex === ex) && (!st || r.st === st) && (!kind || r.kind === kind) && (!verb || r.verb === verb) && (!q || r.hay.includes(q)));
+  const pages = Math.max(1, Math.ceil(rows.length / PAGE));
+  page = Math.min(Math.max(1, page), pages);
+  $("count").textContent = T[lang].rows(rows.length);
+  $("page").textContent = T[lang].page(page, pages);
+  $("prev").disabled = page <= 1;
+  $("next").disabled = page >= pages;
+  $("rows-head").innerHTML = ["cRow","cEx","cCat","cEp","cSt","cMethods","cFlags","cNote"].map(k => `<th>${t(k)}</th>`).join("");
+  const slice = rows.slice((page-1)*PAGE, page*PAGE);
+  $("rows").innerHTML = slice.length ? slice.map(r => {
+    const u = safeUrl(r.url);
+    return `<tr><td class="num">${r.row}</td><td class="exname">${exName(r.ex)}</td><td class="cat">${esc(r.cat)}<br>${esc(r.kind)}</td>
+      <td class="ep">${u ? `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(r.ep)}</a>` : esc(r.ep)}</td>
+      <td><span class="pill" style="--c:${color(r.st)}">${esc(stLabel(r.st))}</span></td>
+      <td class="methods">${esc(r.methods.join(", "))}</td>
+      <td class="flags">${flag(r.rust)} ${flag(r.sync)} ${flag(r.async)}</td>
+      <td class="note">${esc(r.note)}</td></tr>`;
+  }).join("") : `<tr><td colspan="8" class="empty">${t("empty")}</td></tr>`;
+  store.set("dcex-cov-filters", JSON.stringify({ex, st, kind, verb, q}));
+}
+
+function renderRemaining(){
+  $("groups").innerHTML = REMAINING.map(s => {
+    const rs = R.filter(r => r.st === s);
+    const desc = T[lang].stDesc[s] || "";
+    const body = rs.length ? `<div class="card scroll"><table><thead><tr><th>${t("cRow")}</th><th>${t("cEx")}</th><th>${t("cEp")}</th><th>${t("cNote")}</th></tr></thead><tbody>` +
+      rs.map(r => { const u = safeUrl(r.url); return `<tr><td class="num">${r.row}</td><td class="exname">${exName(r.ex)}</td><td class="ep">${u ? `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(r.ep)}</a>` : esc(r.ep)}</td><td class="note">${esc(r.note)}</td></tr>`; }).join("") +
+      `</tbody></table></div>` : `<p class="desc">${t("none")}</p>`;
+    return `<div class="group"><h3><span class="pill" style="--c:${color(s)}">${esc(stLabel(s))}</span><small>${rs.length}</small></h3>${desc ? `<p class="desc">${esc(desc)}</p>` : ""}${body}</div>`;
+  }).join("") || `<p class="empty">${t("none")}</p>`;
+}
+
+function setTab(name){
+  tab = name;
+  document.querySelectorAll("nav.tabs button").forEach(b => b.setAttribute("aria-selected", String(b.dataset.tab === name)));
+  ["overview","endpoints","remaining"].forEach(p => { $("panel-"+p).hidden = p !== name; });
+  if (name === "endpoints") renderRows();
+  if (history.replaceState) history.replaceState(null, "", "#" + name);
+}
+
+function renderAll(){ renderStatic(); renderOverview(); renderFilters(); renderRows(); renderRemaining(); setTab(tab); }
+
+document.querySelectorAll("nav.tabs button").forEach(b => b.addEventListener("click", () => setTab(b.dataset.tab)));
+window.addEventListener("hashchange", () => { const h = location.hash.slice(1); if (["overview","endpoints","remaining"].includes(h) && h !== tab) setTab(h); });
+["f-ex","f-st","f-kind","f-verb"].forEach(id => $(id).addEventListener("change", () => { page = 1; renderRows(); }));
+$("f-q").addEventListener("input", () => { page = 1; renderRows(); });
+$("reset").addEventListener("click", () => { ["f-ex","f-st","f-kind","f-verb","f-q"].forEach(id => { $(id).value = ""; }); page = 1; renderRows(); });
+$("prev").addEventListener("click", () => { page--; renderRows(); });
+$("next").addEventListener("click", () => { page++; renderRows(); });
+$("lang").addEventListener("click", () => { lang = lang === "zh" ? "en" : "zh"; store.set("dcex-cov-lang", lang); renderAll(); });
+$("theme").addEventListener("click", () => { theme = theme === "auto" ? "light" : theme === "light" ? "dark" : "auto"; store.set("dcex-cov-theme", theme); applyTheme(); });
+
+renderFilters();
+try { const s = JSON.parse(store.get("dcex-cov-filters") || "null"); if (s) { $("f-ex").value = s.ex || ""; $("f-st").value = s.st || ""; $("f-kind").value = s.kind || ""; $("f-verb").value = s.verb || ""; $("f-q").value = s.q || ""; } } catch(e) {}
+renderAll();
+})();
+</script>
+</body>
+</html>

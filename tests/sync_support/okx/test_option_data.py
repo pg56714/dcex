@@ -13,9 +13,7 @@ def _assert_ok(response):
 
 def test_option_public_data_endpoints():
     client = Client(preload_product_table=False)
-    instruments = _assert_ok(
-        client.get_public_instruments("OPTION", instFamily="BTC-USD")
-    )
+    instruments = _assert_ok(client.get_public_instruments("OPTION", instFamily="BTC-USD"))
     assert instruments["data"]
     _assert_ok(client.get_delivery_exercise_history("OPTION", instFamily="BTC-USD", limit=20))
     _assert_ok(client.get_option_summary(instFamily="BTC-USD"))
@@ -24,9 +22,7 @@ def test_option_public_data_endpoints():
     _assert_ok(client.get_option_family_trades("BTC-USD"))
     _assert_ok(client.get_options_open_interest_and_volume("BTC"))
     _assert_ok(client.get_option_put_call_ratio("BTC"))
-    expiry_distribution = _assert_ok(
-        client.get_option_open_interest_and_volume_by_expiry("BTC")
-    )
+    expiry_distribution = _assert_ok(client.get_option_open_interest_and_volume_by_expiry("BTC"))
     cutoff = (datetime.now(UTC) + timedelta(days=1)).strftime("%Y%m%d")
     expiry_time = next(row[1] for row in expiry_distribution["data"] if row[1] > cutoff)
     _assert_ok(client.get_option_open_interest_and_volume_by_strike("BTC", expiry_time))

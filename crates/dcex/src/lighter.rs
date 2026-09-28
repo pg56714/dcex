@@ -856,35 +856,27 @@ pub(crate) fn grouped_order_hash(orders: &[[u64; 10]]) -> Result<[u64; 4]> {
 mod grouped_order_vectors {
     #[test]
     fn matches_official_go_poseidon_v0_0_15() {
-        // Generated independently with lighter-go's order folding and poseidon_crypto v0.0.15.
-        let orders = [
-            [1, 42, 1000, 250000, 0, 0, 1, 0, 0, 1800000000000],
-            [1, 43, 0, 240000, 1, 2, 0, 1, 245000, 1800000000000],
-            [1, 44, 0, 270000, 1, 4, 0, 1, 265000, 1800000000000],
-        ];
-        let folded = super::grouped_order_hash(&orders).unwrap();
-        assert_eq!(
-            folded,
-            [
-                5400670057121935099,
-                3896468889462594814,
-                10398233550992208621,
-                9978647018434565302
-            ]
-        );
-        let mut values = vec![304, 28, 5, 1700000600000, 12, 3, 3];
-        values.extend(folded.map(i128::from));
-        let expected = [
-            7156653514492034847_u64,
-            8362786800291750934,
-            5593140061375059301,
-            5344044269466840264,
-            6528189259389496168,
-        ];
-        let expected_bytes: Vec<u8> = expected.into_iter().flat_map(u64::to_le_bytes).collect();
-        assert_eq!(
-            super::transaction_hash(&values, &[]).to_vec(),
-            expected_bytes
-        );
+        let vectors: serde_json::Value = serde_json::from_str(include_str!(
+            "../../../tests/fixtures/signing/lighter_official.json"
+        ))
+        .unwrap();
+        for case in vectors["cases"].as_array().unwrap() {
+            let orders: Vec<[u64; 10]> = serde_json::from_value(case["orders"].clone()).unwrap();
+            let expected: [u64; 4] = serde_json::from_value(case["folded"].clone()).unwrap();
+            let folded = super::grouped_order_hash(&orders).unwrap();
+            assert_eq!(folded, expected);
+            let mut values: Vec<i128> = vectors["transaction_prefix"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|v| i128::from(v.as_u64().unwrap()))
+                .collect();
+            values.extend(folded.map(i128::from));
+            assert_eq!(
+                hex::encode(super::transaction_hash(&values, &[])),
+                case["transaction_hash"].as_str().unwrap()
+            );
+        }
+        assert!(super::grouped_order_hash(&[]).is_err());
     }
 }

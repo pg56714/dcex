@@ -18,8 +18,8 @@ from aiohttp import web
 async def test_income_export_preserves_bytes_and_checks_errors(
     asynchronous: bool, server_error: bool
 ) -> None:
-    from dcex.bingx.client import Client
     from dcex.async_support.bingx.client import Client as AsyncClient
+    from dcex.bingx.client import Client
 
     report = b"PK\x03\x04\x00\xff\x80binary-report"
     requests: list[dict[str, Any]] = []

@@ -172,7 +172,7 @@ const PRIVATE_CASES: &[Case] = &[
     private(
         "vault_redeem",
         "vaultRedeemRequest",
-        &[("vaultId", "1")],
+        &[("all", "true"), ("vaultId", "1")],
         "POST /api/v1/vault/redeem",
     ),
     private(

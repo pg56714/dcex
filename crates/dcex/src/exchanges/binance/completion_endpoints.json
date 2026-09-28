@@ -1,0 +1,604 @@
+[
+  {
+    "method": "POST",
+    "path": "/eapi/v1/block/order/execute",
+    "sdk_method": "accept_block_trade_order",
+    "official_source": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-options/api/rest-api/market-maker-block-trade#accept-block-trade-order",
+    "parameters": [
+      {
+        "name": "block_order_matching_key",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "blockOrderMatchingKey",
+        "kind": "str"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "name": "accept_options_block_order"
+  },
+  {
+    "method": "GET",
+    "path": "/eapi/v1/block/user-trades",
+    "sdk_method": "account_block_trade_list",
+    "official_source": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-options/api/rest-api/market-maker-block-trade#account-block-trade-list",
+    "parameters": [
+      {
+        "name": "end_time",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "endTime",
+        "kind": "int"
+      },
+      {
+        "name": "start_time",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "startTime",
+        "kind": "int"
+      },
+      {
+        "name": "underlying",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "underlying",
+        "kind": "str"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "name": "get_options_account_block_trades"
+  },
+  {
+    "method": "DELETE",
+    "path": "/eapi/v1/block/order/create",
+    "sdk_method": "cancel_block_trade_order",
+    "official_source": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-options/api/rest-api/market-maker-block-trade#cancel-block-trade-order",
+    "parameters": [
+      {
+        "name": "block_order_matching_key",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "blockOrderMatchingKey",
+        "kind": "str"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "name": "cancel_options_block_order"
+  },
+  {
+    "method": "PUT",
+    "path": "/eapi/v1/block/order/create",
+    "sdk_method": "extend_block_trade_order",
+    "official_source": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-options/api/rest-api/market-maker-block-trade#extend-block-trade-order",
+    "parameters": [
+      {
+        "name": "block_order_matching_key",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "blockOrderMatchingKey",
+        "kind": "str"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "name": "extend_options_block_order"
+  },
+  {
+    "method": "POST",
+    "path": "/eapi/v1/block/order/create",
+    "sdk_method": "new_block_trade_order",
+    "official_source": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-options/api/rest-api/market-maker-block-trade#new-block-trade-order",
+    "parameters": [
+      {
+        "name": "liquidity",
+        "type": "Union[NewBlockTradeOrderLiquidityEnum, None]",
+        "required": true,
+        "wire": "liquidity",
+        "kind": "str"
+      },
+      {
+        "name": "legs",
+        "type": "Union[List[NewBlockTradeOrderLegsParameterInner], None]",
+        "required": true,
+        "wire": "legs",
+        "kind": "json"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "name": "create_options_block_order"
+  },
+  {
+    "method": "GET",
+    "path": "/eapi/v1/block/order/execute",
+    "sdk_method": "query_block_trade_details",
+    "official_source": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-options/api/rest-api/market-maker-block-trade#query-block-trade-details",
+    "parameters": [
+      {
+        "name": "block_order_matching_key",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "blockOrderMatchingKey",
+        "kind": "str"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "name": "get_options_block_order_details"
+  },
+  {
+    "method": "GET",
+    "path": "/eapi/v1/block/order/orders",
+    "sdk_method": "query_block_trade_order",
+    "official_source": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-options/api/rest-api/market-maker-block-trade#query-block-trade-order",
+    "parameters": [
+      {
+        "name": "block_order_matching_key",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "blockOrderMatchingKey",
+        "kind": "str"
+      },
+      {
+        "name": "end_time",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "endTime",
+        "kind": "int"
+      },
+      {
+        "name": "start_time",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "startTime",
+        "kind": "int"
+      },
+      {
+        "name": "underlying",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "underlying",
+        "kind": "str"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "name": "get_options_block_orders"
+  },
+  {
+    "method": "POST",
+    "path": "/sapi/v1/managed-subaccount/withdraw",
+    "sdk_method": "withdrawl_assets_from_the_managed_sub_account",
+    "official_source": "https://developers.binance.com/en/docs/catalog/vip-and-institutional-sub-account/api/rest-api/managed-sub-account#withdrawl-assets-from-the-managed-sub-account",
+    "parameters": [
+      {
+        "name": "from_email",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "fromEmail",
+        "kind": "str"
+      },
+      {
+        "name": "asset",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "asset",
+        "kind": "str"
+      },
+      {
+        "name": "amount",
+        "type": "Union[float, None]",
+        "required": true,
+        "wire": "amount",
+        "kind": "decimal"
+      },
+      {
+        "name": "transfer_date",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "transferDate",
+        "kind": "int"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "name": "withdraw_managed_sub_account"
+  },
+  {
+    "method": "POST",
+    "path": "/sapi/v1/account/disableFastWithdrawSwitch",
+    "sdk_method": "disable_fast_withdraw_switch",
+    "official_source": "https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/account#disable-fast-withdraw-switch",
+    "parameters": [
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "name": "disable_fast_withdraw_switch"
+  },
+  {
+    "method": "POST",
+    "path": "/sapi/v1/account/enableFastWithdrawSwitch",
+    "sdk_method": "enable_fast_withdraw_switch",
+    "official_source": "https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/account#enable-fast-withdraw-switch",
+    "parameters": [
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "name": "enable_fast_withdraw_switch"
+  },
+  {
+    "method": "POST",
+    "path": "/sapi/v1/capital/withdraw/apply",
+    "sdk_method": "withdraw",
+    "official_source": "https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/capital#withdraw",
+    "parameters": [
+      {
+        "name": "coin",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "coin",
+        "kind": "str"
+      },
+      {
+        "name": "address",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "address",
+        "kind": "str"
+      },
+      {
+        "name": "amount",
+        "type": "Union[float, None]",
+        "required": true,
+        "wire": "amount",
+        "kind": "decimal"
+      },
+      {
+        "name": "withdraw_order_id",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "withdrawOrderId",
+        "kind": "str"
+      },
+      {
+        "name": "network",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "network",
+        "kind": "str"
+      },
+      {
+        "name": "address_tag",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "addressTag",
+        "kind": "str"
+      },
+      {
+        "name": "transaction_fee_flag",
+        "type": "Optional[bool]",
+        "required": false,
+        "wire": "transactionFeeFlag",
+        "kind": "bool"
+      },
+      {
+        "name": "name",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "name",
+        "kind": "str"
+      },
+      {
+        "name": "wallet_type",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "walletType",
+        "kind": "int"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "name": "create_withdrawal"
+  },
+  {
+    "method": "POST",
+    "path": "/sapi/v1/localentity/broker/withdraw/apply",
+    "sdk_method": "broker_withdraw",
+    "official_source": "https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/travel-rule#broker-withdraw",
+    "parameters": [
+      {
+        "name": "address",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "address",
+        "kind": "str"
+      },
+      {
+        "name": "coin",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "coin",
+        "kind": "str"
+      },
+      {
+        "name": "amount",
+        "type": "Union[float, None]",
+        "required": true,
+        "wire": "amount",
+        "kind": "decimal"
+      },
+      {
+        "name": "withdraw_order_id",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "withdrawOrderId",
+        "kind": "str"
+      },
+      {
+        "name": "questionnaire",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "questionnaire",
+        "kind": "json"
+      },
+      {
+        "name": "originator_pii",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "originatorPii",
+        "kind": "json"
+      },
+      {
+        "name": "address_tag",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "addressTag",
+        "kind": "str"
+      },
+      {
+        "name": "network",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "network",
+        "kind": "str"
+      },
+      {
+        "name": "address_name",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "addressName",
+        "kind": "str"
+      },
+      {
+        "name": "transaction_fee_flag",
+        "type": "Optional[bool]",
+        "required": false,
+        "wire": "transactionFeeFlag",
+        "kind": "bool"
+      },
+      {
+        "name": "wallet_type",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "walletType",
+        "kind": "int"
+      }
+    ],
+    "name": "create_broker_withdrawal"
+  },
+  {
+    "method": "PUT",
+    "path": "/sapi/v1/localentity/broker/deposit/provide-info",
+    "sdk_method": "submit_deposit_questionnaire",
+    "official_source": "https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/travel-rule#submit-deposit-questionnaire",
+    "parameters": [
+      {
+        "name": "sub_account_id",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "subAccountId",
+        "kind": "str"
+      },
+      {
+        "name": "deposit_id",
+        "type": "Union[int, None]",
+        "required": true,
+        "wire": "depositId",
+        "kind": "int"
+      },
+      {
+        "name": "questionnaire",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "questionnaire",
+        "kind": "json"
+      },
+      {
+        "name": "beneficiary_pii",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "beneficiaryPii",
+        "kind": "json"
+      },
+      {
+        "name": "network",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "network",
+        "kind": "str"
+      },
+      {
+        "name": "coin",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "coin",
+        "kind": "str"
+      },
+      {
+        "name": "amount",
+        "type": "Optional[float]",
+        "required": false,
+        "wire": "amount",
+        "kind": "decimal"
+      },
+      {
+        "name": "address",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "address",
+        "kind": "str"
+      },
+      {
+        "name": "address_tag",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "addressTag",
+        "kind": "str"
+      }
+    ],
+    "name": "submit_broker_deposit_questionnaire"
+  },
+  {
+    "method": "POST",
+    "path": "/sapi/v1/localentity/withdraw/apply",
+    "sdk_method": "withdraw_travel_rule",
+    "official_source": "https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/travel-rule#withdraw-travel-rule",
+    "parameters": [
+      {
+        "name": "coin",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "coin",
+        "kind": "str"
+      },
+      {
+        "name": "address",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "address",
+        "kind": "str"
+      },
+      {
+        "name": "amount",
+        "type": "Union[float, None]",
+        "required": true,
+        "wire": "amount",
+        "kind": "decimal"
+      },
+      {
+        "name": "questionnaire",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "questionnaire",
+        "kind": "json"
+      },
+      {
+        "name": "withdraw_order_id",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "withdrawOrderId",
+        "kind": "str"
+      },
+      {
+        "name": "network",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "network",
+        "kind": "str"
+      },
+      {
+        "name": "address_tag",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "addressTag",
+        "kind": "str"
+      },
+      {
+        "name": "transaction_fee_flag",
+        "type": "Optional[bool]",
+        "required": false,
+        "wire": "transactionFeeFlag",
+        "kind": "bool"
+      },
+      {
+        "name": "name",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "name",
+        "kind": "str"
+      },
+      {
+        "name": "wallet_type",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "walletType",
+        "kind": "int"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "name": "create_travel_rule_withdrawal"
+  }
+]

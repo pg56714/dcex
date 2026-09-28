@@ -1,0 +1,501 @@
+[
+  {
+    "name": "reset_mmp",
+    "method": "POST",
+    "path": "/api/v5/account/mmp-reset",
+    "kwargs": {
+      "inst_type": "OPTION",
+      "inst_family": "BTC-USD"
+    },
+    "wire": {
+      "instType": "OPTION",
+      "instFamily": "BTC-USD"
+    },
+    "public": false,
+    "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-reset-mmp-status"
+  },
+  {
+    "name": "set_mmp_config",
+    "method": "POST",
+    "path": "/api/v5/account/mmp-config",
+    "kwargs": {
+      "inst_family": "BTC-USD",
+      "time_interval": "1000",
+      "frozen_interval": "0",
+      "qty_limit": "2"
+    },
+    "wire": {
+      "instFamily": "BTC-USD",
+      "timeInterval": "1000",
+      "frozenInterval": "0",
+      "qtyLimit": "2"
+    },
+    "public": false,
+    "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-set-mmp"
+  },
+  {
+    "name": "get_mmp_config",
+    "method": "GET",
+    "path": "/api/v5/account/mmp-config",
+    "kwargs": {
+      "inst_family": "BTC-USD"
+    },
+    "wire": {
+      "instFamily": "BTC-USD"
+    },
+    "public": false,
+    "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-mmp-config"
+  },
+  {
+    "name": "get_glp_today_performance",
+    "method": "GET",
+    "path": "/api/v5/users/glp/todayperformance",
+    "kwargs": {},
+    "wire": {},
+    "public": false,
+    "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-get-glp-today-performance"
+  },
+  {
+    "name": "get_glp_historical_performance",
+    "method": "GET",
+    "path": "/api/v5/users/glp/historicalperformance",
+    "kwargs": {
+      "program": "SPOT",
+      "begin": "1700000000000",
+      "end": "1700000001000",
+      "limit": "10"
+    },
+    "wire": {
+      "program": "SPOT",
+      "begin": "1700000000000",
+      "end": "1700000001000",
+      "limit": "10"
+    },
+    "public": false,
+    "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-get-glp-historical-performance"
+  },
+  {
+    "name": "mass_cancel_options_orders",
+    "method": "POST",
+    "path": "/api/v5/trade/mass-cancel",
+    "kwargs": {
+      "inst_type": "OPTION",
+      "inst_family": "BTC-USD",
+      "lock_interval": "1000"
+    },
+    "wire": {
+      "instType": "OPTION",
+      "instFamily": "BTC-USD",
+      "lockInterval": "1000"
+    },
+    "public": false,
+    "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-trade-post-mass-cancel-order"
+  },
+  {
+    "name": "create_rfq_quote",
+    "method": "POST",
+    "path": "/api/v5/rfq/create-quote",
+    "kwargs": {
+      "rfq_id": "rfq1",
+      "cl_quote_id": "clientquote1",
+      "tag": "fixture",
+      "anonymous": false,
+      "quote_side": "buy",
+      "expires_in": "60",
+      "legs": [
+        {
+          "instId": "BTC-USDT",
+          "tdMode": "cash",
+          "sz": "1.000000000000000001",
+          "px": "100",
+          "side": "buy"
+        }
+      ]
+    },
+    "wire": {
+      "rfqId": "rfq1",
+      "clQuoteId": "clientquote1",
+      "tag": "fixture",
+      "anonymous": false,
+      "quoteSide": "buy",
+      "expiresIn": "60",
+      "legs": [
+        {
+          "instId": "BTC-USDT",
+          "tdMode": "cash",
+          "sz": "1.000000000000000001",
+          "px": "100",
+          "side": "buy"
+        }
+      ]
+    },
+    "public": false,
+    "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-create-quote"
+  },
+  {
+    "name": "cancel_rfq_quote",
+    "method": "POST",
+    "path": "/api/v5/rfq/cancel-quote",
+    "kwargs": {
+      "quote_id": "quote1",
+      "cl_quote_id": "clientquote1",
+      "rfq_id": "rfq1"
+    },
+    "wire": {
+      "quoteId": "quote1",
+      "clQuoteId": "clientquote1",
+      "rfqId": "rfq1"
+    },
+    "public": false,
+    "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-cancel-quote"
+  },
+  {
+    "name": "get_rfq_maker_instrument_settings",
+    "method": "GET",
+    "path": "/api/v5/rfq/maker-instrument-settings",
+    "kwargs": {},
+    "wire": {},
+    "public": false,
+    "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-get-quote-products"
+  },
+  {
+    "name": "set_rfq_maker_instrument_settings",
+    "method": "POST",
+    "path": "/api/v5/rfq/maker-instrument-settings",
+    "kwargs": {
+      "inst_type": "OPTION",
+      "include_all": false,
+      "data": [
+        {
+          "instFamily": "BTC-USD",
+          "maxBlockSz": "2",
+          "makerPxBand": "1"
+        }
+      ]
+    },
+    "wire": {
+      "instType": "OPTION",
+      "includeAll": false,
+      "data": [
+        {
+          "instFamily": "BTC-USD",
+          "maxBlockSz": "2",
+          "makerPxBand": "1"
+        }
+      ]
+    },
+    "public": false,
+    "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-set-quote-products"
+  },
+  {
+    "name": "reset_rfq_mmp",
+    "method": "POST",
+    "path": "/api/v5/rfq/mmp-reset",
+    "kwargs": {},
+    "wire": {},
+    "public": false,
+    "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-reset-mmp-status"
+  },
+  {
+    "name": "set_rfq_mmp_config",
+    "method": "POST",
+    "path": "/api/v5/rfq/mmp-config",
+    "kwargs": {
+      "time_interval": "1000",
+      "frozen_interval": "0",
+      "count_limit": "3"
+    },
+    "wire": {
+      "timeInterval": "1000",
+      "frozenInterval": "0",
+      "countLimit": "3"
+    },
+    "public": false,
+    "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-set-mmp"
+  },
+  {
+    "name": "get_rfq_mmp_config",
+    "method": "GET",
+    "path": "/api/v5/rfq/mmp-config",
+    "kwargs": {},
+    "wire": {},
+    "public": false,
+    "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-get-mmp-config"
+  },
+  {
+    "name": "cancel_rfq_batch_quotes",
+    "method": "POST",
+    "path": "/api/v5/rfq/cancel-batch-quotes",
+    "kwargs": {
+      "quote_ids": [
+        "quote1"
+      ],
+      "cl_quote_ids": [
+        "clientquote1"
+      ]
+    },
+    "wire": {
+      "quoteIds": [
+        "quote1"
+      ],
+      "clQuoteIds": [
+        "clientquote1"
+      ]
+    },
+    "public": false,
+    "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-cancel-multiple-quotes"
+  },
+  {
+    "name": "cancel_all_rfq_quotes",
+    "method": "POST",
+    "path": "/api/v5/rfq/cancel-all-quotes",
+    "kwargs": {},
+    "wire": {},
+    "public": false,
+    "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-cancel-all-quotes"
+  },
+  {
+    "name": "set_rfq_cancel_all_after",
+    "method": "POST",
+    "path": "/api/v5/rfq/cancel-all-after",
+    "kwargs": {
+      "time_out": "60"
+    },
+    "wire": {
+      "timeOut": "60"
+    },
+    "public": false,
+    "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-cancel-all-after"
+  },
+  {
+    "name": "get_mm_instrument_types",
+    "method": "GET",
+    "path": "/api/v5/public/mm-instrument-types",
+    "kwargs": {
+      "inst_type": "SWAP",
+      "inst_id": "BTC-USDT-SWAP"
+    },
+    "wire": {
+      "instType": "SWAP",
+      "instId": "BTC-USDT-SWAP"
+    },
+    "public": true,
+    "official_source": "https://www.okx.com/docs-v5/en/#public-data-rest-api-get-mm-instrument-types"
+  },
+  {
+    "name": "create_withdrawal",
+    "method": "POST",
+    "path": "/api/v5/asset/withdrawal",
+    "kwargs": {
+      "ccy": "USDT",
+      "amt": "1.01",
+      "dest": "4",
+      "to_addr": "offline-address",
+      "to_addr_type": "1",
+      "chain": "USDT-ERC20",
+      "area_code": "886",
+      "rcvr_info": {
+        "walletType": "exchange",
+        "exchId": "0",
+        "rcvrFirstName": "Offline",
+        "rcvrLastName": "Test"
+      },
+      "client_id": "offline1"
+    },
+    "wire": {
+      "ccy": "USDT",
+      "amt": "1.01",
+      "dest": "4",
+      "toAddr": "offline-address",
+      "toAddrType": "1",
+      "chain": "USDT-ERC20",
+      "areaCode": "886",
+      "rcvrInfo": {
+        "walletType": "exchange",
+        "exchId": "0",
+        "rcvrFirstName": "Offline",
+        "rcvrLastName": "Test"
+      },
+      "clientId": "offline1"
+    },
+    "public": false,
+    "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-withdrawal"
+  },
+  {
+    "name": "cancel_withdrawal",
+    "method": "POST",
+    "path": "/api/v5/asset/cancel-withdrawal",
+    "kwargs": {
+      "wd_id": "withdraw1"
+    },
+    "wire": {
+      "wdId": "withdraw1"
+    },
+    "public": false,
+    "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-cancel-withdrawal"
+  },
+  {
+    "name": "create_fiat_withdrawal",
+    "method": "POST",
+    "path": "/api/v5/fiat/create-withdrawal",
+    "kwargs": {
+      "payment_acct_id": "payment1",
+      "ccy": "EUR",
+      "amt": "1.01",
+      "payment_method": "SEPA",
+      "client_id": "offline1"
+    },
+    "wire": {
+      "paymentAcctId": "payment1",
+      "ccy": "EUR",
+      "amt": "1.01",
+      "paymentMethod": "SEPA",
+      "clientId": "offline1"
+    },
+    "public": false,
+    "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-create-withdrawal-order"
+  },
+  {
+    "name": "cancel_fiat_withdrawal",
+    "method": "POST",
+    "path": "/api/v5/fiat/cancel-withdrawal",
+    "kwargs": {
+      "ord_id": "order1"
+    },
+    "wire": {
+      "ordId": "order1"
+    },
+    "public": false,
+    "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-cancel-withdrawal-order"
+  },
+  {
+    "name": "get_affiliate_performance_summary",
+    "method": "GET",
+    "path": "/api/v5/affiliate/performance/summary",
+    "kwargs": {
+      "period_type": "this_month",
+      "begin": "1700000000000",
+      "end": "1700000001000"
+    },
+    "wire": {
+      "periodType": "this_month",
+      "begin": "1700000000000",
+      "end": "1700000001000"
+    },
+    "public": false,
+    "official_source": "https://www.okx.com/docs-v5/en/#affiliate-rest-api-get-performance-summary"
+  },
+  {
+    "name": "get_affiliate_invitee_detail",
+    "method": "GET",
+    "path": "/api/v5/affiliate/invitee/detail",
+    "kwargs": {
+      "uid": "123",
+      "period_type": "this_month"
+    },
+    "wire": {
+      "uid": "123",
+      "periodType": "this_month"
+    },
+    "public": false,
+    "official_source": "https://www.okx.com/docs-v5/en/#affiliate-rest-api-get-the-invitee-39-s-detail"
+  },
+  {
+    "name": "get_affiliate_invitee_list",
+    "method": "GET",
+    "path": "/api/v5/affiliate/invitee/list",
+    "kwargs": {
+      "page": "1",
+      "limit": "10",
+      "period_type": "this_month",
+      "begin": "1700000000000",
+      "end": "1700000001000",
+      "keyword": "123",
+      "commission_category": "SPOT",
+      "order_by": "cTime",
+      "order_dir": "desc",
+      "kyc_status": "verified",
+      "sub_affiliate_uid": "456",
+      "uid": "123",
+      "join_time_begin": "1700000000000",
+      "join_time_end": "1700000001000"
+    },
+    "wire": {
+      "page": "1",
+      "limit": "10",
+      "periodType": "this_month",
+      "begin": "1700000000000",
+      "end": "1700000001000",
+      "keyword": "123",
+      "commissionCategory": "SPOT",
+      "orderBy": "cTime",
+      "orderDir": "desc",
+      "kycStatus": "verified",
+      "subAffiliateUid": "456",
+      "uid": "123",
+      "joinTimeBegin": "1700000000000",
+      "joinTimeEnd": "1700000001000"
+    },
+    "public": false,
+    "official_source": "https://www.okx.com/docs-v5/en/#affiliate-rest-api-get-invitee-list"
+  },
+  {
+    "name": "get_affiliate_links",
+    "method": "GET",
+    "path": "/api/v5/affiliate/link/list",
+    "kwargs": {
+      "page": "1",
+      "limit": "10",
+      "link_type": "standard",
+      "link_status": "normal"
+    },
+    "wire": {
+      "page": "1",
+      "limit": "10",
+      "linkType": "standard",
+      "linkStatus": "normal"
+    },
+    "public": false,
+    "official_source": "https://www.okx.com/docs-v5/en/#affiliate-rest-api-get-link-list"
+  },
+  {
+    "name": "get_affiliate_co_inviters",
+    "method": "GET",
+    "path": "/api/v5/affiliate/co-inviter/list",
+    "kwargs": {
+      "page": "1",
+      "limit": "10",
+      "link_status": "normal"
+    },
+    "wire": {
+      "page": "1",
+      "limit": "10",
+      "linkStatus": "normal"
+    },
+    "public": false,
+    "official_source": "https://www.okx.com/docs-v5/en/#affiliate-rest-api-get-co-inviter-link-list"
+  },
+  {
+    "name": "get_sub_affiliates",
+    "method": "GET",
+    "path": "/api/v5/affiliate/sub-affiliate/list",
+    "kwargs": {
+      "page": "1",
+      "limit": "10",
+      "keyword": "123",
+      "commission_category": "SPOT",
+      "order_by": "cTime",
+      "order_dir": "desc"
+    },
+    "wire": {
+      "page": "1",
+      "limit": "10",
+      "keyword": "123",
+      "commissionCategory": "SPOT",
+      "orderBy": "cTime",
+      "orderDir": "desc"
+    },
+    "public": false,
+    "official_source": "https://www.okx.com/docs-v5/en/#affiliate-rest-api-get-sub-affiliate-list"
+  }
+]

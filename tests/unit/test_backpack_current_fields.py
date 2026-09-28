@@ -65,9 +65,7 @@ def test_backpack_sync_and_async_expose_current_official_fields(
 def test_backpack_liquidation_stream_requires_a_symbol() -> None:
     from dcex.ws.backpack import PublicClient
 
-    parameter = inspect.signature(PublicClient.subscribe_liquidation).parameters[
-        "product_symbol"
-    ]
+    parameter = inspect.signature(PublicClient.subscribe_liquidation).parameters["product_symbol"]
 
     assert parameter.default is inspect.Parameter.empty
 

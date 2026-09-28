@@ -61,24 +61,24 @@ impl OndoParams {
     }
 
     pub(super) fn optional_one_of(&self, key: &str, allowed: &[&str]) -> Result<()> {
-        if let Some(value) = self.get(key) {
-            if !allowed.contains(&value) {
-                return Err(DcexError::InvalidInput(format!(
-                    "invalid Ondo {key}: {value}; expected one of {}",
-                    allowed.join(", ")
-                )));
-            }
+        if let Some(value) = self.get(key)
+            && !allowed.contains(&value)
+        {
+            return Err(DcexError::InvalidInput(format!(
+                "invalid Ondo {key}: {value}; expected one of {}",
+                allowed.join(", ")
+            )));
         }
         Ok(())
     }
 
     pub(super) fn optional_bool(&self, key: &str) -> Result<()> {
-        if let Some(value) = self.get(key) {
-            if !matches!(value, "true" | "false") {
-                return Err(DcexError::InvalidInput(format!(
-                    "invalid Ondo boolean {key}: {value}"
-                )));
-            }
+        if let Some(value) = self.get(key)
+            && !matches!(value, "true" | "false")
+        {
+            return Err(DcexError::InvalidInput(format!(
+                "invalid Ondo boolean {key}: {value}"
+            )));
         }
         Ok(())
     }

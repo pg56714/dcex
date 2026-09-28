@@ -169,6 +169,14 @@ class AccountHTTP(HTTPManager):
         """Get chains supported by the Extended bridge."""
         return self._native_private("get_bridge_config", [])
 
+    def commit_bridge_quote(self, quote_id: str) -> Any:  # noqa: ANN401
+        """
+        Commit an accepted bridge quote and return the bridge commitment.
+
+        Source: https://api.docs.extended.exchange/#commit-quote
+        """
+        return self._native_private("commit_bridge_quote", self._native_params(id=quote_id))
+
     def get_bridge_quote(
         self,
         chainIn: str,  # noqa: N803
@@ -457,3 +465,84 @@ class AccountHTTP(HTTPManager):
     def get_points_leaderboard_stats(self) -> Any:  # noqa: ANN401
         """GET /api/v1/user/rewards/leaderboard/stats."""
         return self._native_private("get_points_leaderboard_stats", self._native_params())
+
+    def create_withdrawal_signed(self, *, body: dict[str, Any]) -> dict[str, Any] | list[Any]:
+        """
+        Submit a caller-signed withdrawal settlement.
+
+        API withdrawals have no second confirmation; they execute on submit.
+        The caller supplies the official Stark settlement signature and scaled amount.
+        EVM withdrawals require quoteId; STRK withdrawals use a Starknet wallet.
+        Source: https://api.docs.extended.exchange/#withdrawals
+        """
+        return self._native_private(
+            "create_withdrawal_signed", self._native_params(**{"body": body})
+        )
+
+    def get_affiliate_data(self) -> dict[str, Any] | list[Any]:
+        """
+        Get affiliate data.
+
+        Source: https://api.docs.extended.exchange/#get-affiliate-data
+        """
+        return self._native_private("get_affiliate_data", self._native_params(**{}))
+
+    def get_referral_status(self) -> dict[str, Any] | list[Any]:
+        """
+        Get referral program status.
+
+        Source: https://api.docs.extended.exchange/#get-referral-status
+        """
+        return self._native_private("get_referral_status", self._native_params(**{}))
+
+    def get_referral_links(self) -> dict[str, Any] | list[Any]:
+        """
+        Get issued referral links.
+
+        Source: https://api.docs.extended.exchange/#get-referral-links
+        """
+        return self._native_private("get_referral_links", self._native_params(**{}))
+
+    def get_referral_dashboard(self, *, period: str) -> dict[str, Any] | list[Any]:
+        """
+        Get referral dashboard for a caller-selected period.
+
+        Source: https://api.docs.extended.exchange/#get-referral-dashboard
+        """
+        return self._native_private(
+            "get_referral_dashboard", self._native_params(**{"period": period})
+        )
+
+    def use_referral_code(self, *, code: str) -> dict[str, Any] | list[Any]:
+        """
+        Activate a referral code for this account.
+
+        Source: https://api.docs.extended.exchange/#use-referral-link
+        """
+        return self._native_private("use_referral_code", self._native_params(**{"code": code}))
+
+    def create_referral_code(
+        self, *, id: str, is_default: bool | None = None, hidden_at_ui: bool | None = None
+    ) -> dict[str, Any] | list[Any]:
+        """
+        Create a referral link code.
+
+        Source: https://api.docs.extended.exchange/#create-referral-link-code
+        """
+        return self._native_private(
+            "create_referral_code",
+            self._native_params(**{"id": id, "isDefault": is_default, "hiddenAtUi": hidden_at_ui}),
+        )
+
+    def update_referral_code(
+        self, *, id: str, is_default: bool | None = None, hidden_at_ui: bool | None = None
+    ) -> dict[str, Any] | list[Any]:
+        """
+        Update a referral link code.
+
+        Source: https://api.docs.extended.exchange/#update-referral-link-code
+        """
+        return self._native_private(
+            "update_referral_code",
+            self._native_params(**{"id": id, "isDefault": is_default, "hiddenAtUi": hidden_at_ui}),
+        )

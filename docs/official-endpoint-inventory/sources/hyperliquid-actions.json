@@ -1,0 +1,1060 @@
+[
+  {
+    "row": 4093,
+    "name": "top_up_isolated_only_margin",
+    "type": "topUpIsolatedOnlyMargin",
+    "variant": "",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#update-isolated-margin",
+    "sample": {
+      "type": "topUpIsolatedOnlyMargin",
+      "asset": 0,
+      "leverage": "2"
+    },
+    "required_fields": [
+      "asset",
+      "leverage"
+    ]
+  },
+  {
+    "row": 4094,
+    "name": "user_outcome",
+    "type": "userOutcome",
+    "variant": "",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#split-outcome",
+    "sample": {
+      "type": "userOutcome",
+      "splitOutcome": {
+        "outcome": 7,
+        "amount": "1"
+      }
+    },
+    "required_fields": [
+      "splitOutcome"
+    ]
+  },
+  {
+    "row": 4095,
+    "name": "validator_l1_stream",
+    "type": "validatorL1Stream",
+    "variant": "",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#validator-vote-on-risk-free-rate-for-aligned-quote-asset",
+    "sample": {
+      "type": "validatorL1Stream",
+      "riskFreeRate": "0.04"
+    },
+    "required_fields": [
+      "riskFreeRate"
+    ]
+  },
+  {
+    "row": 4096,
+    "name": "authorize_aqav2_role",
+    "type": "authorizeAqav2Role",
+    "variant": "",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#authorize-aqav2-role",
+    "sample": {
+      "type": "authorizeAqav2Role",
+      "token": 0,
+      "role": "technical"
+    },
+    "required_fields": [
+      "token",
+      "role"
+    ]
+  },
+  {
+    "row": 4097,
+    "name": "claim_rewards",
+    "type": "claimRewards",
+    "variant": "",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#claim-rewards",
+    "sample": {
+      "type": "claimRewards"
+    },
+    "required_fields": []
+  },
+  {
+    "row": 4098,
+    "name": "perp_deploy_register_asset2",
+    "type": "perpDeploy",
+    "variant": "registerAsset2",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-3-deployer-actions",
+    "sample": {
+      "type": "perpDeploy",
+      "registerAsset2": {
+        "assetRequest": {
+          "coin": "ab:TEST",
+          "szDecimals": 2,
+          "oraclePx": "10",
+          "marginTableId": 1,
+          "marginMode": "normal"
+        },
+        "dex": "ab"
+      }
+    },
+    "required_fields": [
+      "registerAsset2"
+    ]
+  },
+  {
+    "row": 4099,
+    "name": "perp_deploy_register_asset",
+    "type": "perpDeploy",
+    "variant": "registerAsset",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-3-deployer-actions",
+    "sample": {
+      "type": "perpDeploy",
+      "registerAsset": {
+        "assetRequest": {
+          "coin": "ab:TEST",
+          "szDecimals": 2,
+          "oraclePx": "10",
+          "marginTableId": 1,
+          "onlyIsolated": true
+        },
+        "dex": "ab"
+      }
+    },
+    "required_fields": [
+      "registerAsset"
+    ]
+  },
+  {
+    "row": 4100,
+    "name": "perp_deploy_set_oracle",
+    "type": "perpDeploy",
+    "variant": "setOracle",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-3-deployer-actions",
+    "sample": {
+      "type": "perpDeploy",
+      "setOracle": {
+        "dex": "ab",
+        "oraclePxs": [
+          [
+            "ab:TEST",
+            "10"
+          ]
+        ],
+        "markPxs": [
+          [
+            [
+              "ab:TEST",
+              "10"
+            ]
+          ]
+        ],
+        "externalPerpPxs": [
+          [
+            "ab:TEST",
+            "10"
+          ]
+        ]
+      }
+    },
+    "required_fields": [
+      "setOracle"
+    ]
+  },
+  {
+    "row": 4101,
+    "name": "perp_deploy_set_funding_multipliers",
+    "type": "perpDeploy",
+    "variant": "setFundingMultipliers",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-3-deployer-actions",
+    "sample": {
+      "type": "perpDeploy",
+      "setFundingMultipliers": [
+        [
+          "ab:TEST",
+          "1"
+        ]
+      ]
+    },
+    "required_fields": [
+      "setFundingMultipliers"
+    ]
+  },
+  {
+    "row": 4102,
+    "name": "perp_deploy_set_funding_interest_rates",
+    "type": "perpDeploy",
+    "variant": "setFundingInterestRates",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-3-deployer-actions",
+    "sample": {
+      "type": "perpDeploy",
+      "setFundingInterestRates": [
+        [
+          "ab:TEST",
+          "0.0001"
+        ]
+      ]
+    },
+    "required_fields": [
+      "setFundingInterestRates"
+    ]
+  },
+  {
+    "row": 4103,
+    "name": "perp_deploy_set_funding_clamps",
+    "type": "perpDeploy",
+    "variant": "setFundingClamps",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-3-deployer-actions",
+    "sample": {
+      "type": "perpDeploy",
+      "setFundingClamps": [
+        [
+          "ab:TEST",
+          "0.0003"
+        ]
+      ]
+    },
+    "required_fields": [
+      "setFundingClamps"
+    ]
+  },
+  {
+    "row": 4104,
+    "name": "perp_deploy_halt_trading",
+    "type": "perpDeploy",
+    "variant": "haltTrading",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-3-deployer-actions",
+    "sample": {
+      "type": "perpDeploy",
+      "haltTrading": {
+        "coin": "ab:TEST",
+        "isHalted": true
+      }
+    },
+    "required_fields": [
+      "haltTrading"
+    ]
+  },
+  {
+    "row": 4105,
+    "name": "perp_deploy_insert_margin_table",
+    "type": "perpDeploy",
+    "variant": "insertMarginTable",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-3-deployer-actions",
+    "sample": {
+      "type": "perpDeploy",
+      "insertMarginTable": {
+        "dex": "ab",
+        "marginTable": {
+          "description": "Test",
+          "marginTiers": [
+            {
+              "lowerBound": 0,
+              "maxLeverage": 10
+            }
+          ]
+        }
+      }
+    },
+    "required_fields": [
+      "insertMarginTable"
+    ]
+  },
+  {
+    "row": 4106,
+    "name": "perp_deploy_set_margin_table_ids",
+    "type": "perpDeploy",
+    "variant": "setMarginTableIds",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-3-deployer-actions",
+    "sample": {
+      "type": "perpDeploy",
+      "setMarginTableIds": [
+        [
+          "ab:TEST",
+          1
+        ]
+      ]
+    },
+    "required_fields": [
+      "setMarginTableIds"
+    ]
+  },
+  {
+    "row": 4107,
+    "name": "perp_deploy_set_fee_recipient",
+    "type": "perpDeploy",
+    "variant": "setFeeRecipient",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-3-deployer-actions",
+    "sample": {
+      "type": "perpDeploy",
+      "setFeeRecipient": {
+        "dex": "ab",
+        "feeRecipient": "0x2222222222222222222222222222222222222222"
+      }
+    },
+    "required_fields": [
+      "setFeeRecipient"
+    ]
+  },
+  {
+    "row": 4108,
+    "name": "perp_deploy_set_open_interest_caps",
+    "type": "perpDeploy",
+    "variant": "setOpenInterestCaps",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-3-deployer-actions",
+    "sample": {
+      "type": "perpDeploy",
+      "setOpenInterestCaps": [
+        [
+          "ab:TEST",
+          1000000
+        ]
+      ]
+    },
+    "required_fields": [
+      "setOpenInterestCaps"
+    ]
+  },
+  {
+    "row": 4109,
+    "name": "perp_deploy_set_sub_deployers",
+    "type": "perpDeploy",
+    "variant": "setSubDeployers",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-3-deployer-actions",
+    "sample": {
+      "type": "perpDeploy",
+      "setSubDeployers": {
+        "dex": "ab",
+        "subDeployers": [
+          {
+            "variant": "haltTrading",
+            "user": "0x2222222222222222222222222222222222222222",
+            "allowed": true
+          }
+        ]
+      }
+    },
+    "required_fields": [
+      "setSubDeployers"
+    ]
+  },
+  {
+    "row": 4110,
+    "name": "perp_deploy_set_margin_modes",
+    "type": "perpDeploy",
+    "variant": "setMarginModes",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-3-deployer-actions",
+    "sample": {
+      "type": "perpDeploy",
+      "setMarginModes": [
+        [
+          "ab:TEST",
+          "strictIsolated"
+        ]
+      ]
+    },
+    "required_fields": [
+      "setMarginModes"
+    ]
+  },
+  {
+    "row": 4111,
+    "name": "perp_deploy_set_deployer_fees",
+    "type": "perpDeploy",
+    "variant": "setDeployerFees",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-3-deployer-actions",
+    "sample": {
+      "type": "perpDeploy",
+      "setDeployerFees": [
+        [
+          "ab:TEST",
+          {
+            "scale": "1",
+            "growthMode": false
+          }
+        ]
+      ]
+    },
+    "required_fields": [
+      "setDeployerFees"
+    ]
+  },
+  {
+    "row": 4112,
+    "name": "perp_deploy_set_perp_annotation",
+    "type": "perpDeploy",
+    "variant": "setPerpAnnotation",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-3-deployer-actions",
+    "sample": {
+      "type": "perpDeploy",
+      "setPerpAnnotation": {
+        "coin": "ab:TEST",
+        "category": "test",
+        "description": "Test coin",
+        "displayName": null,
+        "keywords": [
+          "test"
+        ]
+      }
+    },
+    "required_fields": [
+      "setPerpAnnotation"
+    ]
+  },
+  {
+    "row": 4113,
+    "name": "perp_deploy_disable_dex",
+    "type": "perpDeploy",
+    "variant": "disableDex",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-3-deployer-actions",
+    "sample": {
+      "type": "perpDeploy",
+      "disableDex": "ab"
+    },
+    "required_fields": [
+      "disableDex"
+    ]
+  },
+  {
+    "row": 4115,
+    "name": "perp_deploy_star",
+    "type": "perpDeploy",
+    "variant": "star",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": true,
+    "source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-3-deployer-actions",
+    "sample": {
+      "type": "perpDeploy",
+      "star": {
+        "dex": "ab",
+        "operation": {
+          "setOracle": {
+            "oraclePxs": [
+              [
+                "ab:TEST",
+                "10"
+              ]
+            ]
+          }
+        }
+      }
+    },
+    "required_fields": [
+      "star"
+    ]
+  },
+  {
+    "row": 4116,
+    "name": "spot_deploy_register_token2",
+    "type": "spotDeploy",
+    "variant": "registerToken2",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets",
+    "sample": {
+      "type": "spotDeploy",
+      "registerToken2": {
+        "spec": {
+          "name": "TEST",
+          "szDecimals": 2,
+          "weiDecimals": 8
+        },
+        "maxGas": 0,
+        "fullName": "Test token"
+      }
+    },
+    "required_fields": [
+      "registerToken2"
+    ]
+  },
+  {
+    "row": 4117,
+    "name": "spot_deploy_user_genesis",
+    "type": "spotDeploy",
+    "variant": "userGenesis",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets",
+    "sample": {
+      "type": "spotDeploy",
+      "userGenesis": {
+        "token": 1,
+        "userAndWei": [
+          [
+            "0x2222222222222222222222222222222222222222",
+            "100000000"
+          ]
+        ],
+        "existingTokenAndWei": [],
+        "blacklistUsers": []
+      }
+    },
+    "required_fields": [
+      "userGenesis"
+    ]
+  },
+  {
+    "row": 4118,
+    "name": "spot_deploy_genesis",
+    "type": "spotDeploy",
+    "variant": "genesis",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets",
+    "sample": {
+      "type": "spotDeploy",
+      "genesis": {
+        "token": 1,
+        "maxSupply": "100000000",
+        "noHyperliquidity": true
+      }
+    },
+    "required_fields": [
+      "genesis"
+    ]
+  },
+  {
+    "row": 4119,
+    "name": "spot_deploy_register_spot",
+    "type": "spotDeploy",
+    "variant": "registerSpot",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets",
+    "sample": {
+      "type": "spotDeploy",
+      "registerSpot": {
+        "tokens": [
+          1,
+          0
+        ]
+      }
+    },
+    "required_fields": [
+      "registerSpot"
+    ]
+  },
+  {
+    "row": 4120,
+    "name": "spot_deploy_register_hyperliquidity",
+    "type": "spotDeploy",
+    "variant": "registerHyperliquidity",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets",
+    "sample": {
+      "type": "spotDeploy",
+      "registerHyperliquidity": {
+        "spot": 1,
+        "startPx": "1",
+        "orderSz": "1",
+        "nOrders": 0,
+        "nSeededLevels": 0
+      }
+    },
+    "required_fields": [
+      "registerHyperliquidity"
+    ]
+  },
+  {
+    "row": 4121,
+    "name": "spot_deploy_set_deployer_trading_fee_share",
+    "type": "spotDeploy",
+    "variant": "setDeployerTradingFeeShare",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets",
+    "sample": {
+      "type": "spotDeploy",
+      "setDeployerTradingFeeShare": {
+        "token": 1,
+        "share": "50%"
+      }
+    },
+    "required_fields": [
+      "setDeployerTradingFeeShare"
+    ]
+  },
+  {
+    "row": 4122,
+    "name": "spot_deploy_enable_quote_token",
+    "type": "spotDeploy",
+    "variant": "enableQuoteToken",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets",
+    "sample": {
+      "type": "spotDeploy",
+      "enableQuoteToken": {
+        "token": 1
+      }
+    },
+    "required_fields": [
+      "enableQuoteToken"
+    ]
+  },
+  {
+    "row": 4123,
+    "name": "spot_deploy_enable_aligned_quote_token",
+    "type": "spotDeploy",
+    "variant": "enableAlignedQuoteToken",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets",
+    "sample": {
+      "type": "spotDeploy",
+      "enableAlignedQuoteToken": {
+        "token": 1
+      }
+    },
+    "required_fields": [
+      "enableAlignedQuoteToken"
+    ]
+  },
+  {
+    "row": 4124,
+    "name": "spot_deploy_disable_quote_token",
+    "type": "spotDeploy",
+    "variant": "disableQuoteToken",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets",
+    "sample": {
+      "type": "spotDeploy",
+      "disableQuoteToken": {
+        "token": 1
+      }
+    },
+    "required_fields": [
+      "disableQuoteToken"
+    ]
+  },
+  {
+    "row": 4125,
+    "name": "spot_deploy_disable_aligned_quote_token",
+    "type": "spotDeploy",
+    "variant": "disableAlignedQuoteToken",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets",
+    "sample": {
+      "type": "spotDeploy",
+      "disableAlignedQuoteToken": {
+        "token": 1
+      }
+    },
+    "required_fields": [
+      "disableAlignedQuoteToken"
+    ]
+  },
+  {
+    "row": 4126,
+    "name": "spot_deploy_set_token_annotation",
+    "type": "spotDeploy",
+    "variant": "setTokenAnnotation",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets",
+    "sample": {
+      "type": "spotDeploy",
+      "setTokenAnnotation": {
+        "token": 1,
+        "annotation": {
+          "category": "test",
+          "description": "Test token",
+          "displayName": null,
+          "keywords": [
+            "test"
+          ]
+        }
+      }
+    },
+    "required_fields": [
+      "setTokenAnnotation"
+    ]
+  },
+  {
+    "row": 4127,
+    "name": "spot_deploy_set_deployer_label",
+    "type": "spotDeploy",
+    "variant": "setDeployerLabel",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets",
+    "sample": {
+      "type": "spotDeploy",
+      "setDeployerLabel": {
+        "label": "ab"
+      }
+    },
+    "required_fields": [
+      "setDeployerLabel"
+    ]
+  },
+  {
+    "row": 4128,
+    "name": "activate_outcome_deployer",
+    "type": "activateOutcomeDeployer",
+    "variant": "",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": true,
+    "source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-4-deployer-actions#action-format",
+    "sample": {
+      "type": "activateOutcomeDeployer",
+      "activate": {
+        "venueName": "ab"
+      }
+    },
+    "required_fields": [
+      "activate"
+    ]
+  },
+  {
+    "row": 4129,
+    "name": "outcome_deploy",
+    "type": "outcomeDeploy",
+    "variant": "",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": true,
+    "source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-4-deployer-actions#action-format",
+    "sample": {
+      "type": "outcomeDeploy",
+      "venue": "ab",
+      "operation": {
+        "registerStandaloneOutcomeFromTemplate": {
+          "id": "abc",
+          "keywordToValue": [
+            [
+              "expiry",
+              "20260801-0600"
+            ],
+            [
+              "target",
+              "100"
+            ],
+            [
+              "underlying",
+              "ABC"
+            ]
+          ],
+          "deployerFeeScale": "1"
+        }
+      }
+    },
+    "required_fields": [
+      "venue",
+      "operation"
+    ]
+  },
+  {
+    "row": 4131,
+    "name": "get_outcome_templates",
+    "type": "outcomeTemplates",
+    "variant": "",
+    "public": true,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-4-deployer-actions#action-format",
+    "sample": {
+      "type": "outcomeTemplates"
+    },
+    "required_fields": []
+  },
+  {
+    "row": 4543,
+    "name": "get_user_to_multi_sig_signers",
+    "type": "userToMultiSigSigners",
+    "variant": "",
+    "public": true,
+    "user": true,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://github.com/hyperliquid-dex/hyperliquid-python-sdk/blob/2fdb18f9517675ea03695a0962bd19eece9c83f0/hyperliquid/info.py#L626",
+    "sample": {
+      "type": "userToMultiSigSigners",
+      "user": "0x2222222222222222222222222222222222222222"
+    },
+    "required_fields": [
+      "user"
+    ]
+  },
+  {
+    "row": 4544,
+    "name": "get_extra_agents",
+    "type": "extraAgents",
+    "variant": "",
+    "public": true,
+    "user": true,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://github.com/hyperliquid-dex/hyperliquid-python-sdk/blob/2fdb18f9517675ea03695a0962bd19eece9c83f0/hyperliquid/info.py#L763",
+    "sample": {
+      "type": "extraAgents",
+      "user": "0x2222222222222222222222222222222222222222"
+    },
+    "required_fields": [
+      "user"
+    ]
+  },
+  {
+    "row": 4545,
+    "name": "set_referrer",
+    "type": "setReferrer",
+    "variant": "",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://github.com/hyperliquid-dex/hyperliquid-python-sdk/blob/2fdb18f9517675ea03695a0962bd19eece9c83f0/hyperliquid/exchange.py#L437",
+    "sample": {
+      "type": "setReferrer",
+      "code": "TEST"
+    },
+    "required_fields": [
+      "code"
+    ]
+  },
+  {
+    "row": 4546,
+    "name": "convert_to_multi_sig_user_signed",
+    "type": "convertToMultiSigUser",
+    "variant": "",
+    "public": false,
+    "user": false,
+    "signed": true,
+    "testnet_only": false,
+    "source": "https://github.com/hyperliquid-dex/hyperliquid-python-sdk/blob/2fdb18f9517675ea03695a0962bd19eece9c83f0/hyperliquid/exchange.py#L674",
+    "sample": {
+      "type": "convertToMultiSigUser",
+      "signers": "{\"authorizedUsers\": [\"0x2222222222222222222222222222222222222222\"], \"threshold\": 1}",
+      "nonce": 1700000000123,
+      "signatureChainId": "0x66eee",
+      "hyperliquidChain": "Testnet"
+    },
+    "required_fields": [
+      "signers",
+      "nonce",
+      "signatureChainId",
+      "hyperliquidChain"
+    ]
+  },
+  {
+    "row": 4547,
+    "name": "c_signer_action",
+    "type": "CSignerAction",
+    "variant": "",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://github.com/hyperliquid-dex/hyperliquid-python-sdk/blob/2fdb18f9517675ea03695a0962bd19eece9c83f0/hyperliquid/exchange.py#L984",
+    "sample": {
+      "type": "CSignerAction",
+      "unjailSelf": null
+    },
+    "required_fields": [
+      "unjailSelf"
+    ]
+  },
+  {
+    "row": 4548,
+    "name": "c_validator_action",
+    "type": "CValidatorAction",
+    "variant": "",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://github.com/hyperliquid-dex/hyperliquid-python-sdk/blob/2fdb18f9517675ea03695a0962bd19eece9c83f0/hyperliquid/exchange.py#L1014",
+    "sample": {
+      "type": "CValidatorAction",
+      "unregister": null
+    },
+    "required_fields": [
+      "unregister"
+    ]
+  },
+  {
+    "row": 4549,
+    "name": "multi_sig_signed",
+    "type": "multiSig",
+    "variant": "",
+    "public": false,
+    "user": false,
+    "signed": true,
+    "testnet_only": false,
+    "source": "https://github.com/hyperliquid-dex/hyperliquid-python-sdk/blob/2fdb18f9517675ea03695a0962bd19eece9c83f0/hyperliquid/exchange.py#L1103",
+    "sample": {
+      "type": "multiSig",
+      "signatureChainId": "0x66eee",
+      "signatures": [
+        {
+          "r": "0x1111111111111111111111111111111111111111111111111111111111111111",
+          "s": "0x2222222222222222222222222222222222222222222222222222222222222222",
+          "v": 27
+        }
+      ],
+      "payload": {
+        "multiSigUser": "0x2222222222222222222222222222222222222222",
+        "outerSigner": "0x2222222222222222222222222222222222222222",
+        "action": {
+          "type": "noop"
+        }
+      }
+    },
+    "required_fields": [
+      "signatureChainId",
+      "signatures",
+      "payload"
+    ]
+  },
+  {
+    "row": 4550,
+    "name": "evm_user_modify",
+    "type": "evmUserModify",
+    "variant": "",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://github.com/hyperliquid-dex/hyperliquid-python-sdk/blob/2fdb18f9517675ea03695a0962bd19eece9c83f0/hyperliquid/exchange.py#L1130",
+    "sample": {
+      "type": "evmUserModify",
+      "usingBigBlocks": true
+    },
+    "required_fields": [
+      "usingBigBlocks"
+    ]
+  },
+  {
+    "row": 4552,
+    "name": "gossip_priority_bid",
+    "type": "gossipPriorityBid",
+    "variant": "",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://github.com/hyperliquid-dex/hyperliquid-python-sdk/blob/2fdb18f9517675ea03695a0962bd19eece9c83f0/hyperliquid/exchange.py#L1225",
+    "sample": {
+      "type": "gossipPriorityBid",
+      "slotId": 1,
+      "ip": "127.0.0.1",
+      "maxGas": 100
+    },
+    "required_fields": [
+      "slotId",
+      "ip",
+      "maxGas"
+    ]
+  }
+]

@@ -56,6 +56,11 @@ impl KucoinPublicWebSocket {
         futures_http_base_url: String,
         market: KucoinMarket,
     ) -> Result<Self> {
+        if matches!(market, KucoinMarket::Broker) {
+            return Err(DcexError::InvalidInput(
+                "Broker management has no Classic WebSocket market".into(),
+            ));
+        }
         Ok(Self {
             http_client: KucoinClient::with_base_urls(
                 None,

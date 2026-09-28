@@ -252,11 +252,11 @@ impl BingxPrivateWebSocket {
         loop {
             let payload = self.connection_mut()?.recv_bytes().await?;
             let body = decode_event_bytes(payload)?;
-            if let Ok(text) = std::str::from_utf8(&body) {
-                if is_application_ping_text(text) {
-                    self.connection_mut()?.send_text("Pong").await?;
-                    continue;
-                }
+            if let Ok(text) = std::str::from_utf8(&body)
+                && is_application_ping_text(text)
+            {
+                self.connection_mut()?.send_text("Pong").await?;
+                continue;
             }
             return Ok(body);
         }

@@ -317,7 +317,10 @@ fn perps_read_routes_match_official_paths() {
         let expected = format!("GET {target} HTTP/1.1");
         match (&result, requests.as_slice()) {
             (Ok(_), [request]) if line(request) == expected => {
-                if header(request, "x-api-key").is_none() {
+                if *name == "get_commission_rates" {
+                    assert!(header(request, "x-api-key").is_none());
+                    assert!(header(request, "x-signature").is_none());
+                } else if header(request, "x-api-key").is_none() {
                     failures.push(format!("{name}: missing X-API-Key"));
                 }
             }

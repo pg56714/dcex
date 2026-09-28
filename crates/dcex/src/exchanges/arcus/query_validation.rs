@@ -625,18 +625,17 @@ pub(super) fn validate(name: &str, params: &BTreeMap<String, String>) -> Result<
             }
         }
     }
-    if let Some(address) = params.get("address") {
-        if address.len() != 42
+    if let Some(address) = params.get("address")
+        && (address.len() != 42
             || !address.starts_with("0x")
-            || !address[2..].bytes().all(|v| v.is_ascii_hexdigit())
-        {
-            return Err(invalid("invalid wallet address"));
-        }
+            || !address[2..].bytes().all(|v| v.is_ascii_hexdigit()))
+    {
+        return Err(invalid("invalid wallet address"));
     }
-    if let (Some(from), Some(to)) = (params.get("from"), params.get("to")) {
-        if from.parse::<u64>().ok() > to.parse::<u64>().ok() {
-            return Err(invalid("from must not exceed to"));
-        }
+    if let (Some(from), Some(to)) = (params.get("from"), params.get("to"))
+        && from.parse::<u64>().ok() > to.parse::<u64>().ok()
+    {
+        return Err(invalid("from must not exceed to"));
     }
     if name == "get_candles" && params.contains_key("from") && params.contains_key("countback") {
         return Err(invalid("from and countback are mutually exclusive"));

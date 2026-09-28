@@ -193,15 +193,15 @@ async fn websocket_deadman_sends_authenticated_timeout_message() {
 async fn stateful_account_requests_are_validated_before_transport() {
     let client = OndoClient::public(Duration::from_secs(5)).expect("client");
 
-    for method in ["withdraw", "sandbox_withdrawal"] {
+    for method in ["create_withdrawal", "sandbox_withdrawal"] {
         let error = client
             .private_request(method, Vec::new())
             .await
-            .expect_err("external withdrawal creation is outside project scope");
+            .expect_err("withdrawal fields must be validated before transport");
         assert!(
             error
                 .to_string()
-                .contains("unsupported Ondo private method")
+                .contains("missing required parameter: customer_withdrawal_id")
         );
     }
 

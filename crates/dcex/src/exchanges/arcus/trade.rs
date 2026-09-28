@@ -18,6 +18,9 @@ impl ArcusClient {
         method_name: &str,
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
+        if super::completion::handles(method_name, false) {
+            return self.completion_request(method_name, params).await;
+        }
         if super::metadata::handles(method_name, false) {
             return self.metadata_request(method_name, params).await;
         }
@@ -124,7 +127,7 @@ impl ArcusClient {
         let key = self.signing_key.as_ref().ok_or_else(|| {
             DcexError::InvalidInput("Arcus API signing key is required for trading".into())
         })?;
-        let market = required(&values, "product_symbol")?;
+        let market = required(values, "product_symbol")?;
         let market_info = self.market_info(market).await?;
         let market_id = market_info["marketId"]
             .as_u64()
@@ -154,7 +157,7 @@ impl ArcusClient {
                         "Arcus modify_order does not accept order_type".into(),
                     ));
                 }
-                let side = required(&values, "side")?.to_ascii_uppercase();
+                let side = required(values, "side")?.to_ascii_uppercase();
                 let side_number = match side.as_str() {
                     "BUY" => 0,
                     "SELL" => 1,
@@ -175,7 +178,7 @@ impl ArcusClient {
                     ));
                 }
                 let time_in_force = if is_modify {
-                    required(&values, "time_in_force")?
+                    required(values, "time_in_force")?
                 } else {
                     values
                         .get("time_in_force")
@@ -199,8 +202,8 @@ impl ArcusClient {
                         "Arcus MARKET orders require IOC".into(),
                     ));
                 }
-                let price = required(&values, "price")?;
-                let quantity = required(&values, "quantity")?;
+                let price = required(values, "price")?;
+                let quantity = required(values, "quantity")?;
                 let tick = market_info["tickSize"]
                     .as_str()
                     .ok_or_else(|| DcexError::Decode("Arcus tickSize is missing".into()))?;
@@ -218,29 +221,31 @@ impl ArcusClient {
                 } else {
                     exact_units(quantity, step)?
                 };
-                if let Some(min_size) = market_info["minOrderSize"].as_str() {
-                    if !position_tpsl && compare_decimals(quantity, min_size)? < 0 {
-                        return Err(DcexError::InvalidInput(
-                            "Arcus quantity is below minOrderSize".into(),
-                        ));
-                    }
+                if let Some(min_size) = market_info["minOrderSize"].as_str()
+                    && !position_tpsl
+                    && compare_decimals(quantity, min_size)? < 0
+                {
+                    return Err(DcexError::InvalidInput(
+                        "Arcus quantity is below minOrderSize".into(),
+                    ));
                 }
-                if let Some(max_size) = market_info["maxOrderSize"].as_str() {
-                    if compare_decimals(quantity, max_size)? > 0 {
-                        return Err(DcexError::InvalidInput(
-                            "Arcus quantity exceeds maxOrderSize".into(),
-                        ));
-                    }
+                if let Some(max_size) = market_info["maxOrderSize"].as_str()
+                    && compare_decimals(quantity, max_size)? > 0
+                {
+                    return Err(DcexError::InvalidInput(
+                        "Arcus quantity exceeds maxOrderSize".into(),
+                    ));
                 }
-                if let Some(min_notional) = market_info["minOrderNotional"].as_str() {
-                    if !position_tpsl && decimal_product_below(price, quantity, min_notional)? {
-                        return Err(DcexError::InvalidInput(
-                            "Arcus order is below minOrderNotional".into(),
-                        ));
-                    }
+                if let Some(min_notional) = market_info["minOrderNotional"].as_str()
+                    && !position_tpsl
+                    && decimal_product_below(price, quantity, min_notional)?
+                {
+                    return Err(DcexError::InvalidInput(
+                        "Arcus order is below minOrderNotional".into(),
+                    ));
                 }
                 let good_til_time = if is_modify {
-                    Some(required(&values, "good_til_time")?)
+                    Some(required(values, "good_til_time")?)
                 } else {
                     values.get("good_til_time").map(String::as_str)
                 }
@@ -351,7 +356,7 @@ impl ArcusClient {
                 }
             }
             "cancel_order" => {
-                let order_id = required(&values, "order_id")?;
+                let order_id = required(values, "order_id")?;
                 canonical.insert("id", json!(order_id));
                 canonical.insert("op", json!(2));
                 (

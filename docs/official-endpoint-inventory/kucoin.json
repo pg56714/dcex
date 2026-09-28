@@ -1,0 +1,4398 @@
+{
+  "reviewed": "2026-09-28",
+  "source": "https://www.kucoin.com/docs-new/v2/rest/ua/withdrawal",
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/market/announcement",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/get-announcements",
+      "category": "UTA REST V2 / Market Data",
+      "name": "Get Announcements",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/market/currency",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/currency",
+      "category": "UTA REST V2 / Market Data",
+      "name": "Get Currency",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/asset/currencies",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/currencies",
+      "category": "UTA REST V2 / Market Data",
+      "name": "Get Currencies",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/market/ticker",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/get-ticker",
+      "category": "UTA REST V2 / Market Data",
+      "name": "Get Ticker",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/market/instrument",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/instrument",
+      "category": "UTA REST V2 / Market Data",
+      "name": "Get Symbol",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/market/kline",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/get-klines",
+      "category": "UTA REST V2 / Market Data",
+      "name": "Get Klines",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/market/orderbook",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/get-orderbook",
+      "category": "UTA REST V2 / Market Data",
+      "name": "Get OrderBook",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/market/index-price",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/get-index-price",
+      "category": "UTA REST V2 / Market Data",
+      "name": "Get Index Price",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/market/trade",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/get-trades",
+      "category": "UTA REST V2 / Market Data",
+      "name": "Get Trades",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/market/position-tiers",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/get-position-tiers",
+      "category": "UTA REST V2 / Market Data",
+      "name": "Get Position Tiers",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/market/collateral-discount-ratio",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/get-collateral-ratio",
+      "category": "UTA REST V2 / Market Data",
+      "name": "Get Collateral Ratio",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/market/borrowable-currency",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/get-borrowable-currencies",
+      "category": "UTA REST V2 / Market Data",
+      "name": "Get Borrowable Currencies",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/market/funding-rate",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/get-current-funding",
+      "category": "UTA REST V2 / Market Data",
+      "name": "Get Current Funding Rate",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/market/funding-rate-history",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/get-history-funding-rate",
+      "category": "UTA REST V2 / Market Data",
+      "name": "Get History Funding Rate",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/market/open-interest",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/get-futures-open-interest",
+      "category": "UTA REST V2 / Market Data",
+      "name": "Get Futures Open Interest",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/market/interest-rate-index",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/get-interest-rate-index",
+      "category": "UTA REST V2 / Market Data",
+      "name": "Get Interest Rate Index",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/trade-statistics",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/get-trade-statistics",
+      "category": "UTA REST V2 / Market Data",
+      "name": "Platform 24h Market Statistics",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/market/call-auction-info",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/get-call-auction-info",
+      "category": "UTA REST V2 / Market Data",
+      "name": "Get Call Auction Info",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/market/fiat-price",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/fiat-price",
+      "category": "UTA REST V2 / Market Data",
+      "name": "Get Fiat Price",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/oes/currency",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/get-oes-settlement-currency",
+      "category": "UTA REST V2 / Market Data",
+      "name": "Get Third-Party Custody Currencies",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/server/status",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/get-service-status",
+      "category": "UTA REST V2 / Market Data",
+      "name": "Get Service Status",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/user/kyc-region",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/get-kyc-region",
+      "category": "UTA REST V2 / Market Data",
+      "name": "Get KYC Regions",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/user/my-ip",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/get-client-ip-address",
+      "category": "UTA REST V2 / Market Data",
+      "name": "Get Client IP Address",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/unified/account/overview",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/account/get-account-overview-uta",
+      "category": "UTA REST V2 / Account Info / Account & Funding",
+      "name": "Get Account Overview (UTA)",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/unified/account/balance",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/get-account-currency-assets-uta",
+      "category": "UTA REST V2 / Account Info / Account & Funding",
+      "name": "Get Account Currency Assets (UTA)",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/account/balance",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/classic-account-balance",
+      "category": "UTA REST V2 / Account Info / Account & Funding",
+      "name": "Get Account Currency Assets (Classic)",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/user/api-key",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/api-key",
+      "category": "UTA REST V2 / Account Info / Account & Funding",
+      "name": "Get Apikey Info",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/account/mode",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/get-account-mode",
+      "category": "UTA REST V2 / Account Info / Account & Funding",
+      "name": "Get Account Mode",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/ua/v2/account/mode",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/set-account-mode",
+      "category": "UTA REST V2 / Account Info / Account & Funding",
+      "name": "Set Account Mode",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/unified/account/leverage",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/get-leverage",
+      "category": "UTA REST V2 / Account Info / Account & Funding",
+      "name": "Get Leverage (UTA)",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/ua/v2/unified/account/modify-leverage",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/modify-leverage-uta",
+      "category": "UTA REST V2 / Account Info / Account & Funding",
+      "name": "Modify Futures Leverage (UTA)",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/ua/v2/unified/account/modify-leverage-margin-cross",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/modify-cross-margin-leverage-uta",
+      "category": "UTA REST V2 / Account Info / Account & Funding",
+      "name": "Modify Cross Margin Leverage (UTA)",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/account/interest-limits",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/get-borrowing-rates-and-limits",
+      "category": "UTA REST V2 / Account Info / Account & Funding",
+      "name": "Get Borrowing Rates and Limits",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/account/ledger",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/account-ledger",
+      "category": "UTA REST V2 / Account Info / Account & Funding",
+      "name": "Get Account Ledger",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/account/interest-history",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/get-interest-history-uta",
+      "category": "UTA REST V2 / Account Info / Account & Funding",
+      "name": "Get Interest History (UTA)",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/rate-limit/query",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/get-api-rate-limit",
+      "category": "UTA REST V2 / Account Info / Account & Funding",
+      "name": "Get API Rate Limit",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/rate-limit/query-all",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/get-all-api-rate-limit",
+      "category": "UTA REST V2 / Account Info / Account & Funding",
+      "name": "Get All API Rate Limit",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/rate-limit/query-cap",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/get-api-rate-limit-cap",
+      "category": "UTA REST V2 / Account Info / Account & Funding",
+      "name": "Get API Rate Limit Cap",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/user/fee-rate",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/actual-fee",
+      "category": "UTA REST V2 / Account Info / Account & Funding",
+      "name": "Get Fee Rate",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/account/fee/kcs-deduct",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/kcs-deduct",
+      "category": "UTA REST V2 / Account Info / Account & Funding",
+      "name": "KCS Fee Deduction Management",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/oes/custody-quota",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/get-oes-custody-quota",
+      "category": "UTA REST V2 / Account Info / Account & Funding",
+      "name": "Get Third-Party Custody Account Currency Limits",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/sub-account/balance",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/sub-account-balance",
+      "category": "UTA REST V2 / Account Info / Sub Account",
+      "name": "Get Sub Account Currency Assets",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/user/sub-account-list",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/sub-accounts",
+      "category": "UTA REST V2 / Account Info / Sub Account",
+      "name": "Get Sub Account List",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/user/sub-api-key",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/sub-api-keys",
+      "category": "UTA REST V2 / Account Info / Sub Account",
+      "name": "Get Sub Account API List",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/ua/v2/sub-account/canTransferOut",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/transfer-permission",
+      "category": "UTA REST V2 / Account Info / Sub Account",
+      "name": "Set Sub Account Transfer Permission",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/ua/v2/user/sub/create-sub-account",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/add-sub-account",
+      "category": "UTA REST V2 / Account Info / Sub Account",
+      "name": "Add Sub Account",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/ua/v2/user/create-sub-api-key",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/add-sub-api-key",
+      "category": "UTA REST V2 / Account Info / Sub Account",
+      "name": "Add Sub Account API",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/ua/v2/user/modify-sub-api-key",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/modify-sub-api-key",
+      "category": "UTA REST V2 / Account Info / Sub Account",
+      "name": "Modify Sub Account API",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/ua/v2/rate-limit/set",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/set-sub-accounts-api-rate-limit",
+      "category": "UTA REST V2 / Account Info / Sub Account",
+      "name": "Set Sub Accounts API Rate Limit",
+      "api_type": "http"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/ua/v2/user/sub-api-key",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/delete-sub-api-key",
+      "category": "UTA REST V2 / Account Info / Sub Account",
+      "name": "Delete Sub Account API",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/asset/deposit/address",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/deposit-address",
+      "category": "UTA REST V2 / Account Info / Deposit",
+      "name": "Get Deposit Address",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/asset/deposit/history",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/deposit-history",
+      "category": "UTA REST V2 / Account Info / Deposit",
+      "name": "Get Deposit History",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/account/transfer-quota",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/transfer-quota",
+      "category": "UTA REST V2 / Account Info / Transfer",
+      "name": "Get Transfer Quotas",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/ua/v2/account/transfer",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/flex-transfer",
+      "category": "UTA REST V2 / Account Info / Transfer",
+      "name": "Flex Transfer",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/withdrawals/quotas",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/withdrawal-quota",
+      "category": "UTA REST V2 / Account Info / Withdraw",
+      "name": "Get Withdrawal Quotas",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/asset/withdrawal/history",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/withdrawal-history",
+      "category": "UTA REST V2 / Account Info / Withdraw",
+      "name": "Get Withdrawal History",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/ua/v2/asset/withdrawal",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/withdrawal",
+      "category": "UTA REST V2 / Account Info / Withdraw",
+      "name": "Withdraw",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/ua/v2/asset/withdraw/cancel",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/cancel-withdrawal",
+      "category": "UTA REST V2 / Account Info / Withdraw",
+      "name": "Cancel Withdrawal",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/ua/v2/unified/order/place",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/place-order",
+      "category": "UTA REST V2 / Orders",
+      "name": "Place Order",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/ua/v2/unified/order/amend",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/amend-order",
+      "category": "UTA REST V2 / Orders",
+      "name": "Amend Order",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/ua/v2/unified/order/cancel",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/cancel-order",
+      "category": "UTA REST V2 / Orders",
+      "name": "Cancel Order",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/ua/v2/unified/order/cancel-batch",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/batch-cancel-order-by-id",
+      "category": "UTA REST V2 / Orders",
+      "name": "Batch Cancel Orders By ID",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/ua/v2/unified/order/cancel-all",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/batch-cancel-order-by-symbol",
+      "category": "UTA REST V2 / Orders",
+      "name": "Batch Cancel Orders By Symbol",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/unified/order/detail",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/get-order-details",
+      "category": "UTA REST V2 / Orders",
+      "name": "Get Order Details ",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/unified/order/open-list",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/get-open-order-list",
+      "category": "UTA REST V2 / Orders",
+      "name": "Get Open Order List",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/unified/order/history",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/get-order-history",
+      "category": "UTA REST V2 / Orders",
+      "name": "Get Order History",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/unified/order/execution",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/get-trade-history",
+      "category": "UTA REST V2 / Orders",
+      "name": "Get Trade History",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/order/max-order-quantity",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/get-max-order-quantity",
+      "category": "UTA REST V2 / Orders",
+      "name": "Get Max Order Quantity",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/unified/position/open-list",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/get-position-list-uta",
+      "category": "UTA REST V2 / Positions",
+      "name": "Get Position List",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/position/history",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/get-position-history-uta",
+      "category": "UTA REST V2 / Positions",
+      "name": "Get Positions History",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/position/funding-history",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/get-private-funding-fee-history",
+      "category": "UTA REST V2 / Positions",
+      "name": "Get Private Funding Fee History",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/ua/v2/unified/position/margin-mode",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/batch-modify-margin-mode",
+      "category": "UTA REST V2 / Positions",
+      "name": "Modify Margin Mode",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/ua/v2/unified/position/modify-margin",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/modify-isolated-futures-margin",
+      "category": "UTA REST V2 / Positions",
+      "name": "Modify Position Margin",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/unified/position/margin-mode",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/get-margin-mode",
+      "category": "UTA REST V2 / Positions",
+      "name": "Get Margin Mode",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/affiliate/queryInvitees",
+      "official_source": "https://www.kucoin.com/docs-new/rest/affiliate/invited",
+      "category": "UTA REST V2 / Affiliate",
+      "name": "Get Invited",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/affiliate/queryMyCommission",
+      "official_source": "https://www.kucoin.com/docs-new/rest/affiliate/commission",
+      "category": "UTA REST V2 / Affiliate",
+      "name": "Get Commission",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/affiliate/queryTransactionByUid",
+      "official_source": "https://www.kucoin.com/docs-new/rest/affiliate/trade-history",
+      "category": "UTA REST V2 / Affiliate",
+      "name": "Get Trade History",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/affiliate/queryTransactionByTime",
+      "official_source": "https://www.kucoin.com/docs-new/rest/affiliate/transaction",
+      "category": "UTA REST V2 / Affiliate",
+      "name": "Get Transaction",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/affiliate/queryKumining",
+      "official_source": "https://www.kucoin.com/docs-new/rest/affiliate/kumining",
+      "category": "UTA REST V2 / Affiliate",
+      "name": "Get Kumining",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/otc-loan/discount-rate",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/vip-lending/get-collateral-ratio",
+      "category": "UTA REST V2 / VIP Lending",
+      "name": "Get Collateral Ratio",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/otc-loan/loan",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/vip-lending/get-loan-info",
+      "category": "UTA REST V2 / VIP Lending",
+      "name": "Get Loan Info",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/otc-loan/account",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/vip-lending/get-accounts",
+      "category": "UTA REST V2 / VIP Lending",
+      "name": "Get Accounts",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/user-info",
+      "official_source": "https://www.kucoin.com/docs-new/rest/account-info/account-funding/get-account-summary-info",
+      "category": "Classic REST / Account Info / Account & Funding",
+      "name": "Get Account Summary Info",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/user/api-key",
+      "official_source": "https://www.kucoin.com/docs-new/rest/account-info/account-funding/get-apikey-info",
+      "category": "Classic REST / Account Info / Account & Funding",
+      "name": "Get Apikey Info",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/hf/accounts/opened",
+      "official_source": "https://www.kucoin.com/docs-new/rest/account-info/account-funding/get-account-type-spot",
+      "category": "Classic REST / Account Info / Account & Funding",
+      "name": "Get Account Type - Spot ",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/accounts",
+      "official_source": "https://www.kucoin.com/docs-new/rest/account-info/account-funding/get-account-list-spot",
+      "category": "Classic REST / Account Info / Account & Funding",
+      "name": "Get Account List - Spot",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/accounts/{accountId}",
+      "official_source": "https://www.kucoin.com/docs-new/rest/account-info/account-funding/get-account-detail-spot",
+      "category": "Classic REST / Account Info / Account & Funding",
+      "name": "Get Account Detail - Spot",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/margin/accounts",
+      "official_source": "https://www.kucoin.com/docs-new/rest/account-info/account-funding/get-account-cross-margin",
+      "category": "Classic REST / Account Info / Account & Funding",
+      "name": "Get Account - Cross Margin",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/isolated/accounts",
+      "official_source": "https://www.kucoin.com/docs-new/rest/account-info/account-funding/get-account-isolated-margin",
+      "category": "Classic REST / Account Info / Account & Funding",
+      "name": "Get Account - Isolated Margin",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/account-overview",
+      "official_source": "https://www.kucoin.com/docs-new/rest/account-info/account-funding/get-account-futures",
+      "category": "Classic REST / Account Info / Account & Funding",
+      "name": "Get Account - Futures",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/accounts/ledgers",
+      "official_source": "https://www.kucoin.com/docs-new/rest/account-info/account-funding/get-account-ledgers-spot-margin",
+      "category": "Classic REST / Account Info / Account & Funding",
+      "name": "Get Account Ledgers - Spot/Margin",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/hf/accounts/ledgers",
+      "official_source": "https://www.kucoin.com/docs-new/rest/account-info/account-funding/get-account-ledgers-tradehf",
+      "category": "Classic REST / Account Info / Account & Funding",
+      "name": "Get Account Ledgers - Trade_hf",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/hf/margin/account/ledgers",
+      "official_source": "https://www.kucoin.com/docs-new/rest/account-info/account-funding/get-account-ledgers-marginhf",
+      "category": "Classic REST / Account Info / Account & Funding",
+      "name": "Get Account Ledgers - Margin_hf",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/transaction-history",
+      "official_source": "https://www.kucoin.com/docs-new/rest/account-info/account-funding/get-account-ledgers-futures",
+      "category": "Classic REST / Account Info / Account & Funding",
+      "name": "Get Account Ledgers - Futures",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v2/sub/user/created",
+      "official_source": "https://www.kucoin.com/docs-new/3476608e0",
+      "category": "Classic REST / Account Info / Sub Account",
+      "name": "Add Sub Account",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/sub/user/margin/enable",
+      "official_source": "https://www.kucoin.com/docs-new/rest/account-info/sub-account/add-subaccount-margin-permission",
+      "category": "Classic REST / Account Info / Sub Account",
+      "name": "Add sub-account Margin Permission",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/sub/user/futures/enable",
+      "official_source": "https://www.kucoin.com/docs-new/rest/account-info/sub-account/add-subaccount-futures-permission",
+      "category": "Classic REST / Account Info / Sub Account",
+      "name": "Add sub-account Futures Permission",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/sub/user",
+      "official_source": "https://www.kucoin.com/docs-new/rest/account-info/sub-account/get-subaccount-list-summary-info",
+      "category": "Classic REST / Account Info / Sub Account",
+      "name": "Get sub-account List - Summary Info",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/sub-accounts/{subUserId}",
+      "official_source": "https://www.kucoin.com/docs-new/rest/account-info/sub-account/get-subaccount-detail-balance",
+      "category": "Classic REST / Account Info / Sub Account",
+      "name": "Get sub-account Detail - Balance",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/sub-accounts",
+      "official_source": "https://www.kucoin.com/docs-new/rest/account-info/sub-account/get-subaccount-list-spot-balance-v2",
+      "category": "Classic REST / Account Info / Sub Account",
+      "name": "Get sub-account List - Spot Balance (V2)",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/account-overview-all",
+      "official_source": "https://www.kucoin.com/docs-new/rest/account-info/sub-account/get-subaccount-list-futures-balance-v2",
+      "category": "Classic REST / Account Info / Sub Account",
+      "name": "Get sub-account List - Futures Balance (V2)",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/sub/api-key",
+      "official_source": "https://www.kucoin.com/docs-new/rest/account-info/sub-account-api/get-subaccount-api-list",
+      "category": "Classic REST / Account Info / Sub Account API",
+      "name": "Get sub-account API List",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/sub/api-key",
+      "official_source": "https://www.kucoin.com/docs-new/rest/account-info/sub-account-api/add-subaccount-api",
+      "category": "Classic REST / Account Info / Sub Account API",
+      "name": "Add sub-account API",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/sub/api-key/update",
+      "official_source": "https://www.kucoin.com/docs-new/rest/account-info/sub-account-api/modify-subaccount-api",
+      "category": "Classic REST / Account Info / Sub Account API",
+      "name": "Modify sub-account API",
+      "api_type": "http"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/sub/api-key",
+      "official_source": "https://www.kucoin.com/docs-new/rest/account-info/sub-account-api/delete-subaccount-api",
+      "category": "Classic REST / Account Info / Sub Account API",
+      "name": "Delete sub-account API",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/deposit-address/create",
+      "official_source": "https://www.kucoin.com/docs-new/rest/account-info/deposit/add-deposit-address-v3",
+      "category": "Classic REST / Account Info / Deposit",
+      "name": "Add Deposit Address (V3)",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/deposit-addresses",
+      "official_source": "https://www.kucoin.com/docs-new/rest/account-info/deposit/get-deposit-address-v3/en",
+      "category": "Classic REST / Account Info / Deposit",
+      "name": "Get Deposit Address (V3)",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/deposits",
+      "official_source": "https://www.kucoin.com/docs-new/rest/account-info/deposit/get-deposit-history",
+      "category": "Classic REST / Account Info / Deposit",
+      "name": "Get Deposit History",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/withdrawals/quotas",
+      "official_source": "https://www.kucoin.com/docs-new/rest/account-info/withdrawals/get-withdrawal-quotas",
+      "category": "Classic REST / Account Info / Withdrawals",
+      "name": "Get Withdrawal Quotas",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/withdrawals",
+      "official_source": "https://www.kucoin.com/docs-new/rest/account-info/withdrawals/withdraw-v3",
+      "category": "Classic REST / Account Info / Withdrawals",
+      "name": "Withdraw (V3)",
+      "api_type": "http"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/withdrawals/{withdrawalId}",
+      "official_source": "https://www.kucoin.com/docs-new/rest/account-info/withdrawals/cancel-withdrawal",
+      "category": "Classic REST / Account Info / Withdrawals",
+      "name": "Cancel Withdrawal",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/withdrawals",
+      "official_source": "https://www.kucoin.com/docs-new/rest/account-info/withdrawals/get-withdrawal-history",
+      "category": "Classic REST / Account Info / Withdrawals",
+      "name": "Get Withdrawal History",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/withdrawals/{withdrawalId}",
+      "official_source": "https://www.kucoin.com/docs-new/rest/account-info/withdrawals/get-withdrawal-by-id",
+      "category": "Classic REST / Account Info / Withdrawals",
+      "name": "Get Withdrawal History By ID",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/accounts/transferable",
+      "official_source": "https://www.kucoin.com/docs-new/rest/account-info/transfer/get-transfer-quotas",
+      "category": "Classic REST / Account Info / Transfer",
+      "name": "Get Transfer Quotas",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/accounts/universal-transfer",
+      "official_source": "https://www.kucoin.com/docs-new/rest/account-info/transfer/flex-transfer",
+      "category": "Classic REST / Account Info / Transfer",
+      "name": "Flex Transfer",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/base-fee",
+      "official_source": "https://www.kucoin.com/docs-new/rest/account-info/trade-fee/get-basic-fee-spot-margin",
+      "category": "Classic REST / Account Info / Trade Fee",
+      "name": "Get Basic Fee - Spot/Margin",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/trade-fees",
+      "official_source": "https://www.kucoin.com/docs-new/rest/account-info/trade-fee/get-actual-fee-spot-margin",
+      "category": "Classic REST / Account Info / Trade Fee",
+      "name": "Get Actual Fee - Spot/Margin",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/trade-fees",
+      "official_source": "https://www.kucoin.com/docs-new/rest/account-info/trade-fee/get-actual-fee-futures",
+      "category": "Classic REST / Account Info / Trade Fee",
+      "name": "Get Actual Fee - Futures",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/announcements",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/market-data/get-announcements",
+      "category": "Classic REST / Spot Trading / Market Data",
+      "name": "Get Announcements",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/currencies/{currency}",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/market-data/get-currency",
+      "category": "Classic REST / Spot Trading / Market Data",
+      "name": "Get Currency",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/currencies",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/market-data/get-all-currencies",
+      "category": "Classic REST / Spot Trading / Market Data",
+      "name": "Get All Currencies",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/symbols/{symbol}",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/market-data/get-symbol",
+      "category": "Classic REST / Spot Trading / Market Data",
+      "name": "Get Symbol ",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/symbols",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/market-data/get-all-symbols",
+      "category": "Classic REST / Spot Trading / Market Data",
+      "name": "Get All Symbols",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/market/orderbook/level1",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/market-data/get-ticker",
+      "category": "Classic REST / Spot Trading / Market Data",
+      "name": "Get Ticker",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/market/allTickers",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/market-data/get-all-tickers",
+      "category": "Classic REST / Spot Trading / Market Data",
+      "name": "Get All Tickers",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/market/histories",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/market-data/get-trade-history",
+      "category": "Classic REST / Spot Trading / Market Data",
+      "name": "Get Trade History",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/market/candles",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/market-data/get-klines",
+      "category": "Classic REST / Spot Trading / Market Data",
+      "name": "Get Klines",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/market/orderbook/level2_{size}",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/market-data/get-part-orderbook",
+      "category": "Classic REST / Spot Trading / Market Data",
+      "name": "Get Part OrderBook",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/market/orderbook/level2",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/market-data/get-full-orderbook",
+      "category": "Classic REST / Spot Trading / Market Data",
+      "name": "Get Full OrderBook",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/market/orderbook/callauction/level2_{size}",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/market-data/get-call-auction-part-orderbook",
+      "category": "Classic REST / Spot Trading / Market Data",
+      "name": "Get Call Auction Part OrderBook",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/market/callauctionData",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/market-data/get-call-auction-info",
+      "category": "Classic REST / Spot Trading / Market Data",
+      "name": "Get Call Auction Info",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/prices",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/market-data/get-fiat-price",
+      "category": "Classic REST / Spot Trading / Market Data",
+      "name": "Get Fiat Price",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/market/stats",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/market-data/get-24hr-stats",
+      "category": "Classic REST / Spot Trading / Market Data",
+      "name": "Get 24hr Stats",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/markets",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/market-data/get-market-list",
+      "category": "Classic REST / Spot Trading / Market Data",
+      "name": "Get Market List",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/my-ip",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/market-data/get-client-ip-address",
+      "category": "Classic REST / Spot Trading / Market Data",
+      "name": "Get Client IP Address",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/timestamp",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/market-data/get-server-time",
+      "category": "Classic REST / Spot Trading / Market Data",
+      "name": "Get Server Time",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/status",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/market-data/get-service-status",
+      "category": "Classic REST / Spot Trading / Market Data",
+      "name": "Get Service Status",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/kyc/regions/v4",
+      "official_source": "https://www.kucoin.com/docs-new/rest/account-info/withdrawals/get-kyc-regions",
+      "category": "Classic REST / Spot Trading / Market Data",
+      "name": "Get KYC Regions",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/hf/orders",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/orders/add-order",
+      "category": "Classic REST / Spot Trading / Orders",
+      "name": "Add Order",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/hf/orders/sync",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/orders/add-order-sync",
+      "category": "Classic REST / Spot Trading / Orders",
+      "name": "Add Order Sync",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/hf/orders/test",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/orders/add-order-test",
+      "category": "Classic REST / Spot Trading / Orders",
+      "name": "Add Order Test",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/hf/orders/multi",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/orders/batch-add-orders",
+      "category": "Classic REST / Spot Trading / Orders",
+      "name": "Batch Add Orders",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/hf/orders/multi/sync",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/orders/batch-add-orders-sync",
+      "category": "Classic REST / Spot Trading / Orders",
+      "name": "Batch Add Orders Sync",
+      "api_type": "http"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/hf/orders/{orderId}",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/orders/cancel-order-by-orderld",
+      "category": "Classic REST / Spot Trading / Orders",
+      "name": "Cancel Order By OrderId",
+      "api_type": "http"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/hf/orders/sync/{orderId}",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/orders/cancel-order-by-orderld-sync",
+      "category": "Classic REST / Spot Trading / Orders",
+      "name": "Cancel Order By OrderId Sync",
+      "api_type": "http"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/hf/orders/client-order/{clientOid}",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/orders/cancel-order-by-clientoid",
+      "category": "Classic REST / Spot Trading / Orders",
+      "name": "Cancel Order By ClientOid",
+      "api_type": "http"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/hf/orders/sync/client-order/{clientOid}",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/orders/cancel-order-by-clientoid-sync",
+      "category": "Classic REST / Spot Trading / Orders",
+      "name": "Cancel Order By ClientOid Sync",
+      "api_type": "http"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/hf/orders/cancel/{orderId}",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/orders/cancel-partial-order",
+      "category": "Classic REST / Spot Trading / Orders",
+      "name": "Cancel Partial Order",
+      "api_type": "http"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/hf/orders",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/orders/cancel-all-orders-by-symbol",
+      "category": "Classic REST / Spot Trading / Orders",
+      "name": "Cancel All Orders By Symbol",
+      "api_type": "http"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/hf/orders/cancelAll",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/orders/cancel-all-orders",
+      "category": "Classic REST / Spot Trading / Orders",
+      "name": "Cancel All Orders",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/hf/orders/alter",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/orders/modify-order",
+      "category": "Classic REST / Spot Trading / Orders",
+      "name": "Modify Order",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/hf/orders/{orderId}",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/orders/get-order-by-orderld",
+      "category": "Classic REST / Spot Trading / Orders",
+      "name": "Get Order By OrderId",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/hf/orders/client-order/{clientOid}",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/orders/get-order-by-clientoid",
+      "category": "Classic REST / Spot Trading / Orders",
+      "name": "Get Order By ClientOid",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/hf/orders/active/symbols",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/orders/get-symbols-with-open-order",
+      "category": "Classic REST / Spot Trading / Orders",
+      "name": "Get Symbols With Open Order",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/hf/orders/active",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/orders/get-open-orders",
+      "category": "Classic REST / Spot Trading / Orders",
+      "name": "Get Open Orders",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/hf/orders/active/page",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/orders/get-open-orders-by-page",
+      "category": "Classic REST / Spot Trading / Orders",
+      "name": "Get Open Orders By Page",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/hf/orders/done",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/orders/get-closed-orders",
+      "category": "Classic REST / Spot Trading / Orders",
+      "name": "Get Closed Orders",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/hf/fills",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/orders/get-trade-history",
+      "category": "Classic REST / Spot Trading / Orders",
+      "name": "Get Trade History",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/hf/orders/dead-cancel-all/query",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/orders/get-dcp",
+      "category": "Classic REST / Spot Trading / Orders",
+      "name": "Get DCP",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/hf/orders/dead-cancel-all",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/orders/set-dcp",
+      "category": "Classic REST / Spot Trading / Orders",
+      "name": "Set DCP",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/stop-order",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/orders/add-stop-order",
+      "category": "Classic REST / Spot Trading / Orders",
+      "name": "Add Stop Order",
+      "api_type": "http"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/stop-order/cancelOrderByClientOid",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/orders/cancel-stop-order-by-clientoid",
+      "category": "Classic REST / Spot Trading / Orders",
+      "name": "Cancel Stop Order By ClientOid",
+      "api_type": "http"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/stop-order/{orderId}",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/orders/cancel-stop-order-by-orderld",
+      "category": "Classic REST / Spot Trading / Orders",
+      "name": "Cancel Stop Order By OrderId",
+      "api_type": "http"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/stop-order/cancel",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/orders/batch-cancel-stop-orders",
+      "category": "Classic REST / Spot Trading / Orders",
+      "name": "Batch Cancel Stop Orders",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/stop-order",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/orders/get-stop-orders-list",
+      "category": "Classic REST / Spot Trading / Orders",
+      "name": "Get Stop Orders List",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/stop-order/{orderId}",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/orders/get-stop-order-by-orderld",
+      "category": "Classic REST / Spot Trading / Orders",
+      "name": "Get Stop Order By OrderId",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/stop-order/queryOrderByClientOid",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/get-stop-order-by-clientoid",
+      "category": "Classic REST / Spot Trading / Orders",
+      "name": "Get Stop Order By ClientOid",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/oco/order",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/orders/add-oco-order",
+      "category": "Classic REST / Spot Trading / Orders",
+      "name": "Add OCO Order",
+      "api_type": "http"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v3/oco/order/{orderId}",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/orders/cancel-oco-order-by-orderld",
+      "category": "Classic REST / Spot Trading / Orders",
+      "name": "Cancel OCO Order By OrderId",
+      "api_type": "http"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v3/oco/client-order/{clientOid}",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/orders/cancel-oco-order-by-clientoid",
+      "category": "Classic REST / Spot Trading / Orders",
+      "name": "Cancel OCO Order By ClientOid",
+      "api_type": "http"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v3/oco/orders",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/orders/batch-cancel-oco-order",
+      "category": "Classic REST / Spot Trading / Orders",
+      "name": "Batch Cancel OCO Order",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/oco/order/{orderId}",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/orders/get-oco-order-by-orderld",
+      "category": "Classic REST / Spot Trading / Orders",
+      "name": "Get OCO Order By OrderId",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/oco/client-order/{clientOid}",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/orders/get-oco-order-by-clientoid",
+      "category": "Classic REST / Spot Trading / Orders",
+      "name": "Get OCO Order By ClientOid",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/oco/order/details/{orderId}",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/orders/get-oco-order-detail-by-orderld",
+      "category": "Classic REST / Spot Trading / Orders",
+      "name": "Get OCO Order Detail By OrderId",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/oco/orders",
+      "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/orders/get-oco-order-list",
+      "category": "Classic REST / Spot Trading / Orders",
+      "name": "Get OCO Order List",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/margin/symbols",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/market-data/get-symbols-cross-margin",
+      "category": "Classic REST / Margin Trading / Market Data",
+      "name": "Get Symbols - Cross Margin",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/isolated/symbols",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/market-data/get-symbols-isolated-margin",
+      "category": "Classic REST / Margin Trading / Market Data",
+      "name": "Get Symbols - Isolated Margin",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mark-price/{symbol}/current",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/market-data/get-mark-price-detail",
+      "category": "Classic REST / Margin Trading / Market Data",
+      "name": "Get Mark Price Detail",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/margin/config",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/market-data/get-margin-config",
+      "category": "Classic REST / Margin Trading / Market Data",
+      "name": "Get Margin Config",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/mark-price/all-symbols",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/market-data/get-mark-price-list",
+      "category": "Classic REST / Margin Trading / Market Data",
+      "name": "Get Mark Price List",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/margin/collateralRatio",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/market-data/get-margin-collateral-ratio",
+      "category": "Classic REST / Margin Trading / Market Data",
+      "name": "Get Margin Collateral Ratio",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/margin/available-inventory",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/market-data/get-margin",
+      "category": "Classic REST / Margin Trading / Market Data",
+      "name": "Get Market Available Inventory ",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/hf/margin/order",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/orders/add-order",
+      "category": "Classic REST / Margin Trading / Orders",
+      "name": "Add Order",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/hf/margin/order/test",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/orders/add-order-test",
+      "category": "Classic REST / Margin Trading / Orders",
+      "name": "Add Order Test",
+      "api_type": "http"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v3/hf/margin/orders/{orderId}",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/orders/cancel-order-by-orderld",
+      "category": "Classic REST / Margin Trading / Orders",
+      "name": "Cancel Order By OrderId",
+      "api_type": "http"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v3/hf/margin/orders/client-order/{clientOid}",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/orders/cancel-order-by-clientoid",
+      "category": "Classic REST / Margin Trading / Orders",
+      "name": "Cancel Order By ClientOid",
+      "api_type": "http"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v3/hf/margin/orders",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/orders/cancel-all-orders-by-symbol",
+      "category": "Classic REST / Margin Trading / Orders",
+      "name": "Cancel All Orders By Symbol",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/hf/margin/order/active/symbols",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/orders/get-symbols-with-open-order",
+      "category": "Classic REST / Margin Trading / Orders",
+      "name": "Get Symbols With Open Order",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/hf/margin/orders/active",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/orders/get-open-orders",
+      "category": "Classic REST / Margin Trading / Orders",
+      "name": "Get Open Orders",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/hf/margin/orders/done",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/orders/get-closed-orders",
+      "category": "Classic REST / Margin Trading / Orders",
+      "name": "Get Closed Orders",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/hf/margin/fills",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/orders/get-trade-history",
+      "category": "Classic REST / Margin Trading / Orders",
+      "name": "Get Trade History",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/hf/margin/orders/{orderId}",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/orders/get-order-by-orderld",
+      "category": "Classic REST / Margin Trading / Orders",
+      "name": "Get Order By OrderId",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/hf/margin/orders/client-order/{clientOid}",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/orders/get-order-by-clientoid",
+      "category": "Classic REST / Margin Trading / Orders",
+      "name": "Get Order By ClientOid",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/hf/margin/stop-order",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/orders/add-stop-order",
+      "category": "Classic REST / Margin Trading / Orders",
+      "name": "Add Stop Order",
+      "api_type": "http"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v3/hf/margin/stop-order/cancel-by-id",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/orders/cancel-stop-order-by-orderld",
+      "category": "Classic REST / Margin Trading / Orders",
+      "name": "Cancel Stop Order By OrderId",
+      "api_type": "http"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v3/hf/margin/stop-order/cancel-by-clientOid",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/orders/cancel-stop-order-by-clientoid",
+      "category": "Classic REST / Margin Trading / Orders",
+      "name": "Cancel Stop Order By ClientOid",
+      "api_type": "http"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v3/hf/margin/stop-order/cancel",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/orders/batch-cancel-stop-orders",
+      "category": "Classic REST / Margin Trading / Orders",
+      "name": "Batch Cancel Stop Orders",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/hf/margin/stop-orders",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/orders/get-stop-order-list",
+      "category": "Classic REST / Margin Trading / Orders",
+      "name": "Get Stop Orders List",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/hf/margin/stop-order/orderId",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/orders/get-stop-order-by-orderld",
+      "category": "Classic REST / Margin Trading / Orders",
+      "name": "Get Stop Order By OrderId",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/hf/margin/stop-order/clientOid",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/orders/get-stop-order-by-clientoid",
+      "category": "Classic REST / Margin Trading / Orders",
+      "name": "Get Stop Order By ClientOid",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/hf/margin/oco-order",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/orders/add-oco-order",
+      "category": "Classic REST / Margin Trading / Orders",
+      "name": "Add OCO Order",
+      "api_type": "http"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v3/hf/margin/oco-order/cancel-by-id",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/orders/cancel-oco-order-by-orderld",
+      "category": "Classic REST / Margin Trading / Orders",
+      "name": "Cancel OCO Order By OrderId",
+      "api_type": "http"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v3/hf/margin/oco-order/cancel-by-clientOid",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/orders/cancel-oco-order-by-clientoid",
+      "category": "Classic REST / Margin Trading / Orders",
+      "name": "Cancel OCO Order By ClientOid",
+      "api_type": "http"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v3/hf/margin/oco-order/cancel",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/orders/batch-cancel-oco-orders",
+      "category": "Classic REST / Margin Trading / Orders",
+      "name": "Batch Cancel OCO Order",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/hf/margin/oco-order/orderId",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/orders/get-oco-order-by-orderld",
+      "category": "Classic REST / Margin Trading / Orders",
+      "name": "Get OCO Order By OrderId",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/hf/margin/oco-order/clientOid",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/orders/get-oco-order-by-clientoid",
+      "category": "Classic REST / Margin Trading / Orders",
+      "name": "Get OCO Order By ClientOid",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/hf/margin/oco-order/detail/orderId",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/orders/get-oco-order-detail-by-orderld",
+      "category": "Classic REST / Margin Trading / Orders",
+      "name": "Get OCO Order Detail By OrderId",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/hf/margin/oco-orders",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/orders/get-oco-order-list",
+      "category": "Classic REST / Margin Trading / Orders",
+      "name": "Get OCO Order List",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/margin/borrowRate",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/debit/get-borrow-interest-rate",
+      "category": "Classic REST / Margin Trading / Debit",
+      "name": "Get Borrow Interest Rate",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/margin/borrow",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/debit/borrow",
+      "category": "Classic REST / Margin Trading / Debit",
+      "name": "Borrow",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/margin/borrow",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/debit/get-borrow-history",
+      "category": "Classic REST / Margin Trading / Debit",
+      "name": "Get Borrow History",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/margin/repay",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/debit/repay",
+      "category": "Classic REST / Margin Trading / Debit",
+      "name": "Repay",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/margin/repay",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/debit/get-repay-history",
+      "category": "Classic REST / Margin Trading / Debit",
+      "name": "Get Repay History",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/margin/interest",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/debit/get-interest-history",
+      "category": "Classic REST / Margin Trading / Debit",
+      "name": "Get Interest History",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/position/update-user-leverage",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/debit/modify-leverage",
+      "category": "Classic REST / Margin Trading / Debit",
+      "name": "Modify Leverage",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/project/list",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/credit/get-loan-market",
+      "category": "Classic REST / Margin Trading / Credit",
+      "name": "Get Loan Market",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/project/marketInterestRate",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/credit/get-loan-market-interest-rate",
+      "category": "Classic REST / Margin Trading / Credit",
+      "name": "Get Loan Market Interest Rate",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/purchase",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/credit/purchase",
+      "category": "Classic REST / Margin Trading / Credit",
+      "name": "Purchase",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/lend/purchase/update",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/credit/modify-purchase",
+      "category": "Classic REST / Margin Trading / Credit",
+      "name": "Modify Purchase",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/purchase/orders",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/credit/get-purchase-orders",
+      "category": "Classic REST / Margin Trading / Credit",
+      "name": "Get Purchase Orders",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/redeem",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/credit/redeem",
+      "category": "Classic REST / Margin Trading / Credit",
+      "name": "Redeem",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/redeem/orders",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/credit/get-redeem-orders",
+      "category": "Classic REST / Margin Trading / Credit",
+      "name": "Get Redeem Orders",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/margin/currencies",
+      "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/risk-limit/get-margin-risk-limit",
+      "category": "Classic REST / Margin Trading / Risk Limit",
+      "name": "Get Margin Risk Limit",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/contracts/{symbol}",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/market-data/get-symbol",
+      "category": "Classic REST / Futures Trading / Market Data",
+      "name": "Get Symbol",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/contracts/active",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/market-data/get-all-symbols",
+      "category": "Classic REST / Futures Trading / Market Data",
+      "name": "Get All Symbols",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/ticker",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/market-data/get-ticker",
+      "category": "Classic REST / Futures Trading / Market Data",
+      "name": "Get Ticker",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/allTickers",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/market-data/get-all-tickers",
+      "category": "Classic REST / Futures Trading / Market Data",
+      "name": "Get All Tickers",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/level2/snapshot",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/market-data/get-full-orderbook",
+      "category": "Classic REST / Futures Trading / Market Data",
+      "name": "Get Full OrderBook",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/level2/depth{size}",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/market-data/get-part-orderbook",
+      "category": "Classic REST / Futures Trading / Market Data",
+      "name": "Get Part OrderBook",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/trade/history",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/market-data/get-trade-history",
+      "category": "Classic REST / Futures Trading / Market Data",
+      "name": "Get Trade History",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/kline/query",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/market-data/get-klines",
+      "category": "Classic REST / Futures Trading / Market Data",
+      "name": "Get Klines",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mark-price/{symbol}/current",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/market-data/get-mark-price",
+      "category": "Classic REST / Futures Trading / Market Data",
+      "name": "Get Mark Price",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/index/query",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/market-data/get-spot-index-price",
+      "category": "Classic REST / Futures Trading / Market Data",
+      "name": "Get Spot Index Price",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/interest/query",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/market-data/get-interest-rate-index",
+      "category": "Classic REST / Futures Trading / Market Data",
+      "name": "Get Interest Rate Index",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/premium/query",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/market-data/get-premium-index",
+      "category": "Classic REST / Futures Trading / Market Data",
+      "name": "Get Premium Index",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/trade-statistics",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/market-data/get-24hr-stats",
+      "category": "Classic REST / Futures Trading / Market Data",
+      "name": "Get 24hr stats",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/timestamp",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/market-data/get-server-time",
+      "category": "Classic REST / Futures Trading / Market Data",
+      "name": "Get Server Time",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/status",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/market-data/get-service-status",
+      "category": "Classic REST / Futures Trading / Market Data",
+      "name": "Get Service Status",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/orders",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/orders/add-order",
+      "category": "Classic REST / Futures Trading / Orders",
+      "name": "Add Order",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/orders/test",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/orders/add-order-test",
+      "category": "Classic REST / Futures Trading / Orders",
+      "name": "Add Order Test",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/orders/multi",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/orders/batch-add-orders",
+      "category": "Classic REST / Futures Trading / Orders",
+      "name": "Batch Add Orders",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/st-orders",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/orders/add-take-profit-and-stop-loss-order",
+      "category": "Classic REST / Futures Trading / Orders",
+      "name": "Add Take Profit And Stop Loss Order",
+      "api_type": "http"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/orders/{orderId}",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/orders/cancel-order-by-orderld",
+      "category": "Classic REST / Futures Trading / Orders",
+      "name": "Cancel Order By OrderId",
+      "api_type": "http"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/orders/client-order/{clientOid}",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/orders/cancel-order-by-clientoid",
+      "category": "Classic REST / Futures Trading / Orders",
+      "name": "Cancel Order By ClientOid",
+      "api_type": "http"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/orders/multi-cancel",
+      "official_source": "https://www.kucoin.com/docs-new/3470241e0",
+      "category": "Classic REST / Futures Trading / Orders",
+      "name": "Batch Cancel Orders",
+      "api_type": "http"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v3/orders",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/orders/cancel-all-orders",
+      "category": "Classic REST / Futures Trading / Orders",
+      "name": "Cancel All Orders",
+      "api_type": "http"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/stopOrders",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/orders/cancel-all-stop-orders",
+      "category": "Classic REST / Futures Trading / Orders",
+      "name": "Cancel All Stop orders",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/orders/{order-id}",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/orders/get-order-by-orderld",
+      "category": "Classic REST / Futures Trading / Orders",
+      "name": "Get Order By OrderId",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/orders/byClientOid",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/get-stop-order-by-clientoid",
+      "category": "Classic REST / Futures Trading / Orders",
+      "name": "Get Order By ClientOid",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/orders",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/orders/get-order-list",
+      "category": "Classic REST / Futures Trading / Orders",
+      "name": "Get Order List",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/recentDoneOrders",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/orders/get-recent-closed-orders",
+      "category": "Classic REST / Futures Trading / Orders",
+      "name": "Get Recent Closed Orders",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/stopOrders",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/orders/get-stop-order-list",
+      "category": "Classic REST / Futures Trading / Orders",
+      "name": "Get Stop Order List",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/openOrderStatistics",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/orders/get-open-order-value",
+      "category": "Classic REST / Futures Trading / Orders",
+      "name": "Get Open Order Value",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/recentFills",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/orders/get-recent-trade-history",
+      "category": "Classic REST / Futures Trading / Orders",
+      "name": "Get Recent Trade History",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/fills",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/orders/get-trade-history",
+      "category": "Classic REST / Futures Trading / Orders",
+      "name": "Get Trade History",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/position/getMarginMode",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/positions/get-margin-mode",
+      "category": "Classic REST / Futures Trading / Positions",
+      "name": "Get Margin Mode",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v2/position/changeMarginMode",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/positions/switch-margin-mode",
+      "category": "Classic REST / Futures Trading / Positions",
+      "name": "Switch Margin Mode",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v2/position/batchChangeMarginMode",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/positions/batch-switch-margin-mode",
+      "category": "Classic REST / Futures Trading / Positions",
+      "name": "Batch Switch Margin Mode",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/position/getPositionMode",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/positions/get-position-mode",
+      "category": "Classic REST / Futures Trading / Positions",
+      "name": "Get Position Mode",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v2/position/switchPositionMode",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/positions/switch-position-mode",
+      "category": "Classic REST / Futures Trading / Positions",
+      "name": "Switch Position Mode",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/getMaxOpenSize",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/positions/get-max-open-size",
+      "category": "Classic REST / Futures Trading / Positions",
+      "name": "Get Max Open Size",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/position",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/positions/get-position-details",
+      "category": "Classic REST / Futures Trading / Positions",
+      "name": "Get Position Details",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/positions",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/positions/get-position-list",
+      "category": "Classic REST / Futures Trading / Positions",
+      "name": "Get Position List",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/history-positions",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/positions/get-positions-history",
+      "category": "Classic REST / Futures Trading / Positions",
+      "name": "Get Positions History",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/margin/maxWithdrawMargin",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/positions/get-max-withdraw-margin",
+      "category": "Classic REST / Futures Trading / Positions",
+      "name": "Get Max Withdraw Margin",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/getCrossUserLeverage",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/positions/get-cross-margin-leverage",
+      "category": "Classic REST / Futures Trading / Positions",
+      "name": "Get Cross Margin Leverage",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v2/changeCrossUserLeverage",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/positions/modify-cross-margin-leverage",
+      "category": "Classic REST / Futures Trading / Positions",
+      "name": "Modify Cross Margin Leverage",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/position/margin/deposit-margin",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/positions/add-isolated-margin",
+      "category": "Classic REST / Futures Trading / Positions",
+      "name": "Add Isolated Margin",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/margin/withdrawMargin",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/positions/remove-isolated-margin",
+      "category": "Classic REST / Futures Trading / Positions",
+      "name": "Remove Isolated Margin",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/batchGetCrossOrderLimit",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/positions/get-cross-margin-risk-limit",
+      "category": "Classic REST / Futures Trading / Positions",
+      "name": "Get Cross Margin Risk Limit",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v2/getCrossModeMarginRequirement",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/positions/get-cross-margin-requirement",
+      "category": "Classic REST / Futures Trading / Positions",
+      "name": "Get Cross Margin Requirement",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/contracts/risk-limit/{symbol}",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/positions/get-isolated-margin-risk-limit",
+      "category": "Classic REST / Futures Trading / Positions",
+      "name": "Get Isolated Margin Risk Limit",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/position/risk-limit-level/change",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/positions/modify-isolated-margin-risk-limit",
+      "category": "Classic REST / Futures Trading / Positions",
+      "name": "Modify Isolated Margin Risk Limit",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/funding-rate/{symbol}/current",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/funding-fees/get-current-funding-rate",
+      "category": "Classic REST / Futures Trading / Funding Fees",
+      "name": "Get Current Funding Rate",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/contract/funding-rates",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/funding-fees/get-public-funding-history",
+      "category": "Classic REST / Futures Trading / Funding Fees",
+      "name": "Get Public Funding History",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/funding-history",
+      "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/funding-fees/get-private-funding-history",
+      "category": "Classic REST / Futures Trading / Funding Fees",
+      "name": "Get Private Funding History",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/earn/orders",
+      "official_source": "https://www.kucoin.com/docs-new/rest/earn/purchase",
+      "category": "Classic REST / Earn / Simple Earn",
+      "name": "Purchase",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/earn/redeem-preview",
+      "official_source": "https://www.kucoin.com/docs-new/rest/earn/get-redeem-preview",
+      "category": "Classic REST / Earn / Simple Earn",
+      "name": "Get Redeem Preview",
+      "api_type": "http"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/earn/orders",
+      "official_source": "https://www.kucoin.com/docs-new/rest/earn/redeem",
+      "category": "Classic REST / Earn / Simple Earn",
+      "name": "Redeem",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/earn/saving/products",
+      "official_source": "https://www.kucoin.com/docs-new/rest/earn/get-savings-products",
+      "category": "Classic REST / Earn / Simple Earn",
+      "name": "Get Savings Products",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/earn/promotion/products",
+      "official_source": "https://www.kucoin.com/docs-new/rest/earn/get-promotion-products",
+      "category": "Classic REST / Earn / Simple Earn",
+      "name": "Get Promotion Products",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/earn/staking/products",
+      "official_source": "https://www.kucoin.com/docs-new/rest/earn/get-staking-products",
+      "category": "Classic REST / Earn / Simple Earn",
+      "name": "Get Staking Products",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/earn/kcs-staking/products",
+      "official_source": "https://www.kucoin.com/docs-new/rest/earn/get-kcs-staking-products",
+      "category": "Classic REST / Earn / Simple Earn",
+      "name": "Get KCS Staking Products",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/earn/eth-staking/products",
+      "official_source": "https://www.kucoin.com/docs-new/rest/earn/get-eth-staking-products",
+      "category": "Classic REST / Earn / Simple Earn",
+      "name": "Get ETH Staking Products",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/earn/hold-assets",
+      "official_source": "https://www.kucoin.com/docs-new/rest/earn/get-account-holding",
+      "category": "Classic REST / Earn / Simple Earn",
+      "name": "Get Account Holding",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/struct-earn/orders",
+      "official_source": "https://www.kucoin.com/docs-new/rest/earn/structured-product-purchase",
+      "category": "Classic REST / Earn / Structured Earn - Dual",
+      "name": "Structured Product Purchase",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/struct-earn/dual/products",
+      "official_source": "https://www.kucoin.com/docs-new/rest/earn/get-dual-investment-products",
+      "category": "Classic REST / Earn / Structured Earn - Dual",
+      "name": "Get Dual Investment Products",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/struct-earn/orders",
+      "official_source": "https://www.kucoin.com/docs-new/rest/earn/get-structured-product-orders",
+      "category": "Classic REST / Earn / Structured Earn - Dual",
+      "name": "Get Structured Product Orders",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/otc-loan/discount-rate-configs",
+      "official_source": "https://www.kucoin.com/docs-new/rest/vip-lending/get-collateral-ratio",
+      "category": "Classic REST / VIP Lending",
+      "name": "Get Collateral Ratio",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/otc-loan/loan",
+      "official_source": "https://www.kucoin.com/docs-new/rest/vip-lending/get-account-detail",
+      "category": "Classic REST / VIP Lending",
+      "name": "Get Loan Info",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/otc-loan/accounts",
+      "official_source": "https://www.kucoin.com/docs-new/rest/vip-lending/get-accounts",
+      "category": "Classic REST / VIP Lending",
+      "name": "Get Accounts",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/affiliate/queryInvitees",
+      "official_source": "https://www.kucoin.com/docs-new/rest/affiliate/get-invited",
+      "category": "Classic REST / Affiliate",
+      "name": "Get Invited",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/affiliate/queryMyCommission",
+      "official_source": "https://www.kucoin.com/docs-new/rest/affiliate/get-commission",
+      "category": "Classic REST / Affiliate",
+      "name": "Get Commission",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/affiliate/queryTransactionByUid",
+      "official_source": "https://www.kucoin.com/docs-new/rest/affiliate/get-trade-history",
+      "category": "Classic REST / Affiliate",
+      "name": "Get Trade History",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/affiliate/queryTransactionByTime",
+      "official_source": "https://www.kucoin.com/docs-new/rest/affiliate/get-transaction",
+      "category": "Classic REST / Affiliate",
+      "name": "Get Transaction",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/affiliate/queryKumining",
+      "official_source": "https://www.kucoin.com/docs-new/rest/affiliate/get-kumining",
+      "category": "Classic REST / Affiliate",
+      "name": "Get Kumining",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v2/broker/withdrawal",
+      "official_source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/apply-for-fast-withdrawal",
+      "category": "Classic REST / Broker / Broker Pro",
+      "name": "Apply for Fast Withdrawal",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/broker/api/rebate/download",
+      "official_source": "https://www.kucoin.com/docs-new/rest/broker/api-broker/get-broker-rebate",
+      "category": "Classic REST / Broker / Broker Pro",
+      "name": "Get Broker Rebate",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/broker/queryMyCommission",
+      "official_source": "https://www.kucoin.com/docs-new/rest/broker/api-broker/get-commission",
+      "category": "Classic REST / Broker / Broker Pro",
+      "name": "Get Commission",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/broker/queryUser",
+      "official_source": "https://www.kucoin.com/docs-new/rest/broker/api-broker/get-user-list",
+      "category": "Classic REST / Broker / Broker Pro",
+      "name": "Get User List",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/broker/queryDetailByUid",
+      "official_source": "https://www.kucoin.com/docs-new/rest/broker/api-broker/get-user-transactions",
+      "category": "Classic REST / Broker / Broker Pro",
+      "name": "Get User Transactions",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/broker/nd/rebate/download",
+      "official_source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/get-broker-rebate",
+      "category": "Classic REST / Broker / Exchange Broker",
+      "name": "Get Broker Rebate",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/broker/nd/rebate/download",
+      "official_source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/get-broker-rebatev3",
+      "category": "Classic REST / Broker / Exchange Broker",
+      "name": "Get Broker RebateV3",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/kyc/ndBroker/proxyClient/submit",
+      "official_source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/submit-kyc",
+      "category": "Classic REST / Broker / Exchange Broker",
+      "name": "Submit KYC",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/kyc/ndBroker/proxyClient/status/list",
+      "official_source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/get-kyc-status",
+      "category": "Classic REST / Broker / Exchange Broker",
+      "name": "Get KYC Status",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/kyc/ndBroker/proxyClient/status/page",
+      "official_source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/get-kyc-status-list",
+      "category": "Classic REST / Broker / Exchange Broker",
+      "name": "Get KYC Status List",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/broker/nd/info",
+      "official_source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/get-broker-info",
+      "category": "Classic REST / Broker / Exchange Broker",
+      "name": "Get Broker Info",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/broker/nd/account",
+      "official_source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/add-subaccount",
+      "category": "Classic REST / Broker / Exchange Broker",
+      "name": "Add sub-account",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/broker/nd/account",
+      "official_source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/get-subaccount",
+      "category": "Classic REST / Broker / Exchange Broker",
+      "name": "Get sub-account",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/broker/nd/account/apikey",
+      "official_source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/add-subaccount-api",
+      "category": "Classic REST / Broker / Exchange Broker",
+      "name": "Add sub-account API",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/broker/nd/account/apikey",
+      "official_source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/get-subaccount-api",
+      "category": "Classic REST / Broker / Exchange Broker",
+      "name": "Get sub-account API",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/broker/nd/account/update-apikey",
+      "official_source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/modify-subaccount-api",
+      "category": "Classic REST / Broker / Exchange Broker",
+      "name": "Modify sub-account API",
+      "api_type": "http"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/broker/nd/account/apikey",
+      "official_source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/delete-subaccount-api",
+      "category": "Classic REST / Broker / Exchange Broker",
+      "name": "Delete sub-account API",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/broker/nd/transfer",
+      "official_source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/transfer",
+      "category": "Classic REST / Broker / Exchange Broker",
+      "name": "Transfer",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/broker/nd/transfer/detail",
+      "official_source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/get-transfer-history",
+      "category": "Classic REST / Broker / Exchange Broker",
+      "name": "Get Transfer History",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/asset/ndbroker/deposit/list",
+      "official_source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/get-deposit-list",
+      "category": "Classic REST / Broker / Exchange Broker",
+      "name": "Get Deposit List",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/broker/nd/deposit/detail",
+      "official_source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/get-deposit-detail",
+      "category": "Classic REST / Broker / Exchange Broker",
+      "name": "Get Deposit Detail",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/broker/nd/withdraw/detail",
+      "official_source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/get-withdraw-detail",
+      "category": "Classic REST / Broker / Exchange Broker",
+      "name": "Get Withdraw Detail",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/broker/nd/mark-up",
+      "official_source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/setmarkup",
+      "category": "Classic REST / Broker / Exchange Broker",
+      "name": "Set Markup Fee",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/broker/nd/mark-up",
+      "official_source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/getmarkup",
+      "category": "Classic REST / Broker / Exchange Broker",
+      "name": "Get Markup Fee",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/copy-trade/futures/orders",
+      "official_source": "https://www.kucoin.com/docs-new/rest/copy-trading/add-order",
+      "category": "Classic REST / Copy Trading",
+      "name": "Add Order",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/copy-trade/futures/orders/test",
+      "official_source": "https://www.kucoin.com/docs-new/rest/copy-trading/add-order-test",
+      "category": "Classic REST / Copy Trading",
+      "name": "Add Order Test",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/copy-trade/futures/st-orders",
+      "official_source": "https://www.kucoin.com/docs-new/rest/copy-trading/add-take-profit-and-stop-loss-order",
+      "category": "Classic REST / Copy Trading",
+      "name": "Add Take Profit And Stop Loss Order",
+      "api_type": "http"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/copy-trade/futures/orders",
+      "official_source": "https://www.kucoin.com/docs-new/rest/copy-trading/cancel-order-by-orderid",
+      "category": "Classic REST / Copy Trading",
+      "name": "Cancel Order By OrderId",
+      "api_type": "http"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/copy-trade/futures/orders/client-order",
+      "official_source": "https://www.kucoin.com/docs-new/rest/copy-trading/cancel-order-by-clientoid",
+      "category": "Classic REST / Copy Trading",
+      "name": "Cancel Order By ClientOid",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/copy-trade/futures/get-max-open-size",
+      "official_source": "https://www.kucoin.com/docs-new/rest/copy-trading/get-max-open-size",
+      "category": "Classic REST / Copy Trading",
+      "name": "Get Max Open Size",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/copy-trade/futures/position/margin/max-withdraw-margin",
+      "official_source": "https://www.kucoin.com/docs-new/rest/copy-trading/get-max-withdraw-margin",
+      "category": "Classic REST / Copy Trading",
+      "name": "Get Max Withdraw Margin",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/copy-trade/futures/position/margin/deposit-margin",
+      "official_source": "https://www.kucoin.com/docs-new/rest/copy-trading/add-isolated-margin",
+      "category": "Classic REST / Copy Trading",
+      "name": "Add Isolated Margin",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/copy-trade/futures/position/margin/withdraw-margin",
+      "official_source": "https://www.kucoin.com/docs-new/rest/copy-trading/remove-isolated-margin",
+      "category": "Classic REST / Copy Trading",
+      "name": "Remove Isolated Margin",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/copy-trade/futures/position/risk-limit-level/change",
+      "official_source": "https://www.kucoin.com/docs-new/rest/copy-trading/modify-isolated-margin-risk-limit",
+      "category": "Classic REST / Copy Trading",
+      "name": "Modify Isolated Margin Risk Limit",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/copy-trade/futures/position/margin/auto-deposit-status",
+      "official_source": "https://www.kucoin.com/docs-new/rest/copy-trading/modify-isolated-margin-auto-deposit-status",
+      "category": "Classic REST / Copy Trading",
+      "name": "Modify Isolated Margin Auto-Deposit Status",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/copy-trade/futures/position/changeMarginMode",
+      "official_source": "https://www.kucoin.com/docs-new/rest/copy-trading/switch-margin-mode",
+      "category": "Classic REST / Copy Trading",
+      "name": "Switch Margin Mode",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v2/copy-trade/futures/changeCrossUserLeverage",
+      "official_source": "https://www.kucoin.com/docs-new/rest/copy-trading/modify-cross-margin-leverage",
+      "category": "Classic REST / Copy Trading",
+      "name": "Modify Cross Margin Leverage",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v2/copy-trade/getCrossModeMarginRequirement",
+      "official_source": "https://www.kucoin.com/docs-new/rest/copy-trading/get-cross-margin-requirement",
+      "category": "Classic REST / Copy Trading",
+      "name": "Get Cross Margin Requirement",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v2/copy-trade/position/switchPositionMode",
+      "official_source": "https://www.kucoin.com/docs-new/rest/copy-trading/switch-position-mode",
+      "category": "Classic REST / Copy Trading",
+      "name": "Switch Position Mode",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/convert/symbol",
+      "official_source": "https://www.kucoin.com/docs-new/rest/convert/get-convert-symbol",
+      "category": "Classic REST / Convert",
+      "name": "Get Convert Symbol",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/convert/currencies",
+      "official_source": "https://www.kucoin.com/docs-new/rest/convert/get-convert-currencies",
+      "category": "Classic REST / Convert",
+      "name": "Get Convert Currencies",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/convert/quote",
+      "official_source": "https://www.kucoin.com/docs-new/rest/convert/get-convert-quote",
+      "category": "Classic REST / Convert",
+      "name": "Get Convert Quote",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/convert/order",
+      "official_source": "https://www.kucoin.com/docs-new/rest/convert/add-convert-order",
+      "category": "Classic REST / Convert",
+      "name": "Add Convert Order",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/convert/order/detail",
+      "official_source": "https://www.kucoin.com/docs-new/rest/convert/get-convert-order-detail",
+      "category": "Classic REST / Convert",
+      "name": "Get Convert Order Detail",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/convert/order/history",
+      "official_source": "https://www.kucoin.com/docs-new/rest/convert/get-convert-order-history",
+      "category": "Classic REST / Convert",
+      "name": "Get Convert Order History",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/convert/limit/order",
+      "official_source": "https://www.kucoin.com/docs-new/rest/convert/add-convert-limit-order",
+      "category": "Classic REST / Convert",
+      "name": "Add Convert Limit Order",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/convert/limit/quote",
+      "official_source": "https://www.kucoin.com/docs-new/rest/convert/get-convert-limit-quote",
+      "category": "Classic REST / Convert",
+      "name": "Get Convert Limit Quote",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/convert/limit/order/detail",
+      "official_source": "https://www.kucoin.com/docs-new/rest/convert/get-convert-limit-order-detail",
+      "category": "Classic REST / Convert",
+      "name": "Get Convert Limit Order Detail",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/convert/limit/orders",
+      "official_source": "https://www.kucoin.com/docs-new/rest/convert/get-convert-limit-orders",
+      "category": "Classic REST / Convert",
+      "name": "Get Convert Limit Orders",
+      "api_type": "http"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/convert/limit/order/cancel",
+      "official_source": "https://www.kucoin.com/docs-new/rest/convert/cancel-convert-limit-order",
+      "category": "Classic REST / Convert",
+      "name": "Cancel Convert Limit Order",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/bullet-public",
+      "official_source": "https://www.kucoin.com/docs-new/websocket-api/base-info/get-public-token-spot-margin",
+      "category": "Classic WebSocket / Base Info",
+      "name": "Get Public Token - Classic Spot/Margin",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/bullet-private",
+      "official_source": "https://www.kucoin.com/docs-new/websocket-api/base-info/get-private-token-spot-margin",
+      "category": "Classic WebSocket / Base Info",
+      "name": "Get Private Token -  Classic Spot/Margin",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/bullet-public",
+      "official_source": "https://www.kucoin.com/docs-new/websocket-api/base-info/get-public-token-futures",
+      "category": "Classic WebSocket / Base Info",
+      "name": "Get Public Token - Classic Futures",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/bullet-private",
+      "official_source": "https://www.kucoin.com/docs-new/websocket-api/base-info/get-private-token-futures",
+      "category": "Classic WebSocket / Base Info",
+      "name": "Get Private Token - Classic Futures",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/market/announcement",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-announcements",
+      "category": "Abandoned Endpoints / UTA REST / Market Data",
+      "name": "Get Announcements",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/market/currency",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-currency",
+      "category": "Abandoned Endpoints / UTA REST / Market Data",
+      "name": "Get Currency",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/asset/currencies",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-currencies",
+      "category": "Abandoned Endpoints / UTA REST / Market Data",
+      "name": "Get Currencies",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/market/instrument",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-symbol",
+      "category": "Abandoned Endpoints / UTA REST / Market Data",
+      "name": "Get Symbol",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/market/ticker",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-ticker",
+      "category": "Abandoned Endpoints / UTA REST / Market Data",
+      "name": "Get Ticker",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/market/orderbook",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-orderbook",
+      "category": "Abandoned Endpoints / UTA REST / Market Data",
+      "name": "Get OrderBook",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/market/kline",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-klines",
+      "category": "Abandoned Endpoints / UTA REST / Market Data",
+      "name": "Get Klines",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/market/trade",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-trades",
+      "category": "Abandoned Endpoints / UTA REST / Market Data",
+      "name": "Get Trades",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/market/collateral-discount-ratio",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-collateral-ratio",
+      "category": "Abandoned Endpoints / UTA REST / Market Data",
+      "name": "Get Collateral Ratio",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/market/index-price",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-index-price",
+      "category": "Abandoned Endpoints / UTA REST / Market Data",
+      "name": "Get Index Price",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/market/funding-rate",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-current-funding-rate",
+      "category": "Abandoned Endpoints / UTA REST / Market Data",
+      "name": "Get Current Funding Rate",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/market/funding-rate-history",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-history-funding-rate",
+      "category": "Abandoned Endpoints / UTA REST / Market Data",
+      "name": "Get History Funding Rate",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/market/position-tiers",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-position-tiers",
+      "category": "Abandoned Endpoints / UTA REST / Market Data",
+      "name": "Get Position Tiers",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/market/open-interest",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-futures-open-interset",
+      "category": "Abandoned Endpoints / UTA REST / Market Data",
+      "name": "Get Futures Open Interest",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/server/status",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-service-status",
+      "category": "Abandoned Endpoints / UTA REST / Market Data",
+      "name": "Get Service Status",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/oes/currency",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-oes-settlement-currency",
+      "category": "Abandoned Endpoints / UTA REST / Market Data",
+      "name": "Get Third-Party Custody Currencies",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/market/borrowable-currency",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-borrowable-currencies",
+      "category": "Abandoned Endpoints / UTA REST / Market Data",
+      "name": "Get Borrowable Currencies",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/user/kyc-region",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-kyc-region",
+      "category": "Abandoned Endpoints / UTA REST / Market Data",
+      "name": "Get KYC Regions",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/user/my-ip",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-client-ip-address",
+      "category": "Abandoned Endpoints / UTA REST / Market Data",
+      "name": "Get Client IP Address",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/market/fiat-price",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-fiat-price",
+      "category": "Abandoned Endpoints / UTA REST / Market Data",
+      "name": "Get Fiat Price",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/market/interest-rate-index",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-interest-rate-index",
+      "category": "Abandoned Endpoints / UTA REST / Market Data",
+      "name": "Get Interest Rate Index",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/trade-statistics",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-trade-statistics",
+      "category": "Abandoned Endpoints / UTA REST / Market Data",
+      "name": "Platform 24h Market Statistics",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/order/max-order-quantity",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-max-order-quantity",
+      "category": "Abandoned Endpoints / UTA REST / Market Data",
+      "name": "Get max order quantity",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/market/call-auction-info",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-call-auction-info",
+      "category": "Abandoned Endpoints / UTA REST / Market Data",
+      "name": "Get Call Auction Info",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/unified/account/overview",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/account/get-account-overview-uta",
+      "category": "Abandoned Endpoints / UTA REST / Account",
+      "name": "Get Account Overview (UTA)",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/unified/account/balance",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-account-currency-assets-uta",
+      "category": "Abandoned Endpoints / UTA REST / Account",
+      "name": "Get Account Currency Assets (UTA)",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/account/balance",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-account-currency-assets-classic",
+      "category": "Abandoned Endpoints / UTA REST / Account",
+      "name": "Get Account Currency Assets (Classic)",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/sub-account/balance",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-sub-account-currency-assets",
+      "category": "Abandoned Endpoints / UTA REST / Account",
+      "name": "Get Sub Account Currency Assets",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/account/transfer-quota",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-transfer-quotas",
+      "category": "Abandoned Endpoints / UTA REST / Account",
+      "name": "Get Transfer Quotas",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/ua/v1/account/transfer",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/flex-transfer",
+      "category": "Abandoned Endpoints / UTA REST / Account",
+      "name": "Flex Transfer",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/ua/v1/sub-account/canTransferOut",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/set-sub-account-transfer-permission",
+      "category": "Abandoned Endpoints / UTA REST / Account",
+      "name": "Set Sub Account Transfer Permission",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/account/mode",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-account-mode",
+      "category": "Abandoned Endpoints / UTA REST / Account",
+      "name": "Get Account Mode",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/ua/v1/account/mode",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/set-account-mode",
+      "category": "Abandoned Endpoints / UTA REST / Account",
+      "name": "Set Account Mode",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/user/fee-rate",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-actual-fee",
+      "category": "Abandoned Endpoints / UTA REST / Account",
+      "name": "Get Fee Rate",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/account/ledger",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-account-ledger",
+      "category": "Abandoned Endpoints / UTA REST / Account",
+      "name": "Get Account Ledger",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/account/interest-history",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-interest-history-uta",
+      "category": "Abandoned Endpoints / UTA REST / Account",
+      "name": "Get Interest History (UTA)",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/ua/v1/unified/account/modify-leverage",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/modify-leverage-uta",
+      "category": "Abandoned Endpoints / UTA REST / Account",
+      "name": "Modify Futures Leverage (UTA)",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/oes/custody-quota",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-oes-custody-quota",
+      "category": "Abandoned Endpoints / UTA REST / Account",
+      "name": "Get Third-Party Custody Account Currency Limits",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/ua/v1/unified/account/modify-leverage-margin-cross",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/modify-cross-margin-leverage-uta",
+      "category": "Abandoned Endpoints / UTA REST / Account",
+      "name": "Modify Cross Margin Leverage (UTA)",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/unified/account/leverage",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-leverage",
+      "category": "Abandoned Endpoints / UTA REST / Account",
+      "name": "Get Leverage (UTA)",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/account/interest-limits",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-borrowing-rates-and-limits",
+      "category": "Abandoned Endpoints / UTA REST / Account",
+      "name": "Get Borrowing Rates and Limits",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/user/api-key",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-apikey-info",
+      "category": "Abandoned Endpoints / UTA REST / Account",
+      "name": "Get Apikey Info",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/ua/v1/user/sub/create-sub-account",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/add-sub-account",
+      "category": "Abandoned Endpoints / UTA REST / Account",
+      "name": "Add sub-account",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/user/sub-account-list",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/sub-account-list",
+      "category": "Abandoned Endpoints / UTA REST / Account",
+      "name": "Get Sub-account List",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/user/sub-api-key",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-sub-account-api-list",
+      "category": "Abandoned Endpoints / UTA REST / Account",
+      "name": "Get sub-account API List",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/ua/v1/user/create-sub-api-key",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/add-sub-account-api",
+      "category": "Abandoned Endpoints / UTA REST / Account",
+      "name": "Add sub-account API",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/ua/v1/user/modify-sub-api-key",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/modify-sub-account-api",
+      "category": "Abandoned Endpoints / UTA REST / Account",
+      "name": "Modify sub-account API",
+      "api_type": "http"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/ua/v1/user/sub-api-key",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/delete-sub-account-api",
+      "category": "Abandoned Endpoints / UTA REST / Account",
+      "name": "Delete sub-account API",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/asset/deposit/address",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-deposit-address",
+      "category": "Abandoned Endpoints / UTA REST / Account",
+      "name": "Get Deposit Address",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/asset/deposit/history",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-deposit-history",
+      "category": "Abandoned Endpoints / UTA REST / Account",
+      "name": "Get Deposit History",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/withdrawals/quotas",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-withdrawal-quotas",
+      "category": "Abandoned Endpoints / UTA REST / Account",
+      "name": "Get Withdrawal Quotas",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/ua/v1/withdrawal",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/withdrawal",
+      "category": "Abandoned Endpoints / UTA REST / Account",
+      "name": "Withdraw",
+      "api_type": "http"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/ua/v1/withdrawal",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/cancel-withdrawal",
+      "category": "Abandoned Endpoints / UTA REST / Account",
+      "name": "Cancel Withdrawal",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/asset/withdrawal/history",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-withdrawal-history",
+      "category": "Abandoned Endpoints / UTA REST / Account",
+      "name": "Get Withdrawal History",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/account/fee/kcs-deduct",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/kcs-deduct",
+      "category": "Abandoned Endpoints / UTA REST / Account",
+      "name": "KCS Fee Deduction Management",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/rate-limit/query-cap",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-api-rate-limit-cap",
+      "category": "Abandoned Endpoints / UTA REST / Account",
+      "name": "Get API Rate Limit Cap",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/ua/v1/rate-limit/set",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/set-sub-accounts-api-rate-limit",
+      "category": "Abandoned Endpoints / UTA REST / Account",
+      "name": "Set Sub Accounts API Rate Limit",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/rate-limit/query",
+      "official_source": "https://www.kucoin.com/docs-new/get-api-rate-limit",
+      "category": "Abandoned Endpoints / UTA REST / Account",
+      "name": "Get API Rate Limit",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/rate-limit/query-all",
+      "official_source": "https://www.kucoin.com/docs-new/get-all-api-rate-limit",
+      "category": "Abandoned Endpoints / UTA REST / Account",
+      "name": "Get All API Rate Limit",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/ua/v1/unified/order/place",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/place-order",
+      "category": "Abandoned Endpoints / UTA REST / Orders",
+      "name": "Place Order",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/ua/v1/unified/order/amend",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/amend-order",
+      "category": "Abandoned Endpoints / UTA REST / Orders",
+      "name": "Amend Order",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/ua/v1/unified/order/cancel",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/cancel-order",
+      "category": "Abandoned Endpoints / UTA REST / Orders",
+      "name": "Cancel Order",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/ua/v1/unified/order/cancel-batch",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/batch-cancel-order-by-id",
+      "category": "Abandoned Endpoints / UTA REST / Orders",
+      "name": "Batch Cancel Orders By ID",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/ua/v1/unified/order/cancel-all",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/batch-cancel-order-by-symbol",
+      "category": "Abandoned Endpoints / UTA REST / Orders",
+      "name": "Batch Cancel Orders By Symbol",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/unified/order/detail",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-order-details",
+      "category": "Abandoned Endpoints / UTA REST / Orders",
+      "name": "Get Order Details ",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/unified/order/open-list",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-open-order-list",
+      "category": "Abandoned Endpoints / UTA REST / Orders",
+      "name": "Get Open Order List",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/unified/order/history",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-order-history",
+      "category": "Abandoned Endpoints / UTA REST / Orders",
+      "name": "Get Order History",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/unified/order/execution",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-trade-history",
+      "category": "Abandoned Endpoints / UTA REST / Orders",
+      "name": "Get Trade History",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/unified/position/open-list",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-position-list-uta",
+      "category": "Abandoned Endpoints / UTA REST / Positions",
+      "name": "Get Position List (UTA)",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/position/history",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-position-history-uta",
+      "category": "Abandoned Endpoints / UTA REST / Positions",
+      "name": "Get Positions History (UTA)",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/position/funding-history",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-private-funding-fee-history",
+      "category": "Abandoned Endpoints / UTA REST / Positions",
+      "name": "Get Private Funding Fee History",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/ua/v1/unified/position/margin-mode",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/batch-modify-margin-mode",
+      "category": "Abandoned Endpoints / UTA REST / Positions",
+      "name": "Batch Modify Margin Mode",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/ua/v1/unified/position/modify-margin",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/modify-isolated-futures-margin",
+      "category": "Abandoned Endpoints / UTA REST / Positions",
+      "name": "Modify Position Margin",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/unified/position/margin-mode",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-margin-mode",
+      "category": "Abandoned Endpoints / UTA REST / Positions",
+      "name": "Get Margin Mode",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/otc-loan/discount-rate",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/vip-lending/get-collateral-ratio",
+      "category": "Abandoned Endpoints / UTA REST / VIP Lending",
+      "name": "Get Collateral Ratio",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/otc-loan/loan",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/vip-lending/get-loan-info",
+      "category": "Abandoned Endpoints / UTA REST / VIP Lending",
+      "name": "Get Loan Info",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/otc-loan/account",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/vip-lending/get-accounts",
+      "category": "Abandoned Endpoints / UTA REST / VIP Lending",
+      "name": "Get Accounts",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v2/bullet-private",
+      "official_source": "https://www.kucoin.com/docs-new/websocket-api/base-info/get-private-token-uta",
+      "category": "Abandoned Endpoints / UTA WebSocket / Base Info",
+      "name": "Get Private Token - Pro API Private Channels",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/market/cross-config",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-cross-margin-config",
+      "category": "Abandoned Endpoints / PRO REST",
+      "name": "Get Cross Margin Config",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/ua/v1/{accountMode}/order/place-batch",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/batch-place-order-classic",
+      "category": "Abandoned Endpoints / PRO REST",
+      "name": "Batch Place Order (Classic)",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/ua/v1/dcp/set",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/set-dcp-classic",
+      "category": "Abandoned Endpoints / PRO REST",
+      "name": "Set DCP (Classic)",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/dcp/query",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-dcp-classic",
+      "category": "Abandoned Endpoints / PRO REST",
+      "name": "Get DCP (Classic)",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v1/{accountMode}/position/tiers",
+      "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-account-position-tiers",
+      "category": "Abandoned Endpoints / PRO REST",
+      "name": "Get Account Position Tiers",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/deposit-addresses",
+      "official_source": "https://www.kucoin.com/docs-new/abandoned-endpoints/account-funding/get-deposit-addresses-v2",
+      "category": "Abandoned Endpoints / Classic / Account & Funding",
+      "name": "Get Deposit Addresses (V2)",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/deposit-addresses",
+      "official_source": "https://www.kucoin.com/docs-new/abandoned-endpoints/account-funding/get-deposit-addresses-v1",
+      "category": "Abandoned Endpoints / Classic / Account & Funding",
+      "name": "Get Deposit Addresses - V1",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/deposit-addresses",
+      "official_source": "https://www.kucoin.com/docs-new/abandoned-endpoints/account-funding/add-deposit-address-v1",
+      "category": "Abandoned Endpoints / Classic / Account & Funding",
+      "name": "Add Deposit Address - V1",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/sub/user",
+      "official_source": "https://www.kucoin.com/docs-new/abandoned-endpoints/account-funding/get-subacconut-list-summary-info-v1",
+      "category": "Abandoned Endpoints / Classic / Account & Funding",
+      "name": "Get sub-account List - Summary Info (V1)",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/sub-accounts",
+      "official_source": "https://www.kucoin.com/docs-new/abandoned-endpoints/account-funding/get-subacconut-list-spot-balance-v1",
+      "category": "Abandoned Endpoints / Classic / Account & Funding",
+      "name": "Get sub-account List - Spot Balance (V1)",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v2/accounts/sub-transfer",
+      "official_source": "https://www.kucoin.com/docs-new/abandoned-endpoints/account-funding/subaccount-transfer",
+      "category": "Abandoned Endpoints / Classic / Account & Funding",
+      "name": "Sub-account Transfer",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/hist-deposits",
+      "official_source": "https://www.kucoin.com/docs-new/abandoned-endpoints/account-funding/get-deposit-history-old",
+      "category": "Abandoned Endpoints / Classic / Account & Funding",
+      "name": "Get Deposit History - Old",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v2/accounts/inner-transfer",
+      "official_source": "https://www.kucoin.com/docs-new/abandoned-endpoints/account-funding/inner-transfer",
+      "category": "Abandoned Endpoints / Classic / Account & Funding",
+      "name": "Internal Transfer",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/transfer-list",
+      "official_source": "https://www.kucoin.com/docs-new/abandoned-endpoints/account-funding/get-futures-account-transfer-out-ledger",
+      "category": "Abandoned Endpoints / Classic / Account & Funding",
+      "name": "Get Futures Account Transfer Out Ledger",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/hist-withdrawals",
+      "official_source": "https://www.kucoin.com/docs-new/abandoned-endpoints/account-funding/get-withdrawal-history-old",
+      "category": "Abandoned Endpoints / Classic / Account & Funding",
+      "name": "Get Withdrawal History - Old",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/transfer-out",
+      "official_source": "https://www.kucoin.com/docs-new/abandoned-endpoints/account-funding/futures-account-transfer-out",
+      "category": "Abandoned Endpoints / Classic / Account & Funding",
+      "name": "Futures Account Transfer Out",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/transfer-in",
+      "official_source": "https://www.kucoin.com/docs-new/abandoned-endpoints/account-funding/futures-account-transfer-in",
+      "category": "Abandoned Endpoints / Classic / Account & Funding",
+      "name": "Futures Account Transfer In",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/withdrawals",
+      "official_source": "https://www.kucoin.com/docs-new/abandoned-endpoints/account-funding/withdraw-v1",
+      "category": "Abandoned Endpoints / Classic / Account & Funding",
+      "name": "Withdraw - V1",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/orders",
+      "official_source": "https://www.kucoin.com/docs-new/abandoned-endpoints/spot-trading/orders/add-order-old",
+      "category": "Abandoned Endpoints / Classic / Spot Trading / Orders",
+      "name": "Add Order - Old",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/orders/test",
+      "official_source": "https://www.kucoin.com/docs-new/abandoned-endpoints/spot-trading/orders/add-order-test-old",
+      "category": "Abandoned Endpoints / Classic / Spot Trading / Orders",
+      "name": "Add Order Test - Old",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/orders/multi",
+      "official_source": "https://www.kucoin.com/docs-new/abandoned-endpoints/spot-trading/orders/batch-add-orders-old",
+      "category": "Abandoned Endpoints / Classic / Spot Trading / Orders",
+      "name": "Batch Add Orders - Old",
+      "api_type": "http"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/orders/{orderId}",
+      "official_source": "https://www.kucoin.com/docs-new/abandoned-endpoints/spot-trading/orders/cancel-order-by-orderld-old",
+      "category": "Abandoned Endpoints / Classic / Spot Trading / Orders",
+      "name": "Cancel Order By OrderId - Old",
+      "api_type": "http"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/order/client-order/{clientOid}",
+      "official_source": "https://www.kucoin.com/docs-new/abandoned-endpoints/spot-trading/orders/cancel-order-by-clientoid-old",
+      "category": "Abandoned Endpoints / Classic / Spot Trading / Orders",
+      "name": "Cancel Order By ClientOid - Old",
+      "api_type": "http"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/orders",
+      "official_source": "https://www.kucoin.com/docs-new/abandoned-endpoints/spot-trading/orders/batch-cancel-order-old",
+      "category": "Abandoned Endpoints / Classic / Spot Trading / Orders",
+      "name": "Batch Cancel Order - Old",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/orders",
+      "official_source": "https://www.kucoin.com/docs-new/abandoned-endpoints/spot-trading/orders/get-orders-list-old",
+      "category": "Abandoned Endpoints / Classic / Spot Trading / Orders",
+      "name": "Get Orders List - Old",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/limit/orders",
+      "official_source": "https://www.kucoin.com/docs-new/abandoned-endpoints/spot-trading/orders/get-recent-orders-list-old",
+      "category": "Abandoned Endpoints / Classic / Spot Trading / Orders",
+      "name": "Get Recent Orders List - Old",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/orders/{orderId}",
+      "official_source": "https://www.kucoin.com/docs-new/abandoned-endpoints/spot-trading/orders/get-order-by-orderld-old",
+      "category": "Abandoned Endpoints / Classic / Spot Trading / Orders",
+      "name": "Get Order By OrderId - Old",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/order/client-order/{clientOid}",
+      "official_source": "https://www.kucoin.com/docs-new/abandoned-endpoints/spot-trading/orders/get-order-by-clientoid-old",
+      "category": "Abandoned Endpoints / Classic / Spot Trading / Orders",
+      "name": "Get Order By ClientOid - Old",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/fills",
+      "official_source": "https://www.kucoin.com/docs-new/abandoned-endpoints/spot-trading/orders/get-trade-history-old",
+      "category": "Abandoned Endpoints / Classic / Spot Trading / Orders",
+      "name": "Get Trade History - Old",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/limit/fills",
+      "official_source": "https://www.kucoin.com/docs-new/abandoned-endpoints/spot-trading/orders/get-recent-trade-history-old",
+      "category": "Abandoned Endpoints / Classic / Spot Trading / Orders",
+      "name": "Get Recent Trade History - Old",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/etf/info",
+      "official_source": "https://www.kucoin.com/docs-new/abandoned-endpoints/rest/margin-trading/market-data/get-etf-info",
+      "category": "Abandoned Endpoints / Classic / Margin Trading",
+      "name": "Get ETF Info",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/margin/account",
+      "official_source": "https://www.kucoin.com/docs-new/abandoned-endpoints/margin-trading/get-account-detail-margin",
+      "category": "Abandoned Endpoints / Classic / Margin Trading",
+      "name": "Get Account Detail - Margin",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/margin/order",
+      "official_source": "https://www.kucoin.com/docs-new/abandoned-endpoints/margin-trading/add-order-v1",
+      "category": "Abandoned Endpoints / Classic / Margin Trading",
+      "name": "Add Order - V1",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/margin/order/test",
+      "official_source": "https://www.kucoin.com/docs-new/abandoned-endpoints/margin-trading/add-order-test-v1",
+      "category": "Abandoned Endpoints / Classic / Margin Trading",
+      "name": "Add Order Test - V1",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/isolated/accounts",
+      "official_source": "https://www.kucoin.com/docs-new/abandoned-endpoints/margin-trading/get-account-list-isolated-margin-v1",
+      "category": "Abandoned Endpoints / Classic / Margin Trading",
+      "name": "Get Account List - Isolated Margin - V1",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/isolated/account/{symbol}",
+      "official_source": "https://www.kucoin.com/docs-new/abandoned-endpoints/margin-trading/get-account-detail-isolated-margin-v1",
+      "category": "Abandoned Endpoints / Classic / Margin Trading",
+      "name": "Get Account Detail - Isolated Margin - V1",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/position/margin/auto-deposit-status",
+      "official_source": "https://www.kucoin.com/docs-new/abandoned-endpoints/futures-trading/modify-isolated-margin-auto-deposit-status",
+      "category": "Abandoned Endpoints / Classic / Futures Trading",
+      "name": "Modify Isolated Margin Auto - Deposit Status",
+      "api_type": "http"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/orders",
+      "official_source": "https://www.kucoin.com/docs-new/abandoned-endpoints/futures-trading/cancel-all-orders-v1",
+      "category": "Abandoned Endpoints / Classic / Futures Trading",
+      "name": "Cancel All Orders - V1",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/position",
+      "official_source": "https://www.kucoin.com/docs-new/3475249e0",
+      "category": "Abandoned Endpoints / Classic / Futures Trading",
+      "name": "Get Position Details - V1",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/affiliate/inviter/statistics",
+      "official_source": "https://www.kucoin.com/docs-new/abandoned-endpoints/affiliate/get-account",
+      "category": "Abandoned Endpoints / Classic / Affiliate",
+      "name": "Get Account",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/broker/api/rebase/download",
+      "official_source": "https://www.kucoin.com/docs-new/3470280e0",
+      "category": "Abandoned Endpoints / Classic / Broker / Broker Pro",
+      "name": "Get Broker Rebate",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/ua/v2/asset/withdrawal",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/withdrawal",
+      "category": "",
+      "name": "Withdraw",
+      "api_type": "http"
+    },
+    {
+      "method": "GET",
+      "path": "/api/ua/v2/asset/withdrawal/history",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/withdrawal-history",
+      "category": "",
+      "name": "Get Withdrawal History",
+      "api_type": "http"
+    },
+    {
+      "method": "POST",
+      "path": "/api/ua/v2/asset/withdraw/cancel",
+      "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/cancel-withdrawal",
+      "category": "",
+      "name": "Cancel Withdrawal",
+      "api_type": "http"
+    },
+    {
+      "method": "WS",
+      "path": "Ticker",
+      "channel": "3470355w0",
+      "category": "UTA WebSocket V2 > Public Channels",
+      "title": "Ticker",
+      "official_source": "https://www.kucoin.com/docs-new/3470355w0"
+    },
+    {
+      "method": "WS",
+      "path": "Kline",
+      "channel": "3470356w0",
+      "category": "UTA WebSocket V2 > Public Channels",
+      "title": "Kline",
+      "official_source": "https://www.kucoin.com/docs-new/3470356w0"
+    },
+    {
+      "method": "WS",
+      "path": "Trade",
+      "channel": "3470359w0",
+      "category": "UTA WebSocket V2 > Public Channels",
+      "title": "Trade",
+      "official_source": "https://www.kucoin.com/docs-new/3470359w0"
+    },
+    {
+      "method": "WS",
+      "path": "Orderbook",
+      "channel": "3470354w0",
+      "category": "UTA WebSocket V2 > Public Channels",
+      "title": "Orderbook",
+      "official_source": "https://www.kucoin.com/docs-new/3470354w0"
+    },
+    {
+      "method": "WS",
+      "path": "Mark Price",
+      "channel": "3470358w0",
+      "category": "UTA WebSocket V2 > Public Channels",
+      "title": "Mark Price",
+      "official_source": "https://www.kucoin.com/docs-new/3470358w0"
+    },
+    {
+      "method": "WS",
+      "path": "Funding Fee Rate",
+      "channel": "3470357w0",
+      "category": "UTA WebSocket V2 > Public Channels",
+      "title": "Funding Fee Rate",
+      "official_source": "https://www.kucoin.com/docs-new/3470357w0"
+    },
+    {
+      "method": "WS",
+      "path": "All Funding Fee Rates",
+      "channel": "3470412w0",
+      "category": "UTA WebSocket V2 > Public Channels",
+      "title": "All Funding Fee Rates",
+      "official_source": "https://www.kucoin.com/docs-new/3470412w0"
+    },
+    {
+      "method": "WS",
+      "path": "Call Auction Data",
+      "channel": "3470353w0",
+      "category": "UTA WebSocket V2 > Public Channels",
+      "title": "Call Auction Data",
+      "official_source": "https://www.kucoin.com/docs-new/3470353w0"
+    },
+    {
+      "method": "WS",
+      "path": "Order",
+      "channel": "3470346w0",
+      "category": "UTA WebSocket V2 > Private Channels",
+      "title": "Order",
+      "official_source": "https://www.kucoin.com/docs-new/3470346w0"
+    },
+    {
+      "method": "WS",
+      "path": "Execution Lite",
+      "channel": "3470348w0",
+      "category": "UTA WebSocket V2 > Private Channels",
+      "title": "Execution Lite",
+      "official_source": "https://www.kucoin.com/docs-new/3470348w0"
+    },
+    {
+      "method": "WS",
+      "path": "Execution",
+      "channel": "3470406w0",
+      "category": "UTA WebSocket V2 > Private Channels",
+      "title": "Execution",
+      "official_source": "https://www.kucoin.com/docs-new/3470406w0"
+    },
+    {
+      "method": "WS",
+      "path": "Balance",
+      "channel": "3470347w0",
+      "category": "UTA WebSocket V2 > Private Channels",
+      "title": "Balance",
+      "official_source": "https://www.kucoin.com/docs-new/3470347w0"
+    },
+    {
+      "method": "WS",
+      "path": "Position",
+      "channel": "3470350w0",
+      "category": "UTA WebSocket V2 > Private Channels",
+      "title": "Position",
+      "official_source": "https://www.kucoin.com/docs-new/3470350w0"
+    },
+    {
+      "method": "WS",
+      "path": "LiquidationWarning",
+      "channel": "3470351w0",
+      "category": "UTA WebSocket V2 > Private Channels",
+      "title": "LiquidationWarning",
+      "official_source": "https://www.kucoin.com/docs-new/3470351w0"
+    },
+    {
+      "method": "WS",
+      "path": "Leverage",
+      "channel": "3470352w0",
+      "category": "UTA WebSocket V2 > Private Channels",
+      "title": "Leverage",
+      "official_source": "https://www.kucoin.com/docs-new/3470352w0"
+    },
+    {
+      "method": "WS",
+      "path": "Add Order",
+      "channel": "3470344w0",
+      "category": "UTA WebSocket V2 > Trade",
+      "title": "Add Order",
+      "official_source": "https://www.kucoin.com/docs-new/3470344w0"
+    },
+    {
+      "method": "WS",
+      "path": "Cancel Order",
+      "channel": "3470345w0",
+      "category": "UTA WebSocket V2 > Trade",
+      "title": "Cancel Order",
+      "official_source": "https://www.kucoin.com/docs-new/3470345w0"
+    },
+    {
+      "method": "WS",
+      "path": "Amend Order",
+      "channel": "3470409w0",
+      "category": "UTA WebSocket V2 > Trade",
+      "title": "Amend Order",
+      "official_source": "https://www.kucoin.com/docs-new/3470409w0"
+    },
+    {
+      "method": "WS",
+      "path": "Ticker",
+      "channel": "3470063w0",
+      "category": "Classic WebSocket > Spot Trading > Public Channels",
+      "title": "Ticker",
+      "official_source": "https://www.kucoin.com/docs-new/3470063w0"
+    },
+    {
+      "method": "WS",
+      "path": "All Tickers",
+      "channel": "3470064w0",
+      "category": "Classic WebSocket > Spot Trading > Public Channels",
+      "title": "All Tickers",
+      "official_source": "https://www.kucoin.com/docs-new/3470064w0"
+    },
+    {
+      "method": "WS",
+      "path": "Orderbook - Level 1",
+      "channel": "3470067w0",
+      "category": "Classic WebSocket > Spot Trading > Public Channels",
+      "title": "Orderbook - Level 1",
+      "official_source": "https://www.kucoin.com/docs-new/3470067w0"
+    },
+    {
+      "method": "WS",
+      "path": "Orderbook - Level 5",
+      "channel": "3470069w0",
+      "category": "Classic WebSocket > Spot Trading > Public Channels",
+      "title": "Orderbook - Level 5",
+      "official_source": "https://www.kucoin.com/docs-new/3470069w0"
+    },
+    {
+      "method": "WS",
+      "path": "Orderbook - Level 50",
+      "channel": "3470070w0",
+      "category": "Classic WebSocket > Spot Trading > Public Channels",
+      "title": "Orderbook - Level 50",
+      "official_source": "https://www.kucoin.com/docs-new/3470070w0"
+    },
+    {
+      "method": "WS",
+      "path": "Orderbook - Increment",
+      "channel": "3470068w0",
+      "category": "Classic WebSocket > Spot Trading > Public Channels",
+      "title": "Orderbook - Increment",
+      "official_source": "https://www.kucoin.com/docs-new/3470068w0"
+    },
+    {
+      "method": "WS",
+      "path": "Call Auction Orderbook - Level 50",
+      "channel": "3470137w0",
+      "category": "Classic WebSocket > Spot Trading > Public Channels",
+      "title": "Call Auction Orderbook - Level 50",
+      "official_source": "https://www.kucoin.com/docs-new/3470137w0"
+    },
+    {
+      "method": "WS",
+      "path": "Call Auction Data",
+      "channel": "3470138w0",
+      "category": "Classic WebSocket > Spot Trading > Public Channels",
+      "title": "Call Auction Data",
+      "official_source": "https://www.kucoin.com/docs-new/3470138w0"
+    },
+    {
+      "method": "WS",
+      "path": "Klines",
+      "channel": "3470071w0",
+      "category": "Classic WebSocket > Spot Trading > Public Channels",
+      "title": "Klines",
+      "official_source": "https://www.kucoin.com/docs-new/3470071w0"
+    },
+    {
+      "method": "WS",
+      "path": "Trade",
+      "channel": "3470072w0",
+      "category": "Classic WebSocket > Spot Trading > Public Channels",
+      "title": "Trade",
+      "official_source": "https://www.kucoin.com/docs-new/3470072w0"
+    },
+    {
+      "method": "WS",
+      "path": "Symbol Snapshot",
+      "channel": "3470065w0",
+      "category": "Classic WebSocket > Spot Trading > Public Channels",
+      "title": "Symbol Snapshot",
+      "official_source": "https://www.kucoin.com/docs-new/3470065w0"
+    },
+    {
+      "method": "WS",
+      "path": "Market Snapshot ",
+      "channel": "3470066w0",
+      "category": "Classic WebSocket > Spot Trading > Public Channels",
+      "title": "Market Snapshot ",
+      "official_source": "https://www.kucoin.com/docs-new/3470066w0"
+    },
+    {
+      "method": "WS",
+      "path": "Order V2",
+      "channel": "3470073w0",
+      "category": "Classic WebSocket > Spot Trading > Private Channels",
+      "title": "Order V2",
+      "official_source": "https://www.kucoin.com/docs-new/3470073w0"
+    },
+    {
+      "method": "WS",
+      "path": "Order V1",
+      "channel": "3470074w0",
+      "category": "Classic WebSocket > Spot Trading > Private Channels",
+      "title": "Order V1",
+      "official_source": "https://www.kucoin.com/docs-new/3470074w0"
+    },
+    {
+      "method": "WS",
+      "path": "Balance",
+      "channel": "3470075w0",
+      "category": "Classic WebSocket > Spot Trading > Private Channels",
+      "title": "Balance",
+      "official_source": "https://www.kucoin.com/docs-new/3470075w0"
+    },
+    {
+      "method": "WS",
+      "path": "Stop Order",
+      "channel": "3470139w0",
+      "category": "Classic WebSocket > Spot Trading > Private Channels",
+      "title": "Stop Order",
+      "official_source": "https://www.kucoin.com/docs-new/3470139w0"
+    },
+    {
+      "method": "WS",
+      "path": "Index Price",
+      "channel": "3470076w0",
+      "category": "Classic WebSocket > Margin Trading > Public Channels",
+      "title": "Index Price",
+      "official_source": "https://www.kucoin.com/docs-new/3470076w0"
+    },
+    {
+      "method": "WS",
+      "path": "Mark Price",
+      "channel": "3470077w0",
+      "category": "Classic WebSocket > Margin Trading > Public Channels",
+      "title": "Mark Price",
+      "official_source": "https://www.kucoin.com/docs-new/3470077w0"
+    },
+    {
+      "method": "WS",
+      "path": "Order V2",
+      "channel": "3470256w0",
+      "category": "Classic WebSocket > Margin Trading > Private Channels",
+      "title": "Order V2",
+      "official_source": "https://www.kucoin.com/docs-new/3470256w0"
+    },
+    {
+      "method": "WS",
+      "path": "Order V1",
+      "channel": "3470257w0",
+      "category": "Classic WebSocket > Margin Trading > Private Channels",
+      "title": "Order V1",
+      "official_source": "https://www.kucoin.com/docs-new/3470257w0"
+    },
+    {
+      "method": "WS",
+      "path": "Balance",
+      "channel": "3470258w0",
+      "category": "Classic WebSocket > Margin Trading > Private Channels",
+      "title": "Balance",
+      "official_source": "https://www.kucoin.com/docs-new/3470258w0"
+    },
+    {
+      "method": "WS",
+      "path": "Stop Order",
+      "channel": "3470259w0",
+      "category": "Classic WebSocket > Margin Trading > Private Channels",
+      "title": "Stop Order",
+      "official_source": "https://www.kucoin.com/docs-new/3470259w0"
+    },
+    {
+      "method": "WS",
+      "path": "Cross Margin Position",
+      "channel": "3470078w0",
+      "category": "Classic WebSocket > Margin Trading > Private Channels",
+      "title": "Cross Margin Position",
+      "official_source": "https://www.kucoin.com/docs-new/3470078w0"
+    },
+    {
+      "method": "WS",
+      "path": "Isolated Margin Position",
+      "channel": "3470079w0",
+      "category": "Classic WebSocket > Margin Trading > Private Channels",
+      "title": "Isolated Margin Position",
+      "official_source": "https://www.kucoin.com/docs-new/3470079w0"
+    },
+    {
+      "method": "WS",
+      "path": "Ticker V2",
+      "channel": "3470080w0",
+      "category": "Classic WebSocket > Futures Trading > Public Channels",
+      "title": "Ticker V2",
+      "official_source": "https://www.kucoin.com/docs-new/3470080w0"
+    },
+    {
+      "method": "WS",
+      "path": "Ticker V1",
+      "channel": "3470081w0",
+      "category": "Classic WebSocket > Futures Trading > Public Channels",
+      "title": "Ticker V1",
+      "official_source": "https://www.kucoin.com/docs-new/3470081w0"
+    },
+    {
+      "method": "WS",
+      "path": "Orderbook - Level 5",
+      "channel": "3470083w0",
+      "category": "Classic WebSocket > Futures Trading > Public Channels",
+      "title": "Orderbook - Level 5",
+      "official_source": "https://www.kucoin.com/docs-new/3470083w0"
+    },
+    {
+      "method": "WS",
+      "path": "Orderbook - Level 50",
+      "channel": "3470097w0",
+      "category": "Classic WebSocket > Futures Trading > Public Channels",
+      "title": "Orderbook - Level 50",
+      "official_source": "https://www.kucoin.com/docs-new/3470097w0"
+    },
+    {
+      "method": "WS",
+      "path": "Orderbook - Increment",
+      "channel": "3470082w0",
+      "category": "Classic WebSocket > Futures Trading > Public Channels",
+      "title": "Orderbook - Increment",
+      "official_source": "https://www.kucoin.com/docs-new/3470082w0"
+    },
+    {
+      "method": "WS",
+      "path": "Klines",
+      "channel": "3470086w0",
+      "category": "Classic WebSocket > Futures Trading > Public Channels",
+      "title": "Klines",
+      "official_source": "https://www.kucoin.com/docs-new/3470086w0"
+    },
+    {
+      "method": "WS",
+      "path": "Trade",
+      "channel": "3470084w0",
+      "category": "Classic WebSocket > Futures Trading > Public Channels",
+      "title": "Trade",
+      "official_source": "https://www.kucoin.com/docs-new/3470084w0"
+    },
+    {
+      "method": "WS",
+      "path": "Instrument",
+      "channel": "3470087w0",
+      "category": "Classic WebSocket > Futures Trading > Public Channels",
+      "title": "Instrument",
+      "official_source": "https://www.kucoin.com/docs-new/3470087w0"
+    },
+    {
+      "method": "WS",
+      "path": "Funding Fee Settlement",
+      "channel": "3470088w0",
+      "category": "Classic WebSocket > Futures Trading > Public Channels",
+      "title": "Funding Fee Settlement",
+      "official_source": "https://www.kucoin.com/docs-new/3470088w0"
+    },
+    {
+      "method": "WS",
+      "path": "Symbol Snapshot",
+      "channel": "3470089w0",
+      "category": "Classic WebSocket > Futures Trading > Public Channels",
+      "title": "Symbol Snapshot",
+      "official_source": "https://www.kucoin.com/docs-new/3470089w0"
+    },
+    {
+      "method": "WS",
+      "path": "Orders",
+      "channel": "3470090w0",
+      "category": "Classic WebSocket > Futures Trading > Private Channels",
+      "title": "Orders",
+      "official_source": "https://www.kucoin.com/docs-new/3470090w0"
+    },
+    {
+      "method": "WS",
+      "path": "Balance",
+      "channel": "3470092w0",
+      "category": "Classic WebSocket > Futures Trading > Private Channels",
+      "title": "Balance",
+      "official_source": "https://www.kucoin.com/docs-new/3470092w0"
+    },
+    {
+      "method": "WS",
+      "path": "Positions",
+      "channel": "3470093w0",
+      "category": "Classic WebSocket > Futures Trading > Private Channels",
+      "title": "Positions",
+      "official_source": "https://www.kucoin.com/docs-new/3470093w0"
+    },
+    {
+      "method": "WS",
+      "path": "Margin Mode",
+      "channel": "3470095w0",
+      "category": "Classic WebSocket > Futures Trading > Private Channels",
+      "title": "Margin Mode",
+      "official_source": "https://www.kucoin.com/docs-new/3470095w0"
+    },
+    {
+      "method": "WS",
+      "path": "Cross Margin Leverage",
+      "channel": "3470096w0",
+      "category": "Classic WebSocket > Futures Trading > Private Channels",
+      "title": "Cross Margin Leverage",
+      "official_source": "https://www.kucoin.com/docs-new/3470096w0"
+    },
+    {
+      "method": "WS",
+      "path": "Stop Orders",
+      "channel": "3470091w0",
+      "category": "Classic WebSocket > Futures Trading > Private Channels",
+      "title": "Stop Orders",
+      "official_source": "https://www.kucoin.com/docs-new/3470091w0"
+    },
+    {
+      "method": "WS",
+      "path": "Add Order",
+      "channel": "3470252w0",
+      "category": "Classic WebSocket > Add/Cancel Order",
+      "title": "Add Order",
+      "official_source": "https://www.kucoin.com/docs-new/3470252w0"
+    },
+    {
+      "method": "WS",
+      "path": "Cancel Order",
+      "channel": "3470253w0",
+      "category": "Classic WebSocket > Add/Cancel Order",
+      "title": "Cancel Order",
+      "official_source": "https://www.kucoin.com/docs-new/3470253w0"
+    },
+    {
+      "method": "WS",
+      "path": "Order",
+      "channel": "3470228w0",
+      "category": "Abandoned Endpoints > UTA WebSocket > Private Channels",
+      "title": "Order",
+      "official_source": "https://www.kucoin.com/docs-new/3470228w0"
+    },
+    {
+      "method": "WS",
+      "path": "Balance",
+      "channel": "3470231w0",
+      "category": "Abandoned Endpoints > UTA WebSocket > Private Channels",
+      "title": "Balance",
+      "official_source": "https://www.kucoin.com/docs-new/3470231w0"
+    },
+    {
+      "method": "WS",
+      "path": "Execution",
+      "channel": "3470407w0",
+      "category": "Abandoned Endpoints > UTA WebSocket > Private Channels",
+      "title": "Execution",
+      "official_source": "https://www.kucoin.com/docs-new/3470407w0"
+    },
+    {
+      "method": "WS",
+      "path": "Execution Lite",
+      "channel": "3470264w0",
+      "category": "Abandoned Endpoints > UTA WebSocket > Private Channels",
+      "title": "Execution Lite",
+      "official_source": "https://www.kucoin.com/docs-new/3470264w0"
+    },
+    {
+      "method": "WS",
+      "path": "Position",
+      "channel": "3470233w0",
+      "category": "Abandoned Endpoints > UTA WebSocket > Private Channels",
+      "title": "Position",
+      "official_source": "https://www.kucoin.com/docs-new/3470233w0"
+    },
+    {
+      "method": "WS",
+      "path": "Leverage",
+      "channel": "3470237w0",
+      "category": "Abandoned Endpoints > UTA WebSocket > Private Channels",
+      "title": "Leverage",
+      "official_source": "https://www.kucoin.com/docs-new/3470237w0"
+    },
+    {
+      "method": "WS",
+      "path": "LiquidationWarning",
+      "channel": "3470236w0",
+      "category": "Abandoned Endpoints > UTA WebSocket > Private Channels",
+      "title": "LiquidationWarning",
+      "official_source": "https://www.kucoin.com/docs-new/3470236w0"
+    },
+    {
+      "method": "WS",
+      "path": "Kline",
+      "channel": "3470223w0",
+      "category": "Abandoned Endpoints > UTA WebSocket > Public Channels",
+      "title": "Kline",
+      "official_source": "https://www.kucoin.com/docs-new/3470223w0"
+    },
+    {
+      "method": "WS",
+      "path": "Ticker",
+      "channel": "3470222w0",
+      "category": "Abandoned Endpoints > UTA WebSocket > Public Channels",
+      "title": "Ticker",
+      "official_source": "https://www.kucoin.com/docs-new/3470222w0"
+    },
+    {
+      "method": "WS",
+      "path": "Orderbook",
+      "channel": "3470221w0",
+      "category": "Abandoned Endpoints > UTA WebSocket > Public Channels",
+      "title": "Orderbook",
+      "official_source": "https://www.kucoin.com/docs-new/3470221w0"
+    },
+    {
+      "method": "WS",
+      "path": "Call Auction Data",
+      "channel": "3470268w0",
+      "category": "Abandoned Endpoints > UTA WebSocket > Public Channels",
+      "title": "Call Auction Data",
+      "official_source": "https://www.kucoin.com/docs-new/3470268w0"
+    },
+    {
+      "method": "WS",
+      "path": "Trade",
+      "channel": "3470224w0",
+      "category": "Abandoned Endpoints > UTA WebSocket > Public Channels",
+      "title": "Trade",
+      "official_source": "https://www.kucoin.com/docs-new/3470224w0"
+    },
+    {
+      "method": "WS",
+      "path": "Funding Fee",
+      "channel": "3470270w0",
+      "category": "Abandoned Endpoints > UTA WebSocket > Public Channels",
+      "title": "Funding Fee",
+      "official_source": "https://www.kucoin.com/docs-new/3470270w0"
+    },
+    {
+      "method": "WS",
+      "path": "Mark Price",
+      "channel": "3470272w0",
+      "category": "Abandoned Endpoints > UTA WebSocket > Public Channels",
+      "title": "Mark Price",
+      "official_source": "https://www.kucoin.com/docs-new/3470272w0"
+    },
+    {
+      "method": "WS",
+      "path": "Add Order",
+      "channel": "3470133w0",
+      "category": "Abandoned Endpoints > UTA WebSocket > Manage Order",
+      "title": "Add Order",
+      "official_source": "https://www.kucoin.com/docs-new/3470133w0"
+    },
+    {
+      "method": "WS",
+      "path": "Cancel Order",
+      "channel": "3470134w0",
+      "category": "Abandoned Endpoints > UTA WebSocket > Manage Order",
+      "title": "Cancel Order",
+      "official_source": "https://www.kucoin.com/docs-new/3470134w0"
+    },
+    {
+      "method": "WS",
+      "path": "Amend Order",
+      "channel": "3470275w0",
+      "category": "Abandoned Endpoints > UTA WebSocket > Manage Order",
+      "title": "Amend Order",
+      "official_source": "https://www.kucoin.com/docs-new/3470275w0"
+    }
+  ]
+}

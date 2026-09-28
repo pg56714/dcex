@@ -144,13 +144,12 @@ impl KrakenClient {
                 return Err(invalid("id requires 1..=20 ledger identifiers"));
             }
         }
-        if let Some(amount) = params.get("amount") {
-            if !amount
+        if let Some(amount) = params.get("amount")
+            && !amount
                 .parse::<f64>()
                 .is_ok_and(|v| v.is_finite() && v > 0.0)
-            {
-                return Err(invalid("amount must be positive"));
-            }
+        {
+            return Err(invalid("amount must be positive"));
         }
         if name == "get_spot_deposit_addresses"
             && params.get("method") == Some("Bitcoin Lightning")
@@ -159,12 +158,11 @@ impl KrakenClient {
             return Err(invalid("Bitcoin Lightning requires amount"));
         }
         for (start, end) in [("since", "before"), ("from", "to")] {
-            if name.starts_with("get_futures_") {
-                if let (Some(a), Some(b)) = (params.get(start), params.get(end)) {
-                    if a.parse::<u64>().map_err(invalid)? > b.parse::<u64>().map_err(invalid)? {
-                        return Err(invalid(format!("{start} must not exceed {end}")));
-                    }
-                }
+            if name.starts_with("get_futures_")
+                && let (Some(a), Some(b)) = (params.get(start), params.get(end))
+                && a.parse::<u64>().map_err(invalid)? > b.parse::<u64>().map_err(invalid)?
+            {
+                return Err(invalid(format!("{start} must not exceed {end}")));
             }
         }
         if name == "simulate_futures_portfolio" {
@@ -179,9 +177,7 @@ impl KrakenClient {
                 .ok_or_else(|| invalid("positions must be an array of at most 500 entries"))?;
             for position in positions {
                 if position.as_object().is_none_or(|o| o.len() != 3)
-                    || !position["instrument"]
-                        .as_str()
-                        .is_some_and(|v| !v.is_empty())
+                    || position["instrument"].as_str().is_none_or(|v| v.is_empty())
                     || !position["size"].as_f64().is_some_and(f64::is_finite)
                     || !position["entryPrice"]
                         .as_f64()
@@ -191,10 +187,10 @@ impl KrakenClient {
                 }
             }
         }
-        if let (Some(start), Some(end)) = (params.get("starttm"), params.get("endtm")) {
-            if start.parse::<u64>().map_err(invalid)? > end.parse::<u64>().map_err(invalid)? {
-                return Err(invalid("starttm must not exceed endtm"));
-            }
+        if let (Some(start), Some(end)) = (params.get("starttm"), params.get("endtm"))
+            && start.parse::<u64>().map_err(invalid)? > end.parse::<u64>().map_err(invalid)?
+        {
+            return Err(invalid("starttm must not exceed endtm"));
         }
         if name == "get_spot_post_trade_data"
             && params

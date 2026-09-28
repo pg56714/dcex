@@ -5,6 +5,7 @@ import logging
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import Any, cast
+from urllib.parse import urlsplit
 
 from .._native_http import NativeResponse, load_native, request_native_json
 from ..base.http_manager import BaseHTTPManager
@@ -46,7 +47,7 @@ class HTTPManager(BaseHTTPManager):
     private_key: str | None = field(default=None, repr=False)
     spot_base_url: str = field(default="https://sapi.asterdex.com")
     futures_base_url: str = field(default="https://fapi.asterdex.com")
-    prediction_base_url: str = field(default="https://papi.asterdex.com")
+    prediction_base_url: str | None = field(default=None)
     timeout: int = field(default=10)
     logger: logging.Logger | None = field(default=None)
     ptm: ProductTableManager = field(init=False)
@@ -56,6 +57,20 @@ class HTTPManager(BaseHTTPManager):
     def __post_init__(self) -> None:
         """Initialize the Aster HTTP manager."""
         self._logger = self._setup_logger(self.logger)
+        spot_testnet = (urlsplit(self.spot_base_url).hostname or "").endswith(
+            ".asterdex-testnet.com"
+        )
+        futures_testnet = (urlsplit(self.futures_base_url).hostname or "").endswith(
+            ".asterdex-testnet.com"
+        )
+        if spot_testnet != futures_testnet:
+            raise ValueError(
+                "Aster network mismatch: configure both spot and futures URLs for testnet"
+            )
+        if self.prediction_base_url is None:
+            self.prediction_base_url = (
+                "https://papi.asterdex-testnet.com" if spot_testnet else "https://papi.asterdex.com"
+            )
         native_client_type = getattr(_native, "AsterHttpClient", None)
         if native_client_type is None:
             raise RuntimeError("The dcex native extension is required.")
@@ -75,6 +90,12 @@ class HTTPManager(BaseHTTPManager):
                 "set_product_table",
             ):
                 self._native_client.set_product_table(self.ptm._native_table)
+
+    def reserve_nonce(self) -> int:
+        """Reserve a unique microsecond nonce for an order and its later guarded cancel."""
+        if self._native_client is None:
+            raise RuntimeError("Initialize the native client before reserving a nonce.")
+        return int(self._native_client.reserve_nonce())
 
     def _uses_native_transport(self) -> bool:
         if self._native_client is None:

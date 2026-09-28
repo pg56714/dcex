@@ -1379,8 +1379,8 @@ pub(super) fn endpoint(name: &str) -> Option<Endpoint> {
             ],
             required: &["fromType", "toType", "amount", "coin"],
             arrays: &[],
-            limit: Some(100),
-            days: Some(90),
+            limit: None,
+            days: None,
         },
         // https://www.bitget.com/legacy-docs/uta/account/transfer/Sub-Master-Transfer
         "transfer_uta_sub_to_master" => Endpoint {
@@ -1390,8 +1390,8 @@ pub(super) fn endpoint(name: &str) -> Option<Endpoint> {
             fields: &["fromType", "toType", "amount", "coin", "clientOid"],
             required: &["fromType", "toType", "amount", "coin"],
             arrays: &[],
-            limit: Some(100),
-            days: Some(90),
+            limit: None,
+            days: None,
         },
         // https://www.bitget.com/legacy-docs/uta/account/transfer/SubAccount-Transfer
         "transfer_uta_sub_account" => Endpoint {
@@ -1418,8 +1418,8 @@ pub(super) fn endpoint(name: &str) -> Option<Endpoint> {
                 "clientOid",
             ],
             arrays: &[],
-            limit: Some(100),
-            days: Some(90),
+            limit: None,
+            days: None,
         },
         // https://www.bitget.com/legacy-docs/uta/account/transfer/SubAccount-Transfer-Get
         "get_uta_sub_account_transfer_records" => Endpoint {

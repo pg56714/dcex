@@ -21,6 +21,10 @@ from urllib.parse import parse_qsl
 
 import pytest
 
+from tests.unit.wire_expectations import EXPECTED_VERBS as _ALL_VERBS
+
+EXPECTED_VERBS = _ALL_VERBS["aster"]
+
 from dcex.aster.client import Client
 from dcex.async_support.aster.client import Client as AsyncClient
 from dcex.utils.errors import FailedRequestError
@@ -44,6 +48,7 @@ class WireCase:
     path: str
     params: dict[str, str]
     signed: bool
+    verb: str | None = None
 
     @property
     def id(self) -> str:
@@ -225,7 +230,7 @@ CASES = [
         **{"listen_key": "example"},
     ),
     pub("get_asset_logos", "/fapi/v3/common/asset/all-asset-logo", {}, **{}),
-    priv("exchange_futures_assets", "/fapi/v3/assetExchange", {}, **{}),
+    priv("exchange_futures_assets", "/fapi/v3/assetExchange", {}, confirm=True),
     priv("get_sub_accounts", "/fapi/v3/getSubAccountList", {}, **{}),
     priv("get_direct_announcements", "/fapi/v3/announcement/direct", {}, **{}),
     priv("get_direct_announcement", "/fapi/v3/announcement/directById", {"id": "1"}, **{"id": 1}),
@@ -928,15 +933,32 @@ def _fail_if_native_is_stale(case: WireCase, error: ValueError) -> None:
     pytest.fail(f"installed dcex._native predates Rust dispatch {case.method!r}; rebuild needed")
 
 
+def _fresh_nonce_case(case: WireCase) -> WireCase:
+    from dataclasses import replace
+    from time import time_ns
+
+    if "nonce" in case.kwargs and not case.method.endswith("_signed"):
+        nonce = time_ns() // 1000
+        if case.method.startswith("guarded_cancel_"):
+            nonce -= 300_000_000
+        return replace(
+            case,
+            kwargs={**case.kwargs, "nonce": nonce},
+            params={**case.params, "nonce": str(nonce)},
+        )
+    return case
+
+
 def _assert_request(case: WireCase, requests: list[dict[str, Any]]) -> None:
     assert len(requests) == 1, requests
     request = requests[0]
+    assert request["method"] == (case.verb or EXPECTED_VERBS[case.method])
     path, _, query = request["path"].partition("?")
     assert path == case.path
     pairs = dict(parse_qsl(query or request["body"], keep_blank_values=True))
     for key, value in case.params.items():
         assert pairs.get(key) == value, (key, pairs)
-    if case.method.endswith("_signed"):
+    if case.method.endswith("_signed") and not case.method.startswith("withdraw_"):
         assert pairs == case.params
     elif case.signed:
         assert pairs["signer"] == SIGNER
@@ -955,6 +977,55 @@ def _assert_request(case: WireCase, requests: list[dict[str, Any]]) -> None:
         assert all(order.get("side", "SELL") in {"BUY", "SELL"} for order in orders)
 
 
+from dataclasses import replace
+
+ALIASES = {"exchange_futures_assets": "trigger_futures_asset_exchange"}
+CASES += [
+    WireCase(c["name"], c["kwargs"], c["path"], c["wire"], True, c["verb"])
+    for c in json.loads(
+        (Path(__file__).parents[1] / "fixtures/aster_completion.json").read_text(encoding="utf-8")
+    )
+]
+CASES += [
+    WireCase(
+        "get_futures_market_klines",
+        {"symbol": "BTCUSDT", "interval": "1m", "callerFlag": "keep"},
+        "/fapi/v3/marketKlines",
+        {"symbol": "BTCUSDT", "interval": "1m", "callerFlag": "keep"},
+        False,
+        "GET",
+    ),
+    WireCase(
+        "get_spot_optimized_ticker_24hr",
+        {"symbol": "BTCUSDT"},
+        "/api/v3/ticker/opt/24hr",
+        {"symbol": "BTCUSDT"},
+        False,
+        "GET",
+    ),
+    WireCase(
+        "place_spot_batch_orders_raw",
+        {"batchOrders": '[{"symbol":"BTCUSDT"}]', "callerFlag": "keep"},
+        "/api/v3/batchOrders",
+        {"batchOrders": '[{"symbol":"BTCUSDT"}]', "callerFlag": "keep"},
+        True,
+        "POST",
+    ),
+    WireCase(
+        "cancel_spot_batch_orders_raw",
+        {"orderIdList": "[1]"},
+        "/api/v3/batchOrders",
+        {"orderIdList": "[1]"},
+        True,
+        "DELETE",
+    ),
+    WireCase("noop_prediction", {"nonce": 1}, "/api/v3/noop", {}, True, "POST"),
+]
+CASES = tuple(CASES) + tuple(
+    replace(case, method=ALIASES[case.method]) for case in CASES if case.method in ALIASES
+)
+
+
 def test_every_endpoint_wrapper_has_a_wire_case() -> None:
     wrappers = {
         name for name, value in vars(Client).items() if not name.startswith("_") and callable(value)
@@ -967,7 +1038,12 @@ def test_every_endpoint_wrapper_has_a_wire_case() -> None:
                 for name, value in vars(base).items()
                 if not name.startswith("_") and callable(value)
             )
-    assert wrappers - {case.method for case in CASES} == set()
+    from tests.unit.test_aster_auxiliary import CASES as AUXILIARY_CASES
+
+    assert (
+        wrappers - ({case.method for case in CASES} | {case[0] for case in AUXILIARY_CASES})
+        == set()
+    )
     for case in CASES:
         assert f'"{case.method}"' in RUST_SOURCE, case.method
 
@@ -976,6 +1052,7 @@ def test_every_endpoint_wrapper_has_a_wire_case() -> None:
 def test_sync_wrapper_reaches_documented_route(
     case: WireCase, server: tuple[str, queue.Queue[dict[str, Any]]]
 ) -> None:
+    case = _fresh_nonce_case(case)
     base_url, received = server
     _drain(received)
     client = Client(**_client_kwargs(base_url))
@@ -994,6 +1071,7 @@ def test_sync_wrapper_reaches_documented_route(
 async def test_async_wrapper_reaches_documented_route(
     case: WireCase, server: tuple[str, queue.Queue[dict[str, Any]]]
 ) -> None:
+    case = _fresh_nonce_case(case)
     base_url, received = server
     _drain(received)
     client = AsyncClient(**_client_kwargs(base_url))
@@ -1092,6 +1170,9 @@ def test_explicit_placement_nonce_is_preserved(
 ) -> None:
     base_url, received = server
     _drain(received)
+    from time import time_ns
+
+    nonce = time_ns() // 1000
     client = Client(**_client_kwargs(base_url))
     kwargs: dict[str, Any] = {
         "product_symbol": SWAP,
@@ -1104,12 +1185,12 @@ def test_explicit_placement_nonce_is_preserved(
             "batchOrders": [{"symbol": "BTCUSDT", "side": "BUY", "type": "MARKET", "quantity": "1"}]
         }
     try:
-        getattr(client, method)(nonce=1700000000000123, **kwargs)
+        getattr(client, method)(nonce=nonce, **kwargs)
     finally:
         client.close()
     (request,) = _drain(received)
     pairs = parse_qsl(request["body"])
-    assert [value for key, value in pairs if key == "nonce"] == ["1700000000000123"]
+    assert [value for key, value in pairs if key == "nonce"] == [str(nonce)]
 
 
 @pytest.mark.asyncio
@@ -1124,9 +1205,9 @@ async def test_asset_exchange_accepts_empty_success_response(asynchronous: bool)
         try:
             if asynchronous:
                 await client.async_init()
-                assert await client.exchange_futures_assets() == {}
+                assert await client.exchange_futures_assets(confirm=True) == {}
             else:
-                assert client.exchange_futures_assets() == {}
+                assert client.exchange_futures_assets(confirm=True) == {}
         finally:
             if asynchronous:
                 await client.close()

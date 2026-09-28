@@ -391,10 +391,10 @@ impl BinanceClient {
                 *value = value.to_ascii_uppercase();
             }
         }
-        if symbol_aliases.contains(&"product_symbol") {
-            if let Some(product_symbol) = params.get("product_symbol") {
-                query.push(("symbol".to_string(), self.exchange_symbol(product_symbol)?));
-            }
+        if symbol_aliases.contains(&"product_symbol")
+            && let Some(product_symbol) = params.get("product_symbol")
+        {
+            query.push(("symbol".to_string(), self.exchange_symbol(product_symbol)?));
         }
         self.request(method, BinanceMarket::Equity, path, query, true)
             .await
@@ -439,15 +439,14 @@ fn validate_equity_order(params: &PublicParams) -> Result<()> {
                 "Binance Equity LIMIT orders do not accept notional.".to_string(),
             ));
         }
-        if let Some(price) = params.get("price") {
-            if price
+        if let Some(price) = params.get("price")
+            && price
                 .split_once('.')
                 .is_some_and(|(_, decimals)| decimals.len() > 2)
-            {
-                return Err(DcexError::InvalidInput(
-                    "Binance Equity LIMIT price supports at most two decimal places.".to_string(),
-                ));
-            }
+        {
+            return Err(DcexError::InvalidInput(
+                "Binance Equity LIMIT price supports at most two decimal places.".to_string(),
+            ));
         }
     } else {
         for forbidden in ["price", "tradingSession", "timeInForce"] {

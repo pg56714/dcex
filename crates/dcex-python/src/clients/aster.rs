@@ -36,13 +36,25 @@ impl PythonAsterHttpClient {
                 spot_base_url.unwrap_or_else(|| "https://sapi.asterdex.com".to_string()),
                 futures_base_url.unwrap_or_else(|| "https://fapi.asterdex.com".to_string()),
             )
-            .and_then(|client| {
-                client.with_prediction_base_url(
-                    prediction_base_url.unwrap_or_else(|| "https://papi.asterdex.com".into()),
-                )
+            .and_then(|client| match prediction_base_url {
+                Some(url) => client.with_prediction_base_url(url),
+                None => Ok(client),
             })
             .map_err(to_py_runtime_error)?,
         })
+    }
+
+    fn reserve_nonce(&self) -> PyResult<u64> {
+        self.client.reserve_nonce().map_err(to_py_runtime_error)
+    }
+
+    fn set_auxiliary_base_urls(&mut self, chain: String, announcements: String) -> PyResult<()> {
+        self.client = self
+            .client
+            .clone()
+            .with_auxiliary_base_urls(chain, announcements)
+            .map_err(to_py_runtime_error)?;
+        Ok(())
     }
 
     fn set_product_table(&mut self, table: PyRef<'_, PythonProductTable>) {

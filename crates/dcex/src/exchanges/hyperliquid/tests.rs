@@ -155,3 +155,59 @@ fn spot_perp_transfer_rejects_missing_wallet_signature() {
     .expect_err("signature required");
     assert!(error.to_string().contains("signature"));
 }
+
+#[test]
+fn transfers_match_official_sdk_signatures_and_field_order() {
+    let source = include_str!("../../../../../tests/fixtures/signing/hyperliquid_official.json");
+    let vectors: serde_json::Value = serde_json::from_str(source).unwrap();
+    // Deserialize the original JSON text into OrderedValue so test expectations do
+    // not reconstruct or sort the official SDK's action field order.
+    let ordered: OrderedValue = serde_json::from_str(source).unwrap();
+    let OrderedValue::Object(root) = ordered else {
+        panic!("root object")
+    };
+    let OrderedValue::Array(cases) = &root.iter().find(|(k, _)| k == "cases").unwrap().1 else {
+        panic!("cases array")
+    };
+    for (case, ordered_case) in vectors["cases"].as_array().unwrap().iter().zip(cases) {
+        let OrderedValue::Object(fields) = ordered_case else {
+            panic!("case object")
+        };
+        let action = &fields.iter().find(|(k, _)| k == "action").unwrap().1;
+        let msgpack = encode_msgpack(action);
+        assert_eq!(hex::encode(&msgpack), case["msgpack_hex"].as_str().unwrap());
+        let signature = hyperliquid_signature(
+            &msgpack,
+            case["nonce"].as_u64().unwrap(),
+            case["vault_address"].as_str(),
+            case["expires_after"].as_u64(),
+            !case["is_mainnet"].as_bool().unwrap(),
+            &[0x11; 32],
+        )
+        .unwrap();
+        assert_eq!(
+            signature.r,
+            format!(
+                "0x{:0>64}",
+                case["signature"]["r"]
+                    .as_str()
+                    .unwrap()
+                    .trim_start_matches("0x")
+            )
+        );
+        assert_eq!(
+            signature.s,
+            format!(
+                "0x{:0>64}",
+                case["signature"]["s"]
+                    .as_str()
+                    .unwrap()
+                    .trim_start_matches("0x")
+            )
+        );
+        assert_eq!(
+            u64::from(signature.v),
+            case["signature"]["v"].as_u64().unwrap()
+        );
+    }
+}

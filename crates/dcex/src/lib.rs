@@ -18,6 +18,13 @@ pub enum DcexError {
         message: String,
         headers: Vec<(String, String)>,
     },
+    /// Exchange failure with structured outcomes, including partial execution.
+    ExchangeResponse {
+        status: u16,
+        message: String,
+        headers: Vec<(String, String)>,
+        data: serde_json::Value,
+    },
     InvalidInput(String),
     Runtime(String),
     Transport(String),
@@ -28,6 +35,9 @@ impl Display for DcexError {
         match self {
             Self::Decode(message) => write!(f, "failed to decode response: {message}"),
             Self::HttpStatus {
+                status, message, ..
+            }
+            | Self::ExchangeResponse {
                 status, message, ..
             } => write!(f, "HTTP request failed with status {status}: {message}"),
             Self::InvalidInput(message) => f.write_str(message),

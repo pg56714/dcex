@@ -29,6 +29,12 @@ get_latest_interest_rate_curve(),
         )
     ];
     private [
+        /// API withdrawals and external transfers have no second confirmation; they execute on submit.
+        create_withdrawal_signed(body => "body"),
+        get_affiliate_data(), get_referral_status(), get_referral_links(),
+        get_referral_dashboard(period => "period"),
+        use_referral_code(code => "code"),
+        create_referral_code(id => "id"), update_referral_code(id => "id"),
 get_account_equity_history(account_id => "accountId",interval => "interval"),
 get_account_pnl_history(account_id => "accountId",interval => "interval",pnl_type => "pnlType"),
 get_account_pnl_percentage_history(account_id => "accountId",interval => "interval",pnl_type => "pnlType"),
@@ -68,6 +74,7 @@ get_interest_payments_history(account_id => "accountId",interval => "interval"),
         get_builder_dashboard(),
         get_builder_trades(),
         get_bridge_config(),
+        commit_bridge_quote(quote_id => "id"),
         get_bridge_quote(
             chain_in => "chainIn",
             chain_out => "chainOut",

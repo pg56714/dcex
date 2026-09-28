@@ -80,6 +80,28 @@ impl AsterClient {
         method_name: &str,
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
+        let incomplete = match method_name {
+            "place_spot_batch_orders_raw" => Some(HttpMethod::Post),
+            "cancel_spot_batch_orders_raw" => Some(HttpMethod::Delete),
+            _ => None,
+        };
+        if let Some(method) = incomplete {
+            return self
+                .request(
+                    method,
+                    AsterMarket::Spot,
+                    "/api/v3/batchOrders",
+                    params,
+                    true,
+                )
+                .await;
+        }
+        let method_name = if method_name == "trigger_futures_asset_exchange" {
+            "exchange_futures_assets"
+        } else {
+            method_name
+        };
+        let params = super::super::operation_guards::validate("aster", method_name, params)?;
         let params = AsterParams::from_pairs(normalize_order_side(method_name, params));
         if let Some(response) = self
             .prediction_dispatch(method_name, &params, false)
@@ -88,6 +110,12 @@ impl AsterClient {
             return Ok(response);
         }
         if let Some(response) = self.additional_request(method_name, &params, false).await? {
+            return Ok(response);
+        }
+        if let Some(response) = self
+            .completion_private_request(method_name, &params)
+            .await?
+        {
             return Ok(response);
         }
         validate_private_params(method_name, &params)?;
@@ -457,9 +485,9 @@ impl AsterClient {
     pub(super) fn resolve_batch_orders(&self, params: &AsterParams) -> Result<String> {
         let mut value = params.json_required("batchOrders")?;
         let Value::Array(orders) = &mut value else {
-            return Err(DcexError::InvalidInput(format!(
-                "Aster batchOrders must be a JSON array."
-            )));
+            return Err(DcexError::InvalidInput(
+                "Aster batchOrders must be a JSON array.".to_string(),
+            ));
         };
         if orders.is_empty() || orders.len() > 5 {
             return Err(DcexError::InvalidInput(

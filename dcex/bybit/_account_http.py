@@ -2,6 +2,7 @@
 
 from typing import Any
 
+from .._operation_guards import require_confirmation
 from ._http_manager import HTTPManager
 
 
@@ -536,10 +537,9 @@ class AccountHTTP(HTTPManager):
 
     def execute_small_balance_quote(self, *, quote_id: str) -> dict[str, Any]:
         """
-
         POST /v5/asset/covert/small-balance-execute.
 
-        Native symbols; timestamps are milliseconds. Source:
+        Source:
         https://bybit-exchange.github.io/docs/v5/asset/convert-small-balance/confirm-quote
 
         """
@@ -558,10 +558,9 @@ class AccountHTTP(HTTPManager):
         size: str | None = None,
     ) -> dict[str, Any]:
         """
-
         GET /v5/asset/covert/small-balance-history.
 
-        Native symbols; timestamps are milliseconds. Source:
+        Source:
         https://bybit-exchange.github.io/docs/v5/asset/convert-small-balance/exchange-history
 
         """
@@ -581,10 +580,9 @@ class AccountHTTP(HTTPManager):
         self, *, account_type: str, from_coin_list: list[str], to_coin: str
     ) -> dict[str, Any]:
         """
-
         POST /v5/asset/covert/get-quote.
 
-        Native symbols; timestamps are milliseconds. Source:
+        Source:
         https://bybit-exchange.github.io/docs/v5/asset/convert-small-balance/request-quote
 
         """
@@ -599,10 +597,9 @@ class AccountHTTP(HTTPManager):
         self, *, account_type: str, from_coin: str | None = None
     ) -> dict[str, Any]:
         """
-
         GET /v5/asset/covert/small-balance-list.
 
-        Native symbols; timestamps are milliseconds. Source:
+        Source:
         https://bybit-exchange.github.io/docs/v5/asset/convert-small-balance/small-balanc-coins
 
         """
@@ -615,10 +612,9 @@ class AccountHTTP(HTTPManager):
         self, *, account_type: str, coin: str | None = None, side: int | None = None
     ) -> dict[str, Any]:
         """
-
         GET /v5/asset/exchange/query-coin-list.
 
-        Native symbols; timestamps are milliseconds. Source:
+        Source:
         https://bybit-exchange.github.io/docs/v5/asset/convert/convert-coin-list
 
         """
@@ -630,10 +626,9 @@ class AccountHTTP(HTTPManager):
         self, *, account_type: str | None = None, index: int | None = None, limit: int | None = None
     ) -> dict[str, Any]:
         """
-
         GET /v5/asset/exchange/query-convert-history.
 
-        Native symbols; timestamps are milliseconds. Source:
+        Source:
         https://bybit-exchange.github.io/docs/v5/asset/convert/get-convert-history
 
         """
@@ -646,10 +641,9 @@ class AccountHTTP(HTTPManager):
         self, *, coin: str, chain_type: str, sub_member_id: str
     ) -> dict[str, Any]:
         """
-
         GET /v5/asset/deposit/query-sub-member-address.
 
-        Native symbols; timestamps are milliseconds. Source:
+        Source:
         https://bybit-exchange.github.io/docs/v5/asset/deposit/sub-deposit-addr
 
         """
@@ -667,10 +661,9 @@ class AccountHTTP(HTTPManager):
         cursor: str | None = None,
     ) -> dict[str, Any]:
         """
-
         GET /v5/asset/exchange/order-record.
 
-        Native symbols; timestamps are milliseconds. Source:
+        Source:
         https://bybit-exchange.github.io/docs/v5/asset/exchange
 
         """
@@ -690,10 +683,9 @@ class AccountHTTP(HTTPManager):
         cursor: str | None = None,
     ) -> dict[str, Any]:
         """
-
         GET /v5/pre-upgrade/position/closed-pnl.
 
-        Native symbols; timestamps are milliseconds. Source:
+        Source:
         https://bybit-exchange.github.io/docs/v5/pre-upgrade/close-pnl
 
         """
@@ -719,10 +711,9 @@ class AccountHTTP(HTTPManager):
         cursor: str | None = None,
     ) -> dict[str, Any]:
         """
-
         GET /v5/pre-upgrade/asset/delivery-record.
 
-        Native symbols; timestamps are milliseconds. Source:
+        Source:
         https://bybit-exchange.github.io/docs/v5/pre-upgrade/delivery
 
         """
@@ -748,10 +739,9 @@ class AccountHTTP(HTTPManager):
         cursor: str | None = None,
     ) -> dict[str, Any]:
         """
-
         GET /v5/pre-upgrade/execution/list.
 
-        Native symbols; timestamps are milliseconds. Source:
+        Source:
         https://bybit-exchange.github.io/docs/v5/pre-upgrade/execution
 
         """
@@ -787,10 +777,9 @@ class AccountHTTP(HTTPManager):
         cursor: str | None = None,
     ) -> dict[str, Any]:
         """
-
         GET /v5/pre-upgrade/order/history.
 
-        Native symbols; timestamps are milliseconds. Source:
+        Source:
         https://bybit-exchange.github.io/docs/v5/pre-upgrade/order-list
 
         """
@@ -820,10 +809,9 @@ class AccountHTTP(HTTPManager):
         cursor: str | None = None,
     ) -> dict[str, Any]:
         """
-
         GET /v5/pre-upgrade/asset/settlement-record.
 
-        Native symbols; timestamps are milliseconds. Source:
+        Source:
         https://bybit-exchange.github.io/docs/v5/pre-upgrade/settlement
 
         """
@@ -844,10 +832,9 @@ class AccountHTTP(HTTPManager):
         cursor: str | None = None,
     ) -> dict[str, Any]:
         """
-
         GET /v5/pre-upgrade/account/transaction-log.
 
-        Native symbols; timestamps are milliseconds. Source:
+        Source:
         https://bybit-exchange.github.io/docs/v5/pre-upgrade/transaction-log
 
         """
@@ -866,10 +853,9 @@ class AccountHTTP(HTTPManager):
 
     def get_margin_currency_data(self, *, currency: str | None = None) -> dict[str, Any]:
         """
-
         GET /v5/spot-margin-trade/currency-data.
 
-        Native symbols; timestamps are milliseconds. Source:
+        Source:
         https://bybit-exchange.github.io/docs/v5/spot-margin-uta/currency-data
 
         """
@@ -887,10 +873,9 @@ class AccountHTTP(HTTPManager):
         ips: str | None = None,
     ) -> dict[str, Any]:
         """
-
         POST /v5/user/create-sub-api.
 
-        Native symbols; timestamps are milliseconds. Source:
+        Source:
         https://bybit-exchange.github.io/docs/v5/user/create-subuid-apikey
 
         """
@@ -911,10 +896,9 @@ class AccountHTTP(HTTPManager):
         note: str | None = None,
     ) -> dict[str, Any]:
         """
-
         POST /v5/user/create-sub-member.
 
-        Native symbols; timestamps are milliseconds. Source:
+        Source:
         https://bybit-exchange.github.io/docs/v5/user/create-subuid
 
         """
@@ -931,10 +915,9 @@ class AccountHTTP(HTTPManager):
 
     def set_sub_account_frozen(self, *, subuid: int, frozen: int) -> dict[str, Any]:
         """
-
         POST /v5/user/frozen-sub-member.
 
-        Native symbols; timestamps are milliseconds. Source:
+        Source:
         https://bybit-exchange.github.io/docs/v5/user/froze-subuid
 
         """
@@ -946,10 +929,9 @@ class AccountHTTP(HTTPManager):
         self, *, sub_member_id: str, limit: int | None = None, cursor: str | None = None
     ) -> dict[str, Any]:
         """
-
         GET /v5/user/sub-apikeys.
 
-        Native symbols; timestamps are milliseconds. Source:
+        Source:
         https://bybit-exchange.github.io/docs/v5/user/list-sub-apikeys
 
         """
@@ -959,18 +941,28 @@ class AccountHTTP(HTTPManager):
         )
 
     def modify_api_key(
-        self, *, read_only: int | None = None, permissions: dict[str, list[str]] | None = None
+        self,
+        *,
+        read_only: int | None = None,
+        permissions: dict[str, list[str]] | None = None,
+        confirm: bool = False,
     ) -> dict[str, Any]:
         """
-
         POST /v5/user/update-api.
 
-        Native symbols; timestamps are milliseconds. Source:
+        Source:
         https://bybit-exchange.github.io/docs/v5/user/modify-master-apikey
 
+
+
+        Requires confirm=True. This changes the API key permissions.
         """
+        require_confirmation(confirm)
+        if read_only is None and permissions is None:
+            raise ValueError("provide at least one API key change")
         return self._native_private(
-            "modify_api_key", self._native_params(readOnly=read_only, permissions=permissions)
+            "modify_api_key",
+            self._native_params(confirm=confirm, readOnly=read_only, permissions=permissions),
         )
 
     def modify_sub_account_api_key(
@@ -982,10 +974,9 @@ class AccountHTTP(HTTPManager):
         permissions: dict[str, list[str]] | None = None,
     ) -> dict[str, Any]:
         """
-
         POST /v5/user/update-sub-api.
 
-        Native symbols; timestamps are milliseconds. Source:
+        Source:
         https://bybit-exchange.github.io/docs/v5/user/modify-sub-apikey
 
         """
@@ -1000,10 +991,9 @@ class AccountHTTP(HTTPManager):
         self, *, page_size: str | None = None, next_cursor: str | None = None
     ) -> dict[str, Any]:
         """
-
         GET /v5/user/submembers.
 
-        Native symbols; timestamps are milliseconds. Source:
+        Source:
         https://bybit-exchange.github.io/docs/v5/user/page-subuid
 
         """
@@ -1012,23 +1002,25 @@ class AccountHTTP(HTTPManager):
             self._native_params(pageSize=page_size, nextCursor=next_cursor),
         )
 
-    def delete_api_key(self) -> dict[str, Any]:
+    def delete_api_key(self, *, confirm: bool = False) -> dict[str, Any]:
         """
-
         POST /v5/user/delete-api.
 
-        Native symbols; timestamps are milliseconds. Source:
+        Source:
         https://bybit-exchange.github.io/docs/v5/user/rm-master-apikey
 
+
+
+        Requires confirm=True. This revokes the API key and its access.
         """
-        return self._native_private("delete_api_key", self._native_params())
+        require_confirmation(confirm)
+        return self._native_private("delete_api_key", self._native_params(confirm=confirm))
 
     def delete_sub_account_api_key(self, *, apikey: str | None = None) -> dict[str, Any]:
         """
-
         POST /v5/user/delete-sub-api.
 
-        Native symbols; timestamps are milliseconds. Source:
+        Source:
         https://bybit-exchange.github.io/docs/v5/user/rm-sub-apikey
 
         """
@@ -1038,10 +1030,9 @@ class AccountHTTP(HTTPManager):
 
     def delete_sub_account(self, *, sub_member_id: str) -> dict[str, Any]:
         """
-
         POST /v5/user/del-submember.
 
-        Native symbols; timestamps are milliseconds. Source:
+        Source:
         https://bybit-exchange.github.io/docs/v5/user/rm-subuid
 
         """
@@ -1051,10 +1042,9 @@ class AccountHTTP(HTTPManager):
 
     def sign_trading_agreement(self, *, category_v2: int, agree: bool) -> dict[str, Any]:
         """
-
         POST /v5/user/agreement.
 
-        Native symbols; timestamps are milliseconds. Source:
+        Source:
         https://bybit-exchange.github.io/docs/v5/user/sign-agreement
 
         """
@@ -1064,10 +1054,9 @@ class AccountHTTP(HTTPManager):
 
     def get_sub_accounts(self) -> dict[str, Any]:
         """
-
         GET /v5/user/query-sub-members.
 
-        Native symbols; timestamps are milliseconds. Source:
+        Source:
         https://bybit-exchange.github.io/docs/v5/user/subuid-list
 
         """
@@ -1075,10 +1064,9 @@ class AccountHTTP(HTTPManager):
 
     def get_member_wallet_types(self, *, member_ids: str | None = None) -> dict[str, Any]:
         """
-
         GET /v5/user/get-member-type.
 
-        Native symbols; timestamps are milliseconds. Source:
+        Source:
         https://bybit-exchange.github.io/docs/v5/user/wallet-type
 
         """
@@ -1090,10 +1078,9 @@ class AccountHTTP(HTTPManager):
         self, *, limit: str | None = None, cursor: str | None = None, uids: str | None = None
     ) -> dict[str, Any]:
         """
-
         GET /v5/apilimit/query-all.
 
-        Native symbols; timestamps are milliseconds. Source:
+        Source:
         https://bybit-exchange.github.io/docs/v5/rate-limit/rules-for-pros/apilimit-query-all
 
         """
@@ -1103,10 +1090,9 @@ class AccountHTTP(HTTPManager):
 
     def get_api_rate_limit_cap(self) -> dict[str, Any]:
         """
-
         GET /v5/apilimit/query-cap.
 
-        Native symbols; timestamps are milliseconds. Source:
+        Source:
         https://bybit-exchange.github.io/docs/v5/rate-limit/rules-for-pros/apilimit-query-cap
 
         """
@@ -1114,10 +1100,9 @@ class AccountHTTP(HTTPManager):
 
     def get_api_rate_limits(self, *, uids: str) -> dict[str, Any]:
         """
-
         GET /v5/apilimit/query.
 
-        Native symbols; timestamps are milliseconds. Source:
+        Source:
         https://bybit-exchange.github.io/docs/v5/rate-limit/rules-for-pros/apilimit-query
 
         """
@@ -1125,10 +1110,9 @@ class AccountHTTP(HTTPManager):
 
     def set_api_rate_limits(self, *, list: list[dict[str, Any]]) -> dict[str, Any]:
         """
-
         POST /v5/apilimit/set.
 
-        Native symbols; timestamps are milliseconds. Source:
+        Source:
         https://bybit-exchange.github.io/docs/v5/rate-limit/rules-for-pros/apilimit-set
 
         """
@@ -1138,10 +1122,9 @@ class AccountHTTP(HTTPManager):
         self, *, deposit_id: int, questionnaire: str, sub_account_id: int | None = None
     ) -> dict[str, Any]:
         """
-
         POST /v5/asset/travel-rule/deposit/submit.
 
-        Native symbols; timestamps are milliseconds. Source:
+        Source:
         https://bybit-exchange.github.io/docs/v5/asset/deposit/submit-info
 
         """
@@ -1831,14 +1814,17 @@ class AccountHTTP(HTTPManager):
             ),
         )
 
-    def crypto_loan_common_max_loan(self, *, currency: str) -> dict[str, Any]:
+    def crypto_loan_common_max_loan(
+        self, *, currency: str, collateral_list: list[dict[str, str]] | None = None
+    ) -> dict[str, Any]:
         """
         POST /v5/crypto-loan-common/max-loan.
 
         Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/new-crypto-loan/max-loan-amt.mdx
         """
         return self._native_private(
-            "crypto_loan_common_max_loan", self._native_params(currency=currency)
+            "crypto_loan_common_max_loan",
+            self._native_params(currency=currency, collateralList=collateral_list),
         )
 
     def get_crypto_loan_common_max_collateral_amount(self, *, currency: str) -> dict[str, Any]:

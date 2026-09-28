@@ -93,13 +93,13 @@ impl ExtendedParams {
     }
 
     pub(super) fn optional_one_of(&self, key: &str, allowed: &[&str]) -> Result<()> {
-        if let Some(value) = self.get(key) {
-            if !allowed.contains(&value) {
-                return Err(DcexError::InvalidInput(format!(
-                    "invalid Extended {key}: {value}; expected one of {}",
-                    allowed.join(", ")
-                )));
-            }
+        if let Some(value) = self.get(key)
+            && !allowed.contains(&value)
+        {
+            return Err(DcexError::InvalidInput(format!(
+                "invalid Extended {key}: {value}; expected one of {}",
+                allowed.join(", ")
+            )));
         }
         Ok(())
     }
@@ -122,12 +122,12 @@ impl ExtendedParams {
     }
 
     pub(super) fn optional_bool(&self, key: &str) -> Result<()> {
-        if let Some(value) = self.get(key) {
-            if !matches!(value, "true" | "false") {
-                return Err(DcexError::InvalidInput(format!(
-                    "invalid Extended boolean {key}: {value}"
-                )));
-            }
+        if let Some(value) = self.get(key)
+            && !matches!(value, "true" | "false")
+        {
+            return Err(DcexError::InvalidInput(format!(
+                "invalid Extended boolean {key}: {value}"
+            )));
         }
         Ok(())
     }
@@ -143,12 +143,12 @@ impl ExtendedParams {
     }
 
     pub(super) fn optional_u64_range(&self, key: &str, min: u64, max: u64) -> Result<()> {
-        if let Some(value) = self.u64(key)? {
-            if value < min || value > max {
-                return Err(DcexError::InvalidInput(format!(
-                    "Extended parameter {key} must be between {min} and {max}"
-                )));
-            }
+        if let Some(value) = self.u64(key)?
+            && (value < min || value > max)
+        {
+            return Err(DcexError::InvalidInput(format!(
+                "Extended parameter {key} must be between {min} and {max}"
+            )));
         }
         Ok(())
     }

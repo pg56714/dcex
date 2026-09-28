@@ -268,15 +268,50 @@ impl OkxPublicWebSocket {
         self.connection.recv_json().await
     }
 
+    /// Subscribe with complete documented argument objects, including extra filters.
+    pub async fn subscription_args(&mut self, op: &str, args: Vec<Value>) -> Result<()> {
+        super::validate_raw_subscriptions(op, &args)?;
+        let typed = args
+            .iter()
+            .map(|value| {
+                let field = |key| value[key].as_str().map(str::to_owned);
+                let mut arg = OkxWebSocketArg::with_filters(
+                    value["channel"].as_str().unwrap(),
+                    field("instType"),
+                    field("instFamily"),
+                    field("instId"),
+                )?;
+                if let Some(id) = field("sprdId") {
+                    arg = arg.and_sprd_id(id)?;
+                }
+                Ok(arg)
+            })
+            .collect::<Result<Vec<_>>>()?;
+        if op == "subscribe" {
+            self.prepare_subscription_route(&typed).await?;
+        } else {
+            self.validate_subscription_route(&typed)?;
+        }
+        self.connection
+            .send_json(&json!({"op":op,"args":args}))
+            .await?;
+        if op == "subscribe" {
+            self.subscription_count += typed.len();
+        } else {
+            self.subscription_count = self.subscription_count.saturating_sub(typed.len());
+        }
+        Ok(())
+    }
+
     pub async fn recv_bytes(&mut self) -> Result<Vec<u8>> {
         self.connection.recv_bytes().await
     }
 
     fn exchange_symbol(&self, product_symbol: &str) -> Result<String> {
-        if let Some(table) = &self.product_table {
-            if is_canonical_product_symbol(product_symbol) {
-                return table.get_exchange_symbol("okx", product_symbol);
-            }
+        if let Some(table) = &self.product_table
+            && is_canonical_product_symbol(product_symbol)
+        {
+            return table.get_exchange_symbol("okx", product_symbol);
         }
         Ok(exchange_symbol_fallback(product_symbol))
     }

@@ -37,7 +37,7 @@ cargo add dcex
 - A Product Table Manager (PTM) that normalizes exchange symbols and trading specifications.
 - Support for multiple CEX and DEX platforms; available endpoints vary by exchange.
 
-External withdrawal creation endpoints are not wrapped. PTM includes listed options from Binance, Bybit, and OKX; option trading remains exchange-specific.
+Documented withdrawal, market-maker and partner endpoints are in scope; current coverage and specification gaps are recorded in the endpoint ledger. API withdrawals have no second confirmation; they execute on submit. Trading API keys should not have withdrawal permission. PTM includes listed options from Binance, Bybit, and OKX; option trading remains exchange-specific.
 
 ## Supported exchanges
 
@@ -59,7 +59,7 @@ External withdrawal creation endpoints are not wrapped. PTM includes listed opti
 | Ondo | Yes | Yes | Yes | Yes |
 | Arcus | Yes | Yes | Yes | Yes |
 
-Private WebSocket support includes authenticated or address-scoped user-data streams. Trading WebSocket APIs are available for Binance, Bybit, Bitget and Kraken Spot; Hyperliquid and Lighter accept signed actions, and Arcus provides signed request construction. Lighter Mainnet and Robinhood use separate credential profiles; select the network per client (Mainnet is the default); see [.env.example](.env.example) and the [Lighter examples](examples/async/lighter_private_readonly.py). Ondo support covers perpetual futures only.
+Private WebSocket support includes authenticated or address-scoped user-data streams. Trading WebSocket APIs are available for Binance, Bybit, Bitget, OKX, KuCoin and Kraken Spot; Hyperliquid and Lighter accept signed actions, and Arcus provides signed request construction. Lighter Mainnet and Robinhood use separate credential profiles; select the network per client (Mainnet is the default); see [.env.example](.env.example) and the [Lighter examples](examples/async/lighter_private_readonly.py). Ondo support covers perpetual futures only.
 
 
 [Endpoint coverage, limitations and verification](docs/endpoint-audit.md).
@@ -90,6 +90,8 @@ async def main():
 
 asyncio.run(main())
 ```
+
+Additional profiles cover Binance Alpha, Aster Prediction, KuCoin Classic/Pro and Kraken Spot V1. Bitget SBE returns raw binary frames for caller-side decoding.
 
 Public WebSocket:
 

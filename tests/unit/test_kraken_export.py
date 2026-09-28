@@ -1,11 +1,14 @@
 """Kraken ZIP transport and independent Spot authentication regression tests."""
 
 from __future__ import annotations
+
 import base64
 import hashlib
 import hmac
 from urllib.parse import parse_qsl
+
 import pytest
+
 from dcex import _native
 from tests.unit.native_http_helpers import _http_server
 

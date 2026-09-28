@@ -2,6 +2,7 @@ mod config;
 mod grouped;
 mod pools;
 mod transfer;
+mod withdraw;
 
 use serde_json::json;
 
@@ -48,7 +49,15 @@ impl LighterClient {
         params: &LighterParams,
     ) -> Result<Option<ValidatedResponse>> {
         match method_name {
-            "transfer_same_master_account" => Ok(Some(
+            "withdraw_l2" | "approve_integrator" => Ok(Some(
+                self.submit_signed_tx(
+                    self.sign_withdrawal_or_approval(params, method_name == "approve_integrator")
+                        .await?,
+                    params.optional_bool("price_protection")?,
+                )
+                .await?,
+            )),
+            "transfer_l2_account" | "transfer_same_master_account" => Ok(Some(
                 self.submit_signed_tx(
                     self.sign_internal_transfer(params).await?,
                     params.optional_bool("price_protection")?,
@@ -255,7 +264,13 @@ impl LighterClient {
         params: &LighterParams,
     ) -> Result<LighterSignedTransaction> {
         match method_name {
-            "sign_transfer_same_master_account" => self.sign_internal_transfer(params).await,
+            "sign_withdraw_l2" | "sign_approve_integrator" => {
+                self.sign_withdrawal_or_approval(params, method_name == "sign_approve_integrator")
+                    .await
+            }
+            "sign_transfer_l2_account" | "sign_transfer_same_master_account" => {
+                self.sign_internal_transfer(params).await
+            }
 
             "sign_create_public_pool"
             | "sign_update_public_pool"

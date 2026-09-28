@@ -39,6 +39,23 @@ fn to_py_value_error(error: dcex::DcexError) -> PyErr {
 fn to_py_runtime_error(error: dcex::DcexError) -> PyErr {
     match error {
         dcex::DcexError::InvalidInput(_) => to_py_value_error(error),
+        dcex::DcexError::ExchangeResponse {
+            status,
+            ref data,
+            ref headers,
+            ..
+        } => {
+            let exception = PyRuntimeError::new_err(error.to_string());
+            Python::with_gil(|py| {
+                let value = exception.value(py);
+                if let Ok(data) = json_value_to_py(py, data) {
+                    let _ = value.setattr("response_data", data);
+                }
+                let _ = value.setattr("status_code", status);
+                let _ = value.setattr("resp_headers", headers.clone());
+            });
+            exception
+        }
         _ => PyRuntimeError::new_err(error.to_string()),
     }
 }
@@ -261,6 +278,7 @@ fn kucoin_market(market: &str) -> PyResult<KucoinMarket> {
     match market.to_ascii_lowercase().as_str() {
         "contract" | "futures" | "swap" => Ok(KucoinMarket::Futures),
         "spot" | "wallet" => Ok(KucoinMarket::Spot),
+        "broker" => Ok(KucoinMarket::Broker),
         _ => Err(PyValueError::new_err(format!(
             "unsupported KuCoin market: {market}"
         ))),

@@ -11,6 +11,12 @@ impl KrakenClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         let params = KrakenParams::from_pairs(params);
+        if let Some(result) = self
+            .completion_private_request(method_name, &params)
+            .await?
+        {
+            return Ok(result);
+        }
         if let Some(result) = self.risk_request(method_name, &params, false).await? {
             return Ok(result);
         }

@@ -589,6 +589,9 @@ impl BinanceClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         let params = PublicParams(params);
+        if let Some(response) = self.inventory_request(method_name, &params, true).await? {
+            return Ok(response);
+        }
         if let Some(response) = self.risk_request(method_name, &params, true).await? {
             return Ok(response);
         }

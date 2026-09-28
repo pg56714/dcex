@@ -1,0 +1,1151 @@
+{
+  "exchange": "hyperliquid",
+  "endpoints": [
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "order",
+      "title": "Place an order",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#place-an-order"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "cancel",
+      "title": "Cancel order(s)",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-orders"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "cancelByCloid",
+      "title": "Cancel order(s) by cloid",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-orders-by-cloid"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "scheduleCancel",
+      "title": "Schedule cancel (dead man's switch)",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#schedule-cancel-dead-mans-switch"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "modify",
+      "title": "Modify an order",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#modify-an-order"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "batchModify",
+      "title": "Modify multiple orders",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#modify-multiple-orders"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "updateLeverage",
+      "title": "Update leverage",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#update-leverage"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "topUpIsolatedOnlyMargin",
+      "title": "Update isolated margin",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#update-isolated-margin"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "sendAsset",
+      "title": "Send Asset",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#send-asset"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "agentSendAsset",
+      "title": "Agent Send Asset",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#agent-send-asset"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "sendToEvmWithData",
+      "title": "Send to EVM with data",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#send-to-evm-with-data"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "usdSend",
+      "title": "Core USDC transfer",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#core-usdc-transfer"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "spotSend",
+      "title": "Core spot transfer",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#core-spot-transfer"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "withdraw3",
+      "title": "Initiate a withdrawal request",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#initiate-a-withdrawal-request"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "usdClassTransfer",
+      "title": "Transfer from Spot account to Perp account (and vice versa)",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#transfer-from-spot-account-to-perp-account-and-vice-versa"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "cDeposit",
+      "title": "Deposit into staking",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#deposit-into-staking"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "cWithdraw",
+      "title": "Withdraw from staking",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#withdraw-from-staking"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "tokenDelegate",
+      "title": "Delegate or undelegate stake from validator",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#delegate-or-undelegate-stake-from-validator"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "vaultTransfer",
+      "title": "Deposit or withdraw from a vault",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#deposit-or-withdraw-from-a-vault"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "hip3LiquidatorTransfer",
+      "title": "Deposit or withdraw from an HIP-3 DEX's backstop liquidator",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#deposit-or-withdraw-from-an-hip-3-dexs-backstop-liquidator"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "approveAgent",
+      "title": "Approve an API wallet",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#approve-an-api-wallet"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "approveBuilderFee",
+      "title": "Approve a builder fee",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#approve-a-builder-fee"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "twapOrder",
+      "title": "Place a TWAP order",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#place-a-twap-order"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "twapCancel",
+      "title": "Cancel a TWAP order",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-a-twap-order"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "reserveRequestWeight",
+      "title": "Reserve Additional Actions",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#reserve-additional-actions"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "noop",
+      "title": "Invalidate Pending Nonce (noop)",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#invalidate-pending-nonce-noop"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "userDexAbstraction",
+      "title": "Enable HIP-3 DEX abstraction",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#enable-hip-3-dex-abstraction"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "userSetAbstraction",
+      "title": "Set User Abstraction",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#set-user-abstraction"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "agentSetAbstraction",
+      "title": "Set User Abstraction (agent)",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#set-user-abstraction-agent"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "userOutcome",
+      "title": "Split outcome",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#split-outcome"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "validatorL1Stream",
+      "title": "Validator vote on risk-free rate for aligned quote asset",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#validator-vote-on-risk-free-rate-for-aligned-quote-asset"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "authorizeAqav2Role",
+      "title": "Authorize AQAv2 role",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#authorize-aqav2-role"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "claimRewards",
+      "title": "Claim rewards",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#claim-rewards"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "allMids",
+      "title": "Retrieve mids for all coins",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-mids-for-all-coins"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "openOrders",
+      "title": "Retrieve a user's open orders",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-open-orders"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "frontendOpenOrders",
+      "title": "Retrieve a user's open orders with additional frontend info",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-open-orders-with-additional-frontend-info"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "userFills",
+      "title": "Retrieve a user's fills",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-fills"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "userFillsByTime",
+      "title": "Retrieve a user's fills by time",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-fills-by-time"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "userRateLimit",
+      "title": "Query user rate limits",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-user-rate-limits"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "orderStatus",
+      "title": "Query order status by oid or cloid",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-order-status-by-oid-or-cloid"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "l2Book",
+      "title": "L2 book snapshot",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#l2-book-snapshot"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "candleSnapshot",
+      "title": "Candle snapshot",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#candle-snapshot"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "maxBuilderFee",
+      "title": "Check builder fee approval",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#check-builder-fee-approval"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "historicalOrders",
+      "title": "Retrieve a user's historical orders",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-historical-orders"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "userTwapSliceFills",
+      "title": "Retrieve a user's TWAP slice fills",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-twap-slice-fills"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "subAccounts",
+      "title": "Retrieve a user's subaccounts",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-subaccounts"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "vaultDetails",
+      "title": "Retrieve details for a vault",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-details-for-a-vault"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "userVaultEquities",
+      "title": "Retrieve a user's vault deposits",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#retrieve-a-users-vault-deposits"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "userRole",
+      "title": "Query a user's role",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-role"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "portfolio",
+      "title": "Query a user's portfolio",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-portfolio"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "referral",
+      "title": "Query a user's referral information",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-referral-information"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "userFees",
+      "title": "Query a user's fees",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-fees"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "delegations",
+      "title": "Query a user's staking delegations",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-staking-delegations"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "delegatorSummary",
+      "title": "Query a user's staking summary",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-staking-summary"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "delegatorHistory",
+      "title": "Query a user's staking history",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-staking-history"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "delegatorRewards",
+      "title": "Query a user's staking rewards",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-staking-rewards"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "userDexAbstraction",
+      "title": "Query a user's HIP-3 DEX abstraction state",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-hip-3-dex-abstraction-state"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "userAbstraction",
+      "title": "Query a user's abstraction state",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-a-users-abstraction-state"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "borrowLendUserState",
+      "title": "Query borrow/lend user state",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-borrowlend-user-state"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "borrowLendReserveState",
+      "title": "Query borrow/lend reserve state",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-borrowlend-reserve-state"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "allBorrowLendReserveStates",
+      "title": "Query all borrow/lend reserve states",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-all-borrowlend-reserve-states"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "approvedBuilders",
+      "title": "Query approved builders for user",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-approved-builders-for-user"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "perpDexs",
+      "title": "Retrieve all perpetual dexs",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-all-perpetual-dexs"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "meta",
+      "title": "Retrieve perpetuals metadata (universe and margin tables)",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-perpetuals-metadata-universe-and-margin-tables"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "metaAndAssetCtxs",
+      "title": "Retrieve perpetuals asset contexts (includes mark price, current funding, open interest, etc.)",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-perpetuals-asset-contexts-includes-mark-price-current-funding-open-interest-etc"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "clearinghouseState",
+      "title": "Retrieve user's perpetuals account summary",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-users-perpetuals-account-summary"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "userFunding",
+      "title": "Retrieve a user's funding history or non-funding ledger updates",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-a-users-funding-history-or-non-funding-ledger-updates"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "fundingHistory",
+      "title": "Retrieve historical funding rates",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-historical-funding-rates"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "predictedFundings",
+      "title": "Retrieve predicted funding rates for different venues",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-predicted-funding-rates-for-different-venues"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "perpsAtOpenInterestCap",
+      "title": "Query perps at open interest caps",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#query-perps-at-open-interest-caps"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "perpDeployAuctionStatus",
+      "title": "Retrieve information about the Perp Deploy Auction",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-information-about-the-perp-deploy-auction"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "activeAssetData",
+      "title": "Retrieve User's Active Asset Data",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-users-active-asset-data"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "perpDexLimits",
+      "title": "Retrieve Builder-Deployed Perp Market Limits",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-builder-deployed-perp-market-limits"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "perpDexStatus",
+      "title": "Get Perp Market Status",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#get-perp-market-status"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "allPerpMetas",
+      "title": "Retrieve all perpetuals metadata (universe and margin tables)",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-all-perpetuals-metadata-universe-and-margin-tables"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "perpAnnotation",
+      "title": "Retrieve perp annotation",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-perp-annotation"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "perpCategories",
+      "title": "Retrieve perp categories",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-perp-categories"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "perpConciseAnnotations",
+      "title": "Retrieve concise perp annotations",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-concise-perp-annotations"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "spotMeta",
+      "title": "Retrieve spot metadata",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-spot-metadata"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "spotMetaAndAssetCtxs",
+      "title": "Retrieve spot asset contexts",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-spot-asset-contexts"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "spotClearinghouseState",
+      "title": "Retrieve a user's token balances",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-a-users-token-balances"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "spotDeployState",
+      "title": "Retrieve information about the Spot Deploy Auction",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-information-about-the-spot-deploy-auction"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "spotPairDeployAuctionStatus",
+      "title": "Retrieve information about the Spot Pair Deploy Auction",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-information-about-the-spot-pair-deploy-auction"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "tokenDetails",
+      "title": "Retrieve information about a token",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-information-about-a-token"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "outcomeMeta",
+      "title": "Retrieve outcome metadata",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-outcome-metadata"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "settledOutcome",
+      "title": "Retrieve information about a settled outcome",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-information-about-a-settled-outcome"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "outcomeDeployerLimits",
+      "title": "Retrieve outcome deployer limits",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot#retrieve-outcome-deployer-limits"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "perpDeploy",
+      "operation": "registerAsset2",
+      "title": "registerAsset2",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-3-deployer-actions"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "perpDeploy",
+      "operation": "registerAsset",
+      "title": "registerAsset",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-3-deployer-actions"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "perpDeploy",
+      "operation": "setOracle",
+      "title": "setOracle",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-3-deployer-actions"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "perpDeploy",
+      "operation": "setFundingMultipliers",
+      "title": "setFundingMultipliers",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-3-deployer-actions"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "perpDeploy",
+      "operation": "setFundingInterestRates",
+      "title": "setFundingInterestRates",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-3-deployer-actions"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "perpDeploy",
+      "operation": "setFundingClamps",
+      "title": "setFundingClamps",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-3-deployer-actions"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "perpDeploy",
+      "operation": "haltTrading",
+      "title": "haltTrading",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-3-deployer-actions"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "perpDeploy",
+      "operation": "insertMarginTable",
+      "title": "insertMarginTable",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-3-deployer-actions"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "perpDeploy",
+      "operation": "setMarginTableIds",
+      "title": "setMarginTableIds",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-3-deployer-actions"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "perpDeploy",
+      "operation": "setFeeRecipient",
+      "title": "setFeeRecipient",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-3-deployer-actions"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "perpDeploy",
+      "operation": "setOpenInterestCaps",
+      "title": "setOpenInterestCaps",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-3-deployer-actions"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "perpDeploy",
+      "operation": "setSubDeployers",
+      "title": "setSubDeployers",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-3-deployer-actions"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "perpDeploy",
+      "operation": "setMarginModes",
+      "title": "setMarginModes",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-3-deployer-actions"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "perpDeploy",
+      "operation": "setDeployerFees",
+      "title": "setDeployerFees",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-3-deployer-actions"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "perpDeploy",
+      "operation": "setPerpAnnotation",
+      "title": "setPerpAnnotation",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-3-deployer-actions"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "perpDeploy",
+      "operation": "disableDex",
+      "title": "disableDex",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-3-deployer-actions"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "hip3LiquidatorTransfer",
+      "operation": "dex",
+      "title": "dex",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-3-deployer-actions"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "perpDeploy",
+      "operation": "star",
+      "title": "star",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-3-deployer-actions"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "spotDeploy",
+      "operation": "registerToken2",
+      "title": "registerToken2",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "spotDeploy",
+      "operation": "userGenesis",
+      "title": "userGenesis",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "spotDeploy",
+      "operation": "genesis",
+      "title": "genesis",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "spotDeploy",
+      "operation": "registerSpot",
+      "title": "registerSpot",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "spotDeploy",
+      "operation": "registerHyperliquidity",
+      "title": "registerHyperliquidity",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "spotDeploy",
+      "operation": "setDeployerTradingFeeShare",
+      "title": "setDeployerTradingFeeShare",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "spotDeploy",
+      "operation": "enableQuoteToken",
+      "title": "enableQuoteToken",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "spotDeploy",
+      "operation": "enableAlignedQuoteToken",
+      "title": "enableAlignedQuoteToken",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "spotDeploy",
+      "operation": "disableQuoteToken",
+      "title": "disableQuoteToken",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "spotDeploy",
+      "operation": "disableAlignedQuoteToken",
+      "title": "disableAlignedQuoteToken",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "spotDeploy",
+      "operation": "setTokenAnnotation",
+      "title": "setTokenAnnotation",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "spotDeploy",
+      "operation": "setDeployerLabel",
+      "title": "setDeployerLabel",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/deploying-hip-1-and-hip-2-assets"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "activateOutcomeDeployer",
+      "title": "activateOutcomeDeployer",
+      "testnet_only": true,
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-4-deployer-actions#action-format"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "outcomeDeploy",
+      "title": "outcomeDeploy",
+      "testnet_only": true,
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-4-deployer-actions#action-format"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "outcomeMeta",
+      "title": "outcomeMeta",
+      "testnet_only": true,
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-4-deployer-actions#action-format"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "outcomeTemplates",
+      "title": "outcomeTemplates",
+      "testnet_only": true,
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-4-deployer-actions#action-format"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "activeAssetCtx",
+      "title": "activeAssetCtx",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions#subscription-messages"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "activeAssetData",
+      "title": "activeAssetData",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions#subscription-messages"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "allDexsAssetCtxs",
+      "title": "allDexsAssetCtxs",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions#subscription-messages"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "allDexsClearinghouseState",
+      "title": "allDexsClearinghouseState",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions#subscription-messages"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "allMids",
+      "title": "allMids",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions#subscription-messages"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "bbo",
+      "title": "bbo",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions#subscription-messages"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "candle",
+      "title": "candle",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions#subscription-messages"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "clearinghouseState",
+      "title": "clearinghouseState",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions#subscription-messages"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "fastAssetCtxs",
+      "title": "fastAssetCtxs",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions#subscription-messages"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "l2Book",
+      "title": "l2Book",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions#subscription-messages"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "notification",
+      "title": "notification",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions#subscription-messages"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "openOrders",
+      "title": "openOrders",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions#subscription-messages"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "orderUpdates",
+      "title": "orderUpdates",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions#subscription-messages"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "outcomeMetaUpdates",
+      "title": "outcomeMetaUpdates",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions#subscription-messages"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "spotState",
+      "title": "spotState",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions#subscription-messages"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "trades",
+      "title": "trades",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions#subscription-messages"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "twapStates",
+      "title": "twapStates",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions#subscription-messages"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "userEvents",
+      "title": "userEvents",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions#subscription-messages"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "userFills",
+      "title": "userFills",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions#subscription-messages"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "userFundings",
+      "title": "userFundings",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions#subscription-messages"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "userNonFundingLedgerUpdates",
+      "title": "userNonFundingLedgerUpdates",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions#subscription-messages"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "userTwapHistory",
+      "title": "userTwapHistory",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions#subscription-messages"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "userTwapSliceFills",
+      "title": "userTwapSliceFills",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions#subscription-messages"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "webData",
+      "title": "webData",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions#subscription-messages"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "webData3",
+      "title": "webData3",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/websocket/subscriptions#subscription-messages"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "userToMultiSigSigners",
+      "official_source": "https://github.com/hyperliquid-dex/hyperliquid-python-sdk/blob/2fdb18f9517675ea03695a0962bd19eece9c83f0/hyperliquid/info.py#L626"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "userNonFundingLedgerUpdates",
+      "official_source": "https://github.com/hyperliquid-dex/hyperliquid-python-sdk/blob/2fdb18f9517675ea03695a0962bd19eece9c83f0/hyperliquid/info.py#L668"
+    },
+    {
+      "method": "POST",
+      "path": "/info",
+      "action": "extraAgents",
+      "official_source": "https://github.com/hyperliquid-dex/hyperliquid-python-sdk/blob/2fdb18f9517675ea03695a0962bd19eece9c83f0/hyperliquid/info.py#L763"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "updateIsolatedMargin",
+      "official_source": "https://github.com/hyperliquid-dex/hyperliquid-python-sdk/blob/2fdb18f9517675ea03695a0962bd19eece9c83f0/hyperliquid/exchange.py#L415"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "setReferrer",
+      "official_source": "https://github.com/hyperliquid-dex/hyperliquid-python-sdk/blob/2fdb18f9517675ea03695a0962bd19eece9c83f0/hyperliquid/exchange.py#L437"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "createSubAccount",
+      "official_source": "https://github.com/hyperliquid-dex/hyperliquid-python-sdk/blob/2fdb18f9517675ea03695a0962bd19eece9c83f0/hyperliquid/exchange.py#L457"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "subAccountTransfer",
+      "official_source": "https://github.com/hyperliquid-dex/hyperliquid-python-sdk/blob/2fdb18f9517675ea03695a0962bd19eece9c83f0/hyperliquid/exchange.py#L521"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "subAccountSpotTransfer",
+      "official_source": "https://github.com/hyperliquid-dex/hyperliquid-python-sdk/blob/2fdb18f9517675ea03695a0962bd19eece9c83f0/hyperliquid/exchange.py#L543"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "convertToMultiSigUser",
+      "official_source": "https://github.com/hyperliquid-dex/hyperliquid-python-sdk/blob/2fdb18f9517675ea03695a0962bd19eece9c83f0/hyperliquid/exchange.py#L674"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "CSignerAction",
+      "official_source": "https://github.com/hyperliquid-dex/hyperliquid-python-sdk/blob/2fdb18f9517675ea03695a0962bd19eece9c83f0/hyperliquid/exchange.py#L984"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "CValidatorAction",
+      "official_source": "https://github.com/hyperliquid-dex/hyperliquid-python-sdk/blob/2fdb18f9517675ea03695a0962bd19eece9c83f0/hyperliquid/exchange.py#L1014"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "multiSig",
+      "official_source": "https://github.com/hyperliquid-dex/hyperliquid-python-sdk/blob/2fdb18f9517675ea03695a0962bd19eece9c83f0/hyperliquid/exchange.py#L1103"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "evmUserModify",
+      "official_source": "https://github.com/hyperliquid-dex/hyperliquid-python-sdk/blob/2fdb18f9517675ea03695a0962bd19eece9c83f0/hyperliquid/exchange.py#L1130"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "agentEnableDexAbstraction",
+      "official_source": "https://github.com/hyperliquid-dex/hyperliquid-python-sdk/blob/2fdb18f9517675ea03695a0962bd19eece9c83f0/hyperliquid/exchange.py#L1150"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "action": "gossipPriorityBid",
+      "official_source": "https://github.com/hyperliquid-dex/hyperliquid-python-sdk/blob/2fdb18f9517675ea03695a0962bd19eece9c83f0/hyperliquid/exchange.py#L1225"
+    }
+  ]
+}

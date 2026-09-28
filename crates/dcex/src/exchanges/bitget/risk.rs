@@ -58,11 +58,10 @@ impl BitgetClient {
                     return Err(invalid("grid prices and amounts must be positive decimals"));
                 }
             }
-            if let (Some(min), Some(max)) = (params.get("minPrice"), params.get("maxPrice")) {
-                if min.parse::<f64>().unwrap_or_default() >= max.parse::<f64>().unwrap_or_default()
-                {
-                    return Err(invalid("grid minPrice must be below maxPrice"));
-                }
+            if let (Some(min), Some(max)) = (params.get("minPrice"), params.get("maxPrice"))
+                && min.parse::<f64>().unwrap_or_default() >= max.parse::<f64>().unwrap_or_default()
+            {
+                return Err(invalid("grid minPrice must be below maxPrice"));
             }
             if params
                 .get("gridNum")
@@ -169,7 +168,7 @@ impl BitgetClient {
                         || object
                             .keys()
                             .any(|k| !["symbol", "side", "qty"].contains(&k.as_str()))
-                        || !item["symbol"].as_str().is_some_and(|v| !v.is_empty())
+                        || item["symbol"].as_str().is_none_or(|v| v.is_empty())
                         || !matches!(item["side"].as_str(), Some("buy" | "sell"))
                         || !item["qty"]
                             .as_str()
@@ -204,7 +203,7 @@ impl BitgetClient {
                     if object.keys().any(|k| !fields.contains(&k.as_str()))
                         || object
                             .values()
-                            .any(|v| !v.as_str().is_some_and(|s| !s.is_empty()))
+                            .any(|v| v.as_str().is_none_or(|s| s.is_empty()))
                     {
                         return Err(invalid("invalid grid object fields"));
                     }
@@ -385,12 +384,12 @@ fn validate(name: &str, params: &BitgetParams, endpoint: &Endpoint) -> Result<()
         ("ipList", 30, &[][..]),
         ("uids", 50, &[][..]),
     ] {
-        if endpoint.arrays.contains(&key) {
-            if let Some(value) = params.get(key) {
-                let value: Value =
-                    serde_json::from_str(value).map_err(|_| invalid("invalid list JSON"))?;
-                validate_string_list(&value, key, max, choices)?;
-            }
+        if endpoint.arrays.contains(&key)
+            && let Some(value) = params.get(key)
+        {
+            let value: Value =
+                serde_json::from_str(value).map_err(|_| invalid("invalid list JSON"))?;
+            validate_string_list(&value, key, max, choices)?;
         }
     }
     if name == "classic_create_virtual_subaccount" {
@@ -521,29 +520,27 @@ fn validate(name: &str, params: &BitgetParams, endpoint: &Endpoint) -> Result<()
         positive(params, key)?;
     }
     for key in ["limit", "pageSize", "pageNum"] {
-        if let Some(value) = integer(params, key)? {
-            if value == 0
-                || (key != "pageNum" && endpoint.limit.is_some_and(|maximum| value > maximum))
-            {
-                return Err(invalid(&format!("{key} is outside the documented range")));
-            }
+        if let Some(value) = integer(params, key)?
+            && (value == 0
+                || (key != "pageNum" && endpoint.limit.is_some_and(|maximum| value > maximum)))
+        {
+            return Err(invalid(&format!("{key} is outside the documented range")));
         }
     }
     let start = integer(params, "startTime")?;
     let end = integer(params, "endTime")?;
-    if let (Some(start), Some(end)) = (start, end) {
-        if end < start
+    if let (Some(start), Some(end)) = (start, end)
+        && (end < start
             || endpoint
                 .days
-                .is_some_and(|days| end - start > days * 86_400_000)
-        {
-            return Err(invalid("time range exceeds the documented bounds"));
-        }
+                .is_some_and(|days| end - start > days * 86_400_000))
+    {
+        return Err(invalid("time range exceeds the documented bounds"));
     }
-    if name == "get_futures_liquidation_price" || name == "get_futures_max_open_quantity" {
-        if params.get("orderType") == Some("limit") {
-            required(params, "openPrice")?;
-        }
+    if (name == "get_futures_liquidation_price" || name == "get_futures_max_open_quantity")
+        && params.get("orderType") == Some("limit")
+    {
+        required(params, "openPrice")?;
     }
     if name == "get_uta_max_open_available" && params.get("orderType") == Some("limit") {
         required(params, "price")?;
@@ -625,17 +622,16 @@ fn validate(name: &str, params: &BitgetParams, endpoint: &Endpoint) -> Result<()
     }
     if name.contains("_margin_") {
         for key in ["borrowAmount", "repayAmount"] {
-            if let Some(value) = params.get(key) {
-                if value.matches('.').count() > 1
+            if let Some(value) = params.get(key)
+                && (value.matches('.').count() > 1
                     || !value.chars().all(|c| c.is_ascii_digit() || c == '.')
                     || value
                         .split_once('.')
-                        .is_some_and(|(_, decimals)| decimals.len() > 8)
-                {
-                    return Err(invalid(
-                        "borrowAmount and repayAmount allow at most 8 decimal places",
-                    ));
-                }
+                        .is_some_and(|(_, decimals)| decimals.len() > 8))
+            {
+                return Err(invalid(
+                    "borrowAmount and repayAmount allow at most 8 decimal places",
+                ));
             }
         }
         if name.starts_with("place_") && name.ends_with("_order") {

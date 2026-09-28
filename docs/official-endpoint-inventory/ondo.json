@@ -1,0 +1,586 @@
+{
+  "reviewed": "2026-09-28",
+  "source": "https://docs.ondoperps.xyz/api-reference/rest-spec.json",
+  "source_sha256": "860a96ca3fa1e0800841446cddc738bc8ab2749feb67c2f10fcdd1e2aae003f1",
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/status",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/tool/get-status",
+      "operation_id": "getStatus"
+    },
+    {
+      "method": "GET",
+      "path": "/hello",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/tool/hello",
+      "operation_id": "hello"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/account",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/account/get-account",
+      "operation_id": "getAccount"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/auth/erc-4361/login/get_challenge",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/auth/get-siwe-login-challenge",
+      "operation_id": "getSIWEChallenge"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/auth/erc-4361/login/complete_challenge",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/auth/complete-siwe-login",
+      "operation_id": "completeSIWEChallenge"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/auth/erc-4361/address_book/get_challenge",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/auth/get-siwe-address-book-challenge",
+      "operation_id": "getSIWEAddressBookChallenge"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/auth/erc-4361/address_book/complete_challenge",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/auth/complete-siwe-address-book-challenge",
+      "operation_id": "completeSIWEAddressBookChallenge"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/auth/invalidate_jwt",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/auth/invalidate-jwt",
+      "operation_id": "invalidateJWT"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/markets",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/markets/get-markets",
+      "operation_id": "getMarkets"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/sandbox_deposit",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/sandbox/sandbox-deposit",
+      "operation_id": "sandboxDeposit"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/sandbox_withdrawal",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/sandbox/sandbox-withdrawal",
+      "operation_id": "sandboxWithdrawal"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/withdraw",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/wallet/withdraw",
+      "operation_id": "withdraw"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/provision_address",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/wallet/provision-deposit-address",
+      "operation_id": "provisionAddress"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/get_withdrawal_status",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/wallet/get-withdrawal-status",
+      "operation_id": "getWithdrawalStatus"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/wallet/deposits",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/wallet/list-deposits",
+      "operation_id": "listDeposits"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/wallet/deposits/{depositID}",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/wallet/get-deposit-by-id",
+      "operation_id": "getDepositById"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/wallet/withdrawals",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/wallet/list-withdrawals",
+      "operation_id": "listWithdrawals"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/wallet/withdrawals/limit",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/wallet/get-withdrawal-limits",
+      "operation_id": "getWithdrawalLimits"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/wallet/withdrawals/{withdrawalID}",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/wallet/get-withdrawal-by-id",
+      "operation_id": "getWithdrawalById"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/wallet/deposit_address/list",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/wallet/list-deposit-addresses",
+      "operation_id": "listDepositAddresses"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/wallet/deposits/csv",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/wallet/export-deposits-csv",
+      "operation_id": "exportDepositsCsv"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/wallet/withdrawals/csv",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/wallet/export-withdrawals-csv",
+      "operation_id": "exportWithdrawalsCsv"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/wallet/address_book",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/wallet/get-address-book",
+      "operation_id": "getAddressBook"
+    },
+    {
+      "method": "PUT",
+      "path": "/v1/wallet/address_book",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/wallet/edit-address-book-entry",
+      "operation_id": "editAddressBookEntry"
+    },
+    {
+      "method": "DELETE",
+      "path": "/v1/wallet/address_book",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/wallet/remove-address-book-entry",
+      "operation_id": "deleteAddressBookEntry"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/api_keys",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/api-keys/list-api-keys",
+      "operation_id": "listApiKeys"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/api_keys",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/api-keys/create-api-key",
+      "operation_id": "createApiKey"
+    },
+    {
+      "method": "DELETE",
+      "path": "/v1/api_keys/{apiKeyID}",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/api-keys/delete-api-key",
+      "operation_id": "deleteApiKey"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/api_keys/{apiKeyID}/ip_whitelist",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/api-keys/set-api-key-ip-whitelist",
+      "operation_id": "setApiKeyIpWhitelist"
+    },
+    {
+      "method": "DELETE",
+      "path": "/v1/api_keys/{apiKeyID}/ip_whitelist",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/api-keys/remove-api-key-ip-whitelist-entry",
+      "operation_id": "deleteApiKeyIpWhitelist"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/counts/orders",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/account/get-open-order-counts",
+      "operation_id": "getOrderCounts"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/perps/orders",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/orders/create-order",
+      "operation_id": "createOrder"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/perps/orders",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/orders/get-orders",
+      "operation_id": "getOrders"
+    },
+    {
+      "method": "DELETE",
+      "path": "/v1/perps/orders",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/orders/cancel-all-orders",
+      "operation_id": "cancelAllOrders"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/perps/orders/batch",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/orders/create-batched-orders",
+      "operation_id": "createBatchOrders"
+    },
+    {
+      "method": "DELETE",
+      "path": "/v1/perps/orders/batch",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/orders/batch-cancel-orders",
+      "operation_id": "batchCancelOrders"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/perps/twap/order",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/twap-orders/create-twap-order",
+      "operation_id": "createTWAPOrder"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/perps/twap/order/{orderID}",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/twap-orders/get-twap-order-by-id",
+      "operation_id": "getTWAPOrderByID"
+    },
+    {
+      "method": "DELETE",
+      "path": "/v1/perps/twap/order/{orderID}",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/twap-orders/cancel-twap-order",
+      "operation_id": "cancelTWAPOrder"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/perps/twap/order/{orderID}/fills",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/twap-orders/get-twap-order-fills",
+      "operation_id": "getTWAPOrderFills"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/perps/twap/orders/running",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/twap-orders/get-running-twap-orders",
+      "operation_id": "getTWAPRunningOrders"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/perps/twap/orders/history",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/twap-orders/get-twap-order-history",
+      "operation_id": "getTWAPOrderHistory"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/perps/orders/{orderID}",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/orders/get-order-by-id",
+      "operation_id": "getOrderByID"
+    },
+    {
+      "method": "DELETE",
+      "path": "/v1/perps/orders/{orderID}",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/orders/cancel-order-by-id",
+      "operation_id": "cancelOrderByID"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/perps/orders/csv",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/orders/get-orders-csv",
+      "operation_id": "getOrdersCSV"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/perps/fills",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/fills/get-fills",
+      "operation_id": "getFills"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/perps/orders/{orderID}/fills",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/fills/get-fills-by-order-id",
+      "operation_id": "getFillsByOrderID"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/perps/fills/csv",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/fills/get-fills-csv",
+      "operation_id": "getFillsCSV"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/perps/trades",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/market-data/get-trades",
+      "operation_id": "getTrades"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/perps/depth",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/market-data/get-order-book-depth",
+      "operation_id": "getDepth"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/perps/candles",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/market-data/get-candles",
+      "operation_id": "getPerpsCandles"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/perps/symbol_info",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/market-data/get-symbol-info-tradingview",
+      "operation_id": "getPerpsSymbolInfo"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/perps/history",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/market-data/get-price-history-tradingview",
+      "operation_id": "getPerpsHistory"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/perps/positions",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/positions/get-positions",
+      "operation_id": "getPerpsPositions"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/perps/balance",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/margin-account/get-balance",
+      "operation_id": "getPerpsBalance"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/perps/funding_rates",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/funding-rate/get-funding-rates",
+      "operation_id": "getFundingRates"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/perps/funding_rate_history",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/funding-rate/get-funding-rate-history",
+      "operation_id": "getFundingRateHistory"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/perps/funding_fees",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/funding-rate/get-funding-fee-payments",
+      "operation_id": "getFundingFees"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/perps/mark_prices",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/funding-rate/get-mark-prices",
+      "operation_id": "getMarkPrices"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/perps/orders_summaries",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/margin-account/get-orders-summaries",
+      "operation_id": "getPerpsOrdersSummaries"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/perps/max_order_size",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/margin-account/get-max-order-size",
+      "operation_id": "getMaxOrderSize"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/perps/stop_order",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/stop-orders/get-stop-orders",
+      "operation_id": "getStopOrders"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/perps/stop_order",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/stop-orders/set-stop-order",
+      "operation_id": "setStopOrder"
+    },
+    {
+      "method": "DELETE",
+      "path": "/v1/perps/stop_order",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/stop-orders/remove-stop-order",
+      "operation_id": "removeStopOrder"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/perps/liquidation_history",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/margin-account/get-liquidation-history",
+      "operation_id": "getLiquidationHistory"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/perps/leverage",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/positions/get-leverage",
+      "operation_id": "getPerpsLeverage"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/perps/leverage",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/positions/set-leverage",
+      "operation_id": "setPerpsLeverage"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/portfolio/summary",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/portfolio/get-portfolio-summary",
+      "operation_id": "getPortfolioSummary"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/portfolio/summary/graph",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/portfolio/get-portfolio-summary-graph",
+      "operation_id": "getPortfolioSummaryGraph"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/perps/open_interest",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/market-data/get-open-interest",
+      "operation_id": "getOpenInterest"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/perps/volume",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/market-data/get-volume",
+      "operation_id": "getVolume"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/perps/contracts",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/market-data/get-contracts",
+      "operation_id": "getContracts"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "topOfBooksPerps",
+      "title": "Subscribe: Perps Top of Book",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/public-channels/subscribe:-perps-top-of-book"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "depthBooksPerps",
+      "title": "Subscribe: Perps Depth Book",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/public-channels/subscribe:-perps-depth-book"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "tradesPerps",
+      "title": "Subscribe: Perps Trades",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/public-channels/subscribe:-perps-trades"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "fundingRatesPerps",
+      "title": "Subscribe: Perps Funding Rates",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/public-channels/subscribe:-perps-funding-rates"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "markPricesPerps",
+      "title": "Subscribe: Perps Mark Prices",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/public-channels/subscribe:-perps-mark-prices"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "kLinePerps",
+      "title": "Subscribe: Perps Kline / Candlesticks",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/public-channels/subscribe:-perps-kline-candlesticks"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "liquidationAnnouncementsPerps",
+      "title": "Subscribe: Perps Liquidation Announcements",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/private-channels/subscribe:-perps-liquidation-announcements"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "ordersPerps",
+      "title": "Subscribe: Perps Orders",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/private-channels/subscribe:-perps-orders"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "fillsPerps",
+      "title": "Subscribe: Perps Fills",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/private-channels/subscribe:-perps-fills"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "positionsPerps",
+      "title": "Subscribe: Perps Positions",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/private-channels/subscribe:-perps-positions"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "balancePerps",
+      "title": "Subscribe: Perps Balance",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/private-channels/subscribe:-perps-balance"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "liquidationPerps",
+      "title": "Subscribe: Perps Liquidation",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/private-channels/subscribe:-perps-liquidation"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "marginTransfersPerps",
+      "title": "Subscribe: Perps Margin Transfers",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/private-channels/subscribe:-perps-margin-transfers"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "ordersSummariesPerps",
+      "title": "Subscribe: Perps Order Summaries",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/private-channels/subscribe:-perps-order-summaries"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "fundingPaymentsPerps",
+      "title": "Subscribe: Perps Funding Payments",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/private-channels/subscribe:-perps-funding-payments"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "cancelAllOrdersAfterPerps",
+      "title": "Subscribe: Perps Dead Man's Switch",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/private-channels/subscribe:-perps-dead-mans-switch"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "deposits",
+      "title": "Subscribe: Deposits",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/private-channels/subscribe:-deposits"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "withdrawals",
+      "title": "Subscribe: Withdrawals",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/private-channels/subscribe:-withdrawals"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "Connect",
+      "title": "Connect",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/connection/connect"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "Ping",
+      "title": "Ping",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/connection/ping"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "Login",
+      "title": "Login",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/connection/login"
+    }
+  ]
+}

@@ -12,8 +12,8 @@ from urllib.parse import parse_qsl, urlsplit
 
 import pytest
 
-from dcex.binance.client import Client
 from dcex.async_support.binance.client import Client as AsyncClient
+from dcex.binance.client import Client
 from tests.unit.native_http_helpers import _http_server
 
 CASES = [
@@ -328,7 +328,9 @@ async def test_controls_sign_and_encode_native_requests(
 ) -> None:
     import dcex._native as native
 
-    with _http_server() as (base, received):
+    is_batch = method.endswith("batch_orders")
+    payload = [{"orderId": 123}] if is_batch else {"ok": True}
+    with _http_server(response_payload=payload) as (base, received):
         cls = AsyncClient if asynchronous else Client
         client = cls(api_key="api-key", api_secret="api-secret", preload_product_table=False)
         if asynchronous:
@@ -346,7 +348,11 @@ async def test_controls_sign_and_encode_native_requests(
             result = getattr(client, method)(**kwargs)
             if inspect.isawaitable(result):
                 result = await result
-            assert result == {"ok": True}
+            assert result == (
+                {"ok": [{"index": 0, "response": {"orderId": 123}}], "errors": []}
+                if is_batch
+                else {"ok": True}
+            )
         finally:
             result = client.close()
             if inspect.isawaitable(result):

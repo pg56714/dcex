@@ -6,3 +6,6 @@ mod public;
 
 pub use private::KrakenPrivateWebSocket;
 pub use public::KrakenPublicWebSocket;
+
+mod v1;
+pub use v1::KrakenV1WebSocket;

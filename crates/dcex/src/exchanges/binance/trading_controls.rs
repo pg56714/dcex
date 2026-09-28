@@ -9,6 +9,13 @@ crate::exchanges::impl_exchange_method_wrappers! {
     @extend; BinanceClient;
     public [];
     private [
+        /// Submit raw COIN-M algo fields. The official migration note names the route,
+        /// but its standalone parameter/signing examples are not yet published.
+        place_coin_futures_algo_order(fields => "fields"),
+        /// Cancel a COIN-M algo order using caller-provided exchange fields; not verified live.
+        cancel_coin_futures_algo_order(fields => "fields"),
+        /// Query a COIN-M algo order using caller-provided exchange fields; not verified live.
+        get_coin_futures_algo_order(fields => "fields"),
         create_coin_futures_listen_key(),
         keep_alive_coin_futures_listen_key(),
         close_coin_futures_listen_key(),
@@ -21,7 +28,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         cancel_futures_batch_orders(product_symbol => "product_symbol"),
         place_coin_futures_batch_orders(orders => "batchOrders"),
         amend_coin_futures_batch_orders(orders => "batchOrders"),
-        cancel_coin_futures_batch_orders(symbol => "symbol"),
+        cancel_coin_futures_batch_orders(product_symbol => "product_symbol"),
         get_spot_order_list(),
         get_spot_all_order_lists(),
         get_spot_open_order_lists(),
@@ -35,11 +42,11 @@ crate::exchanges::impl_exchange_method_wrappers! {
         amend_futures_order(product_symbol => "product_symbol", side => "side", quantity => "quantity"),
         get_coin_futures_position_mode(),
         set_coin_futures_position_mode(dual_side_position => "dualSidePosition"),
-        set_coin_futures_margin_type(symbol => "symbol", margin_type => "marginType"),
-        set_coin_futures_cancel_countdown(symbol => "symbol", countdown_time => "countdownTime"),
+        set_coin_futures_margin_type(product_symbol => "product_symbol", margin_type => "marginType"),
+        set_coin_futures_cancel_countdown(product_symbol => "product_symbol", countdown_time => "countdownTime"),
         get_coin_futures_leverage_brackets(),
         amend_coin_futures_order(symbol => "symbol", side => "side", quantity => "quantity"),
-        set_coin_futures_leverage(symbol => "symbol", leverage => "leverage"),
+        set_coin_futures_leverage(product_symbol => "product_symbol", leverage => "leverage"),
         get_coin_futures_pair_leverage_brackets(),
         get_coin_futures_all_orders(),
         get_coin_futures_account_trades(),
@@ -52,6 +59,85 @@ impl BinanceClient {
         name: &str,
         params: &PublicParams,
     ) -> Result<Option<ValidatedResponse>> {
+        if matches!(
+            name,
+            "place_coin_futures_algo_order"
+                | "cancel_coin_futures_algo_order"
+                | "get_coin_futures_algo_order"
+        ) {
+            params.ensure_allowed(&["fields"])?;
+            let fields: serde_json::Map<String, serde_json::Value> =
+                serde_json::from_str(params.required("fields")?)
+                    .map_err(|e| DcexError::InvalidInput(e.to_string()))?;
+            if fields.is_empty()
+                || fields
+                    .keys()
+                    .any(|key| matches!(key.as_str(), "timestamp" | "signature" | "apiKey"))
+            {
+                return Err(DcexError::InvalidInput(
+                    "provide nonempty algo fields without authentication fields".into(),
+                ));
+            }
+            if let Some(symbol) = fields.get("symbol") {
+                self.batch_symbol(None, symbol.as_str(), BinanceMarket::CoinFutures)?;
+            }
+            let pairs = fields
+                .into_iter()
+                .map(|(key, value)| {
+                    let value = match value {
+                        serde_json::Value::String(value) => value,
+                        serde_json::Value::Number(value) => value.to_string(),
+                        serde_json::Value::Bool(value) => value.to_string(),
+                        _ => {
+                            return Err(DcexError::InvalidInput(
+                                "algo fields must be scalar exchange parameters".into(),
+                            ));
+                        }
+                    };
+                    Ok((key, value))
+                })
+                .collect::<Result<Vec<_>>>()?;
+            let verb = match name {
+                "place_coin_futures_algo_order" => HttpMethod::Post,
+                "cancel_coin_futures_algo_order" => HttpMethod::Delete,
+                _ => HttpMethod::Get,
+            };
+            return self
+                .request(
+                    verb,
+                    BinanceMarket::CoinFutures,
+                    "/dapi/v1/algoOrder",
+                    pairs,
+                    true,
+                )
+                .await
+                .map(Some);
+        }
+        let normalized;
+        let params = if name.contains("coin_futures") && params.get("product_symbol").is_some() {
+            if params.get("symbol").is_some() {
+                return Err(DcexError::InvalidInput(
+                    "use product_symbol or symbol, exclusively".into(),
+                ));
+            }
+            let product = params.required("product_symbol")?;
+            let symbol = if product.contains('-') {
+                if self.market_for_product_symbol(product)? != BinanceMarket::CoinFutures {
+                    return Err(DcexError::InvalidInput(
+                        "product_symbol does not match COIN-M".into(),
+                    ));
+                }
+                self.exchange_symbol(product)?
+            } else {
+                self.batch_symbol(None, Some(product), BinanceMarket::CoinFutures)?
+            };
+            let mut pairs = params.without(&["product_symbol"]);
+            pairs.push(("symbol".into(), symbol));
+            normalized = PublicParams(pairs);
+            &normalized
+        } else {
+            params
+        };
         let (market, method, path, allowed, required, rule): (
             BinanceMarket,
             HttpMethod,
@@ -505,17 +591,15 @@ impl BinanceClient {
             }
             query.push(("symbol".into(), self.exchange_symbol(symbol)?));
         }
-        if matches!(market, BinanceMarket::CoinFutures) {
-            if let Some(symbol) = params.get("symbol") {
-                if !symbol
-                    .chars()
-                    .all(|c| c.is_ascii_uppercase() || c.is_ascii_digit() || c == '_')
-                {
-                    return Err(DcexError::InvalidInput(
-                        "COIN-M endpoints require a native symbol such as BTCUSD_PERP".into(),
-                    ));
-                }
-            }
+        if matches!(market, BinanceMarket::CoinFutures)
+            && let Some(symbol) = params.get("symbol")
+            && !symbol
+                .chars()
+                .all(|c| c.is_ascii_uppercase() || c.is_ascii_digit() || c == '_')
+        {
+            return Err(DcexError::InvalidInput(
+                "COIN-M endpoints require a native symbol such as BTCUSD_PERP".into(),
+            ));
         }
         Ok(Some(self.request(method, market, path, query, true).await?))
     }

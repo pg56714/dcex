@@ -113,12 +113,12 @@ impl BackpackClient {
             params.optional_bool(key)?;
         }
         for key in ["quantity", "price", "slippageTolerance"] {
-            if let Some(v) = params.get(key) {
-                if !v.parse::<f64>().is_ok_and(|v| v.is_finite() && v > 0.0) {
-                    return Err(invalid(
-                        "quantity, price and slippageTolerance must be positive decimals",
-                    ));
-                }
+            if let Some(v) = params.get(key)
+                && !crate::common::is_positive_plain_decimal(v)
+            {
+                return Err(invalid(
+                    "quantity, price and slippageTolerance must be positive decimals",
+                ));
             }
         }
         if method == "create_strategy" {

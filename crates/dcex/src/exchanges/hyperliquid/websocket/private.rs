@@ -44,6 +44,108 @@ impl HyperliquidPrivateWebSocket {
         self.connection.is_connected()
     }
 
+    /// Sign a batch of wire-format orders offline for `post_action`.
+    /// The caller supplies a unique millisecond nonce and the intended network.
+    #[allow(clippy::too_many_arguments)]
+    pub fn sign_order(
+        orders_json: &str,
+        grouping: &str,
+        nonce: u64,
+        private_key: &str,
+        testnet: bool,
+        vault_address: Option<&str>,
+        expires_after: Option<u64>,
+    ) -> Result<Value> {
+        use super::super::msgpack::OrderedValue;
+        if !["na", "normalTpsl", "positionTpsl"].contains(&grouping) {
+            return Err(crate::DcexError::InvalidInput(
+                "invalid order grouping".into(),
+            ));
+        }
+        let orders: OrderedValue = serde_json::from_str(orders_json)
+            .map_err(|e| crate::DcexError::InvalidInput(e.to_string()))?;
+        let OrderedValue::Array(orders) = orders else {
+            return Err(crate::DcexError::InvalidInput(
+                "orders must be an array".into(),
+            ));
+        };
+        if orders.is_empty() {
+            return Err(crate::DcexError::InvalidInput(
+                "orders must not be empty".into(),
+            ));
+        }
+        let orders = orders
+            .iter()
+            .map(super::super::trade::normalize_wire_order)
+            .collect::<Result<Vec<_>>>()?;
+        let action = OrderedValue::Object(vec![
+            ("type".into(), OrderedValue::String("order".into())),
+            ("orders".into(), OrderedValue::Array(orders)),
+            ("grouping".into(), OrderedValue::String(grouping.into())),
+        ]);
+        signed_action(
+            action,
+            nonce,
+            private_key,
+            testnet,
+            vault_address,
+            expires_after,
+        )
+    }
+
+    /// Sign wire-format `{a: asset_id, o: order_id}` cancellations offline.
+    pub fn sign_cancel(
+        cancels_json: &str,
+        nonce: u64,
+        private_key: &str,
+        testnet: bool,
+        vault_address: Option<&str>,
+        expires_after: Option<u64>,
+    ) -> Result<Value> {
+        use super::super::msgpack::OrderedValue;
+        let cancels: Value = serde_json::from_str(cancels_json)
+            .map_err(|e| crate::DcexError::InvalidInput(e.to_string()))?;
+        let cancels = cancels
+            .as_array()
+            .filter(|items| !items.is_empty())
+            .ok_or_else(|| {
+                crate::DcexError::InvalidInput("cancels must be a nonempty array".into())
+            })?;
+        let cancels = cancels
+            .iter()
+            .map(|cancel| {
+                let item = cancel
+                    .as_object()
+                    .filter(|item| item.len() == 2)
+                    .ok_or_else(|| {
+                        crate::DcexError::InvalidInput("cancel requires only a and o".into())
+                    })?;
+                ["a", "o"]
+                    .into_iter()
+                    .map(|key| {
+                        let value = item.get(key).and_then(Value::as_u64).ok_or_else(|| {
+                            crate::DcexError::InvalidInput(format!("cancel {key} must be unsigned"))
+                        })?;
+                        Ok((key.to_string(), OrderedValue::Uint(value)))
+                    })
+                    .collect::<Result<Vec<_>>>()
+                    .map(OrderedValue::Object)
+            })
+            .collect::<Result<Vec<_>>>()?;
+        let action = OrderedValue::Object(vec![
+            ("type".into(), OrderedValue::String("cancel".into())),
+            ("cancels".into(), OrderedValue::Array(cancels)),
+        ]);
+        signed_action(
+            action,
+            nonce,
+            private_key,
+            testnet,
+            vault_address,
+            expires_after,
+        )
+    }
+
     pub async fn connect(&mut self) -> Result<()> {
         self.connection.connect().await
     }
@@ -206,4 +308,36 @@ impl HyperliquidPrivateWebSocket {
     pub async fn recv_bytes(&mut self) -> Result<Vec<u8>> {
         self.connection.recv_bytes().await
     }
+}
+
+fn signed_action(
+    action: super::super::msgpack::OrderedValue,
+    nonce: u64,
+    private_key: &str,
+    testnet: bool,
+    vault_address: Option<&str>,
+    expires_after: Option<u64>,
+) -> Result<Value> {
+    use super::super::{
+        msgpack::encode_msgpack,
+        signing::{hyperliquid_signature, parse_private_key},
+    };
+    let signature = hyperliquid_signature(
+        &encode_msgpack(&action),
+        nonce,
+        vault_address,
+        expires_after,
+        testnet,
+        &parse_private_key(private_key)?,
+    )?;
+    let mut payload = serde_json::json!({"action":action.to_json(),"nonce":nonce,
+        "signature":{"r":signature.r,"s":signature.s,"v":signature.v}});
+    if let Some(vault) = vault_address {
+        payload["vaultAddress"] = vault.into();
+    }
+    if let Some(expires) = expires_after {
+        payload["expiresAfter"] = expires.into();
+    }
+    super::post::payload(0, "action", payload.clone())?;
+    Ok(payload)
 }

@@ -13,6 +13,7 @@ import json
 import queue
 import threading
 from collections.abc import Iterator
+from decimal import Decimal
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any
@@ -23,7 +24,7 @@ import pytest
 pytest.importorskip("dcex._native")
 
 ROOT = Path(__file__).resolve().parents[2]
-WRAPPER_FILES = ("_account_http.py", "_market_http.py", "_trade_http.py")
+WRAPPER_FILES = ("_account_http.py", "_market_http.py", "_trade_http.py", "_inventory_http.py")
 
 SPOT_ORDER = ("POST", "/openApi/spot/v1/trade/order")
 SWAP_ORDER = ("POST", "/openApi/swap/v2/trade/order")
@@ -31,6 +32,7 @@ LISTEN_KEY = "/openApi/user/auth/userDataStream"
 
 # Python wrapper name -> (HTTP method, documented path).
 ROUTES: dict[str, tuple[str, str]] = {
+    "get_spot_server_time": ("GET", "/openApi/spot/v1/server/time"),
     "replace_swap_batch_orders": ("POST", "/openApi/swap/v1/trade/batchCancelReplace"),
     "get_coin_swap_contracts": ("GET", "/openApi/cswap/v1/market/contracts"),
     "get_coin_swap_orderbook": ("GET", "/openApi/cswap/v1/market/depth"),
@@ -364,7 +366,7 @@ CONTROL_CASES = [
     ("get_swap_asset_mode", {}, "GET", "/openApi/swap/v1/trade/assetMode"),
     (
         "set_swap_asset_mode",
-        {"assetMode": "multiAssetsMode"},
+        {"assetMode": "multiAssetsMode", "confirm": True},
         "POST",
         "/openApi/swap/v1/trade/assetMode",
     ),
@@ -768,7 +770,6 @@ BATCH_REPLACEMENT = [
         "type": "STOP_MARKET",
         "stopPrice": 90,
         "quantity": 1,
-        "closePosition": "true",
         "cancelReplaceMode": "STOP_ON_FAILURE",
     }
 ]
@@ -797,7 +798,7 @@ ADDITIONAL_CASES.extend(
         ),
         (
             "reverse_swap_position",
-            {"type_": "Reverse", "product_symbol": "BTC-USDT-SWAP"},
+            {"type_": "Reverse", "product_symbol": "BTC-USDT-SWAP", "confirm": True},
             "POST",
             "/openApi/swap/v1/trade/reverse",
         ),
@@ -825,13 +826,13 @@ ADDITIONAL_CASES.extend(
         ),
         (
             "create_sub_account_api_key",
-            {"sub_uid": 123, "note": "trading", "permissions": [1, 2, 3]},
+            {"sub_uid": 123, "note": "trading", "permissions": [4, 5]},
             "POST",
             "/openApi/subAccount/v1/apiKey/create",
         ),
         (
             "modify_sub_account_api_key",
-            {"sub_uid": 123, "api_key": "query-key", "note": "trading", "permissions": [1, 2, 3]},
+            {"sub_uid": 123, "api_key": "query-key", "note": "trading", "permissions": [4, 5]},
             "POST",
             "/openApi/subAccount/v1/apiKey/edit",
         ),
@@ -886,13 +887,13 @@ ADDITIONAL_FIELDS.update(
         "create_sub_account_api_key": {
             "subUid": "123",
             "note": "trading",
-            "permissions": "[1,2,3]",
+            "permissions": "[4,5]",
         },
         "modify_sub_account_api_key": {
             "subUid": "123",
             "apiKey": "query-key",
             "note": "trading",
-            "permissions": "[1,2,3]",
+            "permissions": "[4,5]",
         },
         "delete_sub_account_api_key": {"subUid": "123", "apiKey": "query-key"},
         "set_sub_account_transfer_authorization": {"subUids": "123", "transferable": "true"},
@@ -983,6 +984,87 @@ ROUTES.update(
 )
 
 
+WALLET_CASES = [
+    (
+        "transfer_master_internal",
+        {
+            "coin": "USDT",
+            "user_account_type": 2,
+            "user_account": "123456789",
+            "amount": "1.000000000000000001",
+            "wallet_type": 1,
+            "calling_code": "886",
+            "transfer_client_id": "offline1",
+        },
+        "POST",
+        "/openApi/wallets/v1/capital/innerTransfer/apply",
+    ),
+    (
+        "transfer_sub_account_internal",
+        {
+            "coin": "USDT",
+            "user_account_type": 1,
+            "user_account": "123456",
+            "amount": "1.000000000000000001",
+            "wallet_type": 15,
+            "transfer_client_id": "offline2",
+            "recv_window": 5000,
+        },
+        "POST",
+        "/openApi/wallets/v1/capital/subAccountInnerTransfer/apply",
+    ),
+    (
+        "create_withdrawal",
+        {
+            "coin": "USDT",
+            "address": "offline-address",
+            "amount": "1.000000000000000001",
+            "wallet_type": 1,
+            "network": "BEP20",
+            "address_tag": "test",
+            "withdraw_order_id": "offline3",
+            "vasp_entity_id": "Others",
+        },
+        "POST",
+        "/openApi/wallets/v1/capital/withdraw/apply",
+    ),
+]
+ADDITIONAL_CASES.extend(WALLET_CASES)
+ROUTES.update({name: (verb, path) for name, _, verb, path in WALLET_CASES})
+ADDITIONAL_FIELDS.update(
+    {
+        "transfer_master_internal": {
+            "coin": "USDT",
+            "userAccountType": "2",
+            "userAccount": "123456789",
+            "amount": "1.000000000000000001",
+            "walletType": "1",
+            "callingCode": "886",
+            "transferClientId": "offline1",
+        },
+        "transfer_sub_account_internal": {
+            "coin": "USDT",
+            "userAccountType": "1",
+            "userAccount": "123456",
+            "amount": "1.000000000000000001",
+            "walletType": "15",
+            "transferClientId": "offline2",
+            "recvWindow": "5000",
+        },
+        "create_withdrawal": {
+            "coin": "USDT",
+            "address": "offline-address",
+            "amount": "1.000000000000000001",
+            "walletType": "1",
+            "network": "BEP20",
+            "addressTag": "test",
+            "withdrawOrderId": "offline3",
+            "vaspEntityId": "Others",
+        },
+    }
+)
+
+
 def _kwargs(method: Any, name: str) -> dict[str, Any]:  # noqa: ANN401
     if name == "replace_swap_batch_orders":
         return {"orders": BATCH_REPLACEMENT}
@@ -993,6 +1075,7 @@ def _kwargs(method: Any, name: str) -> dict[str, Any]:  # noqa: ANN401
         if name == case_name:
             return kwargs.copy()
     kwargs: dict[str, Any] = {}
+    aliases = {new: old for old, new in getattr(method, "__legacy_keywords__", {}).items()}
     for parameter in inspect.signature(method).parameters.values():
         if parameter.kind in {inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD}:
             continue
@@ -1000,8 +1083,9 @@ def _kwargs(method: Any, name: str) -> dict[str, Any]:  # noqa: ANN401
             continue
         if parameter.name == "product_symbol":
             kwargs[parameter.name] = "BTC-USDT-SPOT" if "spot" in name else "BTC-USDT-SWAP"
-        elif parameter.name in VALUES:
-            kwargs[parameter.name] = VALUES[parameter.name]
+        elif aliases.get(parameter.name, parameter.name) in VALUES:
+            sample_name = aliases.get(parameter.name, parameter.name)
+            kwargs[sample_name] = VALUES[sample_name]
         elif parameter.name == "type_":
             kwargs[parameter.name] = "LIMIT"
         else:
@@ -1023,7 +1107,11 @@ def _assert_route(name: str, request: dict[str, Any]) -> None:
         import hmac
 
         assert fields == {}
-        body = json.loads(request["body"])
+        body = (
+            json.loads(request["body"], parse_float=Decimal)
+            if name == "transfer_sub_account_internal"
+            else json.loads(request["body"])
+        )
         signature = body.pop("signature")
         assert isinstance(body["timestamp"], int)
 
@@ -1055,9 +1143,21 @@ def _assert_route(name: str, request: dict[str, Any]) -> None:
         batch = json.loads(request["query"]["batchOrders"])
         assert batch[0]["symbol"] == "BTC-USDT"
         assert batch[0]["quantity"] == 1
-        assert batch[0]["closePosition"] == "true"
+        assert "closePosition" not in batch[0]
         assert batch[0]["cancelOrderId"] == "1"
     signed = "signature" in fields
+    if name in {"transfer_master_internal", "create_withdrawal"}:
+        import hashlib
+        import hmac
+
+        assert request["body"] == b""
+        canonical = "&".join(
+            f"{key}={value}" for key, value in sorted(fields.items()) if key != "signature"
+        )
+        assert (
+            fields["signature"]
+            == hmac.new(b"api-secret", canonical.encode(), hashlib.sha256).hexdigest()
+        )
     if name in PUBLIC_METHODS:
         assert not signed, name
     elif name in UNSIGNED_PRIVATE:
@@ -1076,6 +1176,7 @@ def _assert_route(name: str, request: dict[str, Any]) -> None:
                 if key == "type_"
                 else key: "BTC-USDT" if key == "product_symbol" else str(value)
                 for key, value in kwargs.items()
+                if key not in {"confirm", "all_symbols"}
             }
             assert {
                 key: value
@@ -1089,7 +1190,8 @@ def test_route_table_matches_python_surface() -> None:
     sync_names = _wrapper_names("sync")
     async_names = _wrapper_names("async")
     assert sync_names == async_names
-    assert sync_names == set(ROUTES)
+    from tests.unit.test_bingx_inventory_completion import NAMES
+    assert sync_names == set(ROUTES) | NAMES
 
 
 @pytest.mark.parametrize("name", sorted(ROUTES))
@@ -1120,7 +1222,9 @@ def test_async_wrapper_reaches_documented_route(
     async def call() -> Any:  # noqa: ANN401
         async with Client(**_client_kwargs(base_url)) as client:
             method = getattr(client, name)
-            return await method(**_kwargs(method, name))
+            aliases = getattr(method, "__legacy_keywords__", {})
+            kwargs = {aliases.get(key, key): value for key, value in _kwargs(method, name).items()}
+            return await method(**kwargs)
 
     assert _call_checked_native(name, lambda: asyncio.run(call())) is not None
     _assert_route(name, received.get(timeout=5))
@@ -1164,6 +1268,7 @@ def test_spot_orderbook_v2_requires_depth() -> None:
 
 # Official request tables list no timestamp only for these public spot routes.
 PUBLIC_WITHOUT_TIMESTAMP = {
+    "get_spot_server_time",
     "get_swap_server_time",
     "get_spot_orderbook_v2",
     "get_spot_price_ticker",
@@ -1229,7 +1334,7 @@ def test_public_routes_send_documented_timestamp(
             "get_swap_position_history",
             {"product_symbol": "BTC-USDT-SWAP", "startTs": 1, "endTs": 8000000000},
         ),
-        ("set_swap_asset_mode", {"assetMode": "invalid"}),
+        ("set_swap_asset_mode", {"assetMode": "invalid", "confirm": True}),
     ],
 )
 async def test_new_risk_controls_reject_invalid_input_before_transport(

@@ -37,6 +37,7 @@ def test_sync_position_controls_forward_to_rust() -> None:
 
 def test_async_position_controls_forward_to_rust() -> None:
     """Asynchronous methods forward the same position-control fields."""
+
     async def check() -> None:
         client = object.__new__(AsyncPositionHTTP)
         client._native_private = AsyncMock(return_value={"ok": True})

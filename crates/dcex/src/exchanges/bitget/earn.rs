@@ -20,13 +20,12 @@ impl BitgetClient {
             }
             "get_savings_account" => self.get_private(SAVINGS_ACCOUNT, Vec::new()).await,
             "get_savings_products" => {
-                if let Some(filter) = params.get("filter") {
-                    if !["available", "held", "available_and_held", "all"].contains(&filter) {
-                        return Err(DcexError::InvalidInput(
-                            "filter must be available, held, available_and_held, or all"
-                                .to_string(),
-                        ));
-                    }
+                if let Some(filter) = params.get("filter")
+                    && !["available", "held", "available_and_held", "all"].contains(&filter)
+                {
+                    return Err(DcexError::InvalidInput(
+                        "filter must be available, held, available_and_held, or all".to_string(),
+                    ));
                 }
                 self.get_private(SAVINGS_PRODUCTS, params.only(&["coin", "filter"]))
                     .await
@@ -43,13 +42,13 @@ impl BitgetClient {
             "get_savings_records" => {
                 validate_period_type(params)?;
                 validate_page(params)?;
-                if let Some(order_type) = params.get("orderType") {
-                    if !["subscribe", "redeem", "pay_interest", "deduction"].contains(&order_type) {
-                        return Err(DcexError::InvalidInput(
-                            "orderType must be subscribe, redeem, pay_interest, or deduction"
-                                .to_string(),
-                        ));
-                    }
+                if let Some(order_type) = params.get("orderType")
+                    && !["subscribe", "redeem", "pay_interest", "deduction"].contains(&order_type)
+                {
+                    return Err(DcexError::InvalidInput(
+                        "orderType must be subscribe, redeem, pay_interest, or deduction"
+                            .to_string(),
+                    ));
                 }
                 self.get_private(
                     SAVINGS_RECORDS,
@@ -180,12 +179,12 @@ fn validate_positive_amount(params: &BitgetParams) -> Result<()> {
 }
 
 fn validate_account(params: &BitgetParams, key: &str) -> Result<()> {
-    if let Some(value) = params.get(key) {
-        if !["spot", "unified"].contains(&value) {
-            return Err(DcexError::InvalidInput(format!(
-                "{key} must be spot or unified"
-            )));
-        }
+    if let Some(value) = params.get(key)
+        && !["spot", "unified"].contains(&value)
+    {
+        return Err(DcexError::InvalidInput(format!(
+            "{key} must be spot or unified"
+        )));
     }
     Ok(())
 }
@@ -208,12 +207,12 @@ fn validate_elite_redemption(params: &BitgetParams) -> Result<()> {
     }
     params.required("receiveAccount")?;
     validate_account(params, "receiveAccount")?;
-    if let Some(value) = params.get("advancedSettle") {
-        if !["yes", "no"].contains(&value) {
-            return Err(DcexError::InvalidInput(
-                "advancedSettle must be yes or no".to_string(),
-            ));
-        }
+    if let Some(value) = params.get("advancedSettle")
+        && !["yes", "no"].contains(&value)
+    {
+        return Err(DcexError::InvalidInput(
+            "advancedSettle must be yes or no".to_string(),
+        ));
     }
     Ok(())
 }

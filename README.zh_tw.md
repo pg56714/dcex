@@ -37,7 +37,7 @@ cargo add dcex
 - Product Table Manager（PTM）統一交易所商品代號與交易規格。
 - 支援多個 CEX 與 DEX；實際可用的端點依交易所而異。
 
-目前不封裝建立外部提領的端點。PTM 包含 Binance、Bybit 與 OKX 已上市期權；期權交易仍使用各交易所專屬 API。
+官方提款、做市商與合作夥伴端點均納入範圍；實作覆蓋與規格缺口以端點清冊為準。API 提款沒有第二次確認，送出即執行；建議交易用 API 金鑰不要開啟提款權限。PTM 包含 Binance、Bybit 與 OKX 已上市期權；期權交易仍使用各交易所專屬 API。
 
 ## 支援交易所
 
@@ -59,7 +59,7 @@ cargo add dcex
 | Ondo | 支援 | 支援 | 支援 | 支援 |
 | Arcus | 支援 | 支援 | 支援 | 支援 |
 
-私人 WebSocket 包含需驗證身分或指定地址的使用者資料流；Binance、Bybit、Bitget 與 Kraken 現貨提供交易 WebSocket；Hyperliquid 與 Lighter 可提交已簽名操作，Arcus 提供簽名請求建立介面。Lighter Mainnet 與 Robinhood 使用不同憑證；可逐一為客戶端選擇網路，預設為 Mainnet；參閱 [.env.example](.env.example) 與 [Lighter 範例](examples/async/lighter_private_readonly.py)。Ondo 目前僅支援永續合約。
+私人 WebSocket 包含需驗證身分或指定地址的使用者資料流；Binance、Bybit、Bitget、OKX、KuCoin 與 Kraken 現貨提供交易 WebSocket；Hyperliquid 與 Lighter 可提交已簽名操作，Arcus 提供簽名請求建立介面。Lighter Mainnet 與 Robinhood 使用不同憑證；可逐一為客戶端選擇網路，預設為 Mainnet；參閱 [.env.example](.env.example) 與 [Lighter 範例](examples/async/lighter_private_readonly.py)。Ondo 目前僅支援永續合約。
 
 ## Python 快速開始
 
@@ -87,6 +87,8 @@ async def main():
 
 asyncio.run(main())
 ```
+
+另提供 Binance Alpha、Aster Prediction、KuCoin Classic／Pro 與 Kraken 現貨 V1 介面。Bitget SBE 回傳原始二進位封包，由呼叫端解碼。
 
 公開 WebSocket：
 

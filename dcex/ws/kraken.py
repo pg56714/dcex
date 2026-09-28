@@ -373,3 +373,34 @@ class Level3Client(AsyncWebSocketMixin):
         if not isinstance(event, dict):
             raise TypeError("Unexpected Kraken L3 event")
         return event
+
+
+class V1Client(AsyncWebSocketMixin):
+    """
+    Kraken Spot V1 event/subscription protocol, including array event payloads.
+
+    Use a REST GetWebSocketsToken token for private channels and trading.
+    Check acknowledgement status events received with `recv` after sending.
+    """
+
+    def __init__(
+        self, token: str | None = None, *, timeout: float = 10.0, base_url: str | None = None
+    ) -> None:
+        """Select the V1 public endpoint or the private endpoint when token is set."""
+        self._native_client = _native.KrakenV1WebSocketClient(token, timeout, base_url)
+
+    async def connect(self) -> None:
+        """Open V1; the initial systemStatus event remains available via recv."""
+        await self._native_client.connect()
+
+    async def close(self) -> None:
+        """Close this connection."""
+        await self._native_client.close()
+
+    async def send_message(self, message: dict[str, Any], *, all_symbols: bool = False) -> None:
+        """Send a documented V1 event; cancelAll/countdown require all_symbols=True."""
+        await self._native_client.send_message(json.dumps(message), all_symbols)
+
+    async def recv(self) -> dict[str, Any] | list[Any]:
+        """Receive a raw V1 status or market/account event."""
+        return json.loads(bytes(await self._native_client.recv()))

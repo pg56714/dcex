@@ -65,6 +65,25 @@ impl PythonOkxPublicWebSocketClient {
         })
     }
 
+    fn subscription_args<'py>(
+        &self,
+        py: Python<'py>,
+        op: String,
+        args_json: String,
+    ) -> PyResult<Bound<'py, PyAny>> {
+        let args = serde_json::from_str(&args_json)
+            .map_err(|e| PyValueError::new_err(format!("invalid subscription JSON: {e}")))?;
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client
+                .lock()
+                .await
+                .subscription_args(&op, args)
+                .await
+                .map_err(to_py_runtime_error)
+        })
+    }
+
     #[pyo3(signature = (channel, product_symbol=None, inst_type=None, inst_family=None, sprd_id=None))]
     fn subscribe_channel<'py>(
         &self,
@@ -284,6 +303,48 @@ impl PythonOkxPrivateWebSocketClient {
                 .lock()
                 .await
                 .close()
+                .await
+                .map_err(to_py_runtime_error)
+        })
+    }
+
+    fn subscription_args<'py>(
+        &self,
+        py: Python<'py>,
+        op: String,
+        args_json: String,
+    ) -> PyResult<Bound<'py, PyAny>> {
+        let args = serde_json::from_str(&args_json)
+            .map_err(|e| PyValueError::new_err(format!("invalid subscription JSON: {e}")))?;
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client
+                .lock()
+                .await
+                .subscription_args(&op, args)
+                .await
+                .map_err(to_py_runtime_error)
+        })
+    }
+
+    #[pyo3(signature = (id, op, args_json, exp_time=None, all_symbols=false))]
+    fn send_operation<'py>(
+        &self,
+        py: Python<'py>,
+        id: String,
+        op: String,
+        args_json: String,
+        exp_time: Option<u64>,
+        all_symbols: bool,
+    ) -> PyResult<Bound<'py, PyAny>> {
+        let args = serde_json::from_str(&args_json)
+            .map_err(|e| PyValueError::new_err(format!("invalid operation JSON: {e}")))?;
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client
+                .lock()
+                .await
+                .send_operation(&id, &op, args, exp_time, all_symbols)
                 .await
                 .map_err(to_py_runtime_error)
         })

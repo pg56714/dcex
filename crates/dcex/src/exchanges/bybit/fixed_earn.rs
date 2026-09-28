@@ -177,15 +177,14 @@ fn validate_order_link_id(value: &str) -> Result<()> {
 }
 
 fn validate_history(params: &BybitParams) -> Result<()> {
-    if let Some(limit) = params.get("limit") {
-        if !limit
+    if let Some(limit) = params.get("limit")
+        && !limit
             .parse::<u16>()
             .is_ok_and(|value| (1..=50).contains(&value))
-        {
-            return Err(DcexError::InvalidInput(
-                "limit must be between 1 and 50".to_string(),
-            ));
-        }
+    {
+        return Err(DcexError::InvalidInput(
+            "limit must be between 1 and 50".to_string(),
+        ));
     }
     if let (Some(start), Some(end)) = (params.get("startTime"), params.get("endTime")) {
         let start = start

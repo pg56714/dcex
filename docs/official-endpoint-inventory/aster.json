@@ -1,0 +1,1875 @@
+{
+  "exchange": "aster",
+  "scope": "Current recommended V3 spot/futures/prediction and BAPI documentation; testnet mirrors deduplicated",
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/aster-chain/v3/account/status",
+      "host": "fapi",
+      "title": "Get Account Status (USER_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-chain.md#get-account-status-user_data"
+    },
+    {
+      "method": "POST",
+      "path": "/aster-chain/v3/account/modify-status",
+      "host": "fapi",
+      "title": "Modify Account Status (TRADE)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-chain.md#modify-account-status-trade"
+    },
+    {
+      "method": "POST",
+      "path": "/aster-chain/v3/transfer",
+      "host": "fapi",
+      "title": "Transfer to Address (WITHDRAW)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-chain.md#transfer-to-address-withdraw"
+    },
+    {
+      "method": "GET",
+      "path": "/aster-chain/v3/staking/stakeAccountStatus",
+      "host": "fapi",
+      "title": "Get Staking Account Status (USER_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-chain.md#get-staking-account-status-user_data"
+    },
+    {
+      "method": "GET",
+      "path": "/aster-chain/v3/staking/myStaking",
+      "host": "fapi",
+      "title": "Get My Staking (USER_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-chain.md#get-my-staking-user_data"
+    },
+    {
+      "method": "GET",
+      "path": "/aster-chain/v3/staking/claimableRewards",
+      "host": "fapi",
+      "title": "Get Claimable Rewards (USER_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-chain.md#get-claimable-rewards-user_data"
+    },
+    {
+      "method": "POST",
+      "path": "/aster-chain/v3/staking/create",
+      "host": "fapi",
+      "title": "Create Staking (TRADE)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-chain.md#create-staking-trade"
+    },
+    {
+      "method": "POST",
+      "path": "/aster-chain/v3/staking/deposit",
+      "host": "fapi",
+      "title": "Deposit Stake (TRADE)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-chain.md#deposit-stake-trade"
+    },
+    {
+      "method": "POST",
+      "path": "/aster-chain/v3/staking/updateLockPeriod",
+      "host": "fapi",
+      "title": "Update Lock Period (TRADE)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-chain.md#update-lock-period-trade"
+    },
+    {
+      "method": "POST",
+      "path": "/aster-chain/v3/staking/claimRewards",
+      "host": "fapi",
+      "title": "Claim Rewards (TRADE)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-chain.md#claim-rewards-trade"
+    },
+    {
+      "method": "GET",
+      "path": "/aster-chain/v3/staking/getLockedAster",
+      "host": "fapi",
+      "title": "Get Locked Aster (NONE)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-chain.md#get-locked-aster-none"
+    },
+    {
+      "method": "GET",
+      "path": "/aster-chain/v3/spot/user-deposit-address",
+      "host": "fapi",
+      "title": "Get User Deposit Address (USER_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-chain.md#get-user-deposit-address-user_data"
+    },
+    {
+      "method": "POST",
+      "path": "/aster-chain/v3/perp/user-withdraw",
+      "host": "fapi",
+      "title": "User Withdraw (WITHDRAW)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-chain.md#user-withdraw-withdraw"
+    },
+    {
+      "method": "POST",
+      "path": "/aster-chain/v3/perp/user-solana-withdraw",
+      "host": "fapi",
+      "title": "User Solana Withdraw (WITHDRAW)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-chain.md#user-solana-withdraw-withdraw"
+    },
+    {
+      "method": "GET",
+      "path": "/aster-chain/v3/perp/user-withdraw-info",
+      "host": "fapi",
+      "title": "Get Withdraw Info (USER_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-chain.md#get-withdraw-info-user_data"
+    },
+    {
+      "method": "GET",
+      "path": "/aster-chain/v3/perp/deposit-withdraw-history",
+      "host": "fapi",
+      "title": "Deposit/Withdraw History (USER_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-chain.md#depositwithdraw-history-user_data"
+    },
+    {
+      "method": "POST",
+      "path": "/aster-chain/v3/perp/wallet/transfer",
+      "host": "fapi",
+      "title": "Wallet Transfer (TRADE)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-chain.md#wallet-transfer-trade"
+    },
+    {
+      "method": "POST",
+      "path": "/aster-chain/v3/spot/user-withdraw",
+      "host": "fapi",
+      "title": "User Withdraw (WITHDRAW)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-chain.md#user-withdraw-withdraw"
+    },
+    {
+      "method": "POST",
+      "path": "/aster-chain/v3/spot/user-solana-withdraw",
+      "host": "fapi",
+      "title": "User Solana Withdraw (WITHDRAW)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-chain.md#user-solana-withdraw-withdraw"
+    },
+    {
+      "method": "POST",
+      "path": "/aster-chain/v3/spot/wallet/transfer",
+      "host": "fapi",
+      "title": "Wallet Transfer (TRADE)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-chain.md#wallet-transfer-trade"
+    },
+    {
+      "method": "GET",
+      "path": "/aster-chain/v3/withdraw/estimateFee",
+      "host": "fapi",
+      "title": "Estimate Withdraw Fee (NONE)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-chain.md#estimate-withdraw-fee-none"
+    },
+    {
+      "method": "POST",
+      "path": "/fapi/v3/noop",
+      "host": "fapi",
+      "title": "Noop (TRADE)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#noop-trade"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/ping",
+      "host": "fapi",
+      "title": "Test Connectivity",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#test-connectivity"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/time",
+      "host": "fapi",
+      "title": "Check Server Time",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#check-server-time"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/exchangeInfo",
+      "host": "fapi",
+      "title": "Exchange Information",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#exchange-information"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/depth",
+      "host": "fapi",
+      "title": "Order Book",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#order-book"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/trades",
+      "host": "fapi",
+      "title": "Recent Trades List",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#recent-trades-list"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/historicalTrades",
+      "host": "fapi",
+      "title": "Old Trades Lookup",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#old-trades-lookup"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/aggTrades",
+      "host": "fapi",
+      "title": "Compressed/Aggregate Trades List",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#compressedaggregate-trades-list"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/klines",
+      "host": "fapi",
+      "title": "Kline/Candlestick Data",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#klinecandlestick-data"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/marketKlines",
+      "host": "fapi",
+      "title": "Index Price Kline/Candlestick Data",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#index-price-klinecandlestick-data"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/indexPriceKlines",
+      "host": "fapi",
+      "title": "Index Price Kline/Candlestick Data",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#index-price-klinecandlestick-data"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/markPriceKlines",
+      "host": "fapi",
+      "title": "Mark Price Kline/Candlestick Data",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#mark-price-klinecandlestick-data"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/premiumIndex",
+      "host": "fapi",
+      "title": "Mark Price",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#mark-price"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/fundingRate",
+      "host": "fapi",
+      "title": "Get Funding Rate History",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#get-funding-rate-history"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/ticker/24hr",
+      "host": "fapi",
+      "title": "24hr Ticker Price Change Statistics",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#24hr-ticker-price-change-statistics"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/ticker/price",
+      "host": "fapi",
+      "title": "Symbol Price Ticker",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#symbol-price-ticker"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/ticker/bookTicker",
+      "host": "fapi",
+      "title": "Symbol Order Book Ticker",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#symbol-order-book-ticker"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/indexreferences",
+      "host": "fapi",
+      "title": "Index Price References",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#index-price-references"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/remainingOpenableNotionalValue",
+      "host": "fapi",
+      "title": "Remaining Openable Notional Value",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#remaining-openable-notional-value"
+    },
+    {
+      "method": "POST",
+      "path": "/fapi/v3/positionSide/dual",
+      "host": "fapi",
+      "title": "Change Position Mode(TRADE)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#change-position-modetrade"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/positionSide/dual",
+      "host": "fapi",
+      "title": "Get Current Position Mode(USER_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#get-current-position-modeuser_data"
+    },
+    {
+      "method": "POST",
+      "path": "/fapi/v3/stpMode",
+      "host": "fapi",
+      "title": "Change STP Mode (TRADE)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#change-stp-mode-trade"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/stpMode",
+      "host": "fapi",
+      "title": "Get Current STP Mode (USER_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#get-current-stp-mode-user_data"
+    },
+    {
+      "method": "POST",
+      "path": "/fapi/v3/multiAssetsMargin",
+      "host": "fapi",
+      "title": "Change Multi-Assets Mode (TRADE)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#change-multi-assets-mode-trade"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/multiAssetsMargin",
+      "host": "fapi",
+      "title": "Get Current Multi-Assets Mode (USER_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#get-current-multi-assets-mode-user_data"
+    },
+    {
+      "method": "POST",
+      "path": "/fapi/v3/assetExchange",
+      "host": "fapi",
+      "title": "Asset Exchange (TRADE)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#asset-exchange-trade"
+    },
+    {
+      "method": "POST",
+      "path": "/fapi/v3/order",
+      "host": "fapi",
+      "title": "New Order  (TRADE)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#new-order--trade"
+    },
+    {
+      "method": "POST",
+      "path": "/fapi/v3/chase",
+      "host": "fapi",
+      "title": "Modify Order (TRADE)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#modify-order-trade"
+    },
+    {
+      "method": "DELETE",
+      "path": "/fapi/v3/order",
+      "host": "fapi",
+      "title": "Place Chase Order (TRADE)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#place-chase-order-trade"
+    },
+    {
+      "method": "POST",
+      "path": "/fapi/v3/batchOrders",
+      "host": "fapi",
+      "title": "Place Multiple Orders  (TRADE)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#place-multiple-orders--trade"
+    },
+    {
+      "method": "PUT",
+      "path": "/fapi/v3/batchOrders",
+      "host": "fapi",
+      "title": "Batch Modify Orders (TRADE)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#batch-modify-orders-trade"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/order",
+      "host": "fapi",
+      "title": "Query Order (USER_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#query-order-user_data"
+    },
+    {
+      "method": "DELETE",
+      "path": "/fapi/v3/guardedCancelOrder",
+      "host": "fapi",
+      "title": "Cancel Order (Guarded) (TRADE)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#cancel-order-guarded-trade"
+    },
+    {
+      "method": "DELETE",
+      "path": "/fapi/v3/allOpenOrders",
+      "host": "fapi",
+      "title": "Cancel All Open Orders (TRADE)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#cancel-all-open-orders-trade"
+    },
+    {
+      "method": "DELETE",
+      "path": "/fapi/v3/batchOrders",
+      "host": "fapi",
+      "title": "Cancel Multiple Orders (TRADE)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#cancel-multiple-orders-trade"
+    },
+    {
+      "method": "DELETE",
+      "path": "/fapi/v3/guardedBatchOrders",
+      "host": "fapi",
+      "title": "Cancel Multiple Orders (Guarded) (TRADE)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#cancel-multiple-orders-guarded-trade"
+    },
+    {
+      "method": "POST",
+      "path": "/fapi/v3/countdownCancelAll",
+      "host": "fapi",
+      "title": "Auto-Cancel All Open Orders (TRADE)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#auto-cancel-all-open-orders-trade"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/openOrder",
+      "host": "fapi",
+      "title": "Query Current Open Order (USER_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#query-current-open-order-user_data"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/openOrders",
+      "host": "fapi",
+      "title": "Current All Open Orders (USER_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#current-all-open-orders-user_data"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/allOrders",
+      "host": "fapi",
+      "title": "All Orders (USER_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#all-orders-user_data"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/balance",
+      "host": "fapi",
+      "title": "Futures Account Balance v3 (USER_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#futures-account-balance-v3-user_data"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/accountWithJoinMargin",
+      "host": "fapi",
+      "title": "Account Information v3 (USER_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#account-information-v3-user_data"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/account",
+      "host": "fapi",
+      "title": "Account Information v3 (USER_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#account-information-v3-user_data"
+    },
+    {
+      "method": "POST",
+      "path": "/fapi/v3/leverage",
+      "host": "fapi",
+      "title": "Change Initial Leverage (TRADE)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#change-initial-leverage-trade"
+    },
+    {
+      "method": "POST",
+      "path": "/fapi/v3/marginType",
+      "host": "fapi",
+      "title": "Change Margin Type (TRADE)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#change-margin-type-trade"
+    },
+    {
+      "method": "POST",
+      "path": "/fapi/v3/positionMargin",
+      "host": "fapi",
+      "title": "Modify Isolated Position Margin (TRADE)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#modify-isolated-position-margin-trade"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/positionMargin/history",
+      "host": "fapi",
+      "title": "Get Position Margin Change History (TRADE)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#get-position-margin-change-history-trade"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/positionRisk",
+      "host": "fapi",
+      "title": "Position Information v3 (USER_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#position-information-v3-user_data"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/userTrades",
+      "host": "fapi",
+      "title": "Account Trade List (USER_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#account-trade-list-user_data"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/income",
+      "host": "fapi",
+      "title": "Get Income History(USER_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#get-income-historyuser_data"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/leverageBrackets",
+      "host": "fapi",
+      "title": "Notional and Leverage Brackets (USER_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#notional-and-leverage-brackets-user_data"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/leverageBracket",
+      "host": "fapi",
+      "title": "Notional and Leverage Brackets (USER_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#notional-and-leverage-brackets-user_data"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/adlQuantile",
+      "host": "fapi",
+      "title": "Position ADL Quantile Estimation (USER_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#position-adl-quantile-estimation-user_data"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/forceOrders",
+      "host": "fapi",
+      "title": "User's Force Orders (USER_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#users-force-orders-user_data"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/commissionRate",
+      "host": "fapi",
+      "title": "User Commission Rate (USER_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#user-commission-rate-user_data"
+    },
+    {
+      "method": "POST",
+      "path": "/fapi/v3/mmp",
+      "host": "fapi",
+      "title": "Update User MMP (USER_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#update-user-mmp-user_data"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/mmp",
+      "host": "fapi",
+      "title": "Get User MMP (USER_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#get-user-mmp-user_data"
+    },
+    {
+      "method": "DELETE",
+      "path": "/fapi/v3/mmp",
+      "host": "fapi",
+      "title": "Delete User MMP (USER_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#delete-user-mmp-user_data"
+    },
+    {
+      "method": "POST",
+      "path": "/fapi/v3/mmpReset",
+      "host": "fapi",
+      "title": "Reset User MMP (USER_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#reset-user-mmp-user_data"
+    },
+    {
+      "method": "POST",
+      "path": "/fapi/v3/placeStrategyOrder",
+      "host": "fapi",
+      "title": "Place Strategy Order (TRADE)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#place-strategy-order-trade"
+    },
+    {
+      "method": "POST",
+      "path": "/fapi/v3/updateStrategyOrder",
+      "host": "fapi",
+      "title": "Update Strategy Order (TRADE)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#update-strategy-order-trade"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/strategyOpenOrder",
+      "host": "fapi",
+      "title": "Query Strategy Open Order (USER_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#query-strategy-open-order-user_data"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/strategyHistoryOrder",
+      "host": "fapi",
+      "title": "Query Strategy History Order (USER_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#query-strategy-history-order-user_data"
+    },
+    {
+      "method": "POST",
+      "path": "/fapi/v3/sub-accounts/bind",
+      "host": "fapi",
+      "title": "Bind Sub-Account (USER_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#bind-sub-account-user_data"
+    },
+    {
+      "method": "POST",
+      "path": "/fapi/v3/createSubAccount",
+      "host": "fapi",
+      "title": "Create Sub-Account (TRADE)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#create-sub-account-trade"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/getSubAccountList",
+      "host": "fapi",
+      "title": "Get Sub-Account List (USER_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#get-sub-account-list-user_data"
+    },
+    {
+      "method": "POST",
+      "path": "/fapi/v3/updateSubAccount",
+      "host": "fapi",
+      "title": "Update Sub-Account (TRADE)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#update-sub-account-trade"
+    },
+    {
+      "method": "POST",
+      "path": "/fapi/v3/subAccountTransfer",
+      "host": "fapi",
+      "title": "Sub-Account Transfer (TRADE)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#sub-account-transfer-trade"
+    },
+    {
+      "method": "POST",
+      "path": "/fapi/v3/registerAndApproveAgent",
+      "host": "fapi",
+      "title": "Important Notes",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#important-notes"
+    },
+    {
+      "method": "POST",
+      "path": "/fapi/v3/asset/migrateUser",
+      "host": "fapi",
+      "title": "Migrate User Assets (WITHDRAW)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#migrate-user-assets-withdraw"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/asset/migrateUser/history",
+      "host": "fapi",
+      "title": "Migrate User Assets History (USER_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#migrate-user-assets-history-user_data"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/announcement/direct",
+      "host": "fapi",
+      "title": "Get Direct Announcements (USER_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#get-direct-announcements-user_data"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/announcement/directById",
+      "host": "fapi",
+      "title": "Get Direct Announcement By ID (USER_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#get-direct-announcement-by-id-user_data"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/builder/userAccounts",
+      "host": "fapi",
+      "title": "Get Builder User Accounts (USER_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#get-builder-user-accounts-user_data"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/builder/userOpenOrders",
+      "host": "fapi",
+      "title": "Get Builder User Open Orders (USER_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#get-builder-user-open-orders-user_data"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/builder/userBalances",
+      "host": "fapi",
+      "title": "Get Builder User Balances (USER_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#get-builder-user-balances-user_data"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/builder/userPositionRisk",
+      "host": "fapi",
+      "title": "Get Builder User Position Risk (USER_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#get-builder-user-position-risk-user_data"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/builder/userCommissionRates",
+      "host": "fapi",
+      "title": "Get Builder User Commission Rates (USER_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#get-builder-user-commission-rates-user_data"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/builder/userTrades",
+      "host": "fapi",
+      "title": "Get Builder Trades (USER_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#get-builder-trades-user_data"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/builder/userAllOrders",
+      "host": "fapi",
+      "title": "Get Builder All Orders (USER_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#get-builder-all-orders-user_data"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/builder/approvedUserList",
+      "host": "fapi",
+      "title": "Get Builder Approved User List (USER_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#get-builder-approved-user-list-user_data"
+    },
+    {
+      "method": "GET",
+      "path": "/fapi/v3/common/asset/all-asset-logo",
+      "host": "fapi",
+      "title": "Get All Asset Logos",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#get-all-asset-logos"
+    },
+    {
+      "method": "POST",
+      "path": "/fapi/v3/listenKey",
+      "host": "fapi",
+      "title": "Start User Data Stream (USER_STREAM)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#start-user-data-stream-user_stream"
+    },
+    {
+      "method": "PUT",
+      "path": "/fapi/v3/listenKey",
+      "host": "fapi",
+      "title": "Keepalive User Data Stream (USER_STREAM)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#keepalive-user-data-stream-user_stream"
+    },
+    {
+      "method": "DELETE",
+      "path": "/fapi/v3/listenKey",
+      "host": "fapi",
+      "title": "Close User Data Stream (USER_STREAM)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#close-user-data-stream-user_stream"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/noop",
+      "host": "papi",
+      "title": "Noop",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#noop"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/ping",
+      "host": "papi",
+      "title": "Test server connectivity",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#test-server-connectivity"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/time",
+      "host": "papi",
+      "title": "Get server time",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#get-server-time"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/prediction/exchangeInfo",
+      "host": "papi",
+      "title": "Trading specification information",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#trading-specification-information"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/depth",
+      "host": "papi",
+      "title": "Depth information",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#depth-information"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/trades",
+      "host": "papi",
+      "title": "Recent trades list",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#recent-trades-list"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/historicalTrades",
+      "host": "papi",
+      "title": "Query historical trades (MARKET\\_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#query-historical-trades-market_data"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/aggTrades",
+      "host": "papi",
+      "title": "Recent trades (aggregated)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#recent-trades-aggregated"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/klines",
+      "host": "papi",
+      "title": "K-line data",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#k-line-data"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/ticker/24hr",
+      "host": "papi",
+      "title": "24h price change",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#24h-price-change"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/ticker/price",
+      "host": "papi",
+      "title": "Latest price",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#latest-price"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/ticker/bookTicker",
+      "host": "papi",
+      "title": "Current best order",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#current-best-order"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/commissionRate",
+      "host": "papi",
+      "title": "Get symbol fees",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#get-symbol-fees"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/order",
+      "host": "papi",
+      "title": "Place order (TRADE)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#place-order-trade"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v3/order",
+      "host": "papi",
+      "title": "Cancel order (TRADE)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#cancel-order-trade"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/order",
+      "host": "papi",
+      "title": "Query order (USER\\_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#query-order-user_data"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/openOrder",
+      "host": "papi",
+      "title": "Query Current Open Order (USER\\_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#query-current-open-order-user_data"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/openOrders",
+      "host": "papi",
+      "title": "Current open orders (USER\\_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#current-open-orders-user_data"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/allOrders",
+      "host": "papi",
+      "title": "Query all orders (USER\\_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#query-all-orders-user_data"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/asset/wallet/transfer",
+      "host": "papi",
+      "title": "Perp-spot transfer (TRADE)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#perp-spot-transfer-trade"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/prediction/mint",
+      "host": "papi",
+      "title": "Prediction market mint (TRADE)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#prediction-market-mint-trade"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/prediction/burn",
+      "host": "papi",
+      "title": "Prediction market burn (TRADE)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#prediction-market-burn-trade"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/prediction/split",
+      "host": "papi",
+      "title": "Prediction market split (TRADE)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#prediction-market-split-trade"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/prediction/merge",
+      "host": "papi",
+      "title": "Prediction market merge (TRADE)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#prediction-market-merge-trade"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/prediction/positions",
+      "host": "papi",
+      "title": "Query prediction market current positions (USER\\_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#query-prediction-market-current-positions-user_data"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/prediction/positionHistories",
+      "host": "papi",
+      "title": "Query prediction market position history (USER\\_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#query-prediction-market-position-history-user_data"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/prediction/settlementHistories",
+      "host": "papi",
+      "title": "Query prediction market settlement histories (USER\\_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#query-prediction-market-settlement-histories-user_data"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/account",
+      "host": "papi",
+      "title": "Account information (USER\\_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#account-information-user_data"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/userTrades",
+      "host": "papi",
+      "title": "Account trade history (USER\\_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#account-trade-history-user_data"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/listenKey",
+      "host": "papi",
+      "title": "Generate Listen Key (USER\\_STREAM)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#generate-listen-key-user_stream"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v3/listenKey",
+      "host": "papi",
+      "title": "Extend Listen Key validity period (USER\\_STREAM)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#extend-listen-key-validity-period-user_stream"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v3/listenKey",
+      "host": "papi",
+      "title": "Close Listen Key (USER\\_STREAM)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#close-listen-key-user_stream"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/order",
+      "host": "sapi",
+      "title": "Enumeration definition",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-spot-api-v3.md#enumeration-definition"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/noop",
+      "host": "sapi",
+      "title": "Noop",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-spot-api-v3.md#noop"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/ping",
+      "host": "sapi",
+      "title": "Test server connectivity",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-spot-api-v3.md#test-server-connectivity"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/time",
+      "host": "sapi",
+      "title": "Get server time",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-spot-api-v3.md#get-server-time"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/exchangeInfo",
+      "host": "sapi",
+      "title": "Trading specification information",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-spot-api-v3.md#trading-specification-information"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/depth",
+      "host": "sapi",
+      "title": "Depth information",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-spot-api-v3.md#depth-information"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/trades",
+      "host": "sapi",
+      "title": "Recent trades list",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-spot-api-v3.md#recent-trades-list"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/historicalTrades",
+      "host": "sapi",
+      "title": "Query historical trades (MARKET\\_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-spot-api-v3.md#query-historical-trades-market_data"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/aggTrades",
+      "host": "sapi",
+      "title": "Recent trades (aggregated)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-spot-api-v3.md#recent-trades-aggregated"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/klines",
+      "host": "sapi",
+      "title": "K-line data",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-spot-api-v3.md#k-line-data"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/ticker/24hr",
+      "host": "sapi",
+      "title": "24h price change",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-spot-api-v3.md#24h-price-change"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/ticker/opt/24hr",
+      "host": "sapi",
+      "title": "24h price change",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-spot-api-v3.md#24h-price-change"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/ticker/price",
+      "host": "sapi",
+      "title": "Latest price",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-spot-api-v3.md#latest-price"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/ticker/bookTicker",
+      "host": "sapi",
+      "title": "Current best order",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-spot-api-v3.md#current-best-order"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/commissionRate",
+      "host": "sapi",
+      "title": "Get symbol fees",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-spot-api-v3.md#get-symbol-fees"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v3/order",
+      "host": "sapi",
+      "title": "Cancel order (TRADE)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-spot-api-v3.md#cancel-order-trade"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/order",
+      "host": "sapi",
+      "title": "Query order (USER\\_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-spot-api-v3.md#query-order-user_data"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/openOrder",
+      "host": "sapi",
+      "title": "Query Current Open Order (USER\\_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-spot-api-v3.md#query-current-open-order-user_data"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/openOrders",
+      "host": "sapi",
+      "title": "Current open orders (USER\\_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-spot-api-v3.md#current-open-orders-user_data"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/batchOrders",
+      "host": "sapi",
+      "title": "Cancel All Open Orders (TRADE)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-spot-api-v3.md#cancel-all-open-orders-trade"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/allOrders",
+      "host": "sapi",
+      "title": "Query all orders (USER\\_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-spot-api-v3.md#query-all-orders-user_data"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/asset/wallet/transfer",
+      "host": "sapi",
+      "title": "Perp-spot transfer (TRADE)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-spot-api-v3.md#perp-spot-transfer-trade"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/aster/user-solana-withdraw",
+      "host": "sapi",
+      "title": "Withdraw (USER_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-spot-api-v3.md#withdraw-user_data"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/account",
+      "host": "sapi",
+      "title": "Account information (USER\\_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-spot-api-v3.md#account-information-user_data"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/userTrades",
+      "host": "sapi",
+      "title": "Account trade history (USER\\_DATA)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-spot-api-v3.md#account-trade-history-user_data"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/listenKey",
+      "host": "sapi",
+      "title": "Generate Listen Key (USER\\_STREAM)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-spot-api-v3.md#generate-listen-key-user_stream"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v3/listenKey",
+      "host": "sapi",
+      "title": "Extend Listen Key validity period (USER\\_STREAM)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-spot-api-v3.md#extend-listen-key-validity-period-user_stream"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v3/listenKey",
+      "host": "sapi",
+      "title": "Close Listen Key (USER\\_STREAM)",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-spot-api-v3.md#close-listen-key-user_stream"
+    },
+    {
+      "method": "GET",
+      "path": "/bapi/composite/v1/public/composite/ae/announcement/get",
+      "host": "bapi",
+      "title": "1. Get Announcement",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/bapi/aster-bapi-en.md#1-get-announcement"
+    },
+    {
+      "method": "POST",
+      "path": "/bapi/composite/v1/public/composite/ae/announcement/search",
+      "host": "bapi",
+      "title": "2. Search Announcements",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/bapi/aster-bapi-en.md#2-search-announcements"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/private/campaign/portfolio/summary/pro",
+      "host": "bapi",
+      "title": "3. Pro Summary",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/bapi/aster-bapi-en.md#3-pro-summary"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/private/campaign/portfolio/overview/v2/line/chart",
+      "host": "bapi",
+      "title": "4. Portfolio Line Chart",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/bapi/aster-bapi-en.md#4-portfolio-line-chart"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/private/campaign/portfolio/overview/line/calendar",
+      "host": "bapi",
+      "title": "5. Portfolio Line Calendar",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/bapi/aster-bapi-en.md#5-portfolio-line-calendar"
+    },
+    {
+      "method": "WS",
+      "path": "Aggregate Trade Streams",
+      "channel": "Aggregate Trade Streams",
+      "host": "aster-finance-futures-api-testnet",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-futures-api-testnet.md#L1563"
+    },
+    {
+      "method": "WS",
+      "path": "Mark Price Stream",
+      "channel": "Mark Price Stream",
+      "host": "aster-finance-futures-api-testnet",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-futures-api-testnet.md#L1591"
+    },
+    {
+      "method": "WS",
+      "path": "Mark Price Stream for All market",
+      "channel": "Mark Price Stream for All market",
+      "host": "aster-finance-futures-api-testnet",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-futures-api-testnet.md#L1615"
+    },
+    {
+      "method": "WS",
+      "path": "Kline/Candlestick Streams",
+      "channel": "Kline/Candlestick Streams",
+      "host": "aster-finance-futures-api-testnet",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-futures-api-testnet.md#L1641"
+    },
+    {
+      "method": "WS",
+      "path": "Individual Symbol Mini Ticker Stream",
+      "channel": "Individual Symbol Mini Ticker Stream",
+      "host": "aster-finance-futures-api-testnet",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-futures-api-testnet.md#L1699"
+    },
+    {
+      "method": "WS",
+      "path": "All Market Mini Tickers Stream",
+      "channel": "All Market Mini Tickers Stream",
+      "host": "aster-finance-futures-api-testnet",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-futures-api-testnet.md#L1724"
+    },
+    {
+      "method": "WS",
+      "path": "Individual Symbol Ticker Streams",
+      "channel": "Individual Symbol Ticker Streams",
+      "host": "aster-finance-futures-api-testnet",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-futures-api-testnet.md#L1751"
+    },
+    {
+      "method": "WS",
+      "path": "All Market Tickers Streams",
+      "channel": "All Market Tickers Streams",
+      "host": "aster-finance-futures-api-testnet",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-futures-api-testnet.md#L1785"
+    },
+    {
+      "method": "WS",
+      "path": "Individual Symbol Book Ticker Streams",
+      "channel": "Individual Symbol Book Ticker Streams",
+      "host": "aster-finance-futures-api-testnet",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-futures-api-testnet.md#L1821"
+    },
+    {
+      "method": "WS",
+      "path": "All Book Tickers Stream",
+      "channel": "All Book Tickers Stream",
+      "host": "aster-finance-futures-api-testnet",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-futures-api-testnet.md#L1845"
+    },
+    {
+      "method": "WS",
+      "path": "Liquidation Order Streams",
+      "channel": "Liquidation Order Streams",
+      "host": "aster-finance-futures-api-testnet",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-futures-api-testnet.md#L1861"
+    },
+    {
+      "method": "WS",
+      "path": "All Market Liquidation Order Streams",
+      "channel": "All Market Liquidation Order Streams",
+      "host": "aster-finance-futures-api-testnet",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-futures-api-testnet.md#L1897"
+    },
+    {
+      "method": "WS",
+      "path": "Partial Book Depth Streams",
+      "channel": "Partial Book Depth Streams",
+      "host": "aster-finance-futures-api-testnet",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-futures-api-testnet.md#L1933"
+    },
+    {
+      "method": "WS",
+      "path": "Diff. Book Depth Streams",
+      "channel": "Diff. Book Depth Streams",
+      "host": "aster-finance-futures-api-testnet",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-futures-api-testnet.md#L1999"
+    },
+    {
+      "method": "WS",
+      "path": "Event: User Data Stream Expired",
+      "channel": "Event: User Data Stream Expired",
+      "host": "aster-finance-futures-api-testnet",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-futures-api-testnet.md#L4396"
+    },
+    {
+      "method": "WS",
+      "path": "Event: Margin Call",
+      "channel": "Event: Margin Call",
+      "host": "aster-finance-futures-api-testnet",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-futures-api-testnet.md#L4415"
+    },
+    {
+      "method": "WS",
+      "path": "Event: Balance and Position Update",
+      "channel": "Event: Balance and Position Update",
+      "host": "aster-finance-futures-api-testnet",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-futures-api-testnet.md#L4443"
+    },
+    {
+      "method": "WS",
+      "path": "Event: Order Update",
+      "channel": "Event: Order Update",
+      "host": "aster-finance-futures-api-testnet",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-futures-api-testnet.md#L4535"
+    },
+    {
+      "method": "WS",
+      "path": "Event: Account Configuration Update previous Leverage Update",
+      "channel": "Event: Account Configuration Update previous Leverage Update",
+      "host": "aster-finance-futures-api-testnet",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-futures-api-testnet.md#L4629"
+    },
+    {
+      "method": "WS",
+      "path": "40xx - Filters and other Issues",
+      "channel": "40xx - Filters and other Issues",
+      "host": "aster-finance-futures-api-testnet",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-futures-api-testnet.md#L4946"
+    },
+    {
+      "method": "WS",
+      "path": "Aggregate Trade Streams",
+      "channel": "Aggregate Trade Streams",
+      "host": "aster-finance-futures-api-v3",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#L1838"
+    },
+    {
+      "method": "WS",
+      "path": "Mark Price Stream",
+      "channel": "Mark Price Stream",
+      "host": "aster-finance-futures-api-v3",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#L1866"
+    },
+    {
+      "method": "WS",
+      "path": "Mark Price Stream for All market",
+      "channel": "Mark Price Stream for All market",
+      "host": "aster-finance-futures-api-v3",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#L1890"
+    },
+    {
+      "method": "WS",
+      "path": "Kline/Candlestick Streams",
+      "channel": "Kline/Candlestick Streams",
+      "host": "aster-finance-futures-api-v3",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#L1916"
+    },
+    {
+      "method": "WS",
+      "path": "Individual Symbol Mini Ticker Stream",
+      "channel": "Individual Symbol Mini Ticker Stream",
+      "host": "aster-finance-futures-api-v3",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#L1974"
+    },
+    {
+      "method": "WS",
+      "path": "All Market Mini Tickers Stream",
+      "channel": "All Market Mini Tickers Stream",
+      "host": "aster-finance-futures-api-v3",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#L1999"
+    },
+    {
+      "method": "WS",
+      "path": "Individual Symbol Ticker Streams",
+      "channel": "Individual Symbol Ticker Streams",
+      "host": "aster-finance-futures-api-v3",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#L2026"
+    },
+    {
+      "method": "WS",
+      "path": "All Market Tickers Streams",
+      "channel": "All Market Tickers Streams",
+      "host": "aster-finance-futures-api-v3",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#L2060"
+    },
+    {
+      "method": "WS",
+      "path": "Individual Symbol Book Ticker Streams",
+      "channel": "Individual Symbol Book Ticker Streams",
+      "host": "aster-finance-futures-api-v3",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#L2096"
+    },
+    {
+      "method": "WS",
+      "path": "All Book Tickers Stream",
+      "channel": "All Book Tickers Stream",
+      "host": "aster-finance-futures-api-v3",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#L2120"
+    },
+    {
+      "method": "WS",
+      "path": "Liquidation Order Streams",
+      "channel": "Liquidation Order Streams",
+      "host": "aster-finance-futures-api-v3",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#L2136"
+    },
+    {
+      "method": "WS",
+      "path": "All Market Liquidation Order Streams",
+      "channel": "All Market Liquidation Order Streams",
+      "host": "aster-finance-futures-api-v3",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#L2172"
+    },
+    {
+      "method": "WS",
+      "path": "Partial Book Depth Streams",
+      "channel": "Partial Book Depth Streams",
+      "host": "aster-finance-futures-api-v3",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#L2208"
+    },
+    {
+      "method": "WS",
+      "path": "Diff. Book Depth Streams",
+      "channel": "Diff. Book Depth Streams",
+      "host": "aster-finance-futures-api-v3",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#L2274"
+    },
+    {
+      "method": "WS",
+      "path": "Event: User Data Stream Expired",
+      "channel": "Event: User Data Stream Expired",
+      "host": "aster-finance-futures-api-v3",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#L5837"
+    },
+    {
+      "method": "WS",
+      "path": "Event: Margin Call",
+      "channel": "Event: Margin Call",
+      "host": "aster-finance-futures-api-v3",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#L5856"
+    },
+    {
+      "method": "WS",
+      "path": "Event: Balance and Position Update",
+      "channel": "Event: Balance and Position Update",
+      "host": "aster-finance-futures-api-v3",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#L5884"
+    },
+    {
+      "method": "WS",
+      "path": "Event: Order Update",
+      "channel": "Event: Order Update",
+      "host": "aster-finance-futures-api-v3",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#L5976"
+    },
+    {
+      "method": "WS",
+      "path": "Event: Account Configuration Update previous Leverage Update",
+      "channel": "Event: Account Configuration Update previous Leverage Update",
+      "host": "aster-finance-futures-api-v3",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#L6070"
+    },
+    {
+      "method": "WS",
+      "path": "Event: Public Announcement",
+      "channel": "Event: Public Announcement",
+      "host": "aster-finance-futures-api-v3",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#L6152"
+    },
+    {
+      "method": "WS",
+      "path": "Event: Direct Announcement",
+      "channel": "Event: Direct Announcement",
+      "host": "aster-finance-futures-api-v3",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#L6196"
+    },
+    {
+      "method": "WS",
+      "path": "40xx - Filters and other Issues",
+      "channel": "40xx - Filters and other Issues",
+      "host": "aster-finance-futures-api-v3",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#L6518"
+    },
+    {
+      "method": "WS",
+      "path": "predictionEvents \\- Prediction Events",
+      "channel": "predictionEvents \\- Prediction Events",
+      "host": "aster-finance-prediction-api-tesetnet",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api-tesetnet.md#L455"
+    },
+    {
+      "method": "WS",
+      "path": "Collection transaction flow",
+      "channel": "Collection transaction flow",
+      "host": "aster-finance-prediction-api-tesetnet",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api-tesetnet.md#L2125"
+    },
+    {
+      "method": "WS",
+      "path": "Tick-by-tick trades",
+      "channel": "Tick-by-tick trades",
+      "host": "aster-finance-prediction-api-tesetnet",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api-tesetnet.md#L2151"
+    },
+    {
+      "method": "WS",
+      "path": "K-line streams",
+      "channel": "K-line streams",
+      "host": "aster-finance-prediction-api-tesetnet",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api-tesetnet.md#L2172"
+    },
+    {
+      "method": "WS",
+      "path": "Simplified ticker by symbol",
+      "channel": "Simplified ticker by symbol",
+      "host": "aster-finance-prediction-api-tesetnet",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api-tesetnet.md#L2229"
+    },
+    {
+      "method": "WS",
+      "path": "Compact tickers for all symbols in the entire market",
+      "channel": "Compact tickers for all symbols in the entire market",
+      "host": "aster-finance-prediction-api-tesetnet",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api-tesetnet.md#L2253"
+    },
+    {
+      "method": "WS",
+      "path": "Full ticker per symbol",
+      "channel": "Full ticker per symbol",
+      "host": "aster-finance-prediction-api-tesetnet",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api-tesetnet.md#L2271"
+    },
+    {
+      "method": "WS",
+      "path": "Complete ticker for all trading pairs on the entire market",
+      "channel": "Complete ticker for all trading pairs on the entire market",
+      "host": "aster-finance-prediction-api-tesetnet",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api-tesetnet.md#L2304"
+    },
+    {
+      "method": "WS",
+      "path": "Best order book information by symbol",
+      "channel": "Best order book information by symbol",
+      "host": "aster-finance-prediction-api-tesetnet",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api-tesetnet.md#L2322"
+    },
+    {
+      "method": "WS",
+      "path": "Best order book information across the entire market",
+      "channel": "Best order book information across the entire market",
+      "host": "aster-finance-prediction-api-tesetnet",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api-tesetnet.md#L2343"
+    },
+    {
+      "method": "WS",
+      "path": "Limited depth information",
+      "channel": "Limited depth information",
+      "host": "aster-finance-prediction-api-tesetnet",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api-tesetnet.md#L2359"
+    },
+    {
+      "method": "WS",
+      "path": "Incremental depth information",
+      "channel": "Incremental depth information",
+      "host": "aster-finance-prediction-api-tesetnet",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api-tesetnet.md#L2393"
+    },
+    {
+      "method": "WS",
+      "path": "How to correctly maintain a local copy of an order book",
+      "channel": "How to correctly maintain a local copy of an order book",
+      "host": "aster-finance-prediction-api-tesetnet",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api-tesetnet.md#L2427"
+    },
+    {
+      "method": "WS",
+      "path": "Payload: ACCOUNT\\_UPDATE",
+      "channel": "Payload: ACCOUNT\\_UPDATE",
+      "host": "aster-finance-prediction-api-tesetnet",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api-tesetnet.md#L2508"
+    },
+    {
+      "method": "WS",
+      "path": "predictionEvents \\- Prediction Events",
+      "channel": "predictionEvents \\- Prediction Events",
+      "host": "aster-finance-prediction-api",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api.md#L455"
+    },
+    {
+      "method": "WS",
+      "path": "Collection transaction flow",
+      "channel": "Collection transaction flow",
+      "host": "aster-finance-prediction-api",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api.md#L2125"
+    },
+    {
+      "method": "WS",
+      "path": "Tick-by-tick trades",
+      "channel": "Tick-by-tick trades",
+      "host": "aster-finance-prediction-api",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api.md#L2151"
+    },
+    {
+      "method": "WS",
+      "path": "K-line streams",
+      "channel": "K-line streams",
+      "host": "aster-finance-prediction-api",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api.md#L2172"
+    },
+    {
+      "method": "WS",
+      "path": "Simplified ticker by symbol",
+      "channel": "Simplified ticker by symbol",
+      "host": "aster-finance-prediction-api",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api.md#L2229"
+    },
+    {
+      "method": "WS",
+      "path": "Compact tickers for all symbols in the entire market",
+      "channel": "Compact tickers for all symbols in the entire market",
+      "host": "aster-finance-prediction-api",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api.md#L2253"
+    },
+    {
+      "method": "WS",
+      "path": "Full ticker per symbol",
+      "channel": "Full ticker per symbol",
+      "host": "aster-finance-prediction-api",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api.md#L2271"
+    },
+    {
+      "method": "WS",
+      "path": "Complete ticker for all trading pairs on the entire market",
+      "channel": "Complete ticker for all trading pairs on the entire market",
+      "host": "aster-finance-prediction-api",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api.md#L2304"
+    },
+    {
+      "method": "WS",
+      "path": "Best order book information by symbol",
+      "channel": "Best order book information by symbol",
+      "host": "aster-finance-prediction-api",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api.md#L2322"
+    },
+    {
+      "method": "WS",
+      "path": "Best order book information across the entire market",
+      "channel": "Best order book information across the entire market",
+      "host": "aster-finance-prediction-api",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api.md#L2343"
+    },
+    {
+      "method": "WS",
+      "path": "Limited depth information",
+      "channel": "Limited depth information",
+      "host": "aster-finance-prediction-api",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api.md#L2359"
+    },
+    {
+      "method": "WS",
+      "path": "Incremental depth information",
+      "channel": "Incremental depth information",
+      "host": "aster-finance-prediction-api",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api.md#L2393"
+    },
+    {
+      "method": "WS",
+      "path": "How to correctly maintain a local copy of an order book",
+      "channel": "How to correctly maintain a local copy of an order book",
+      "host": "aster-finance-prediction-api",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api.md#L2427"
+    },
+    {
+      "method": "WS",
+      "path": "Payload: ACCOUNT\\_UPDATE",
+      "channel": "Payload: ACCOUNT\\_UPDATE",
+      "host": "aster-finance-prediction-api",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api.md#L2508"
+    },
+    {
+      "method": "WS",
+      "path": "Collection transaction flow",
+      "channel": "Collection transaction flow",
+      "host": "aster-finance-spot-api-testnet",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-spot-api-testnet.md#L1754"
+    },
+    {
+      "method": "WS",
+      "path": "Tick-by-tick trades",
+      "channel": "Tick-by-tick trades",
+      "host": "aster-finance-spot-api-testnet",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-spot-api-testnet.md#L1780"
+    },
+    {
+      "method": "WS",
+      "path": "K-line streams",
+      "channel": "K-line streams",
+      "host": "aster-finance-spot-api-testnet",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-spot-api-testnet.md#L1801"
+    },
+    {
+      "method": "WS",
+      "path": "Simplified ticker by symbol",
+      "channel": "Simplified ticker by symbol",
+      "host": "aster-finance-spot-api-testnet",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-spot-api-testnet.md#L1858"
+    },
+    {
+      "method": "WS",
+      "path": "Compact tickers for all symbols in the entire market",
+      "channel": "Compact tickers for all symbols in the entire market",
+      "host": "aster-finance-spot-api-testnet",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-spot-api-testnet.md#L1882"
+    },
+    {
+      "method": "WS",
+      "path": "Full ticker per symbol",
+      "channel": "Full ticker per symbol",
+      "host": "aster-finance-spot-api-testnet",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-spot-api-testnet.md#L1900"
+    },
+    {
+      "method": "WS",
+      "path": "Complete ticker for all trading pairs on the entire market",
+      "channel": "Complete ticker for all trading pairs on the entire market",
+      "host": "aster-finance-spot-api-testnet",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-spot-api-testnet.md#L1933"
+    },
+    {
+      "method": "WS",
+      "path": "Best order book information by symbol",
+      "channel": "Best order book information by symbol",
+      "host": "aster-finance-spot-api-testnet",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-spot-api-testnet.md#L1951"
+    },
+    {
+      "method": "WS",
+      "path": "Best order book information across the entire market",
+      "channel": "Best order book information across the entire market",
+      "host": "aster-finance-spot-api-testnet",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-spot-api-testnet.md#L1972"
+    },
+    {
+      "method": "WS",
+      "path": "Limited depth information",
+      "channel": "Limited depth information",
+      "host": "aster-finance-spot-api-testnet",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-spot-api-testnet.md#L1988"
+    },
+    {
+      "method": "WS",
+      "path": "Incremental depth information",
+      "channel": "Incremental depth information",
+      "host": "aster-finance-spot-api-testnet",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-spot-api-testnet.md#L2022"
+    },
+    {
+      "method": "WS",
+      "path": "How to correctly maintain a local copy of an order book",
+      "channel": "How to correctly maintain a local copy of an order book",
+      "host": "aster-finance-spot-api-testnet",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-spot-api-testnet.md#L2056"
+    },
+    {
+      "method": "WS",
+      "path": "Payload: ACCOUNT\\_UPDATE",
+      "channel": "Payload: ACCOUNT\\_UPDATE",
+      "host": "aster-finance-spot-api-testnet",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-spot-api-testnet.md#L2137"
+    },
+    {
+      "method": "WS",
+      "path": "Collection transaction flow",
+      "channel": "Collection transaction flow",
+      "host": "aster-finance-spot-api-v3",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-spot-api-v3.md#L1756"
+    },
+    {
+      "method": "WS",
+      "path": "Tick-by-tick trades",
+      "channel": "Tick-by-tick trades",
+      "host": "aster-finance-spot-api-v3",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-spot-api-v3.md#L1782"
+    },
+    {
+      "method": "WS",
+      "path": "K-line streams",
+      "channel": "K-line streams",
+      "host": "aster-finance-spot-api-v3",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-spot-api-v3.md#L1803"
+    },
+    {
+      "method": "WS",
+      "path": "Simplified ticker by symbol",
+      "channel": "Simplified ticker by symbol",
+      "host": "aster-finance-spot-api-v3",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-spot-api-v3.md#L1860"
+    },
+    {
+      "method": "WS",
+      "path": "Compact tickers for all symbols in the entire market",
+      "channel": "Compact tickers for all symbols in the entire market",
+      "host": "aster-finance-spot-api-v3",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-spot-api-v3.md#L1884"
+    },
+    {
+      "method": "WS",
+      "path": "Full ticker per symbol",
+      "channel": "Full ticker per symbol",
+      "host": "aster-finance-spot-api-v3",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-spot-api-v3.md#L1902"
+    },
+    {
+      "method": "WS",
+      "path": "Complete ticker for all trading pairs on the entire market",
+      "channel": "Complete ticker for all trading pairs on the entire market",
+      "host": "aster-finance-spot-api-v3",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-spot-api-v3.md#L1935"
+    },
+    {
+      "method": "WS",
+      "path": "Best order book information by symbol",
+      "channel": "Best order book information by symbol",
+      "host": "aster-finance-spot-api-v3",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-spot-api-v3.md#L1953"
+    },
+    {
+      "method": "WS",
+      "path": "Best order book information across the entire market",
+      "channel": "Best order book information across the entire market",
+      "host": "aster-finance-spot-api-v3",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-spot-api-v3.md#L1974"
+    },
+    {
+      "method": "WS",
+      "path": "Limited depth information",
+      "channel": "Limited depth information",
+      "host": "aster-finance-spot-api-v3",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-spot-api-v3.md#L1990"
+    },
+    {
+      "method": "WS",
+      "path": "Incremental depth information",
+      "channel": "Incremental depth information",
+      "host": "aster-finance-spot-api-v3",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-spot-api-v3.md#L2024"
+    },
+    {
+      "method": "WS",
+      "path": "How to correctly maintain a local copy of an order book",
+      "channel": "How to correctly maintain a local copy of an order book",
+      "host": "aster-finance-spot-api-v3",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-spot-api-v3.md#L2058"
+    },
+    {
+      "method": "WS",
+      "path": "Payload: ACCOUNT\\_UPDATE",
+      "channel": "Payload: ACCOUNT\\_UPDATE",
+      "host": "aster-finance-spot-api-v3",
+      "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-spot-api-v3.md#L2139"
+    }
+  ]
+}

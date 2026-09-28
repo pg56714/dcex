@@ -246,7 +246,7 @@ fn insert_optional_json(
 
 fn required_non_empty_array(params: &BybitParams, key: &str) -> Result<Value> {
     let value = params.json_required(key)?;
-    if !value.as_array().is_some_and(|items| !items.is_empty()) {
+    if value.as_array().is_none_or(|items| items.is_empty()) {
         return Err(DcexError::InvalidInput(format!(
             "{key} must be a non-empty JSON array"
         )));
@@ -272,16 +272,15 @@ fn is_empty_array(value: &Value) -> bool {
 }
 
 fn validate_link_id(params: &BybitParams, key: &str) -> Result<()> {
-    if let Some(value) = params.get(key) {
-        if !(1..=32).contains(&value.len())
+    if let Some(value) = params.get(key)
+        && (!(1..=32).contains(&value.len())
             || !value
                 .chars()
-                .all(|character| character.is_ascii_alphanumeric())
-        {
-            return Err(DcexError::InvalidInput(format!(
-                "{key} must contain 1 to 32 ASCII letters or numbers"
-            )));
-        }
+                .all(|character| character.is_ascii_alphanumeric()))
+    {
+        return Err(DcexError::InvalidInput(format!(
+            "{key} must contain 1 to 32 ASCII letters or numbers"
+        )));
     }
     Ok(())
 }

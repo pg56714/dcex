@@ -1,0 +1,189 @@
+{
+  "source": "https://github.com/hyperliquid-dex/hyperliquid-python-sdk",
+  "commit": "2fdb18f9517675ea03695a0962bd19eece9c83f0",
+  "private_key": "0x1111111111111111111111111111111111111111111111111111111111111111",
+  "cases": [
+    {
+      "action": {
+        "type": "vaultTransfer",
+        "vaultAddress": "0x2222222222222222222222222222222222222222",
+        "isDeposit": true,
+        "usd": 1234567
+      },
+      "nonce": 1700000000123,
+      "vault_address": null,
+      "expires_after": null,
+      "is_mainnet": true,
+      "msgpack_hex": "84a474797065ad7661756c745472616e73666572ac7661756c7441646472657373d92a307832323232323232323232323232323232323232323232323232323232323232323232323232323232a969734465706f736974c3a3757364ce0012d687",
+      "action_hash": "61af1886f7c3f4a9324a4621e6974752027b33983b5244e453df729f90135d69",
+      "signature": {
+        "r": "0x439ee89859128275057fe98eb35a320faac49933c76d40bd034b5afa4966765e",
+        "s": "0x288922cb5b5a177b0fcc59ffe93476c5c0a1d48898a6f9ce9748a2a709f379a1",
+        "v": 28
+      }
+    },
+    {
+      "action": {
+        "type": "vaultTransfer",
+        "vaultAddress": "0x2222222222222222222222222222222222222222",
+        "isDeposit": true,
+        "usd": 1234567
+      },
+      "nonce": 1700000000123,
+      "vault_address": "0x4444444444444444444444444444444444444444",
+      "expires_after": 1700000060123,
+      "is_mainnet": false,
+      "msgpack_hex": "84a474797065ad7661756c745472616e73666572ac7661756c7441646472657373d92a307832323232323232323232323232323232323232323232323232323232323232323232323232323232a969734465706f736974c3a3757364ce0012d687",
+      "action_hash": "17163d844a73eb99c38ba242f7999a27a04aee9110e0c4ad17c7eabd2902972c",
+      "signature": {
+        "r": "0x36264db43a9ad5faa0483d280b5ffbbd26ca5f3654be960a148a95499fafcbda",
+        "s": "0x56a7dd73840a9452539caf9faac7577746daf257f6e3a93d8d4ea59b0294fa87",
+        "v": 27
+      }
+    },
+    {
+      "action": {
+        "type": "subAccountTransfer",
+        "subAccountUser": "0x3333333333333333333333333333333333333333",
+        "isDeposit": false,
+        "usd": 1000000
+      },
+      "nonce": 1700000000123,
+      "vault_address": null,
+      "expires_after": null,
+      "is_mainnet": true,
+      "msgpack_hex": "84a474797065b27375624163636f756e745472616e73666572ae7375624163636f756e7455736572d92a307833333333333333333333333333333333333333333333333333333333333333333333333333333333a969734465706f736974c2a3757364ce000f4240",
+      "action_hash": "506b6235e567a8b2f7a0987ecb6e13ff51ac861caed88689bc20113ceb9ece91",
+      "signature": {
+        "r": "0xe372443075f98755206a1606b9cf3fa117154e10c100c885d403bb897f2c3ec5",
+        "s": "0x5a124e48619f132c14eb04d415156107c63c654381637b19e842d3d46bbcbeb2",
+        "v": 27
+      }
+    },
+    {
+      "action": {
+        "type": "subAccountTransfer",
+        "subAccountUser": "0x3333333333333333333333333333333333333333",
+        "isDeposit": false,
+        "usd": 1000000
+      },
+      "nonce": 1700000000123,
+      "vault_address": "0x4444444444444444444444444444444444444444",
+      "expires_after": 1700000060123,
+      "is_mainnet": false,
+      "msgpack_hex": "84a474797065b27375624163636f756e745472616e73666572ae7375624163636f756e7455736572d92a307833333333333333333333333333333333333333333333333333333333333333333333333333333333a969734465706f736974c2a3757364ce000f4240",
+      "action_hash": "af6df7f3f4c6e35260ee6f7465857ff8f9cf28b4f92d669b09471a7f53a41814",
+      "signature": {
+        "r": "0x3bf6f353603bb89db3311170f652f9b9873923c9887751eeb97bdca60347c843",
+        "s": "0x6d0776ea2449c848f0795928392618e2b536cbded82938cb3f410c8f97b41fb",
+        "v": 27
+      }
+    },
+    {
+      "action": {
+        "type": "order",
+        "orders": [
+          {
+            "a": 0,
+            "b": true,
+            "p": "100",
+            "s": "1",
+            "r": false,
+            "t": {
+              "limit": {
+                "tif": "Gtc"
+              }
+            }
+          }
+        ],
+        "grouping": "na"
+      },
+      "nonce": 1700000000123,
+      "vault_address": null,
+      "expires_after": null,
+      "is_mainnet": true,
+      "msgpack_hex": "83a474797065a56f72646572a66f72646572739186a16100a162c3a170a3313030a173a131a172c2a17481a56c696d697481a3746966a3477463a867726f7570696e67a26e61",
+      "action_hash": "3b0e08080e9b2c5d548bd7826372db4b35adb8239bd6aa86dfe20adadd2e4749",
+      "signature": {
+        "r": "0xb886e3b23a2dbc64573bcb6dae7599a09765d7613bb492dc0b0db640a2b2c274",
+        "s": "0x1c9745fb1da3194eed4b42ab13eb0b53bab2abd9d95e46b9cdbb31602cfff12e",
+        "v": 28
+      }
+    },
+    {
+      "action": {
+        "type": "order",
+        "orders": [
+          {
+            "a": 0,
+            "b": true,
+            "p": "100",
+            "s": "1",
+            "r": false,
+            "t": {
+              "limit": {
+                "tif": "Gtc"
+              }
+            }
+          }
+        ],
+        "grouping": "na"
+      },
+      "nonce": 1700000000123,
+      "vault_address": "0x4444444444444444444444444444444444444444",
+      "expires_after": 1700000060123,
+      "is_mainnet": false,
+      "msgpack_hex": "83a474797065a56f72646572a66f72646572739186a16100a162c3a170a3313030a173a131a172c2a17481a56c696d697481a3746966a3477463a867726f7570696e67a26e61",
+      "action_hash": "feae3b9043cb1df57a9d4ae6a895a4f3e0396808a1cd82becb2112212963e47d",
+      "signature": {
+        "r": "0xf7d9c9319eab6e2a97c3e1226caeb4f38a928c7548c403f29068b7a51b3b2bc8",
+        "s": "0x66ea198cdd56829ff600507e187cf197d9b98f61c86f30018b284ebd15086743",
+        "v": 28
+      }
+    },
+    {
+      "action": {
+        "type": "cancel",
+        "cancels": [
+          {
+            "a": 0,
+            "o": 42
+          }
+        ]
+      },
+      "nonce": 1700000000123,
+      "vault_address": null,
+      "expires_after": null,
+      "is_mainnet": true,
+      "msgpack_hex": "82a474797065a663616e63656ca763616e63656c739182a16100a16f2a",
+      "action_hash": "2267b27d2d6fd9a895314dc25c2ddb5393c836742f405403ea789d6d042388ce",
+      "signature": {
+        "r": "0xe7d3a8dd26783c5aaf0fe881d233e644e6436527a320d6ff102bc403171a9075",
+        "s": "0x6f351b80daa5e4245c471a2032b56aac6bb56dfd523f5054c40097aad16ab86d",
+        "v": 27
+      }
+    },
+    {
+      "action": {
+        "type": "cancel",
+        "cancels": [
+          {
+            "a": 0,
+            "o": 42
+          }
+        ]
+      },
+      "nonce": 1700000000123,
+      "vault_address": "0x4444444444444444444444444444444444444444",
+      "expires_after": 1700000060123,
+      "is_mainnet": false,
+      "msgpack_hex": "82a474797065a663616e63656ca763616e63656c739182a16100a16f2a",
+      "action_hash": "69c139577507933a68755f90abee7db4ded73cea815b06eebd60e84aa930c39f",
+      "signature": {
+        "r": "0x12ac2fb0deffca2cc75eca89737a598ebe6dabc41c7446f82b7b6c8fdee894a5",
+        "s": "0x54baf27e13b2c8bf95584707006554364b08ad8a011e0eeb34de81adc71a97ae",
+        "v": 28
+      }
+    }
+  ]
+}

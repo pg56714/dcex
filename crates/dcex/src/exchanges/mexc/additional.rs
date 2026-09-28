@@ -273,10 +273,10 @@ impl MexcClient {
         )?;
         validate_u64_range(p, "startTime", 0, u64::MAX)?;
         validate_u64_range(p, "endTime", 0, u64::MAX)?;
-        if let (Some(start), Some(end)) = (p.get("startTime"), p.get("endTime")) {
-            if start.parse::<u64>().unwrap() > end.parse::<u64>().unwrap() {
-                return Err(DcexError::InvalidInput("startTime exceeds endTime".into()));
-            }
+        if let (Some(start), Some(end)) = (p.get("startTime"), p.get("endTime"))
+            && start.parse::<u64>().unwrap() > end.parse::<u64>().unwrap()
+        {
+            return Err(DcexError::InvalidInput("startTime exceeds endTime".into()));
         }
         if name == "get_announcements"
             && p.get("limit")

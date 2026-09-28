@@ -768,7 +768,7 @@ class MarketHTTP(HTTPManager):
         """
         return await self._native_public("get_futures_24h_statistics", self._native_params())
 
-    async def get_uta_oe_scurrency(
+    async def get_uta_oes_currency(
         self, *, custodian: str | None = None, currency: str | None = None
     ) -> dict[str, Any]:
         """
@@ -777,8 +777,10 @@ class MarketHTTP(HTTPManager):
         Use native exchange symbols and decimal strings. Source: https://www.kucoin.com/docs-new/v2/rest/ua/get-oes-settlement-currency
         """
         return await self._native_public(
-            "get_uta_oe_scurrency", self._native_params(custodian=custodian, currency=currency)
+            "get_uta_oes_currency", self._native_params(custodian=custodian, currency=currency)
         )
+
+    get_uta_oe_scurrency = get_uta_oes_currency
 
     async def get_currencies_v3(self) -> dict[str, Any]:
         """List current currency metadata."""

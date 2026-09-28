@@ -1,0 +1,1918 @@
+{
+  "source": "https://github.com/hyperliquid-dex/hyperliquid-python-sdk",
+  "sdk_version": "0.24.0",
+  "private_key": "0x1111111111111111111111111111111111111111111111111111111111111111",
+  "wallet_address": "0x19E7E376E7C213B7E7e7e46cc70A5dD086DAff2A",
+  "cases": [
+    {
+      "name": "top_up_isolated_only_margin",
+      "action": {
+        "type": "topUpIsolatedOnlyMargin",
+        "asset": 0,
+        "leverage": "2"
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0xe4323fd924b5bdcaf2cb12e03bbfa54f56fbe90cf38b39df406f051d25260794",
+        "s": "0x302ee536a7d9a8cb9d3c75043af111543d60e94a727a989ed84945b7359ad0f8",
+        "v": 27
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": false,
+      "caller_signed": false,
+      "msgpack_hex": "83a474797065b7746f70557049736f6c617465644f6e6c794d617267696ea5617373657400a86c65766572616765a132"
+    },
+    {
+      "name": "top_up_isolated_only_margin",
+      "action": {
+        "type": "topUpIsolatedOnlyMargin",
+        "asset": 0,
+        "leverage": "2"
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x53ef36fd52644231d4433cfd874b66c021fe3d25834cc65a02c4bc9cfefa9b0d",
+        "s": "0x6ec50a69be6bfa1753e06de19626247cf9da5b1791dd0867eca2e4bbc6d07310",
+        "v": 27
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": true,
+      "caller_signed": false,
+      "msgpack_hex": "83a474797065b7746f70557049736f6c617465644f6e6c794d617267696ea5617373657400a86c65766572616765a132"
+    },
+    {
+      "name": "user_outcome",
+      "action": {
+        "type": "userOutcome",
+        "splitOutcome": {
+          "outcome": 7,
+          "amount": "1"
+        }
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x31e1554adc0aaf20d71ca5e0b632a8c562fa0c62a6e6ab5d843c7d00ea29681c",
+        "s": "0x3e012b0b70fa8fa51d71a12607206f591c5950171b8fcbf159a0d740eb062f5f",
+        "v": 27
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": false,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065ab757365724f7574636f6d65ac73706c69744f7574636f6d6582a76f7574636f6d6507a6616d6f756e74a131"
+    },
+    {
+      "name": "user_outcome",
+      "action": {
+        "type": "userOutcome",
+        "splitOutcome": {
+          "outcome": 7,
+          "amount": "1"
+        }
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0xa6b1b4f61356b8fccc2aed0788bb2bcbc867ac02aa0f5c398305b2b5ec13fc4d",
+        "s": "0x3c70af42288fe6fd166dd7aa5b21cdf90ad300ac9b5d5005499123f992eecae1",
+        "v": 28
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": true,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065ab757365724f7574636f6d65ac73706c69744f7574636f6d6582a76f7574636f6d6507a6616d6f756e74a131"
+    },
+    {
+      "name": "validator_l1_stream",
+      "action": {
+        "type": "validatorL1Stream",
+        "riskFreeRate": "0.04"
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x98e26d2d8d84332f11b3ca5a7e9b046cd1b31906a396b214af822f62fa744da0",
+        "s": "0x2649dfa394048621dc4f836fa748df89bb6fdb7510b1d0be8cb41d02336e76ab",
+        "v": 28
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": false,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065b176616c696461746f724c3153747265616dac7269736b4672656552617465a4302e3034"
+    },
+    {
+      "name": "validator_l1_stream",
+      "action": {
+        "type": "validatorL1Stream",
+        "riskFreeRate": "0.04"
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x75bac71578bd3e2a36a7d10a2de2e3c513bf5fce636107c55e6908214ad59230",
+        "s": "0x03662f4d73929ce6292e01215f689de1634b6c114e1485affafb9c46b774a4b9",
+        "v": 28
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": true,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065b176616c696461746f724c3153747265616dac7269736b4672656552617465a4302e3034"
+    },
+    {
+      "name": "authorize_aqav2_role",
+      "action": {
+        "type": "authorizeAqav2Role",
+        "token": 0,
+        "role": "technical"
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x3df0b4ebf13f1c5360bfefe89ffe764f6f67e697431de8affdffe5f8ee3cb440",
+        "s": "0x5cb5f3f60b245ecfbcf00e9dcab5c34c541281d2ff212cdede2d29f24c36c213",
+        "v": 27
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": false,
+      "caller_signed": false,
+      "msgpack_hex": "83a474797065b2617574686f72697a654171617632526f6c65a5746f6b656e00a4726f6c65a9746563686e6963616c"
+    },
+    {
+      "name": "authorize_aqav2_role",
+      "action": {
+        "type": "authorizeAqav2Role",
+        "token": 0,
+        "role": "technical"
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x6968d6c161f7cce614b2cd1f591438bfe4f6ad304143b3021b46d02b685da0cd",
+        "s": "0x5d98eaaa81b110adea8e62e3e3a4767e3ad5eab2f3d785570c9598aadec4eb10",
+        "v": 28
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": true,
+      "caller_signed": false,
+      "msgpack_hex": "83a474797065b2617574686f72697a654171617632526f6c65a5746f6b656e00a4726f6c65a9746563686e6963616c"
+    },
+    {
+      "name": "claim_rewards",
+      "action": {
+        "type": "claimRewards"
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x18f71768bb63a2e213f1b29b155ce2f70352656ddd8d01b56598c111a3e9713e",
+        "s": "0x382a19af889aa078f2b6d428e097d88468390de892b1e0d656a09fcd1e0f7f4e",
+        "v": 28
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": false,
+      "caller_signed": false,
+      "msgpack_hex": "81a474797065ac636c61696d52657761726473"
+    },
+    {
+      "name": "claim_rewards",
+      "action": {
+        "type": "claimRewards"
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x7390e84f61df29a49824fde894765aeecffa4f48153a7a8ea33c984fb02d18b7",
+        "s": "0x39ee4fb13179a7e2dc2ac88d8cc2cdd4a24f9bef94f692459b791ba381843e62",
+        "v": 28
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": true,
+      "caller_signed": false,
+      "msgpack_hex": "81a474797065ac636c61696d52657761726473"
+    },
+    {
+      "name": "perp_deploy_register_asset2",
+      "action": {
+        "type": "perpDeploy",
+        "registerAsset2": {
+          "assetRequest": {
+            "coin": "ab:TEST",
+            "szDecimals": 2,
+            "oraclePx": "10",
+            "marginTableId": 1,
+            "marginMode": "normal"
+          },
+          "dex": "ab"
+        }
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x9dc4cb40ca0ed94876984737dc2450d048cc90d37dd32272a46b5a13a614e8e3",
+        "s": "0x671f7ad114fd6f9836d88ea5e269de4ab4c15503dca1103c3e7a0d8c0e58a2bb",
+        "v": 28
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": false,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa706572704465706c6f79ae726567697374657241737365743282ac61737365745265717565737485a4636f696ea761623a54455354aa737a446563696d616c7302a86f7261636c655078a23130ad6d617267696e5461626c65496401aa6d617267696e4d6f6465a66e6f726d616ca3646578a26162"
+    },
+    {
+      "name": "perp_deploy_register_asset2",
+      "action": {
+        "type": "perpDeploy",
+        "registerAsset2": {
+          "assetRequest": {
+            "coin": "ab:TEST",
+            "szDecimals": 2,
+            "oraclePx": "10",
+            "marginTableId": 1,
+            "marginMode": "normal"
+          },
+          "dex": "ab"
+        }
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x1048d300127ffeb3c780d26728ba9078f458b2aaee7244508f799e5f37cc5484",
+        "s": "0x705fe2441e43623809bdd48cda2780e2f779eabab25381eac402600df8fd7e94",
+        "v": 28
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": true,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa706572704465706c6f79ae726567697374657241737365743282ac61737365745265717565737485a4636f696ea761623a54455354aa737a446563696d616c7302a86f7261636c655078a23130ad6d617267696e5461626c65496401aa6d617267696e4d6f6465a66e6f726d616ca3646578a26162"
+    },
+    {
+      "name": "perp_deploy_register_asset",
+      "action": {
+        "type": "perpDeploy",
+        "registerAsset": {
+          "assetRequest": {
+            "coin": "ab:TEST",
+            "szDecimals": 2,
+            "oraclePx": "10",
+            "marginTableId": 1,
+            "onlyIsolated": true
+          },
+          "dex": "ab"
+        }
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x25c150b6585b799082d121765e43338eae83c33bb3cf3c3c334784385c1c7d4d",
+        "s": "0x469470dcd8185ad821684a428b0c7cc4c4331b67e6c868deeee4835e4275ed5b",
+        "v": 28
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": false,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa706572704465706c6f79ad7265676973746572417373657482ac61737365745265717565737485a4636f696ea761623a54455354aa737a446563696d616c7302a86f7261636c655078a23130ad6d617267696e5461626c65496401ac6f6e6c7949736f6c61746564c3a3646578a26162"
+    },
+    {
+      "name": "perp_deploy_register_asset",
+      "action": {
+        "type": "perpDeploy",
+        "registerAsset": {
+          "assetRequest": {
+            "coin": "ab:TEST",
+            "szDecimals": 2,
+            "oraclePx": "10",
+            "marginTableId": 1,
+            "onlyIsolated": true
+          },
+          "dex": "ab"
+        }
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x697caf67631fe7b817592b0c2dc3b49b05914c8533beb70a39e3d17471031c71",
+        "s": "0x6c82e82867d59254ef5f087a758f53cd61ce020b4d9043b0705086f4114f48d7",
+        "v": 27
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": true,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa706572704465706c6f79ad7265676973746572417373657482ac61737365745265717565737485a4636f696ea761623a54455354aa737a446563696d616c7302a86f7261636c655078a23130ad6d617267696e5461626c65496401ac6f6e6c7949736f6c61746564c3a3646578a26162"
+    },
+    {
+      "name": "perp_deploy_set_oracle",
+      "action": {
+        "type": "perpDeploy",
+        "setOracle": {
+          "dex": "ab",
+          "oraclePxs": [
+            [
+              "ab:TEST",
+              "10"
+            ]
+          ],
+          "markPxs": [
+            [
+              [
+                "ab:TEST",
+                "10"
+              ]
+            ]
+          ],
+          "externalPerpPxs": [
+            [
+              "ab:TEST",
+              "10"
+            ]
+          ]
+        }
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x11a552ad8be1bef829f759eb27b4ce28b371a0dcd99e119c7aaa5f7f700a5dc0",
+        "s": "0x1027c20e4bfd5be7ff6effc89be5254a3e7ad182d47ba4c5f313d2b9d8486286",
+        "v": 27
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": false,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa706572704465706c6f79a97365744f7261636c6584a3646578a26162a96f7261636c655078739192a761623a54455354a23130a76d61726b507873919192a761623a54455354a23130af65787465726e616c506572705078739192a761623a54455354a23130"
+    },
+    {
+      "name": "perp_deploy_set_oracle",
+      "action": {
+        "type": "perpDeploy",
+        "setOracle": {
+          "dex": "ab",
+          "oraclePxs": [
+            [
+              "ab:TEST",
+              "10"
+            ]
+          ],
+          "markPxs": [
+            [
+              [
+                "ab:TEST",
+                "10"
+              ]
+            ]
+          ],
+          "externalPerpPxs": [
+            [
+              "ab:TEST",
+              "10"
+            ]
+          ]
+        }
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x046e9bb286b25fb1c27b3ab6740cfa6bba682dede4bac66f1eeddd1be3d0eb9d",
+        "s": "0x2b357cbd3617d859680c6bab3e38c23921ad6e801897326ddde9228853652f80",
+        "v": 28
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": true,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa706572704465706c6f79a97365744f7261636c6584a3646578a26162a96f7261636c655078739192a761623a54455354a23130a76d61726b507873919192a761623a54455354a23130af65787465726e616c506572705078739192a761623a54455354a23130"
+    },
+    {
+      "name": "perp_deploy_set_funding_multipliers",
+      "action": {
+        "type": "perpDeploy",
+        "setFundingMultipliers": [
+          [
+            "ab:TEST",
+            "1"
+          ]
+        ]
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x1bfd66621e67d6676fa3a318ddbe6baa5dad81cf567e0aa8dfa342b2f01e9c6b",
+        "s": "0x129a1b190788c7aead26823634f15421d8c5727fe2a86856b9bc512c5b141fb5",
+        "v": 28
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": false,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa706572704465706c6f79b573657446756e64696e674d756c7469706c696572739192a761623a54455354a131"
+    },
+    {
+      "name": "perp_deploy_set_funding_multipliers",
+      "action": {
+        "type": "perpDeploy",
+        "setFundingMultipliers": [
+          [
+            "ab:TEST",
+            "1"
+          ]
+        ]
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x36003082653b2434828bec4c20ff14161268295bf6aad5271c96f5e2ee868ac2",
+        "s": "0x7a6cbbc0a62a06dccbfab94347e743ce0598eca8a12fd4031ef8c0b81c416fce",
+        "v": 28
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": true,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa706572704465706c6f79b573657446756e64696e674d756c7469706c696572739192a761623a54455354a131"
+    },
+    {
+      "name": "perp_deploy_set_funding_interest_rates",
+      "action": {
+        "type": "perpDeploy",
+        "setFundingInterestRates": [
+          [
+            "ab:TEST",
+            "0.0001"
+          ]
+        ]
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0xe8969dfcd49623235848c5507449a2e069dcd7ed07e812e933ce9895fa950375",
+        "s": "0x2643f315d75ec852d2893c494a82675e20900e6bdcd01334242a6a26b4f55a84",
+        "v": 27
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": false,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa706572704465706c6f79b773657446756e64696e67496e74657265737452617465739192a761623a54455354a6302e30303031"
+    },
+    {
+      "name": "perp_deploy_set_funding_interest_rates",
+      "action": {
+        "type": "perpDeploy",
+        "setFundingInterestRates": [
+          [
+            "ab:TEST",
+            "0.0001"
+          ]
+        ]
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0xa9164b49f99f10beaf6fd6ee3925681158a6d7db5773fafc5c3ae519862c43f2",
+        "s": "0x3b44a5bb19f09195f7ff9a58ca1624c4928fae6a4764fcf5045961efa1746820",
+        "v": 28
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": true,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa706572704465706c6f79b773657446756e64696e67496e74657265737452617465739192a761623a54455354a6302e30303031"
+    },
+    {
+      "name": "perp_deploy_set_funding_clamps",
+      "action": {
+        "type": "perpDeploy",
+        "setFundingClamps": [
+          [
+            "ab:TEST",
+            "0.0003"
+          ]
+        ]
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x0d9c2699aab135b04970a65ba4427d38a0a65ecf7b86ea2e6096700786363f97",
+        "s": "0x20ee5e44b6a3cb1dc72ead0e739487f94f623f47697c8f30c14bb9de87d7d07c",
+        "v": 27
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": false,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa706572704465706c6f79b073657446756e64696e67436c616d70739192a761623a54455354a6302e30303033"
+    },
+    {
+      "name": "perp_deploy_set_funding_clamps",
+      "action": {
+        "type": "perpDeploy",
+        "setFundingClamps": [
+          [
+            "ab:TEST",
+            "0.0003"
+          ]
+        ]
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x4f99770412d980bb6f88da8fca5dd844c82291e2086334a6327bac0b994273dc",
+        "s": "0x5c08178ea9ddccbec2ea034def700e362f8cdfb825a25bbcf4d5da2a51d86210",
+        "v": 28
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": true,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa706572704465706c6f79b073657446756e64696e67436c616d70739192a761623a54455354a6302e30303033"
+    },
+    {
+      "name": "perp_deploy_halt_trading",
+      "action": {
+        "type": "perpDeploy",
+        "haltTrading": {
+          "coin": "ab:TEST",
+          "isHalted": true
+        }
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x29b367a4e7eca05aa537f215a0caa118c3921e5daac09ed954ab8905e66a11a1",
+        "s": "0x267a5bfe9cbb1d31e6f8974572df3342c2f50ad69d9a7bf76744e9e8239e5c94",
+        "v": 28
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": false,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa706572704465706c6f79ab68616c7454726164696e6782a4636f696ea761623a54455354a8697348616c746564c3"
+    },
+    {
+      "name": "perp_deploy_halt_trading",
+      "action": {
+        "type": "perpDeploy",
+        "haltTrading": {
+          "coin": "ab:TEST",
+          "isHalted": true
+        }
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x2f6cb8b9d08c5748c08360f19bc653844b16bdd40e8269e1630de168331a9ed1",
+        "s": "0x282693bc57f5539ad34cf3addc3f764c81029c7da4b5e9ba5a1d5520a4cdcc0b",
+        "v": 27
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": true,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa706572704465706c6f79ab68616c7454726164696e6782a4636f696ea761623a54455354a8697348616c746564c3"
+    },
+    {
+      "name": "perp_deploy_insert_margin_table",
+      "action": {
+        "type": "perpDeploy",
+        "insertMarginTable": {
+          "dex": "ab",
+          "marginTable": {
+            "description": "Test",
+            "marginTiers": [
+              {
+                "lowerBound": 0,
+                "maxLeverage": 10
+              }
+            ]
+          }
+        }
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x2332960f85ecb8960cc228eca0003e4627d49e31c4f888a9561d5fb69ca35c18",
+        "s": "0x607578a98708ef037790f2b9d87f0d1a7b6e6f01094d0840d066e096adc288ef",
+        "v": 27
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": false,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa706572704465706c6f79b1696e736572744d617267696e5461626c6582a3646578a26162ab6d617267696e5461626c6582ab6465736372697074696f6ea454657374ab6d617267696e54696572739182aa6c6f776572426f756e6400ab6d61784c657665726167650a"
+    },
+    {
+      "name": "perp_deploy_insert_margin_table",
+      "action": {
+        "type": "perpDeploy",
+        "insertMarginTable": {
+          "dex": "ab",
+          "marginTable": {
+            "description": "Test",
+            "marginTiers": [
+              {
+                "lowerBound": 0,
+                "maxLeverage": 10
+              }
+            ]
+          }
+        }
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0xe9effc73aa5b1c455c4699ef6fdad717f0eaeec278a00cdcf1bca4b83fd8630b",
+        "s": "0x03f24e096173f7d44744fa85448a85a9db09bb69bcd6acde350967b07ac3039f",
+        "v": 28
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": true,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa706572704465706c6f79b1696e736572744d617267696e5461626c6582a3646578a26162ab6d617267696e5461626c6582ab6465736372697074696f6ea454657374ab6d617267696e54696572739182aa6c6f776572426f756e6400ab6d61784c657665726167650a"
+    },
+    {
+      "name": "perp_deploy_set_margin_table_ids",
+      "action": {
+        "type": "perpDeploy",
+        "setMarginTableIds": [
+          [
+            "ab:TEST",
+            1
+          ]
+        ]
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x42306f31452959202b85a94206e21c414150e6caf5ad866a6d40e66cf8e6aa7b",
+        "s": "0x7034205e429aeca3a8647ffe78b5259be3903422f60ad31f7377a258f2e265c1",
+        "v": 27
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": false,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa706572704465706c6f79b17365744d617267696e5461626c654964739192a761623a5445535401"
+    },
+    {
+      "name": "perp_deploy_set_margin_table_ids",
+      "action": {
+        "type": "perpDeploy",
+        "setMarginTableIds": [
+          [
+            "ab:TEST",
+            1
+          ]
+        ]
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0xe6ccf1ebcf8e64ea10da49c29a6b5122978dbd85f3df18dfe8fd59e962ddc469",
+        "s": "0x258dd5aa9f6c0d24d4f407a7e28173965f6f2c7d7cfc057710e0961a351f74da",
+        "v": 27
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": true,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa706572704465706c6f79b17365744d617267696e5461626c654964739192a761623a5445535401"
+    },
+    {
+      "name": "perp_deploy_set_fee_recipient",
+      "action": {
+        "type": "perpDeploy",
+        "setFeeRecipient": {
+          "dex": "ab",
+          "feeRecipient": "0x2222222222222222222222222222222222222222"
+        }
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x290cd4735bd56f8e81f1e759faee9b441129ef43fbbe48af78e118c19dc37f61",
+        "s": "0x0f46605ac47dc1216f9e24420ae9b2675aacecce06d46a89d0e7a2bbf3640b54",
+        "v": 27
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": false,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa706572704465706c6f79af736574466565526563697069656e7482a3646578a26162ac666565526563697069656e74d92a307832323232323232323232323232323232323232323232323232323232323232323232323232323232"
+    },
+    {
+      "name": "perp_deploy_set_fee_recipient",
+      "action": {
+        "type": "perpDeploy",
+        "setFeeRecipient": {
+          "dex": "ab",
+          "feeRecipient": "0x2222222222222222222222222222222222222222"
+        }
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0xd0fa246db5412867c999491124add8a910bf4658b257c2622f9cb531a3a8e1b0",
+        "s": "0x22d324514e0b31b205786de3e206348616047fbaaef80e21b19804cd1e463dc5",
+        "v": 27
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": true,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa706572704465706c6f79af736574466565526563697069656e7482a3646578a26162ac666565526563697069656e74d92a307832323232323232323232323232323232323232323232323232323232323232323232323232323232"
+    },
+    {
+      "name": "perp_deploy_set_open_interest_caps",
+      "action": {
+        "type": "perpDeploy",
+        "setOpenInterestCaps": [
+          [
+            "ab:TEST",
+            1000000
+          ]
+        ]
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0xc7258b861998458788757a8d6a56600fc2b5cf0c47ac2af881a6710d6422c9e8",
+        "s": "0x16251d60c4c645c996f167fccdc8048ab1028226ed6fcb613f6ca496beff07a6",
+        "v": 27
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": false,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa706572704465706c6f79b37365744f70656e496e746572657374436170739192a761623a54455354ce000f4240"
+    },
+    {
+      "name": "perp_deploy_set_open_interest_caps",
+      "action": {
+        "type": "perpDeploy",
+        "setOpenInterestCaps": [
+          [
+            "ab:TEST",
+            1000000
+          ]
+        ]
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0xd61b012a0fdd9b9b909eb10ed2c75f2f6b414af90f9ead5d74d3f6692154e5b1",
+        "s": "0x586a8748f2faf7109b2c14e9748bd1300f155270b2f1ce37bfd077943178ec8c",
+        "v": 27
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": true,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa706572704465706c6f79b37365744f70656e496e746572657374436170739192a761623a54455354ce000f4240"
+    },
+    {
+      "name": "perp_deploy_set_sub_deployers",
+      "action": {
+        "type": "perpDeploy",
+        "setSubDeployers": {
+          "dex": "ab",
+          "subDeployers": [
+            {
+              "variant": "haltTrading",
+              "user": "0x2222222222222222222222222222222222222222",
+              "allowed": true
+            }
+          ]
+        }
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x71a2c4d52c5ac93744fa6f10b917bd260f5a77f786d6557597afd489c3ce236c",
+        "s": "0x012000020c32e4547b0f5160c6b7782696b21e59ea0a0151ed02da06a1ef78a0",
+        "v": 27
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": false,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa706572704465706c6f79af7365745375624465706c6f7965727382a3646578a26162ac7375624465706c6f796572739183a776617269616e74ab68616c7454726164696e67a475736572d92a307832323232323232323232323232323232323232323232323232323232323232323232323232323232a7616c6c6f776564c3"
+    },
+    {
+      "name": "perp_deploy_set_sub_deployers",
+      "action": {
+        "type": "perpDeploy",
+        "setSubDeployers": {
+          "dex": "ab",
+          "subDeployers": [
+            {
+              "variant": "haltTrading",
+              "user": "0x2222222222222222222222222222222222222222",
+              "allowed": true
+            }
+          ]
+        }
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0xc7d28c4947db5010d428fa06e69df1ceae3bfbab92e13648270537e272f74d4e",
+        "s": "0x6a8434f020b1ffdd74a14e22cfeba3afa430804e267d92b6b32a6d00c9e994a6",
+        "v": 28
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": true,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa706572704465706c6f79af7365745375624465706c6f7965727382a3646578a26162ac7375624465706c6f796572739183a776617269616e74ab68616c7454726164696e67a475736572d92a307832323232323232323232323232323232323232323232323232323232323232323232323232323232a7616c6c6f776564c3"
+    },
+    {
+      "name": "perp_deploy_set_margin_modes",
+      "action": {
+        "type": "perpDeploy",
+        "setMarginModes": [
+          [
+            "ab:TEST",
+            "strictIsolated"
+          ]
+        ]
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x1815cac2d7f77286796fe09491adc744f3269d2fff7853d0ab0e4200dddc9466",
+        "s": "0x068fbecab8c0b344180f7f90871e4b8de4d9dd238d0d7ad740925aa0555ee93d",
+        "v": 27
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": false,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa706572704465706c6f79ae7365744d617267696e4d6f6465739192a761623a54455354ae73747269637449736f6c61746564"
+    },
+    {
+      "name": "perp_deploy_set_margin_modes",
+      "action": {
+        "type": "perpDeploy",
+        "setMarginModes": [
+          [
+            "ab:TEST",
+            "strictIsolated"
+          ]
+        ]
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x3f30883b5b5397d3f1844474767920f26aa8a0077fe5959b8571be624f7b833d",
+        "s": "0x7795ad13998540783c58c4d2fc67d8cfd3805acd3df8345607c467b2bea0782d",
+        "v": 27
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": true,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa706572704465706c6f79ae7365744d617267696e4d6f6465739192a761623a54455354ae73747269637449736f6c61746564"
+    },
+    {
+      "name": "perp_deploy_set_deployer_fees",
+      "action": {
+        "type": "perpDeploy",
+        "setDeployerFees": [
+          [
+            "ab:TEST",
+            {
+              "scale": "1",
+              "growthMode": false
+            }
+          ]
+        ]
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x527332a7a2632ce6aed4ca06bbc842f844b1685066e1c479474d676015d8515a",
+        "s": "0x3c2a61c1258073148c5e9fbc496284afe8a1df91ff24621d5a9a838a84a1474a",
+        "v": 28
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": false,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa706572704465706c6f79af7365744465706c6f796572466565739192a761623a5445535482a57363616c65a131aa67726f7774684d6f6465c2"
+    },
+    {
+      "name": "perp_deploy_set_deployer_fees",
+      "action": {
+        "type": "perpDeploy",
+        "setDeployerFees": [
+          [
+            "ab:TEST",
+            {
+              "scale": "1",
+              "growthMode": false
+            }
+          ]
+        ]
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0xeba92526f9c2f7549e23db35912622df753c308edad750714b7e70424a8de75b",
+        "s": "0x08e38c537b7fbd248afb7c8f6ff29f0a95f7ba87ddc878fa18198fb83f7cb137",
+        "v": 28
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": true,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa706572704465706c6f79af7365744465706c6f796572466565739192a761623a5445535482a57363616c65a131aa67726f7774684d6f6465c2"
+    },
+    {
+      "name": "perp_deploy_set_perp_annotation",
+      "action": {
+        "type": "perpDeploy",
+        "setPerpAnnotation": {
+          "coin": "ab:TEST",
+          "category": "test",
+          "description": "Test coin",
+          "displayName": null,
+          "keywords": [
+            "test"
+          ]
+        }
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x0c0c2c7e0e97e62ecbfd1225254a60f40372c69d0419d61dee8568b294333d7b",
+        "s": "0x78c61432784239a96283719f5ad109cc4a2fb81fb5023af4e33d37340a935a58",
+        "v": 27
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": false,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa706572704465706c6f79b173657450657270416e6e6f746174696f6e85a4636f696ea761623a54455354a863617465676f7279a474657374ab6465736372697074696f6ea95465737420636f696eab646973706c61794e616d65c0a86b6579776f72647391a474657374"
+    },
+    {
+      "name": "perp_deploy_set_perp_annotation",
+      "action": {
+        "type": "perpDeploy",
+        "setPerpAnnotation": {
+          "coin": "ab:TEST",
+          "category": "test",
+          "description": "Test coin",
+          "displayName": null,
+          "keywords": [
+            "test"
+          ]
+        }
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0xc9768b553d5c71543f690123d2f29055f7cc8ff6528e2aa65f716caeee432b83",
+        "s": "0x1e52fa62e426ffea8f266a819e64ccc4a0e0373faccb0b00dcb55a7ac043942c",
+        "v": 28
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": true,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa706572704465706c6f79b173657450657270416e6e6f746174696f6e85a4636f696ea761623a54455354a863617465676f7279a474657374ab6465736372697074696f6ea95465737420636f696eab646973706c61794e616d65c0a86b6579776f72647391a474657374"
+    },
+    {
+      "name": "perp_deploy_disable_dex",
+      "action": {
+        "type": "perpDeploy",
+        "disableDex": "ab"
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x0eb3ebcf7db53d4c4910689586653050f666a6cf4a6a0a1a830c1aa7d2ddb9dc",
+        "s": "0x6e3b46a7d8516d0d2461c30720dd2aa323aee0e60dda5e2edce441e3fdd3ede0",
+        "v": 28
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": false,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa706572704465706c6f79aa64697361626c65446578a26162"
+    },
+    {
+      "name": "perp_deploy_disable_dex",
+      "action": {
+        "type": "perpDeploy",
+        "disableDex": "ab"
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0xb2aa2bc959ab188866f2ee8fb7baa48d31790803db078a88d74f5239f554cfbd",
+        "s": "0x106b4bbc831da8ed9a6c4bc95d6fcb8013caf87723fd48ebecc1a6cec5c77f88",
+        "v": 27
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": true,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa706572704465706c6f79aa64697361626c65446578a26162"
+    },
+    {
+      "name": "perp_deploy_star",
+      "action": {
+        "type": "perpDeploy",
+        "star": {
+          "dex": "ab",
+          "operation": {
+            "setOracle": {
+              "oraclePxs": [
+                [
+                  "ab:TEST",
+                  "10"
+                ]
+              ]
+            }
+          }
+        }
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x795793899aea6e53fd2a6515313f3eeb3415dd1653a9ba77eee2db959232802c",
+        "s": "0x385890860eac58e53700b5e394f89f8ac5a04fc2023115fefe09087768503fea",
+        "v": 28
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": false,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa706572704465706c6f79a47374617282a3646578a26162a96f7065726174696f6e81a97365744f7261636c6581a96f7261636c655078739192a761623a54455354a23130"
+    },
+    {
+      "name": "spot_deploy_register_token2",
+      "action": {
+        "type": "spotDeploy",
+        "registerToken2": {
+          "spec": {
+            "name": "TEST",
+            "szDecimals": 2,
+            "weiDecimals": 8
+          },
+          "maxGas": 0,
+          "fullName": "Test token"
+        }
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0xab4b6d3cc6ecfb44bc6b820138ecb003f64ac9450d59226e203e3be726fb0cf8",
+        "s": "0x7ebf1bc310230a96635c102406cc79ab719d6ba737c38c7df36888f347f00d96",
+        "v": 28
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": false,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa73706f744465706c6f79ae7265676973746572546f6b656e3283a47370656383a46e616d65a454455354aa737a446563696d616c7302ab776569446563696d616c7308a66d617847617300a866756c6c4e616d65aa5465737420746f6b656e"
+    },
+    {
+      "name": "spot_deploy_register_token2",
+      "action": {
+        "type": "spotDeploy",
+        "registerToken2": {
+          "spec": {
+            "name": "TEST",
+            "szDecimals": 2,
+            "weiDecimals": 8
+          },
+          "maxGas": 0,
+          "fullName": "Test token"
+        }
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0xe854bdbdb6d16d23226d0942b133718b08e3bf3bc9cc1d1365f7bb5f187ce022",
+        "s": "0x4e924ff040e65cacf048c99f8c2e2296db9ce83f741042473b0738ddc0cec057",
+        "v": 27
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": true,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa73706f744465706c6f79ae7265676973746572546f6b656e3283a47370656383a46e616d65a454455354aa737a446563696d616c7302ab776569446563696d616c7308a66d617847617300a866756c6c4e616d65aa5465737420746f6b656e"
+    },
+    {
+      "name": "spot_deploy_user_genesis",
+      "action": {
+        "type": "spotDeploy",
+        "userGenesis": {
+          "token": 1,
+          "userAndWei": [
+            [
+              "0x2222222222222222222222222222222222222222",
+              "100000000"
+            ]
+          ],
+          "existingTokenAndWei": [],
+          "blacklistUsers": []
+        }
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x501d397fbd921729f809404c77a2f0a81c07c5d2f0fb6e7d2842ac37dd50ec7b",
+        "s": "0x7338c51f4eb6803658ee17b742f448778bdadd9d8d597139a87664a34917b855",
+        "v": 27
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": false,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa73706f744465706c6f79ab7573657247656e6573697384a5746f6b656e01aa75736572416e645765699192d92a307832323232323232323232323232323232323232323232323232323232323232323232323232323232a9313030303030303030b36578697374696e67546f6b656e416e6457656990ae626c61636b6c697374557365727390"
+    },
+    {
+      "name": "spot_deploy_user_genesis",
+      "action": {
+        "type": "spotDeploy",
+        "userGenesis": {
+          "token": 1,
+          "userAndWei": [
+            [
+              "0x2222222222222222222222222222222222222222",
+              "100000000"
+            ]
+          ],
+          "existingTokenAndWei": [],
+          "blacklistUsers": []
+        }
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0xaa61a9e27bfe65861959fc465235ff881831ff3be4dd925af5876e513e43bc03",
+        "s": "0x41ca8f70786f913b19dc5252b3fba2efaf4b587ec5d6569b5b5fa2b7fb4355d1",
+        "v": 28
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": true,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa73706f744465706c6f79ab7573657247656e6573697384a5746f6b656e01aa75736572416e645765699192d92a307832323232323232323232323232323232323232323232323232323232323232323232323232323232a9313030303030303030b36578697374696e67546f6b656e416e6457656990ae626c61636b6c697374557365727390"
+    },
+    {
+      "name": "spot_deploy_genesis",
+      "action": {
+        "type": "spotDeploy",
+        "genesis": {
+          "token": 1,
+          "maxSupply": "100000000",
+          "noHyperliquidity": true
+        }
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0xedb6a8e99e1d518244f3f5a56e32df21b0bcc996880854d8d52bab393726aa43",
+        "s": "0x584db1bfe15a6558866ecec21c3474d9766da18bda272eb53fd5f3f59b22b731",
+        "v": 27
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": false,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa73706f744465706c6f79a767656e6573697383a5746f6b656e01a96d6178537570706c79a9313030303030303030b06e6f48797065726c6971756964697479c3"
+    },
+    {
+      "name": "spot_deploy_genesis",
+      "action": {
+        "type": "spotDeploy",
+        "genesis": {
+          "token": 1,
+          "maxSupply": "100000000",
+          "noHyperliquidity": true
+        }
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x6168e60ab81dbe79a6704479a25e0d795ea30ebf3b821fcb45505f422b5d26ba",
+        "s": "0x2115eed860a2421d5254bb4bc72fa391628e4c89e49f6edc124a1f5f32dd4955",
+        "v": 27
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": true,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa73706f744465706c6f79a767656e6573697383a5746f6b656e01a96d6178537570706c79a9313030303030303030b06e6f48797065726c6971756964697479c3"
+    },
+    {
+      "name": "spot_deploy_register_spot",
+      "action": {
+        "type": "spotDeploy",
+        "registerSpot": {
+          "tokens": [
+            1,
+            0
+          ]
+        }
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x97daebe76f1ee2830aa29ad2dc67cd31e5d34753be5a639979a4d87720b956b3",
+        "s": "0x68f0cd6a1071540d1e9bc53a514839c53e942e24caf3011f093984509c6a4a6d",
+        "v": 28
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": false,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa73706f744465706c6f79ac726567697374657253706f7481a6746f6b656e73920100"
+    },
+    {
+      "name": "spot_deploy_register_spot",
+      "action": {
+        "type": "spotDeploy",
+        "registerSpot": {
+          "tokens": [
+            1,
+            0
+          ]
+        }
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0xfbe6b7b90c7057c9bd2b31438790e6e929e634f7d77c03fa27d2edfebc71f193",
+        "s": "0x73be1b646fd5599e7d2d3286517831599ac56646593916150d736640f98bf79d",
+        "v": 28
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": true,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa73706f744465706c6f79ac726567697374657253706f7481a6746f6b656e73920100"
+    },
+    {
+      "name": "spot_deploy_register_hyperliquidity",
+      "action": {
+        "type": "spotDeploy",
+        "registerHyperliquidity": {
+          "spot": 1,
+          "startPx": "1",
+          "orderSz": "1",
+          "nOrders": 0,
+          "nSeededLevels": 0
+        }
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x371704ce8fa3bf8ed354b748afce203052ca2fac7df3d76af3206705cfc5b4aa",
+        "s": "0x6339f86473e48e8751138834ce9ab06b4808010c8218b85f17de71e992743f3b",
+        "v": 27
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": false,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa73706f744465706c6f79b6726567697374657248797065726c697175696469747985a473706f7401a773746172745078a131a76f72646572537aa131a76e4f726465727300ad6e5365656465644c6576656c7300"
+    },
+    {
+      "name": "spot_deploy_register_hyperliquidity",
+      "action": {
+        "type": "spotDeploy",
+        "registerHyperliquidity": {
+          "spot": 1,
+          "startPx": "1",
+          "orderSz": "1",
+          "nOrders": 0,
+          "nSeededLevels": 0
+        }
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x424c063d8fc9c072df00a90d402d2659f6e401afc9fdcf8c020893458e3bdca3",
+        "s": "0x6645f0959abd9d9feda18f593017dd8f2991f0a26051ec80546da3705f7d7a88",
+        "v": 28
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": true,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa73706f744465706c6f79b6726567697374657248797065726c697175696469747985a473706f7401a773746172745078a131a76f72646572537aa131a76e4f726465727300ad6e5365656465644c6576656c7300"
+    },
+    {
+      "name": "spot_deploy_set_deployer_trading_fee_share",
+      "action": {
+        "type": "spotDeploy",
+        "setDeployerTradingFeeShare": {
+          "token": 1,
+          "share": "50%"
+        }
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0xfeb959da36b6558ab6c393d6623bdb0b598661fc66502382c52e1683645281b4",
+        "s": "0x39455a29853d526e7d04629bff7787f42527a79e91bce57229c322a2142a3299",
+        "v": 27
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": false,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa73706f744465706c6f79ba7365744465706c6f79657254726164696e67466565536861726582a5746f6b656e01a57368617265a3353025"
+    },
+    {
+      "name": "spot_deploy_set_deployer_trading_fee_share",
+      "action": {
+        "type": "spotDeploy",
+        "setDeployerTradingFeeShare": {
+          "token": 1,
+          "share": "50%"
+        }
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x421e42575544ba18aa84ede99abca1b668e0360d9611fa8d102f9502b17eb381",
+        "s": "0x6bd311dd5016e67cf904a6c42f60a00f1b2f7b882afeeb862ccf35698ac0eb1c",
+        "v": 27
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": true,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa73706f744465706c6f79ba7365744465706c6f79657254726164696e67466565536861726582a5746f6b656e01a57368617265a3353025"
+    },
+    {
+      "name": "spot_deploy_enable_quote_token",
+      "action": {
+        "type": "spotDeploy",
+        "enableQuoteToken": {
+          "token": 1
+        }
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x09fc422d1b5354b8208c79868bab56a3bf6ed6a249514926c13024b82d18fb88",
+        "s": "0x5deffa81a2573f69f07c1d8c6002ff004b10cf7e1ba4227b47d00fa25b8a4cfe",
+        "v": 27
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": false,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa73706f744465706c6f79b0656e61626c6551756f7465546f6b656e81a5746f6b656e01"
+    },
+    {
+      "name": "spot_deploy_enable_quote_token",
+      "action": {
+        "type": "spotDeploy",
+        "enableQuoteToken": {
+          "token": 1
+        }
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x9e0a38dcb51d2a15d7554b92b0d34da599bc302422aa4a7f4b292bae463039e5",
+        "s": "0x059c52679f076cd63d16f02b69691777008bb244cd0ca3988e0b2a73181f7f99",
+        "v": 27
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": true,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa73706f744465706c6f79b0656e61626c6551756f7465546f6b656e81a5746f6b656e01"
+    },
+    {
+      "name": "spot_deploy_enable_aligned_quote_token",
+      "action": {
+        "type": "spotDeploy",
+        "enableAlignedQuoteToken": {
+          "token": 1
+        }
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x007406b9f599d21f36614b469c77f7fd52b08029c979885524844b736a4d3ec9",
+        "s": "0x2f6b6a2b9721a55dd983425e6d3c71a74a1e1e0c70ad6eee0cfea817a161235f",
+        "v": 28
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": false,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa73706f744465706c6f79b7656e61626c65416c69676e656451756f7465546f6b656e81a5746f6b656e01"
+    },
+    {
+      "name": "spot_deploy_enable_aligned_quote_token",
+      "action": {
+        "type": "spotDeploy",
+        "enableAlignedQuoteToken": {
+          "token": 1
+        }
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0xe2cb9b2b1bdb840ad6488567f9b1a8fb61d0ac2b4b71e1aba3a92755113170dd",
+        "s": "0x330c612da67eaf8d7bc24c38b0007c00b769c93319adf27d837f2bc6d72f2a39",
+        "v": 28
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": true,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa73706f744465706c6f79b7656e61626c65416c69676e656451756f7465546f6b656e81a5746f6b656e01"
+    },
+    {
+      "name": "spot_deploy_disable_quote_token",
+      "action": {
+        "type": "spotDeploy",
+        "disableQuoteToken": {
+          "token": 1
+        }
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x9d8c6bc746c71bfd7ac32eb52e5d52f9aa1f5ec213da0c3f452926741d88cac1",
+        "s": "0x7f76e32ab6b0cef42ba5f47b5e6594fd4d078a4a62cd0c7dc40a28e5f78bce35",
+        "v": 28
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": false,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa73706f744465706c6f79b164697361626c6551756f7465546f6b656e81a5746f6b656e01"
+    },
+    {
+      "name": "spot_deploy_disable_quote_token",
+      "action": {
+        "type": "spotDeploy",
+        "disableQuoteToken": {
+          "token": 1
+        }
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x4755e11841d9bf13e4d5bc925828eb5fb3359f4165b196ceaddfe2b63a48b0d6",
+        "s": "0x11d9e1f61efa8c286bbc9e5e6873ac54b175801b3de296de216a81640b1ecf9e",
+        "v": 28
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": true,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa73706f744465706c6f79b164697361626c6551756f7465546f6b656e81a5746f6b656e01"
+    },
+    {
+      "name": "spot_deploy_disable_aligned_quote_token",
+      "action": {
+        "type": "spotDeploy",
+        "disableAlignedQuoteToken": {
+          "token": 1
+        }
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x0f153af1491238def5f8e346db841527704cfd4af5e99315dec6c55322a33741",
+        "s": "0x09f92432a6102f51920b2c39ee67fcaf33928b007b6f9e8fa52680153a9e172a",
+        "v": 27
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": false,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa73706f744465706c6f79b864697361626c65416c69676e656451756f7465546f6b656e81a5746f6b656e01"
+    },
+    {
+      "name": "spot_deploy_disable_aligned_quote_token",
+      "action": {
+        "type": "spotDeploy",
+        "disableAlignedQuoteToken": {
+          "token": 1
+        }
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x093ab6f70975801996af20416b60fc854caa7f6306e5f52b922a5bfc90aca530",
+        "s": "0x13e2c24d4ea9248838f8c34ca62dc8641b86f37fa0c381755ed7f3728004733a",
+        "v": 27
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": true,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa73706f744465706c6f79b864697361626c65416c69676e656451756f7465546f6b656e81a5746f6b656e01"
+    },
+    {
+      "name": "spot_deploy_set_token_annotation",
+      "action": {
+        "type": "spotDeploy",
+        "setTokenAnnotation": {
+          "token": 1,
+          "annotation": {
+            "category": "test",
+            "description": "Test token",
+            "displayName": null,
+            "keywords": [
+              "test"
+            ]
+          }
+        }
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x67d6b76b24f71a13d479873adcd20ce043c34a6c895c9161dcef8484955712b1",
+        "s": "0x660c22fe6150e25149d8f90379adaec2c1672ead83e4697bb9dc050f75201db5",
+        "v": 28
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": false,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa73706f744465706c6f79b2736574546f6b656e416e6e6f746174696f6e82a5746f6b656e01aa616e6e6f746174696f6e84a863617465676f7279a474657374ab6465736372697074696f6eaa5465737420746f6b656eab646973706c61794e616d65c0a86b6579776f72647391a474657374"
+    },
+    {
+      "name": "spot_deploy_set_token_annotation",
+      "action": {
+        "type": "spotDeploy",
+        "setTokenAnnotation": {
+          "token": 1,
+          "annotation": {
+            "category": "test",
+            "description": "Test token",
+            "displayName": null,
+            "keywords": [
+              "test"
+            ]
+          }
+        }
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x6f22d753b91e49cada8aa8ae8715eaf28ca3a284211154dfd77d1c4519f31738",
+        "s": "0x57331e593772b219c0c235f101ed22a7bac06a75a6626719e121acf78cd076b2",
+        "v": 28
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": true,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa73706f744465706c6f79b2736574546f6b656e416e6e6f746174696f6e82a5746f6b656e01aa616e6e6f746174696f6e84a863617465676f7279a474657374ab6465736372697074696f6eaa5465737420746f6b656eab646973706c61794e616d65c0a86b6579776f72647391a474657374"
+    },
+    {
+      "name": "spot_deploy_set_deployer_label",
+      "action": {
+        "type": "spotDeploy",
+        "setDeployerLabel": {
+          "label": "ab"
+        }
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x5afbb71d1f567bdd93cd2b634b96295aff3399342950b44765f5e17398a818ca",
+        "s": "0x26c323d81324030428f7f63aa3136d5559709dfdc0bfed3037ba68e25d2d87c8",
+        "v": 27
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": false,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa73706f744465706c6f79b07365744465706c6f7965724c6162656c81a56c6162656ca26162"
+    },
+    {
+      "name": "spot_deploy_set_deployer_label",
+      "action": {
+        "type": "spotDeploy",
+        "setDeployerLabel": {
+          "label": "ab"
+        }
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x58787b7e4c92d17ff8719011182d90afdafffdddc22b81006622a041aa02ea9d",
+        "s": "0x06c407b8b5633d50401f6e6159fa7dbc5288c5f2e5255ade786713481d5fdd93",
+        "v": 28
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": true,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065aa73706f744465706c6f79b07365744465706c6f7965724c6162656c81a56c6162656ca26162"
+    },
+    {
+      "name": "activate_outcome_deployer",
+      "action": {
+        "type": "activateOutcomeDeployer",
+        "activate": {
+          "venueName": "ab"
+        }
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x75bca54f511c297c54bd9f1caeaab6965527b09575ccfe4ae112e20f9a938510",
+        "s": "0x78392d1c442d950fd26dc0b73ef0df2b7163a46013eb558a7ce6c17beefeed2d",
+        "v": 28
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": false,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065b761637469766174654f7574636f6d654465706c6f796572a8616374697661746581a976656e75654e616d65a26162"
+    },
+    {
+      "name": "outcome_deploy",
+      "action": {
+        "type": "outcomeDeploy",
+        "venue": "ab",
+        "operation": {
+          "registerStandaloneOutcomeFromTemplate": {
+            "id": "abc",
+            "keywordToValue": [
+              [
+                "expiry",
+                "20260801-0600"
+              ],
+              [
+                "target",
+                "100"
+              ],
+              [
+                "underlying",
+                "ABC"
+              ]
+            ],
+            "deployerFeeScale": "1"
+          }
+        }
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x97a321310863cbd09a9fddb7e4de5a8bf06ccb6ff79d294a56cc1daed36e6346",
+        "s": "0x46cea13d0242ef570b16d033c37fbee3a39eea2dc88ad66063e635528a4d917a",
+        "v": 28
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": false,
+      "caller_signed": false,
+      "msgpack_hex": "83a474797065ad6f7574636f6d654465706c6f79a576656e7565a26162a96f7065726174696f6e81d92572656769737465725374616e64616c6f6e654f7574636f6d6546726f6d54656d706c61746583a26964a3616263ae6b6579776f7264546f56616c75659392a6657870697279ad32303236303830312d3036303092a6746172676574a331303092aa756e6465726c79696e67a3414243b06465706c6f7965724665655363616c65a131"
+    },
+    {
+      "name": "set_referrer",
+      "action": {
+        "type": "setReferrer",
+        "code": "TEST"
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x63ccac4000ccfeda57df4aed72ec657916d5174dac3136863eb84259ec25dae7",
+        "s": "0x1c118490bec94b92fe0ea5daed23173db4c673d6f306cb890e61906f188b01a3",
+        "v": 27
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": false,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065ab7365745265666572726572a4636f6465a454455354"
+    },
+    {
+      "name": "set_referrer",
+      "action": {
+        "type": "setReferrer",
+        "code": "TEST"
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x0707b512a4d434d19dd164a30f59577772ad501fb2449c92dffb720439402122",
+        "s": "0x746d6c4c775104df146675b08fe66fa7176556833d8d70e7f2327d64e721c594",
+        "v": 27
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": true,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065ab7365745265666572726572a4636f6465a454455354"
+    },
+    {
+      "name": "convert_to_multi_sig_user_signed",
+      "action": {
+        "type": "convertToMultiSigUser",
+        "signers": "{\"authorizedUsers\": [\"0x2222222222222222222222222222222222222222\"], \"threshold\": 1}",
+        "nonce": 1700000000123,
+        "signatureChainId": "0x66eee",
+        "hyperliquidChain": "Testnet"
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x3fd8a09bf4f0526eea25330c9f15bf6ade39b8d7d252a630db9addb986c8116d",
+        "s": "0x5fed87643862dfdfabc4e2096563d87c17655e35714e387fb127c20b9310b942",
+        "v": 27
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": false,
+      "caller_signed": true,
+      "msgpack_hex": "85a474797065b5636f6e76657274546f4d756c746953696755736572a77369676e657273d9537b22617574686f72697a65645573657273223a205b22307832323232323232323232323232323232323232323232323232323232323232323232323232323232225d2c20227468726573686f6c64223a20317da56e6f6e6365cf0000018bcfe5687bb07369676e6174757265436861696e4964a730783636656565b068797065726c6971756964436861696ea7546573746e6574"
+    },
+    {
+      "name": "convert_to_multi_sig_user_signed",
+      "action": {
+        "type": "convertToMultiSigUser",
+        "signers": "{\"authorizedUsers\": [\"0x2222222222222222222222222222222222222222\"], \"threshold\": 1}",
+        "nonce": 1700000000123,
+        "signatureChainId": "0x66eee",
+        "hyperliquidChain": "Mainnet"
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0xd22979744792fc42b199d87c3b6ad54c8213e8102e7b910eb56572dce81107cf",
+        "s": "0x2c1243ad243fd78191d29fac49809536a04af3e38d29db59ce88362091648063",
+        "v": 27
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": true,
+      "caller_signed": true,
+      "msgpack_hex": "85a474797065b5636f6e76657274546f4d756c746953696755736572a77369676e657273d9537b22617574686f72697a65645573657273223a205b22307832323232323232323232323232323232323232323232323232323232323232323232323232323232225d2c20227468726573686f6c64223a20317da56e6f6e6365cf0000018bcfe5687bb07369676e6174757265436861696e4964a730783636656565b068797065726c6971756964436861696ea74d61696e6e6574"
+    },
+    {
+      "name": "c_signer_action",
+      "action": {
+        "type": "CSignerAction",
+        "unjailSelf": null
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x29df4f463a722e6c38417e1f90aac884f32c06463046037ac707e9ec148d3d4e",
+        "s": "0x147030c9c3e541bd89a03f617ba32a9adf7afb234617f4ee9374166f4d3a160c",
+        "v": 28
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": false,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065ad435369676e6572416374696f6eaa756e6a61696c53656c66c0"
+    },
+    {
+      "name": "c_signer_action",
+      "action": {
+        "type": "CSignerAction",
+        "unjailSelf": null
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x317a517d1e27bf2d95d61f60ba6a16c3da6972deb46999366c2564af8cfe2ab8",
+        "s": "0x2b8fbabc7247e0bd56b4ca40b5b2fd61702ce9da39891216d3c9dcccc73d3a1a",
+        "v": 28
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": true,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065ad435369676e6572416374696f6eaa756e6a61696c53656c66c0"
+    },
+    {
+      "name": "c_validator_action",
+      "action": {
+        "type": "CValidatorAction",
+        "unregister": null
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0xfcf7d82144fb2766608590bf180db33dc4d88058ae2374a415e2a11c74d58e0f",
+        "s": "0x50a32e12515e12177f3f8306863dbe5e6121dfb72bdf2a3bb39ffa9be65e27d2",
+        "v": 28
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": false,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065b04356616c696461746f72416374696f6eaa756e7265676973746572c0"
+    },
+    {
+      "name": "c_validator_action",
+      "action": {
+        "type": "CValidatorAction",
+        "unregister": null
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x82b9baf81beff0104587c6a1a42315fc8f5b0f4098e2449c8f51c839c8617e3d",
+        "s": "0x6f4601c977dea3e93d481cb948e6e5d70bb4a2a5add4197183c7ee3828025763",
+        "v": 28
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": true,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065b04356616c696461746f72416374696f6eaa756e7265676973746572c0"
+    },
+    {
+      "name": "multi_sig_signed",
+      "action": {
+        "type": "multiSig",
+        "signatureChainId": "0x66eee",
+        "signatures": [
+          {
+            "r": "0x1111111111111111111111111111111111111111111111111111111111111111",
+            "s": "0x2222222222222222222222222222222222222222222222222222222222222222",
+            "v": 27
+          }
+        ],
+        "payload": {
+          "multiSigUser": "0x2222222222222222222222222222222222222222",
+          "outerSigner": "0x2222222222222222222222222222222222222222",
+          "action": {
+            "type": "noop"
+          }
+        }
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x2e4d2d58891902815f188419bec78a748b38cabd6e93d35ae811cb05da881b19",
+        "s": "0x6bb3b9fe109c5da86ee01429f48d11acf4c5975f7d82ed75732a4145cce54f90",
+        "v": 27
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": false,
+      "caller_signed": true,
+      "msgpack_hex": "84a474797065a86d756c7469536967b07369676e6174757265436861696e4964a730783636656565aa7369676e6174757265739183a172d942307831313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131a173d942307832323232323232323232323232323232323232323232323232323232323232323232323232323232323232323232323232323232323232323232323232323232a1761ba77061796c6f616483ac6d756c746953696755736572d92a307832323232323232323232323232323232323232323232323232323232323232323232323232323232ab6f757465725369676e6572d92a307832323232323232323232323232323232323232323232323232323232323232323232323232323232a6616374696f6e81a474797065a46e6f6f70"
+    },
+    {
+      "name": "multi_sig_signed",
+      "action": {
+        "type": "multiSig",
+        "signatureChainId": "0x66eee",
+        "signatures": [
+          {
+            "r": "0x1111111111111111111111111111111111111111111111111111111111111111",
+            "s": "0x2222222222222222222222222222222222222222222222222222222222222222",
+            "v": 27
+          }
+        ],
+        "payload": {
+          "multiSigUser": "0x2222222222222222222222222222222222222222",
+          "outerSigner": "0x2222222222222222222222222222222222222222",
+          "action": {
+            "type": "noop"
+          }
+        }
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0xd6e613c37843949671b0a4380875bec490605be02fda4b5611b027033c2bdc3f",
+        "s": "0x4c2a47cdef993f48d5df3c6c4d7ed3ffbe32655d50447d0e7aa72c6eabf2fa8c",
+        "v": 27
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": true,
+      "caller_signed": true,
+      "msgpack_hex": "84a474797065a86d756c7469536967b07369676e6174757265436861696e4964a730783636656565aa7369676e6174757265739183a172d942307831313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131a173d942307832323232323232323232323232323232323232323232323232323232323232323232323232323232323232323232323232323232323232323232323232323232a1761ba77061796c6f616483ac6d756c746953696755736572d92a307832323232323232323232323232323232323232323232323232323232323232323232323232323232ab6f757465725369676e6572d92a307832323232323232323232323232323232323232323232323232323232323232323232323232323232a6616374696f6e81a474797065a46e6f6f70"
+    },
+    {
+      "name": "evm_user_modify",
+      "action": {
+        "type": "evmUserModify",
+        "usingBigBlocks": true
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x3a1f263d9f90e29c87c9dc9cb79e9cfdcf901e052a6ce36e7564a2854dcb95b6",
+        "s": "0x365107e772254d2d3eed5ad094df0334664fe12e213f5e8ba0fa70a19c97a787",
+        "v": 27
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": false,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065ad65766d557365724d6f64696679ae7573696e67426967426c6f636b73c3"
+    },
+    {
+      "name": "evm_user_modify",
+      "action": {
+        "type": "evmUserModify",
+        "usingBigBlocks": true
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0x00b4fe8ca61da2b0d2b571260b7e824136796594b192dca54da00690dca7dda6",
+        "s": "0x7259c0747fd2f9ddaa9b408365d154da66f93e6fa76ba8bb60c4fd4dccdb3308",
+        "v": 28
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": true,
+      "caller_signed": false,
+      "msgpack_hex": "82a474797065ad65766d557365724d6f64696679ae7573696e67426967426c6f636b73c3"
+    },
+    {
+      "name": "gossip_priority_bid",
+      "action": {
+        "type": "gossipPriorityBid",
+        "slotId": 1,
+        "ip": "127.0.0.1",
+        "maxGas": 100
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0xaf38f00afd8de6890da9e3268fbc2dfb643be4abed69ed58d8f5d7629cbae50e",
+        "s": "0x4b54a2d415592643c3a636ec6a8f6c76e695e456405664fcfc8ecbb5afe75f6c",
+        "v": 27
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": false,
+      "caller_signed": false,
+      "msgpack_hex": "84a474797065b1676f737369705072696f72697479426964a6736c6f74496401a26970a93132372e302e302e31a66d617847617364"
+    },
+    {
+      "name": "gossip_priority_bid",
+      "action": {
+        "type": "gossipPriorityBid",
+        "slotId": 1,
+        "ip": "127.0.0.1",
+        "maxGas": 100
+      },
+      "nonce": 1700000000123,
+      "signature": {
+        "r": "0xe460dc060978b2c791c22ce18c08bfa6efefdf47bc7ae54fe616cfd3d5a80d1c",
+        "s": "0x3da34e23c32b7d64c51e46d39687a22b45cd87aecca166a87d1241b0066685ef",
+        "v": 27
+      },
+      "vault_address": "0x2222222222222222222222222222222222222222",
+      "expires_after": 1900000000000,
+      "mainnet": true,
+      "caller_signed": false,
+      "msgpack_hex": "84a474797065b1676f737369705072696f72697479426964a6736c6f74496401a26970a93132372e302e302e31a66d617847617364"
+    }
+  ]
+}

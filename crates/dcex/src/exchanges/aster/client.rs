@@ -39,6 +39,8 @@ pub struct AsterClient {
     spot_base_url: String,
     futures_base_url: String,
     prediction_base_url: String,
+    chain_base_url: String,
+    announcement_base_url: String,
     user_address: Option<String>,
     signer_address: Option<String>,
     private_key: Option<[u8; 32]>,
@@ -92,17 +94,138 @@ impl AsterClient {
         if let Some(user) = &user_address {
             validate_wallet_address("user_address", user)?;
         }
+        let is_testnet = |url: &str| {
+            url::Url::parse(url)
+                .ok()
+                .and_then(|u| u.host_str().map(str::to_owned))
+                .is_some_and(|host| host.ends_with(".asterdex-testnet.com"))
+        };
+        let spot_testnet = is_testnet(&spot_base_url);
+        let futures_testnet = is_testnet(&futures_base_url);
+        if spot_testnet != futures_testnet {
+            return Err(DcexError::InvalidInput(
+                "Aster network mismatch: configure both spot and futures URLs for testnet".into(),
+            ));
+        }
+        let prediction_base_url = if spot_testnet {
+            "https://papi.asterdex-testnet.com"
+        } else {
+            "https://papi.asterdex.com"
+        };
         Ok(Self {
             transport: AsyncHttpClient::new(timeout)?,
             spot_base_url: spot_base_url.trim_end_matches('/').to_string(),
             futures_base_url: futures_base_url.trim_end_matches('/').to_string(),
-            prediction_base_url: "https://papi.asterdex.com".into(),
+            prediction_base_url: prediction_base_url.into(),
+            chain_base_url: "https://chainapi.asterdex.com".into(),
+            announcement_base_url: "https://www.asterdex.com".into(),
             user_address,
             signer_address,
             private_key: private_key.map(|key| parse_private_key(&key)).transpose()?,
             last_nonce: Arc::new(AtomicU64::new(0)),
             product_table: None,
         })
+    }
+
+    pub fn with_auxiliary_base_urls(
+        mut self,
+        chain: String,
+        announcements: String,
+    ) -> Result<Self> {
+        if chain.trim().is_empty() || announcements.trim().is_empty() {
+            return Err(DcexError::InvalidInput(
+                "Aster auxiliary base URLs cannot be empty".into(),
+            ));
+        }
+        self.chain_base_url = chain.trim_end_matches('/').into();
+        self.announcement_base_url = announcements.trim_end_matches('/').into();
+        Ok(self)
+    }
+
+    pub(super) async fn auxiliary_public_request(
+        &self,
+        name: &str,
+        params: &super::params::AsterParams,
+    ) -> Result<Option<ValidatedResponse>> {
+        use serde_json::json;
+        let (base, path, method, fields, body): (&str, &str, HttpMethod, &[&str], Option<Value>) =
+            match name {
+                "get_chain_locked_aster" => (
+                    &self.chain_base_url,
+                    "/aster-chain/v3/staking/getLockedAster",
+                    HttpMethod::Get,
+                    &[],
+                    None,
+                ),
+                "get_chain_withdraw_fee" => {
+                    params.required("chainId")?.parse::<u64>().map_err(|_| {
+                        DcexError::InvalidInput("chainId must be an unsigned integer".into())
+                    })?;
+                    params.required("asset")?;
+                    (
+                        &self.chain_base_url,
+                        "/aster-chain/v3/withdraw/estimateFee",
+                        HttpMethod::Get,
+                        &["chainId", "asset"],
+                        None,
+                    )
+                }
+                "get_announcement" => {
+                    params.required("id")?.parse::<u64>().map_err(|_| {
+                        DcexError::InvalidInput("id must be an unsigned integer".into())
+                    })?;
+                    (
+                        &self.announcement_base_url,
+                        "/bapi/composite/v1/public/composite/ae/announcement/get",
+                        HttpMethod::Get,
+                        &["id"],
+                        None,
+                    )
+                }
+                "search_announcements" => {
+                    let number = |key| -> Result<u64> {
+                        let n = params.required(key)?.parse::<u64>().map_err(|_| {
+                            DcexError::InvalidInput(format!("{key} must be positive"))
+                        })?;
+                        if n == 0 {
+                            return Err(DcexError::InvalidInput(format!("{key} must be positive")));
+                        }
+                        Ok(n)
+                    };
+                    let mut body = json!({"page":number("page")?,"size":number("size")?});
+                    if let Some(category) = params.get("category") {
+                        if !["ACTIVITY", "NEW_LISTING", "DELISTING", "UPDATES"].contains(&category)
+                        {
+                            return Err(DcexError::InvalidInput(
+                                "invalid announcement category".into(),
+                            ));
+                        }
+                        body["category"] = category.into();
+                    }
+                    (
+                        &self.announcement_base_url,
+                        "/bapi/composite/v1/public/composite/ae/announcement/search",
+                        HttpMethod::Post,
+                        &["page", "size", "category"],
+                        Some(body),
+                    )
+                }
+                _ => return Ok(None),
+            };
+        params.ensure_allowed(fields, &[])?;
+        let mut request = HttpRequest::new(method, base, path);
+        if let Some(body) = body {
+            request = request.json(body);
+        } else {
+            request.query = params.only(fields);
+        }
+        let response = self.transport.execute(request).await?;
+        let data = validate_response(&response)?;
+        Ok(Some(ValidatedResponse {
+            status: response.status,
+            headers: response.headers,
+            data,
+        }))
     }
 
     pub fn with_prediction_base_url(mut self, url: String) -> Result<Self> {
@@ -125,6 +248,20 @@ impl AsterClient {
         client.spot_base_url = self.prediction_base_url.clone();
         client
             .request(method, AsterMarket::Spot, path, params, signed)
+            .await
+    }
+
+    pub(super) async fn prediction_noop(&self, nonce: u64) -> Result<ValidatedResponse> {
+        let mut client = self.clone();
+        client.spot_base_url = self.prediction_base_url.clone();
+        client
+            .signed_at_nonce(
+                HttpMethod::Post,
+                AsterMarket::Spot,
+                "/api/v3/noop",
+                vec![],
+                Some(nonce),
+            )
             .await
     }
     pub fn with_product_table(mut self, product_table: ProductTable) -> Self {
@@ -217,6 +354,7 @@ impl AsterClient {
         signed: bool,
         nonce: Option<u64>,
     ) -> Result<HttpRequest> {
+        let path = path.into();
         if !matches!(
             method,
             HttpMethod::Get | HttpMethod::Post | HttpMethod::Put | HttpMethod::Delete
@@ -238,7 +376,21 @@ impl AsterClient {
                 )
             })?;
             let nonce = match nonce {
-                Some(nonce) => nonce,
+                Some(nonce) => {
+                    // Guarded cancellation authenticates with the original order's
+                    // nonce, even when that order has rested for more than a minute.
+                    let original_order_nonce = method == HttpMethod::Delete
+                        && market == AsterMarket::Futures
+                        && matches!(
+                            path.as_str(),
+                            "/fapi/v3/guardedCancelOrder" | "/fapi/v3/guardedBatchOrders"
+                        );
+                    if !original_order_nonce {
+                        validate_nonce_window(nonce)?;
+                    }
+                    self.last_nonce.fetch_max(nonce, Ordering::Relaxed);
+                    nonce
+                }
                 None => self.next_nonce()?,
             };
             params.push(("nonce".to_string(), nonce.to_string()));
@@ -262,7 +414,6 @@ impl AsterClient {
             AsterMarket::Futures => &self.futures_base_url,
             AsterMarket::Spot => &self.spot_base_url,
         };
-        let path = path.into();
         let encoded = encode_params(&params);
         let mut request =
             HttpRequest::new(method, base_url, &path).header("Accept", "application/json");
@@ -301,7 +452,10 @@ impl AsterClient {
     }
 
     /// Transfers within one master/sub-account family using the approved agent.
-    /// This endpoint identifies the signing key with `signer` alone, unlike orders.
+    /// Not verified live: the official V3 parameter table specifies `signer`, but
+    /// its generic signing template also includes `user`. This implementation
+    /// follows the endpoint table pending an authoritative signed example.
+    /// https://github.com/asterdex/api-docs/blob/master/V3(Recommended)/EN/aster-finance-futures-api-v3.md
     pub(super) async fn sub_account_transfer(
         &self,
         params: &super::params::AsterParams,
@@ -331,6 +485,13 @@ impl AsterClient {
             false,
         )
         .await
+    }
+
+    /// Reserve a unique microsecond nonce; pass it to the order and its guarded cancel.
+    pub fn reserve_nonce(&self) -> Result<u64> {
+        let nonce = self.next_nonce()?;
+        validate_nonce_window(nonce)?;
+        Ok(nonce)
     }
 
     fn next_nonce(&self) -> Result<u64> {
@@ -388,7 +549,11 @@ pub(super) fn validate_response(response: &HttpResponse) -> Result<Value> {
     response.ensure_success()?;
     if let Some(object) = data.as_object() {
         let code = object.get("code");
-        if code.is_some_and(|code| !matches!(json_value_string(code).as_str(), "0" | "200")) {
+        if object.get("success") == Some(&Value::Bool(false))
+            || code.is_some_and(|code| {
+                !matches!(json_value_string(code).as_str(), "0" | "000000" | "200")
+            })
+        {
             let message = object
                 .get("msg")
                 .or_else(|| object.get("message"))
@@ -410,4 +575,86 @@ pub(super) fn validate_response(response: &HttpResponse) -> Result<Value> {
         }
     }
     Ok(data)
+}
+
+fn validate_nonce_window(nonce: u64) -> Result<()> {
+    let now = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map_err(|error| DcexError::Runtime(error.to_string()))?
+        .as_micros();
+    if now.abs_diff(u128::from(nonce)) > 60_000_000 {
+        return Err(DcexError::InvalidInput(
+            "Aster nonce must be within 60 seconds of current time (microseconds)".into(),
+        ));
+    }
+    Ok(())
+}
+
+#[cfg(test)]
+mod review_nonce_tests {
+    use super::*;
+
+    fn signed_client() -> AsterClient {
+        AsterClient::with_base_urls(
+            Some(format!("0x{}", "22".repeat(20))),
+            Some(format!("0x{}", "33".repeat(20))),
+            Some(format!("0x{}", "11".repeat(32))),
+            Duration::from_secs(1),
+            "http://127.0.0.1:1".into(),
+            "http://127.0.0.1:1".into(),
+        )
+        .unwrap()
+    }
+
+    #[test]
+    fn explicit_nonce_advances_shared_counter_and_rejects_outside_window() {
+        let client = signed_client();
+        let future = client.reserve_nonce().unwrap() + 30_000_000;
+        client
+            .build_request(
+                HttpMethod::Post,
+                AsterMarket::Futures,
+                "/fapi/v3/noop",
+                vec![],
+                true,
+                Some(future),
+            )
+            .unwrap();
+        assert!(client.reserve_nonce().unwrap() > future);
+        for invalid in [1, future + 120_000_000] {
+            let error = client
+                .build_request(
+                    HttpMethod::Post,
+                    AsterMarket::Futures,
+                    "/fapi/v3/noop",
+                    vec![],
+                    true,
+                    Some(invalid),
+                )
+                .unwrap_err();
+            assert!(error.to_string().contains("within 60 seconds"));
+        }
+    }
+
+    #[test]
+    fn concurrent_reservations_do_not_collide() {
+        let client = signed_client();
+        let values: Vec<_> = std::thread::scope(|scope| {
+            let tasks: Vec<_> = (0..16)
+                .map(|_| {
+                    scope.spawn(|| {
+                        (0..100)
+                            .map(|_| client.reserve_nonce().unwrap())
+                            .collect::<Vec<_>>()
+                    })
+                })
+                .collect();
+            tasks
+                .into_iter()
+                .flat_map(|task| task.join().unwrap())
+                .collect()
+        });
+        let unique: std::collections::HashSet<_> = values.iter().collect();
+        assert_eq!(unique.len(), 1600);
+    }
 }

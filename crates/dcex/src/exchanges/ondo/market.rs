@@ -31,7 +31,7 @@ impl OndoClient {
                 let body = params.body(allowed, required, &[], &[], &[])?;
                 if body.as_object().is_some_and(|o| {
                     o.values()
-                        .any(|v| !v.as_str().is_some_and(|s| !s.trim().is_empty()))
+                        .any(|v| v.as_str().is_none_or(|s| s.trim().is_empty()))
                 }) {
                     return Err(DcexError::InvalidInput(
                         "Ondo login fields must be nonempty strings".into(),

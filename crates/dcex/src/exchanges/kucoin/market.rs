@@ -17,6 +17,12 @@ impl KucoinClient {
         method_name: &str,
         mut params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
+        let method_name = match method_name {
+            "get_uta_oes_currency" => "get_uta_oe_scurrency",
+            "get_otc_loan_accounts" => "get_accounts",
+            other => other,
+        };
+
         if matches!(
             method_name,
             "get_futures_current_funding_rate" | "get_futures_public_funding_history"

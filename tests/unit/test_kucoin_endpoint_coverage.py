@@ -59,10 +59,71 @@ LIMIT = {"size": "1", "price": "100"}
 FUT_LIMIT = {"size": "1", "price": "100", "leverage": 3}
 
 CASES: tuple[Case, ...] = (
+    Case(
+        "create_withdrawal",
+        {
+            "currency": "USDT",
+            "amount": "1.000000000000000001",
+            "to_address": "offline-address",
+            "withdraw_type": "ADDRESS",
+            "chain": "trx",
+            "memo": "",
+            "is_inner": False,
+            "fee_deduct_type": "EXTERNAL",
+        },
+        "POST /api/v3/withdrawals",
+        body={
+            "currency": "USDT",
+            "amount": "1.000000000000000001",
+            "toAddress": "offline-address",
+            "withdrawType": "ADDRESS",
+            "chain": "trx",
+            "memo": "",
+            "isInner": False,
+            "feeDeductType": "EXTERNAL",
+        },
+    ),
+    Case(
+        "create_uta_withdrawal",
+        {
+            "currency": "USDT",
+            "amount": "3",
+            "to_address": "123456",
+            "withdraw_type": "UID",
+            "is_inner": True,
+            "remark": "offline",
+        },
+        "POST /api/ua/v2/asset/withdrawal",
+        body={
+            "currency": "USDT",
+            "amount": "3",
+            "toAddress": "123456",
+            "withdrawType": "UID",
+            "isInner": True,
+            "remark": "offline",
+        },
+    ),
+    Case(
+        "cancel_withdrawal",
+        {"withdrawal_id": "test-withdrawal"},
+        "DELETE /api/v1/withdrawals/test-withdrawal",
+    ),
+    Case(
+        "cancel_uta_withdrawal",
+        {"withdraw_id": "test-withdrawal"},
+        "POST /api/ua/v2/asset/withdraw/cancel",
+        body={"withdrawId": "test-withdrawal"},
+    ),
+    Case(
+        "cancel_margin_stop_order_by_id_raw",
+        {"orderId": "test-order", "callerFlag": "keep"},
+        "DELETE /api/v3/hf/margin/stop-order/cancel-by-id",
+        query={"orderId": "test-order", "callerFlag": "keep"},
+    ),
     Case("get_currencies_v3", {}, "GET /api/v3/currencies", body={}, signed=False),
     Case(
         "set_uta_account_mode",
-        {"account_type": "UNIFIED"},
+        {"account_type": "UNIFIED", "confirm": True},
         "POST /api/ua/v2/account/mode",
         body={"accountType": "UNIFIED"},
         signed=True,
@@ -2835,9 +2896,21 @@ def _wrapper_names(mode: str) -> set[str]:
     return names
 
 
+from dataclasses import replace
+
+ALIASES = {"get_uta_oe_scurrency": "get_uta_oes_currency", "get_accounts": "get_otc_loan_accounts"}
+CASES = tuple(CASES) + tuple(
+    replace(case, method_name=ALIASES[case.method_name])
+    for case in CASES
+    if case.method_name in ALIASES
+)
+
+
 @pytest.mark.parametrize("mode", ["sync", "async"])
 def test_every_kucoin_wrapper_has_a_route_case(mode: str) -> None:
-    covered = {case.method_name for case in CASES}
+    from tests.unit.test_kucoin_inventory_completion import NAMES
+
+    covered = {case.method_name for case in CASES} | NAMES
     missing = _wrapper_names(mode) - covered
     assert not missing, f"add route cases for: {sorted(missing)}"
 

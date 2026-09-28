@@ -1,7 +1,11 @@
 mod account;
 mod client;
+mod completion;
+mod completion_wrappers;
 mod earn;
 mod endpoints;
+mod inventory_completion;
+mod inventory_wrappers;
 mod loan;
 mod market;
 mod params;

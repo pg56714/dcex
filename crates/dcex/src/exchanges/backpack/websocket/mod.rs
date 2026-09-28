@@ -36,10 +36,10 @@ pub(crate) fn subscription_payload(
         "method": method,
         "params": streams,
     });
-    if method == "SUBSCRIBE" {
-        if let Some(signature) = signature {
-            payload["signature"] = json!(signature);
-        }
+    if method == "SUBSCRIBE"
+        && let Some(signature) = signature
+    {
+        payload["signature"] = json!(signature);
     }
     Ok(payload)
 }

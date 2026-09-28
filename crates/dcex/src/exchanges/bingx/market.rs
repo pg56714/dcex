@@ -39,10 +39,18 @@ impl BingxClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         let params = BingxParams::from_pairs(params);
+        if let Some(response) = self.inventory_request(method_name, &params, true).await? {
+            return Ok(response);
+        }
         if let Some(response) = self.additional_request(method_name, &params, true).await? {
             return Ok(response);
         }
         match method_name {
+            "get_spot_server_time" => {
+                params.ensure_allowed(&[])?;
+                self.market_get("/openApi/spot/v1/server/time", vec![])
+                    .await
+            }
             "get_swap_instrument_info" => {
                 params.ensure_allowed(&["product_symbol", "symbol"])?;
                 let mut query = Vec::new();
@@ -183,16 +191,14 @@ impl BingxClient {
         let mut query = Vec::new();
         self.push_required_symbol(&mut query, params)?;
         if path == SWAP_ORDERBOOK {
-            if let Some(limit) = params.get("limit") {
-                if !matches!(limit, "5" | "10" | "20" | "50" | "100" | "500" | "1000") {
-                    return Err(DcexError::InvalidInput(format!(
-                        "unsupported BingX swap orderbook limit: {limit}"
-                    )));
-                }
+            if let Some(limit) = params.get("limit")
+                && !matches!(limit, "5" | "10" | "20" | "50" | "100" | "500" | "1000")
+            {
+                return Err(DcexError::InvalidInput(format!(
+                    "unsupported BingX swap orderbook limit: {limit}"
+                )));
             }
-        } else if path == SPOT_ORDERBOOK {
-            validate_u64_range(params, "limit", 1, 1000)?;
-        } else if path == SWAP_PUBLIC_TRADE {
+        } else if matches!(path, SPOT_ORDERBOOK | SWAP_PUBLIC_TRADE) {
             validate_u64_range(params, "limit", 1, 1000)?;
         }
         if let Some(type_) = type_ {

@@ -20,10 +20,10 @@ fn ensure_native_symbol(params: &PublicParams) -> Result<()> {
 }
 
 fn positive(params: &PublicParams, key: &str) -> Result<()> {
-    if let Some(value) = params.get(key) {
-        if !value.parse::<f64>().is_ok_and(|v| v.is_finite() && v > 0.0) {
-            return Err(DcexError::InvalidInput(format!("{key} must be positive")));
-        }
+    if let Some(value) = params.get(key)
+        && !value.parse::<f64>().is_ok_and(|v| v.is_finite() && v > 0.0)
+    {
+        return Err(DcexError::InvalidInput(format!("{key} must be positive")));
     }
     Ok(())
 }

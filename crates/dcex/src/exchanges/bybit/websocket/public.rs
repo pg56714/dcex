@@ -149,10 +149,10 @@ impl BybitPublicWebSocket {
         if self.category == "spread" {
             return normalize_spread_symbol(product_symbol);
         }
-        if let Some(table) = &self.product_table {
-            if is_canonical_product_symbol(product_symbol) {
-                return table.get_exchange_symbol("bybit", product_symbol);
-            }
+        if let Some(table) = &self.product_table
+            && is_canonical_product_symbol(product_symbol)
+        {
+            return table.get_exchange_symbol("bybit", product_symbol);
         }
         let symbol = exchange_symbol_fallback(product_symbol);
         if self.category == "option" {

@@ -119,10 +119,9 @@ impl BitgetPublicWebSocket {
         timeout: Duration,
     ) -> Result<Self> {
         let url = url.into();
-        let uta_v3 = url
-            .split('?')
-            .next()
-            .is_some_and(|path| path.ends_with("/v3/ws/public"));
+        let uta_v3 = url.split('?').next().is_some_and(|path| {
+            path.ends_with("/v3/ws/public") || path.ends_with("/v3/ws/public/sbe")
+        });
         Ok(Self {
             connection: WebSocketConnection::new(WebSocketConfig::new(url, timeout)?),
             default_inst_type: normalize_inst_type(&default_inst_type.into())?,
@@ -255,12 +254,11 @@ impl BitgetPublicWebSocket {
     }
 
     fn inst_type_for(&self, product_symbol: &str) -> Result<String> {
-        if let Some(table) = &self.product_table {
-            if is_canonical_product_symbol(product_symbol) {
-                let exchange_type =
-                    table.get_exchange_type("bitget", Some(product_symbol), None)?;
-                return normalize_inst_type(&exchange_type);
-            }
+        if let Some(table) = &self.product_table
+            && is_canonical_product_symbol(product_symbol)
+        {
+            let exchange_type = table.get_exchange_type("bitget", Some(product_symbol), None)?;
+            return normalize_inst_type(&exchange_type);
         }
         if product_symbol.ends_with("-SPOT") {
             return Ok("SPOT".to_string());
@@ -348,7 +346,7 @@ fn uta_orderbook_topic(depth: u32) -> Result<&'static str> {
 fn normalize_inst_type(inst_type: &str) -> Result<String> {
     let inst_type = inst_type.trim().to_ascii_uppercase();
     match inst_type.as_str() {
-        "SPOT" | "USDT-FUTURES" | "COIN-FUTURES" | "USDC-FUTURES" => Ok(inst_type),
+        "MARGIN" | "SPOT" | "USDT-FUTURES" | "COIN-FUTURES" | "USDC-FUTURES" => Ok(inst_type),
         "MIX" | "SWAP" | "FUTURES" => Ok("USDT-FUTURES".to_string()),
         _ => Err(DcexError::InvalidInput(format!(
             "unsupported Bitget WebSocket instrument type: {inst_type}"
@@ -359,9 +357,8 @@ fn normalize_inst_type(inst_type: &str) -> Result<String> {
 fn normalize_channel(channel: &str) -> Result<String> {
     let channel = channel.trim();
     match channel {
-        "ticker" | "trade" | "books" | "books1" | "books5" | "books15" | "auction" => {
-            Ok(channel.to_string())
-        }
+        "ticker" | "trade" | "books" | "books1" | "books5" | "books15" | "auction"
+        | "index-price" => Ok(channel.to_string()),
         _ if channel
             .strip_prefix("candle")
             .is_some_and(|interval| normalize_interval(interval).is_ok()) =>
@@ -376,6 +373,9 @@ fn normalize_channel(channel: &str) -> Result<String> {
 
 fn normalize_inst_id(inst_id: &str) -> Result<String> {
     let inst_id = inst_id.trim();
+    if inst_id == "default" {
+        return Ok(inst_id.into());
+    }
     if inst_id.is_empty() {
         return Err(DcexError::InvalidInput(
             "Bitget instrument ID must not be empty.".to_string(),

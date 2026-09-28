@@ -3,6 +3,7 @@
 import json
 from typing import Any
 
+from ..._operation_guards import require_confirmation, require_scope
 from ._http_manager import HTTPManager
 
 
@@ -1200,12 +1201,21 @@ class TradeHTTP(HTTPManager):
         product_symbol: str | None = None,
         trade_type: str | None = None,
         order_ids: str | None = None,
+        all_symbols: bool = False,
     ) -> dict[str, Any]:
-        """DELETE /api/v1/stop-order/cancel; classic trading account."""
+        """
+        DELETE /api/v1/stop-order/cancel; classic trading account.
+
+        Provide order IDs or a product symbol; use all_symbols=True for all symbols.
+        """
+        require_scope(product_symbol, all_symbols, order_ids=order_ids)
         return await self._native_private(
             "cancel_spot_stop_orders",
             self._native_params(
-                product_symbol=product_symbol, tradeType=trade_type, orderIds=order_ids
+                all_symbols=all_symbols,
+                product_symbol=product_symbol,
+                tradeType=trade_type,
+                orderIds=order_ids,
             ),
         )
 
@@ -1288,12 +1298,23 @@ class TradeHTTP(HTTPManager):
         )
 
     async def cancel_spot_oco_orders(
-        self, *, order_ids: str | None = None, product_symbol: str | None = None
+        self,
+        *,
+        order_ids: str | None = None,
+        product_symbol: str | None = None,
+        all_symbols: bool = False,
     ) -> dict[str, Any]:
-        """DELETE /api/v3/oco/orders; classic trading account."""
+        """
+        DELETE /api/v3/oco/orders; classic trading account.
+
+        Provide order IDs or a product symbol; use all_symbols=True for all symbols.
+        """
+        require_scope(product_symbol, all_symbols, order_ids=order_ids)
         return await self._native_private(
             "cancel_spot_oco_orders",
-            self._native_params(orderIds=order_ids, product_symbol=product_symbol),
+            self._native_params(
+                all_symbols=all_symbols, orderIds=order_ids, product_symbol=product_symbol
+            ),
         )
 
     async def get_spot_oco_order(self, order_id: str) -> dict[str, Any]:
@@ -1678,12 +1699,21 @@ class TradeHTTP(HTTPManager):
         order_ids: str | None = None,
         product_symbol: str | None = None,
         trade_type: str | None = None,
+        all_symbols: bool = False,
     ) -> dict[str, Any]:
-        """DELETE /api/v3/hf/margin/oco-order/cancel; classic trading account."""
+        """
+        DELETE /api/v3/hf/margin/oco-order/cancel; classic trading account.
+
+        Provide order IDs or a product symbol; use all_symbols=True for all symbols.
+        """
+        require_scope(product_symbol, all_symbols, order_ids=order_ids)
         return await self._native_private(
             "cancel_margin_oco_orders",
             self._native_params(
-                orderIds=order_ids, product_symbol=product_symbol, tradeType=trade_type
+                all_symbols=all_symbols,
+                orderIds=order_ids,
+                product_symbol=product_symbol,
+                tradeType=trade_type,
             ),
         )
 
@@ -1784,11 +1814,17 @@ class TradeHTTP(HTTPManager):
         )
 
     async def cancel_futures_stop_orders(
-        self, *, product_symbol: str | None = None
+        self, *, product_symbol: str | None = None, all_symbols: bool = False
     ) -> dict[str, Any]:
-        """DELETE /api/v1/stopOrders; classic trading account."""
+        """
+        DELETE /api/v1/stopOrders; classic trading account.
+
+        Provide a product symbol or all_symbols=True to cancel these orders across all symbols.
+        """
+        require_scope(product_symbol, all_symbols)
         return await self._native_private(
-            "cancel_futures_stop_orders", self._native_params(product_symbol=product_symbol)
+            "cancel_futures_stop_orders",
+            self._native_params(all_symbols=all_symbols, product_symbol=product_symbol),
         )
 
     async def get_futures_recent_closed_orders(
@@ -1985,7 +2021,7 @@ class TradeHTTP(HTTPManager):
         order_ids: list[str] | None = None,
         client_orders: list[dict[str, str]] | None = None,
     ) -> dict[str, Any]:
-        """Cancel up to 10 orders; order_ids takes precedence when both lists are given."""
+        """Cancel up to 10 orders; provide exactly one of order_ids or client_orders."""
         return await self._native_private(
             "cancel_futures_batch_orders",
             self._native_params(
@@ -3024,13 +3060,15 @@ class TradeHTTP(HTTPManager):
         """
         return await self._native_private("get_loan_info", self._native_params())
 
-    async def get_accounts(self) -> dict[str, Any]:
+    async def get_otc_loan_accounts(self) -> dict[str, Any]:
         """
         GET /api/v1/otc-loan/accounts.
 
         Use native exchange symbols and decimal strings. Source: https://www.kucoin.com/docs-new/rest/vip-lending/get-accounts
         """
-        return await self._native_private("get_accounts", self._native_params())
+        return await self._native_private("get_otc_loan_accounts", self._native_params())
+
+    get_accounts = get_otc_loan_accounts
 
     async def get_discount_rate_configs(self) -> dict[str, Any]:
         """
@@ -3133,8 +3171,116 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
-    async def set_uta_account_mode(self, *, account_type: str) -> dict[str, Any]:
-        """Set the account mode; exchange migration eligibility applies."""
+    async def set_uta_account_mode(
+        self, *, account_type: str, confirm: bool = False
+    ) -> dict[str, Any]:
+        """
+        Set the account mode; exchange migration eligibility applies.
+
+        Requires confirm=True. This changes the account margin mode.
+        """
+        require_confirmation(confirm)
         return await self._native_private(
-            "set_uta_account_mode", self._native_params(accountType=account_type)
+            "set_uta_account_mode", self._native_params(confirm=confirm, accountType=account_type)
+        )
+
+    async def cancel_margin_stop_order_by_id_raw(self, **params: object) -> Any:  # noqa: ANN401
+        """
+        Cancel a margin stop order with caller-supplied query parameters.
+
+        Official spec incomplete; not verified live. The endpoint documentation omits
+        the request parameter table, so wire parameter names are supplied by the caller.
+        """
+        return await self._native_private(
+            "cancel_margin_stop_order_by_id_raw", self._native_params(**params)
+        )
+
+    async def create_withdrawal(
+        self,
+        *,
+        currency: str,
+        amount: str,
+        to_address: str,
+        withdraw_type: str,
+        chain: str | None = None,
+        memo: str | None = None,
+        remark: str | None = None,
+        is_inner: bool | None = None,
+        fee_deduct_type: str | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """
+        Submit an address, UID, email or phone withdrawal.
+
+        API withdrawals have no second confirmation; they execute on submit.
+        Caller supplies chain and memo/tag required by the destination.
+        Source: https://www.kucoin.com/docs-new/rest/account-info/withdrawals/withdraw-v3
+        """
+        return await self._native_private(
+            "create_withdrawal",
+            self._native_params(
+                currency=currency,
+                amount=amount,
+                toAddress=to_address,
+                withdrawType=withdraw_type,
+                chain=chain,
+                memo=memo,
+                remark=remark,
+                isInner=is_inner,
+                feeDeductType=fee_deduct_type,
+            ),
+        )
+
+    async def create_uta_withdrawal(
+        self,
+        *,
+        currency: str,
+        amount: str,
+        to_address: str,
+        withdraw_type: str,
+        chain: str | None = None,
+        memo: str | None = None,
+        remark: str | None = None,
+        is_inner: bool | None = None,
+        fee_deduct_type: str | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """
+        Submit an address, UID, email or phone withdrawal.
+
+        API withdrawals have no second confirmation; they execute on submit.
+        Caller supplies chain and memo/tag required by the destination.
+        Source: https://www.kucoin.com/docs-new/v2/rest/ua/withdrawal
+        """
+        return await self._native_private(
+            "create_uta_withdrawal",
+            self._native_params(
+                currency=currency,
+                amount=amount,
+                toAddress=to_address,
+                withdrawType=withdraw_type,
+                chain=chain,
+                memo=memo,
+                remark=remark,
+                isInner=is_inner,
+                feeDeductType=fee_deduct_type,
+            ),
+        )
+
+    async def cancel_withdrawal(self, withdrawal_id: str) -> dict[str, Any] | list[Any]:
+        """
+        Cancel a withdrawal while the exchange still permits cancellation.
+
+        Source: https://www.kucoin.com/docs-new/rest/account-info/withdrawals/cancel-withdrawal
+        """
+        return await self._native_private(
+            "cancel_withdrawal", self._native_params(withdrawalId=withdrawal_id)
+        )
+
+    async def cancel_uta_withdrawal(self, withdraw_id: str) -> dict[str, Any] | list[Any]:
+        """
+        Cancel a withdrawal while the exchange still permits cancellation.
+
+        Source: https://www.kucoin.com/docs-new/v2/rest/ua/cancel-withdrawal
+        """
+        return await self._native_private(
+            "cancel_uta_withdrawal", self._native_params(withdrawId=withdraw_id)
         )

@@ -194,21 +194,20 @@ fn validate(name: &str, params: &KucoinParams) -> Result<()> {
     ) {
         params.required_any(&["orderId", "clientOrderId"])?;
     }
-    if let Some(id) = params.get("clientOrderId") {
-        if id.len() > 40
+    if let Some(id) = params.get("clientOrderId")
+        && (id.len() > 40
             || !id
                 .bytes()
-                .all(|b| b.is_ascii_alphanumeric() || matches!(b, b'_' | b'-'))
-        {
-            return Err(invalid(
-                "clientOrderId must contain at most 40 letters, digits, underscores or hyphens",
-            ));
-        }
+                .all(|b| b.is_ascii_alphanumeric() || matches!(b, b'_' | b'-')))
+    {
+        return Err(invalid(
+            "clientOrderId must contain at most 40 letters, digits, underscores or hyphens",
+        ));
     }
-    if let (Some(from), Some(to)) = (params.get("fromCurrency"), params.get("toCurrency")) {
-        if from == to {
-            return Err(invalid("conversion currencies must differ"));
-        }
+    if let (Some(from), Some(to)) = (params.get("fromCurrency"), params.get("toCurrency"))
+        && from == to
+    {
+        return Err(invalid("conversion currencies must differ"));
     }
     if name == "set_uta_rate_limit" {
         let value = params.json_required("list")?;
@@ -228,10 +227,10 @@ fn validate(name: &str, params: &KucoinParams) -> Result<()> {
                 .filter(|s| !s.is_empty())
                 .ok_or_else(|| invalid("uid must be a nonempty string"))?;
             if !seen.insert(uid)
-                || !item
+                || item
                     .get("rate")
                     .and_then(Value::as_u64)
-                    .is_some_and(|n| n > 0)
+                    .is_none_or(|n| n == 0)
             {
                 return Err(invalid(
                     "rate must be a positive integer and uid must be unique",
@@ -267,26 +266,25 @@ fn validate(name: &str, params: &KucoinParams) -> Result<()> {
         }
     }
     if name.contains("sub_account_api") {
-        if let Some(pass) = params.get("passphrase") {
-            if !(7..=32).contains(&pass.chars().count()) || pass.chars().any(char::is_whitespace) {
-                return Err(invalid(
-                    "passphrase requires 7..32 characters without spaces",
-                ));
-            }
+        if let Some(pass) = params.get("passphrase")
+            && (!(7..=32).contains(&pass.chars().count()) || pass.chars().any(char::is_whitespace))
+        {
+            return Err(invalid(
+                "passphrase requires 7..32 characters without spaces",
+            ));
         }
         if params.get("remark").is_some_and(|s| s.chars().count() > 24) {
             return Err(invalid("remark must not exceed 24 characters"));
         }
-        if let Some(ips) = params.get("ipWhitelist") {
-            if ips.split(',').count() > 20
+        if let Some(ips) = params.get("ipWhitelist")
+            && (ips.split(',').count() > 20
                 || ips
                     .split(',')
-                    .any(|ip| ip.parse::<std::net::IpAddr>().is_err())
-            {
-                return Err(invalid(
-                    "ipWhitelist requires at most 20 valid IP addresses",
-                ));
-            }
+                    .any(|ip| ip.parse::<std::net::IpAddr>().is_err()))
+        {
+            return Err(invalid(
+                "ipWhitelist requires at most 20 valid IP addresses",
+            ));
         }
     }
     for (start_key, end_key) in [("startAt", "endAt"), ("startTime", "endTime")] {
@@ -304,10 +302,10 @@ fn validate(name: &str, params: &KucoinParams) -> Result<()> {
                     .map_err(|_| invalid("end time must be a nonnegative integer"))
             })
             .transpose()?;
-        if let (Some(start), Some(end)) = (start, end) {
-            if start > end {
-                return Err(invalid("start time must not exceed end time"));
-            }
+        if let (Some(start), Some(end)) = (start, end)
+            && start > end
+        {
+            return Err(invalid("start time must not exceed end time"));
         }
     }
     if name == "get_uta_account_ledgers" {

@@ -24,10 +24,10 @@ fn transaction(tx_type: u64, tx_info: &str, account: u64) -> Result<Value> {
             return Err(invalid(&format!("{key} must be an unsigned integer")));
         }
     }
-    if !object
+    if object
         .get("Sig")
         .and_then(Value::as_str)
-        .is_some_and(|s| !s.is_empty())
+        .is_none_or(|s| s.is_empty())
     {
         return Err(invalid("signed transaction Sig is required"));
     }

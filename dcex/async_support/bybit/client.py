@@ -5,6 +5,7 @@ from typing import Any
 
 from ._account_http import AccountHTTP
 from ._asset_http import AssetHTTP
+from ._completion_http import CompletionHTTP
 from ._earn_http import EarnHTTP
 from ._market_http import MarketHTTP
 from ._position_http import PositionHTTP
@@ -14,6 +15,7 @@ from ._trade_http import TradeHTTP
 
 
 class Client(
+    CompletionHTTP,
     TradeHTTP,
     AccountHTTP,
     EarnHTTP,

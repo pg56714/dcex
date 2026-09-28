@@ -9,7 +9,11 @@ impl BybitClient {
         method_name: &str,
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
+        let params = super::super::operation_guards::validate("bybit", method_name, params)?;
         let params = BybitParams::from_pairs(params);
+        if let Some(result) = self.completion_request(method_name, &params, false).await? {
+            return Ok(result);
+        }
         if let Some(result) = self.risk_request(method_name, &params, false).await? {
             return Ok(result);
         }

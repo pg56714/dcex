@@ -191,10 +191,10 @@ fn canonical_market_pair(
     display_key: &str,
     exchange_symbol: &str,
 ) -> Result<(String, String)> {
-    if let Some(display_symbol) = non_empty_string(market, display_key) {
-        if let Ok(pair) = split_last(&display_symbol, '-') {
-            return Ok(pair);
-        }
+    if let Some(display_symbol) = non_empty_string(market, display_key)
+        && let Ok(pair) = split_last(&display_symbol, '-')
+    {
+        return Ok(pair);
     }
     split_last(exchange_symbol, '-')
 }
@@ -224,12 +224,11 @@ fn bybit_product_symbol(
         format!("{base}-{quote}-{expiry}-SWAP")
     } else {
         let pair = format!("{base}{quote}");
-        if category == "inverse" {
-            if let Some(expiry) = symbol.strip_prefix(&pair) {
-                if !expiry.is_empty() {
-                    return format!("{base}-{quote}-{expiry}-SWAP");
-                }
-            }
+        if category == "inverse"
+            && let Some(expiry) = symbol.strip_prefix(&pair)
+            && !expiry.is_empty()
+        {
+            return format!("{base}-{quote}-{expiry}-SWAP");
         }
         format!("{base}-{quote}-SWAP")
     }

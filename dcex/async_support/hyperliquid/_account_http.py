@@ -122,3 +122,17 @@ class AccountHTTP(HTTPManager):
         return await self._native_public(
             "get_borrow_lend_user_state", self._native_params(user=user)
         )
+
+    async def get_max_builder_fee(self, user: str, builder: str) -> Any:
+        """Query the official /info maxBuilderFee request type."""
+        return await self._native_public(
+            "get_max_builder_fee", self._native_params(user=user, builder=builder)
+        )
+
+    async def get_approved_builders(self, user: str) -> Any:
+        """Query the official /info approvedBuilders request type."""
+        return await self._native_public("get_approved_builders", self._native_params(user=user))
+
+    async def get_referral_state(self, user: str) -> Any:
+        """Query the official /info referral request type."""
+        return await self._native_public("get_referral_state", self._native_params(user=user))

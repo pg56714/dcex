@@ -22,6 +22,10 @@ from urllib.parse import unquote
 
 import pytest
 
+from tests.unit.wire_expectations import EXPECTED_VERBS as _ALL_VERBS
+
+EXPECTED_VERBS = _ALL_VERBS["ondo"]
+
 from dcex.async_support.ondo.client import Client as AsyncClient
 from dcex.ondo.client import Client
 from dcex.utils.errors import FailedRequestError
@@ -54,6 +58,38 @@ def case(method: str, target: str, body: dict[str, Any] | None = None, **kwargs:
 
 
 CASES = [
+    case(
+        "create_withdrawal",
+        "/v1/withdraw",
+        {
+            "customer_withdrawal_id": "offline-1",
+            "symbol": "USDC",
+            "network": "solana",
+            "amount": "1.000000000000000001",
+            "address": "offline-address",
+            "from": DESTINATION,
+        },
+        customer_withdrawal_id="offline-1",
+        symbol="USDC",
+        network="solana",
+        amount="1.000000000000000001",
+        address="offline-address",
+        from_account=DESTINATION,
+    ),
+    case(
+        "sandbox_withdrawal",
+        "/v1/sandbox_withdrawal",
+        {
+            "customer_withdrawal_id": "offline-2",
+            "symbol": "USDC",
+            "amount": "500.00",
+            "from": DESTINATION,
+        },
+        customer_withdrawal_id="offline-2",
+        symbol="USDC",
+        amount="500.00",
+        from_account=DESTINATION,
+    ),
     case(
         "get_login_challenge",
         "/v1/auth/erc-4361/login/get_challenge",
@@ -297,7 +333,7 @@ CASES = [
         name="bot",
         scopes=["trade", "transfer"],
     ),
-    case("delete_api_key", "/v1/api_keys/k1", apiKeyID="k1"),
+    case("delete_api_key", "/v1/api_keys/k1", apiKeyID="k1", confirm=True),
     case(
         "set_api_key_ip_whitelist",
         "/v1/api_keys/k1/ip_whitelist",
@@ -336,7 +372,10 @@ def _drain(received: queue.Queue[dict[str, Any]]) -> list[dict[str, Any]]:
 def _assert_request(wire: WireCase, requests: list[dict[str, Any]]) -> None:
     assert len(requests) == 1, requests
     request = requests[0]
+    assert request["method"] == EXPECTED_VERBS[wire.method]
     assert unquote(request["path"]) == wire.target
+    if wire.method in {"create_withdrawal", "sandbox_withdrawal"}:
+        assert request["method"] == "POST"
     if wire.body is None:
         assert request["body"] == ""
     else:

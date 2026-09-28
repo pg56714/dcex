@@ -10,7 +10,32 @@ impl KucoinClient {
         method_name: &str,
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
+        if method_name == "cancel_margin_stop_order_by_id_raw" {
+            // Official docs omit all request parameters. Preserve the caller's query.
+            return self
+                .request(
+                    crate::http::HttpMethod::Delete,
+                    super::client::KucoinMarket::Spot,
+                    "/api/v3/hf/margin/stop-order/cancel-by-id",
+                    params,
+                    None,
+                    true,
+                )
+                .await;
+        }
+        let method_name = match method_name {
+            "get_uta_oes_currency" => "get_uta_oe_scurrency",
+            "get_otc_loan_accounts" => "get_accounts",
+            other => other,
+        };
+        let params = super::super::operation_guards::validate("kucoin", method_name, params)?;
         let params = KucoinParams::from_pairs(params);
+        if let Some(response) = self.inventory_request(method_name, &params).await? {
+            return Ok(response);
+        }
+        if let Some(response) = self.withdrawal_request(method_name, &params).await? {
+            return Ok(response);
+        }
         if let Some(response) = self.risk_request(method_name, &params, false).await? {
             return Ok(response);
         }

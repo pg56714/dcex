@@ -13,6 +13,12 @@ impl HyperliquidClient {
         params: &HyperliquidParams,
     ) -> Result<Option<ValidatedResponse>> {
         let payload = match method_name {
+            "get_max_builder_fee" => {
+                params.ensure_allowed(&["user", "builder"])?;
+                json!({"type":"maxBuilderFee", "user":params.address("user")?, "builder":params.address("builder")?})
+            }
+            "get_approved_builders" => user_payload(params, "approvedBuilders")?,
+            "get_referral_state" => user_payload(params, "referral")?,
             "get_spot_fee_rates" | "get_futures_fee_rates" => {
                 params.ensure_allowed(&["user"])?;
                 json!({"type": "userFees", "user": params.address("user")?})
@@ -128,10 +134,8 @@ fn time_range_payload(
     if let Some(end) = end {
         payload["endTime"] = json!(end);
     }
-    if allow_aggregate {
-        if let Some(aggregate) = params.optional_bool("aggregateByTime")? {
-            payload["aggregateByTime"] = json!(aggregate);
-        }
+    if allow_aggregate && let Some(aggregate) = params.optional_bool("aggregateByTime")? {
+        payload["aggregateByTime"] = json!(aggregate);
     }
     Ok(payload)
 }
@@ -178,17 +182,17 @@ fn order_id_value(value: &str) -> Result<Value> {
 }
 
 fn insert_optional_string(payload: &mut Value, key: &str, value: Option<&str>) {
-    if let Some(value) = value {
-        if let Some(object) = payload.as_object_mut() {
-            object.insert(key.to_string(), Value::String(value.to_string()));
-        }
+    if let Some(value) = value
+        && let Some(object) = payload.as_object_mut()
+    {
+        object.insert(key.to_string(), Value::String(value.to_string()));
     }
 }
 
 fn insert_optional_bool(payload: &mut Value, key: &str, value: Option<bool>) {
-    if let Some(value) = value {
-        if let Some(object) = payload.as_object_mut() {
-            object.insert(key.to_string(), Value::Bool(value));
-        }
+    if let Some(value) = value
+        && let Some(object) = payload.as_object_mut()
+    {
+        object.insert(key.to_string(), Value::Bool(value));
     }
 }

@@ -97,6 +97,22 @@ def _action(
 
 
 WRAPPER_CASES = [
+    _action(
+        "borrow_lend_signed",
+        ({"type": "borrowLend", "operation": "supply", "token": 0, "amount": "1"},),
+        [
+            ("action", '{"type":"borrowLend","operation":"supply","token":0,"amount":"1"}'),
+            ("nonce", "100"),
+            ("signature", json.dumps(SIGNATURE, separators=(",", ":"))),
+            ("vaultAddress", USER),
+            ("expiresAfter", "1900000000000"),
+        ],
+        "borrowLend",
+        nonce=100,
+        signature=SIGNATURE,
+        vault_address=USER,
+        expires_after=1900000000000,
+    ),
     _info("get_all_mids", (), [("dex", "")], "allMids"),
     _info(
         "get_active_asset_data",
@@ -694,6 +710,89 @@ WRAPPER_CASES = [
     ),
 ]
 
+
+COMPLETION_ACTIONS = {
+    "send_asset_signed": {
+        "type": "sendAsset",
+        "destination": "0x" + "aB" * 20,
+        "sourceDex": "",
+        "destinationDex": "spot",
+        "token": "USDC",
+        "amount": "0.000000000000000123",
+        "fromSubAccount": "",
+        "nonce": 100,
+    },
+    "send_usd_signed": {
+        "type": "usdSend",
+        "destination": "0x" + "aB" * 20,
+        "amount": "1.2300",
+        "time": 100,
+    },
+    "send_spot_signed": {
+        "type": "spotSend",
+        "destination": USER,
+        "token": "PURR:0xc4bf3f870c0e9465323c0b6ed28096c2",
+        "amount": "2.0000",
+        "time": 100,
+    },
+    "withdraw_from_bridge_signed": {
+        "type": "withdraw3",
+        "destination": USER,
+        "amount": "10.0000",
+        "time": 100,
+    },
+    "approve_builder_fee_signed": {
+        "type": "approveBuilderFee",
+        "builder": USER,
+        "maxFeeRate": "0.001%",
+        "nonce": 100,
+    },
+    "send_to_evm_with_data_signed": {
+        "type": "sendToEvmWithData",
+        "token": "USDC",
+        "amount": "1",
+        "sourceDex": "",
+        "destinationRecipient": "0x" + "12" * 32,
+        "addressEncoding": "hex",
+        "destinationChainId": 999,
+        "gasLimit": 200000,
+        "data": "0x1234",
+        "nonce": 100,
+    },
+}
+COMPLETION_INFO = {
+    "get_max_builder_fee": {"type": "maxBuilderFee", "user": USER, "builder": WALLET},
+    "get_approved_builders": {"type": "approvedBuilders", "user": USER},
+    "get_referral_state": {"type": "referral", "user": USER},
+}
+for _name, _payload in COMPLETION_INFO.items():
+    _fields = {k: v for k, v in _payload.items() if k != "type"}
+    WRAPPER_CASES.append(_info(_name, (), list(_fields.items()), _payload["type"], **_fields))
+for _name, _action_body in COMPLETION_ACTIONS.items():
+    _action_body.update(hyperliquidChain="Mainnet", signatureChainId="0xa4b1")
+    if _name == "send_to_evm_with_data_signed":
+        _fields = {"action": _action_body}
+    else:
+        _fields = {
+            k: v
+            for k, v in _action_body.items()
+            if k not in {"type", "time", "nonce", "hyperliquidChain", "signatureChainId"}
+        }
+    _fields.update(nonce=100, signature=SIGNATURE, signatureChainId="0xa4b1")
+    _aliases = {
+        "sourceDex": "source_dex",
+        "destinationDex": "destination_dex",
+        "fromSubAccount": "from_sub_account",
+        "maxFeeRate": "max_fee_rate",
+        "signatureChainId": "signature_chain_id",
+    }
+    _kwargs = {_aliases.get(k, k): v for k, v in _fields.items()}
+    _params = [
+        (k, json.dumps(v, separators=(",", ":")) if isinstance(v, dict) else str(v))
+        for k, v in _fields.items()
+    ]
+    WRAPPER_CASES.append(_action(_name, (), _params, _action_body["type"], **_kwargs))
+
 NON_ENDPOINT_METHODS = {"async_init", "close"}
 
 
@@ -707,7 +806,9 @@ def _public_methods(cls: type) -> set[str]:
 
 def test_every_hyperliquid_wrapper_has_a_coverage_case() -> None:
     """New sync or async wrappers must be added to this offline coverage table."""
-    covered = {case.method for case in WRAPPER_CASES}
+    from tests.unit.test_hyperliquid_inventory_completion import NAMES
+
+    covered = {case.method for case in WRAPPER_CASES} | NAMES
     assert _public_methods(Client) == covered
     assert _public_methods(AsyncClient) == covered
 
@@ -769,12 +870,101 @@ def test_wrapper_params_reach_official_wire_type(case: WrapperCase) -> None:
     assert requests
     last = requests[-1]
     payload = json.loads(last["body"])
+    assert last["method"] == "POST"
+    if case.method == "borrow_lend_signed":
+        assert payload == {
+            "action": {"type": "borrowLend", "operation": "supply", "token": 0, "amount": "1"},
+            "nonce": 100, "signature": SIGNATURE,
+            "vaultAddress": USER, "expiresAfter": 1900000000000,
+        }
     if case.kind == "public":
         assert last["path"] == "/info"
         assert payload["type"] == case.wire_type
+        if case.method in COMPLETION_INFO:
+            assert payload == COMPLETION_INFO[case.method]
         return
     assert last["path"] == "/exchange"
     assert payload["action"]["type"] == case.wire_type
+    if case.method in COMPLETION_ACTIONS:
+        assert payload == {
+            "action": COMPLETION_ACTIONS[case.method],
+            "nonce": 100,
+            "signature": SIGNATURE,
+        }
+    expected_actions = {
+        "approveAgent": {
+            "type": "approveAgent",
+            "hyperliquidChain": "Mainnet",
+            "signatureChainId": "0xa4b1",
+            "nonce": 100,
+            "agentAddress": USER,
+        },
+        "createSubAccount": {"type": "createSubAccount", "name": "desk"},
+        "subAccountTransfer": {
+            "type": "subAccountTransfer",
+            "subAccountUser": USER,
+            "isDeposit": True,
+            "usd": 100,
+        },
+        "subAccountSpotTransfer": {
+            "type": "subAccountSpotTransfer",
+            "subAccountUser": USER,
+            "isDeposit": True,
+            "token": "USDC",
+            "amount": "1",
+        },
+        "vaultTransfer": {
+            "type": "vaultTransfer",
+            "vaultAddress": USER,
+            "isDeposit": True,
+            "usd": 100,
+        },
+        "agentEnableDexAbstraction": {"type": "agentEnableDexAbstraction"},
+        "hip3LiquidatorTransfer": {
+            "type": "hip3LiquidatorTransfer",
+            "dex": "xyz",
+            "ntl": 100,
+            "isDeposit": True,
+        },
+        "cDeposit": {
+            "type": "cDeposit",
+            "hyperliquidChain": "Mainnet",
+            "signatureChainId": "0xa4b1",
+            "nonce": 100,
+            "wei": 100,
+        },
+        "cWithdraw": {
+            "type": "cWithdraw",
+            "hyperliquidChain": "Mainnet",
+            "signatureChainId": "0xa4b1",
+            "nonce": 100,
+            "wei": 100,
+        },
+        "tokenDelegate": {
+            "type": "tokenDelegate",
+            "hyperliquidChain": "Mainnet",
+            "signatureChainId": "0xa4b1",
+            "nonce": 100,
+            "wei": 100,
+            "validator": USER,
+            "isUndelegate": True,
+        },
+        "userDexAbstraction": {
+            "type": "userDexAbstraction",
+            "hyperliquidChain": "Mainnet",
+            "signatureChainId": "0xa4b1",
+            "nonce": 100,
+            "user": USER,
+            "enabled": True,
+        },
+        "agentSetAbstraction": {"type": "agentSetAbstraction", "abstraction": "u"},
+        "reserveRequestWeight": {"type": "reserveRequestWeight", "weight": 100},
+        "borrowLend": {"type": "borrowLend", "operation": "supply", "token": 0, "amount": "1"},
+    }
+    if case.wire_type in expected_actions:
+        assert payload["action"] == expected_actions[case.wire_type]
+        assert list(payload["action"]) == list(expected_actions[case.wire_type])
+
     if case.wire_type in {"usdClassTransfer", "userSetAbstraction"}:
         assert payload["signature"] == SIGNATURE
         assert payload["action"]["nonce"] == payload["nonce"] == 1700000000000

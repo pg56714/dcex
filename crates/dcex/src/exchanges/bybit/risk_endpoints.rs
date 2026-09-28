@@ -1133,7 +1133,7 @@ pub(super) fn endpoint(name: &str) -> Option<RiskEndpoint> {
             path: "/v5/crypto-loan-common/max-loan",
             post: true,
             public: false,
-            keys: &["currency"],
+            keys: &["currency", "collateralList"],
             required: &["currency"],
             integers: &[],
         },

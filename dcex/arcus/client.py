@@ -696,3 +696,271 @@ class Client(BaseHTTPManager):
                 if v is not None
             },
         )
+
+    def create_withdrawal_signed(
+        self,
+        *,
+        ethereum_address: str,
+        amount: str,
+        nonce: str,
+        signature: dict[str, str],
+        account_index: int | None = None,
+        spot_asset_id: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /v1/withdraw.
+
+        API withdrawals have no second confirmation; they execute on submit. Amount is an integer
+        quantum string. Supply a wallet EIP-712 signature; no API key headers are sent.
+        Source: https://docs.arcus.xyz/api-reference/exchange/submit-withdrawal
+        """
+        return self.private_request(
+            "create_withdrawal_signed",
+            **{
+                "ethereumAddress": ethereum_address,
+                "accountIndex": account_index,
+                "spotAssetId": spot_asset_id,
+                "amount": amount,
+                "nonce": nonce,
+                "signature": json.dumps(signature, separators=(",", ":"), allow_nan=False),
+            },
+        )
+
+    def create_withdrawal(
+        self, *, ethereum_address: str, amount: str, nonce: str, account_index: int | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /v1/withdraw.
+
+        API withdrawals have no second confirmation; they execute on submit. Amount is an integer
+        quantum string. USDG only; the API key must carry operator-provisioned withdraw permission.
+        Source: https://docs.arcus.xyz/api-reference/exchange/submit-withdrawal
+        """
+        return self.private_request(
+            "create_withdrawal",
+            **{
+                "ethereumAddress": ethereum_address,
+                "accountIndex": account_index,
+                "amount": amount,
+                "nonce": nonce,
+            },
+        )
+
+    def get_commission_rates(self) -> Any:  # noqa: ANN401
+        """
+        GET /v1/commissionrates.
+
+        Public affiliate metadata query.
+        Source: https://docs.arcus.xyz/api-reference/public/get-referral-commission-rate-schedule
+        """
+        return self.public_request("get_commission_rates", **{})
+
+    def check_referral_code(self, *, code: str) -> Any:  # noqa: ANN401
+        """
+        GET /v1/affiliate/codeAvailable.
+
+        Public affiliate metadata query.
+        Source: https://docs.arcus.xyz/api-reference/referral/check-whether-a-referral-code-is-available
+        """
+        return self.public_request("check_referral_code", **{"code": code})
+
+    def claim_affiliate_commission(
+        self, *, address: str, cutoff_fill_id: int | None = None, amount_quantums: int | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /v1/affiliate/claim.
+
+        Signed affiliate access is scoped to the configured master address.
+        Source: https://docs.arcus.xyz/api-reference/referral/claim-accrued-commission
+        """
+        return self.private_request(
+            "claim_affiliate_commission",
+            **{
+                "address": address,
+                "cutoffFillId": cutoff_fill_id,
+                "amountQuantums": amount_quantums,
+            },
+        )
+
+    def create_referral_code(self, *, address: str, code: str, kickback_bps: int) -> Any:  # noqa: ANN401
+        """
+        POST /v1/affiliate/createCode.
+
+        Signed affiliate access is scoped to the configured master address.
+        Source: https://docs.arcus.xyz/api-reference/referral/create-referral-code
+        """
+        return self.private_request(
+            "create_referral_code",
+            **{"address": address, "code": code, "kickbackBps": kickback_bps},
+        )
+
+    def get_affiliate_claims(
+        self,
+        *,
+        address: str,
+        from_: int | None = None,
+        to: int | None = None,
+        limit: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /v1/affiliate/claims.
+
+        Public affiliate metadata query.
+        Source: https://docs.arcus.xyz/api-reference/referral/get-affiliate-claim-history
+        """
+        return self.public_request(
+            "get_affiliate_claims", **{"address": address, "from": from_, "to": to, "limit": limit}
+        )
+
+    def get_affiliate_commissions(
+        self,
+        *,
+        address: str,
+        from_: int | None = None,
+        to: int | None = None,
+        limit: int | None = None,
+        cursor: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /v1/affiliate/commissions.
+
+        Signed affiliate access is scoped to the configured master address.
+        Source: https://docs.arcus.xyz/api-reference/referral/get-affiliate-commission-history
+        """
+        return self.private_request(
+            "get_affiliate_commissions",
+            **{"address": address, "from": from_, "to": to, "limit": limit, "cursor": cursor},
+        )
+
+    def get_affiliate_info(self, *, address: str) -> Any:  # noqa: ANN401
+        """
+        GET /v1/affiliate/info.
+
+        Signed affiliate access is scoped to the configured master address.
+        Source: https://docs.arcus.xyz/api-reference/referral/get-affiliate-info
+        """
+        return self.private_request("get_affiliate_info", **{"address": address})
+
+    def get_affiliate_leaderboard(self, *, limit: int | None = None) -> Any:  # noqa: ANN401
+        """
+        GET /v1/affiliate/leaderboard.
+
+        Public affiliate metadata query.
+        Source: https://docs.arcus.xyz/api-reference/referral/get-affiliate-leaderboard
+        """
+        return self.public_request("get_affiliate_leaderboard", **{"limit": limit})
+
+    def get_referrer(self, *, address: str) -> Any:  # noqa: ANN401
+        """
+        GET /v1/affiliate/myReferrer.
+
+        Public affiliate metadata query.
+        Source: https://docs.arcus.xyz/api-reference/referral/get-my-referrer
+        """
+        return self.public_request("get_referrer", **{"address": address})
+
+    def get_referees(
+        self,
+        *,
+        address: str,
+        from_: int | None = None,
+        to: int | None = None,
+        limit: int | None = None,
+        cursor: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /v1/affiliate/referees.
+
+        Signed affiliate access is scoped to the configured master address.
+        Source: https://docs.arcus.xyz/api-reference/referral/get-referees
+        """
+        return self.private_request(
+            "get_referees",
+            **{"address": address, "from": from_, "to": to, "limit": limit, "cursor": cursor},
+        )
+
+    def get_referral_code(self, *, address: str) -> Any:  # noqa: ANN401
+        """
+        GET /v1/affiliate/code.
+
+        Signed affiliate access is scoped to the configured master address.
+        Source: https://docs.arcus.xyz/api-reference/referral/get-the-callers-referral-code
+        """
+        return self.private_request("get_referral_code", **{"address": address})
+
+    def get_invite_codes(
+        self,
+        *,
+        address: str,
+        status: str | None = None,
+        limit: int | None = None,
+        offset: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /v1/affiliate/inviteCodes.
+
+        Signed affiliate access is scoped to the configured master address.
+        Source: https://docs.arcus.xyz/api-reference/referral/list-the-callers-invite-codes
+        """
+        return self.private_request(
+            "get_invite_codes",
+            **{"address": address, "status": status, "limit": limit, "offset": offset},
+        )
+
+    def get_affiliate_claim(self, *, address: str, id: str) -> Any:  # noqa: ANN401
+        """
+        GET /v1/affiliate/claimStatus.
+
+        Public affiliate metadata query.
+        Source: https://docs.arcus.xyz/api-reference/referral/look-up-a-single-claim
+        """
+        return self.public_request("get_affiliate_claim", **{"address": address, "id": id})
+
+    def redeem_invite_code(self, *, address: str, invite_code: str) -> Any:  # noqa: ANN401
+        """
+        POST /v1/affiliate/redeemInvite.
+
+        Signed affiliate access is scoped to the configured master address.
+        Source: https://docs.arcus.xyz/api-reference/referral/redeem-an-invite-code
+        """
+        return self.private_request(
+            "redeem_invite_code", **{"address": address, "inviteCode": invite_code}
+        )
+
+    def register_referral(self, *, address: str, code: str) -> Any:  # noqa: ANN401
+        """
+        POST /v1/affiliate/registerAffiliate.
+
+        Signed affiliate access is scoped to the configured master address.
+        Source: https://docs.arcus.xyz/api-reference/referral/register-as-referee
+        """
+        return self.private_request("register_referral", **{"address": address, "code": code})
+
+    def rename_referral_code(self, *, address: str, code: str) -> Any:  # noqa: ANN401
+        """
+        POST /v1/affiliate/modifyCode.
+
+        Signed affiliate access is scoped to the configured master address.
+        Source: https://docs.arcus.xyz/api-reference/referral/rename-referral-code
+        """
+        return self.private_request("rename_referral_code", **{"address": address, "code": code})
+
+    def revoke_referral_code(self, *, address: str) -> Any:  # noqa: ANN401
+        """
+        POST /v1/affiliate/revokeCode.
+
+        Signed affiliate access is scoped to the configured master address.
+        Source: https://docs.arcus.xyz/api-reference/referral/revoke-referral-code
+        """
+        return self.private_request("revoke_referral_code", **{"address": address})
+
+    def update_referral_kickback(self, *, address: str, kickback_bps: int) -> Any:  # noqa: ANN401
+        """
+        POST /v1/affiliate/kickback.
+
+        Signed affiliate access is scoped to the configured master address.
+        Source: https://docs.arcus.xyz/api-reference/referral/update-kickback-rate
+        """
+        return self.private_request(
+            "update_referral_kickback", **{"address": address, "kickbackBps": kickback_bps}
+        )

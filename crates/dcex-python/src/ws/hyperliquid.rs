@@ -281,6 +281,52 @@ impl PythonHyperliquidPrivateWebSocketClient {
         })
     }
 
+    #[staticmethod]
+    #[pyo3(signature = (orders, grouping, nonce, private_key, testnet=false, vault_address=None, expires_after=None))]
+    fn sign_order(
+        orders: &str,
+        grouping: &str,
+        nonce: u64,
+        private_key: &str,
+        testnet: bool,
+        vault_address: Option<&str>,
+        expires_after: Option<u64>,
+    ) -> PyResult<String> {
+        HyperliquidPrivateWebSocket::sign_order(
+            orders,
+            grouping,
+            nonce,
+            private_key,
+            testnet,
+            vault_address,
+            expires_after,
+        )
+        .map(|value| value.to_string())
+        .map_err(to_py_runtime_error)
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (cancels, nonce, private_key, testnet=false, vault_address=None, expires_after=None))]
+    fn sign_cancel(
+        cancels: &str,
+        nonce: u64,
+        private_key: &str,
+        testnet: bool,
+        vault_address: Option<&str>,
+        expires_after: Option<u64>,
+    ) -> PyResult<String> {
+        HyperliquidPrivateWebSocket::sign_cancel(
+            cancels,
+            nonce,
+            private_key,
+            testnet,
+            vault_address,
+            expires_after,
+        )
+        .map(|value| value.to_string())
+        .map_err(to_py_runtime_error)
+    }
+
     fn user(&self) -> PyResult<String> {
         let client = self.client.try_lock().map_err(|_| {
             PyRuntimeError::new_err("Hyperliquid WebSocket client is busy; try again later.")

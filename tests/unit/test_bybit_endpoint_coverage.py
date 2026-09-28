@@ -709,7 +709,14 @@ CASES: tuple[RouteCase, ...] = (
         signed=True,
         query={"subMemberId": "2"},
     ),
-    RouteCase("modify_api_key", "POST", "/v5/user/update-api", kwargs={}, signed=True, body={}),
+    RouteCase(
+        "modify_api_key",
+        "POST",
+        "/v5/user/update-api",
+        kwargs={"confirm": True, "read_only": 1},
+        signed=True,
+        body={"readOnly": 1},
+    ),
     RouteCase(
         "modify_sub_account_api_key",
         "POST",
@@ -721,7 +728,14 @@ CASES: tuple[RouteCase, ...] = (
     RouteCase(
         "get_sub_accounts_paginated", "GET", "/v5/user/submembers", kwargs={}, signed=True, query={}
     ),
-    RouteCase("delete_api_key", "POST", "/v5/user/delete-api", kwargs={}, signed=True, body={}),
+    RouteCase(
+        "delete_api_key",
+        "POST",
+        "/v5/user/delete-api",
+        kwargs={"confirm": True},
+        signed=True,
+        body={},
+    ),
     RouteCase(
         "delete_sub_account_api_key",
         "POST",
@@ -1822,6 +1836,8 @@ def _public_wrapper_names(module: str) -> set[str]:
 @pytest.mark.parametrize("module", ["dcex.bybit.client", "dcex.async_support.bybit.client"])
 def test_every_bybit_endpoint_wrapper_has_a_route_case(module: str) -> None:
     names = _public_wrapper_names(module) - {"close", "async_init"}
-    covered = {case.method_name for case in CASES}
+    from tests.unit.test_bybit_completion import CASES as COMPLETION_CASES
+
+    covered = {case.method_name for case in CASES} | {case["name"] for case in COMPLETION_CASES}
     assert sorted(names - covered) == []
     assert sorted(covered - names) == []

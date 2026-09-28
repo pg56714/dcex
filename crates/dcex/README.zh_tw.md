@@ -28,7 +28,7 @@ cargo add tokio --features macros,rt-multi-thread
 - Rust 核心內的交易所簽章、序列化與回應驗證。
 - 透過 Product Table 查詢統一／原生商品代號及交易規格。
 
-實際可用的端點依交易所而異。目前不封裝建立外部提領的端點。Product Table 包含 Binance、Bybit 與 OKX 已上市期權；期權交易使用各交易所專屬 API。
+實際可用的端點依交易所而異。官方提款、做市商與合作夥伴端點均納入範圍；實作覆蓋與規格缺口以端點清冊為準。API 提款沒有第二次確認，送出即執行；建議交易用 API 金鑰不要開啟提款權限。Product Table 包含 Binance、Bybit 與 OKX 已上市期權；期權交易使用各交易所專屬 API。
 
 ## 支援交易所
 
@@ -50,7 +50,7 @@ cargo add tokio --features macros,rt-multi-thread
 | Ondo | 支援 | 支援 | 支援 |
 | Arcus | 支援 | 支援 | 支援 |
 
-私人 WebSocket 包含需驗證身分或指定地址的使用者資料流；Binance、Bybit、Bitget 與 Kraken 現貨提供交易 WebSocket；Hyperliquid 與 Lighter 可提交已簽名操作，Arcus 提供簽名請求建立介面。
+私人 WebSocket 包含需驗證身分或指定地址的使用者資料流；Binance、Bybit、Bitget、OKX、KuCoin 與 Kraken 現貨提供交易 WebSocket；Hyperliquid 與 Lighter 可提交已簽名操作，Arcus 提供簽名請求建立介面。
 
 Lighter 支援 Mainnet 與 Robinhood，兩者使用不同憑證；可逐一為客戶端選擇網路，預設為 Mainnet。Ondo 僅支援永續合約。Arcus Spot 使用獨立的 RFQ router，送出報價時須由外部錢包簽章；Arcus Perps 使用另一個客戶端，其私人交易流程尚未經實際環境驗證。
 
@@ -91,6 +91,8 @@ async fn main() -> dcex::Result<()> {
 ```
 
 沒有必填參數的 HTTP 方法不需傳入空參數列表；選填參數可使用 `.limit(100)` 或 `.param("key", value)` 等 builder 方法。
+
+另提供 Binance Alpha、Aster Prediction、KuCoin Classic／Pro 與 Kraken 現貨 V1 介面。Bitget SBE 回傳原始二進位封包，由呼叫端解碼。
 
 公開 WebSocket：
 

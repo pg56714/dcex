@@ -271,7 +271,7 @@ const ROUTE_CASES: &[(bool, &str, &[(&str, &str)], &str, &str)] = &[
     (
         false,
         "cancel_spot_all_orders",
-        &[],
+        &[("all_symbols", "true")],
         "DELETE",
         "/api/v3/order/all",
     ),

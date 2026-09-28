@@ -400,10 +400,9 @@ class MarketHTTP(HTTPManager):
         limit: int | None = None,
     ) -> dict[str, Any]:
         """
-
         GET /v5/announcements/index.
 
-        Native symbols; timestamps are milliseconds. Source:
+        Source:
         https://bybit-exchange.github.io/docs/v5/announcement
 
         """
@@ -416,10 +415,9 @@ class MarketHTTP(HTTPManager):
         self, *, product_type: str, group_id: str | None = None
     ) -> dict[str, Any]:
         """
-
         GET /v5/market/fee-group-info.
 
-        Native symbols; timestamps are milliseconds. Source:
+        Source:
         https://bybit-exchange.github.io/docs/v5/market/fee-group-info
 
         """
@@ -429,10 +427,9 @@ class MarketHTTP(HTTPManager):
 
     def get_index_price_components(self, *, index_name: str) -> dict[str, Any]:
         """
-
         GET /v5/market/index-price-components.
 
-        Native symbols; timestamps are milliseconds. Source:
+        Source:
         https://bybit-exchange.github.io/docs/v5/market/index-components
 
         """
@@ -444,10 +441,9 @@ class MarketHTTP(HTTPManager):
         self, *, category: str, base_coin: str, settle_coin: str | None = None
     ) -> dict[str, Any]:
         """
-
         GET /v5/market/new-delivery-price.
 
-        Native symbols; timestamps are milliseconds. Source:
+        Source:
         https://bybit-exchange.github.io/docs/v5/market/new-delivery-price
 
         """
@@ -458,10 +454,9 @@ class MarketHTTP(HTTPManager):
 
     def get_option_base_coins(self, *, underlying_type: str | None = None) -> dict[str, Any]:
         """
-
         GET /v5/market/option-base-coins.
 
-        Native symbols; timestamps are milliseconds. Source:
+        Source:
         https://bybit-exchange.github.io/docs/v5/market/option-base-coins
 
         """

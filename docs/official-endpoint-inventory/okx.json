@@ -1,0 +1,2826 @@
+{
+  "reviewed": "2026-09-28",
+  "source": "https://www.okx.com/docs-v5/en/",
+  "source_sha256": "8a08f29d3da3ad1ecec9a6a36704b09dc61834e6fb9116efb51a7bbf4ae8a02c",
+  "endpoints": [
+    {
+      "method": "GET",
+      "title": "Get instruments",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-instruments",
+      "path": "/api/v5/account/instruments"
+    },
+    {
+      "method": "GET",
+      "title": "Get balance",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-balance",
+      "path": "/api/v5/account/balance"
+    },
+    {
+      "method": "GET",
+      "title": "Get positions",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-positions",
+      "path": "/api/v5/account/positions"
+    },
+    {
+      "method": "GET",
+      "title": "Get positions history",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-positions-history",
+      "path": "/api/v5/account/positions-history"
+    },
+    {
+      "method": "GET",
+      "title": "Get account and position risk",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-account-and-position-risk",
+      "path": "/api/v5/account/account-position-risk"
+    },
+    {
+      "method": "GET",
+      "title": "Get bills details (last 7 days)",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-bills-details-last-7-days",
+      "path": "/api/v5/account/bills"
+    },
+    {
+      "method": "GET",
+      "title": "Get bills details (last 3 months)",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-bills-details-last-3-months",
+      "path": "/api/v5/account/bills-archive"
+    },
+    {
+      "method": "POST",
+      "title": "Apply bills details (since 2021)",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-apply-bills-details-since-2021",
+      "path": "/api/v5/account/bills-history-archive"
+    },
+    {
+      "method": "GET",
+      "title": "Get bills details (since 2021)",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-bills-details-since-2021",
+      "path": "/api/v5/account/bills-history-archive"
+    },
+    {
+      "method": "GET",
+      "title": "Get bill types",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-bill-types",
+      "path": "/api/v5/account/subtypes"
+    },
+    {
+      "method": "GET",
+      "title": "Get account configuration",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-account-configuration",
+      "path": "/api/v5/account/config"
+    },
+    {
+      "method": "POST",
+      "title": "Set position mode",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-set-position-mode",
+      "path": "/api/v5/account/set-position-mode"
+    },
+    {
+      "method": "POST",
+      "title": "Set leverage",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-set-leverage",
+      "path": "/api/v5/account/set-leverage"
+    },
+    {
+      "method": "GET",
+      "title": "Get maximum order quantity",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-maximum-order-quantity",
+      "path": "/api/v5/account/max-size"
+    },
+    {
+      "method": "GET",
+      "title": "Get maximum available balance/equity",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-maximum-available-balance-equity",
+      "path": "/api/v5/account/max-avail-size"
+    },
+    {
+      "method": "POST",
+      "title": "Increase/decrease margin",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-increase-decrease-margin",
+      "path": "/api/v5/account/position/margin-balance"
+    },
+    {
+      "method": "GET",
+      "title": "Get leverage",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-leverage",
+      "path": "/api/v5/account/leverage-info"
+    },
+    {
+      "method": "GET",
+      "title": "Get leverage estimated info",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-leverage-estimated-info",
+      "path": "/api/v5/account/adjust-leverage-info"
+    },
+    {
+      "method": "GET",
+      "title": "Get the maximum loan of instrument",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-the-maximum-loan-of-instrument",
+      "path": "/api/v5/account/max-loan"
+    },
+    {
+      "method": "GET",
+      "title": "Get fee rates",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-fee-rates",
+      "path": "/api/v5/account/trade-fee"
+    },
+    {
+      "method": "GET",
+      "title": "Get interest accrued data",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-interest-accrued-data",
+      "path": "/api/v5/account/interest-accrued"
+    },
+    {
+      "method": "GET",
+      "title": "Get interest rate",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-interest-rate",
+      "path": "/api/v5/account/interest-rate"
+    },
+    {
+      "method": "POST",
+      "title": "Set fee type",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-set-fee-type",
+      "path": "/api/v5/account/set-fee-type"
+    },
+    {
+      "method": "POST",
+      "title": "Set greeks (PA/BS)",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-set-greeks-pa-bs",
+      "path": "/api/v5/account/set-greeks"
+    },
+    {
+      "method": "POST",
+      "title": "Isolated margin trading settings",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-isolated-margin-trading-settings",
+      "path": "/api/v5/account/set-isolated-mode"
+    },
+    {
+      "method": "GET",
+      "title": "Get maximum withdrawals",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-maximum-withdrawals",
+      "path": "/api/v5/account/max-withdrawal"
+    },
+    {
+      "method": "GET",
+      "title": "Get account risk state",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-account-risk-state",
+      "path": "/api/v5/account/risk-state"
+    },
+    {
+      "method": "GET",
+      "title": "Get borrow interest and limit",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-borrow-interest-and-limit",
+      "path": "/api/v5/account/interest-limits"
+    },
+    {
+      "method": "POST",
+      "title": "Manual borrow / repay",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-manual-borrow-repay",
+      "path": "/api/v5/account/spot-manual-borrow-repay"
+    },
+    {
+      "method": "POST",
+      "title": "Set auto repay",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-set-auto-repay",
+      "path": "/api/v5/account/set-auto-repay"
+    },
+    {
+      "method": "GET",
+      "title": "Get borrow/repay history",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-borrow-repay-history",
+      "path": "/api/v5/account/spot-borrow-repay-history"
+    },
+    {
+      "method": "POST",
+      "title": "Position builder (new)",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-position-builder-new",
+      "path": "/api/v5/account/position-builder"
+    },
+    {
+      "method": "POST",
+      "title": "Position builder trend graph",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-position-builder-trend-graph",
+      "path": "/api/v5/account/position-builder-graph"
+    },
+    {
+      "method": "POST",
+      "title": "Set risk offset amount",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-set-risk-offset-amount",
+      "path": "/api/v5/account/set-riskOffset-amt"
+    },
+    {
+      "method": "GET",
+      "title": "Get Greeks",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-greeks",
+      "path": "/api/v5/account/greeks"
+    },
+    {
+      "method": "GET",
+      "title": "Get PM position limitation",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-pm-position-limitation",
+      "path": "/api/v5/account/position-tiers"
+    },
+    {
+      "method": "POST",
+      "title": "Activate option",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-activate-option",
+      "path": "/api/v5/account/activate-option"
+    },
+    {
+      "method": "POST",
+      "title": "Set auto loan",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-set-auto-loan",
+      "path": "/api/v5/account/set-auto-loan"
+    },
+    {
+      "method": "POST",
+      "title": "Preset account mode switch",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-preset-account-mode-switch",
+      "path": "/api/v5/account/account-level-switch-preset"
+    },
+    {
+      "method": "GET",
+      "title": "Precheck account mode switch",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-precheck-account-mode-switch",
+      "path": "/api/v5/account/set-account-switch-precheck"
+    },
+    {
+      "method": "POST",
+      "title": "Set account mode",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-set-account-mode",
+      "path": "/api/v5/account/set-account-level"
+    },
+    {
+      "method": "POST",
+      "title": "Set collateral assets",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-set-collateral-assets",
+      "path": "/api/v5/account/set-collateral-assets"
+    },
+    {
+      "method": "GET",
+      "title": "Get collateral assets",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-collateral-assets",
+      "path": "/api/v5/account/collateral-assets"
+    },
+    {
+      "method": "POST",
+      "title": "Reset MMP Status",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-reset-mmp-status",
+      "path": "/api/v5/account/mmp-reset"
+    },
+    {
+      "method": "POST",
+      "title": "Set MMP",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-set-mmp",
+      "path": "/api/v5/account/mmp-config"
+    },
+    {
+      "method": "GET",
+      "title": "GET MMP Config",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-mmp-config",
+      "path": "/api/v5/account/mmp-config"
+    },
+    {
+      "method": "POST",
+      "title": "Move positions",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-move-positions",
+      "path": "/api/v5/account/move-positions"
+    },
+    {
+      "method": "GET",
+      "title": "Get move positions history",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-move-positions-history",
+      "path": "/api/v5/account/move-positions-history"
+    },
+    {
+      "method": "POST",
+      "title": "Set auto earn",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-set-auto-earn",
+      "path": "/api/v5/account/set-auto-earn"
+    },
+    {
+      "method": "POST",
+      "title": "Set settle currency",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-set-settle-currency",
+      "path": "/api/v5/account/set-settle-currency"
+    },
+    {
+      "method": "POST",
+      "title": "Set trading config",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-set-trading-config",
+      "path": "/api/v5/account/set-trading-config"
+    },
+    {
+      "method": "GET",
+      "title": "Precheck set delta neutral",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-precheck-set-delta-neutral",
+      "path": "/api/v5/account/precheck-set-delta-neutral"
+    },
+    {
+      "method": "POST",
+      "title": "Adjust demo account balance",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-adjust-demo-account-balance",
+      "path": "/api/v5/account/demo-adjust-balance"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Get GLP today performance",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-get-glp-today-performance",
+      "path": "/api/v5/users/glp/todayperformance"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Get GLP historical performance",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-get-glp-historical-performance",
+      "path": "/api/v5/users/glp/historicalperformance"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Place order",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-trade-post-place-order",
+      "path": "/api/v5/trade/order"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Place multiple orders",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-trade-post-place-multiple-orders",
+      "path": "/api/v5/trade/batch-orders"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Cancel order",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-trade-post-cancel-order",
+      "path": "/api/v5/trade/cancel-order"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Cancel multiple orders",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-trade-post-cancel-multiple-orders",
+      "path": "/api/v5/trade/cancel-batch-orders"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Amend order",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-trade-post-amend-order",
+      "path": "/api/v5/trade/amend-order"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Amend multiple orders",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-trade-post-amend-multiple-orders",
+      "path": "/api/v5/trade/amend-batch-orders"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Close positions",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-trade-post-close-positions",
+      "path": "/api/v5/trade/close-position"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Order details",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-trade-get-order-details",
+      "path": "/api/v5/trade/order"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Order List",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-trade-get-order-list",
+      "path": "/api/v5/trade/orders-pending"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Order history (last 7 days)",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-trade-get-order-history-last-7-days",
+      "path": "/api/v5/trade/orders-history"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Order history (last 3 months)",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-trade-get-order-history-last-3-months",
+      "path": "/api/v5/trade/orders-history-archive"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Transaction details (last 3 days)",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-trade-get-transaction-details-last-3-days",
+      "path": "/api/v5/trade/fills"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Transaction details (last 3 months)",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-trade-get-transaction-details-last-3-months",
+      "path": "/api/v5/trade/fills-history"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Easy convert currency list",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-trade-get-easy-convert-currency-list",
+      "path": "/api/v5/trade/easy-convert-currency-list"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Place easy convert",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-trade-post-place-easy-convert",
+      "path": "/api/v5/trade/easy-convert"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Easy convert history",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-trade-get-easy-convert-history",
+      "path": "/api/v5/trade/easy-convert-history"
+    },
+    {
+      "method": "GET",
+      "title": "GET / One-click repay currency list",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-trade-get-one-click-repay-currency-list",
+      "path": "/api/v5/trade/one-click-repay-currency-list"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Trade one-click repay",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-trade-post-trade-one-click-repay",
+      "path": "/api/v5/trade/one-click-repay"
+    },
+    {
+      "method": "GET",
+      "title": "GET / One-click repay history",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-trade-get-one-click-repay-history",
+      "path": "/api/v5/trade/one-click-repay-history"
+    },
+    {
+      "method": "GET",
+      "title": "GET / One-click repay currency list (New)",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-trade-get-one-click-repay-currency-list-new",
+      "path": "/api/v5/trade/one-click-repay-currency-list-v2"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Trade one-click repay (New)",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-trade-post-trade-one-click-repay-new",
+      "path": "/api/v5/trade/one-click-repay-v2"
+    },
+    {
+      "method": "GET",
+      "title": "GET / One-click repay history (New)",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-trade-get-one-click-repay-history-new",
+      "path": "/api/v5/trade/one-click-repay-history-v2"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Mass cancel order",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-trade-post-mass-cancel-order",
+      "path": "/api/v5/trade/mass-cancel"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Cancel All After",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-trade-post-cancel-all-after",
+      "path": "/api/v5/trade/cancel-all-after"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Account rate limit",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-trade-get-account-rate-limit",
+      "path": "/api/v5/trade/account-rate-limit"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Order precheck",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-trade-post-order-precheck",
+      "path": "/api/v5/trade/order-precheck"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Place algo order",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-algo-trading-post-place-algo-order",
+      "path": "/api/v5/trade/order-algo"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Cancel algo order",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-algo-trading-post-cancel-algo-order",
+      "path": "/api/v5/trade/cancel-algos"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Amend algo order",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-algo-trading-post-amend-algo-order",
+      "path": "/api/v5/trade/amend-algos"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Algo order details",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-algo-trading-get-algo-order-details",
+      "path": "/api/v5/trade/order-algo"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Algo order list",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-algo-trading-get-algo-order-list",
+      "path": "/api/v5/trade/orders-algo-pending"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Algo order history",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-algo-trading-get-algo-order-history",
+      "path": "/api/v5/trade/orders-algo-history"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Place grid algo order",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-grid-trading-post-place-grid-algo-order",
+      "path": "/api/v5/tradingBot/grid/order-algo"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Amend grid algo order basic param",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-grid-trading-post-amend-grid-algo-order-basic-param",
+      "path": "/api/v5/tradingBot/grid/amend-algo-basic-param"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Amend grid algo order",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-grid-trading-post-amend-grid-algo-order",
+      "path": "/api/v5/tradingBot/grid/amend-order-algo"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Stop grid algo order",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-grid-trading-post-stop-grid-algo-order",
+      "path": "/api/v5/tradingBot/grid/stop-order-algo"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Close position for contract grid",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-grid-trading-post-close-position-for-contract-grid",
+      "path": "/api/v5/tradingBot/grid/close-position"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Cancel close position order for contract grid",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-grid-trading-post-cancel-close-position-order-for-contract-grid",
+      "path": "/api/v5/tradingBot/grid/cancel-close-order"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Instant trigger grid algo order",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-grid-trading-post-instant-trigger-grid-algo-order",
+      "path": "/api/v5/tradingBot/grid/order-instant-trigger"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Grid algo order list",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-grid-trading-get-grid-algo-order-list",
+      "path": "/api/v5/tradingBot/grid/orders-algo-pending"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Grid algo order history",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-grid-trading-get-grid-algo-order-history",
+      "path": "/api/v5/tradingBot/grid/orders-algo-history"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Grid algo order details",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-grid-trading-get-grid-algo-order-details",
+      "path": "/api/v5/tradingBot/grid/orders-algo-details"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Grid algo sub orders",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-grid-trading-get-grid-algo-sub-orders",
+      "path": "/api/v5/tradingBot/grid/sub-orders"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Grid algo order positions",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-grid-trading-get-grid-algo-order-positions",
+      "path": "/api/v5/tradingBot/grid/positions"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Spot grid withdraw income",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-grid-trading-post-spot-grid-withdraw-income",
+      "path": "/api/v5/tradingBot/grid/withdraw-income"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Compute margin balance",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-grid-trading-post-compute-margin-balance",
+      "path": "/api/v5/tradingBot/grid/compute-margin-balance"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Adjust margin balance",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-grid-trading-post-adjust-margin-balance",
+      "path": "/api/v5/tradingBot/grid/margin-balance"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Add investment",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-grid-trading-post-add-investment",
+      "path": "/api/v5/tradingBot/grid/adjust-investment"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Grid AI parameter (public)",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-grid-trading-get-grid-ai-parameter-public",
+      "path": "/api/v5/tradingBot/grid/ai-param"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Compute min investment (public)",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-grid-trading-post-compute-min-investment-public",
+      "path": "/api/v5/tradingBot/grid/min-investment"
+    },
+    {
+      "method": "GET",
+      "title": "GET / RSI back testing (public)",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-grid-trading-get-rsi-back-testing-public",
+      "path": "/api/v5/tradingBot/public/rsi-back-testing"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Max grid quantity (public)",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-grid-trading-get-max-grid-quantity-public",
+      "path": "/api/v5/tradingBot/grid/grid-quantity"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Copy grid algo order",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-grid-trading-post-copy-grid-algo-order",
+      "path": "/api/v5/tradingBot/grid/copy-order-algo"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Place dca algo order",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-dca-trading-post-place-dca-algo-order",
+      "path": "/api/v5/tradingBot/dca/create"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Amend spot dca basic param",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-dca-trading-post-amend-spot-dca-basic-param",
+      "path": "/api/v5/tradingBot/dca/amend-order-algo"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Stop dca algo order",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-dca-trading-post-stop-dca-algo-order",
+      "path": "/api/v5/tradingBot/dca/stop"
+    },
+    {
+      "method": "GET",
+      "title": "GET / DCA algo order details",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-dca-trading-get-dca-algo-order-details",
+      "path": "/api/v5/tradingBot/dca/ongoing-list"
+    },
+    {
+      "method": "GET",
+      "title": "GET / DCA algo order history",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-dca-trading-get-dca-algo-order-history",
+      "path": "/api/v5/tradingBot/dca/history-list"
+    },
+    {
+      "method": "GET",
+      "title": "GET / DCA sub orders",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-dca-trading-get-dca-sub-orders",
+      "path": "/api/v5/tradingBot/dca/orders"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Add investment",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-dca-trading-post-add-investment",
+      "path": "/api/v5/tradingBot/dca/orders/manual-buy"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Amend dca reinvestment",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-dca-trading-post-amend-dca-reinvestment",
+      "path": "/api/v5/tradingBot/dca/settings/reinvestment"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Amend dca take profit settings",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-dca-trading-post-amend-dca-take-profit-settings",
+      "path": "/api/v5/tradingBot/dca/settings/take-profit"
+    },
+    {
+      "method": "GET",
+      "title": "Get / DCA algo order position details",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-dca-trading-get-dca-algo-order-position-details",
+      "path": "/api/v5/tradingBot/dca/position-details"
+    },
+    {
+      "method": "GET",
+      "title": "GET / DCA cycle list",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-dca-trading-get-dca-cycle-list",
+      "path": "/api/v5/tradingBot/dca/cycle-list"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Add dca margin",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-dca-trading-post-add-dca-margin",
+      "path": "/api/v5/tradingBot/dca/margin/add"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Reduce dca margin",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-dca-trading-post-reduce-dca-margin",
+      "path": "/api/v5/tradingBot/dca/margin/reduce"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Create signal",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-signal-bot-trading-post-create-signal",
+      "path": "/api/v5/tradingBot/signal/create-signal"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Signals",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-signal-bot-trading-get-signals",
+      "path": "/api/v5/tradingBot/signal/signals"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Create signal bot",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-signal-bot-trading-post-create-signal-bot",
+      "path": "/api/v5/tradingBot/signal/order-algo"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Cancel signal bots",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-signal-bot-trading-post-cancel-signal-bots",
+      "path": "/api/v5/tradingBot/signal/stop-order-algo"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Adjust margin balance",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-signal-bot-trading-post-adjust-margin-balance",
+      "path": "/api/v5/tradingBot/signal/margin-balance"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Amend TPSL",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-signal-bot-trading-post-amend-tpsl",
+      "path": "/api/v5/tradingBot/signal/amendTPSL"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Set instruments",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-signal-bot-trading-post-set-instruments",
+      "path": "/api/v5/tradingBot/signal/set-instruments"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Signal bot order details",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-signal-bot-trading-get-signal-bot-order-details",
+      "path": "/api/v5/tradingBot/signal/orders-algo-details"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Active signal bot",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-signal-bot-trading-get-active-signal-bot",
+      "path": "/api/v5/tradingBot/signal/orders-algo-pending"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Signal bot history",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-signal-bot-trading-get-signal-bot-history",
+      "path": "/api/v5/tradingBot/signal/orders-algo-history"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Signal bot order positions",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-signal-bot-trading-get-signal-bot-order-positions",
+      "path": "/api/v5/tradingBot/signal/positions"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Position history",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-signal-bot-trading-get-position-history",
+      "path": "/api/v5/tradingBot/signal/positions-history"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Close position",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-signal-bot-trading-post-close-position",
+      "path": "/api/v5/tradingBot/signal/close-position"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Place sub order",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-signal-bot-trading-post-place-sub-order",
+      "path": "/api/v5/tradingBot/signal/sub-order"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Cancel sub order",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-signal-bot-trading-post-cancel-sub-order",
+      "path": "/api/v5/tradingBot/signal/cancel-sub-order"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Signal bot sub orders",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-signal-bot-trading-get-signal-bot-sub-orders",
+      "path": "/api/v5/tradingBot/signal/sub-orders"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Signal bot event history",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-signal-bot-trading-get-signal-bot-event-history",
+      "path": "/api/v5/tradingBot/signal/event-history"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Place recurring buy order",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-recurring-buy-post-place-recurring-buy-order",
+      "path": "/api/v5/tradingBot/recurring/order-algo"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Amend recurring buy order",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-recurring-buy-post-amend-recurring-buy-order",
+      "path": "/api/v5/tradingBot/recurring/amend-order-algo"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Stop recurring buy order",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-recurring-buy-post-stop-recurring-buy-order",
+      "path": "/api/v5/tradingBot/recurring/stop-order-algo"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Recurring buy order list",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-recurring-buy-get-recurring-buy-order-list",
+      "path": "/api/v5/tradingBot/recurring/orders-algo-pending"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Recurring buy order history",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-recurring-buy-get-recurring-buy-order-history",
+      "path": "/api/v5/tradingBot/recurring/orders-algo-history"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Recurring buy order details",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-recurring-buy-get-recurring-buy-order-details",
+      "path": "/api/v5/tradingBot/recurring/orders-algo-details"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Recurring buy sub orders",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-recurring-buy-get-recurring-buy-sub-orders",
+      "path": "/api/v5/tradingBot/recurring/sub-orders"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Amend recurring buy time",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-recurring-buy-post-amend-recurring-buy-time",
+      "path": "/api/v5/tradingBot/recurring/amend-recurring-time"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Amend recurring buy amount",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-recurring-buy-post-amend-recurring-buy-amount",
+      "path": "/api/v5/tradingBot/recurring/amend-recurring-amount"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Add investment",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-recurring-buy-post-add-investment",
+      "path": "/api/v5/tradingBot/recurring/add-investment"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Pause recurring buy",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-recurring-buy-post-pause-recurring-buy",
+      "path": "/api/v5/tradingBot/recurring/pause"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Restart recurring buy",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-recurring-buy-post-restart-recurring-buy",
+      "path": "/api/v5/tradingBot/recurring/restart"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Amend price range",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-recurring-buy-post-amend-price-range",
+      "path": "/api/v5/tradingBot/recurring/amend-price-range"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Existing lead positions",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-copy-trading-get-existing-lead-positions",
+      "path": "/api/v5/copytrading/current-subpositions"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Lead position history",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-copy-trading-get-lead-position-history",
+      "path": "/api/v5/copytrading/subpositions-history"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Place lead stop order",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-copy-trading-post-place-lead-stop-order",
+      "path": "/api/v5/copytrading/algo-order"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Close lead position",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-copy-trading-post-close-lead-position",
+      "path": "/api/v5/copytrading/close-subposition"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Leading instruments",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-copy-trading-get-leading-instruments",
+      "path": "/api/v5/copytrading/instruments"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Amend leading instruments",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-copy-trading-post-amend-leading-instruments",
+      "path": "/api/v5/copytrading/set-instruments"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Profit sharing details",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-copy-trading-get-profit-sharing-details",
+      "path": "/api/v5/copytrading/profit-sharing-details"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Total profit sharing",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-copy-trading-get-total-profit-sharing",
+      "path": "/api/v5/copytrading/total-profit-sharing"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Unrealized profit sharing details",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-copy-trading-get-unrealized-profit-sharing-details",
+      "path": "/api/v5/copytrading/unrealized-profit-sharing-details"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Total unrealized profit sharing",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-copy-trading-get-total-unrealized-profit-sharing",
+      "path": "/api/v5/copytrading/total-unrealized-profit-sharing"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Amend profit sharing ratio",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-copy-trading-post-amend-profit-sharing-ratio",
+      "path": "/api/v5/copytrading/amend-profit-sharing-ratio"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Account configuration",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-copy-trading-get-account-configuration",
+      "path": "/api/v5/copytrading/config"
+    },
+    {
+      "method": "POST",
+      "title": "POST / First copy settings",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-copy-trading-post-first-copy-settings",
+      "path": "/api/v5/copytrading/first-copy-settings"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Amend copy settings",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-copy-trading-post-amend-copy-settings",
+      "path": "/api/v5/copytrading/amend-copy-settings"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Stop copying",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-copy-trading-post-stop-copying",
+      "path": "/api/v5/copytrading/stop-copy-trading"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Copy settings",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-copy-trading-get-copy-settings",
+      "path": "/api/v5/copytrading/copy-settings"
+    },
+    {
+      "method": "GET",
+      "title": "GET / My lead traders",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-copy-trading-get-my-lead-traders",
+      "path": "/api/v5/copytrading/current-lead-traders"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Copy trading configuration",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-copy-trading-get-copy-trading-configuration",
+      "path": "/api/v5/copytrading/public-config"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Lead trader ranks",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-copy-trading-get-lead-trader-ranks",
+      "path": "/api/v5/copytrading/public-lead-traders"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Lead trader weekly pnl",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-copy-trading-get-lead-trader-weekly-pnl",
+      "path": "/api/v5/copytrading/public-weekly-pnl"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Lead trader daily pnl",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-copy-trading-get-lead-trader-daily-pnl",
+      "path": "/api/v5/copytrading/public-pnl"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Lead trader stats",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-copy-trading-get-lead-trader-stats",
+      "path": "/api/v5/copytrading/public-stats"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Lead trader currency preferences",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-copy-trading-get-lead-trader-currency-preferences",
+      "path": "/api/v5/copytrading/public-preference-currency"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Lead trader current lead positions",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-copy-trading-get-lead-trader-current-lead-positions",
+      "path": "/api/v5/copytrading/public-current-subpositions"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Lead trader lead position history",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-copy-trading-get-lead-trader-lead-position-history",
+      "path": "/api/v5/copytrading/public-subpositions-history"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Copy traders",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-copy-trading-get-copy-traders",
+      "path": "/api/v5/copytrading/public-copy-traders"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Tickers",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-market-data-get-tickers",
+      "path": "/api/v5/market/tickers"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Ticker",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-market-data-get-ticker",
+      "path": "/api/v5/market/ticker"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Order book",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-market-data-get-order-book",
+      "path": "/api/v5/market/books"
+    },
+    {
+      "method": "GET",
+      "title": "GET / RPI order book",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-market-data-get-rpi-order-book",
+      "path": "/api/v5/market/books-rpi"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Full order book",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-market-data-get-full-order-book",
+      "path": "/api/v5/market/books-full"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Candlesticks",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-market-data-get-candlesticks",
+      "path": "/api/v5/market/candles"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Candlesticks history",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-market-data-get-candlesticks-history",
+      "path": "/api/v5/market/history-candles"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Trades",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-market-data-get-trades",
+      "path": "/api/v5/market/trades"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Trades history",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-market-data-get-trades-history",
+      "path": "/api/v5/market/history-trades"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Option trades by instrument family",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-market-data-get-option-trades-by-instrument-family",
+      "path": "/api/v5/market/option/instrument-family-trades"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Option trades",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-market-data-get-option-trades",
+      "path": "/api/v5/public/option-trades"
+    },
+    {
+      "method": "GET",
+      "title": "GET / 24H total volume",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-market-data-get-24h-total-volume",
+      "path": "/api/v5/market/platform-24-volume"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Call auction details",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-market-data-get-call-auction-details",
+      "path": "/api/v5/market/call-auction-details"
+    },
+    {
+      "method": "GET",
+      "title": "SBE Order book",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-sbe-market-data-sbe-order-book",
+      "path": "/api/v5/market/books-sbe"
+    },
+    {
+      "method": "GET",
+      "title": "Get Counterparties",
+      "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-get-counterparties",
+      "path": "/api/v5/rfq/counterparties"
+    },
+    {
+      "method": "POST",
+      "title": "Create RFQ",
+      "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-create-rfq",
+      "path": "/api/v5/rfq/create-rfq"
+    },
+    {
+      "method": "POST",
+      "title": "Cancel RFQ",
+      "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-cancel-rfq",
+      "path": "/api/v5/rfq/cancel-rfq"
+    },
+    {
+      "method": "POST",
+      "title": "Cancel multiple RFQs",
+      "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-cancel-multiple-rfqs",
+      "path": "/api/v5/rfq/cancel-batch-rfqs"
+    },
+    {
+      "method": "POST",
+      "title": "Cancel all RFQs",
+      "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-cancel-all-rfqs",
+      "path": "/api/v5/rfq/cancel-all-rfqs"
+    },
+    {
+      "method": "POST",
+      "title": "Execute Quote",
+      "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-execute-quote",
+      "path": "/api/v5/rfq/execute-quote"
+    },
+    {
+      "method": "GET",
+      "title": "Get Quote products",
+      "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-get-quote-products",
+      "path": "/api/v5/rfq/maker-instrument-settings"
+    },
+    {
+      "method": "POST",
+      "title": "Set Quote products",
+      "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-set-quote-products",
+      "path": "/api/v5/rfq/maker-instrument-settings"
+    },
+    {
+      "method": "POST",
+      "title": "Reset MMP status",
+      "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-reset-mmp-status",
+      "path": "/api/v5/rfq/mmp-reset"
+    },
+    {
+      "method": "POST",
+      "title": "Set MMP",
+      "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-set-mmp",
+      "path": "/api/v5/rfq/mmp-config"
+    },
+    {
+      "method": "GET",
+      "title": "Get MMP Config",
+      "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-get-mmp-config",
+      "path": "/api/v5/rfq/mmp-config"
+    },
+    {
+      "method": "POST",
+      "title": "Create Quote",
+      "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-create-quote",
+      "path": "/api/v5/rfq/create-quote"
+    },
+    {
+      "method": "POST",
+      "title": "Cancel Quote",
+      "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-cancel-quote",
+      "path": "/api/v5/rfq/cancel-quote"
+    },
+    {
+      "method": "POST",
+      "title": "Cancel multiple Quotes",
+      "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-cancel-multiple-quotes",
+      "path": "/api/v5/rfq/cancel-batch-quotes"
+    },
+    {
+      "method": "POST",
+      "title": "Cancel all Quotes",
+      "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-cancel-all-quotes",
+      "path": "/api/v5/rfq/cancel-all-quotes"
+    },
+    {
+      "method": "POST",
+      "title": "Cancel All After",
+      "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-cancel-all-after",
+      "path": "/api/v5/rfq/cancel-all-after"
+    },
+    {
+      "method": "GET",
+      "title": "Get rfqs",
+      "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-get-rfqs",
+      "path": "/api/v5/rfq/rfqs"
+    },
+    {
+      "method": "GET",
+      "title": "Get quotes",
+      "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-get-quotes",
+      "path": "/api/v5/rfq/quotes"
+    },
+    {
+      "method": "GET",
+      "title": "Get trades",
+      "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-get-trades",
+      "path": "/api/v5/rfq/trades"
+    },
+    {
+      "method": "GET",
+      "title": "Get block tickers",
+      "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-get-block-tickers",
+      "path": "/api/v5/market/block-tickers"
+    },
+    {
+      "method": "GET",
+      "title": "Get block ticker",
+      "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-get-block-ticker",
+      "path": "/api/v5/market/block-ticker"
+    },
+    {
+      "method": "GET",
+      "title": "Get public multi-leg transactions of block trades",
+      "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-get-public-multi-leg-transactions-of-block-trades",
+      "path": "/api/v5/rfq/public-trades"
+    },
+    {
+      "method": "GET",
+      "title": "Get public single-leg transactions of block trades",
+      "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-get-public-single-leg-transactions-of-block-trades",
+      "path": "/api/v5/public/block-trades"
+    },
+    {
+      "method": "GET",
+      "title": "Get Spreads (Public)",
+      "official_source": "https://www.okx.com/docs-v5/en/#spread-trading-rest-api-get-spreads-public",
+      "path": "/api/v5/sprd/spreads"
+    },
+    {
+      "method": "GET",
+      "title": "Get order details",
+      "official_source": "https://www.okx.com/docs-v5/en/#spread-trading-rest-api-get-order-details",
+      "path": "/api/v5/sprd/order"
+    },
+    {
+      "method": "GET",
+      "title": "Get trades (last 7 days)",
+      "official_source": "https://www.okx.com/docs-v5/en/#spread-trading-rest-api-get-trades-last-7-days",
+      "path": "/api/v5/sprd/trades"
+    },
+    {
+      "method": "POST",
+      "title": "Place order",
+      "official_source": "https://www.okx.com/docs-v5/en/#spread-trading-rest-api-place-order",
+      "path": "/api/v5/sprd/order"
+    },
+    {
+      "method": "POST",
+      "title": "Cancel order",
+      "official_source": "https://www.okx.com/docs-v5/en/#spread-trading-rest-api-cancel-order",
+      "path": "/api/v5/sprd/cancel-order"
+    },
+    {
+      "method": "POST",
+      "title": "Cancel All orders",
+      "official_source": "https://www.okx.com/docs-v5/en/#spread-trading-rest-api-cancel-all-orders",
+      "path": "/api/v5/sprd/mass-cancel"
+    },
+    {
+      "method": "POST",
+      "title": "Amend order",
+      "official_source": "https://www.okx.com/docs-v5/en/#spread-trading-rest-api-amend-order",
+      "path": "/api/v5/sprd/amend-order"
+    },
+    {
+      "method": "GET",
+      "title": "Get active orders",
+      "official_source": "https://www.okx.com/docs-v5/en/#spread-trading-rest-api-get-active-orders",
+      "path": "/api/v5/sprd/orders-pending"
+    },
+    {
+      "method": "GET",
+      "title": "Get orders (last 21 days)",
+      "official_source": "https://www.okx.com/docs-v5/en/#spread-trading-rest-api-get-orders-last-21-days",
+      "path": "/api/v5/sprd/orders-history"
+    },
+    {
+      "method": "GET",
+      "title": "Get orders history (last 3 months)",
+      "official_source": "https://www.okx.com/docs-v5/en/#spread-trading-rest-api-get-orders-history-last-3-months",
+      "path": "/api/v5/sprd/orders-history-archive"
+    },
+    {
+      "method": "GET",
+      "title": "Get order book (Public)",
+      "official_source": "https://www.okx.com/docs-v5/en/#spread-trading-rest-api-get-order-book-public",
+      "path": "/api/v5/sprd/books"
+    },
+    {
+      "method": "GET",
+      "title": "Get ticker (Public)",
+      "official_source": "https://www.okx.com/docs-v5/en/#spread-trading-rest-api-get-ticker-public",
+      "path": "/api/v5/market/sprd-ticker"
+    },
+    {
+      "method": "GET",
+      "title": "Get public trades (Public)",
+      "official_source": "https://www.okx.com/docs-v5/en/#spread-trading-rest-api-get-public-trades-public",
+      "path": "/api/v5/sprd/public-trades"
+    },
+    {
+      "method": "GET",
+      "title": "Get candlesticks",
+      "official_source": "https://www.okx.com/docs-v5/en/#spread-trading-rest-api-get-candlesticks",
+      "path": "/api/v5/market/sprd-candles"
+    },
+    {
+      "method": "GET",
+      "title": "Get candlesticks history",
+      "official_source": "https://www.okx.com/docs-v5/en/#spread-trading-rest-api-get-candlesticks-history",
+      "path": "/api/v5/market/sprd-history-candles"
+    },
+    {
+      "method": "POST",
+      "title": "Cancel All After",
+      "official_source": "https://www.okx.com/docs-v5/en/#spread-trading-rest-api-cancel-all-after",
+      "path": "/api/v5/sprd/cancel-all-after"
+    },
+    {
+      "method": "GET",
+      "title": "Get instruments",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-rest-api-get-instruments",
+      "path": "/api/v5/public/instruments"
+    },
+    {
+      "method": "GET",
+      "title": "Get series",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-rest-api-get-series",
+      "path": "/api/v5/public/event-contract/series"
+    },
+    {
+      "method": "GET",
+      "title": "Get events",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-rest-api-get-events",
+      "path": "/api/v5/public/event-contract/events"
+    },
+    {
+      "method": "GET",
+      "title": "Get markets",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-rest-api-get-markets",
+      "path": "/api/v5/public/event-contract/markets"
+    },
+    {
+      "method": "GET",
+      "title": "Get estimated delivery/exercise price",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-rest-api-get-estimated-delivery-exercise-price",
+      "path": "/api/v5/public/estimated-price"
+    },
+    {
+      "method": "GET",
+      "title": "Get delivery/exercise history",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-rest-api-get-delivery-exercise-history",
+      "path": "/api/v5/public/delivery-exercise-history"
+    },
+    {
+      "method": "GET",
+      "title": "Get estimated future settlement price",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-rest-api-get-estimated-future-settlement-price",
+      "path": "/api/v5/public/estimated-settlement-info"
+    },
+    {
+      "method": "GET",
+      "title": "Get futures settlement history",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-rest-api-get-futures-settlement-history",
+      "path": "/api/v5/public/settlement-history"
+    },
+    {
+      "method": "GET",
+      "title": "Get funding rate",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-rest-api-get-funding-rate",
+      "path": "/api/v5/public/funding-rate"
+    },
+    {
+      "method": "GET",
+      "title": "Get funding rate history",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-rest-api-get-funding-rate-history",
+      "path": "/api/v5/public/funding-rate-history"
+    },
+    {
+      "method": "GET",
+      "title": "Get open interest",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-rest-api-get-open-interest",
+      "path": "/api/v5/public/open-interest"
+    },
+    {
+      "method": "GET",
+      "title": "Get limit price",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-rest-api-get-limit-price",
+      "path": "/api/v5/public/price-limit"
+    },
+    {
+      "method": "GET",
+      "title": "Get option market data",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-rest-api-get-option-market-data",
+      "path": "/api/v5/public/opt-summary"
+    },
+    {
+      "method": "GET",
+      "title": "Get discount rate and interest-free quota",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-rest-api-get-discount-rate-and-interest-free-quota",
+      "path": "/api/v5/public/discount-rate-interest-free-quota"
+    },
+    {
+      "method": "GET",
+      "title": "Get system time",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-rest-api-get-system-time",
+      "path": "/api/v5/public/time"
+    },
+    {
+      "method": "GET",
+      "title": "Get mark price",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-rest-api-get-mark-price",
+      "path": "/api/v5/public/mark-price"
+    },
+    {
+      "method": "GET",
+      "title": "Get position tiers",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-rest-api-get-position-tiers",
+      "path": "/api/v5/public/position-tiers"
+    },
+    {
+      "method": "GET",
+      "title": "Get interest rate and loan quota",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-rest-api-get-interest-rate-and-loan-quota",
+      "path": "/api/v5/public/interest-rate-loan-quota"
+    },
+    {
+      "method": "GET",
+      "title": "Get underlying",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-rest-api-get-underlying",
+      "path": "/api/v5/public/underlying"
+    },
+    {
+      "method": "GET",
+      "title": "Get security fund",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-rest-api-get-security-fund",
+      "path": "/api/v5/public/insurance-fund"
+    },
+    {
+      "method": "GET",
+      "title": "Unit convert",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-rest-api-unit-convert",
+      "path": "/api/v5/public/convert-contract-coin"
+    },
+    {
+      "method": "GET",
+      "title": "Get instrument tick bands",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-rest-api-get-instrument-tick-bands",
+      "path": "/api/v5/public/instrument-tick-bands"
+    },
+    {
+      "method": "GET",
+      "title": "Get premium history",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-rest-api-get-premium-history",
+      "path": "/api/v5/public/premium-history"
+    },
+    {
+      "method": "GET",
+      "title": "Get index tickers",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-rest-api-get-index-tickers",
+      "path": "/api/v5/market/index-tickers"
+    },
+    {
+      "method": "GET",
+      "title": "Get index candlesticks",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-rest-api-get-index-candlesticks",
+      "path": "/api/v5/market/index-candles"
+    },
+    {
+      "method": "GET",
+      "title": "Get index candlesticks history",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-rest-api-get-index-candlesticks-history",
+      "path": "/api/v5/market/history-index-candles"
+    },
+    {
+      "method": "GET",
+      "title": "Get mark price candlesticks",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-rest-api-get-mark-price-candlesticks",
+      "path": "/api/v5/market/mark-price-candles"
+    },
+    {
+      "method": "GET",
+      "title": "Get mark price candlesticks history",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-rest-api-get-mark-price-candlesticks-history",
+      "path": "/api/v5/market/history-mark-price-candles"
+    },
+    {
+      "method": "GET",
+      "title": "Get exchange rate",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-rest-api-get-exchange-rate",
+      "path": "/api/v5/market/exchange-rate"
+    },
+    {
+      "method": "GET",
+      "title": "Get index components",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-rest-api-get-index-components",
+      "path": "/api/v5/market/index-components"
+    },
+    {
+      "method": "GET",
+      "title": "Get economic calendar data",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-rest-api-get-economic-calendar-data",
+      "path": "/api/v5/public/economic-calendar"
+    },
+    {
+      "method": "GET",
+      "title": "Get historical market data",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-rest-api-get-historical-market-data",
+      "path": "/api/v5/public/market-data-history"
+    },
+    {
+      "method": "GET",
+      "title": "Get MM instrument types",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-rest-api-get-mm-instrument-types",
+      "path": "/api/v5/public/mm-instrument-types"
+    },
+    {
+      "method": "GET",
+      "title": "Get Delta hedge currencies",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-rest-api-get-delta-hedge-currencies",
+      "path": "/api/v5/public/delta-hedge-currencies"
+    },
+    {
+      "method": "GET",
+      "title": "Get support coin",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-statistics-rest-api-get-support-coin",
+      "path": "/api/v5/rubik/stat/trading-data/support-coin"
+    },
+    {
+      "method": "GET",
+      "title": "Get contract open interest history",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-statistics-rest-api-get-contract-open-interest-history",
+      "path": "/api/v5/rubik/stat/contracts/open-interest-history"
+    },
+    {
+      "method": "GET",
+      "title": "Get taker volume",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-statistics-rest-api-get-taker-volume",
+      "path": "/api/v5/rubik/stat/taker-volume"
+    },
+    {
+      "method": "GET",
+      "title": "Get contract taker volume",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-statistics-rest-api-get-contract-taker-volume",
+      "path": "/api/v5/rubik/stat/taker-volume-contract"
+    },
+    {
+      "method": "GET",
+      "title": "Get margin long/short ratio",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-statistics-rest-api-get-margin-long-short-ratio",
+      "path": "/api/v5/rubik/stat/margin/loan-ratio"
+    },
+    {
+      "method": "GET",
+      "title": "Get top traders contract long/short ratio",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-statistics-rest-api-get-top-traders-contract-long-short-ratio",
+      "path": "/api/v5/rubik/stat/contracts/long-short-account-ratio-contract-top-trader"
+    },
+    {
+      "method": "GET",
+      "title": "Get top traders contract long/short ratio (by position)",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-statistics-rest-api-get-top-traders-contract-long-short-ratio-by-position",
+      "path": "/api/v5/rubik/stat/contracts/long-short-position-ratio-contract-top-trader"
+    },
+    {
+      "method": "GET",
+      "title": "Get contract long/short ratio",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-statistics-rest-api-get-contract-long-short-ratio",
+      "path": "/api/v5/rubik/stat/contracts/long-short-account-ratio-contract"
+    },
+    {
+      "method": "GET",
+      "title": "Get long/short ratio",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-statistics-rest-api-get-long-short-ratio",
+      "path": "/api/v5/rubik/stat/contracts/long-short-account-ratio"
+    },
+    {
+      "method": "GET",
+      "title": "Get contracts open interest and volume",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-statistics-rest-api-get-contracts-open-interest-and-volume",
+      "path": "/api/v5/rubik/stat/contracts/open-interest-volume"
+    },
+    {
+      "method": "GET",
+      "title": "Get options open interest and volume",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-statistics-rest-api-get-options-open-interest-and-volume",
+      "path": "/api/v5/rubik/stat/option/open-interest-volume"
+    },
+    {
+      "method": "GET",
+      "title": "Get put/call ratio",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-statistics-rest-api-get-put-call-ratio",
+      "path": "/api/v5/rubik/stat/option/open-interest-volume-ratio"
+    },
+    {
+      "method": "GET",
+      "title": "Get open interest and volume (expiry)",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-statistics-rest-api-get-open-interest-and-volume-expiry",
+      "path": "/api/v5/rubik/stat/option/open-interest-volume-expiry"
+    },
+    {
+      "method": "GET",
+      "title": "Get open interest and volume (strike)",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-statistics-rest-api-get-open-interest-and-volume-strike",
+      "path": "/api/v5/rubik/stat/option/open-interest-volume-strike"
+    },
+    {
+      "method": "GET",
+      "title": "Get taker flow",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-statistics-rest-api-get-taker-flow",
+      "path": "/api/v5/rubik/stat/option/taker-block-volume"
+    },
+    {
+      "method": "GET",
+      "title": "Get currencies",
+      "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-get-currencies",
+      "path": "/api/v5/asset/currencies"
+    },
+    {
+      "method": "GET",
+      "title": "Get balance",
+      "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-get-balance",
+      "path": "/api/v5/asset/balances"
+    },
+    {
+      "method": "GET",
+      "title": "Get non-tradable assets",
+      "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-get-non-tradable-assets",
+      "path": "/api/v5/asset/non-tradable-assets"
+    },
+    {
+      "method": "GET",
+      "title": "Get account asset valuation",
+      "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-get-account-asset-valuation",
+      "path": "/api/v5/asset/asset-valuation"
+    },
+    {
+      "method": "POST",
+      "title": "Funds transfer",
+      "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-funds-transfer",
+      "path": "/api/v5/asset/transfer"
+    },
+    {
+      "method": "GET",
+      "title": "Get funds transfer state",
+      "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-get-funds-transfer-state",
+      "path": "/api/v5/asset/transfer-state"
+    },
+    {
+      "method": "GET",
+      "title": "Asset bills details",
+      "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-asset-bills-details",
+      "path": "/api/v5/asset/bills"
+    },
+    {
+      "method": "GET",
+      "title": "Asset bills history",
+      "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-asset-bills-history",
+      "path": "/api/v5/asset/bills-history"
+    },
+    {
+      "method": "GET",
+      "title": "Get deposit address",
+      "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-get-deposit-address",
+      "path": "/api/v5/asset/deposit-address"
+    },
+    {
+      "method": "GET",
+      "title": "Get deposit history",
+      "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-get-deposit-history",
+      "path": "/api/v5/asset/deposit-history"
+    },
+    {
+      "method": "POST",
+      "title": "Withdrawal",
+      "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-withdrawal",
+      "path": "/api/v5/asset/withdrawal"
+    },
+    {
+      "method": "POST",
+      "title": "Cancel withdrawal",
+      "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-cancel-withdrawal",
+      "path": "/api/v5/asset/cancel-withdrawal"
+    },
+    {
+      "method": "GET",
+      "title": "Get withdrawal history",
+      "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-get-withdrawal-history",
+      "path": "/api/v5/asset/withdrawal-history"
+    },
+    {
+      "method": "GET",
+      "title": "Get deposit withdraw status",
+      "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-get-deposit-withdraw-status",
+      "path": "/api/v5/asset/deposit-withdraw-status"
+    },
+    {
+      "method": "GET",
+      "title": "Get exchange list (public)",
+      "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-get-exchange-list-public",
+      "path": "/api/v5/asset/exchange-list"
+    },
+    {
+      "method": "POST",
+      "title": "Apply for monthly statement (last year)",
+      "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-apply-for-monthly-statement-last-year",
+      "path": "/api/v5/asset/monthly-statement"
+    },
+    {
+      "method": "GET",
+      "title": "Get monthly statement (last year)",
+      "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-get-monthly-statement-last-year",
+      "path": "/api/v5/asset/monthly-statement"
+    },
+    {
+      "method": "GET",
+      "title": "Get convert currencies",
+      "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-get-convert-currencies",
+      "path": "/api/v5/asset/convert/currencies"
+    },
+    {
+      "method": "GET",
+      "title": "Get convert currency pair",
+      "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-get-convert-currency-pair",
+      "path": "/api/v5/asset/convert/currency-pair"
+    },
+    {
+      "method": "POST",
+      "title": "Estimate quote",
+      "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-estimate-quote",
+      "path": "/api/v5/asset/convert/estimate-quote"
+    },
+    {
+      "method": "POST",
+      "title": "Convert trade",
+      "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-convert-trade",
+      "path": "/api/v5/asset/convert/trade"
+    },
+    {
+      "method": "GET",
+      "title": "Get convert history",
+      "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-get-convert-history",
+      "path": "/api/v5/asset/convert/history"
+    },
+    {
+      "method": "GET",
+      "title": "Get deposit payment methods",
+      "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-get-deposit-payment-methods",
+      "path": "/api/v5/fiat/deposit-payment-methods"
+    },
+    {
+      "method": "GET",
+      "title": "Get withdrawal payment methods",
+      "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-get-withdrawal-payment-methods",
+      "path": "/api/v5/fiat/withdrawal-payment-methods"
+    },
+    {
+      "method": "POST",
+      "title": "Create withdrawal order",
+      "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-create-withdrawal-order",
+      "path": "/api/v5/fiat/create-withdrawal"
+    },
+    {
+      "method": "POST",
+      "title": "Cancel withdrawal order",
+      "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-cancel-withdrawal-order",
+      "path": "/api/v5/fiat/cancel-withdrawal"
+    },
+    {
+      "method": "GET",
+      "title": "Get withdrawal order history",
+      "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-get-withdrawal-order-history",
+      "path": "/api/v5/fiat/withdrawal-order-history"
+    },
+    {
+      "method": "GET",
+      "title": "Get withdrawal order detail",
+      "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-get-withdrawal-order-detail",
+      "path": "/api/v5/fiat/withdrawal"
+    },
+    {
+      "method": "GET",
+      "title": "Get deposit order history",
+      "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-get-deposit-order-history",
+      "path": "/api/v5/fiat/deposit-order-history"
+    },
+    {
+      "method": "GET",
+      "title": "Get deposit order detail",
+      "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-get-deposit-order-detail",
+      "path": "/api/v5/fiat/deposit"
+    },
+    {
+      "method": "GET",
+      "title": "Get buy/sell currencies",
+      "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-get-buy-sell-currencies",
+      "path": "/api/v5/fiat/buy-sell/currencies"
+    },
+    {
+      "method": "GET",
+      "title": "Get buy/sell currency pair",
+      "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-get-buy-sell-currency-pair",
+      "path": "/api/v5/fiat/buy-sell/currency-pair"
+    },
+    {
+      "method": "POST",
+      "title": "Get buy/sell quote",
+      "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-get-buy-sell-quote",
+      "path": "/api/v5/fiat/buy-sell/quote"
+    },
+    {
+      "method": "POST",
+      "title": "Buy/sell trade",
+      "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-buy-sell-trade",
+      "path": "/api/v5/fiat/buy-sell/trade"
+    },
+    {
+      "method": "GET",
+      "title": "Get buy/sell trade history",
+      "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-get-buy-sell-trade-history",
+      "path": "/api/v5/fiat/buy-sell/history"
+    },
+    {
+      "method": "GET",
+      "title": "Get sub-account list",
+      "official_source": "https://www.okx.com/docs-v5/en/#sub-account-rest-api-get-sub-account-list",
+      "path": "/api/v5/users/subaccount/list"
+    },
+    {
+      "method": "POST",
+      "title": "Create sub-account",
+      "official_source": "https://www.okx.com/docs-v5/en/#sub-account-rest-api-create-sub-account",
+      "path": "/api/v5/users/subaccount/create-subaccount"
+    },
+    {
+      "method": "POST",
+      "title": "Create an API Key for a sub-account",
+      "official_source": "https://www.okx.com/docs-v5/en/#sub-account-rest-api-create-an-api-key-for-a-sub-account",
+      "path": "/api/v5/users/subaccount/apikey"
+    },
+    {
+      "method": "GET",
+      "title": "Query the API Key of a sub-account",
+      "official_source": "https://www.okx.com/docs-v5/en/#sub-account-rest-api-query-the-api-key-of-a-sub-account",
+      "path": "/api/v5/users/subaccount/apikey"
+    },
+    {
+      "method": "POST",
+      "title": "Reset the API Key of a sub-account",
+      "official_source": "https://www.okx.com/docs-v5/en/#sub-account-rest-api-reset-the-api-key-of-a-sub-account",
+      "path": "/api/v5/users/subaccount/modify-apikey"
+    },
+    {
+      "method": "POST",
+      "title": "Delete the API Key of sub-accounts",
+      "official_source": "https://www.okx.com/docs-v5/en/#sub-account-rest-api-delete-the-api-key-of-sub-accounts",
+      "path": "/api/v5/users/subaccount/delete-apikey"
+    },
+    {
+      "method": "GET",
+      "title": "Get sub-account trading balance",
+      "official_source": "https://www.okx.com/docs-v5/en/#sub-account-rest-api-get-sub-account-trading-balance",
+      "path": "/api/v5/account/subaccount/balances"
+    },
+    {
+      "method": "GET",
+      "title": "Get sub-account funding balance",
+      "official_source": "https://www.okx.com/docs-v5/en/#sub-account-rest-api-get-sub-account-funding-balance",
+      "path": "/api/v5/asset/subaccount/balances"
+    },
+    {
+      "method": "GET",
+      "title": "Get sub-account maximum withdrawals",
+      "official_source": "https://www.okx.com/docs-v5/en/#sub-account-rest-api-get-sub-account-maximum-withdrawals",
+      "path": "/api/v5/account/subaccount/max-withdrawal"
+    },
+    {
+      "method": "GET",
+      "title": "Get history of sub-account transfer",
+      "official_source": "https://www.okx.com/docs-v5/en/#sub-account-rest-api-get-history-of-sub-account-transfer",
+      "path": "/api/v5/asset/subaccount/bills"
+    },
+    {
+      "method": "GET",
+      "title": "Get history of managed sub-account transfer",
+      "official_source": "https://www.okx.com/docs-v5/en/#sub-account-rest-api-get-history-of-managed-sub-account-transfer",
+      "path": "/api/v5/asset/subaccount/managed-subaccount-bills"
+    },
+    {
+      "method": "POST",
+      "title": "Master accounts manage the transfers between sub-accounts",
+      "official_source": "https://www.okx.com/docs-v5/en/#sub-account-rest-api-master-accounts-manage-the-transfers-between-sub-accounts",
+      "path": "/api/v5/asset/subaccount/transfer"
+    },
+    {
+      "method": "POST",
+      "title": "Set permission of transfer out",
+      "official_source": "https://www.okx.com/docs-v5/en/#sub-account-rest-api-set-permission-of-transfer-out",
+      "path": "/api/v5/users/subaccount/set-transfer-out"
+    },
+    {
+      "method": "GET",
+      "title": "Get custody trading sub-account list",
+      "official_source": "https://www.okx.com/docs-v5/en/#sub-account-rest-api-get-custody-trading-sub-account-list",
+      "path": "/api/v5/users/entrust-subaccount-list"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Offers",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-on-chain-earn-get-offers",
+      "path": "/api/v5/finance/staking-defi/offers"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Purchase",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-on-chain-earn-post-purchase",
+      "path": "/api/v5/finance/staking-defi/purchase"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Redeem",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-on-chain-earn-post-redeem",
+      "path": "/api/v5/finance/staking-defi/redeem"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Cancel purchases/redemptions",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-on-chain-earn-post-cancel-purchases-redemptions",
+      "path": "/api/v5/finance/staking-defi/cancel"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Active orders",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-on-chain-earn-get-active-orders",
+      "path": "/api/v5/finance/staking-defi/orders-active"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Order history",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-on-chain-earn-get-order-history",
+      "path": "/api/v5/finance/staking-defi/orders-history"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Product info",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-eth-staking-get-product-info",
+      "path": "/api/v5/finance/staking-defi/eth/product-info"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Purchase",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-eth-staking-post-purchase",
+      "path": "/api/v5/finance/staking-defi/eth/purchase"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Redeem",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-eth-staking-post-redeem",
+      "path": "/api/v5/finance/staking-defi/eth/redeem"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Cancel redeem",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-eth-staking-post-cancel-redeem",
+      "path": "/api/v5/finance/staking-defi/eth/cancel-redeem"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Balance",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-eth-staking-get-balance",
+      "path": "/api/v5/finance/staking-defi/eth/balance"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Purchase&Redeem history",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-eth-staking-get-purchase-amp-redeem-history",
+      "path": "/api/v5/finance/staking-defi/eth/purchase-redeem-history"
+    },
+    {
+      "method": "GET",
+      "title": "GET / APY history (Public)",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-eth-staking-get-apy-history-public",
+      "path": "/api/v5/finance/staking-defi/eth/apy-history"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Product info",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-sol-staking-get-product-info",
+      "path": "/api/v5/finance/staking-defi/sol/product-info"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Purchase",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-sol-staking-post-purchase",
+      "path": "/api/v5/finance/staking-defi/sol/purchase"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Redeem",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-sol-staking-post-redeem",
+      "path": "/api/v5/finance/staking-defi/sol/redeem"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Balance",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-sol-staking-get-balance",
+      "path": "/api/v5/finance/staking-defi/sol/balance"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Purchase&Redeem history",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-sol-staking-get-purchase-amp-redeem-history",
+      "path": "/api/v5/finance/staking-defi/sol/purchase-redeem-history"
+    },
+    {
+      "method": "GET",
+      "title": "GET / APY history (Public)",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-sol-staking-get-apy-history-public",
+      "path": "/api/v5/finance/staking-defi/sol/apy-history"
+    },
+    {
+      "method": "POST",
+      "title": "GET / APY history (Public)",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-stable-rewards",
+      "path": "/api/v5/finance/stable-rewards/quote"
+    },
+    {
+      "method": "POST",
+      "title": "GET / APY history (Public)",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-stable-rewards",
+      "path": "/api/v5/finance/stable-rewards/trade"
+    },
+    {
+      "method": "GET",
+      "title": "GET / APY history (Public)",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-stable-rewards",
+      "path": "/api/v5/finance/stable-rewards/subscribe-redeem-history"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Product info",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-stable-rewards-get-product-info",
+      "path": "/api/v5/finance/stable-rewards/product-info"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Balance",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-stable-rewards-get-balance",
+      "path": "/api/v5/finance/stable-rewards/balance"
+    },
+    {
+      "method": "GET",
+      "title": "GET / APY history",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-stable-rewards-get-apy-history",
+      "path": "/api/v5/finance/stable-rewards/apy-history"
+    },
+    {
+      "method": "GET",
+      "title": "GET / OKUSD limits",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-okusd-get-okusd-limits",
+      "path": "/api/v5/finance/okusd/limits"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Subscribe OKUSD",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-okusd-post-subscribe-okusd",
+      "path": "/api/v5/finance/okusd/subscribe"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Redeem OKUSD",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-okusd-post-redeem-okusd",
+      "path": "/api/v5/finance/okusd/redeem"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Get OKUSD Account",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-okusd-get-get-okusd-account",
+      "path": "/api/v5/finance/okusd/account"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Get Subscription History",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-okusd-get-get-subscription-history",
+      "path": "/api/v5/finance/okusd/subscribe/history"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Get Redemption History",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-okusd-get-get-redemption-history",
+      "path": "/api/v5/finance/okusd/redeem/history"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Get Rewards History",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-okusd-get-get-rewards-history",
+      "path": "/api/v5/finance/okusd/rewards/history"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Get APR History",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-okusd-get-get-apr-history",
+      "path": "/api/v5/finance/okusd/rate/history"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Saving balance",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-simple-earn-flexible-get-saving-balance",
+      "path": "/api/v5/finance/savings/balance"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Savings purchase/redemption",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-simple-earn-flexible-post-savings-purchase-redemption",
+      "path": "/api/v5/finance/savings/purchase-redempt"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Lending history",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-simple-earn-flexible-get-lending-history",
+      "path": "/api/v5/finance/savings/lending-history"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Public borrow info (public)",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-simple-earn-flexible-get-public-borrow-info-public",
+      "path": "/api/v5/finance/savings/lending-rate-summary"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Public borrow history (public)",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-simple-earn-flexible-get-public-borrow-history-public",
+      "path": "/api/v5/finance/savings/lending-rate-history"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Borrowable currencies",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-flexible-loan-get-borrowable-currencies",
+      "path": "/api/v5/finance/flexible-loan/borrow-currencies"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Collateral assets",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-flexible-loan-get-collateral-assets",
+      "path": "/api/v5/finance/flexible-loan/collateral-assets"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Maximum loan amount",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-flexible-loan-post-maximum-loan-amount",
+      "path": "/api/v5/finance/flexible-loan/max-loan"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Maximum collateral redeem amount",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-flexible-loan-get-maximum-collateral-redeem-amount",
+      "path": "/api/v5/finance/flexible-loan/max-collateral-redeem-amount"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Adjust collateral",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-flexible-loan-post-adjust-collateral",
+      "path": "/api/v5/finance/flexible-loan/adjust-collateral"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Borrow",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-flexible-loan-post-borrow",
+      "path": "/api/v5/finance/flexible-loan/borrow"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Repay",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-flexible-loan-post-repay",
+      "path": "/api/v5/finance/flexible-loan/repay"
+    },
+    {
+      "method": "GET",
+      "title": "GET / E-Mode info",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-flexible-loan-get-e-mode-info",
+      "path": "/api/v5/finance/flexible-loan/emode-info"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Loan info",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-flexible-loan-get-loan-info",
+      "path": "/api/v5/finance/flexible-loan/loan-info"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Loan history",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-flexible-loan-get-loan-history",
+      "path": "/api/v5/finance/flexible-loan/loan-history"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Accrued interest",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-flexible-loan-get-accrued-interest",
+      "path": "/api/v5/finance/flexible-loan/interest-accrued"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Currency pairs",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-dual-investment-get-currency-pairs",
+      "path": "/api/v5/finance/sfp/dcd/currency-pair"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Product info",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-dual-investment-get-product-info",
+      "path": "/api/v5/finance/sfp/dcd/products"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Request for quote",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-dual-investment-post-request-for-quote",
+      "path": "/api/v5/finance/sfp/dcd/quote"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Trade",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-dual-investment-post-trade",
+      "path": "/api/v5/finance/sfp/dcd/trade"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Request for redeem quote",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-dual-investment-post-request-for-redeem-quote",
+      "path": "/api/v5/finance/sfp/dcd/redeem-quote"
+    },
+    {
+      "method": "POST",
+      "title": "POST / Redeem",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-dual-investment-post-redeem",
+      "path": "/api/v5/finance/sfp/dcd/redeem"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Order state",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-dual-investment-get-order-state",
+      "path": "/api/v5/finance/sfp/dcd/order-status"
+    },
+    {
+      "method": "GET",
+      "title": "GET / Order history",
+      "official_source": "https://www.okx.com/docs-v5/en/#financial-product-dual-investment-get-order-history",
+      "path": "/api/v5/finance/sfp/dcd/order-history"
+    },
+    {
+      "method": "GET",
+      "title": "Get performance summary",
+      "official_source": "https://www.okx.com/docs-v5/en/#affiliate-rest-api-get-performance-summary",
+      "path": "/api/v5/affiliate/performance/summary"
+    },
+    {
+      "method": "GET",
+      "title": "Get the invitee's detail",
+      "official_source": "https://www.okx.com/docs-v5/en/#affiliate-rest-api-get-the-invitee-39-s-detail",
+      "path": "/api/v5/affiliate/invitee/detail"
+    },
+    {
+      "method": "GET",
+      "title": "Get invitee list",
+      "official_source": "https://www.okx.com/docs-v5/en/#affiliate-rest-api-get-invitee-list",
+      "path": "/api/v5/affiliate/invitee/list"
+    },
+    {
+      "method": "GET",
+      "title": "Get link list",
+      "official_source": "https://www.okx.com/docs-v5/en/#affiliate-rest-api-get-link-list",
+      "path": "/api/v5/affiliate/link/list"
+    },
+    {
+      "method": "GET",
+      "title": "Get co-inviter link list",
+      "official_source": "https://www.okx.com/docs-v5/en/#affiliate-rest-api-get-co-inviter-link-list",
+      "path": "/api/v5/affiliate/co-inviter/list"
+    },
+    {
+      "method": "GET",
+      "title": "Get sub-affiliate list",
+      "official_source": "https://www.okx.com/docs-v5/en/#affiliate-rest-api-get-sub-affiliate-list",
+      "path": "/api/v5/affiliate/sub-affiliate/list"
+    },
+    {
+      "method": "GET",
+      "title": "Get sub-affiliate list",
+      "official_source": "https://www.okx.com/docs-v5/en/#affiliate-rest-api-get-sub-affiliate-list",
+      "path": "/api/v5/system/status"
+    },
+    {
+      "method": "GET",
+      "title": "Get sub-affiliate list",
+      "official_source": "https://www.okx.com/docs-v5/en/#affiliate-rest-api-get-sub-affiliate-list",
+      "path": "/api/v5/support/announcements"
+    },
+    {
+      "method": "GET",
+      "title": "Get sub-affiliate list",
+      "official_source": "https://www.okx.com/docs-v5/en/#affiliate-rest-api-get-sub-affiliate-list",
+      "path": "/api/v5/support/announcement-types"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "overview-websocket-connection-count-limit",
+      "title": "Connection count limit",
+      "official_source": "https://www.okx.com/docs-v5/en/#overview-websocket-connection-count-limit"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "overview-websocket-login",
+      "title": "Login",
+      "official_source": "https://www.okx.com/docs-v5/en/#overview-websocket-login"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "overview-websocket-subscribe",
+      "title": "Subscribe",
+      "official_source": "https://www.okx.com/docs-v5/en/#overview-websocket-subscribe"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "overview-websocket-unsubscribe",
+      "title": "Unsubscribe",
+      "official_source": "https://www.okx.com/docs-v5/en/#overview-websocket-unsubscribe"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "trading-account-websocket-account-channel",
+      "title": "Account channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-websocket-account-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "trading-account-websocket-positions-channel",
+      "title": "Positions channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-websocket-positions-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "trading-account-websocket-balance-and-position-channel",
+      "title": "Balance and position channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-websocket-balance-and-position-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "trading-account-websocket-position-risk-warning",
+      "title": "Position risk warning",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-websocket-position-risk-warning"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "trading-account-websocket-account-greeks-channel",
+      "title": "Account greeks channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-websocket-account-greeks-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "order-book-trading-trade-ws-order-channel",
+      "title": "WS / Order channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-trade-ws-order-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "order-book-trading-trade-ws-fills-channel",
+      "title": "WS / Fills channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-trade-ws-fills-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "order-book-trading-trade-ws-place-order",
+      "title": "WS / Place order",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-trade-ws-place-order"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "order-book-trading-trade-ws-place-multiple-orders",
+      "title": "WS / Place multiple orders",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-trade-ws-place-multiple-orders"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "order-book-trading-trade-ws-cancel-order",
+      "title": "WS / Cancel order",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-trade-ws-cancel-order"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "order-book-trading-trade-ws-cancel-multiple-orders",
+      "title": "WS / Cancel multiple orders",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-trade-ws-cancel-multiple-orders"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "order-book-trading-trade-ws-amend-order",
+      "title": "WS / Amend order",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-trade-ws-amend-order"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "order-book-trading-trade-ws-amend-multiple-orders",
+      "title": "WS / Amend multiple orders",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-trade-ws-amend-multiple-orders"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "order-book-trading-trade-ws-mass-cancel-order",
+      "title": "WS / Mass cancel order",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-trade-ws-mass-cancel-order"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "order-book-trading-algo-trading-ws-algo-orders-channel",
+      "title": "WS / Algo orders channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-algo-trading-ws-algo-orders-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "order-book-trading-algo-trading-ws-advance-algo-orders-channel",
+      "title": "WS / Advance algo orders channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-algo-trading-ws-advance-algo-orders-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "order-book-trading-grid-trading-ws-spot-grid-algo-orders-channel",
+      "title": "WS / Spot grid algo orders channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-grid-trading-ws-spot-grid-algo-orders-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "order-book-trading-grid-trading-ws-contract-grid-algo-orders-channel",
+      "title": "WS / Contract grid algo orders channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-grid-trading-ws-contract-grid-algo-orders-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "order-book-trading-grid-trading-ws-grid-positions-channel",
+      "title": "WS / Grid positions channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-grid-trading-ws-grid-positions-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "order-book-trading-grid-trading-ws-grid-sub-orders-channel",
+      "title": "WS / Grid sub orders channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-grid-trading-ws-grid-sub-orders-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "order-book-trading-recurring-buy-ws-recurring-buy-orders-channel",
+      "title": "WS / Recurring buy orders channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-recurring-buy-ws-recurring-buy-orders-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "order-book-trading-copy-trading-ws-lead-trading-notification-channel",
+      "title": "WS / Lead trading notification channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-copy-trading-ws-lead-trading-notification-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "order-book-trading-market-data-ws-tickers-channel",
+      "title": "WS / Tickers channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-market-data-ws-tickers-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "order-book-trading-market-data-ws-candlesticks-channel",
+      "title": "WS / Candlesticks channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-market-data-ws-candlesticks-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "order-book-trading-market-data-ws-trades-channel",
+      "title": "WS / Trades channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-market-data-ws-trades-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "order-book-trading-market-data-ws-all-trades-channel",
+      "title": "WS / All trades channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-market-data-ws-all-trades-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "order-book-trading-market-data-ws-order-book-channel",
+      "title": "WS / Order book channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-market-data-ws-order-book-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "order-book-trading-market-data-ws-option-trades-channel",
+      "title": "WS / Option trades channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-market-data-ws-option-trades-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "order-book-trading-market-data-ws-call-auction-details-channel",
+      "title": "WS / Call auction details channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-market-data-ws-call-auction-details-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "block-trading-websocket-private-channel-rfqs-channel",
+      "title": "Rfqs channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#block-trading-websocket-private-channel-rfqs-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "block-trading-websocket-private-channel-quotes-channel",
+      "title": "Quotes channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#block-trading-websocket-private-channel-quotes-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "block-trading-websocket-private-channel-structure-block-trades-channel",
+      "title": "Structure block trades channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#block-trading-websocket-private-channel-structure-block-trades-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "block-trading-websocket-public-channel-public-structure-block-trades-channel",
+      "title": "Public structure block trades channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#block-trading-websocket-public-channel-public-structure-block-trades-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "block-trading-websocket-public-channel-public-block-trades-channel",
+      "title": "Public block trades channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#block-trading-websocket-public-channel-public-block-trades-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "block-trading-websocket-public-channel-block-tickers-channel",
+      "title": "Block tickers channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#block-trading-websocket-public-channel-block-tickers-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "spread-trading-websocket-trade-api-ws-place-order",
+      "title": "WS / Place order",
+      "official_source": "https://www.okx.com/docs-v5/en/#spread-trading-websocket-trade-api-ws-place-order"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "spread-trading-websocket-trade-api-ws-amend-order",
+      "title": "WS / Amend order",
+      "official_source": "https://www.okx.com/docs-v5/en/#spread-trading-websocket-trade-api-ws-amend-order"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "spread-trading-websocket-trade-api-ws-cancel-order",
+      "title": "WS / Cancel order",
+      "official_source": "https://www.okx.com/docs-v5/en/#spread-trading-websocket-trade-api-ws-cancel-order"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "spread-trading-websocket-trade-api-ws-cancel-all-orders",
+      "title": "WS / Cancel all orders",
+      "official_source": "https://www.okx.com/docs-v5/en/#spread-trading-websocket-trade-api-ws-cancel-all-orders"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "spread-trading-websocket-private-channel-order-channel",
+      "title": "Order channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#spread-trading-websocket-private-channel-order-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "spread-trading-websocket-private-channel-trades-channel",
+      "title": "Trades channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#spread-trading-websocket-private-channel-trades-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "spread-trading-websocket-public-channel-order-book-channel",
+      "title": "Order book channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#spread-trading-websocket-public-channel-order-book-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "spread-trading-websocket-public-channel-public-trades-channel",
+      "title": "Public Trades channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#spread-trading-websocket-public-channel-public-trades-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "spread-trading-websocket-public-channel-tickers-channel",
+      "title": "Tickers channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#spread-trading-websocket-public-channel-tickers-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "spread-trading-websocket-public-channel-candlesticks-channel",
+      "title": "Candlesticks channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#spread-trading-websocket-public-channel-candlesticks-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "public-data-websocket-instruments-channel",
+      "title": "Instruments channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-websocket-instruments-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "public-data-websocket-event-contract-markets-channel",
+      "title": "Event contract markets channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-websocket-event-contract-markets-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "public-data-websocket-open-interest-channel",
+      "title": "Open interest channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-websocket-open-interest-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "public-data-websocket-funding-rate-channel",
+      "title": "Funding rate channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-websocket-funding-rate-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "public-data-websocket-price-limit-channel",
+      "title": "Price limit channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-websocket-price-limit-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "public-data-websocket-option-summary-channel",
+      "title": "Option summary channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-websocket-option-summary-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "public-data-websocket-estimated-delivery-exercise-settlement-price-channel",
+      "title": "Estimated delivery/exercise/settlement price channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-websocket-estimated-delivery-exercise-settlement-price-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "public-data-websocket-mark-price-channel",
+      "title": "Mark price channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-websocket-mark-price-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "public-data-websocket-index-tickers-channel",
+      "title": "Index tickers channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-websocket-index-tickers-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "public-data-websocket-mark-price-candlesticks-channel",
+      "title": "Mark price candlesticks channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-websocket-mark-price-candlesticks-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "public-data-websocket-index-candlesticks-channel",
+      "title": "Index candlesticks channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-websocket-index-candlesticks-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "public-data-websocket-liquidation-orders-channel",
+      "title": "Liquidation orders channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-websocket-liquidation-orders-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "public-data-websocket-adl-warning-channel",
+      "title": "ADL warning channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-websocket-adl-warning-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "public-data-websocket-economic-calendar-channel",
+      "title": "Economic calendar channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#public-data-websocket-economic-calendar-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "funding-account-websocket-deposit-info-channel",
+      "title": "Deposit info channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#funding-account-websocket-deposit-info-channel"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "funding-account-websocket-withdrawal-info-channel",
+      "title": "Withdrawal info channel",
+      "official_source": "https://www.okx.com/docs-v5/en/#funding-account-websocket-withdrawal-info-channel"
+    }
+  ]
+}

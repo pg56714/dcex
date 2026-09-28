@@ -215,7 +215,7 @@ impl LighterClient {
         };
         let mut client = self.clone();
         if explorer {
-            client.base_url = self.explorer_base_url.clone();
+            client.base_url = self.explorer_base_url.clone().ok_or_else(|| crate::DcexError::InvalidInput("explorer_base_url must be configured for this network; no documented default is available".into()))?;
         }
         client.get_path(&path, query, headers).await.map(Some)
     }

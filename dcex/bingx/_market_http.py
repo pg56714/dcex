@@ -463,3 +463,9 @@ class MarketHTTP(HTTPManager):
                 product_symbol=product_symbol, fromId=from_id, limit=limit, recvWindow=recv_window
             ),
         )
+
+    def get_spot_server_time(self) -> Any:  # noqa: ANN401
+        """
+        Get the spot server time; the server returns its native timestamp unit.
+        """
+        return self._native_public("get_spot_server_time", [])

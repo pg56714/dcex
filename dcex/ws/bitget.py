@@ -64,6 +64,15 @@ class PublicClient(AsyncWebSocketMixin):
         """Subscribe to kline events for a product."""
         await self._native_client.subscribe_klines(product_symbol, interval)
 
+    async def recv_bytes(self) -> bytes:
+        """
+        Receive the unmodified text/binary payload, including SBE market frames.
+
+        SBE decoding is the caller's responsibility; use the official schema.
+        Subscription acknowledgements and pong remain text payloads.
+        """
+        return bytes(await self._native_client.recv())
+
     async def recv(self) -> dict[str, Any] | list[Any]:
         """Receive and decode one WebSocket event."""
         body = await self._native_client.recv()
@@ -338,3 +347,13 @@ __all__ = [
     "uta_private",
     "uta_public",
 ]
+
+
+def sbe_public(
+    inst_type: str = "usdt-futures",
+    *,
+    timeout: float = 10.0,
+    base_url: str = "wss://ws.bitget.com/v3/ws/public/sbe",
+) -> PublicClient:
+    """Connect to SBE; subscribe to books1/books50/publicTrade and use recv_bytes."""
+    return PublicClient(inst_type=inst_type, timeout=timeout, base_url=base_url)

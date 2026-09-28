@@ -1,0 +1,434 @@
+[
+  {
+    "name": "create_contract_stp_group",
+    "method": "POST",
+    "path": "/api/v1/private/market_maker/self_trade/blacklist/create",
+    "kwargs": {
+      "config_name": "liquidity-team",
+      "blacklist": [
+        123,
+        456
+      ]
+    },
+    "wire": {
+      "configName": "liquidity-team",
+      "blacklist": [
+        123,
+        456
+      ]
+    },
+    "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/create-stp-group"
+  },
+  {
+    "name": "delete_contract_stp_group",
+    "method": "POST",
+    "path": "/api/v1/private/market_maker/self_trade/blacklist/delete",
+    "kwargs": {
+      "config_name": "liquidity-team"
+    },
+    "wire": {
+      "configName": "liquidity-team"
+    },
+    "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/delete-stp-group"
+  },
+  {
+    "name": "get_current_contract_stp_group",
+    "method": "GET",
+    "path": "/api/v1/private/market_maker/self_trade/blacklist/search",
+    "kwargs": {},
+    "wire": {},
+    "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/get-current-user-stp-group"
+  },
+  {
+    "name": "get_contract_stp_groups",
+    "method": "GET",
+    "path": "/api/v1/private/market_maker/self_trade/blacklist",
+    "kwargs": {
+      "config_name": "liquidity-team"
+    },
+    "wire": {
+      "configName": "liquidity-team"
+    },
+    "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/query-stp-groups-and-group-members"
+  },
+  {
+    "name": "update_contract_stp_group",
+    "method": "POST",
+    "path": "/api/v1/private/market_maker/self_trade/blacklist/update",
+    "kwargs": {
+      "config_name": "liquidity-team",
+      "blacklist": [
+        123,
+        456
+      ]
+    },
+    "wire": {
+      "configName": "liquidity-team",
+      "blacklist": [
+        123,
+        456
+      ]
+    },
+    "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/update-stp-group"
+  },
+  {
+    "name": "get_rebate_affiliate_campaign",
+    "method": "GET",
+    "path": "/api/v3/rebate/affiliate/campaign",
+    "kwargs": {
+      "start_time": 1700000000000,
+      "end_time": 1700000001000,
+      "page": 1,
+      "page_size": 10,
+      "recv_window": 5000
+    },
+    "wire": {
+      "startTime": 1700000000000,
+      "endTime": 1700000001000,
+      "page": 1,
+      "pageSize": 10,
+      "recvWindow": 5000
+    },
+    "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-affiliate-campaign-data-affiliate-only"
+  },
+  {
+    "name": "get_rebate_affiliate_commission_detail",
+    "method": "GET",
+    "path": "/api/v3/rebate/affiliate/commission/detail",
+    "kwargs": {
+      "start_time": 1700000000000,
+      "end_time": 1700000001000,
+      "uid": "123",
+      "invite_code": "ref-test",
+      "page": 1,
+      "page_size": 10,
+      "type_": 1,
+      "recv_window": 5000
+    },
+    "wire": {
+      "startTime": 1700000000000,
+      "endTime": 1700000001000,
+      "uid": "123",
+      "inviteCode": "ref-test",
+      "page": 1,
+      "pageSize": 10,
+      "type": 1,
+      "recvWindow": 5000
+    },
+    "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-affiliate-commission-detail-record-affiliate-only"
+  },
+  {
+    "name": "get_rebate_affiliate_commission",
+    "method": "GET",
+    "path": "/api/v3/rebate/affiliate/commission",
+    "kwargs": {
+      "start_time": 1700000000000,
+      "end_time": 1700000001000,
+      "uid": "123",
+      "invite_code": "ref-test",
+      "page": 1,
+      "page_size": 10,
+      "recv_window": 5000
+    },
+    "wire": {
+      "startTime": 1700000000000,
+      "endTime": 1700000001000,
+      "uid": "123",
+      "inviteCode": "ref-test",
+      "page": 1,
+      "pageSize": 10,
+      "recvWindow": 5000
+    },
+    "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-affiliate-commission-record-affiliate-only"
+  },
+  {
+    "name": "get_rebate_affiliate_referral",
+    "method": "GET",
+    "path": "/api/v3/rebate/affiliate/referral",
+    "kwargs": {
+      "start_time": 1700000000000,
+      "end_time": 1700000001000,
+      "uid": "123",
+      "invite_code": "ref-test",
+      "page": 1,
+      "page_size": 10,
+      "recv_window": 5000
+    },
+    "wire": {
+      "startTime": 1700000000000,
+      "endTime": 1700000001000,
+      "uid": "123",
+      "inviteCode": "ref-test",
+      "page": 1,
+      "pageSize": 10,
+      "recvWindow": 5000
+    },
+    "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-affiliate-referral-dataaffiliate-only"
+  },
+  {
+    "name": "get_rebate_affiliate_withdraw",
+    "method": "GET",
+    "path": "/api/v3/rebate/affiliate/withdraw",
+    "kwargs": {
+      "start_time": 1700000000000,
+      "end_time": 1700000001000,
+      "page": 1,
+      "page_size": 10,
+      "recv_window": 5000
+    },
+    "wire": {
+      "startTime": 1700000000000,
+      "endTime": 1700000001000,
+      "page": 1,
+      "pageSize": 10,
+      "recvWindow": 5000
+    },
+    "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-affiliate-withdraw-record-affiliate-only"
+  },
+  {
+    "name": "get_rebate_affiliate_list",
+    "method": "GET",
+    "path": "/api/v3/rebate/affiliate/list",
+    "kwargs": {
+      "member_info": "123",
+      "recv_window": 5000
+    },
+    "wire": {
+      "memberInfo": "123",
+      "recvWindow": 5000
+    },
+    "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-direct-subaffiliate-data-affiliate-only"
+  },
+  {
+    "name": "get_rebate_tax_query",
+    "method": "GET",
+    "path": "/api/v3/rebate/taxQuery",
+    "kwargs": {
+      "start_time": 1700000000000,
+      "end_time": 1700000001000,
+      "page": 1,
+      "recv_window": 5000
+    },
+    "wire": {
+      "startTime": 1700000000000,
+      "endTime": 1700000001000,
+      "page": 1,
+      "recvWindow": 5000
+    },
+    "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-rebate-history-records"
+  },
+  {
+    "name": "get_rebate_detail",
+    "method": "GET",
+    "path": "/api/v3/rebate/detail",
+    "kwargs": {
+      "start_time": 1700000000000,
+      "end_time": 1700000001000,
+      "page": 1,
+      "recv_window": 5000
+    },
+    "wire": {
+      "startTime": 1700000000000,
+      "endTime": 1700000001000,
+      "page": 1,
+      "recvWindow": 5000
+    },
+    "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-rebate-records-detail"
+  },
+  {
+    "name": "get_rebate_detail_kickback",
+    "method": "GET",
+    "path": "/api/v3/rebate/detail/kickback",
+    "kwargs": {
+      "start_time": 1700000000000,
+      "end_time": 1700000001000,
+      "page": 1,
+      "recv_window": 5000
+    },
+    "wire": {
+      "startTime": 1700000000000,
+      "endTime": 1700000001000,
+      "page": 1,
+      "recvWindow": 5000
+    },
+    "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-self-rebate-records-detail"
+  },
+  {
+    "name": "get_rebate_affiliate_subaffiliates",
+    "method": "GET",
+    "path": "/api/v3/rebate/affiliate/subaffiliates",
+    "kwargs": {
+      "start_time": 1700000000000,
+      "end_time": 1700000001000,
+      "uid": "123",
+      "invite_code": "ref-test",
+      "page": 1,
+      "page_size": 10,
+      "recv_window": 5000
+    },
+    "wire": {
+      "startTime": 1700000000000,
+      "endTime": 1700000001000,
+      "uid": "123",
+      "inviteCode": "ref-test",
+      "page": 1,
+      "pageSize": 10,
+      "recvWindow": 5000
+    },
+    "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-subaffiliates-data-affiliate-only"
+  },
+  {
+    "name": "get_rebate_refer_code",
+    "method": "GET",
+    "path": "/api/v3/rebate/referCode",
+    "kwargs": {
+      "recv_window": 5000
+    },
+    "wire": {
+      "recvWindow": 5000
+    },
+    "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/query-refercode"
+  },
+  {
+    "name": "cancel_spot_withdrawal",
+    "method": "DELETE",
+    "path": "/api/v3/capital/withdraw",
+    "kwargs": {
+      "id": "withdraw-test",
+      "recv_window": 5000
+    },
+    "wire": {
+      "id": "withdraw-test",
+      "recvWindow": 5000
+    },
+    "official_source": "https://www.mexc.com/api-docs/spot-v3/wallet-endpoints/cancel-withdraw"
+  },
+  {
+    "name": "transfer_spot_internal",
+    "method": "POST",
+    "path": "/api/v3/capital/transfer/internal",
+    "kwargs": {
+      "to_account_type": "UID",
+      "to_account": "456",
+      "area_code": "886",
+      "asset": "USDT",
+      "amount": "1.000000000000000001",
+      "recv_window": 5000
+    },
+    "wire": {
+      "toAccountType": "UID",
+      "toAccount": "456",
+      "areaCode": "886",
+      "asset": "USDT",
+      "amount": "1.000000000000000001",
+      "recvWindow": 5000
+    },
+    "official_source": "https://www.mexc.com/api-docs/spot-v3/wallet-endpoints/internal-transfer"
+  },
+  {
+    "name": "create_spot_withdrawal",
+    "method": "POST",
+    "path": "/api/v3/capital/withdraw",
+    "kwargs": {
+      "coin": "USDT",
+      "withdraw_order_id": "client-withdraw-test",
+      "network": "ETH",
+      "contract_address": "0x1111111111111111111111111111111111111111",
+      "address": "0x2222222222222222222222222222222222222222",
+      "memo": "test-memo",
+      "amount": "1.000000000000000001",
+      "remark": "offline test",
+      "recv_window": 5000
+    },
+    "wire": {
+      "coin": "USDT",
+      "withdrawOrderId": "client-withdraw-test",
+      "netWork": "ETH",
+      "contractAddress": "0x1111111111111111111111111111111111111111",
+      "address": "0x2222222222222222222222222222222222222222",
+      "memo": "test-memo",
+      "amount": "1.000000000000000001",
+      "remark": "offline test",
+      "recvWindow": 5000
+    },
+    "official_source": "https://www.mexc.com/api-docs/spot-v3/wallet-endpoints/withdrawnew"
+  },
+  {
+    "name": "create_spot_withdrawal_legacy",
+    "method": "POST",
+    "path": "/api/v3/capital/withdraw/apply",
+    "kwargs": {
+      "coin": "USDT",
+      "withdraw_order_id": "client-withdraw-test",
+      "network": "ETH",
+      "address": "0x2222222222222222222222222222222222222222",
+      "memo": "test-memo",
+      "amount": "1.000000000000000001",
+      "remark": "offline test",
+      "recv_window": 5000
+    },
+    "wire": {
+      "coin": "USDT",
+      "withdrawOrderId": "client-withdraw-test",
+      "network": "ETH",
+      "address": "0x2222222222222222222222222222222222222222",
+      "memo": "test-memo",
+      "amount": "1.000000000000000001",
+      "remark": "offline test",
+      "recvWindow": 5000
+    },
+    "official_source": "https://www.mexc.com/api-docs/spot-v3/wallet-endpoints/withdrawpreviousoffline-soon"
+  },
+  {
+    "name": "place_contract_batch_orders",
+    "method": "POST",
+    "path": "/api/v1/private/order/submit_batch",
+    "kwargs": {
+      "orders": [
+        {
+          "symbol": "BTC_USDT",
+          "price": "100.000000000000000001",
+          "vol": "1",
+          "side": 1,
+          "type": 1,
+          "openType": 2,
+          "stpMode": 1,
+          "leverage": 5,
+          "externalOid": "batch-offline-1"
+        },
+        {
+          "symbol": "BTC_USDT",
+          "price": "0",
+          "vol": "1",
+          "side": 2,
+          "type": 5,
+          "openType": 2,
+          "stpMode": 1
+        }
+      ]
+    },
+    "wire": [
+      {
+        "symbol": "BTC_USDT",
+        "price": "100.000000000000000001",
+        "vol": "1",
+        "side": 1,
+        "type": 1,
+        "openType": 2,
+        "stpMode": 1,
+        "leverage": 5,
+        "externalOid": "batch-offline-1"
+      },
+      {
+        "symbol": "BTC_USDT",
+        "price": "0",
+        "vol": "1",
+        "side": 2,
+        "type": 5,
+        "openType": 2,
+        "stpMode": 1
+      }
+    ],
+    "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/batch-place-order"
+  }
+]

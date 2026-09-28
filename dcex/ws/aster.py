@@ -179,3 +179,43 @@ def private(
 
 
 __all__ = ["PrivateClient", "PublicClient", "private", "public"]
+
+
+class PredictionPublicClient(PublicClient):
+    """Prediction market streams on the dedicated mainnet or testnet endpoint."""
+
+    def __init__(
+        self, *, testnet: bool = False, timeout: float = 10.0, base_url: str | None = None
+    ) -> None:
+        """Use raw prediction stream names, for example btc_up_down_5m_...@trade."""
+        domain = "asterdex-testnet.com" if testnet else "asterdex.com"
+        super().__init__(
+            market="spot", timeout=timeout, base_url=base_url or f"wss://pstream.{domain}/ws"
+        )
+
+
+class PredictionPrivateClient(PrivateClient):
+    """Prediction listen-key account streams, signed with the approved agent."""
+
+    def __init__(
+        self,
+        signer_address: str,
+        private_key: str,
+        user_address: str | None = None,
+        *,
+        testnet: bool = False,
+        timeout: float = 10.0,
+        http_base_url: str | None = None,
+        ws_base_url: str | None = None,
+    ) -> None:
+        """Create, renew and close the prediction listen key on its own HTTP host."""
+        domain = "asterdex-testnet.com" if testnet else "asterdex.com"
+        super().__init__(
+            signer_address,
+            private_key,
+            user_address,
+            market="spot",
+            timeout=timeout,
+            spot_http_base_url=http_base_url or f"https://papi.{domain}",
+            ws_base_url=ws_base_url or f"wss://pstream.{domain}",
+        )

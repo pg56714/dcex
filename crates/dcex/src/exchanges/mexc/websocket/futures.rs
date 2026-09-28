@@ -129,15 +129,17 @@ impl MexcFuturesWebSocket {
             "funding.rate",
             "index.price",
             "fair.price",
+            "contract",
+            "event.contract",
         ]
         .contains(&channel)
         {
             return Err(invalid("unsupported futures channel"));
         }
         let mut param = json!({});
-        if channel == "tickers" {
+        if matches!(channel, "tickers" | "contract" | "event.contract") {
             if symbol.is_some() {
-                return Err(invalid("tickers does not accept a symbol"));
+                return Err(invalid("this channel does not accept a symbol"));
             }
         } else {
             param["symbol"] =
@@ -182,7 +184,13 @@ impl MexcFuturesWebSocket {
         } else if step.is_some() {
             return Err(invalid("step is only valid for depth.step"));
         }
-        self.connection.send_json(&json!({"method":format!("{}.{channel}",if subscribe {"sub"} else {"unsub"}),"param":param,"gzip":false})).await
+        let method = format!("{}.{channel}", if subscribe { "sub" } else { "unsub" });
+        if matches!(channel, "contract" | "event.contract") {
+            return self.connection.send_json(&json!({"method": method})).await;
+        }
+        self.connection
+            .send_json(&json!({"method":method,"param":param,"gzip":false}))
+            .await
     }
     /// Replace the private push filter; an empty list restores all default pushes.
     pub async fn set_private_filters(&mut self, filters: Value) -> Result<()> {

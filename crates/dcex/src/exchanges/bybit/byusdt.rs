@@ -138,12 +138,12 @@ fn query_with_coin(params: &BybitParams, keys: &[&str]) -> Vec<(String, String)>
 }
 
 fn validate_optional_order_type(params: &BybitParams) -> Result<()> {
-    if let Some(value) = params.get("orderType") {
-        if !matches!(value, "Mint" | "Redeem") {
-            return Err(DcexError::InvalidInput(
-                "orderType must be Mint or Redeem".to_string(),
-            ));
-        }
+    if let Some(value) = params.get("orderType")
+        && !matches!(value, "Mint" | "Redeem")
+    {
+        return Err(DcexError::InvalidInput(
+            "orderType must be Mint or Redeem".to_string(),
+        ));
     }
     Ok(())
 }
@@ -159,12 +159,12 @@ fn validate_times(params: &BybitParams) -> Result<()> {
             })
             .transpose()
     };
-    if let (Some(start), Some(end)) = (parse("startTime")?, parse("endTime")?) {
-        if end < start {
-            return Err(DcexError::InvalidInput(
-                "endTime must not be earlier than startTime".to_string(),
-            ));
-        }
+    if let (Some(start), Some(end)) = (parse("startTime")?, parse("endTime")?)
+        && end < start
+    {
+        return Err(DcexError::InvalidInput(
+            "endTime must not be earlier than startTime".to_string(),
+        ));
     }
     Ok(())
 }

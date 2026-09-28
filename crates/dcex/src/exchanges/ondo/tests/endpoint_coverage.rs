@@ -725,7 +725,7 @@ fn private_wallet_and_key_routes_match_official_paths() {
         ),
         private(
             "delete_api_key",
-            &[("apiKeyID", "k1")],
+            &[("confirm", "true"), ("apiKeyID", "k1")],
             "DELETE",
             "/v1/api_keys/k1",
         ),

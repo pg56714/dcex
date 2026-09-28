@@ -10,7 +10,14 @@ impl MexcClient {
         method_name: &str,
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
+        let params = super::super::operation_guards::validate("mexc", method_name, params)?;
         let params = MexcParams::from_pairs(params);
+        if let Some(result) = self
+            .completion_private_request(method_name, &params)
+            .await?
+        {
+            return Ok(result);
+        }
         if let Some(result) = self.additional_request(method_name, &params, false).await? {
             return Ok(result);
         }

@@ -83,6 +83,11 @@ impl KucoinPrivateWebSocket {
         market: KucoinMarket,
     ) -> Result<Self> {
         validate_credential("KuCoin API key", &api_key)?;
+        if matches!(market, KucoinMarket::Broker) {
+            return Err(DcexError::InvalidInput(
+                "Broker management has no Classic WebSocket market".into(),
+            ));
+        }
         validate_credential("KuCoin API secret", &api_secret)?;
         validate_credential("KuCoin API passphrase", &passphrase)?;
         Ok(Self {
@@ -166,6 +171,11 @@ impl KucoinPrivateWebSocket {
         let topic = match self.market {
             KucoinMarket::Futures => "/contractMarket/tradeOrders",
             KucoinMarket::Spot => "/spotMarket/tradeOrders",
+            KucoinMarket::Broker => {
+                return Err(DcexError::InvalidInput(
+                    "Broker management has no order topic".into(),
+                ));
+            }
         };
         self.subscribe(topic).await
     }
@@ -174,6 +184,11 @@ impl KucoinPrivateWebSocket {
         let topic = match self.market {
             KucoinMarket::Futures => "/contractAccount/wallet",
             KucoinMarket::Spot => "/account/balance",
+            KucoinMarket::Broker => {
+                return Err(DcexError::InvalidInput(
+                    "Broker management has no balance topic".into(),
+                ));
+            }
         };
         self.subscribe(topic).await
     }

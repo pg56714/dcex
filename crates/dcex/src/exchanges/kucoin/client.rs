@@ -18,6 +18,14 @@ use super::signing::{
 pub enum KucoinMarket {
     Futures,
     Spot,
+    Broker,
+}
+
+#[derive(Clone)]
+struct BrokerAuth {
+    partner: String,
+    key: String,
+    name: String,
 }
 
 #[derive(Clone)]
@@ -25,6 +33,8 @@ pub struct KucoinClient {
     transport: AsyncHttpClient,
     spot_base_url: String,
     futures_base_url: String,
+    broker_base_url: String,
+    broker_auth: Option<BrokerAuth>,
     api_key: Option<String>,
     api_secret: Option<String>,
     encrypted_passphrase: Option<String>,
@@ -66,11 +76,44 @@ impl KucoinClient {
             transport: AsyncHttpClient::new(timeout)?,
             spot_base_url,
             futures_base_url,
+            broker_base_url: "https://api-broker.kucoin.com".into(),
+            broker_auth: None,
             api_key,
             api_secret,
             encrypted_passphrase,
             product_table: None,
         })
+    }
+
+    /// Configure the broker host and optional partner attribution credentials.
+    pub fn configure_broker(
+        &mut self,
+        base_url: String,
+        partner: Option<String>,
+        key: Option<String>,
+        name: Option<String>,
+    ) -> Result<()> {
+        if base_url.trim().is_empty() {
+            return Err(DcexError::InvalidInput(
+                "broker base URL must not be empty".into(),
+            ));
+        }
+        let auth = match (partner, key, name) {
+            (None, None, None) => None,
+            (Some(partner), Some(key), Some(name))
+                if !partner.is_empty() && !key.is_empty() && !name.is_empty() =>
+            {
+                Some(BrokerAuth { partner, key, name })
+            }
+            _ => {
+                return Err(DcexError::InvalidInput(
+                    "broker partner, key and name must be provided together".into(),
+                ));
+            }
+        };
+        self.broker_base_url = base_url;
+        self.broker_auth = auth;
+        Ok(())
     }
 
     pub fn with_product_table(mut self, product_table: ProductTable) -> Self {
@@ -232,6 +275,7 @@ impl KucoinClient {
         let base_url = match market {
             KucoinMarket::Futures => &self.futures_base_url,
             KucoinMarket::Spot => &self.spot_base_url,
+            KucoinMarket::Broker => &self.broker_base_url,
         };
         let mut request = HttpRequest::new(method, base_url, &request_path)
             .header("Content-Type", "application/json");
@@ -256,6 +300,23 @@ impl KucoinClient {
             request
                 .headers
                 .insert("KC-API-KEY-VERSION".to_string(), "2".to_string());
+            if let Some(auth) = &self.broker_auth {
+                let preimage = format!("{timestamp}{}{api_key}", auth.partner);
+                let signature =
+                    crate::crypto::hmac_sha256_base64(auth.key.as_bytes(), preimage.as_bytes())?;
+                request
+                    .headers
+                    .insert("KC-API-PARTNER".into(), auth.partner.clone());
+                request
+                    .headers
+                    .insert("KC-API-PARTNER-SIGN".into(), signature);
+                request
+                    .headers
+                    .insert("KC-BROKER-NAME".into(), auth.name.clone());
+                request
+                    .headers
+                    .insert("KC-API-PARTNER-VERIFY".into(), "true".into());
+            }
         }
 
         Ok(request)
@@ -273,10 +334,10 @@ impl KucoinClient {
     }
 
     pub(super) fn exchange_symbol(&self, product_symbol: &str, futures: bool) -> Result<String> {
-        if is_canonical_product_symbol(product_symbol) {
-            if let Some(table) = &self.product_table {
-                return table.get_exchange_symbol("kucoin", product_symbol);
-            }
+        if is_canonical_product_symbol(product_symbol)
+            && let Some(table) = &self.product_table
+        {
+            return table.get_exchange_symbol("kucoin", product_symbol);
         }
         Ok(exchange_symbol_fallback(product_symbol, futures))
     }

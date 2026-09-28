@@ -1,5 +1,7 @@
 mod account;
 mod client;
+mod completion;
+mod completion_wrappers;
 mod endpoints;
 mod market;
 mod params;

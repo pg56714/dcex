@@ -1,0 +1,422 @@
+[
+  {
+    "name": "submit_fast_withdrawal",
+    "kwargs": {
+      "tx_info": "{\"FromAccountIndex\":12,\"ToAccountIndex\":99,\"AssetIndex\":3,\"Amount\":4000000,\"Sig\":\"offline-L2\",\"L1Sig\":\"0x111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111b\"}",
+      "to_address": "0x4444444444444444444444444444444444444444",
+      "authorization": "test-token"
+    },
+    "params": [
+      [
+        "tx_info",
+        "{\"FromAccountIndex\":12,\"ToAccountIndex\":99,\"AssetIndex\":3,\"Amount\":4000000,\"Sig\":\"offline-L2\",\"L1Sig\":\"0x111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111b\"}"
+      ],
+      [
+        "to_address",
+        "0x4444444444444444444444444444444444444444"
+      ],
+      [
+        "authorization",
+        "test-token"
+      ]
+    ],
+    "method": "POST",
+    "path": "/api/v1/fastwithdraw",
+    "kind": "private"
+  },
+  {
+    "name": "create_referral_code",
+    "kwargs": {
+      "account_index": 12,
+      "authorization": "test-token"
+    },
+    "params": [
+      [
+        "account_index",
+        "12"
+      ],
+      [
+        "authorization",
+        "test-token"
+      ]
+    ],
+    "method": "POST",
+    "path": "/api/v1/referral/create",
+    "kind": "private"
+  },
+  {
+    "name": "get_referral_code",
+    "kwargs": {
+      "account_index": 12,
+      "authorization": "test-token"
+    },
+    "params": [
+      [
+        "account_index",
+        "12"
+      ],
+      [
+        "authorization",
+        "test-token"
+      ]
+    ],
+    "method": "GET",
+    "path": "/api/v1/referral/get",
+    "kind": "private"
+  },
+  {
+    "name": "update_referral_kickback",
+    "kwargs": {
+      "account_index": 12,
+      "kickback_percentage": "12.345",
+      "authorization": "test-token"
+    },
+    "params": [
+      [
+        "account_index",
+        "12"
+      ],
+      [
+        "kickback_percentage",
+        "12.345"
+      ],
+      [
+        "authorization",
+        "test-token"
+      ]
+    ],
+    "method": "POST",
+    "path": "/api/v1/referral/kickback/update",
+    "kind": "private"
+  },
+  {
+    "name": "get_referral_stats",
+    "kwargs": {
+      "l1_address": "0x4444444444444444444444444444444444444444",
+      "auth": "query-token",
+      "is_eligible": false,
+      "authorization": "test-token"
+    },
+    "params": [
+      [
+        "l1_address",
+        "0x4444444444444444444444444444444444444444"
+      ],
+      [
+        "auth",
+        "query-token"
+      ],
+      [
+        "is_eligible",
+        "false"
+      ],
+      [
+        "authorization",
+        "test-token"
+      ]
+    ],
+    "method": "GET",
+    "path": "/api/v1/referral/stats",
+    "kind": "private"
+  },
+  {
+    "name": "update_referral_code",
+    "kwargs": {
+      "account_index": 12,
+      "new_referral_code": "OFFLINE",
+      "authorization": "test-token"
+    },
+    "params": [
+      [
+        "account_index",
+        "12"
+      ],
+      [
+        "new_referral_code",
+        "OFFLINE"
+      ],
+      [
+        "authorization",
+        "test-token"
+      ]
+    ],
+    "method": "POST",
+    "path": "/api/v1/referral/update",
+    "kind": "private"
+  },
+  {
+    "name": "use_referral_code",
+    "kwargs": {
+      "l1_address": "0x4444444444444444444444444444444444444444",
+      "referral_code": "OFFLINE",
+      "discord": "offline",
+      "telegram": "offline",
+      "x": "offline",
+      "signature": "caller-wallet-signature",
+      "source": "api",
+      "authorization": "test-token"
+    },
+    "params": [
+      [
+        "l1_address",
+        "0x4444444444444444444444444444444444444444"
+      ],
+      [
+        "referral_code",
+        "OFFLINE"
+      ],
+      [
+        "discord",
+        "offline"
+      ],
+      [
+        "telegram",
+        "offline"
+      ],
+      [
+        "x",
+        "offline"
+      ],
+      [
+        "signature",
+        "caller-wallet-signature"
+      ],
+      [
+        "source",
+        "api"
+      ],
+      [
+        "authorization",
+        "test-token"
+      ]
+    ],
+    "method": "POST",
+    "path": "/api/v1/referral/use",
+    "kind": "private"
+  },
+  {
+    "name": "respond_to_rfq",
+    "kwargs": {
+      "rfq_id": 123,
+      "status": "liquidity_provided",
+      "authorization": "test-token"
+    },
+    "params": [
+      [
+        "rfq_id",
+        "123"
+      ],
+      [
+        "status",
+        "liquidity_provided"
+      ],
+      [
+        "authorization",
+        "test-token"
+      ]
+    ],
+    "method": "POST",
+    "path": "/api/v1/rfq/respond",
+    "kind": "private"
+  },
+  {
+    "name": "withdraw_l2",
+    "kwargs": {
+      "asset_index": 3,
+      "route_type": 1,
+      "amount": 1099511627899,
+      "nonce": 5,
+      "api_key_index": 3,
+      "skip_nonce": 0
+    },
+    "params": [
+      [
+        "asset_index",
+        "3"
+      ],
+      [
+        "route_type",
+        "1"
+      ],
+      [
+        "amount",
+        "1099511627899"
+      ],
+      [
+        "nonce",
+        "5"
+      ],
+      [
+        "api_key_index",
+        "3"
+      ],
+      [
+        "skip_nonce",
+        "0"
+      ]
+    ],
+    "method": "POST",
+    "path": 13,
+    "kind": "private"
+  },
+  {
+    "name": "sign_withdraw_l2",
+    "kwargs": {
+      "asset_index": 3,
+      "route_type": 1,
+      "amount": 1099511627899,
+      "nonce": 5,
+      "api_key_index": 3,
+      "skip_nonce": 0
+    },
+    "params": [
+      [
+        "asset_index",
+        "3"
+      ],
+      [
+        "route_type",
+        "1"
+      ],
+      [
+        "amount",
+        "1099511627899"
+      ],
+      [
+        "nonce",
+        "5"
+      ],
+      [
+        "api_key_index",
+        "3"
+      ],
+      [
+        "skip_nonce",
+        "0"
+      ]
+    ],
+    "method": "POST",
+    "path": 13,
+    "kind": "sign"
+  },
+  {
+    "name": "approve_integrator",
+    "kwargs": {
+      "integrator_account_index": 99,
+      "max_perps_taker_fee": 100,
+      "max_perps_maker_fee": 20,
+      "max_spot_taker_fee": 50,
+      "max_spot_maker_fee": 10,
+      "approval_expiry": 1900000000000,
+      "l1_signature": "0x111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111b",
+      "nonce": 5,
+      "api_key_index": 3,
+      "skip_nonce": 0
+    },
+    "params": [
+      [
+        "integrator_account_index",
+        "99"
+      ],
+      [
+        "max_perps_taker_fee",
+        "100"
+      ],
+      [
+        "max_perps_maker_fee",
+        "20"
+      ],
+      [
+        "max_spot_taker_fee",
+        "50"
+      ],
+      [
+        "max_spot_maker_fee",
+        "10"
+      ],
+      [
+        "approval_expiry",
+        "1900000000000"
+      ],
+      [
+        "l1_signature",
+        "0x111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111b"
+      ],
+      [
+        "nonce",
+        "5"
+      ],
+      [
+        "api_key_index",
+        "3"
+      ],
+      [
+        "skip_nonce",
+        "0"
+      ]
+    ],
+    "method": "POST",
+    "path": 45,
+    "kind": "private"
+  },
+  {
+    "name": "sign_approve_integrator",
+    "kwargs": {
+      "integrator_account_index": 99,
+      "max_perps_taker_fee": 100,
+      "max_perps_maker_fee": 20,
+      "max_spot_taker_fee": 50,
+      "max_spot_maker_fee": 10,
+      "approval_expiry": 1900000000000,
+      "l1_signature": "0x111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111b",
+      "nonce": 5,
+      "api_key_index": 3,
+      "skip_nonce": 0
+    },
+    "params": [
+      [
+        "integrator_account_index",
+        "99"
+      ],
+      [
+        "max_perps_taker_fee",
+        "100"
+      ],
+      [
+        "max_perps_maker_fee",
+        "20"
+      ],
+      [
+        "max_spot_taker_fee",
+        "50"
+      ],
+      [
+        "max_spot_maker_fee",
+        "10"
+      ],
+      [
+        "approval_expiry",
+        "1900000000000"
+      ],
+      [
+        "l1_signature",
+        "0x111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111b"
+      ],
+      [
+        "nonce",
+        "5"
+      ],
+      [
+        "api_key_index",
+        "3"
+      ],
+      [
+        "skip_nonce",
+        "0"
+      ]
+    ],
+    "method": "POST",
+    "path": 45,
+    "kind": "sign"
+  }
+]

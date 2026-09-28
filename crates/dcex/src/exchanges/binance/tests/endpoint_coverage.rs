@@ -81,7 +81,16 @@ fn multi_request_server() -> (String, Arc<AtomicBool>, JoinHandle<Vec<String>>) 
                     if let Some(line) = request.lines().next() {
                         lines.push(line.to_string());
                     }
-                    let body = r#"{"serverTime":1700000000000,"listenKey":"test-listen-key"}"#;
+                    let batch = request.lines().next().is_some_and(|line| {
+                        line.contains("/fapi/v1/batchOrders")
+                            || line.contains("/dapi/v1/batchOrders")
+                            || line.contains("/eapi/v1/batchOrders")
+                    });
+                    let body = if batch {
+                        r#"[{"orderId":1}]"#
+                    } else {
+                        r#"{"serverTime":1700000000000,"listenKey":"test-listen-key"}"#
+                    };
                     let response = format!(
                         "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n\
                          Content-Length: {}\r\nConnection: close\r\n\r\n{}",

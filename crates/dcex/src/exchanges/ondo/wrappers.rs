@@ -14,6 +14,9 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_mark_prices(), get_open_interest(), get_volume(), get_contracts()
     ];
     private [
+        /// API withdrawals and external transfers have no second confirmation; they execute on submit.
+        create_withdrawal(customer_withdrawal_id => "customer_withdrawal_id", symbol => "symbol", network => "network", amount => "amount", address => "address"),
+        sandbox_withdrawal(customer_withdrawal_id => "customer_withdrawal_id", symbol => "symbol", amount => "amount", from_account => "from"),
         invalidate_jwt(),
         get_account(), get_open_order_counts(), get_deposits(),
         get_deposit(deposit_id => "depositID"), get_withdrawals(),

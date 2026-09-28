@@ -314,12 +314,14 @@ add_sub_account(password => "password",sub_name => "subName",access => "access")
 
 crate::exchanges::impl_exchange_method_wrappers! { @extend; KucoinClient; public [
 get_uta_oe_scurrency(),
+get_uta_oes_currency(),
 ]; private [
 get_withdrawal_history_by_id(withdrawal_id => "withdrawalId"),
 get_withdrawal_history(currency => "currency"),
 get_withdrawal_quotas(currency => "currency"),
 get_loan_info(),
 get_accounts(),
+get_otc_loan_accounts(),
 get_discount_rate_configs(),
 get_uta_oes_custody_quota(),
 get_uta_accounts(),

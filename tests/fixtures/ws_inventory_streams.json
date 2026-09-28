@@ -1,0 +1,366 @@
+[
+  {
+    "row": 4274,
+    "exchange": "binance",
+    "stream": "alpha_116usdt@aggTrade",
+    "official_source": "https://developers.binance.com/en/docs/catalog/advanced-trading-alpha-trading/api/ws-streams/~#aggregate-trade-stream"
+  },
+  {
+    "row": 4275,
+    "exchange": "binance",
+    "stream": "!bookTicker",
+    "official_source": "https://developers.binance.com/en/docs/catalog/advanced-trading-alpha-trading/api/ws-streams/~#all-book-ticker-stream"
+  },
+  {
+    "row": 4276,
+    "exchange": "binance",
+    "stream": "!miniTicker@arr",
+    "official_source": "https://developers.binance.com/en/docs/catalog/advanced-trading-alpha-trading/api/ws-streams/~#all-mini-ticker-stream"
+  },
+  {
+    "row": 4277,
+    "exchange": "binance",
+    "stream": "!ticker@arr",
+    "official_source": "https://developers.binance.com/en/docs/catalog/advanced-trading-alpha-trading/api/ws-streams/~#all-ticker-stream"
+  },
+  {
+    "row": 4278,
+    "exchange": "binance",
+    "stream": "came@allTokens@ticker24",
+    "official_source": "https://developers.binance.com/en/docs/catalog/advanced-trading-alpha-trading/api/ws-streams/~#all-tokens24h-ticker-stream"
+  },
+  {
+    "row": 4279,
+    "exchange": "binance",
+    "stream": "alpha_116usdt@bookTicker",
+    "official_source": "https://developers.binance.com/en/docs/catalog/advanced-trading-alpha-trading/api/ws-streams/~#book-ticker-stream"
+  },
+  {
+    "row": 4280,
+    "exchange": "binance",
+    "stream": "came@0x1234567890123456789012345678901234567890@56@kline_1m",
+    "official_source": "https://developers.binance.com/en/docs/catalog/advanced-trading-alpha-trading/api/ws-streams/~#contract-kline-stream"
+  },
+  {
+    "row": 4281,
+    "exchange": "binance",
+    "stream": "alpha_116usdt@fulldepth@100ms",
+    "official_source": "https://developers.binance.com/en/docs/catalog/advanced-trading-alpha-trading/api/ws-streams/~#full-depth-stream"
+  },
+  {
+    "row": 4282,
+    "exchange": "binance",
+    "stream": "alpha_116usdt@kline_1m",
+    "official_source": "https://developers.binance.com/en/docs/catalog/advanced-trading-alpha-trading/api/ws-streams/~#kline-stream"
+  },
+  {
+    "row": 4283,
+    "exchange": "binance",
+    "stream": "alpha_116usdt@miniTicker",
+    "official_source": "https://developers.binance.com/en/docs/catalog/advanced-trading-alpha-trading/api/ws-streams/~#mini-ticker-stream"
+  },
+  {
+    "row": 4284,
+    "exchange": "binance",
+    "stream": "alpha_116usdt@depth20@100ms",
+    "official_source": "https://developers.binance.com/en/docs/catalog/advanced-trading-alpha-trading/api/ws-streams/~#partial-depth-stream"
+  },
+  {
+    "row": 4285,
+    "exchange": "binance",
+    "stream": "alpha_116usdt@ticker",
+    "official_source": "https://developers.binance.com/en/docs/catalog/advanced-trading-alpha-trading/api/ws-streams/~#ticker-stream"
+  },
+  {
+    "row": 4286,
+    "exchange": "binance",
+    "stream": "alpha_116usdt@trade",
+    "official_source": "https://developers.binance.com/en/docs/catalog/advanced-trading-alpha-trading/api/ws-streams/~#trade-stream"
+  },
+  {
+    "row": 4220,
+    "exchange": "aster",
+    "stream": "btc_up_down_5m_1778483280_yusdt@aggTrade",
+    "testnet": true,
+    "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api-tesetnet.md#L2125"
+  },
+  {
+    "row": 4221,
+    "exchange": "aster",
+    "stream": "btc_up_down_5m_1778483280_yusdt@trade",
+    "testnet": true,
+    "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api-tesetnet.md#L2151"
+  },
+  {
+    "row": 4222,
+    "exchange": "aster",
+    "stream": "btc_up_down_5m_1778483280_yusdt@kline_1m",
+    "testnet": true,
+    "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api-tesetnet.md#L2172"
+  },
+  {
+    "row": 4223,
+    "exchange": "aster",
+    "stream": "btc_up_down_5m_1778483280_yusdt@miniTicker",
+    "testnet": true,
+    "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api-tesetnet.md#L2229"
+  },
+  {
+    "row": 4224,
+    "exchange": "aster",
+    "stream": "!miniTicker@arr",
+    "testnet": true,
+    "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api-tesetnet.md#L2253"
+  },
+  {
+    "row": 4225,
+    "exchange": "aster",
+    "stream": "btc_up_down_5m_1778483280_yusdt@ticker",
+    "testnet": true,
+    "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api-tesetnet.md#L2271"
+  },
+  {
+    "row": 4226,
+    "exchange": "aster",
+    "stream": "!ticker@arr",
+    "testnet": true,
+    "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api-tesetnet.md#L2304"
+  },
+  {
+    "row": 4227,
+    "exchange": "aster",
+    "stream": "btc_up_down_5m_1778483280_yusdt@bookTicker",
+    "testnet": true,
+    "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api-tesetnet.md#L2322"
+  },
+  {
+    "row": 4228,
+    "exchange": "aster",
+    "stream": "!bookTicker",
+    "testnet": true,
+    "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api-tesetnet.md#L2343"
+  },
+  {
+    "row": 4229,
+    "exchange": "aster",
+    "stream": "btc_up_down_5m_1778483280_yusdt@depth20@100ms",
+    "testnet": true,
+    "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api-tesetnet.md#L2359"
+  },
+  {
+    "row": 4230,
+    "exchange": "aster",
+    "stream": "btc_up_down_5m_1778483280_yusdt@depth@100ms",
+    "testnet": true,
+    "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api-tesetnet.md#L2393"
+  },
+  {
+    "row": 4234,
+    "exchange": "aster",
+    "stream": "btc_up_down_5m_1778483280_yusdt@aggTrade",
+    "testnet": false,
+    "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api.md#L2125"
+  },
+  {
+    "row": 4235,
+    "exchange": "aster",
+    "stream": "btc_up_down_5m_1778483280_yusdt@trade",
+    "testnet": false,
+    "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api.md#L2151"
+  },
+  {
+    "row": 4236,
+    "exchange": "aster",
+    "stream": "btc_up_down_5m_1778483280_yusdt@kline_1m",
+    "testnet": false,
+    "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api.md#L2172"
+  },
+  {
+    "row": 4237,
+    "exchange": "aster",
+    "stream": "btc_up_down_5m_1778483280_yusdt@miniTicker",
+    "testnet": false,
+    "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api.md#L2229"
+  },
+  {
+    "row": 4238,
+    "exchange": "aster",
+    "stream": "!miniTicker@arr",
+    "testnet": false,
+    "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api.md#L2253"
+  },
+  {
+    "row": 4239,
+    "exchange": "aster",
+    "stream": "btc_up_down_5m_1778483280_yusdt@ticker",
+    "testnet": false,
+    "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api.md#L2271"
+  },
+  {
+    "row": 4240,
+    "exchange": "aster",
+    "stream": "!ticker@arr",
+    "testnet": false,
+    "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api.md#L2304"
+  },
+  {
+    "row": 4241,
+    "exchange": "aster",
+    "stream": "btc_up_down_5m_1778483280_yusdt@bookTicker",
+    "testnet": false,
+    "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api.md#L2322"
+  },
+  {
+    "row": 4242,
+    "exchange": "aster",
+    "stream": "!bookTicker",
+    "testnet": false,
+    "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api.md#L2343"
+  },
+  {
+    "row": 4243,
+    "exchange": "aster",
+    "stream": "btc_up_down_5m_1778483280_yusdt@depth20@100ms",
+    "testnet": false,
+    "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api.md#L2359"
+  },
+  {
+    "row": 4244,
+    "exchange": "aster",
+    "stream": "btc_up_down_5m_1778483280_yusdt@depth@100ms",
+    "testnet": false,
+    "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api.md#L2393"
+  },
+  {
+    "row": 4273,
+    "exchange": "backpack",
+    "stream": "account.balanceUpdate",
+    "official_source": "https://docs.backpack.exchange/#tag/Streams"
+  },
+  {
+    "row": 4273,
+    "exchange": "backpack",
+    "stream": "account.orderUpdate",
+    "official_source": "https://docs.backpack.exchange/#tag/Streams"
+  },
+  {
+    "row": 4273,
+    "exchange": "backpack",
+    "stream": "account.orderUpdate.SOL_USDC",
+    "official_source": "https://docs.backpack.exchange/#tag/Streams"
+  },
+  {
+    "row": 4273,
+    "exchange": "backpack",
+    "stream": "account.positionUpdate",
+    "official_source": "https://docs.backpack.exchange/#tag/Streams"
+  },
+  {
+    "row": 4273,
+    "exchange": "backpack",
+    "stream": "account.positionUpdate.SOL_USDC",
+    "official_source": "https://docs.backpack.exchange/#tag/Streams"
+  },
+  {
+    "row": 4273,
+    "exchange": "backpack",
+    "stream": "account.rfqUpdate",
+    "official_source": "https://docs.backpack.exchange/#tag/Streams"
+  },
+  {
+    "row": 4273,
+    "exchange": "backpack",
+    "stream": "account.rfqUpdate.SOL_USDC",
+    "official_source": "https://docs.backpack.exchange/#tag/Streams"
+  },
+  {
+    "row": 4273,
+    "exchange": "backpack",
+    "stream": "account.rfq",
+    "official_source": "https://docs.backpack.exchange/#tag/Streams"
+  },
+  {
+    "row": 4273,
+    "exchange": "backpack",
+    "stream": "account.rfq.SOL_USDC",
+    "official_source": "https://docs.backpack.exchange/#tag/Streams"
+  },
+  {
+    "row": 4273,
+    "exchange": "backpack",
+    "stream": "bookTicker.SOL_USDC",
+    "official_source": "https://docs.backpack.exchange/#tag/Streams"
+  },
+  {
+    "row": 4273,
+    "exchange": "backpack",
+    "stream": "depth.SOL_USDC",
+    "official_source": "https://docs.backpack.exchange/#tag/Streams"
+  },
+  {
+    "row": 4273,
+    "exchange": "backpack",
+    "stream": "depth.200ms.SOL_USDC",
+    "official_source": "https://docs.backpack.exchange/#tag/Streams"
+  },
+  {
+    "row": 4273,
+    "exchange": "backpack",
+    "stream": "depth.600ms.SOL_USDC",
+    "official_source": "https://docs.backpack.exchange/#tag/Streams"
+  },
+  {
+    "row": 4273,
+    "exchange": "backpack",
+    "stream": "depth.1000ms.SOL_USDC",
+    "official_source": "https://docs.backpack.exchange/#tag/Streams"
+  },
+  {
+    "row": 4273,
+    "exchange": "backpack",
+    "stream": "kline.1m.SOL_USDC",
+    "official_source": "https://docs.backpack.exchange/#tag/Streams"
+  },
+  {
+    "row": 4273,
+    "exchange": "backpack",
+    "stream": "liquidation.SOL_USDC",
+    "official_source": "https://docs.backpack.exchange/#tag/Streams"
+  },
+  {
+    "row": 4273,
+    "exchange": "backpack",
+    "stream": "markPrice.SOL_USDC",
+    "official_source": "https://docs.backpack.exchange/#tag/Streams"
+  },
+  {
+    "row": 4273,
+    "exchange": "backpack",
+    "stream": "ticker.SOL_USDC",
+    "official_source": "https://docs.backpack.exchange/#tag/Streams"
+  },
+  {
+    "row": 4273,
+    "exchange": "backpack",
+    "stream": "externalTicker.SOL_USDC",
+    "official_source": "https://docs.backpack.exchange/#tag/Streams"
+  },
+  {
+    "row": 4273,
+    "exchange": "backpack",
+    "stream": "stockPrice.AAPL",
+    "official_source": "https://docs.backpack.exchange/#tag/Streams"
+  },
+  {
+    "row": 4273,
+    "exchange": "backpack",
+    "stream": "openInterest.SOL_USDC",
+    "official_source": "https://docs.backpack.exchange/#tag/Streams"
+  },
+  {
+    "row": 4273,
+    "exchange": "backpack",
+    "stream": "trade.SOL_USDC",
+    "official_source": "https://docs.backpack.exchange/#tag/Streams"
+  }
+]

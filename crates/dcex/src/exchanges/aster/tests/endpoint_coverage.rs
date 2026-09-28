@@ -27,23 +27,23 @@ enum Kind {
     Private,
 }
 
-struct Case {
+struct Case<'a> {
     kind: Kind,
     name: &'static str,
-    params: &'static [(&'static str, &'static str)],
+    params: &'a [(&'a str, &'a str)],
     method: &'static str,
     path: &'static str,
     /// Substrings that must appear in the query string or form body.
-    contains: &'static [&'static str],
+    contains: &'a [&'a str],
 }
 
-const fn public(
+const fn public<'a>(
     name: &'static str,
-    params: &'static [(&'static str, &'static str)],
+    params: &'a [(&'a str, &'a str)],
     method: &'static str,
     path: &'static str,
-    contains: &'static [&'static str],
-) -> Case {
+    contains: &'a [&'a str],
+) -> Case<'a> {
     Case {
         kind: Kind::Public,
         name,
@@ -54,13 +54,13 @@ const fn public(
     }
 }
 
-const fn private(
+const fn private<'a>(
     name: &'static str,
-    params: &'static [(&'static str, &'static str)],
+    params: &'a [(&'a str, &'a str)],
     method: &'static str,
     path: &'static str,
-    contains: &'static [&'static str],
-) -> Case {
+    contains: &'a [&'a str],
+) -> Case<'a> {
     Case {
         kind: Kind::Private,
         name,
@@ -1139,42 +1139,49 @@ fn signed_spot_request_omits_user() {
 
 #[test]
 fn nonce_controls_preserve_the_original_nonce() {
+    let nonce = client("http://127.0.0.1:1")
+        .reserve_nonce()
+        .unwrap()
+        .to_string();
+    let expected_nonce = format!("nonce={nonce}");
+    let old_nonce = (nonce.parse::<u64>().unwrap() - 300_000_000).to_string();
+    let old_expected = format!("nonce={old_nonce}");
     assert_cases(&[
         private(
             "noop_spot",
-            &[("nonce", "1700000000000123")],
+            &[("nonce", nonce.as_str())],
             "POST",
             "/api/v3/noop",
-            &["nonce=1700000000000123"],
+            &[expected_nonce.as_str()],
         ),
         private(
             "noop_futures",
-            &[("nonce", "1700000000000123")],
+            &[("nonce", nonce.as_str())],
             "POST",
             "/fapi/v3/noop",
-            &["nonce=1700000000000123"],
+            &[expected_nonce.as_str()],
         ),
         private(
             "guarded_cancel_futures_order",
             &[
                 ("product_symbol", SWAP),
-                ("nonce", "1700000000000123"),
+                ("nonce", old_nonce.as_str()),
                 ("orderId", "123"),
             ],
             "DELETE",
             "/fapi/v3/guardedCancelOrder",
-            &["symbol=BTCUSDT", "orderId=123", "nonce=1700000000000123"],
+            &["symbol=BTCUSDT", "orderId=123", old_expected.as_str()],
         ),
         private(
             "guarded_cancel_futures_batch_orders",
             &[
                 ("product_symbol", SWAP),
-                ("nonce", "1700000000000123"),
+                ("nonce", old_nonce.as_str()),
                 ("orderIdList", "[123, 456]"),
             ],
             "DELETE",
             "/fapi/v3/guardedBatchOrders",
-            &["nonce=1700000000000123", "orderIdList=%5B123%2C456%5D"],
+            &[old_expected.as_str(), "orderIdList=%5B123%2C456%5D"],
         ),
         private(
             "transfer_sub_account",
@@ -1216,11 +1223,11 @@ fn nonce_controls_preserve_the_original_nonce() {
                 ("side", "BUY"),
                 ("type", "MARKET"),
                 ("quantity", "1"),
-                ("nonce", "1700000000000123"),
+                ("nonce", nonce.as_str()),
             ],
         );
         result.expect("explicit placement nonce");
-        assert_eq!(requests[0].matches("nonce=1700000000000123").count(), 1);
+        assert_eq!(requests[0].matches(expected_nonce.as_str()).count(), 1);
     }
 }
 
@@ -1277,7 +1284,7 @@ fn additional_account_routes() {
         ),
         private(
             "exchange_futures_assets",
-            &[],
+            &[("confirm", "true")],
             "POST",
             "/fapi/v3/assetExchange",
             &[],
@@ -1610,6 +1617,42 @@ fn prediction_routes_use_dedicated_host() {
             &[],
         ),
     ]);
+}
+
+#[test]
+fn withdraw_permission_requires_an_ip_whitelist() {
+    for whitelist in [None, Some("192.0.2.1")] {
+        let signature = format!("0x{}", "11".repeat(65));
+        let mut params = vec![
+            ("user", USER),
+            ("nonce", "1700000000000123"),
+            ("agentName", "trader"),
+            ("agentAddress", SIGNER),
+            ("expired", "1800000000000"),
+            ("signatureChainId", "56"),
+            ("canSpotTrade", "true"),
+            ("canPerpTrade", "true"),
+            ("canWithdraw", "true"),
+            ("signature", signature.as_str()),
+        ];
+        if let Some(ip) = whitelist {
+            params.push(("ipWhitelist", ip));
+        }
+        let (result, requests) = run(Kind::Private, "register_agent_signed", &params);
+        if whitelist.is_none() {
+            assert!(result.unwrap_err().to_string().contains("ipWhitelist"));
+            assert!(requests.is_empty());
+            continue;
+        }
+        result.unwrap();
+        assert_eq!(requests.len(), 1);
+        assert!(requests[0].starts_with("POST /fapi/v3/registerAndApproveAgent "));
+        assert!(requests[0].contains("canWithdraw=true"));
+        assert_eq!(
+            requests[0].contains("ipWhitelist=192.0.2.1"),
+            whitelist.is_some()
+        );
+    }
 }
 
 #[test]

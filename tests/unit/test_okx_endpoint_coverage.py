@@ -13,6 +13,9 @@ the native client) and also covers ``_finance_http.py`` and
 from __future__ import annotations
 
 import ast
+import base64
+import hashlib
+import hmac
 import json
 import queue
 import threading
@@ -2307,6 +2310,22 @@ WRAPPER_FILES = (
 )
 
 
+COMPLETION = json.loads((ROOT / "tests/fixtures/okx_completion.json").read_text(encoding="utf-8"))
+COMPLETION_NAMES = {e["name"] for e in COMPLETION}
+CASES += tuple(
+    Case(
+        e["name"],
+        e["method"],
+        e["path"],
+        kwargs=e["kwargs"],
+        signed=not e["public"],
+        body=e["wire"] if e["method"] == "POST" else {},
+        query=e["wire"] if e["method"] == "GET" else {},
+    )
+    for e in COMPLETION
+)
+
+
 class _Handler(BaseHTTPRequestHandler):
     received: queue.Queue[dict[str, Any]]
 
@@ -2319,6 +2338,7 @@ class _Handler(BaseHTTPRequestHandler):
                 "path": self.path,
                 "body": body,
                 "signed": self.headers.get("OK-ACCESS-SIGN") is not None,
+                "headers": {key.lower(): value for key, value in self.headers.items()},
             }
         )
         payload = b'{"code":"0","msg":"","data":[]}'
@@ -2374,6 +2394,19 @@ def _assert_request(case: Case, request: dict[str, Any]) -> None:
     assert request["method"] == case.method, case.name
     assert split.path == case.path, case.name
     assert request["signed"] is case.signed, case.name
+    if case.name in COMPLETION_NAMES:
+        assert dict(parse_qsl(split.query)) == case.query
+        if case.method == "POST":
+            assert json.loads(request["body"]) == case.body
+        if case.signed:
+            headers = request["headers"]
+            message = (
+                headers["ok-access-timestamp"] + case.method + request["path"] + request["body"]
+            )
+            expected = base64.b64encode(
+                hmac.new(b"secret", message.encode(), hashlib.sha256).digest()
+            ).decode()
+            assert headers["ok-access-sign"] == expected
     query = dict(parse_qsl(split.query))
     for key, value in case.query.items():
         assert query.get(key) == value, (case.name, key, query)

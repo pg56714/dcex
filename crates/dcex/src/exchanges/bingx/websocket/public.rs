@@ -178,11 +178,11 @@ impl BingxPublicWebSocket {
         loop {
             let payload = self.connection.recv_bytes().await?;
             let body = decode_event_bytes(payload)?;
-            if let Ok(text) = std::str::from_utf8(&body) {
-                if is_application_ping_text(text) {
-                    self.connection.send_text("Pong").await?;
-                    continue;
-                }
+            if let Ok(text) = std::str::from_utf8(&body)
+                && is_application_ping_text(text)
+            {
+                self.connection.send_text("Pong").await?;
+                continue;
             }
             return Ok(body);
         }
@@ -222,12 +222,12 @@ impl BingxPublicWebSocket {
                 "BingX Coin-M requires a BASE-USD symbol".into(),
             ));
         }
-        if let Some(market) = market {
-            if market != self.market {
-                return Err(DcexError::InvalidInput(format!(
-                    "BingX {market:?} WebSocket symbol requires the matching public WebSocket URL"
-                )));
-            }
+        if let Some(market) = market
+            && market != self.market
+        {
+            return Err(DcexError::InvalidInput(format!(
+                "BingX {market:?} WebSocket symbol requires the matching public WebSocket URL"
+            )));
         }
         Ok(symbol)
     }

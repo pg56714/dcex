@@ -321,5 +321,142 @@ impl PythonKucoinPrivateWebSocketClient {
 
 pub(super) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PythonKucoinPublicWebSocketClient>()?;
+    m.add_class::<PythonKucoinProWebSocketClient>()?;
     m.add_class::<PythonKucoinPrivateWebSocketClient>()
+}
+
+#[pyclass(name = "KucoinProWebSocketClient")]
+struct PythonKucoinProWebSocketClient {
+    client: Arc<Mutex<dcex::ws::kucoin::KucoinProWebSocket>>,
+}
+#[pymethods]
+impl PythonKucoinProWebSocketClient {
+    #[new]
+    #[pyo3(signature = (profile="public_spot", api_key=None, api_secret=None, passphrase=None, timeout=10.0, base_url=None))]
+    fn new(
+        profile: &str,
+        api_key: Option<String>,
+        api_secret: Option<String>,
+        passphrase: Option<String>,
+        timeout: f64,
+        base_url: Option<String>,
+    ) -> PyResult<Self> {
+        let credentials = match (api_key, api_secret, passphrase) {
+            (None, None, None) => None,
+            (Some(k), Some(s), Some(p)) => Some((k, s, p)),
+            _ => {
+                return Err(PyValueError::new_err(
+                    "Supply all three KuCoin credentials together.",
+                ));
+            }
+        };
+        let client = dcex::ws::kucoin::KucoinProWebSocket::new(
+            profile,
+            credentials,
+            base_url,
+            websocket_timeout(timeout)?,
+        )
+        .map_err(to_py_runtime_error)?;
+        Ok(Self {
+            client: Arc::new(Mutex::new(client)),
+        })
+    }
+    fn is_connected(&self) -> PyResult<bool> {
+        Ok(self
+            .client
+            .try_lock()
+            .map_err(|_| PyRuntimeError::new_err("KuCoin Pro WS is busy."))?
+            .is_connected())
+    }
+    fn url(&self) -> PyResult<String> {
+        Ok(self
+            .client
+            .try_lock()
+            .map_err(|_| PyRuntimeError::new_err("KuCoin Pro WS is busy."))?
+            .url()
+            .into())
+    }
+    fn connect<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let event = client
+                .lock()
+                .await
+                .connect()
+                .await
+                .map_err(to_py_runtime_error)?;
+            Ok(event.to_string())
+        })
+    }
+    fn close<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client
+                .lock()
+                .await
+                .close()
+                .await
+                .map_err(to_py_runtime_error)
+        })
+    }
+    fn recv<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let bytes = client
+                .lock()
+                .await
+                .recv_bytes()
+                .await
+                .map_err(to_py_runtime_error)?;
+            Python::with_gil(|py| Ok(PyBytes::new(py, &bytes).unbind()))
+        })
+    }
+    fn subscription<'py>(
+        &self,
+        py: Python<'py>,
+        message: String,
+        subscribe: bool,
+    ) -> PyResult<Bound<'py, PyAny>> {
+        let message = serde_json::from_str(&message)
+            .map_err(|e| PyValueError::new_err(format!("Invalid JSON: {e}")))?;
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client
+                .lock()
+                .await
+                .subscription(message, subscribe)
+                .await
+                .map_err(to_py_runtime_error)
+        })
+    }
+    fn send_operation<'py>(
+        &self,
+        py: Python<'py>,
+        id: String,
+        operation: String,
+        args: String,
+    ) -> PyResult<Bound<'py, PyAny>> {
+        let args = serde_json::from_str(&args)
+            .map_err(|e| PyValueError::new_err(format!("Invalid JSON: {e}")))?;
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client
+                .lock()
+                .await
+                .send_operation(&id, &operation, args)
+                .await
+                .map_err(to_py_runtime_error)
+        })
+    }
+    fn ping<'py>(&self, py: Python<'py>, id: String) -> PyResult<Bound<'py, PyAny>> {
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client
+                .lock()
+                .await
+                .ping(&id)
+                .await
+                .map_err(to_py_runtime_error)
+        })
+    }
 }

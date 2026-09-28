@@ -2,6 +2,7 @@
 
 from typing import Any
 
+from ..._operation_guards import require_confirmation
 from ...enums import OrderSide
 from ._http_manager import HTTPManager
 
@@ -571,6 +572,9 @@ class TradeHTTP(HTTPManager):
         Transfer within one master/sub-account family using the approved agent.
 
         Aster enforces account-family membership; external transfers are not supported.
+
+        Not verified live: the official signature template includes both user and signer,
+        while its parameter notes require only one. This method sends signer only.
         """
         return await self._native_private(
             "transfer_sub_account",
@@ -583,9 +587,20 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
-    async def exchange_futures_assets(self) -> dict[str, Any] | list[Any]:
-        """POST /fapi/v3/assetExchange."""
-        return await self._native_private("exchange_futures_assets", self._native_params())
+    async def trigger_futures_asset_exchange(
+        self, *, confirm: bool = False
+    ) -> dict[str, Any] | list[Any]:
+        """
+        POST /fapi/v3/assetExchange.
+
+        Requires confirm=True. This immediately converts Multi-Assets balances.
+        """
+        require_confirmation(confirm)
+        return await self._native_private(
+            "trigger_futures_asset_exchange", self._native_params(confirm=confirm)
+        )
+
+    exchange_futures_assets = trigger_futures_asset_exchange
 
     async def get_sub_accounts(self) -> dict[str, Any] | list[Any]:
         """GET /fapi/v3/getSubAccountList."""
@@ -963,4 +978,365 @@ class TradeHTTP(HTTPManager):
         """Query a migration batch with the authenticated destination account."""
         return await self._native_private(
             "get_asset_migration_history", self._native_params(batchId=batch_id)
+        )
+
+    async def place_spot_batch_orders_raw(self, **params: object) -> Any:  # noqa: ANN401
+        """
+        Submit caller-supplied batch order parameters.
+
+        Official spec incomplete; not verified live. Inspect every item in the response;
+        an HTTP success does not imply every order succeeded.
+        """
+        return await self._native_private(
+            "place_spot_batch_orders_raw", self._native_params(**params)
+        )
+
+    async def cancel_spot_batch_orders_raw(self, **params: object) -> Any:  # noqa: ANN401
+        """
+        Cancel a batch using caller-supplied wire parameters.
+
+        Official spec incomplete; not verified live. Inspect every item in the response.
+        """
+        return await self._native_private(
+            "cancel_spot_batch_orders_raw", self._native_params(**params)
+        )
+
+    async def noop_prediction(self, nonce: int) -> Any:  # noqa: ANN401
+        """
+        Attempt to cancel an unprocessed Prediction transaction with the same nonce.
+
+        Uses the Prediction host. Cancellation is not guaranteed by the exchange.
+        """
+        return await self._native_private("noop_prediction", self._native_params(nonce=nonce))
+
+    async def get_builder_user_accounts(
+        self,
+        *,
+        user_addresses: str | None = None,
+        symbol: str | None = None,
+        page: int | None = None,
+        limit: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        Query userAccounts for users who approved this builder.
+
+        Uses the authenticated builder identity; pagination and eligibility are enforced by Aster.
+        Source: https://github.com/asterdex/api-docs/blob/master/V3(Recommended)/EN/aster-finance-futures-api-v3.md
+        """
+        return await self._native_private(
+            "get_builder_user_accounts",
+            self._native_params(
+                userAddresses=user_addresses,
+                symbol=symbol,
+                page=page,
+                limit=limit,
+            ),
+        )
+
+    async def get_builder_user_open_orders(
+        self,
+        *,
+        user_addresses: str | None = None,
+        symbol: str | None = None,
+        page: int | None = None,
+        limit: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        Query userOpenOrders for users who approved this builder.
+
+        Uses the authenticated builder identity; pagination and eligibility are enforced by Aster.
+        Source: https://github.com/asterdex/api-docs/blob/master/V3(Recommended)/EN/aster-finance-futures-api-v3.md
+        """
+        return await self._native_private(
+            "get_builder_user_open_orders",
+            self._native_params(
+                userAddresses=user_addresses,
+                symbol=symbol,
+                page=page,
+                limit=limit,
+            ),
+        )
+
+    async def get_builder_user_balances(
+        self,
+        *,
+        user_addresses: str | None = None,
+        page: int | None = None,
+        limit: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        Query userBalances for users who approved this builder.
+
+        Uses the authenticated builder identity; pagination and eligibility are enforced by Aster.
+        Source: https://github.com/asterdex/api-docs/blob/master/V3(Recommended)/EN/aster-finance-futures-api-v3.md
+        """
+        return await self._native_private(
+            "get_builder_user_balances",
+            self._native_params(
+                userAddresses=user_addresses,
+                page=page,
+                limit=limit,
+            ),
+        )
+
+    async def get_builder_user_position_risk(
+        self,
+        *,
+        user_addresses: str | None = None,
+        symbol: str | None = None,
+        page: int | None = None,
+        limit: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        Query userPositionRisk for users who approved this builder.
+
+        Uses the authenticated builder identity; pagination and eligibility are enforced by Aster.
+        Source: https://github.com/asterdex/api-docs/blob/master/V3(Recommended)/EN/aster-finance-futures-api-v3.md
+        """
+        return await self._native_private(
+            "get_builder_user_position_risk",
+            self._native_params(
+                userAddresses=user_addresses,
+                symbol=symbol,
+                page=page,
+                limit=limit,
+            ),
+        )
+
+    async def get_builder_user_commission_rates(
+        self,
+        *,
+        user_addresses: str | None = None,
+        symbol: str,
+        page: int | None = None,
+        limit: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        Query userCommissionRates for users who approved this builder.
+
+        Uses the authenticated builder identity; pagination and eligibility are enforced by Aster.
+        Source: https://github.com/asterdex/api-docs/blob/master/V3(Recommended)/EN/aster-finance-futures-api-v3.md
+        """
+        return await self._native_private(
+            "get_builder_user_commission_rates",
+            self._native_params(
+                userAddresses=user_addresses,
+                symbol=symbol,
+                page=page,
+                limit=limit,
+            ),
+        )
+
+    async def get_builder_user_trades(
+        self,
+        *,
+        user_addresses: str | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        page: int | None = None,
+        limit: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        Query userTrades for users who approved this builder.
+
+        Uses the authenticated builder identity; pagination and eligibility are enforced by Aster.
+        Source: https://github.com/asterdex/api-docs/blob/master/V3(Recommended)/EN/aster-finance-futures-api-v3.md
+        """
+        return await self._native_private(
+            "get_builder_user_trades",
+            self._native_params(
+                userAddresses=user_addresses,
+                startTime=start_time,
+                endTime=end_time,
+                page=page,
+                limit=limit,
+            ),
+        )
+
+    async def get_builder_user_all_orders(
+        self,
+        *,
+        user_addresses: str | None = None,
+        symbol: str | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        page: int | None = None,
+        limit: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        Query userAllOrders for users who approved this builder.
+
+        Uses the authenticated builder identity; pagination and eligibility are enforced by Aster.
+        Source: https://github.com/asterdex/api-docs/blob/master/V3(Recommended)/EN/aster-finance-futures-api-v3.md
+        """
+        return await self._native_private(
+            "get_builder_user_all_orders",
+            self._native_params(
+                userAddresses=user_addresses,
+                symbol=symbol,
+                startTime=start_time,
+                endTime=end_time,
+                page=page,
+                limit=limit,
+            ),
+        )
+
+    async def get_builder_approved_users(
+        self,
+        *,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        page: int | None = None,
+        limit: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        Query approvedUserList for users who approved this builder.
+
+        Uses the authenticated builder identity; pagination and eligibility are enforced by Aster.
+        Source: https://github.com/asterdex/api-docs/blob/master/V3(Recommended)/EN/aster-finance-futures-api-v3.md
+        """
+        return await self._native_private(
+            "get_builder_approved_users",
+            self._native_params(
+                startTime=start_time,
+                endTime=end_time,
+                page=page,
+                limit=limit,
+            ),
+        )
+
+    async def withdraw_spot_signed(
+        self,
+        *,
+        chain_id: int,
+        asset: str,
+        amount: str,
+        fee: str,
+        receiver: str,
+        user_nonce: str,
+        user_signature: str,
+        signature_type: str | None = None,
+        signature_chain_id: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        Submit a wallet-authorized spot withdrawal.
+
+        API withdrawals have no second confirmation; they execute on submit.
+        user_nonce and user_signature belong to the wallet authorization and are preserved
+        verbatim; the client adds a separate V3 agent nonce/signature.
+        Source: https://github.com/asterdex/api-docs/blob/master/demo/aster-deposit-withdrawal.md
+        """
+        return await self._native_private(
+            "withdraw_spot_signed",
+            self._native_params(
+                chainId=chain_id,
+                asset=asset,
+                amount=amount,
+                fee=fee,
+                receiver=receiver,
+                userNonce=user_nonce,
+                userSignature=user_signature,
+                signatureType=signature_type,
+                signatureChainId=signature_chain_id,
+            ),
+        )
+
+    async def withdraw_spot_solana_signed(
+        self,
+        *,
+        chain_id: int,
+        asset: str,
+        amount: str,
+        fee: str,
+        receiver: str,
+        user_nonce: str | None = None,
+        user_signature: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        Submit a wallet-authorized spot withdrawal.
+
+        API withdrawals have no second confirmation; they execute on submit.
+        user_nonce and user_signature belong to the wallet authorization and are preserved
+        verbatim; the client adds a separate V3 agent nonce/signature.
+        Source: https://github.com/asterdex/api-docs/blob/master/demo/aster-deposit-withdrawal.md
+        """
+        return await self._native_private(
+            "withdraw_spot_solana_signed",
+            self._native_params(
+                chainId=chain_id,
+                asset=asset,
+                amount=amount,
+                fee=fee,
+                receiver=receiver,
+                userNonce=user_nonce,
+                userSignature=user_signature,
+            ),
+        )
+
+    async def withdraw_futures_signed(
+        self,
+        *,
+        chain_id: int,
+        asset: str,
+        amount: str,
+        fee: str,
+        receiver: str,
+        user_nonce: str,
+        user_signature: str,
+        signature_type: str | None = None,
+        signature_chain_id: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        Submit a wallet-authorized futures withdrawal.
+
+        API withdrawals have no second confirmation; they execute on submit.
+        user_nonce and user_signature belong to the wallet authorization and are preserved
+        verbatim; the client adds a separate V3 agent nonce/signature.
+        Source: https://github.com/asterdex/api-docs/blob/master/demo/aster-deposit-withdrawal.md
+        """
+        return await self._native_private(
+            "withdraw_futures_signed",
+            self._native_params(
+                chainId=chain_id,
+                asset=asset,
+                amount=amount,
+                fee=fee,
+                receiver=receiver,
+                userNonce=user_nonce,
+                userSignature=user_signature,
+                signatureType=signature_type,
+                signatureChainId=signature_chain_id,
+            ),
+        )
+
+    async def withdraw_futures_solana_signed(
+        self,
+        *,
+        chain_id: int,
+        asset: str,
+        amount: str,
+        fee: str,
+        receiver: str,
+        user_nonce: str | None = None,
+        user_signature: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        Submit a wallet-authorized futures withdrawal.
+
+        API withdrawals have no second confirmation; they execute on submit.
+        user_nonce and user_signature belong to the wallet authorization and are preserved
+        verbatim; the client adds a separate V3 agent nonce/signature.
+        Source: https://github.com/asterdex/api-docs/blob/master/demo/aster-deposit-withdrawal.md
+        """
+        return await self._native_private(
+            "withdraw_futures_solana_signed",
+            self._native_params(
+                chainId=chain_id,
+                asset=asset,
+                amount=amount,
+                fee=fee,
+                receiver=receiver,
+                userNonce=user_nonce,
+                userSignature=user_signature,
+            ),
         )

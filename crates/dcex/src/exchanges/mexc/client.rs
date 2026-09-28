@@ -295,10 +295,10 @@ impl MexcClient {
     }
 
     pub(super) fn exchange_symbol(&self, product_symbol: &str, separator: &str) -> Result<String> {
-        if is_canonical_product_symbol(product_symbol) {
-            if let Some(table) = &self.product_table {
-                return table.get_exchange_symbol("mexc", product_symbol);
-            }
+        if is_canonical_product_symbol(product_symbol)
+            && let Some(table) = &self.product_table
+        {
+            return table.get_exchange_symbol("mexc", product_symbol);
         }
         Ok(exchange_symbol_fallback(product_symbol, separator))
     }

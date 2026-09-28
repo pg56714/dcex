@@ -595,7 +595,27 @@ impl AsterClient {
         method_name: &str,
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
+        // These ordinary public routes are documented without complete parameter tables.
+        // Preserve caller-supplied wire parameters rather than inventing a schema.
+        let incomplete = match method_name {
+            "get_futures_market_klines" => Some((AsterMarket::Futures, "/fapi/v3/marketKlines")),
+            "get_spot_optimized_ticker_24hr" => {
+                Some((AsterMarket::Spot, "/api/v3/ticker/opt/24hr"))
+            }
+            _ => None,
+        };
+        if let Some((market, path)) = incomplete {
+            if method_name == "get_futures_market_klines" {
+                AsterParams::from_pairs(params.clone()).required("symbol")?;
+            }
+            return self
+                .request(HttpMethod::Get, market, path, params, false)
+                .await;
+        }
         let params = AsterParams::from_pairs(params);
+        if let Some(response) = self.auxiliary_public_request(method_name, &params).await? {
+            return Ok(response);
+        }
         if let Some(response) = self.prediction_dispatch(method_name, &params, true).await? {
             return Ok(response);
         }
@@ -906,13 +926,12 @@ fn validate_public_params(method_name: &str, params: &AsterParams) -> Result<()>
         "get_spot_orderbook" | "get_futures_orderbook" => {
             params.ensure_allowed(&["product_symbol", "limit"], &[])?;
             params.required("product_symbol")?;
-            if let Some(limit) = params.u64("limit")? {
-                if !matches!(limit, 5 | 10 | 20 | 50 | 100 | 500 | 1000) {
-                    return Err(DcexError::InvalidInput(
-                        "Aster depth limit must be one of 5, 10, 20, 50, 100, 500, 1000"
-                            .to_string(),
-                    ));
-                }
+            if let Some(limit) = params.u64("limit")?
+                && !matches!(limit, 5 | 10 | 20 | 50 | 100 | 500 | 1000)
+            {
+                return Err(DcexError::InvalidInput(
+                    "Aster depth limit must be one of 5, 10, 20, 50, 100, 500, 1000".to_string(),
+                ));
             }
             Ok(())
         }

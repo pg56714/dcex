@@ -3,30 +3,47 @@
 from json import dumps
 from typing import Any
 
+from .._keyword_aliases import legacy_keywords
+from .._operation_guards import require_confirmation, require_scope
 from ._http_manager import HTTPManager
 
 
 class TradeHTTP(HTTPManager):
     """HTTP client for Bitget private trading operations."""
 
+    @legacy_keywords(
+        {
+            "orderType": "order_type",
+            "clientOid": "client_oid",
+            "triggerPrice": "trigger_price",
+            "tpslType": "tpsl_type",
+            "requestTime": "request_time",
+            "receiveWindow": "receive_window",
+            "stpMode": "stp_mode",
+            "presetTakeProfitPrice": "preset_take_profit_price",
+            "executeTakeProfitPrice": "execute_take_profit_price",
+            "presetStopLossPrice": "preset_stop_loss_price",
+            "executeStopLossPrice": "execute_stop_loss_price",
+        }
+    )
     def place_spot_order(
         self,
         product_symbol: str,
         side: str,
-        orderType: str,
+        order_type: str,
         size: str,
         price: str | None = None,
         force: str | None = None,
-        clientOid: str | None = None,
-        triggerPrice: str | None = None,
-        tpslType: str | None = None,
-        requestTime: int | str | None = None,
-        receiveWindow: int | str | None = None,
-        stpMode: str | None = None,
-        presetTakeProfitPrice: str | None = None,
-        executeTakeProfitPrice: str | None = None,
-        presetStopLossPrice: str | None = None,
-        executeStopLossPrice: str | None = None,
+        client_oid: str | None = None,
+        trigger_price: str | None = None,
+        tpsl_type: str | None = None,
+        request_time: int | str | None = None,
+        receive_window: int | str | None = None,
+        stp_mode: str | None = None,
+        preset_take_profit_price: str | None = None,
+        execute_take_profit_price: str | None = None,
+        preset_stop_loss_price: str | None = None,
+        execute_stop_loss_price: str | None = None,
     ) -> dict[str, Any]:
         """Place a Bitget spot order."""
         return self._native_private(
@@ -34,29 +51,30 @@ class TradeHTTP(HTTPManager):
             self._native_params(
                 product_symbol=product_symbol,
                 side=side,
-                orderType=orderType,
+                orderType=order_type,
                 size=size,
                 price=price,
                 force=force,
-                clientOid=clientOid,
-                triggerPrice=triggerPrice,
-                tpslType=tpslType,
-                requestTime=requestTime,
-                receiveWindow=receiveWindow,
-                stpMode=stpMode,
-                presetTakeProfitPrice=presetTakeProfitPrice,
-                executeTakeProfitPrice=executeTakeProfitPrice,
-                presetStopLossPrice=presetStopLossPrice,
-                executeStopLossPrice=executeStopLossPrice,
+                clientOid=client_oid,
+                triggerPrice=trigger_price,
+                tpslType=tpsl_type,
+                requestTime=request_time,
+                receiveWindow=receive_window,
+                stpMode=stp_mode,
+                presetTakeProfitPrice=preset_take_profit_price,
+                executeTakeProfitPrice=execute_take_profit_price,
+                presetStopLossPrice=preset_stop_loss_price,
+                executeStopLossPrice=execute_stop_loss_price,
             ),
         )
 
+    @legacy_keywords({"clientOid": "client_oid"})
     def place_spot_market_order(
         self,
         product_symbol: str,
         side: str,
         size: str,
-        clientOid: str | None = None,
+        client_oid: str | None = None,
     ) -> dict[str, Any]:
         """Place a Bitget spot market order."""
         return self._native_private(
@@ -65,34 +83,37 @@ class TradeHTTP(HTTPManager):
                 product_symbol=product_symbol,
                 side=side,
                 size=size,
-                clientOid=clientOid,
+                clientOid=client_oid,
             ),
         )
 
+    @legacy_keywords({"clientOid": "client_oid"})
     def place_spot_market_buy_order(
         self,
         product_symbol: str,
         size: str,
-        clientOid: str | None = None,
+        client_oid: str | None = None,
     ) -> dict[str, Any]:
         """Place a Bitget spot market buy order."""
         return self._native_private(
             "place_spot_market_buy_order",
-            self._native_params(product_symbol=product_symbol, size=size, clientOid=clientOid),
+            self._native_params(product_symbol=product_symbol, size=size, clientOid=client_oid),
         )
 
+    @legacy_keywords({"clientOid": "client_oid"})
     def place_spot_market_sell_order(
         self,
         product_symbol: str,
         size: str,
-        clientOid: str | None = None,
+        client_oid: str | None = None,
     ) -> dict[str, Any]:
         """Place a Bitget spot market sell order."""
         return self._native_private(
             "place_spot_market_sell_order",
-            self._native_params(product_symbol=product_symbol, size=size, clientOid=clientOid),
+            self._native_params(product_symbol=product_symbol, size=size, clientOid=client_oid),
         )
 
+    @legacy_keywords({"clientOid": "client_oid"})
     def place_spot_limit_order(
         self,
         product_symbol: str,
@@ -100,7 +121,7 @@ class TradeHTTP(HTTPManager):
         size: str,
         price: str,
         force: str = "gtc",
-        clientOid: str | None = None,
+        client_oid: str | None = None,
     ) -> dict[str, Any]:
         """Place a Bitget spot limit order."""
         return self._native_private(
@@ -111,16 +132,17 @@ class TradeHTTP(HTTPManager):
                 size=size,
                 price=price,
                 force=force,
-                clientOid=clientOid,
+                clientOid=client_oid,
             ),
         )
 
+    @legacy_keywords({"clientOid": "client_oid"})
     def place_spot_limit_buy_order(
         self,
         product_symbol: str,
         size: str,
         price: str,
-        clientOid: str | None = None,
+        client_oid: str | None = None,
     ) -> dict[str, Any]:
         """Place a Bitget spot limit buy order."""
         return self._native_private(
@@ -129,16 +151,17 @@ class TradeHTTP(HTTPManager):
                 product_symbol=product_symbol,
                 size=size,
                 price=price,
-                clientOid=clientOid,
+                clientOid=client_oid,
             ),
         )
 
+    @legacy_keywords({"clientOid": "client_oid"})
     def place_spot_limit_sell_order(
         self,
         product_symbol: str,
         size: str,
         price: str,
-        clientOid: str | None = None,
+        client_oid: str | None = None,
     ) -> dict[str, Any]:
         """Place a Bitget spot limit sell order."""
         return self._native_private(
@@ -147,17 +170,18 @@ class TradeHTTP(HTTPManager):
                 product_symbol=product_symbol,
                 size=size,
                 price=price,
-                clientOid=clientOid,
+                clientOid=client_oid,
             ),
         )
 
+    @legacy_keywords({"clientOid": "client_oid"})
     def place_spot_post_only_limit_order(
         self,
         product_symbol: str,
         side: str,
         size: str,
         price: str,
-        clientOid: str | None = None,
+        client_oid: str | None = None,
     ) -> dict[str, Any]:
         """Place a Bitget spot post-only limit order."""
         return self._native_private(
@@ -167,16 +191,17 @@ class TradeHTTP(HTTPManager):
                 side=side,
                 size=size,
                 price=price,
-                clientOid=clientOid,
+                clientOid=client_oid,
             ),
         )
 
+    @legacy_keywords({"clientOid": "client_oid"})
     def place_spot_post_only_limit_buy_order(
         self,
         product_symbol: str,
         size: str,
         price: str,
-        clientOid: str | None = None,
+        client_oid: str | None = None,
     ) -> dict[str, Any]:
         """Place a Bitget spot post-only limit buy order."""
         return self._native_private(
@@ -185,16 +210,17 @@ class TradeHTTP(HTTPManager):
                 product_symbol=product_symbol,
                 size=size,
                 price=price,
-                clientOid=clientOid,
+                clientOid=client_oid,
             ),
         )
 
+    @legacy_keywords({"clientOid": "client_oid"})
     def place_spot_post_only_limit_sell_order(
         self,
         product_symbol: str,
         size: str,
         price: str,
-        clientOid: str | None = None,
+        client_oid: str | None = None,
     ) -> dict[str, Any]:
         """Place a Bitget spot post-only limit sell order."""
         return self._native_private(
@@ -203,89 +229,111 @@ class TradeHTTP(HTTPManager):
                 product_symbol=product_symbol,
                 size=size,
                 price=price,
-                clientOid=clientOid,
+                clientOid=client_oid,
             ),
         )
 
+    @legacy_keywords({"orderList": "order_list", "batchMode": "batch_mode"})
     def place_spot_batch_orders(
         self,
-        orderList: list[dict[str, Any]],
+        order_list: list[dict[str, Any]],
         product_symbol: str | None = None,
-        batchMode: str | None = None,
+        batch_mode: str | None = None,
     ) -> dict[str, Any]:
         """Place Bitget spot orders in batch."""
         return self._native_private(
             "place_spot_batch_orders",
             self._native_params(
                 product_symbol=product_symbol,
-                batchMode=batchMode,
-                orderList=orderList,
+                batchMode=batch_mode,
+                orderList=order_list,
             ),
         )
 
+    @legacy_keywords({"orderId": "order_id", "clientOid": "client_oid", "tpslType": "tpsl_type"})
     def cancel_spot_order(
         self,
         product_symbol: str,
-        orderId: str | None = None,
-        clientOid: str | None = None,
-        tpslType: str | None = None,
+        order_id: str | None = None,
+        client_oid: str | None = None,
+        tpsl_type: str | None = None,
     ) -> dict[str, Any]:
         """Cancel a Bitget spot order."""
         return self._native_private(
             "cancel_spot_order",
             self._native_params(
                 product_symbol=product_symbol,
-                orderId=orderId,
-                clientOid=clientOid,
-                tpslType=tpslType,
+                orderId=order_id,
+                clientOid=client_oid,
+                tpslType=tpsl_type,
             ),
         )
 
+    @legacy_keywords({"orderList": "order_list", "batchMode": "batch_mode"})
     def cancel_spot_batch_orders(
         self,
-        orderList: list[dict[str, Any]],
+        order_list: list[dict[str, Any]],
         product_symbol: str | None = None,
-        batchMode: str | None = None,
+        batch_mode: str | None = None,
     ) -> dict[str, Any]:
         """Cancel Bitget spot orders in batch."""
         return self._native_private(
             "cancel_spot_batch_orders",
             self._native_params(
                 product_symbol=product_symbol,
-                batchMode=batchMode,
-                orderList=orderList,
+                batchMode=batch_mode,
+                orderList=order_list,
             ),
         )
 
+    @legacy_keywords(
+        {
+            "orderId": "order_id",
+            "clientOid": "client_oid",
+            "requestTime": "request_time",
+            "receiveWindow": "receive_window",
+        }
+    )
     def get_spot_order(
         self,
-        orderId: str | None = None,
-        clientOid: str | None = None,
-        requestTime: int | str | None = None,
-        receiveWindow: int | str | None = None,
+        order_id: str | None = None,
+        client_oid: str | None = None,
+        request_time: int | str | None = None,
+        receive_window: int | str | None = None,
     ) -> dict[str, Any]:
         """Retrieve one Bitget spot order."""
         return self._native_private(
             "get_spot_order",
             self._native_params(
-                orderId=orderId,
-                clientOid=clientOid,
-                requestTime=requestTime,
-                receiveWindow=receiveWindow,
+                orderId=order_id,
+                clientOid=client_oid,
+                requestTime=request_time,
+                receiveWindow=receive_window,
             ),
         )
 
+    @legacy_keywords(
+        {
+            "idLessThan": "id_less_than",
+            "startTime": "start_time",
+            "endTime": "end_time",
+            "orderId": "order_id",
+            "tpslType": "tpsl_type",
+            "requestTime": "request_time",
+            "receiveWindow": "receive_window",
+        }
+    )
     def get_spot_open_orders(
         self,
         product_symbol: str | None = None,
         limit: int | None = None,
-        idLessThan: str | None = None,
-        startTime: int | str | None = None,
-        endTime: int | str | None = None,
-        orderId: str | None = None,
-        tpslType: str | None = None,
-        requestTime: int | str | None = None,
-        receiveWindow: int | str | None = None,
+        id_less_than: str | None = None,
+        start_time: int | str | None = None,
+        end_time: int | str | None = None,
+        order_id: str | None = None,
+        tpsl_type: str | None = None,
+        request_time: int | str | None = None,
+        receive_window: int | str | None = None,
     ) -> dict[str, Any]:
         """Retrieve Bitget spot open orders."""
         return self._native_private(
@@ -293,27 +341,38 @@ class TradeHTTP(HTTPManager):
             self._native_params(
                 product_symbol=product_symbol,
                 limit=limit,
-                idLessThan=idLessThan,
-                startTime=startTime,
-                endTime=endTime,
-                orderId=orderId,
-                tpslType=tpslType,
-                requestTime=requestTime,
-                receiveWindow=receiveWindow,
+                idLessThan=id_less_than,
+                startTime=start_time,
+                endTime=end_time,
+                orderId=order_id,
+                tpslType=tpsl_type,
+                requestTime=request_time,
+                receiveWindow=receive_window,
             ),
         )
 
+    @legacy_keywords(
+        {
+            "idLessThan": "id_less_than",
+            "startTime": "start_time",
+            "endTime": "end_time",
+            "orderId": "order_id",
+            "tpslType": "tpsl_type",
+            "requestTime": "request_time",
+            "receiveWindow": "receive_window",
+        }
+    )
     def get_spot_history_orders(
         self,
         product_symbol: str | None = None,
         limit: int | None = None,
-        idLessThan: str | None = None,
-        startTime: int | str | None = None,
-        endTime: int | str | None = None,
-        orderId: str | None = None,
-        tpslType: str | None = None,
-        requestTime: int | str | None = None,
-        receiveWindow: int | str | None = None,
+        id_less_than: str | None = None,
+        start_time: int | str | None = None,
+        end_time: int | str | None = None,
+        order_id: str | None = None,
+        tpsl_type: str | None = None,
+        request_time: int | str | None = None,
+        receive_window: int | str | None = None,
     ) -> dict[str, Any]:
         """Retrieve Bitget spot historical orders."""
         return self._native_private(
@@ -321,60 +380,87 @@ class TradeHTTP(HTTPManager):
             self._native_params(
                 product_symbol=product_symbol,
                 limit=limit,
-                idLessThan=idLessThan,
-                startTime=startTime,
-                endTime=endTime,
-                orderId=orderId,
-                tpslType=tpslType,
-                requestTime=requestTime,
-                receiveWindow=receiveWindow,
+                idLessThan=id_less_than,
+                startTime=start_time,
+                endTime=end_time,
+                orderId=order_id,
+                tpslType=tpsl_type,
+                requestTime=request_time,
+                receiveWindow=receive_window,
             ),
         )
 
+    @legacy_keywords(
+        {
+            "orderId": "order_id",
+            "idLessThan": "id_less_than",
+            "startTime": "start_time",
+            "endTime": "end_time",
+        }
+    )
     def get_spot_fills(
         self,
         product_symbol: str | None = None,
-        orderId: str | None = None,
+        order_id: str | None = None,
         limit: int | None = None,
-        idLessThan: str | None = None,
-        startTime: int | str | None = None,
-        endTime: int | str | None = None,
+        id_less_than: str | None = None,
+        start_time: int | str | None = None,
+        end_time: int | str | None = None,
     ) -> dict[str, Any]:
         """Retrieve Bitget spot fills."""
         return self._native_private(
             "get_spot_fills",
             self._native_params(
                 product_symbol=product_symbol,
-                orderId=orderId,
+                orderId=order_id,
                 limit=limit,
-                idLessThan=idLessThan,
-                startTime=startTime,
-                endTime=endTime,
+                idLessThan=id_less_than,
+                startTime=start_time,
+                endTime=end_time,
             ),
         )
 
+    @legacy_keywords(
+        {
+            "orderType": "order_type",
+            "timeInForce": "time_in_force",
+            "posSide": "pos_side",
+            "clientOid": "client_oid",
+            "reduceOnly": "reduce_only",
+            "stpMode": "stp_mode",
+            "marginMode": "margin_mode",
+            "tpTriggerBy": "tp_trigger_by",
+            "slTriggerBy": "sl_trigger_by",
+            "takeProfit": "take_profit",
+            "stopLoss": "stop_loss",
+            "tpOrderType": "tp_order_type",
+            "slOrderType": "sl_order_type",
+            "tpLimitPrice": "tp_limit_price",
+            "slLimitPrice": "sl_limit_price",
+        }
+    )
     def place_uta_order(
         self,
         category: str,
         product_symbol: str,
         side: str,
-        orderType: str,
+        order_type: str,
         qty: str,
         price: str | None = None,
-        timeInForce: str | None = None,
-        posSide: str | None = None,
-        clientOid: str | None = None,
-        reduceOnly: str | None = None,
-        stpMode: str | None = None,
-        marginMode: str | None = None,
-        tpTriggerBy: str | None = None,
-        slTriggerBy: str | None = None,
-        takeProfit: str | None = None,
-        stopLoss: str | None = None,
-        tpOrderType: str | None = None,
-        slOrderType: str | None = None,
-        tpLimitPrice: str | None = None,
-        slLimitPrice: str | None = None,
+        time_in_force: str | None = None,
+        pos_side: str | None = None,
+        client_oid: str | None = None,
+        reduce_only: str | None = None,
+        stp_mode: str | None = None,
+        margin_mode: str | None = None,
+        tp_trigger_by: str | None = None,
+        sl_trigger_by: str | None = None,
+        take_profit: str | None = None,
+        stop_loss: str | None = None,
+        tp_order_type: str | None = None,
+        sl_order_type: str | None = None,
+        tp_limit_price: str | None = None,
+        sl_limit_price: str | None = None,
     ) -> dict[str, Any]:
         """Place a Bitget UTA order."""
         return self._native_private(
@@ -383,35 +469,36 @@ class TradeHTTP(HTTPManager):
                 category=category,
                 product_symbol=product_symbol,
                 side=side,
-                orderType=orderType,
+                orderType=order_type,
                 qty=qty,
                 price=price,
-                timeInForce=timeInForce,
-                posSide=posSide,
-                clientOid=clientOid,
-                reduceOnly=reduceOnly,
-                stpMode=stpMode,
-                marginMode=marginMode,
-                tpTriggerBy=tpTriggerBy,
-                slTriggerBy=slTriggerBy,
-                takeProfit=takeProfit,
-                stopLoss=stopLoss,
-                tpOrderType=tpOrderType,
-                slOrderType=slOrderType,
-                tpLimitPrice=tpLimitPrice,
-                slLimitPrice=slLimitPrice,
+                timeInForce=time_in_force,
+                posSide=pos_side,
+                clientOid=client_oid,
+                reduceOnly=reduce_only,
+                stpMode=stp_mode,
+                marginMode=margin_mode,
+                tpTriggerBy=tp_trigger_by,
+                slTriggerBy=sl_trigger_by,
+                takeProfit=take_profit,
+                stopLoss=stop_loss,
+                tpOrderType=tp_order_type,
+                slOrderType=sl_order_type,
+                tpLimitPrice=tp_limit_price,
+                slLimitPrice=sl_limit_price,
             ),
         )
 
+    @legacy_keywords({"orderType": "order_type", "clientOid": "client_oid"})
     def place_reality_order(
         self,
         product_symbol: str,
         side: str,
-        orderType: str,
+        order_type: str,
         qty: str,
         price: str | None = None,
         category: str = "SPOT",
-        clientOid: str | None = None,
+        client_oid: str | None = None,
     ) -> dict[str, Any]:
         """Place a Bitget Reality stock order through the dedicated endpoint."""
         return self._native_private(
@@ -419,38 +506,41 @@ class TradeHTTP(HTTPManager):
             self._native_params(
                 product_symbol=product_symbol,
                 side=side,
-                orderType=orderType,
+                orderType=order_type,
                 qty=qty,
                 price=price,
                 category=category,
-                clientOid=clientOid,
+                clientOid=client_oid,
             ),
         )
 
-    def place_uta_batch_orders(self, orderList: list[dict[str, Any]]) -> dict[str, Any]:
+    @legacy_keywords({"orderList": "order_list"})
+    def place_uta_batch_orders(self, order_list: list[dict[str, Any]]) -> dict[str, Any]:
         """Place Bitget UTA orders in batch."""
         return self._native_private(
             "place_uta_batch_orders",
-            self._native_params(orderList=orderList),
+            self._native_params(orderList=order_list),
         )
 
+    @legacy_keywords({"orderId": "order_id", "clientOid": "client_oid"})
     def cancel_uta_order(
         self,
-        orderId: str | None = None,
-        clientOid: str | None = None,
+        order_id: str | None = None,
+        client_oid: str | None = None,
         category: str | None = None,
     ) -> dict[str, Any]:
         """Cancel a Bitget UTA order."""
         return self._native_private(
             "cancel_uta_order",
-            self._native_params(orderId=orderId, clientOid=clientOid, category=category),
+            self._native_params(orderId=order_id, clientOid=client_oid, category=category),
         )
 
+    @legacy_keywords({"orderId": "order_id", "clientOid": "client_oid"})
     def cancel_reality_order(
         self,
         product_symbol: str,
-        orderId: str | None = None,
-        clientOid: str | None = None,
+        order_id: str | None = None,
+        client_oid: str | None = None,
         category: str = "SPOT",
     ) -> dict[str, Any]:
         """Cancel a Bitget Reality stock order through the dedicated endpoint."""
@@ -458,37 +548,40 @@ class TradeHTTP(HTTPManager):
             "cancel_reality_order",
             self._native_params(
                 product_symbol=product_symbol,
-                orderId=orderId,
-                clientOid=clientOid,
+                orderId=order_id,
+                clientOid=client_oid,
                 category=category,
             ),
         )
 
-    def cancel_uta_batch_orders(self, orderList: list[dict[str, Any]]) -> dict[str, Any]:
+    @legacy_keywords({"orderList": "order_list"})
+    def cancel_uta_batch_orders(self, order_list: list[dict[str, Any]]) -> dict[str, Any]:
         """Cancel Bitget UTA orders in batch."""
         return self._native_private(
             "cancel_uta_batch_orders",
-            self._native_params(orderList=orderList),
+            self._native_params(orderList=order_list),
         )
 
+    @legacy_keywords({"orderId": "order_id", "clientOid": "client_oid"})
     def get_uta_order(
         self,
-        orderId: str | None = None,
-        clientOid: str | None = None,
+        order_id: str | None = None,
+        client_oid: str | None = None,
     ) -> dict[str, Any]:
         """Retrieve one Bitget UTA order."""
         return self._native_private(
             "get_uta_order",
-            self._native_params(orderId=orderId, clientOid=clientOid),
+            self._native_params(orderId=order_id, clientOid=client_oid),
         )
 
+    @legacy_keywords({"startTime": "start_time", "endTime": "end_time"})
     def get_uta_open_orders(
         self,
         category: str | None = None,
         product_symbol: str | None = None,
         symbol: str | None = None,
-        startTime: int | str | None = None,
-        endTime: int | str | None = None,
+        start_time: int | str | None = None,
+        end_time: int | str | None = None,
         limit: int | None = None,
         cursor: str | None = None,
     ) -> dict[str, Any]:
@@ -499,20 +592,21 @@ class TradeHTTP(HTTPManager):
                 category=category,
                 product_symbol=product_symbol,
                 symbol=symbol,
-                startTime=startTime,
-                endTime=endTime,
+                startTime=start_time,
+                endTime=end_time,
                 limit=limit,
                 cursor=cursor,
             ),
         )
 
+    @legacy_keywords({"startTime": "start_time", "endTime": "end_time"})
     def get_uta_history_orders(
         self,
         category: str,
         product_symbol: str | None = None,
         symbol: str | None = None,
-        startTime: int | str | None = None,
-        endTime: int | str | None = None,
+        start_time: int | str | None = None,
+        end_time: int | str | None = None,
         limit: int | None = None,
         cursor: str | None = None,
     ) -> dict[str, Any]:
@@ -523,19 +617,20 @@ class TradeHTTP(HTTPManager):
                 category=category,
                 product_symbol=product_symbol,
                 symbol=symbol,
-                startTime=startTime,
-                endTime=endTime,
+                startTime=start_time,
+                endTime=end_time,
                 limit=limit,
                 cursor=cursor,
             ),
         )
 
+    @legacy_keywords({"orderId": "order_id", "startTime": "start_time", "endTime": "end_time"})
     def get_uta_fills(
         self,
         category: str | None = None,
-        orderId: str | None = None,
-        startTime: int | str | None = None,
-        endTime: int | str | None = None,
+        order_id: str | None = None,
+        start_time: int | str | None = None,
+        end_time: int | str | None = None,
         limit: int | None = None,
         cursor: str | None = None,
     ) -> dict[str, Any]:
@@ -544,20 +639,21 @@ class TradeHTTP(HTTPManager):
             "get_uta_fills",
             self._native_params(
                 category=category,
-                orderId=orderId,
-                startTime=startTime,
-                endTime=endTime,
+                orderId=order_id,
+                startTime=start_time,
+                endTime=end_time,
                 limit=limit,
                 cursor=cursor,
             ),
         )
 
+    @legacy_keywords({"posSide": "pos_side"})
     def get_uta_positions(
         self,
         category: str,
         product_symbol: str | None = None,
         symbol: str | None = None,
-        posSide: str | None = None,
+        pos_side: str | None = None,
     ) -> dict[str, Any]:
         """Retrieve Bitget UTA positions."""
         return self._native_private(
@@ -566,79 +662,105 @@ class TradeHTTP(HTTPManager):
                 category=category,
                 product_symbol=product_symbol,
                 symbol=symbol,
-                posSide=posSide,
+                posSide=pos_side,
             ),
         )
 
+    @legacy_keywords(
+        {
+            "orderType": "order_type",
+            "marginMode": "margin_mode",
+            "marginCoin": "margin_coin",
+            "productType": "product_type",
+            "tradeSide": "trade_side",
+            "clientOid": "client_oid",
+            "reduceOnly": "reduce_only",
+            "presetStopSurplusPrice": "preset_stop_surplus_price",
+            "presetStopLossPrice": "preset_stop_loss_price",
+            "presetStopSurplusExecutePrice": "preset_stop_surplus_execute_price",
+            "presetStopLossExecutePrice": "preset_stop_loss_execute_price",
+            "stpMode": "stp_mode",
+        }
+    )
     def place_futures_order(
         self,
         product_symbol: str,
         side: str,
-        orderType: str,
+        order_type: str,
         size: str,
-        marginMode: str = "crossed",
-        marginCoin: str = "USDT",
-        productType: str = "USDT-FUTURES",
+        margin_mode: str = "crossed",
+        margin_coin: str = "USDT",
+        product_type: str = "USDT-FUTURES",
         price: str | None = None,
-        tradeSide: str | None = None,
+        trade_side: str | None = None,
         force: str | None = None,
-        clientOid: str | None = None,
-        reduceOnly: str | None = None,
-        presetStopSurplusPrice: str | None = None,
-        presetStopLossPrice: str | None = None,
-        presetStopSurplusExecutePrice: str | None = None,
-        presetStopLossExecutePrice: str | None = None,
-        stpMode: str | None = None,
+        client_oid: str | None = None,
+        reduce_only: str | None = None,
+        preset_stop_surplus_price: str | None = None,
+        preset_stop_loss_price: str | None = None,
+        preset_stop_surplus_execute_price: str | None = None,
+        preset_stop_loss_execute_price: str | None = None,
+        stp_mode: str | None = None,
     ) -> dict[str, Any]:
         """Place a Bitget futures order."""
         return self._native_private(
             "place_futures_order",
             self._native_params(
                 product_symbol=product_symbol,
-                productType=productType,
-                marginMode=marginMode,
-                marginCoin=marginCoin,
+                productType=product_type,
+                marginMode=margin_mode,
+                marginCoin=margin_coin,
                 size=size,
                 price=price,
                 side=side,
-                tradeSide=tradeSide,
-                orderType=orderType,
+                tradeSide=trade_side,
+                orderType=order_type,
                 force=force,
-                clientOid=clientOid,
-                reduceOnly=reduceOnly,
-                presetStopSurplusPrice=presetStopSurplusPrice,
-                presetStopLossPrice=presetStopLossPrice,
-                presetStopSurplusExecutePrice=presetStopSurplusExecutePrice,
-                presetStopLossExecutePrice=presetStopLossExecutePrice,
-                stpMode=stpMode,
+                clientOid=client_oid,
+                reduceOnly=reduce_only,
+                presetStopSurplusPrice=preset_stop_surplus_price,
+                presetStopLossPrice=preset_stop_loss_price,
+                presetStopSurplusExecutePrice=preset_stop_surplus_execute_price,
+                presetStopLossExecutePrice=preset_stop_loss_execute_price,
+                stpMode=stp_mode,
             ),
         )
 
+    @legacy_keywords(
+        {
+            "marginMode": "margin_mode",
+            "marginCoin": "margin_coin",
+            "productType": "product_type",
+            "tradeSide": "trade_side",
+            "clientOid": "client_oid",
+            "reduceOnly": "reduce_only",
+        }
+    )
     def place_futures_market_order(
         self,
         product_symbol: str,
         side: str,
         size: str,
-        marginMode: str = "crossed",
-        marginCoin: str = "USDT",
-        productType: str = "USDT-FUTURES",
-        tradeSide: str | None = None,
-        clientOid: str | None = None,
-        reduceOnly: str | None = None,
+        margin_mode: str = "crossed",
+        margin_coin: str = "USDT",
+        product_type: str = "USDT-FUTURES",
+        trade_side: str | None = None,
+        client_oid: str | None = None,
+        reduce_only: str | None = None,
     ) -> dict[str, Any]:
         """Place a Bitget futures market order."""
         return self._native_private(
             "place_futures_market_order",
             self._native_params(
                 product_symbol=product_symbol,
-                productType=productType,
-                marginMode=marginMode,
-                marginCoin=marginCoin,
+                productType=product_type,
+                marginMode=margin_mode,
+                marginCoin=margin_coin,
                 side=side,
                 size=size,
-                tradeSide=tradeSide,
-                clientOid=clientOid,
-                reduceOnly=reduceOnly,
+                tradeSide=trade_side,
+                clientOid=client_oid,
+                reduceOnly=reduce_only,
             ),
         )
 
@@ -649,11 +771,12 @@ class TradeHTTP(HTTPManager):
             self._native_params(product_symbol=product_symbol, size=size),
         )
 
+    @legacy_keywords({"reduceOnly": "reduce_only"})
     def place_futures_market_sell_order(
         self,
         product_symbol: str,
         size: str,
-        reduceOnly: str | None = None,
+        reduce_only: str | None = None,
     ) -> dict[str, Any]:
         """Place a Bitget futures market sell order."""
         return self._native_private(
@@ -661,10 +784,11 @@ class TradeHTTP(HTTPManager):
             self._native_params(
                 product_symbol=product_symbol,
                 size=size,
-                reduceOnly=reduceOnly,
+                reduceOnly=reduce_only,
             ),
         )
 
+    @legacy_keywords({"clientOid": "client_oid"})
     def place_futures_limit_order(
         self,
         product_symbol: str,
@@ -672,7 +796,7 @@ class TradeHTTP(HTTPManager):
         size: str,
         price: str,
         force: str = "gtc",
-        clientOid: str | None = None,
+        client_oid: str | None = None,
     ) -> dict[str, Any]:
         """Place a Bitget futures limit order."""
         return self._native_private(
@@ -683,16 +807,17 @@ class TradeHTTP(HTTPManager):
                 size=size,
                 price=price,
                 force=force,
-                clientOid=clientOid,
+                clientOid=client_oid,
             ),
         )
 
+    @legacy_keywords({"clientOid": "client_oid"})
     def place_futures_limit_buy_order(
         self,
         product_symbol: str,
         size: str,
         price: str,
-        clientOid: str | None = None,
+        client_oid: str | None = None,
     ) -> dict[str, Any]:
         """Place a Bitget futures limit buy order."""
         return self._native_private(
@@ -701,16 +826,17 @@ class TradeHTTP(HTTPManager):
                 product_symbol=product_symbol,
                 size=size,
                 price=price,
-                clientOid=clientOid,
+                clientOid=client_oid,
             ),
         )
 
+    @legacy_keywords({"clientOid": "client_oid"})
     def place_futures_limit_sell_order(
         self,
         product_symbol: str,
         size: str,
         price: str,
-        clientOid: str | None = None,
+        client_oid: str | None = None,
     ) -> dict[str, Any]:
         """Place a Bitget futures limit sell order."""
         return self._native_private(
@@ -719,17 +845,18 @@ class TradeHTTP(HTTPManager):
                 product_symbol=product_symbol,
                 size=size,
                 price=price,
-                clientOid=clientOid,
+                clientOid=client_oid,
             ),
         )
 
+    @legacy_keywords({"clientOid": "client_oid"})
     def place_futures_post_only_limit_order(
         self,
         product_symbol: str,
         side: str,
         size: str,
         price: str,
-        clientOid: str | None = None,
+        client_oid: str | None = None,
     ) -> dict[str, Any]:
         """Place a Bitget futures post-only limit order."""
         return self._native_private(
@@ -739,16 +866,17 @@ class TradeHTTP(HTTPManager):
                 side=side,
                 size=size,
                 price=price,
-                clientOid=clientOid,
+                clientOid=client_oid,
             ),
         )
 
+    @legacy_keywords({"clientOid": "client_oid"})
     def place_futures_post_only_limit_buy_order(
         self,
         product_symbol: str,
         size: str,
         price: str,
-        clientOid: str | None = None,
+        client_oid: str | None = None,
     ) -> dict[str, Any]:
         """Place a Bitget futures post-only limit buy order."""
         return self._native_private(
@@ -757,16 +885,17 @@ class TradeHTTP(HTTPManager):
                 product_symbol=product_symbol,
                 size=size,
                 price=price,
-                clientOid=clientOid,
+                clientOid=client_oid,
             ),
         )
 
+    @legacy_keywords({"clientOid": "client_oid"})
     def place_futures_post_only_limit_sell_order(
         self,
         product_symbol: str,
         size: str,
         price: str,
-        clientOid: str | None = None,
+        client_oid: str | None = None,
     ) -> dict[str, Any]:
         """Place a Bitget futures post-only limit sell order."""
         return self._native_private(
@@ -775,96 +904,128 @@ class TradeHTTP(HTTPManager):
                 product_symbol=product_symbol,
                 size=size,
                 price=price,
-                clientOid=clientOid,
+                clientOid=client_oid,
             ),
         )
 
+    @legacy_keywords(
+        {
+            "orderList": "order_list",
+            "productType": "product_type",
+            "marginMode": "margin_mode",
+            "marginCoin": "margin_coin",
+        }
+    )
     def place_futures_batch_orders(
         self,
-        orderList: list[dict[str, Any]],
+        order_list: list[dict[str, Any]],
         product_symbol: str,
-        productType: str = "USDT-FUTURES",
-        marginMode: str = "crossed",
-        marginCoin: str = "USDT",
+        product_type: str = "USDT-FUTURES",
+        margin_mode: str = "crossed",
+        margin_coin: str = "USDT",
     ) -> dict[str, Any]:
         """Place Bitget futures orders in batch."""
         return self._native_private(
             "place_futures_batch_orders",
             self._native_params(
                 product_symbol=product_symbol,
-                productType=productType,
-                marginMode=marginMode,
-                marginCoin=marginCoin,
-                orderList=orderList,
+                productType=product_type,
+                marginMode=margin_mode,
+                marginCoin=margin_coin,
+                orderList=order_list,
             ),
         )
 
+    @legacy_keywords(
+        {
+            "orderId": "order_id",
+            "clientOid": "client_oid",
+            "productType": "product_type",
+            "marginCoin": "margin_coin",
+        }
+    )
     def cancel_futures_order(
         self,
         product_symbol: str,
-        orderId: str | None = None,
-        clientOid: str | None = None,
-        productType: str = "USDT-FUTURES",
-        marginCoin: str = "USDT",
+        order_id: str | None = None,
+        client_oid: str | None = None,
+        product_type: str = "USDT-FUTURES",
+        margin_coin: str = "USDT",
     ) -> dict[str, Any]:
         """Cancel a Bitget futures order."""
         return self._native_private(
             "cancel_futures_order",
             self._native_params(
                 product_symbol=product_symbol,
-                productType=productType,
-                marginCoin=marginCoin,
-                orderId=orderId,
-                clientOid=clientOid,
+                productType=product_type,
+                marginCoin=margin_coin,
+                orderId=order_id,
+                clientOid=client_oid,
             ),
         )
 
+    @legacy_keywords(
+        {"orderIdList": "order_id_list", "productType": "product_type", "marginCoin": "margin_coin"}
+    )
     def cancel_futures_batch_orders(
         self,
         product_symbol: str | None = None,
-        orderIdList: list[dict[str, Any]] | None = None,
-        productType: str = "USDT-FUTURES",
-        marginCoin: str = "USDT",
+        order_id_list: list[dict[str, Any]] | None = None,
+        product_type: str = "USDT-FUTURES",
+        margin_coin: str = "USDT",
     ) -> dict[str, Any]:
         """Cancel Bitget futures orders in batch."""
         return self._native_private(
             "cancel_futures_batch_orders",
             self._native_params(
                 product_symbol=product_symbol,
-                productType=productType,
-                marginCoin=marginCoin,
-                orderIdList=orderIdList,
+                productType=product_type,
+                marginCoin=margin_coin,
+                orderIdList=order_id_list,
             ),
         )
 
+    @legacy_keywords(
+        {"orderId": "order_id", "clientOid": "client_oid", "productType": "product_type"}
+    )
     def get_futures_order(
         self,
         product_symbol: str,
-        orderId: str | None = None,
-        clientOid: str | None = None,
-        productType: str = "USDT-FUTURES",
+        order_id: str | None = None,
+        client_oid: str | None = None,
+        product_type: str = "USDT-FUTURES",
     ) -> dict[str, Any]:
         """Retrieve one Bitget futures order."""
         return self._native_private(
             "get_futures_order",
             self._native_params(
                 product_symbol=product_symbol,
-                productType=productType,
-                orderId=orderId,
-                clientOid=clientOid,
+                productType=product_type,
+                orderId=order_id,
+                clientOid=client_oid,
             ),
         )
 
+    @legacy_keywords(
+        {
+            "productType": "product_type",
+            "orderId": "order_id",
+            "clientOid": "client_oid",
+            "idLessThan": "id_less_than",
+            "startTime": "start_time",
+            "endTime": "end_time",
+        }
+    )
     def get_futures_open_orders(
         self,
         product_symbol: str | None = None,
-        productType: str = "USDT-FUTURES",
-        orderId: str | None = None,
-        clientOid: str | None = None,
-        idLessThan: str | None = None,
+        product_type: str = "USDT-FUTURES",
+        order_id: str | None = None,
+        client_oid: str | None = None,
+        id_less_than: str | None = None,
         status: str | None = None,
-        startTime: int | str | None = None,
-        endTime: int | str | None = None,
+        start_time: int | str | None = None,
+        end_time: int | str | None = None,
         limit: int | None = None,
     ) -> dict[str, Any]:
         """Retrieve Bitget futures open orders."""
@@ -872,27 +1033,38 @@ class TradeHTTP(HTTPManager):
             "get_futures_open_orders",
             self._native_params(
                 product_symbol=product_symbol,
-                productType=productType,
-                orderId=orderId,
-                clientOid=clientOid,
-                idLessThan=idLessThan,
+                productType=product_type,
+                orderId=order_id,
+                clientOid=client_oid,
+                idLessThan=id_less_than,
                 status=status,
-                startTime=startTime,
-                endTime=endTime,
+                startTime=start_time,
+                endTime=end_time,
                 limit=limit,
             ),
         )
 
+    @legacy_keywords(
+        {
+            "productType": "product_type",
+            "startTime": "start_time",
+            "endTime": "end_time",
+            "idLessThan": "id_less_than",
+            "orderId": "order_id",
+            "clientOid": "client_oid",
+            "orderSource": "order_source",
+        }
+    )
     def get_futures_history_orders(
         self,
         product_symbol: str | None = None,
-        productType: str = "USDT-FUTURES",
-        startTime: int | str | None = None,
-        endTime: int | str | None = None,
-        idLessThan: str | None = None,
-        orderId: str | None = None,
-        clientOid: str | None = None,
-        orderSource: str | None = None,
+        product_type: str = "USDT-FUTURES",
+        start_time: int | str | None = None,
+        end_time: int | str | None = None,
+        id_less_than: str | None = None,
+        order_id: str | None = None,
+        client_oid: str | None = None,
+        order_source: str | None = None,
         limit: int | None = None,
     ) -> dict[str, Any]:
         """Retrieve Bitget futures historical orders."""
@@ -900,25 +1072,34 @@ class TradeHTTP(HTTPManager):
             "get_futures_history_orders",
             self._native_params(
                 product_symbol=product_symbol,
-                productType=productType,
-                startTime=startTime,
-                endTime=endTime,
-                idLessThan=idLessThan,
-                orderId=orderId,
-                clientOid=clientOid,
-                orderSource=orderSource,
+                productType=product_type,
+                startTime=start_time,
+                endTime=end_time,
+                idLessThan=id_less_than,
+                orderId=order_id,
+                clientOid=client_oid,
+                orderSource=order_source,
                 limit=limit,
             ),
         )
 
+    @legacy_keywords(
+        {
+            "orderId": "order_id",
+            "productType": "product_type",
+            "idLessThan": "id_less_than",
+            "startTime": "start_time",
+            "endTime": "end_time",
+        }
+    )
     def get_futures_fills(
         self,
         product_symbol: str | None = None,
-        orderId: str | None = None,
-        productType: str = "USDT-FUTURES",
-        idLessThan: str | None = None,
-        startTime: int | str | None = None,
-        endTime: int | str | None = None,
+        order_id: str | None = None,
+        product_type: str = "USDT-FUTURES",
+        id_less_than: str | None = None,
+        start_time: int | str | None = None,
+        end_time: int | str | None = None,
         limit: int | None = None,
     ) -> dict[str, Any]:
         """Retrieve Bitget futures fills."""
@@ -926,11 +1107,11 @@ class TradeHTTP(HTTPManager):
             "get_futures_fills",
             self._native_params(
                 product_symbol=product_symbol,
-                orderId=orderId,
-                productType=productType,
-                idLessThan=idLessThan,
-                startTime=startTime,
-                endTime=endTime,
+                orderId=order_id,
+                productType=product_type,
+                idLessThan=id_less_than,
+                startTime=start_time,
+                endTime=end_time,
                 limit=limit,
             ),
         )
@@ -944,28 +1125,30 @@ class TradeHTTP(HTTPManager):
             self._native_params(category=category, product_symbol=product_symbol, **params),
         )
 
+    @legacy_keywords({"orderId": "order_id", "clientOid": "client_oid"})
     def modify_uta_strategy_order(
         self,
-        orderId: str,
+        order_id: str,
         qty: str,
-        clientOid: str | None = None,
+        client_oid: str | None = None,
         **params: object,
     ) -> dict[str, Any]:
         """Modify a Bitget UTA strategy order."""
         return self._native_private(
             "modify_uta_strategy_order",
-            self._native_params(qty=qty, orderId=orderId, clientOid=clientOid, **params),
+            self._native_params(qty=qty, orderId=order_id, clientOid=client_oid, **params),
         )
 
+    @legacy_keywords({"orderId": "order_id", "clientOid": "client_oid"})
     def cancel_uta_strategy_order(
         self,
-        orderId: str,
-        clientOid: str | None = None,
+        order_id: str,
+        client_oid: str | None = None,
     ) -> dict[str, Any]:
         """Cancel a Bitget UTA strategy order."""
         return self._native_private(
             "cancel_uta_strategy_order",
-            self._native_params(orderId=orderId, clientOid=clientOid),
+            self._native_params(orderId=order_id, clientOid=client_oid),
         )
 
     def get_uta_unfilled_strategy_orders(
@@ -982,12 +1165,13 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
+    @legacy_keywords({"startTime": "start_time", "endTime": "end_time"})
     def get_uta_history_strategy_orders(
         self,
         category: str,
         type: str | None = None,
-        startTime: int | str | None = None,
-        endTime: int | str | None = None,
+        start_time: int | str | None = None,
+        end_time: int | str | None = None,
         limit: int | None = None,
         cursor: str | None = None,
     ) -> dict[str, Any]:
@@ -997,8 +1181,8 @@ class TradeHTTP(HTTPManager):
             self._native_params(
                 category=category,
                 type=type,
-                startTime=startTime,
-                endTime=endTime,
+                startTime=start_time,
+                endTime=end_time,
                 limit=limit,
                 cursor=cursor,
             ),
@@ -1227,11 +1411,18 @@ class TradeHTTP(HTTPManager):
         product_symbol: str | None = None,
         margin_coin: str | None = None,
         plan_type: str | None = None,
+        all_symbols: bool = False,
     ) -> dict[str, Any]:
-        """Call ``POST /api/v2/mix/order/cancel-plan-order``."""
+        """
+        Call ``POST /api/v2/mix/order/cancel-plan-order``.
+
+        Provide order IDs or a product symbol; use all_symbols=True for all plans.
+        """
+        require_scope(product_symbol, all_symbols, order_ids=order_id_list)
         return self._native_private(
             "cancel_futures_plan_orders",
             self._native_params(
+                all_symbols=all_symbols,
                 productType=product_type,
                 orderIdList=dumps(order_id_list) if order_id_list is not None else None,
                 product_symbol=product_symbol,
@@ -1362,11 +1553,21 @@ class TradeHTTP(HTTPManager):
             "cancel_spot_plan_order", self._native_params(orderId=order_id, clientOid=client_oid)
         )
 
-    def cancel_spot_plan_orders(self, *, symbol_list: list[str] | None = None) -> dict[str, Any]:
-        """Call ``POST /api/v2/spot/trade/batch-cancel-plan-order``."""
+    def cancel_spot_plan_orders(
+        self, *, symbol_list: list[str] | None = None, all_symbols: bool = False
+    ) -> dict[str, Any]:
+        """
+        Call ``POST /api/v2/spot/trade/batch-cancel-plan-order``.
+
+        Provide a symbol list or all_symbols=True to cancel plans across all spot symbols.
+        """
+        require_scope(symbol_list, all_symbols)
         return self._native_private(
             "cancel_spot_plan_orders",
-            self._native_params(symbolList=dumps(symbol_list) if symbol_list is not None else None),
+            self._native_params(
+                all_symbols=all_symbols,
+                symbolList=dumps(symbol_list) if symbol_list is not None else None,
+            ),
         )
 
     def get_pending_spot_plan_orders(
@@ -1447,13 +1648,26 @@ class TradeHTTP(HTTPManager):
         )
 
     def close_futures_positions(
-        self, product_type: str, *, product_symbol: str | None = None, hold_side: str | None = None
+        self,
+        product_type: str,
+        *,
+        product_symbol: str | None = None,
+        hold_side: str | None = None,
+        all_symbols: bool = False,
     ) -> dict[str, Any]:
-        """Call ``POST /api/v2/mix/order/close-positions``."""
+        """
+        Call ``POST /api/v2/mix/order/close-positions``.
+
+        Provide a product symbol or all_symbols=True to close all positions in this product type.
+        """
+        require_scope(product_symbol, all_symbols)
         return self._native_private(
             "close_futures_positions",
             self._native_params(
-                productType=product_type, product_symbol=product_symbol, holdSide=hold_side
+                all_symbols=all_symbols,
+                productType=product_type,
+                product_symbol=product_symbol,
+                holdSide=hold_side,
             ),
         )
 
@@ -1598,12 +1812,27 @@ class TradeHTTP(HTTPManager):
         )
 
     def close_uta_positions(
-        self, category: str, *, product_symbol: str | None = None, pos_side: str | None = None
+        self,
+        category: str,
+        *,
+        product_symbol: str | None = None,
+        pos_side: str | None = None,
+        all_symbols: bool = False,
     ) -> dict[str, Any]:
-        """Call ``POST /api/v3/trade/close-positions``."""
+        """
+        Call ``POST /api/v3/trade/close-positions``.
+
+        Provide a product symbol or all_symbols=True to close all positions in this category.
+        """
+        require_scope(product_symbol, all_symbols)
         return self._native_private(
             "close_uta_positions",
-            self._native_params(category=category, product_symbol=product_symbol, posSide=pos_side),
+            self._native_params(
+                all_symbols=all_symbols,
+                category=category,
+                product_symbol=product_symbol,
+                posSide=pos_side,
+            ),
         )
 
     def get_uta_position_history(
@@ -1790,11 +2019,18 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
-    def set_futures_asset_mode(self, product_type: str, asset_mode: str) -> dict[str, Any]:
-        """Call ``POST /api/v2/mix/account/set-asset-mode``."""
+    def set_futures_asset_mode(
+        self, product_type: str, asset_mode: str, *, confirm: bool = False
+    ) -> dict[str, Any]:
+        """
+        Call ``POST /api/v2/mix/account/set-asset-mode``.
+
+        Requires confirm=True. This changes collateral accounting for futures.
+        """
+        require_confirmation(confirm)
         return self._native_private(
             "set_futures_asset_mode",
-            self._native_params(productType=product_type, assetMode=asset_mode),
+            self._native_params(confirm=confirm, productType=product_type, assetMode=asset_mode),
         )
 
     def convert_futures_union_asset(self, coin: str, amount: str) -> dict[str, Any]:
@@ -1858,11 +2094,18 @@ class TradeHTTP(HTTPManager):
         size: str | None = None,
         trade_side: str | None = None,
         client_oid: str | None = None,
+        confirm: bool = False,
     ) -> dict[str, Any]:
-        """Call ``POST /api/v2/mix/order/click-backhand``."""
+        """
+        Call ``POST /api/v2/mix/order/click-backhand``.
+
+        Requires confirm=True. This closes and reverses the selected position.
+        """
+        require_confirmation(confirm)
         return self._native_private(
             "reverse_futures_position",
             self._native_params(
+                confirm=confirm,
                 product_symbol=product_symbol,
                 marginCoin=margin_coin,
                 productType=product_type,
@@ -2757,15 +3000,26 @@ class TradeHTTP(HTTPManager):
         )
 
     def set_uta_account_mode(
-        self, mode: str, *, delta_switch: str | None = None, target_uid: str | None = None
+        self,
+        mode: str,
+        *,
+        delta_switch: str | None = None,
+        target_uid: str | None = None,
+        confirm: bool = False,
     ) -> dict[str, Any]:
         """
         Call ``POST /api/v3/account/adjust-account-mode``. Uses advanced mode with delta_switch;
         the deprecated delta mode is not accepted.
+
+
+        Requires confirm=True. This changes the account margin mode.
         """
+        require_confirmation(confirm)
         return self._native_private(
             "set_uta_account_mode",
-            self._native_params(mode=mode, deltaSwitch=delta_switch, targetUid=target_uid),
+            self._native_params(
+                confirm=confirm, mode=mode, deltaSwitch=delta_switch, targetUid=target_uid
+            ),
         )
 
     def get_uta_adl_rank(self) -> dict[str, Any]:
@@ -2974,9 +3228,14 @@ class TradeHTTP(HTTPManager):
         """Call ``GET /api/v3/account/deduct-info``."""
         return self._native_private("get_uta_fee_deduction", self._native_params())
 
-    def upgrade_to_uta(self) -> dict[str, Any]:
-        """Call ``POST /api/v3/account/switch``."""
-        return self._native_private("upgrade_to_uta", self._native_params())
+    def upgrade_to_uta(self, *, confirm: bool = False) -> dict[str, Any]:
+        """
+        Call ``POST /api/v3/account/switch``.
+
+        Requires confirm=True. This migrates the account to UTA.
+        """
+        require_confirmation(confirm)
+        return self._native_private("upgrade_to_uta", self._native_params(confirm=confirm))
 
     def get_uta_upgrade_status(self) -> dict[str, Any]:
         """Call ``GET /api/v3/account/switch-status``."""
@@ -3046,9 +3305,18 @@ class TradeHTTP(HTTPManager):
             "get_classic_account_upgrade_status", self._native_params(subUid=sub_uid)
         )
 
-    def upgrade_classic_account(self, *, sub_uid: str | None = None) -> dict[str, Any]:
-        """Call ``POST /api/v2/spot/account/upgrade``."""
-        return self._native_private("upgrade_classic_account", self._native_params(subUid=sub_uid))
+    def upgrade_classic_account(
+        self, *, sub_uid: str | None = None, confirm: bool = False
+    ) -> dict[str, Any]:
+        """
+        Call ``POST /api/v2/spot/account/upgrade``.
+
+        Requires confirm=True. This upgrades the classic account.
+        """
+        require_confirmation(confirm)
+        return self._native_private(
+            "upgrade_classic_account", self._native_params(confirm=confirm, subUid=sub_uid)
+        )
 
     def get_spot_fee_deduction(self) -> dict[str, Any]:
         """Call ``GET /api/v2/spot/account/deduct-info``."""
@@ -3203,15 +3471,26 @@ class TradeHTTP(HTTPManager):
         """Call ``GET /api/v3/convert/small-assets``."""
         return self._native_private("get_uta_small_assets", self._native_params())
 
-    def uta_small_assets_trade(self, from_coin_list: list[str]) -> dict[str, Any]:
+    def convert_uta_small_assets(self, from_coin_list: list[str]) -> dict[str, Any]:
         """Call ``POST /api/v3/convert/small-assets-trade``."""
         return self._native_private(
-            "uta_small_assets_trade", self._native_params(fromCoinList=from_coin_list)
+            "convert_uta_small_assets", self._native_params(fromCoinList=from_coin_list)
         )
 
-    def uta_delete_sub(self, sub_uid: str) -> dict[str, Any]:
-        """Call ``POST /api/v3/user/delete-sub``."""
-        return self._native_private("uta_delete_sub", self._native_params(subUid=sub_uid))
+    uta_small_assets_trade = convert_uta_small_assets
+
+    def delete_uta_subaccount(self, sub_uid: str, *, confirm: bool = False) -> dict[str, Any]:
+        """
+        Call ``POST /api/v3/user/delete-sub``.
+
+        Requires confirm=True. This deletes the sub-account.
+        """
+        require_confirmation(confirm)
+        return self._native_private(
+            "delete_uta_subaccount", self._native_params(confirm=confirm, subUid=sub_uid)
+        )
+
+    uta_delete_sub = delete_uta_subaccount
 
     def uta_freeze_sub(self, sub_uid: str, operation: str) -> dict[str, Any]:
         """Call ``POST /api/v3/user/freeze-sub``."""
@@ -3369,7 +3648,7 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
-    def classic_trade(
+    def convert_classic_asset(
         self,
         from_coin: str,
         from_coin_size: str,
@@ -3380,7 +3659,7 @@ class TradeHTTP(HTTPManager):
     ) -> dict[str, Any]:
         """Call ``POST /api/v2/convert/trade``."""
         return self._native_private(
-            "classic_trade",
+            "convert_classic_asset",
             self._native_params(
                 fromCoin=from_coin,
                 fromCoinSize=from_coin_size,
@@ -3390,6 +3669,8 @@ class TradeHTTP(HTTPManager):
                 traceId=trace_id,
             ),
         )
+
+    classic_trade = convert_classic_asset
 
     def get_classic_convert_record(
         self,
@@ -3414,7 +3695,13 @@ class TradeHTTP(HTTPManager):
         )
 
     def move_uta_positions(
-        self, from_uid: str, to_uid: str, category: str, position_list: list[dict[str, Any]]
+        self,
+        from_uid: str,
+        to_uid: str,
+        category: str,
+        position_list: list[dict[str, Any]],
+        *,
+        confirm: bool = False,
     ) -> dict[str, Any]:
         """
         Move up to 10 cross-margin positions within the same account family.
@@ -3422,11 +3709,19 @@ class TradeHTTP(HTTPManager):
         Requires a whitelisted master account. Bitget cancels pending orders for
         the moved symbols in both accounts. Only USDT/USDC futures are supported.
         Nested symbols use native exchange IDs. Execution uses the mark price.
+
+
+        Requires confirm=True. This transfers positions and cancels related pending orders.
         """
+        require_confirmation(confirm)
         return self._native_private(
             "move_uta_positions",
             self._native_params(
-                fromUid=from_uid, toUid=to_uid, category=category, positionList=position_list
+                confirm=confirm,
+                fromUid=from_uid,
+                toUid=to_uid,
+                category=category,
+                positionList=position_list,
             ),
         )
 
@@ -3534,7 +3829,7 @@ class TradeHTTP(HTTPManager):
         """
         return self._native_private("get_classic_earn_elite_product", self._native_params())
 
-    def classic_earn_elite_subscribe(
+    def subscribe_classic_elite(
         self,
         *,
         product_sub_id: str,
@@ -3548,7 +3843,7 @@ class TradeHTTP(HTTPManager):
         Source: https://www.bitget.com/docs/catalog/earn-classic-elite/classic-earn-elite#elite-subscribe
         """
         return self._native_private(
-            "classic_earn_elite_subscribe",
+            "subscribe_classic_elite",
             self._native_params(
                 productSubId=product_sub_id,
                 amount=amount,
@@ -3556,6 +3851,8 @@ class TradeHTTP(HTTPManager):
                 paymentAccount=payment_account,
             ),
         )
+
+    classic_earn_elite_subscribe = subscribe_classic_elite
 
     def get_classic_earn_elite_subscribe_result(self, *, order_id: str) -> dict[str, Any]:
         """
@@ -3577,7 +3874,7 @@ class TradeHTTP(HTTPManager):
             "get_classic_earn_elite_subscribe_info", self._native_params(productId=product_id)
         )
 
-    def classic_earn_elite_redeem(
+    def redeem_classic_elite(
         self,
         *,
         product_id: str,
@@ -3594,7 +3891,7 @@ class TradeHTTP(HTTPManager):
         Source: https://www.bitget.com/docs/catalog/earn-classic-elite/classic-earn-elite#elite-redeem
         """
         return self._native_private(
-            "classic_earn_elite_redeem",
+            "redeem_classic_elite",
             self._native_params(
                 productId=product_id,
                 productSubId=product_sub_id,
@@ -3605,6 +3902,8 @@ class TradeHTTP(HTTPManager):
                 coin=coin,
             ),
         )
+
+    classic_earn_elite_redeem = redeem_classic_elite
 
     def get_classic_earn_elite_redeem_info(self, *, product_id: str) -> dict[str, Any]:
         """
@@ -3645,7 +3944,7 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
-    def classic_earn_loan_borrow(
+    def borrow_classic_earn_loan(
         self,
         *,
         loan_coin: str,
@@ -3660,7 +3959,7 @@ class TradeHTTP(HTTPManager):
         Source: https://www.bitget.com/docs/catalog/earn-classic-loan/classic-earn-loan#borrow
         """
         return self._native_private(
-            "classic_earn_loan_borrow",
+            "borrow_classic_earn_loan",
             self._native_params(
                 loanCoin=loan_coin,
                 pledgeCoin=pledge_coin,
@@ -3669,6 +3968,8 @@ class TradeHTTP(HTTPManager):
                 loanAmount=loan_amount,
             ),
         )
+
+    classic_earn_loan_borrow = borrow_classic_earn_loan
 
     def get_classic_earn_loan_ongoing_orders(
         self,
@@ -3687,7 +3988,7 @@ class TradeHTTP(HTTPManager):
             self._native_params(orderId=order_id, loanCoin=loan_coin, pledgeCoin=pledge_coin),
         )
 
-    def classic_earn_loan_repay(
+    def repay_classic_earn_loan(
         self,
         *,
         order_id: str,
@@ -3701,11 +4002,13 @@ class TradeHTTP(HTTPManager):
         Source: https://www.bitget.com/docs/catalog/earn-classic-loan/classic-earn-loan#repay
         """
         return self._native_private(
-            "classic_earn_loan_repay",
+            "repay_classic_earn_loan",
             self._native_params(
                 orderId=order_id, repayAll=repay_all, amount=amount, repayUnlock=repay_unlock
             ),
         )
+
+    classic_earn_loan_repay = repay_classic_earn_loan
 
     def get_classic_earn_loan_repay_history(
         self,
@@ -4236,4 +4539,148 @@ class TradeHTTP(HTTPManager):
                 marketOpen=market_open,
                 lossReserve=loss_reserve,
             ),
+        )
+
+    def create_spot_withdrawal(
+        self,
+        *,
+        coin: str,
+        transfer_type: str,
+        address: str,
+        size: str,
+        chain: str | None = None,
+        inner_to_type: str | None = None,
+        area_code: str | None = None,
+        tag: str | None = None,
+        remark: str | None = None,
+        client_oid: str | None = None,
+        member_code: str | None = None,
+        identity_type: str | None = None,
+        company_name: str | None = None,
+        first_name: str | None = None,
+        last_name: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        Withdraw.
+
+        API withdrawals have no second confirmation; they execute on submit.
+        Source: https://www.bitget.com/docs/catalog/classic-spot-account/classic-spot-account#withdraw
+        """
+        return self._native_private(
+            "create_spot_withdrawal",
+            self._native_params(
+                coin=coin,
+                transferType=transfer_type,
+                address=address,
+                chain=chain,
+                innerToType=inner_to_type,
+                areaCode=area_code,
+                tag=tag,
+                size=size,
+                remark=remark,
+                clientOid=client_oid,
+                memberCode=member_code,
+                identityType=identity_type,
+                companyName=company_name,
+                firstName=first_name,
+                lastName=last_name,
+            ),
+        )
+
+    def cancel_spot_withdrawal(self, *, order_id: str) -> Any:  # noqa: ANN401
+        """
+        Cancel Withdrawal.
+
+        Cancellation is subject to the exchange withdrawal state.
+        Source: https://www.bitget.com/docs/catalog/classic-spot-account/classic-spot-account#cancel-withdrawal
+        """
+        return self._native_private("cancel_spot_withdrawal", self._native_params(orderId=order_id))
+
+    def create_uta_agent_sub_account(
+        self, *, username: str, passphrase: str, note: str | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        Create Agent Sub-account.
+
+        The response includes an API secret. Do not log or persist the secret in plaintext.
+        Source: https://www.bitget.com/docs/catalog/account/sub-accounts#create-agent-sub-account
+        """
+        return self._native_private(
+            "create_uta_agent_sub_account",
+            self._native_params(username=username, passphrase=passphrase, note=note),
+        )
+
+    def create_classic_agent_sub_account(
+        self, *, username: str, passphrase: str, note: str | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        Create Agent Subaccount.
+
+        The response includes an API secret. Do not log or persist the secret in plaintext.
+        Source: https://www.bitget.com/docs/catalog/classic-common-vsubaccount/classic-common-vsubaccount#create-agent-subaccount
+        """
+        return self._native_private(
+            "create_classic_agent_sub_account",
+            self._native_params(username=username, passphrase=passphrase, note=note),
+        )
+
+    def create_uta_withdrawal(
+        self,
+        *,
+        coin: str,
+        transfer_type: str,
+        address: str,
+        size: str,
+        chain: str | None = None,
+        inner_to_type: str | None = None,
+        area_code: str | None = None,
+        tag: str | None = None,
+        remark: str | None = None,
+        client_oid: str | None = None,
+        member_code: str | None = None,
+        identity_type: str | None = None,
+        company_name: str | None = None,
+        first_name: str | None = None,
+        last_name: str | None = None,
+        account_type: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        Withdrawal.
+
+        API withdrawals have no second confirmation; they execute on submit.
+        Source: https://www.bitget.com/docs/catalog/account/deposit-withdrawal#withdrawal
+        """
+        return self._native_private(
+            "create_uta_withdrawal",
+            self._native_params(
+                coin=coin,
+                chain=chain,
+                transferType=transfer_type,
+                address=address,
+                innerToType=inner_to_type,
+                areaCode=area_code,
+                tag=tag,
+                size=size,
+                remark=remark,
+                clientOid=client_oid,
+                memberCode=member_code,
+                identityType=identity_type,
+                companyName=company_name,
+                firstName=first_name,
+                lastName=last_name,
+                accountType=account_type,
+            ),
+        )
+
+    def cancel_uta_withdrawal(
+        self, *, order_id: str | None = None, client_oid: str | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        Cancel Withdrawal.
+
+        Cancellation is subject to the exchange withdrawal state.
+        Source: https://www.bitget.com/docs/catalog/account/deposit-withdrawal#cancel-withdrawal
+        """
+        return self._native_private(
+            "cancel_uta_withdrawal", self._native_params(orderId=order_id, clientOid=client_oid)
         )

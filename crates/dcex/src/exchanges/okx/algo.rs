@@ -208,13 +208,12 @@ impl OkxClient {
                 for key in ["chaseVal", "pxLimit", "pxSpread"] {
                     number(params, key, true, false)?;
                 }
-                if let Some(value) = params.get("pxVar") {
-                    if !value
+                if let Some(value) = params.get("pxVar")
+                    && !value
                         .parse::<f64>()
                         .is_ok_and(|v| (0.0001..=0.01).contains(&v))
-                    {
-                        return Err(invalid("pxVar must be 0.0001..=0.01"));
-                    }
+                {
+                    return Err(invalid("pxVar must be 0.0001..=0.01"));
                 }
                 if params.get("cxlOnClosePos") == Some("true")
                     && params.get("reduceOnly") != Some("true")
@@ -292,7 +291,7 @@ impl OkxClient {
                     }
                     if object
                         .values()
-                        .any(|v| !v.as_str().is_some_and(|s| !s.trim().is_empty()))
+                        .any(|v| v.as_str().is_none_or(|s| s.trim().is_empty()))
                     {
                         return Err(invalid("cancel algo fields must be nonempty strings"));
                     }
@@ -462,13 +461,12 @@ fn paired(params: &OkxParams, first: &str, second: &str) -> Result<()> {
     Ok(())
 }
 fn number(params: &OkxParams, key: &str, zero: bool, market: bool) -> Result<()> {
-    if let Some(value) = params.get(key) {
-        if !value
+    if let Some(value) = params.get(key)
+        && !value
             .parse::<f64>()
             .is_ok_and(|v| v.is_finite() && (v > 0.0 || zero && v == 0.0 || market && v == -1.0))
-        {
-            return Err(invalid(&format!("invalid {key}")));
-        }
+    {
+        return Err(invalid(&format!("invalid {key}")));
     }
     Ok(())
 }

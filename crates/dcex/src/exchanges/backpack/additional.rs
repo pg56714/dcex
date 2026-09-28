@@ -261,11 +261,11 @@ impl BackpackClient {
                 _ => Value::String(v.to_string()),
             };
             if ["quantity", "vaultTokenQuantity"].contains(&f.key)
-                && !v.parse::<f64>().is_ok_and(|n| n.is_finite() && n > 0.0)
+                && !crate::common::is_positive_plain_decimal(v)
             {
                 return Err(DcexError::InvalidInput("quantity must be positive".into()));
             }
-            if f.key == "vaultId" && !v.parse::<u32>().is_ok() {
+            if f.key == "vaultId" && v.parse::<u32>().is_err() {
                 return Err(DcexError::InvalidInput("vaultId must be uint32".into()));
             }
             query.push((f.key.to_string(), v.to_string()));

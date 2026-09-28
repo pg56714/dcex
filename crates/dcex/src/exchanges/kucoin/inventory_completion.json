@@ -1,0 +1,3827 @@
+[
+  {
+    "name": "get_v1_accounts_account_id",
+    "method": "GET",
+    "path": "/api/v1/accounts/{accountId}",
+    "market": "spot",
+    "fields": [
+      {
+        "name": "accountId",
+        "required": true,
+        "location": "path",
+        "schema": {
+          "type": "string"
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/account-info/account-funding/get-account-detail-spot",
+    "summary": "Get Account Detail - Spot",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_ua_v2_affiliate_query_invitees",
+    "method": "GET",
+    "path": "/api/ua/v2/affiliate/queryInvitees",
+    "market": "spot",
+    "fields": [
+      {
+        "name": "userType",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "1",
+            "2",
+            "3"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "1",
+              "name": "1",
+              "description": "Ordinary user"
+            },
+            {
+              "value": "2",
+              "name": "2",
+              "description": "Ordinary affiliate"
+            },
+            {
+              "value": "3",
+              "name": "3",
+              "description": "Multi-level affiliate"
+            }
+          ]
+        }
+      },
+      {
+        "name": "referralCode",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "uid",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "registrationEndAt",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "registrationStartAt",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "page",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int32",
+          "default": 1,
+          "minimum": 1
+        }
+      },
+      {
+        "name": "pageSize",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "default": 10,
+          "minimum": 1,
+          "maximum": 500,
+          "format": "int32"
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/affiliate/invited",
+    "summary": "Get Invited",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_ua_v2_affiliate_query_my_commission",
+    "method": "GET",
+    "path": "/api/ua/v2/affiliate/queryMyCommission",
+    "market": "spot",
+    "fields": [
+      {
+        "name": "siteType",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "rebateType",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      {
+        "name": "rebateStartAt",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "rebateEndAt",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "page",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      {
+        "name": "pageSize",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      {
+        "name": "dataType",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/affiliate/commission",
+    "summary": "Get Commission",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_ua_v2_affiliate_query_transaction_by_uid",
+    "method": "GET",
+    "path": "/api/ua/v2/affiliate/queryTransactionByUid",
+    "market": "spot",
+    "fields": [
+      {
+        "name": "uid",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "tradeType",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "SPOT",
+            "FEATURE"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "SPOT",
+              "name": "SPOT",
+              "description": "spot trading"
+            },
+            {
+              "value": "FEATURE",
+              "name": "FEATURE",
+              "description": "futures trading"
+            }
+          ]
+        }
+      },
+      {
+        "name": "tradeStartAt",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "tradeEndAt",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "page",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int32",
+          "default": 1,
+          "minimum": 1
+        }
+      },
+      {
+        "name": "pageSize",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int32",
+          "default": 10,
+          "minimum": 1,
+          "maximum": 500
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/affiliate/trade-history",
+    "summary": "Get Trade History",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_ua_v2_affiliate_query_transaction_by_time",
+    "method": "GET",
+    "path": "/api/ua/v2/affiliate/queryTransactionByTime",
+    "market": "spot",
+    "fields": [
+      {
+        "name": "uid",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "tradeType",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "SPOT",
+            "FUTURES"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "SPOT",
+              "name": "SPOT",
+              "description": "spot oder"
+            },
+            {
+              "value": "FUTURES",
+              "name": "FUTURES",
+              "description": "Futures order"
+            }
+          ]
+        }
+      },
+      {
+        "name": "tradeStartAt",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "tradeEndAt",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "lastId",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "direction",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "PRE",
+            "NEXT"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "PRE",
+              "name": "PRE",
+              "description": "Pre page"
+            },
+            {
+              "value": "NEXT",
+              "name": "NEXT",
+              "description": "Next page"
+            }
+          ],
+          "default": "NEXT"
+        }
+      },
+      {
+        "name": "pageSize",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int32",
+          "default": 10,
+          "minimum": 1,
+          "maximum": 500
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/affiliate/transaction",
+    "summary": "Get Transaction",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_ua_v2_affiliate_query_kumining",
+    "method": "GET",
+    "path": "/api/ua/v2/affiliate/queryKumining",
+    "market": "spot",
+    "fields": [
+      {
+        "name": "uid",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "startAt",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "endAt",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "lastId",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "direction",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "PRE",
+            "NEXT"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "PRE",
+              "name": "PRE",
+              "description": "Last page"
+            },
+            {
+              "value": "NEXT",
+              "name": "NEXT",
+              "description": "Next page"
+            }
+          ]
+        }
+      },
+      {
+        "name": "pageSize",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 500,
+          "format": "int32"
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/affiliate/kumining",
+    "summary": "Get Kumining",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_v2_affiliate_query_invitees",
+    "method": "GET",
+    "path": "/api/v2/affiliate/queryInvitees",
+    "market": "spot",
+    "fields": [
+      {
+        "name": "userType",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "1",
+            "2",
+            "3"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "1",
+              "name": "1",
+              "description": "Ordinary user"
+            },
+            {
+              "value": "2",
+              "name": "2",
+              "description": "Ordinary affiliate"
+            },
+            {
+              "value": "3",
+              "name": "3",
+              "description": "Multi-level affiliate"
+            }
+          ]
+        }
+      },
+      {
+        "name": "referralCode",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "uid",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "registrationStartAt",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "registrationEndAt",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "page",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 1
+        }
+      },
+      {
+        "name": "pageSize",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "default": 10,
+          "maximum": 500,
+          "minimum": 1
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/affiliate/get-invited",
+    "summary": "Get Invited",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_v2_affiliate_query_my_commission",
+    "method": "GET",
+    "path": "/api/v2/affiliate/queryMyCommission",
+    "market": "spot",
+    "fields": [
+      {
+        "name": "siteType",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "all"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "all",
+              "name": "all",
+              "description": "all"
+            }
+          ]
+        }
+      },
+      {
+        "name": "rebateType",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "enum": [
+            0,
+            1,
+            2
+          ],
+          "x-apidog-enum": [
+            {
+              "value": 0,
+              "name": "0",
+              "description": "All"
+            },
+            {
+              "value": 1,
+              "name": "1",
+              "description": "Direct rebate"
+            },
+            {
+              "value": 2,
+              "name": "2",
+              "description": "Secondary rebate"
+            }
+          ],
+          "default": 0
+        }
+      },
+      {
+        "name": "rebateStartAt",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "rebateEndAt",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "page",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "default": 1,
+          "minimum": 1
+        }
+      },
+      {
+        "name": "pageSize",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "default": 10,
+          "minimum": 1,
+          "maximum": 500
+        }
+      },
+      {
+        "name": "userId",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "dataType",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "trade",
+            "kumining"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "trade",
+              "name": "trade",
+              "description": "trade commission"
+            },
+            {
+              "value": "kumining",
+              "name": "kumining",
+              "description": "kumining commission"
+            }
+          ],
+          "default": "trade"
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/affiliate/get-commission",
+    "summary": "Get Commission",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_v2_affiliate_query_transaction_by_uid",
+    "method": "GET",
+    "path": "/api/v2/affiliate/queryTransactionByUid",
+    "market": "spot",
+    "fields": [
+      {
+        "name": "uid",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "tradeType",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "SPOT",
+            "FEATURE"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "SPOT",
+              "name": "SPOT",
+              "description": "spot trading"
+            },
+            {
+              "value": "FEATURE",
+              "name": "FEATURE",
+              "description": "futures trading"
+            }
+          ]
+        }
+      },
+      {
+        "name": "tradeStartAt",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "tradeEndAt",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "page",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "default": 1,
+          "minimum": 1
+        }
+      },
+      {
+        "name": "pageSize",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "default": 10,
+          "minimum": 1,
+          "maximum": 500
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/affiliate/get-trade-history",
+    "summary": "Get Trade History",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_v2_affiliate_query_transaction_by_time",
+    "method": "GET",
+    "path": "/api/v2/affiliate/queryTransactionByTime",
+    "market": "spot",
+    "fields": [
+      {
+        "name": "uid",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "tradeType",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "SPOT",
+            "FEATURE"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "SPOT",
+              "name": "SPOT",
+              "description": "spot oder"
+            },
+            {
+              "value": "FEATURE",
+              "name": "FEATURE",
+              "description": "Futures order"
+            }
+          ]
+        }
+      },
+      {
+        "name": "tradeStartAt",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "tradeEndAt",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "lastId",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer"
+        }
+      },
+      {
+        "name": "direction",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "PRE",
+            "NEXT"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "PRE",
+              "name": "PRE",
+              "description": "Pre page"
+            },
+            {
+              "value": "NEXT",
+              "name": "NEXT",
+              "description": "Next page"
+            }
+          ],
+          "default": "NEXT"
+        }
+      },
+      {
+        "name": "pageSize",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "default": 10,
+          "minimum": 1,
+          "maximum": 500
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/affiliate/get-transaction",
+    "summary": "Get Transaction",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_v2_affiliate_query_kumining",
+    "method": "GET",
+    "path": "/api/v2/affiliate/queryKumining",
+    "market": "spot",
+    "fields": [
+      {
+        "name": "uid",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "startAt",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "endAt",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "lastId",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "direction",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "PRE",
+            "NEXT"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "PRE",
+              "name": "PRE",
+              "description": "Last page"
+            },
+            {
+              "value": "NEXT",
+              "name": "NEXT",
+              "description": "Next page"
+            }
+          ]
+        }
+      },
+      {
+        "name": "pageSize",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "default": 10,
+          "minimum": 1,
+          "maximum": 500
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/affiliate/get-kumining",
+    "summary": "Get Kumining",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "post_v2_broker_withdrawal",
+    "method": "POST",
+    "path": "/api/v2/broker/withdrawal",
+    "market": "spot",
+    "fields": [
+      {
+        "name": "body",
+        "required": true,
+        "location": "raw_body",
+        "schema": {
+          "type": "object"
+        }
+      }
+    ],
+    "json_body": true,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/apply-for-fast-withdrawal",
+    "summary": "Apply for Fast Withdrawal",
+    "withdrawal": true,
+    "confirm": false
+  },
+  {
+    "name": "get_v2_broker_api_rebate_download",
+    "method": "GET",
+    "path": "/api/v2/broker/api/rebate/download",
+    "market": "spot",
+    "fields": [
+      {
+        "name": "begin",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "end",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "tradeType",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "SPOT",
+            "FUTURE"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "SPOT",
+              "name": "SPOT",
+              "description": "SPOT"
+            },
+            {
+              "value": "FUTURE",
+              "name": "FUTURE",
+              "description": "futures"
+            }
+          ]
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/api-broker/get-broker-rebate",
+    "summary": "Get Broker Rebate",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_v2_broker_query_my_commission",
+    "method": "GET",
+    "path": "/api/v2/broker/queryMyCommission",
+    "market": "spot",
+    "fields": [
+      {
+        "name": "siteType",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "default": "all"
+        }
+      },
+      {
+        "name": "tradeType",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "default": "all",
+          "enum": [
+            "all",
+            "SPOT",
+            "FUTURE"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "all",
+              "name": "all",
+              "description": "all trade type"
+            },
+            {
+              "value": "SPOT",
+              "name": "SPOT",
+              "description": "SPOT"
+            },
+            {
+              "value": "FUTURE",
+              "name": "FUTURE",
+              "description": "FUTURE"
+            }
+          ]
+        }
+      },
+      {
+        "name": "rebateType",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "1",
+            "2"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "1",
+              "name": "",
+              "description": "spot"
+            },
+            {
+              "value": "2",
+              "name": "",
+              "description": "futures"
+            }
+          ]
+        }
+      },
+      {
+        "name": "startAt",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "endAt",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "page",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer"
+        }
+      },
+      {
+        "name": "pageSize",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer"
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/api-broker/get-commission",
+    "summary": "Get Commission",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_v2_broker_query_user",
+    "method": "GET",
+    "path": "/api/v2/broker/queryUser",
+    "market": "spot",
+    "fields": [
+      {
+        "name": "tradeType",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "all",
+            "SPOT",
+            "FUTURE"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "all",
+              "name": "all",
+              "description": "all trade types"
+            },
+            {
+              "value": "SPOT",
+              "name": "SPOT",
+              "description": "SPOT"
+            },
+            {
+              "value": "FUTURE",
+              "name": "FUTURE",
+              "description": "FUTURE"
+            }
+          ],
+          "default": "all"
+        }
+      },
+      {
+        "name": "uid",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "rcode",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "tag",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "startAt",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "endAt",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "page",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer"
+        }
+      },
+      {
+        "name": "pageSize",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "default": 10
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/api-broker/get-user-list",
+    "summary": "Get User List",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_v2_broker_query_detail_by_uid",
+    "method": "GET",
+    "path": "/api/v2/broker/queryDetailByUid",
+    "market": "spot",
+    "fields": [
+      {
+        "name": "tradeType",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "all",
+            "SPOT",
+            "FUTURE"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "all",
+              "name": "all",
+              "description": "all trade types"
+            },
+            {
+              "value": "SPOT",
+              "name": "SPOT",
+              "description": "SPOT"
+            },
+            {
+              "value": "FUTURE",
+              "name": "FUTURE",
+              "description": "FUTURE"
+            }
+          ],
+          "default": "all"
+        }
+      },
+      {
+        "name": "uid",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "startAt",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "endAt",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "lastId",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "direction",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "PRE",
+            "NEXT"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "PRE",
+              "name": "PRE",
+              "description": "last page"
+            },
+            {
+              "value": "NEXT",
+              "name": "NEXT",
+              "description": "next page"
+            }
+          ]
+        }
+      },
+      {
+        "name": "pageSize",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "default": 10
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/api-broker/get-user-transactions",
+    "summary": "Get User Transactions",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_v1_broker_nd_rebate_download",
+    "method": "GET",
+    "path": "/api/v1/broker/nd/rebate/download",
+    "market": "broker",
+    "fields": [
+      {
+        "name": "begin",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "end",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "tradeType",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "1",
+            "2"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "1",
+              "name": "1",
+              "description": "spot"
+            },
+            {
+              "value": "2",
+              "name": "2",
+              "description": "futures"
+            }
+          ]
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/get-broker-rebate",
+    "summary": "Get Broker Rebate",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_v3_broker_nd_rebate_download",
+    "method": "GET",
+    "path": "/api/v3/broker/nd/rebate/download",
+    "market": "broker",
+    "fields": [
+      {
+        "name": "begin",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "end",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "tradeType",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "enum": [
+            "FUTURE",
+            "SPOT"
+          ],
+          "type": "string"
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/get-broker-rebatev3",
+    "summary": "Get Broker RebateV3",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "post_kyc_nd_broker_proxy_client_submit",
+    "method": "POST",
+    "path": "/api/kyc/ndBroker/proxyClient/submit",
+    "market": "broker",
+    "fields": [
+      {
+        "name": "clientUid",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "client uid",
+          "examples": [
+            "226383154"
+          ]
+        }
+      },
+      {
+        "name": "firstName",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "first Name"
+        }
+      },
+      {
+        "name": "lastName",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "last Name"
+        }
+      },
+      {
+        "name": "issueCountry",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "ISO country code",
+          "examples": [
+            "CN",
+            "US",
+            "DE",
+            "JP"
+          ]
+        }
+      },
+      {
+        "name": "birthDate",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Birth Date",
+          "examples": [
+            "2000-01-01"
+          ]
+        }
+      },
+      {
+        "name": "identityType",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Identity type",
+          "enum": [
+            "idcard",
+            "drivinglicense",
+            "passport",
+            "bvn"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "idcard",
+              "name": "idcard",
+              "description": "id card"
+            },
+            {
+              "value": "drivinglicense",
+              "name": "drivinglicense",
+              "description": "driving license"
+            },
+            {
+              "value": "passport",
+              "name": "passport",
+              "description": "passport"
+            },
+            {
+              "value": "bvn",
+              "name": "bvn",
+              "description": "bvn"
+            }
+          ]
+        }
+      },
+      {
+        "name": "identityNumber",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Identity Number"
+        }
+      },
+      {
+        "name": "expireDate",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "expire Date. If there is no expiration date, please fill in: 2099-01-01",
+          "examples": [
+            "2030-01-01",
+            "2099-01-01"
+          ]
+        }
+      },
+      {
+        "name": "frontPhoto",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Optional when identityType=bvn\nFront photo of the ID card, in base64 format, PNG or JPG is recommended, and the size cannot exceed 2MB. If it exceeds 2MB, it is recommended to adjust the resolution and compress it to less than 2MB\nPlease note that the ID photo must be the original document; scanned copies are not acceptable.",
+          "examples": [
+            "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJCh..."
+          ]
+        }
+      },
+      {
+        "name": "backendPhoto",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Optional when identityType=passport/bvn\nBack photo of ID, same as above\nPlease note that the ID photo must be the original document; scanned copies are not acceptable.",
+          "examples": [
+            "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJCh..."
+          ]
+        }
+      },
+      {
+        "name": "facePhoto",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Please submit a selfie showing yourself. Selfie photo, in base64 format, PNG or JPG is recommended, and the size cannot exceed 2MB. If it exceeds 2MB, it is recommended to adjust the resolution and compress it to less than 2MB",
+          "examples": [
+            "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJCh..."
+          ]
+        }
+      }
+    ],
+    "json_body": true,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/submit-kyc",
+    "summary": "Submit KYC",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_kyc_nd_broker_proxy_client_status_list",
+    "method": "GET",
+    "path": "/api/kyc/ndBroker/proxyClient/status/list",
+    "market": "broker",
+    "fields": [
+      {
+        "name": "clientUids",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "examples": [
+            "226383154",
+            "226383154,22341356"
+          ]
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/get-kyc-status",
+    "summary": "Get KYC Status",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_kyc_nd_broker_proxy_client_status_page",
+    "method": "GET",
+    "path": "/api/kyc/ndBroker/proxyClient/status/page",
+    "market": "broker",
+    "fields": [
+      {
+        "name": "pageNumber",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "default": 1
+        }
+      },
+      {
+        "name": "pageSize",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "default": 100,
+          "maximum": 100,
+          "minimum": 1
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/get-kyc-status-list",
+    "summary": "Get KYC Status List",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_v1_broker_nd_info",
+    "method": "GET",
+    "path": "/api/v1/broker/nd/info",
+    "market": "broker",
+    "fields": [
+      {
+        "name": "begin",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "end",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "tradeType",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "1",
+            "2"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "1",
+              "name": "1",
+              "description": "spot"
+            },
+            {
+              "value": "2",
+              "name": "2",
+              "description": "futures"
+            }
+          ]
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/get-broker-info",
+    "summary": "Get Broker Info",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "post_v1_broker_nd_account",
+    "method": "POST",
+    "path": "/api/v1/broker/nd/account",
+    "market": "broker",
+    "fields": [
+      {
+        "name": "accountName",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Sub-account Name. Note that this name is unique across the exchange. It is recommended to add a special identifier to prevent name duplication."
+        }
+      }
+    ],
+    "json_body": true,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/add-subaccount",
+    "summary": "Add sub-account",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_v1_broker_nd_account",
+    "method": "GET",
+    "path": "/api/v1/broker/nd/account",
+    "market": "broker",
+    "fields": [
+      {
+        "name": "uid",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "currentPage",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "default": 1
+        }
+      },
+      {
+        "name": "pageSize",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "default": 20,
+          "maximum": 100,
+          "minimum": 1
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/get-subaccount",
+    "summary": "Get sub-account",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "post_v1_broker_nd_account_apikey",
+    "method": "POST",
+    "path": "/api/v1/broker/nd/account/apikey",
+    "market": "broker",
+    "fields": [
+      {
+        "name": "uid",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Sub-account UID",
+          "x-apidog-mock": "226383154"
+        }
+      },
+      {
+        "name": "passphrase",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "API passphrase",
+          "x-apidog-mock": "11223344"
+        }
+      },
+      {
+        "name": "ipWhitelist",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "x-apidog-mock": "127.0.0.1"
+          },
+          "description": "IP whitelist list, supports up to 20 IPs.\nWhen permissions include 'Transfer(Withdraw)', ipWhitelist is required. Otherwise, ipWhitelist is optional."
+        }
+      },
+      {
+        "name": "permissions",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "x-apidog-mock": "general",
+            "default": "General"
+          },
+          "description": "[Permissions](/docs-new/introduction) group list. Possible values: General, Spot, Margin, Futures, InnerTransfer(Flex Transfer), Transfer(Withdraw), Earn. such as \"General, Trade\". If empty, the default permission is \"General\"."
+        }
+      },
+      {
+        "name": "label",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "apikey remarks (length 4~32)\n",
+          "minLength": 4,
+          "maxLength": 32,
+          "x-apidog-mock": "This is remarks"
+        }
+      }
+    ],
+    "json_body": true,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/add-subaccount-api",
+    "summary": "Add sub-account API",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_v1_broker_nd_account_apikey",
+    "method": "GET",
+    "path": "/api/v1/broker/nd/account/apikey",
+    "market": "broker",
+    "fields": [
+      {
+        "name": "uid",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "apiKey",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/get-subaccount-api",
+    "summary": "Get sub-account API",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "post_v1_broker_nd_account_update_apikey",
+    "method": "POST",
+    "path": "/api/v1/broker/nd/account/update-apikey",
+    "market": "broker",
+    "fields": [
+      {
+        "name": "uid",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Sub-account UID",
+          "x-apidog-mock": "226383154"
+        }
+      },
+      {
+        "name": "ipWhitelist",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "x-apidog-mock": "127.0.0.1"
+          },
+          "description": "IP whitelist list, supports up to 20 IPs.\nWhen permissions include 'Transfer(Withdraw)', ipWhitelist is required. Otherwise, ipWhitelist is optional."
+        }
+      },
+      {
+        "name": "permissions",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "x-apidog-mock": "general",
+            "default": "General"
+          },
+          "description": "[Permissions](/docs-new/introduction) group list. Possible values: General, Spot, Margin, Futures, InnerTransfer(Flex Transfer), Transfer(Withdraw), Earn. such as \"General, Trade\". If empty, the default permission is \"General\"."
+        }
+      },
+      {
+        "name": "label",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "apikey remarks (length 4~32)\n",
+          "minLength": 4,
+          "maxLength": 32,
+          "x-apidog-mock": "This is remarks"
+        }
+      },
+      {
+        "name": "apiKey",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Sub-account apiKey",
+          "x-apidog-mock": "671afb36cee20f00015cfaf1"
+        }
+      }
+    ],
+    "json_body": true,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/modify-subaccount-api",
+    "summary": "Modify sub-account API",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "delete_v1_broker_nd_account_apikey",
+    "method": "DELETE",
+    "path": "/api/v1/broker/nd/account/apikey",
+    "market": "broker",
+    "fields": [
+      {
+        "name": "uid",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "apiKey",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/delete-subaccount-api",
+    "summary": "Delete sub-account API",
+    "withdrawal": false,
+    "confirm": true
+  },
+  {
+    "name": "post_v1_broker_nd_transfer",
+    "method": "POST",
+    "path": "/api/v1/broker/nd/transfer",
+    "market": "broker",
+    "fields": [
+      {
+        "name": "currency",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Currency",
+          "x-apidog-mock": "USDT"
+        }
+      },
+      {
+        "name": "amount",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Transfer Amount (must be a positive integer in the currency's precision)",
+          "x-apidog-mock": "1"
+        }
+      },
+      {
+        "name": "direction",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Fund transfer direction: OUT (Broker account is transferred to Broker sub-account), IN (Broker sub-account is transferred to Broker account)",
+          "enum": [
+            "OUT",
+            "IN"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "OUT",
+              "name": "OUT",
+              "description": "Broker account is transferred to Broker sub-account"
+            },
+            {
+              "value": "IN",
+              "name": "IN",
+              "description": "Broker sub-account is transferred to Broker account"
+            }
+          ],
+          "x-apidog-mock": "OUT"
+        }
+      },
+      {
+        "name": "accountType",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Broker account types: MAIN (Funding account), TRADE (Spot trading account)",
+          "enum": [
+            "MAIN",
+            "TRADE"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "MAIN",
+              "name": "main",
+              "description": "funding account"
+            },
+            {
+              "value": "TRADE",
+              "name": "trade",
+              "description": "spot trading account"
+            }
+          ],
+          "x-apidog-mock": "MAIN"
+        }
+      },
+      {
+        "name": "specialUid",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Broker sub-account UID, must be the Broker sub-account created by the current Broker user.",
+          "x-apidog-mock": "226383154"
+        }
+      },
+      {
+        "name": "specialAccountType",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Broker sub-account types: MAIN (Funding account), TRADE (Spot trading account)",
+          "enum": [
+            "MAIN",
+            "TRADE"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "MAIN",
+              "name": "main",
+              "description": "funding account"
+            },
+            {
+              "value": "TRADE",
+              "name": "trade",
+              "description": "spot trading account"
+            }
+          ],
+          "x-apidog-mock": "MAIN"
+        }
+      },
+      {
+        "name": "clientOid",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Client Order ID, the unique identifier created by the client. It is recommended to use UUID. The maximum length is 128 bits.",
+          "maxLength": 128,
+          "x-apidog-mock": "e6c24d23-6bc2-401b-bf9e-55e2daddfbc1"
+        }
+      }
+    ],
+    "json_body": true,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/transfer",
+    "summary": "Transfer",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_v3_broker_nd_transfer_detail",
+    "method": "GET",
+    "path": "/api/v3/broker/nd/transfer/detail",
+    "market": "broker",
+    "fields": [
+      {
+        "name": "orderId",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/get-transfer-history",
+    "summary": "Get Transfer History",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_v1_asset_ndbroker_deposit_list",
+    "method": "GET",
+    "path": "/api/v1/asset/ndbroker/deposit/list",
+    "market": "broker",
+    "fields": [
+      {
+        "name": "currency",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "status",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "hash",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "startTimestamp",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "endTimestamp",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "limit",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "default": 1000,
+          "maximum": 1000
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/get-deposit-list",
+    "summary": "Get Deposit List",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_v3_broker_nd_deposit_detail",
+    "method": "GET",
+    "path": "/api/v3/broker/nd/deposit/detail",
+    "market": "broker",
+    "fields": [
+      {
+        "name": "currency",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "hash",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/get-deposit-detail",
+    "summary": "Get Deposit Detail",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_v3_broker_nd_withdraw_detail",
+    "method": "GET",
+    "path": "/api/v3/broker/nd/withdraw/detail",
+    "market": "broker",
+    "fields": [
+      {
+        "name": "withdrawalId",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/get-withdraw-detail",
+    "summary": "Get Withdraw Detail",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "post_v1_broker_nd_mark_up",
+    "method": "POST",
+    "path": "/api/v1/broker/nd/mark-up",
+    "market": "broker",
+    "fields": [
+      {
+        "name": "subUids",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "description": "Valid when effectiveType=UID_SPECIFIC; specify the sub‑account UIDs to be set (up to 20). Ignored when effectiveType=DEFAULT."
+        }
+      },
+      {
+        "name": "effectAt",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Effective timestamp for the mark‑up fee (in milliseconds). If not provided, it defaults to 00:10 at the earliest UTC+8 T+1 (the next calendar day).\""
+        }
+      },
+      {
+        "name": "tradeType",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Business type",
+          "enum": [
+            "SPOT",
+            "FUTURES"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "SPOT",
+              "name": "SPOT",
+              "description": "SPOT"
+            },
+            {
+              "value": "FUTURES",
+              "name": "FUTURES",
+              "description": "FUTURES"
+            }
+          ]
+        }
+      },
+      {
+        "name": "makerMarkUp",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "number",
+          "format": "bigdecimal",
+          "description": "Absolute value of mark‑up for Taker orders – range: [0, 0.03] for spot, [0, 0.001] for futures. Maker and Taker must be set together."
+        }
+      },
+      {
+        "name": "takerMarkUp",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "number",
+          "format": "bigdecimal",
+          "description": "Absolute value of mark‑up for Taker orders – range: [0, 0.03] for spot, [0, 0.001] for futures. Maker and Taker must be set together.\""
+        }
+      },
+      {
+        "name": "effectiveType",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Effective mode for mark‑up fee",
+          "enum": [
+            "DEFAULT",
+            "UID_SPECIFIC"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "DEFAULT",
+              "name": "DEFAULT",
+              "description": "Applicable to all sub-accounts"
+            },
+            {
+              "value": "UID_SPECIFIC",
+              "name": "UID_SPECIFIC",
+              "description": "Set by UID"
+            }
+          ]
+        }
+      }
+    ],
+    "json_body": true,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/setmarkup",
+    "summary": "Set Markup Fee",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_v1_broker_nd_mark_up",
+    "method": "GET",
+    "path": "/api/v1/broker/nd/mark-up",
+    "market": "broker",
+    "fields": [
+      {
+        "name": "subUids",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/getmarkup",
+    "summary": "Get Markup Fee",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "post_v1_copy_trade_futures_orders",
+    "method": "POST",
+    "path": "/api/v1/copy-trade/futures/orders",
+    "market": "futures",
+    "fields": [
+      {
+        "name": "clientOid",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Unique order id created by users to identify their orders, the maximum length cannot exceed 40, e.g. UUID, Only allows numbers, characters, underline(_), and separator(-)",
+          "examples": [
+            "5c52e11203aa677f33e493fb"
+          ]
+        }
+      },
+      {
+        "name": "side",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "specify if the order is to 'buy' or 'sell' ",
+          "enum": [
+            "buy",
+            "sell"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "buy",
+              "name": "buy",
+              "description": "buy"
+            },
+            {
+              "value": "sell",
+              "name": "sell",
+              "description": "sell"
+            }
+          ],
+          "examples": [
+            "buy"
+          ]
+        }
+      },
+      {
+        "name": "symbol",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Symbol of the contract, Please refer to [Get Symbol endpoint: symbol](/docs-new/rest/futures-trading/market-data/get-all-symbols) ",
+          "examples": [
+            "XBTUSDTM"
+          ]
+        }
+      },
+      {
+        "name": "leverage",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "integer",
+          "description": "Used to calculate the margin to be frozen for the order. If you are to close the position, this parameter is not required.",
+          "examples": [
+            3
+          ],
+          "minimum": 1,
+          "maximum": 20
+        }
+      },
+      {
+        "name": "type",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "specify if the order is an 'limit' order or 'market' order",
+          "enum": [
+            "limit",
+            "market"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "limit",
+              "name": "limit",
+              "description": "limit order"
+            },
+            {
+              "value": "market",
+              "name": "market",
+              "description": "market order"
+            }
+          ],
+          "examples": [
+            "limit"
+          ],
+          "default": "limit"
+        }
+      },
+      {
+        "name": "stop",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Either 'down' or 'up'.  If stop is used,parameter stopPrice and stopPriceType also need to be provieded.",
+          "enum": [
+            "down",
+            "up"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "down",
+              "name": "down",
+              "description": "Triggers when the price reaches or goes below the stopPrice."
+            },
+            {
+              "value": "up",
+              "name": "up",
+              "description": "Triggers when the price reaches or goes above the stopPrice"
+            }
+          ]
+        }
+      },
+      {
+        "name": "stopPriceType",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Either 'TP' or 'MP', Need to be defined if stop is specified.",
+          "enum": [
+            "TP",
+            "MP"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "TP",
+              "name": "trade price",
+              "description": "TP for trade price, The last trade price is the last price at which an order was filled. This price can be found in the latest match message."
+            },
+            {
+              "value": "MP",
+              "name": "mark price",
+              "description": "MP for mark price, The mark price can be obtained through relevant OPEN API for index services"
+            }
+          ]
+        }
+      },
+      {
+        "name": "stopPrice",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Need to be defined if stop is specified. "
+        }
+      },
+      {
+        "name": "reduceOnly",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "boolean",
+          "description": "A mark to reduce the position size only. Set to false by default. Need to set the position size when reduceOnly is true. If set to true, only the orders reducing the position size will be executed. If the reduce-only order size exceeds the position size, the extra size will be canceled.",
+          "default": false
+        }
+      },
+      {
+        "name": "closeOrder",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "boolean",
+          "description": "A mark to close the position. Set to false by default. If closeOrder is set to true, the system will close the position and the position size will become 0. Side, Size and Leverage fields can be left empty and the system will determine the side and size automatically.",
+          "default": false
+        }
+      },
+      {
+        "name": "marginMode",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "ISOLATED",
+            "CROSS"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "ISOLATED",
+              "name": "ISOLATED",
+              "description": "Isolated Margin"
+            },
+            {
+              "value": "CROSS",
+              "name": "CROSS",
+              "description": "Cross Margin"
+            }
+          ],
+          "default": "ISOLATED",
+          "description": "Margin mode: ISOLATED, CROSS default: ISOLATED."
+        }
+      },
+      {
+        "name": "price",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Required for type is 'limit' order, indicating the operating price",
+          "examples": [
+            "0.1"
+          ]
+        }
+      },
+      {
+        "name": "size",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "integer",
+          "description": "Order size (Lot), must be a positive integer. The quantity unit of coin-swap contracts is size(lot), and other units are not supported."
+        }
+      },
+      {
+        "name": "timeInForce",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Optional for type is 'limit' order, [Time in force](/docs-new/enums-definitions) is a special strategy used during trading, default is GTC",
+          "enum": [
+            "GTC",
+            "IOC"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "GTC",
+              "name": "Good Till Canceled",
+              "description": "order remains open on the order book until canceled. This is the default type if the field is left empty."
+            },
+            {
+              "value": "IOC",
+              "name": "Immediate Or Cancel",
+              "description": "being matched or not, the remaining size of the order will be instantly canceled instead of entering the order book."
+            }
+          ],
+          "default": "GTC"
+        }
+      },
+      {
+        "name": "postOnly",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "boolean",
+          "description": "Optional for type is 'limit' order,  post only flag, invalid when timeInForce is IOC. The post-only flag ensures that the trader always pays the maker fee and provides liquidity to the order book. If any part of the order is going to pay taker fee, the order will be fully rejected.",
+          "default": false
+        }
+      },
+      {
+        "name": "positionSide",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Position direction, optional in one-way mode, defaults to BOTH. Required in hedge mode.",
+          "enum": [
+            "BOTH",
+            "LONG",
+            "SHORT"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "BOTH",
+              "name": "both",
+              "description": "BOTH for one-way mode."
+            },
+            {
+              "value": "LONG",
+              "name": "long",
+              "description": "LONG for long position in hedge mode."
+            },
+            {
+              "value": "SHORT",
+              "name": "short",
+              "description": "SHORT for short position in hedge mode."
+            }
+          ]
+        }
+      }
+    ],
+    "json_body": true,
+    "source": "https://www.kucoin.com/docs-new/rest/copy-trading/add-order",
+    "summary": "Add Order",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "post_v1_copy_trade_futures_orders_test",
+    "method": "POST",
+    "path": "/api/v1/copy-trade/futures/orders/test",
+    "market": "futures",
+    "fields": [
+      {
+        "name": "clientOid",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Unique order ID created by users to identify their orders. The maximum length cannot exceed 40, e.g. UUID only allows numbers, characters, underline(_), and separator (-).",
+          "examples": [
+            "5c52e11203aa677f33e493fb"
+          ]
+        }
+      },
+      {
+        "name": "side",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Specify if the order is to 'buy' or 'sell'.",
+          "enum": [
+            "buy",
+            "sell"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "buy",
+              "name": "buy",
+              "description": "buy"
+            },
+            {
+              "value": "sell",
+              "name": "sell",
+              "description": "sell"
+            }
+          ],
+          "examples": [
+            "buy"
+          ]
+        }
+      },
+      {
+        "name": "symbol",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Symbol of the contract. Please refer to [Get Symbol endpoint: symbol](/docs-new/rest/futures-trading/market-data/get-all-symbols) ",
+          "examples": [
+            "XBTUSDTM"
+          ]
+        }
+      },
+      {
+        "name": "leverage",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "integer",
+          "description": "Used to calculate the margin to be frozen for the order. If you are to close the position, this parameter is not required.",
+          "examples": [
+            3
+          ],
+          "minimum": 1,
+          "maximum": 20
+        }
+      },
+      {
+        "name": "type",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Specify if the order is a 'limit' order or 'market' order",
+          "enum": [
+            "limit",
+            "market"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "limit",
+              "name": "limit",
+              "description": "limit order"
+            },
+            {
+              "value": "market",
+              "name": "market",
+              "description": "market order"
+            }
+          ],
+          "examples": [
+            "limit"
+          ],
+          "default": "limit"
+        }
+      },
+      {
+        "name": "stop",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Either 'down' or 'up'.  If stop is used, parameter stopPrice and stopPriceType also need to be provided.",
+          "enum": [
+            "down",
+            "up"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "down",
+              "name": "down",
+              "description": "Triggers when the price reaches or goes below the stopPrice."
+            },
+            {
+              "value": "up",
+              "name": "up",
+              "description": "Triggers when the price reaches or goes above the stopPrice."
+            }
+          ]
+        }
+      },
+      {
+        "name": "stopPriceType",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Either 'TP' or 'MP' need to be defined if stop is specified.",
+          "enum": [
+            "TP",
+            "MP"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "TP",
+              "name": "trade price",
+              "description": "TP for trade price, The last trade price is the last price at which an order was filled. This price can be found in the latest match message."
+            },
+            {
+              "value": "MP",
+              "name": "mark price",
+              "description": "MP for mark price. The mark price can be obtained through relevant OPEN API for index services."
+            }
+          ]
+        }
+      },
+      {
+        "name": "stopPrice",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Needs to be defined if stop is specified. "
+        }
+      },
+      {
+        "name": "reduceOnly",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "boolean",
+          "description": "A mark to reduce the position size only. Set to false by default. Need to set the position size when reduceOnly is true. If set to true, only the orders reducing the position size will be executed. If the reduce-only order size exceeds the position size, the extra size will be canceled.",
+          "default": false
+        }
+      },
+      {
+        "name": "closeOrder",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "boolean",
+          "description": "A mark to close the position. Set to false by default. If closeOrder is set to true, the system will close the position and the position size will become 0. Side, Size and Leverage fields can be left empty and the system will determine the side and size automatically.",
+          "default": false
+        }
+      },
+      {
+        "name": "marginMode",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Margin mode: ISOLATED, CROSS default: ISOLATED",
+          "enum": [
+            "ISOLATED",
+            "CROSS"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "ISOLATED",
+              "name": "ISOLATED",
+              "description": "Isolated Margin"
+            },
+            {
+              "value": "CROSS",
+              "name": "CROSS",
+              "description": "Cross Margin"
+            }
+          ],
+          "default": "ISOLATED"
+        }
+      },
+      {
+        "name": "price",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Required for type is 'limit' order, indicating the operating price",
+          "examples": [
+            "0.1"
+          ]
+        }
+      },
+      {
+        "name": "size",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "integer",
+          "description": "Order size (lot), must be a positive integer. The quantity unit of coin-swap contracts is size (lot), and other units are not supported."
+        }
+      },
+      {
+        "name": "timeInForce",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Optional for type is 'limit' order, [Time in force](/docs-new/enums-definitions) is a special strategy used during trading, default is GTC",
+          "enum": [
+            "GTC",
+            "IOC"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "GTC",
+              "name": "Good Till Canceled",
+              "description": "order remains open on the order book until canceled. This is the default type if the field is left empty."
+            },
+            {
+              "value": "IOC",
+              "name": "Immediate Or Cancel",
+              "description": "being matched or not, the remaining size of the order will be instantly canceled instead of entering the order book."
+            }
+          ],
+          "default": "GTC"
+        }
+      },
+      {
+        "name": "postOnly",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "boolean",
+          "description": "Optional for type is 'limit' order, post only flag, invalid when timeInForce is IOC. The post-only flag ensures that the trader always pays the maker fee and provides liquidity to the order book. If any part of the order is going to pay taker fees, the order will be fully rejected.",
+          "default": false
+        }
+      },
+      {
+        "name": "positionSide",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Position direction, optional in one-way mode, defaults to BOTH. Required in hedge mode.",
+          "enum": [
+            "BOTH",
+            "LONG",
+            "SHORT"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "BOTH",
+              "name": "both",
+              "description": "BOTH for one-way mode."
+            },
+            {
+              "value": "LONG",
+              "name": "long",
+              "description": "LONG for long position in hedge mode."
+            },
+            {
+              "value": "SHORT",
+              "name": "short",
+              "description": "SHORT for short position in hedge mode."
+            }
+          ]
+        }
+      }
+    ],
+    "json_body": true,
+    "source": "https://www.kucoin.com/docs-new/rest/copy-trading/add-order-test",
+    "summary": "Add Order Test",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "post_v1_copy_trade_futures_st_orders",
+    "method": "POST",
+    "path": "/api/v1/copy-trade/futures/st-orders",
+    "market": "futures",
+    "fields": [
+      {
+        "name": "clientOid",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Unique order ID created by users to identify their orders. The maximum length cannot exceed 40, e.g. UUID only allows numbers, characters, underline(_), and separator (-).",
+          "examples": [
+            "5c52e11203aa677f33e493fb"
+          ]
+        }
+      },
+      {
+        "name": "side",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Specify if the order is to 'buy' or 'sell'.",
+          "enum": [
+            "buy",
+            "sell"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "buy",
+              "name": "buy",
+              "description": "buy"
+            },
+            {
+              "value": "sell",
+              "name": "sell",
+              "description": "sell"
+            }
+          ],
+          "examples": [
+            "buy"
+          ]
+        }
+      },
+      {
+        "name": "symbol",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Symbol of the contract. Please refer to [Get Symbol endpoint: symbol](/docs-new/rest/futures-trading/market-data/get-all-symbols) ",
+          "examples": [
+            "XBTUSDTM"
+          ]
+        }
+      },
+      {
+        "name": "leverage",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "integer",
+          "description": "Used to calculate the margin to be frozen for the order. If you are to close the position, this parameter is not required.",
+          "examples": [
+            3
+          ],
+          "minimum": 1,
+          "maximum": 20,
+          "exclusiveMaximum": 20
+        }
+      },
+      {
+        "name": "type",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Specify if the order is a 'limit' order or 'market' order",
+          "enum": [
+            "limit",
+            "market"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "limit",
+              "name": "limit",
+              "description": "limit order"
+            },
+            {
+              "value": "market",
+              "name": "market",
+              "description": "market order"
+            }
+          ],
+          "examples": [
+            "limit"
+          ],
+          "default": "limit"
+        }
+      },
+      {
+        "name": "stopPriceType",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Either 'TP' or 'MP'",
+          "enum": [
+            "TP",
+            "MP"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "TP",
+              "name": "trade price",
+              "description": "TP for trade price, The last trade price is the last price at which an order was filled. This price can be found in the latest match message."
+            },
+            {
+              "value": "MP",
+              "name": "mark price",
+              "description": "MP for mark price. The mark price can be obtained through relevant OPEN API for index services."
+            }
+          ]
+        }
+      },
+      {
+        "name": "reduceOnly",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "boolean",
+          "description": "A mark to reduce the position size only. Set to false by default. Need to set the position size when reduceOnly is true. If set to true, only the orders reducing the position size will be executed. If the reduce-only order size exceeds the position size, the extra size will be canceled.",
+          "default": false
+        }
+      },
+      {
+        "name": "closeOrder",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "boolean",
+          "description": "A mark to close the position. Set to false by default. If closeOrder is set to true, the system will close the position and the position size will become 0. Side, Size and Leverage fields can be left empty and the system will determine the side and size automatically.",
+          "default": false
+        }
+      },
+      {
+        "name": "marginMode",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Margin mode: ISOLATED, CROSS default: ISOLATED",
+          "enum": [
+            "ISOLATED",
+            "CROSS"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "ISOLATED",
+              "name": "ISOLATED",
+              "description": "Isolated Margin"
+            },
+            {
+              "value": "CROSS",
+              "name": "CROSS",
+              "description": "Cross Margin"
+            }
+          ],
+          "default": "ISOLATED"
+        }
+      },
+      {
+        "name": "price",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Required for type is 'limit' order, indicating the operating price",
+          "examples": [
+            "0.1"
+          ]
+        }
+      },
+      {
+        "name": "size",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "integer",
+          "description": "Order size (lot), must be a positive integer. The quantity unit of coin-swap contracts is size (lot), and other units are not supported."
+        }
+      },
+      {
+        "name": "timeInForce",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Optional for type is 'limit' order, [Time in force](/docs-new/enums-definitions) is a special strategy used during trading, default is GTC",
+          "enum": [
+            "GTC",
+            "IOC"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "GTC",
+              "name": "Good Till Canceled",
+              "description": "Order remains open on the order book until canceled. This is the default type if the field is left empty."
+            },
+            {
+              "value": "IOC",
+              "name": "Immediate Or Cancel",
+              "description": "Being matched or not, the remaining size of the order will be instantly canceled instead of entering the order book."
+            }
+          ],
+          "default": "GTC"
+        }
+      },
+      {
+        "name": "postOnly",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "boolean",
+          "description": "Optional for type is 'limit' order, post only flag, invalid when timeInForce is IOC. The post-only flag ensures that the trader always pays the maker fee and provides liquidity to the order book. If any part of the order is going to pay taker fees, the order will be fully rejected.",
+          "default": false
+        }
+      },
+      {
+        "name": "triggerStopUpPrice",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Take profit price"
+        }
+      },
+      {
+        "name": "triggerStopDownPrice",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Stop loss price"
+        }
+      },
+      {
+        "name": "positionSide",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Position direction, optional in one-way mode, defaults to BOTH. Required in hedge mode.",
+          "enum": [
+            "BOTH",
+            "LONG",
+            "SHORT"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "BOTH",
+              "name": "both",
+              "description": "BOTH for one-way mode."
+            },
+            {
+              "value": "LONG",
+              "name": "long",
+              "description": "LONG for long position in hedge mode."
+            },
+            {
+              "value": "SHORT",
+              "name": "short",
+              "description": "SHORT for short position in hedge mode."
+            }
+          ]
+        }
+      }
+    ],
+    "json_body": true,
+    "source": "https://www.kucoin.com/docs-new/rest/copy-trading/add-take-profit-and-stop-loss-order",
+    "summary": "Add Take Profit And Stop Loss Order",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "delete_v1_copy_trade_futures_orders",
+    "method": "DELETE",
+    "path": "/api/v1/copy-trade/futures/orders",
+    "market": "futures",
+    "fields": [
+      {
+        "name": "orderId",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/copy-trading/cancel-order-by-orderid",
+    "summary": "Cancel Order By OrderId",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "delete_v1_copy_trade_futures_orders_client_order",
+    "method": "DELETE",
+    "path": "/api/v1/copy-trade/futures/orders/client-order",
+    "market": "futures",
+    "fields": [
+      {
+        "name": "symbol",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "clientOid",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/copy-trading/cancel-order-by-clientoid",
+    "summary": "Cancel Order By ClientOid",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_v1_copy_trade_futures_get_max_open_size",
+    "method": "GET",
+    "path": "/api/v1/copy-trade/futures/get-max-open-size",
+    "market": "futures",
+    "fields": [
+      {
+        "name": "symbol",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "examples": [
+            "XBTUSDTM",
+            "XBTUSDM",
+            "ETHUSDTM"
+          ]
+        }
+      },
+      {
+        "name": "price",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "number"
+        }
+      },
+      {
+        "name": "leverage",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "integer"
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/copy-trading/get-max-open-size",
+    "summary": "Get Max Open Size",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_v1_copy_trade_futures_position_margin_max_withdraw_margin",
+    "method": "GET",
+    "path": "/api/v1/copy-trade/futures/position/margin/max-withdraw-margin",
+    "market": "futures",
+    "fields": [
+      {
+        "name": "symbol",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "positionSide",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "description": "Position direction, optional in one-way mode, defaults to BOTH. Required in hedge mode.",
+          "enum": [
+            "BOTH",
+            "LONG",
+            "SHORT"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "BOTH",
+              "name": "both",
+              "description": "BOTH for one-way mode."
+            },
+            {
+              "value": "LONG",
+              "name": "long",
+              "description": "LONG for long position in hedge mode."
+            },
+            {
+              "value": "SHORT",
+              "name": "short",
+              "description": "SHORT for short position in hedge mode."
+            }
+          ]
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/copy-trading/get-max-withdraw-margin",
+    "summary": "Get Max Withdraw Margin",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "post_v1_copy_trade_futures_position_margin_deposit_margin",
+    "method": "POST",
+    "path": "/api/v1/copy-trade/futures/position/margin/deposit-margin",
+    "market": "futures",
+    "fields": [
+      {
+        "name": "symbol",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Symbol of the contract, Please refer to [Get Symbol endpoint: symbol](/docs-new/rest/futures-trading/market-data/get-all-symbols) "
+        }
+      },
+      {
+        "name": "margin",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "number",
+          "description": "Margin amount (min. margin amount≥0.00001667XBT）"
+        }
+      },
+      {
+        "name": "bizNo",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "A unique ID generated by the user, to ensure the operation is processed by the system only once, The maximum length cannot exceed 36"
+        }
+      },
+      {
+        "name": "positionSide",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Position direction, optional in one-way mode, defaults to BOTH. Required in hedge mode.",
+          "enum": [
+            "BOTH",
+            "LONG",
+            "SHORT"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "BOTH",
+              "name": "both",
+              "description": "BOTH for one-way mode."
+            },
+            {
+              "value": "LONG",
+              "name": "long",
+              "description": "LONG for long position in hedge mode."
+            },
+            {
+              "value": "SHORT",
+              "name": "short",
+              "description": "SHORT for short position in hedge mode."
+            }
+          ]
+        }
+      }
+    ],
+    "json_body": true,
+    "source": "https://www.kucoin.com/docs-new/rest/copy-trading/add-isolated-margin",
+    "summary": "Add Isolated Margin",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "post_v1_copy_trade_futures_position_margin_withdraw_margin",
+    "method": "POST",
+    "path": "/api/v1/copy-trade/futures/position/margin/withdraw-margin",
+    "market": "futures",
+    "fields": [
+      {
+        "name": "symbol",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Symbol of the contract, Please refer to [Get Symbol endpoint: symbol](/docs-new/rest/futures-trading/market-data/get-all-symbols) "
+        }
+      },
+      {
+        "name": "withdrawAmount",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "number",
+          "description": "The size of the position that can be deposited. If it is USDT-margin, it represents the amount of USDT. If it is coin-margin, this value represents the number of coins\n"
+        }
+      },
+      {
+        "name": "positionSide",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Position direction, optional in one-way mode, defaults to BOTH. Required in hedge mode.",
+          "enum": [
+            "BOTH",
+            "LONG",
+            "SHORT"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "BOTH",
+              "name": "both",
+              "description": "BOTH for one-way mode."
+            },
+            {
+              "value": "LONG",
+              "name": "long",
+              "description": "LONG for long position in hedge mode."
+            },
+            {
+              "value": "SHORT",
+              "name": "short",
+              "description": "SHORT for short position in hedge mode."
+            }
+          ]
+        }
+      }
+    ],
+    "json_body": true,
+    "source": "https://www.kucoin.com/docs-new/rest/copy-trading/remove-isolated-margin",
+    "summary": "Remove Isolated Margin",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "post_v1_copy_trade_futures_position_risk_limit_level_change",
+    "method": "POST",
+    "path": "/api/v1/copy-trade/futures/position/risk-limit-level/change",
+    "market": "futures",
+    "fields": [
+      {
+        "name": "symbol",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Symbol of the contract. Please refer to [Get Symbol endpoint: symbol](/docs-new/rest/futures-trading/market-data/get-all-symbols) "
+        }
+      },
+      {
+        "name": "level",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "integer",
+          "description": "Level"
+        }
+      }
+    ],
+    "json_body": true,
+    "source": "https://www.kucoin.com/docs-new/rest/copy-trading/modify-isolated-margin-risk-limit",
+    "summary": "Modify Isolated Margin Risk Limit",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "post_v1_copy_trade_futures_position_margin_auto_deposit_status",
+    "method": "POST",
+    "path": "/api/v1/copy-trade/futures/position/margin/auto-deposit-status",
+    "market": "futures",
+    "fields": [
+      {
+        "name": "symbol",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Symbol of the contract\n",
+          "examples": [
+            "XBTUSDTM",
+            "ETHUSDTM"
+          ]
+        }
+      },
+      {
+        "name": "status",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "boolean",
+          "description": "Status"
+        }
+      },
+      {
+        "name": "positionSide",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Position direction, optional in one-way mode, defaults to BOTH. Required in hedge mode.",
+          "enum": [
+            "BOTH",
+            "LONG",
+            "SHORT"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "BOTH",
+              "name": "both",
+              "description": "BOTH for one-way mode."
+            },
+            {
+              "value": "LONG",
+              "name": "long",
+              "description": "LONG for long position in hedge mode."
+            },
+            {
+              "value": "SHORT",
+              "name": "short",
+              "description": "SHORT for short position in hedge mode."
+            }
+          ]
+        }
+      }
+    ],
+    "json_body": true,
+    "source": "https://www.kucoin.com/docs-new/rest/copy-trading/modify-isolated-margin-auto-deposit-status",
+    "summary": "Modify Isolated Margin Auto-Deposit Status",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "post_v1_copy_trade_futures_position_change_margin_mode",
+    "method": "POST",
+    "path": "/api/v1/copy-trade/futures/position/changeMarginMode",
+    "market": "futures",
+    "fields": [
+      {
+        "name": "symbol",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Symbol of the contract, Please refer to [Get Symbol endpoint: symbol](/docs-new/rest/futures-trading/market-data/get-all-symbols) "
+        }
+      },
+      {
+        "name": "marginMode",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Modified margin model: ISOLATED (isolated), CROSS (cross margin).",
+          "enum": [
+            "ISOLATED",
+            "CROSS"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "ISOLATED",
+              "name": "ISOLATED",
+              "description": "Isolated Margin Mode"
+            },
+            {
+              "value": "CROSS",
+              "name": "CROSS",
+              "description": "Cross Margin MOde"
+            }
+          ]
+        }
+      }
+    ],
+    "json_body": true,
+    "source": "https://www.kucoin.com/docs-new/rest/copy-trading/switch-margin-mode",
+    "summary": "Switch Margin Mode",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "post_v2_copy_trade_futures_change_cross_user_leverage",
+    "method": "POST",
+    "path": "/api/v2/copy-trade/futures/changeCrossUserLeverage",
+    "market": "futures",
+    "fields": [
+      {
+        "name": "symbol",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Symbol of the contract, Please refer to [Get Symbol endpoint: symbol](/docs-new/rest/futures-trading/market-data/get-all-symbols) "
+        }
+      },
+      {
+        "name": "leverage",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Leverage multiple"
+        }
+      }
+    ],
+    "json_body": true,
+    "source": "https://www.kucoin.com/docs-new/rest/copy-trading/modify-cross-margin-leverage",
+    "summary": "Modify Cross Margin Leverage",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "post_v2_copy_trade_get_cross_mode_margin_requirement",
+    "method": "POST",
+    "path": "/api/v2/copy-trade/getCrossModeMarginRequirement",
+    "market": "futures",
+    "fields": [
+      {
+        "name": "symbol",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Trading pair name, supports up to 50 trading pairs separated by commas."
+        }
+      },
+      {
+        "name": "leverage",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Trading pair leverage multiplier, defaults to the maximum leverage multiplier of the trading pair. An error will be reported if the provided leverage multiplier exceeds the maximum leverage multiplier of the trading pair."
+        }
+      },
+      {
+        "name": "positionValue",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Position value,\nFor USDT contracts, the unit is USDT.\nFor USDC contracts, the unit is USDC.\nFor coin-margined contracts, the unit is USD."
+        }
+      }
+    ],
+    "json_body": true,
+    "source": "https://www.kucoin.com/docs-new/rest/copy-trading/get-cross-margin-requirement",
+    "summary": "Get Cross Margin Requirement",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "post_v2_copy_trade_position_switch_position_mode",
+    "method": "POST",
+    "path": "/api/v2/copy-trade/position/switchPositionMode",
+    "market": "futures",
+    "fields": [
+      {
+        "name": "positionMode",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Position mode settings, apply to all futures trading pairs.\n\n0 - one-way mode, one-way position\n\n1 - hedge mode, two-way position",
+          "enum": [
+            "0",
+            "1"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "0",
+              "name": "one-way mode",
+              "description": "one-way position"
+            },
+            {
+              "value": "1",
+              "name": "hedge mode",
+              "description": "two-way position"
+            }
+          ]
+        }
+      }
+    ],
+    "json_body": true,
+    "source": "https://www.kucoin.com/docs-new/rest/copy-trading/switch-position-mode",
+    "summary": "Switch Position Mode",
+    "withdrawal": false,
+    "confirm": false
+  }
+]

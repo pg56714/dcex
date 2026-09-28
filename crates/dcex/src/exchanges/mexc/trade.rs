@@ -216,11 +216,21 @@ impl MexcClient {
                 .await
             }
             "cancel_spot_all_orders" => {
-                params.ensure_allowed(&["recvWindow"])?;
+                params.ensure_allowed(&["recvWindow", "product_symbol", "symbol"])?;
+                let mut query = params.only(&["recvWindow"]);
+                let scoped =
+                    params.get("product_symbol").is_some() || params.get("symbol").is_some();
+                if scoped {
+                    self.push_product_symbol(&mut query, params, "")?;
+                }
                 self.spot_private(
                     HttpMethod::Delete,
-                    "/api/v3/order/all",
-                    params.only(&["recvWindow"]),
+                    if scoped {
+                        SPOT_OPEN_ORDERS
+                    } else {
+                        "/api/v3/order/all"
+                    },
+                    query,
                 )
                 .await
             }
@@ -1214,15 +1224,15 @@ impl MexcClient {
                     }
                 }
             }
-            if let Some(stp_mode) = order.get("stpMode").map(json_value_string) {
-                if !matches!(
+            if let Some(stp_mode) = order.get("stpMode").map(json_value_string)
+                && !matches!(
                     stp_mode.as_str(),
                     "CANCEL_MAKER" | "CANCEL_TAKER" | "CANCEL_BOTH"
-                ) {
-                    return Err(DcexError::InvalidInput(format!(
-                        "unsupported MEXC Spot batch order stpMode: {stp_mode}"
-                    )));
-                }
+                )
+            {
+                return Err(DcexError::InvalidInput(format!(
+                    "unsupported MEXC Spot batch order stpMode: {stp_mode}"
+                )));
             }
         }
         let mut query = vec![(

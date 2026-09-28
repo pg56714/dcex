@@ -42,6 +42,19 @@ impl PythonKucoinHttpClient {
         self.client.set_product_table(table.table.clone());
     }
 
+    #[pyo3(signature = (base_url, partner=None, key=None, name=None))]
+    fn configure_broker(
+        &mut self,
+        base_url: String,
+        partner: Option<String>,
+        key: Option<String>,
+        name: Option<String>,
+    ) -> PyResult<()> {
+        self.client
+            .configure_broker(base_url, partner, key, name)
+            .map_err(to_py_runtime_error)
+    }
+
     #[pyo3(signature = (method, market, path, params=None, body=None, signed=true))]
     #[allow(clippy::too_many_arguments)]
     fn request_raw_json(

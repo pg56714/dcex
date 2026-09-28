@@ -1,0 +1,2190 @@
+[
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "place_spot_order",
+    "aliases": {
+      "timeInForce": "time_in_force",
+      "quoteOrderQty": "quote_order_qty",
+      "stopPrice": "stop_price",
+      "newClientOrderId": "new_client_order_id",
+      "clientOrderId": "client_order_id",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "place_spot_market_buy_order",
+    "aliases": {
+      "quoteOrderQty": "quote_order_qty",
+      "clientOrderId": "client_order_id",
+      "newClientOrderId": "new_client_order_id",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "place_spot_market_sell_order",
+    "aliases": {
+      "clientOrderId": "client_order_id",
+      "newClientOrderId": "new_client_order_id",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "place_spot_limit_order",
+    "aliases": {
+      "timeInForce": "time_in_force",
+      "clientOrderId": "client_order_id",
+      "newClientOrderId": "new_client_order_id",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "place_spot_limit_buy_order",
+    "aliases": {
+      "timeInForce": "time_in_force",
+      "clientOrderId": "client_order_id",
+      "newClientOrderId": "new_client_order_id",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "place_spot_limit_sell_order",
+    "aliases": {
+      "timeInForce": "time_in_force",
+      "clientOrderId": "client_order_id",
+      "newClientOrderId": "new_client_order_id",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "place_spot_post_only_order",
+    "aliases": {
+      "clientOrderId": "client_order_id",
+      "newClientOrderId": "new_client_order_id",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "place_spot_post_only_buy_order",
+    "aliases": {
+      "clientOrderId": "client_order_id",
+      "newClientOrderId": "new_client_order_id",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "place_spot_post_only_sell_order",
+    "aliases": {
+      "clientOrderId": "client_order_id",
+      "newClientOrderId": "new_client_order_id",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "place_spot_batch_order",
+    "aliases": {
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "replace_spot_order",
+    "aliases": {
+      "cancelReplaceMode": "cancel_replace_mode",
+      "cancelOrderId": "cancel_order_id",
+      "cancelClientOrderID": "cancel_client_order_id",
+      "cancelRestrictions": "cancel_restrictions",
+      "quoteOrderQty": "quote_order_qty",
+      "stopPrice": "stop_price",
+      "timeInForce": "time_in_force",
+      "newClientOrderId": "new_client_order_id",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "cancel_spot_order",
+    "aliases": {
+      "orderId": "order_id",
+      "clientOrderID": "client_order_id",
+      "clientOrderId": "client_order_id",
+      "cancelRestrictions": "cancel_restrictions",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "cancel_spot_batch_orders",
+    "aliases": {
+      "orderIds": "order_ids",
+      "clientOrderIDs": "client_order_ids",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "cancel_spot_open_orders",
+    "aliases": {
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "set_spot_cancel_all_after",
+    "aliases": {
+      "timeOut": "time_out",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "get_spot_order",
+    "aliases": {
+      "orderId": "order_id",
+      "clientOrderID": "client_order_id",
+      "clientOrderId": "client_order_id",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "get_spot_open_orders",
+    "aliases": {
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "get_spot_order_history",
+    "aliases": {
+      "orderId": "order_id",
+      "startTime": "start_time",
+      "endTime": "end_time",
+      "pageIndex": "page_index",
+      "pageSize": "page_size",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "get_spot_my_trades",
+    "aliases": {
+      "orderId": "order_id",
+      "startTime": "start_time",
+      "endTime": "end_time",
+      "fromId": "from_id",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "get_spot_commission_rate",
+    "aliases": {
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "place_swap_order",
+    "aliases": {
+      "positionSide": "position_side",
+      "reduceOnly": "reduce_only",
+      "quoteOrderQty": "quote_order_qty",
+      "stopPrice": "stop_price",
+      "priceRate": "price_rate",
+      "stopLoss": "stop_loss",
+      "takeProfit": "take_profit",
+      "workingType": "working_type",
+      "clientOrderId": "client_order_id",
+      "recvWindow": "recv_window",
+      "timeInForce": "time_in_force",
+      "closePosition": "close_position",
+      "activationPrice": "activation_price",
+      "stopGuaranteed": "stop_guaranteed",
+      "positionId": "position_id"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "test_swap_order",
+    "aliases": {
+      "positionSide": "position_side",
+      "reduceOnly": "reduce_only",
+      "quoteOrderQty": "quote_order_qty",
+      "stopPrice": "stop_price",
+      "priceRate": "price_rate",
+      "stopLoss": "stop_loss",
+      "takeProfit": "take_profit",
+      "workingType": "working_type",
+      "clientOrderId": "client_order_id",
+      "recvWindow": "recv_window",
+      "timeInForce": "time_in_force",
+      "closePosition": "close_position",
+      "activationPrice": "activation_price",
+      "stopGuaranteed": "stop_guaranteed",
+      "positionId": "position_id"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "place_swap_market_order",
+    "aliases": {
+      "clientOrderId": "client_order_id",
+      "reduceOnly": "reduce_only",
+      "positionSide": "position_side",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "place_swap_market_buy_order",
+    "aliases": {
+      "positionSide": "position_side",
+      "clientOrderId": "client_order_id",
+      "reduceOnly": "reduce_only",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "place_swap_market_sell_order",
+    "aliases": {
+      "positionSide": "position_side",
+      "clientOrderId": "client_order_id",
+      "reduceOnly": "reduce_only",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "place_swap_limit_order",
+    "aliases": {
+      "clientOrderId": "client_order_id",
+      "timeInForce": "time_in_force",
+      "reduceOnly": "reduce_only",
+      "positionSide": "position_side",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "place_swap_limit_buy_order",
+    "aliases": {
+      "positionSide": "position_side",
+      "timeInForce": "time_in_force",
+      "clientOrderId": "client_order_id",
+      "reduceOnly": "reduce_only",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "place_swap_limit_sell_order",
+    "aliases": {
+      "positionSide": "position_side",
+      "timeInForce": "time_in_force",
+      "clientOrderId": "client_order_id",
+      "reduceOnly": "reduce_only",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "place_swap_post_only_order",
+    "aliases": {
+      "clientOrderId": "client_order_id",
+      "timeInForce": "time_in_force",
+      "reduceOnly": "reduce_only",
+      "positionSide": "position_side",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "place_swap_post_only_buy_order",
+    "aliases": {
+      "positionSide": "position_side",
+      "clientOrderId": "client_order_id",
+      "reduceOnly": "reduce_only",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "place_swap_post_only_sell_order",
+    "aliases": {
+      "positionSide": "position_side",
+      "clientOrderId": "client_order_id",
+      "reduceOnly": "reduce_only",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "place_swap_batch_order",
+    "aliases": {
+      "batchOrders": "batch_orders",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "cancel_swap_order",
+    "aliases": {
+      "orderId": "order_id",
+      "clientOrderId": "client_order_id",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "cancel_swap_batch_order",
+    "aliases": {
+      "orderIdList": "order_id_list",
+      "clientOrderIdList": "client_order_id_list",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "cancel_swap_all_orders",
+    "aliases": {
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "replace_swap_order",
+    "aliases": {
+      "cancelReplaceMode": "cancel_replace_mode",
+      "positionSide": "position_side",
+      "orderId": "order_id",
+      "cancelClientOrderId": "cancel_client_order_id",
+      "cancelOrderId": "cancel_order_id",
+      "cancelRestrictions": "cancel_restrictions",
+      "reduceOnly": "reduce_only",
+      "quoteOrderQty": "quote_order_qty",
+      "stopPrice": "stop_price",
+      "priceRate": "price_rate",
+      "workingType": "working_type",
+      "stopLoss": "stop_loss",
+      "takeProfit": "take_profit",
+      "clientOrderId": "client_order_id",
+      "closePosition": "close_position",
+      "activationPrice": "activation_price",
+      "stopGuaranteed": "stop_guaranteed",
+      "timeInForce": "time_in_force",
+      "positionId": "position_id",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "close_swap_position",
+    "aliases": {
+      "positionId": "position_id",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "close_swap_all_positions",
+    "aliases": {
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "get_order_detail",
+    "aliases": {
+      "orderId": "order_id",
+      "clientOrderId": "client_order_id",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "get_open_orders",
+    "aliases": {
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "get_order_history",
+    "aliases": {
+      "orderId": "order_id",
+      "startTime": "start_time",
+      "endTime": "end_time",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "change_margin_type",
+    "aliases": {
+      "marginType": "margin_type",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "get_margin_type",
+    "aliases": {
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "set_leverage",
+    "aliases": {
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "get_leverage",
+    "aliases": {
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "set_position_mode",
+    "aliases": {
+      "dualSidePosition": "dual_side_position",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "get_position_mode",
+    "aliases": {
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "set_swap_cancel_all_after",
+    "aliases": {
+      "timeOut": "time_out",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "get_swap_open_order",
+    "aliases": {
+      "orderId": "order_id",
+      "clientOrderId": "client_order_id",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "get_swap_force_orders",
+    "aliases": {
+      "autoCloseType": "auto_close_type",
+      "startTime": "start_time",
+      "endTime": "end_time",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "get_swap_trade_fills",
+    "aliases": {
+      "tradingUnit": "trading_unit",
+      "startTs": "start_ts",
+      "endTs": "end_ts",
+      "orderId": "order_id",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "adjust_swap_position_margin",
+    "aliases": {
+      "positionSide": "position_side",
+      "positionId": "position_id",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "amend_swap_order",
+    "aliases": {
+      "orderId": "order_id",
+      "clientOrderId": "client_order_id",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "place_swap_twap_order",
+    "aliases": {
+      "positionSide": "position_side",
+      "priceType": "price_type",
+      "priceVariance": "price_variance",
+      "triggerPrice": "trigger_price",
+      "amountPerOrder": "amount_per_order",
+      "totalAmount": "total_amount",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "cancel_swap_twap_order",
+    "aliases": {
+      "mainOrderId": "main_order_id",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "get_swap_open_twap_orders",
+    "aliases": {
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "get_swap_twap_order_history",
+    "aliases": {
+      "pageIndex": "page_index",
+      "pageSize": "page_size",
+      "startTime": "start_time",
+      "endTime": "end_time",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "get_swap_twap_order",
+    "aliases": {
+      "mainOrderId": "main_order_id",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "get_swap_asset_mode",
+    "aliases": {
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "set_swap_asset_mode",
+    "aliases": {
+      "assetMode": "asset_mode",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "get_swap_multi_asset_rules",
+    "aliases": {
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "get_swap_margin_assets",
+    "aliases": {
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "get_swap_full_orders",
+    "aliases": {
+      "orderId": "order_id",
+      "startTime": "start_time",
+      "endTime": "end_time",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "get_swap_fill_history",
+    "aliases": {
+      "startTs": "start_ts",
+      "endTs": "end_ts",
+      "orderId": "order_id",
+      "lastFillId": "last_fill_id",
+      "pageIndex": "page_index",
+      "pageSize": "page_size",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "get_swap_position_history",
+    "aliases": {
+      "startTs": "start_ts",
+      "endTs": "end_ts",
+      "positionId": "position_id",
+      "pageIndex": "page_index",
+      "pageSize": "page_size",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "get_swap_margin_history",
+    "aliases": {
+      "positionId": "position_id",
+      "startTime": "start_time",
+      "endTime": "end_time",
+      "pageIndex": "page_index",
+      "pageSize": "page_size",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "get_swap_maintenance_margin_ratios",
+    "aliases": {
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bingx\\_trade_http.py",
+    "method": "set_swap_auto_add_margin",
+    "aliases": {
+      "positionId": "position_id",
+      "functionSwitch": "function_switch",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\bitget\\_trade_http.py",
+    "method": "place_spot_order",
+    "aliases": {
+      "orderType": "order_type",
+      "clientOid": "client_oid",
+      "triggerPrice": "trigger_price",
+      "tpslType": "tpsl_type",
+      "requestTime": "request_time",
+      "receiveWindow": "receive_window",
+      "stpMode": "stp_mode",
+      "presetTakeProfitPrice": "preset_take_profit_price",
+      "executeTakeProfitPrice": "execute_take_profit_price",
+      "presetStopLossPrice": "preset_stop_loss_price",
+      "executeStopLossPrice": "execute_stop_loss_price"
+    }
+  },
+  {
+    "file": "dcex\\bitget\\_trade_http.py",
+    "method": "place_spot_market_order",
+    "aliases": {
+      "clientOid": "client_oid"
+    }
+  },
+  {
+    "file": "dcex\\bitget\\_trade_http.py",
+    "method": "place_spot_market_buy_order",
+    "aliases": {
+      "clientOid": "client_oid"
+    }
+  },
+  {
+    "file": "dcex\\bitget\\_trade_http.py",
+    "method": "place_spot_market_sell_order",
+    "aliases": {
+      "clientOid": "client_oid"
+    }
+  },
+  {
+    "file": "dcex\\bitget\\_trade_http.py",
+    "method": "place_spot_limit_order",
+    "aliases": {
+      "clientOid": "client_oid"
+    }
+  },
+  {
+    "file": "dcex\\bitget\\_trade_http.py",
+    "method": "place_spot_limit_buy_order",
+    "aliases": {
+      "clientOid": "client_oid"
+    }
+  },
+  {
+    "file": "dcex\\bitget\\_trade_http.py",
+    "method": "place_spot_limit_sell_order",
+    "aliases": {
+      "clientOid": "client_oid"
+    }
+  },
+  {
+    "file": "dcex\\bitget\\_trade_http.py",
+    "method": "place_spot_post_only_limit_order",
+    "aliases": {
+      "clientOid": "client_oid"
+    }
+  },
+  {
+    "file": "dcex\\bitget\\_trade_http.py",
+    "method": "place_spot_post_only_limit_buy_order",
+    "aliases": {
+      "clientOid": "client_oid"
+    }
+  },
+  {
+    "file": "dcex\\bitget\\_trade_http.py",
+    "method": "place_spot_post_only_limit_sell_order",
+    "aliases": {
+      "clientOid": "client_oid"
+    }
+  },
+  {
+    "file": "dcex\\bitget\\_trade_http.py",
+    "method": "place_spot_batch_orders",
+    "aliases": {
+      "orderList": "order_list",
+      "batchMode": "batch_mode"
+    }
+  },
+  {
+    "file": "dcex\\bitget\\_trade_http.py",
+    "method": "cancel_spot_order",
+    "aliases": {
+      "orderId": "order_id",
+      "clientOid": "client_oid",
+      "tpslType": "tpsl_type"
+    }
+  },
+  {
+    "file": "dcex\\bitget\\_trade_http.py",
+    "method": "cancel_spot_batch_orders",
+    "aliases": {
+      "orderList": "order_list",
+      "batchMode": "batch_mode"
+    }
+  },
+  {
+    "file": "dcex\\bitget\\_trade_http.py",
+    "method": "get_spot_order",
+    "aliases": {
+      "orderId": "order_id",
+      "clientOid": "client_oid",
+      "requestTime": "request_time",
+      "receiveWindow": "receive_window"
+    }
+  },
+  {
+    "file": "dcex\\bitget\\_trade_http.py",
+    "method": "get_spot_open_orders",
+    "aliases": {
+      "idLessThan": "id_less_than",
+      "startTime": "start_time",
+      "endTime": "end_time",
+      "orderId": "order_id",
+      "tpslType": "tpsl_type",
+      "requestTime": "request_time",
+      "receiveWindow": "receive_window"
+    }
+  },
+  {
+    "file": "dcex\\bitget\\_trade_http.py",
+    "method": "get_spot_history_orders",
+    "aliases": {
+      "idLessThan": "id_less_than",
+      "startTime": "start_time",
+      "endTime": "end_time",
+      "orderId": "order_id",
+      "tpslType": "tpsl_type",
+      "requestTime": "request_time",
+      "receiveWindow": "receive_window"
+    }
+  },
+  {
+    "file": "dcex\\bitget\\_trade_http.py",
+    "method": "get_spot_fills",
+    "aliases": {
+      "orderId": "order_id",
+      "idLessThan": "id_less_than",
+      "startTime": "start_time",
+      "endTime": "end_time"
+    }
+  },
+  {
+    "file": "dcex\\bitget\\_trade_http.py",
+    "method": "place_uta_order",
+    "aliases": {
+      "orderType": "order_type",
+      "timeInForce": "time_in_force",
+      "posSide": "pos_side",
+      "clientOid": "client_oid",
+      "reduceOnly": "reduce_only",
+      "stpMode": "stp_mode",
+      "marginMode": "margin_mode",
+      "tpTriggerBy": "tp_trigger_by",
+      "slTriggerBy": "sl_trigger_by",
+      "takeProfit": "take_profit",
+      "stopLoss": "stop_loss",
+      "tpOrderType": "tp_order_type",
+      "slOrderType": "sl_order_type",
+      "tpLimitPrice": "tp_limit_price",
+      "slLimitPrice": "sl_limit_price"
+    }
+  },
+  {
+    "file": "dcex\\bitget\\_trade_http.py",
+    "method": "place_reality_order",
+    "aliases": {
+      "orderType": "order_type",
+      "clientOid": "client_oid"
+    }
+  },
+  {
+    "file": "dcex\\bitget\\_trade_http.py",
+    "method": "place_uta_batch_orders",
+    "aliases": {
+      "orderList": "order_list"
+    }
+  },
+  {
+    "file": "dcex\\bitget\\_trade_http.py",
+    "method": "cancel_uta_order",
+    "aliases": {
+      "orderId": "order_id",
+      "clientOid": "client_oid"
+    }
+  },
+  {
+    "file": "dcex\\bitget\\_trade_http.py",
+    "method": "cancel_reality_order",
+    "aliases": {
+      "orderId": "order_id",
+      "clientOid": "client_oid"
+    }
+  },
+  {
+    "file": "dcex\\bitget\\_trade_http.py",
+    "method": "cancel_uta_batch_orders",
+    "aliases": {
+      "orderList": "order_list"
+    }
+  },
+  {
+    "file": "dcex\\bitget\\_trade_http.py",
+    "method": "get_uta_order",
+    "aliases": {
+      "orderId": "order_id",
+      "clientOid": "client_oid"
+    }
+  },
+  {
+    "file": "dcex\\bitget\\_trade_http.py",
+    "method": "get_uta_open_orders",
+    "aliases": {
+      "startTime": "start_time",
+      "endTime": "end_time"
+    }
+  },
+  {
+    "file": "dcex\\bitget\\_trade_http.py",
+    "method": "get_uta_history_orders",
+    "aliases": {
+      "startTime": "start_time",
+      "endTime": "end_time"
+    }
+  },
+  {
+    "file": "dcex\\bitget\\_trade_http.py",
+    "method": "get_uta_fills",
+    "aliases": {
+      "orderId": "order_id",
+      "startTime": "start_time",
+      "endTime": "end_time"
+    }
+  },
+  {
+    "file": "dcex\\bitget\\_trade_http.py",
+    "method": "get_uta_positions",
+    "aliases": {
+      "posSide": "pos_side"
+    }
+  },
+  {
+    "file": "dcex\\bitget\\_trade_http.py",
+    "method": "place_futures_order",
+    "aliases": {
+      "orderType": "order_type",
+      "marginMode": "margin_mode",
+      "marginCoin": "margin_coin",
+      "productType": "product_type",
+      "tradeSide": "trade_side",
+      "clientOid": "client_oid",
+      "reduceOnly": "reduce_only",
+      "presetStopSurplusPrice": "preset_stop_surplus_price",
+      "presetStopLossPrice": "preset_stop_loss_price",
+      "presetStopSurplusExecutePrice": "preset_stop_surplus_execute_price",
+      "presetStopLossExecutePrice": "preset_stop_loss_execute_price",
+      "stpMode": "stp_mode"
+    }
+  },
+  {
+    "file": "dcex\\bitget\\_trade_http.py",
+    "method": "place_futures_market_order",
+    "aliases": {
+      "marginMode": "margin_mode",
+      "marginCoin": "margin_coin",
+      "productType": "product_type",
+      "tradeSide": "trade_side",
+      "clientOid": "client_oid",
+      "reduceOnly": "reduce_only"
+    }
+  },
+  {
+    "file": "dcex\\bitget\\_trade_http.py",
+    "method": "place_futures_market_sell_order",
+    "aliases": {
+      "reduceOnly": "reduce_only"
+    }
+  },
+  {
+    "file": "dcex\\bitget\\_trade_http.py",
+    "method": "place_futures_limit_order",
+    "aliases": {
+      "clientOid": "client_oid"
+    }
+  },
+  {
+    "file": "dcex\\bitget\\_trade_http.py",
+    "method": "place_futures_limit_buy_order",
+    "aliases": {
+      "clientOid": "client_oid"
+    }
+  },
+  {
+    "file": "dcex\\bitget\\_trade_http.py",
+    "method": "place_futures_limit_sell_order",
+    "aliases": {
+      "clientOid": "client_oid"
+    }
+  },
+  {
+    "file": "dcex\\bitget\\_trade_http.py",
+    "method": "place_futures_post_only_limit_order",
+    "aliases": {
+      "clientOid": "client_oid"
+    }
+  },
+  {
+    "file": "dcex\\bitget\\_trade_http.py",
+    "method": "place_futures_post_only_limit_buy_order",
+    "aliases": {
+      "clientOid": "client_oid"
+    }
+  },
+  {
+    "file": "dcex\\bitget\\_trade_http.py",
+    "method": "place_futures_post_only_limit_sell_order",
+    "aliases": {
+      "clientOid": "client_oid"
+    }
+  },
+  {
+    "file": "dcex\\bitget\\_trade_http.py",
+    "method": "place_futures_batch_orders",
+    "aliases": {
+      "orderList": "order_list",
+      "productType": "product_type",
+      "marginMode": "margin_mode",
+      "marginCoin": "margin_coin"
+    }
+  },
+  {
+    "file": "dcex\\bitget\\_trade_http.py",
+    "method": "cancel_futures_order",
+    "aliases": {
+      "orderId": "order_id",
+      "clientOid": "client_oid",
+      "productType": "product_type",
+      "marginCoin": "margin_coin"
+    }
+  },
+  {
+    "file": "dcex\\bitget\\_trade_http.py",
+    "method": "cancel_futures_batch_orders",
+    "aliases": {
+      "orderIdList": "order_id_list",
+      "productType": "product_type",
+      "marginCoin": "margin_coin"
+    }
+  },
+  {
+    "file": "dcex\\bitget\\_trade_http.py",
+    "method": "get_futures_order",
+    "aliases": {
+      "orderId": "order_id",
+      "clientOid": "client_oid",
+      "productType": "product_type"
+    }
+  },
+  {
+    "file": "dcex\\bitget\\_trade_http.py",
+    "method": "get_futures_open_orders",
+    "aliases": {
+      "productType": "product_type",
+      "orderId": "order_id",
+      "clientOid": "client_oid",
+      "idLessThan": "id_less_than",
+      "startTime": "start_time",
+      "endTime": "end_time"
+    }
+  },
+  {
+    "file": "dcex\\bitget\\_trade_http.py",
+    "method": "get_futures_history_orders",
+    "aliases": {
+      "productType": "product_type",
+      "startTime": "start_time",
+      "endTime": "end_time",
+      "idLessThan": "id_less_than",
+      "orderId": "order_id",
+      "clientOid": "client_oid",
+      "orderSource": "order_source"
+    }
+  },
+  {
+    "file": "dcex\\bitget\\_trade_http.py",
+    "method": "get_futures_fills",
+    "aliases": {
+      "orderId": "order_id",
+      "productType": "product_type",
+      "idLessThan": "id_less_than",
+      "startTime": "start_time",
+      "endTime": "end_time"
+    }
+  },
+  {
+    "file": "dcex\\bitget\\_trade_http.py",
+    "method": "modify_uta_strategy_order",
+    "aliases": {
+      "orderId": "order_id",
+      "clientOid": "client_oid"
+    }
+  },
+  {
+    "file": "dcex\\bitget\\_trade_http.py",
+    "method": "cancel_uta_strategy_order",
+    "aliases": {
+      "orderId": "order_id",
+      "clientOid": "client_oid"
+    }
+  },
+  {
+    "file": "dcex\\bitget\\_trade_http.py",
+    "method": "get_uta_history_strategy_orders",
+    "aliases": {
+      "startTime": "start_time",
+      "endTime": "end_time"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "place_spot_order",
+    "aliases": {
+      "timeInForce": "time_in_force",
+      "quoteOrderQty": "quote_order_qty",
+      "stopPrice": "stop_price",
+      "newClientOrderId": "new_client_order_id",
+      "clientOrderId": "client_order_id",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "place_spot_market_buy_order",
+    "aliases": {
+      "quoteOrderQty": "quote_order_qty",
+      "clientOrderId": "client_order_id",
+      "newClientOrderId": "new_client_order_id",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "place_spot_market_sell_order",
+    "aliases": {
+      "clientOrderId": "client_order_id",
+      "newClientOrderId": "new_client_order_id",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "place_spot_limit_order",
+    "aliases": {
+      "timeInForce": "time_in_force",
+      "clientOrderId": "client_order_id",
+      "newClientOrderId": "new_client_order_id",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "place_spot_limit_buy_order",
+    "aliases": {
+      "timeInForce": "time_in_force",
+      "clientOrderId": "client_order_id",
+      "newClientOrderId": "new_client_order_id",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "place_spot_limit_sell_order",
+    "aliases": {
+      "timeInForce": "time_in_force",
+      "clientOrderId": "client_order_id",
+      "newClientOrderId": "new_client_order_id",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "place_spot_post_only_order",
+    "aliases": {
+      "clientOrderId": "client_order_id",
+      "newClientOrderId": "new_client_order_id",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "place_spot_post_only_buy_order",
+    "aliases": {
+      "clientOrderId": "client_order_id",
+      "newClientOrderId": "new_client_order_id",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "place_spot_post_only_sell_order",
+    "aliases": {
+      "clientOrderId": "client_order_id",
+      "newClientOrderId": "new_client_order_id",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "place_spot_batch_order",
+    "aliases": {
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "replace_spot_order",
+    "aliases": {
+      "cancelReplaceMode": "cancel_replace_mode",
+      "cancelOrderId": "cancel_order_id",
+      "cancelClientOrderID": "cancel_client_order_id",
+      "cancelRestrictions": "cancel_restrictions",
+      "quoteOrderQty": "quote_order_qty",
+      "stopPrice": "stop_price",
+      "timeInForce": "time_in_force",
+      "newClientOrderId": "new_client_order_id",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "cancel_spot_order",
+    "aliases": {
+      "orderId": "order_id",
+      "clientOrderID": "client_order_id",
+      "clientOrderId": "client_order_id",
+      "cancelRestrictions": "cancel_restrictions",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "cancel_spot_batch_orders",
+    "aliases": {
+      "orderIds": "order_ids",
+      "clientOrderIDs": "client_order_ids",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "cancel_spot_open_orders",
+    "aliases": {
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "set_spot_cancel_all_after",
+    "aliases": {
+      "timeOut": "time_out",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "get_spot_order",
+    "aliases": {
+      "orderId": "order_id",
+      "clientOrderID": "client_order_id",
+      "clientOrderId": "client_order_id",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "get_spot_open_orders",
+    "aliases": {
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "get_spot_order_history",
+    "aliases": {
+      "orderId": "order_id",
+      "startTime": "start_time",
+      "endTime": "end_time",
+      "pageIndex": "page_index",
+      "pageSize": "page_size",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "get_spot_my_trades",
+    "aliases": {
+      "orderId": "order_id",
+      "startTime": "start_time",
+      "endTime": "end_time",
+      "fromId": "from_id",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "get_spot_commission_rate",
+    "aliases": {
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "place_swap_order",
+    "aliases": {
+      "positionSide": "position_side",
+      "reduceOnly": "reduce_only",
+      "quoteOrderQty": "quote_order_qty",
+      "stopPrice": "stop_price",
+      "priceRate": "price_rate",
+      "stopLoss": "stop_loss",
+      "takeProfit": "take_profit",
+      "workingType": "working_type",
+      "clientOrderId": "client_order_id",
+      "recvWindow": "recv_window",
+      "timeInForce": "time_in_force",
+      "closePosition": "close_position",
+      "activationPrice": "activation_price",
+      "stopGuaranteed": "stop_guaranteed",
+      "positionId": "position_id"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "test_swap_order",
+    "aliases": {
+      "positionSide": "position_side",
+      "reduceOnly": "reduce_only",
+      "quoteOrderQty": "quote_order_qty",
+      "stopPrice": "stop_price",
+      "priceRate": "price_rate",
+      "stopLoss": "stop_loss",
+      "takeProfit": "take_profit",
+      "workingType": "working_type",
+      "clientOrderId": "client_order_id",
+      "recvWindow": "recv_window",
+      "timeInForce": "time_in_force",
+      "closePosition": "close_position",
+      "activationPrice": "activation_price",
+      "stopGuaranteed": "stop_guaranteed",
+      "positionId": "position_id"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "place_swap_market_order",
+    "aliases": {
+      "clientOrderId": "client_order_id",
+      "reduceOnly": "reduce_only",
+      "positionSide": "position_side",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "place_swap_market_buy_order",
+    "aliases": {
+      "positionSide": "position_side",
+      "clientOrderId": "client_order_id",
+      "reduceOnly": "reduce_only",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "place_swap_market_sell_order",
+    "aliases": {
+      "positionSide": "position_side",
+      "clientOrderId": "client_order_id",
+      "reduceOnly": "reduce_only",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "place_swap_limit_order",
+    "aliases": {
+      "clientOrderId": "client_order_id",
+      "timeInForce": "time_in_force",
+      "reduceOnly": "reduce_only",
+      "positionSide": "position_side",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "place_swap_limit_buy_order",
+    "aliases": {
+      "positionSide": "position_side",
+      "timeInForce": "time_in_force",
+      "clientOrderId": "client_order_id",
+      "reduceOnly": "reduce_only",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "place_swap_limit_sell_order",
+    "aliases": {
+      "positionSide": "position_side",
+      "timeInForce": "time_in_force",
+      "clientOrderId": "client_order_id",
+      "reduceOnly": "reduce_only",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "place_swap_post_only_order",
+    "aliases": {
+      "clientOrderId": "client_order_id",
+      "timeInForce": "time_in_force",
+      "reduceOnly": "reduce_only",
+      "positionSide": "position_side",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "place_swap_post_only_buy_order",
+    "aliases": {
+      "positionSide": "position_side",
+      "clientOrderId": "client_order_id",
+      "reduceOnly": "reduce_only",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "place_swap_post_only_sell_order",
+    "aliases": {
+      "positionSide": "position_side",
+      "clientOrderId": "client_order_id",
+      "reduceOnly": "reduce_only",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "place_swap_batch_order",
+    "aliases": {
+      "batchOrders": "batch_orders",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "cancel_swap_order",
+    "aliases": {
+      "orderId": "order_id",
+      "clientOrderId": "client_order_id",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "cancel_swap_batch_order",
+    "aliases": {
+      "orderIdList": "order_id_list",
+      "clientOrderIdList": "client_order_id_list",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "cancel_swap_all_orders",
+    "aliases": {
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "replace_swap_order",
+    "aliases": {
+      "cancelReplaceMode": "cancel_replace_mode",
+      "positionSide": "position_side",
+      "orderId": "order_id",
+      "cancelClientOrderId": "cancel_client_order_id",
+      "cancelOrderId": "cancel_order_id",
+      "cancelRestrictions": "cancel_restrictions",
+      "reduceOnly": "reduce_only",
+      "quoteOrderQty": "quote_order_qty",
+      "stopPrice": "stop_price",
+      "priceRate": "price_rate",
+      "workingType": "working_type",
+      "stopLoss": "stop_loss",
+      "takeProfit": "take_profit",
+      "clientOrderId": "client_order_id",
+      "closePosition": "close_position",
+      "activationPrice": "activation_price",
+      "stopGuaranteed": "stop_guaranteed",
+      "timeInForce": "time_in_force",
+      "positionId": "position_id",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "close_swap_position",
+    "aliases": {
+      "positionId": "position_id",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "close_swap_all_positions",
+    "aliases": {
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "get_order_detail",
+    "aliases": {
+      "orderId": "order_id",
+      "clientOrderId": "client_order_id",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "get_open_orders",
+    "aliases": {
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "get_order_history",
+    "aliases": {
+      "orderId": "order_id",
+      "startTime": "start_time",
+      "endTime": "end_time",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "change_margin_type",
+    "aliases": {
+      "marginType": "margin_type",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "get_margin_type",
+    "aliases": {
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "set_leverage",
+    "aliases": {
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "get_leverage",
+    "aliases": {
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "set_position_mode",
+    "aliases": {
+      "dualSidePosition": "dual_side_position",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "get_position_mode",
+    "aliases": {
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "set_swap_cancel_all_after",
+    "aliases": {
+      "timeOut": "time_out",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "get_swap_open_order",
+    "aliases": {
+      "orderId": "order_id",
+      "clientOrderId": "client_order_id",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "get_swap_force_orders",
+    "aliases": {
+      "autoCloseType": "auto_close_type",
+      "startTime": "start_time",
+      "endTime": "end_time",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "get_swap_trade_fills",
+    "aliases": {
+      "tradingUnit": "trading_unit",
+      "startTs": "start_ts",
+      "endTs": "end_ts",
+      "orderId": "order_id",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "adjust_swap_position_margin",
+    "aliases": {
+      "positionSide": "position_side",
+      "positionId": "position_id",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "amend_swap_order",
+    "aliases": {
+      "orderId": "order_id",
+      "clientOrderId": "client_order_id",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "place_swap_twap_order",
+    "aliases": {
+      "positionSide": "position_side",
+      "priceType": "price_type",
+      "priceVariance": "price_variance",
+      "triggerPrice": "trigger_price",
+      "amountPerOrder": "amount_per_order",
+      "totalAmount": "total_amount",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "cancel_swap_twap_order",
+    "aliases": {
+      "mainOrderId": "main_order_id",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "get_swap_open_twap_orders",
+    "aliases": {
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "get_swap_twap_order_history",
+    "aliases": {
+      "pageIndex": "page_index",
+      "pageSize": "page_size",
+      "startTime": "start_time",
+      "endTime": "end_time",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "get_swap_twap_order",
+    "aliases": {
+      "mainOrderId": "main_order_id",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "get_swap_asset_mode",
+    "aliases": {
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "set_swap_asset_mode",
+    "aliases": {
+      "assetMode": "asset_mode",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "get_swap_multi_asset_rules",
+    "aliases": {
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "get_swap_margin_assets",
+    "aliases": {
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "get_swap_full_orders",
+    "aliases": {
+      "orderId": "order_id",
+      "startTime": "start_time",
+      "endTime": "end_time",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "get_swap_fill_history",
+    "aliases": {
+      "startTs": "start_ts",
+      "endTs": "end_ts",
+      "orderId": "order_id",
+      "lastFillId": "last_fill_id",
+      "pageIndex": "page_index",
+      "pageSize": "page_size",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "get_swap_position_history",
+    "aliases": {
+      "startTs": "start_ts",
+      "endTs": "end_ts",
+      "positionId": "position_id",
+      "pageIndex": "page_index",
+      "pageSize": "page_size",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "get_swap_margin_history",
+    "aliases": {
+      "positionId": "position_id",
+      "startTime": "start_time",
+      "endTime": "end_time",
+      "pageIndex": "page_index",
+      "pageSize": "page_size",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "get_swap_maintenance_margin_ratios",
+    "aliases": {
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bingx\\_trade_http.py",
+    "method": "set_swap_auto_add_margin",
+    "aliases": {
+      "positionId": "position_id",
+      "functionSwitch": "function_switch",
+      "recvWindow": "recv_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bitget\\_trade_http.py",
+    "method": "place_spot_order",
+    "aliases": {
+      "orderType": "order_type",
+      "clientOid": "client_oid",
+      "triggerPrice": "trigger_price",
+      "tpslType": "tpsl_type",
+      "requestTime": "request_time",
+      "receiveWindow": "receive_window",
+      "stpMode": "stp_mode",
+      "presetTakeProfitPrice": "preset_take_profit_price",
+      "executeTakeProfitPrice": "execute_take_profit_price",
+      "presetStopLossPrice": "preset_stop_loss_price",
+      "executeStopLossPrice": "execute_stop_loss_price"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bitget\\_trade_http.py",
+    "method": "place_spot_market_order",
+    "aliases": {
+      "clientOid": "client_oid"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bitget\\_trade_http.py",
+    "method": "place_spot_market_buy_order",
+    "aliases": {
+      "clientOid": "client_oid"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bitget\\_trade_http.py",
+    "method": "place_spot_market_sell_order",
+    "aliases": {
+      "clientOid": "client_oid"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bitget\\_trade_http.py",
+    "method": "place_spot_limit_order",
+    "aliases": {
+      "clientOid": "client_oid"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bitget\\_trade_http.py",
+    "method": "place_spot_limit_buy_order",
+    "aliases": {
+      "clientOid": "client_oid"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bitget\\_trade_http.py",
+    "method": "place_spot_limit_sell_order",
+    "aliases": {
+      "clientOid": "client_oid"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bitget\\_trade_http.py",
+    "method": "place_spot_post_only_limit_order",
+    "aliases": {
+      "clientOid": "client_oid"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bitget\\_trade_http.py",
+    "method": "place_spot_post_only_limit_buy_order",
+    "aliases": {
+      "clientOid": "client_oid"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bitget\\_trade_http.py",
+    "method": "place_spot_post_only_limit_sell_order",
+    "aliases": {
+      "clientOid": "client_oid"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bitget\\_trade_http.py",
+    "method": "place_spot_batch_orders",
+    "aliases": {
+      "orderList": "order_list",
+      "batchMode": "batch_mode"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bitget\\_trade_http.py",
+    "method": "cancel_spot_order",
+    "aliases": {
+      "orderId": "order_id",
+      "clientOid": "client_oid",
+      "tpslType": "tpsl_type"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bitget\\_trade_http.py",
+    "method": "cancel_spot_batch_orders",
+    "aliases": {
+      "orderList": "order_list",
+      "batchMode": "batch_mode"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bitget\\_trade_http.py",
+    "method": "get_spot_order",
+    "aliases": {
+      "orderId": "order_id",
+      "clientOid": "client_oid",
+      "requestTime": "request_time",
+      "receiveWindow": "receive_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bitget\\_trade_http.py",
+    "method": "get_spot_open_orders",
+    "aliases": {
+      "idLessThan": "id_less_than",
+      "startTime": "start_time",
+      "endTime": "end_time",
+      "orderId": "order_id",
+      "tpslType": "tpsl_type",
+      "requestTime": "request_time",
+      "receiveWindow": "receive_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bitget\\_trade_http.py",
+    "method": "get_spot_history_orders",
+    "aliases": {
+      "idLessThan": "id_less_than",
+      "startTime": "start_time",
+      "endTime": "end_time",
+      "orderId": "order_id",
+      "tpslType": "tpsl_type",
+      "requestTime": "request_time",
+      "receiveWindow": "receive_window"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bitget\\_trade_http.py",
+    "method": "get_spot_fills",
+    "aliases": {
+      "orderId": "order_id",
+      "idLessThan": "id_less_than",
+      "startTime": "start_time",
+      "endTime": "end_time"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bitget\\_trade_http.py",
+    "method": "place_uta_order",
+    "aliases": {
+      "orderType": "order_type",
+      "timeInForce": "time_in_force",
+      "posSide": "pos_side",
+      "clientOid": "client_oid",
+      "reduceOnly": "reduce_only",
+      "stpMode": "stp_mode",
+      "marginMode": "margin_mode",
+      "tpTriggerBy": "tp_trigger_by",
+      "slTriggerBy": "sl_trigger_by",
+      "takeProfit": "take_profit",
+      "stopLoss": "stop_loss",
+      "tpOrderType": "tp_order_type",
+      "slOrderType": "sl_order_type",
+      "tpLimitPrice": "tp_limit_price",
+      "slLimitPrice": "sl_limit_price"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bitget\\_trade_http.py",
+    "method": "place_reality_order",
+    "aliases": {
+      "orderType": "order_type",
+      "clientOid": "client_oid"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bitget\\_trade_http.py",
+    "method": "place_uta_batch_orders",
+    "aliases": {
+      "orderList": "order_list"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bitget\\_trade_http.py",
+    "method": "cancel_uta_order",
+    "aliases": {
+      "orderId": "order_id",
+      "clientOid": "client_oid"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bitget\\_trade_http.py",
+    "method": "cancel_reality_order",
+    "aliases": {
+      "orderId": "order_id",
+      "clientOid": "client_oid"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bitget\\_trade_http.py",
+    "method": "cancel_uta_batch_orders",
+    "aliases": {
+      "orderList": "order_list"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bitget\\_trade_http.py",
+    "method": "get_uta_order",
+    "aliases": {
+      "orderId": "order_id",
+      "clientOid": "client_oid"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bitget\\_trade_http.py",
+    "method": "get_uta_open_orders",
+    "aliases": {
+      "startTime": "start_time",
+      "endTime": "end_time"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bitget\\_trade_http.py",
+    "method": "get_uta_history_orders",
+    "aliases": {
+      "startTime": "start_time",
+      "endTime": "end_time"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bitget\\_trade_http.py",
+    "method": "get_uta_fills",
+    "aliases": {
+      "orderId": "order_id",
+      "startTime": "start_time",
+      "endTime": "end_time"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bitget\\_trade_http.py",
+    "method": "get_uta_positions",
+    "aliases": {
+      "posSide": "pos_side"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bitget\\_trade_http.py",
+    "method": "place_futures_order",
+    "aliases": {
+      "orderType": "order_type",
+      "marginMode": "margin_mode",
+      "marginCoin": "margin_coin",
+      "productType": "product_type",
+      "tradeSide": "trade_side",
+      "clientOid": "client_oid",
+      "reduceOnly": "reduce_only",
+      "presetStopSurplusPrice": "preset_stop_surplus_price",
+      "presetStopLossPrice": "preset_stop_loss_price",
+      "presetStopSurplusExecutePrice": "preset_stop_surplus_execute_price",
+      "presetStopLossExecutePrice": "preset_stop_loss_execute_price",
+      "stpMode": "stp_mode"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bitget\\_trade_http.py",
+    "method": "place_futures_market_order",
+    "aliases": {
+      "marginMode": "margin_mode",
+      "marginCoin": "margin_coin",
+      "productType": "product_type",
+      "tradeSide": "trade_side",
+      "clientOid": "client_oid",
+      "reduceOnly": "reduce_only"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bitget\\_trade_http.py",
+    "method": "place_futures_market_sell_order",
+    "aliases": {
+      "reduceOnly": "reduce_only"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bitget\\_trade_http.py",
+    "method": "place_futures_limit_order",
+    "aliases": {
+      "clientOid": "client_oid"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bitget\\_trade_http.py",
+    "method": "place_futures_limit_buy_order",
+    "aliases": {
+      "clientOid": "client_oid"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bitget\\_trade_http.py",
+    "method": "place_futures_limit_sell_order",
+    "aliases": {
+      "clientOid": "client_oid"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bitget\\_trade_http.py",
+    "method": "place_futures_post_only_limit_order",
+    "aliases": {
+      "clientOid": "client_oid"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bitget\\_trade_http.py",
+    "method": "place_futures_post_only_limit_buy_order",
+    "aliases": {
+      "clientOid": "client_oid"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bitget\\_trade_http.py",
+    "method": "place_futures_post_only_limit_sell_order",
+    "aliases": {
+      "clientOid": "client_oid"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bitget\\_trade_http.py",
+    "method": "place_futures_batch_orders",
+    "aliases": {
+      "orderList": "order_list",
+      "productType": "product_type",
+      "marginMode": "margin_mode",
+      "marginCoin": "margin_coin"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bitget\\_trade_http.py",
+    "method": "cancel_futures_order",
+    "aliases": {
+      "orderId": "order_id",
+      "clientOid": "client_oid",
+      "productType": "product_type",
+      "marginCoin": "margin_coin"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bitget\\_trade_http.py",
+    "method": "cancel_futures_batch_orders",
+    "aliases": {
+      "orderIdList": "order_id_list",
+      "productType": "product_type",
+      "marginCoin": "margin_coin"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bitget\\_trade_http.py",
+    "method": "get_futures_order",
+    "aliases": {
+      "orderId": "order_id",
+      "clientOid": "client_oid",
+      "productType": "product_type"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bitget\\_trade_http.py",
+    "method": "get_futures_open_orders",
+    "aliases": {
+      "productType": "product_type",
+      "orderId": "order_id",
+      "clientOid": "client_oid",
+      "idLessThan": "id_less_than",
+      "startTime": "start_time",
+      "endTime": "end_time"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bitget\\_trade_http.py",
+    "method": "get_futures_history_orders",
+    "aliases": {
+      "productType": "product_type",
+      "startTime": "start_time",
+      "endTime": "end_time",
+      "idLessThan": "id_less_than",
+      "orderId": "order_id",
+      "clientOid": "client_oid",
+      "orderSource": "order_source"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bitget\\_trade_http.py",
+    "method": "get_futures_fills",
+    "aliases": {
+      "orderId": "order_id",
+      "productType": "product_type",
+      "idLessThan": "id_less_than",
+      "startTime": "start_time",
+      "endTime": "end_time"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bitget\\_trade_http.py",
+    "method": "modify_uta_strategy_order",
+    "aliases": {
+      "orderId": "order_id",
+      "clientOid": "client_oid"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bitget\\_trade_http.py",
+    "method": "cancel_uta_strategy_order",
+    "aliases": {
+      "orderId": "order_id",
+      "clientOid": "client_oid"
+    }
+  },
+  {
+    "file": "dcex\\async_support\\bitget\\_trade_http.py",
+    "method": "get_uta_history_strategy_orders",
+    "aliases": {
+      "startTime": "start_time",
+      "endTime": "end_time"
+    }
+  }
+]

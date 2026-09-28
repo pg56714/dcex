@@ -793,10 +793,10 @@ impl BingxClient {
         validate_spot_order(params, order_type)?;
         query.push(("side".to_string(), side));
         query.push(("type".to_string(), order_type.to_string()));
-        if let Some(time_in_force) = time_in_force_override {
-            if !query.iter().any(|(key, _)| key == "timeInForce") {
-                query.push(("timeInForce".to_string(), time_in_force.to_string()));
-            }
+        if let Some(time_in_force) = time_in_force_override
+            && !query.iter().any(|(key, _)| key == "timeInForce")
+        {
+            query.push(("timeInForce".to_string(), time_in_force.to_string()));
         }
         self.private_post(SPOT_PLACE_ORDER, query).await
     }
@@ -844,15 +844,15 @@ impl BingxClient {
         validate_swap_order(params, order_type)?;
         query.push(("type".to_string(), order_type.to_string()));
         query.push(("side".to_string(), side));
-        if let Some(position_side) = defaults.position_side {
-            if !query.iter().any(|(key, _)| key == "positionSide") {
-                query.push(("positionSide".to_string(), position_side.to_string()));
-            }
+        if let Some(position_side) = defaults.position_side
+            && !query.iter().any(|(key, _)| key == "positionSide")
+        {
+            query.push(("positionSide".to_string(), position_side.to_string()));
         }
-        if let Some(time_in_force) = defaults.time_in_force {
-            if !query.iter().any(|(key, _)| key == "timeInForce") {
-                query.push(("timeInForce".to_string(), time_in_force.to_string()));
-            }
+        if let Some(time_in_force) = defaults.time_in_force
+            && !query.iter().any(|(key, _)| key == "timeInForce")
+        {
+            query.push(("timeInForce".to_string(), time_in_force.to_string()));
         }
         normalize_bool_fields(&mut query);
         self.private_post(endpoint, query).await
@@ -907,7 +907,7 @@ impl BingxClient {
             &["ONLY_NEW", "ONLY_PENDING", "ONLY_PARTIALLY_FILLED"],
         )?;
         validate_client_id(params, "cancelClientOrderId", false)?;
-        validate_swap_order_rules(params, params.required("type_")?, true)?;
+        validate_swap_order(params, params.required("type_")?)?;
         let mut query = params.only(SWAP_REPLACE_OPTIONAL_KEYS);
         self.push_required_symbol(&mut query, params)?;
         query.push((
@@ -989,14 +989,6 @@ fn validate_spot_order(params: &BingxParams, order_type: &str) -> Result<()> {
 }
 
 fn validate_swap_order(params: &BingxParams, order_type: &str) -> Result<()> {
-    validate_swap_order_rules(params, order_type, false)
-}
-
-fn validate_swap_order_rules(
-    params: &BingxParams,
-    order_type: &str,
-    replacement: bool,
-) -> Result<()> {
     if !SWAP_ORDER_TYPES.contains(&order_type) {
         return Err(crate::DcexError::InvalidInput(format!(
             "unsupported BingX type: {order_type}"
@@ -1031,20 +1023,18 @@ fn validate_swap_order_rules(
     ] {
         validate_positive_number(params, key)?;
     }
-    if let Some(price_rate) = params.get("priceRate") {
-        if price_rate.parse::<f64>().is_ok_and(|value| value > 1.0) {
-            return Err(crate::DcexError::InvalidInput(
-                "BingX parameter priceRate must not exceed 1".to_string(),
-            ));
-        }
+    if let Some(price_rate) = params.get("priceRate")
+        && price_rate.parse::<f64>().is_ok_and(|value| value > 1.0)
+    {
+        return Err(crate::DcexError::InvalidInput(
+            "BingX parameter priceRate must not exceed 1".to_string(),
+        ));
     }
     let close_position = params
         .get("closePosition")
         .is_some_and(|value| value.eq_ignore_ascii_case("true"));
     if close_position {
-        if !replacement
-            && (params.get("quantity").is_some() || params.get("quoteOrderQty").is_some())
-        {
+        if params.get("quantity").is_some() || params.get("quoteOrderQty").is_some() {
             return Err(crate::DcexError::InvalidInput(
                 "BingX closePosition cannot be used with quantity or quoteOrderQty".to_string(),
             ));
@@ -1058,9 +1048,6 @@ fn validate_swap_order_rules(
         return Err(crate::DcexError::InvalidInput(
             "one of quantity, quoteOrderQty is required".to_string(),
         ));
-    }
-    if replacement && matches!(order_type, "STOP_MARKET" | "TAKE_PROFIT_MARKET") {
-        params.required("quantity")?;
     }
     if matches!(
         order_type,

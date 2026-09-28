@@ -4,10 +4,10 @@ from typing import Any
 
 from ._coin_futures_http import CoinFuturesHTTP
 from ._convert_http import ConvertHTTP
-from ._trade_http import TradeHTTP
+from ._inventory_http import InventoryHTTP
 
 
-class Client(CoinFuturesHTTP, ConvertHTTP, TradeHTTP):
+class Client(CoinFuturesHTTP, ConvertHTTP, InventoryHTTP):
     """
     Unified Binance API client combining trading, account, and market data functionality.
 

@@ -161,12 +161,12 @@ fn validate_times(params: &BybitParams, max_span_days: u64) -> Result<()> {
             })
             .transpose()
     };
-    if let (Some(start), Some(end)) = (parse("startTime")?, parse("endTime")?) {
-        if end < start || end - start > max_span_days * 24 * 60 * 60 {
-            return Err(DcexError::InvalidInput(format!(
-                "time range must be ordered and no more than {max_span_days} days"
-            )));
-        }
+    if let (Some(start), Some(end)) = (parse("startTime")?, parse("endTime")?)
+        && (end < start || end - start > max_span_days * 24 * 60 * 60)
+    {
+        return Err(DcexError::InvalidInput(format!(
+            "time range must be ordered and no more than {max_span_days} days"
+        )));
     }
     Ok(())
 }

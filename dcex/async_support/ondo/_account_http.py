@@ -4,6 +4,7 @@
 
 from typing import Any
 
+from ..._operation_guards import require_confirmation
 from ._http_manager import HTTPManager
 
 
@@ -196,8 +197,10 @@ class AccountHTTP(HTTPManager):
     async def create_api_key(self, name: str, scopes: list[str]) -> Any:
         return await self._native_private("create_api_key", name=name, scopes=scopes)
 
-    async def delete_api_key(self, apiKeyID: str) -> Any:
-        return await self._native_private("delete_api_key", apiKeyID=apiKeyID)
+    async def delete_api_key(self, apiKeyID: str, *, confirm: bool = False) -> Any:
+        """This revokes the API key and its access. Requires confirm=True."""
+        require_confirmation(confirm)
+        return await self._native_private("delete_api_key", apiKeyID=apiKeyID, confirm=confirm)
 
     async def set_api_key_ip_whitelist(self, apiKeyID: str, ip: str) -> Any:
         return await self._native_private(
@@ -271,3 +274,60 @@ class AccountHTTP(HTTPManager):
     async def invalidate_jwt(self) -> Any:
         """Invalidate all JWT sessions for this account using API key authentication."""
         return await self._native_private("invalidate_jwt")
+
+    async def create_withdrawal(
+        self,
+        *,
+        customer_withdrawal_id: str,
+        symbol: str,
+        network: str,
+        amount: str,
+        address: str,
+        from_account: dict[str, Any] | None = None,
+    ) -> Any:
+        """
+        Submit a withdrawal to the specified address.
+
+        API withdrawals have no second confirmation; they execute on submit.
+        Optional from_account identifies the main or margin wallet.
+        Source: https://docs.ondoperps.xyz/api-reference/wallet/withdraw
+        """
+        return await self._native_private(
+            "create_withdrawal",
+            **dict(
+                **{
+                    "customer_withdrawal_id": customer_withdrawal_id,
+                    "symbol": symbol,
+                    "network": network,
+                    "amount": amount,
+                    "address": address,
+                    "from": from_account,
+                }
+            ),
+        )
+
+    async def sandbox_withdrawal(
+        self,
+        *,
+        customer_withdrawal_id: str,
+        symbol: str,
+        amount: str,
+        from_account: dict[str, Any],
+    ) -> Any:
+        """
+        Debit a specified wallet in the sandbox environment only.
+
+        API withdrawals have no second confirmation; they execute on submit.
+        Source: https://docs.ondoperps.xyz/api-reference/sandbox/sandbox-withdrawal
+        """
+        return await self._native_private(
+            "sandbox_withdrawal",
+            **dict(
+                **{
+                    "customer_withdrawal_id": customer_withdrawal_id,
+                    "symbol": symbol,
+                    "amount": amount,
+                    "from": from_account,
+                }
+            ),
+        )

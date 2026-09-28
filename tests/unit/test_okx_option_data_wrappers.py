@@ -65,9 +65,7 @@ async def test_async_okx_option_data_wrappers_forward_official_fields() -> None:
     await client.get_option_summary(uly="BTC-USD")
     await client.get_option_family_trades("BTC-USD")
     await client.get_option_put_call_ratio("BTC", period="1D")
-    await client.get_option_open_interest_and_volume_by_strike(
-        "BTC", "2000000000000", period="1D"
-    )
+    await client.get_option_open_interest_and_volume_by_strike("BTC", "2000000000000", period="1D")
     await client.get_public_underlying("OPTION")
 
     assert native.calls[0] == ("get_option_summary", [("uly", "BTC-USD")])

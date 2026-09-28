@@ -1,0 +1,1299 @@
+{
+  "exchange": "bingx",
+  "source": "https://bingx-api.github.io/docs-v3/",
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/openApi/fund/v1/account/balance",
+      "title": "Query Fund Account Assets",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Account%20and%20Wallet/Fund%20Account/Query%20Fund%20Account%20Assets"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/swap/v3/user/balance",
+      "title": "Query account data",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Account%20Endpoints/Query%20account%20data"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/cswap/v1/trade/closeAllPositions",
+      "title": "Close all positions in bulk",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Coin-M%20Futures/Trades%20Endpoints/Close%20all%20positions%20in%20bulk"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/cswap/v1/user/commissionRate",
+      "title": "Query Trade Commission Rate",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Coin-M%20Futures/Trades%20Endpoints/Query%20Trade%20Commission%20Rate"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/spot/v1/oco/order",
+      "title": "Create an OCO Order",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Spot/Trades%20Endpoints/Create%20an%20OCO%20Order"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/swap/v1/tradingRules",
+      "title": "Trading Rules",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Market%20Data/Trading%20Rules"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/spot/v1/trade/cancelAllAfter",
+      "title": "Cancel All After",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Spot/Trades%20Endpoints/Cancel%20All%20After"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/spot/v1/trade/query",
+      "title": "Query Order details",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Spot/Trades%20Endpoints/Query%20Order%20details"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/cswap/v1/market/depth",
+      "title": "Query Depth Data",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Coin-M%20Futures/Market%20Data/Query%20Depth%20Data"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/cswap/v1/market/klines",
+      "title": "Get K-line Data",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Coin-M%20Futures/Market%20Data/Get%20K-line%20Data"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/spot/v1/oco/historyOrderList",
+      "title": "Query OCO Historical Order List",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Spot/Trades%20Endpoints/Query%20OCO%20Historical%20Order%20List"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/agent/v1/asset/partnerData",
+      "title": "Query partner information",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Agent/Query%20partner%20information"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/swap/v2/trade/leverage",
+      "title": "Set Leverage",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Trades%20Endpoints/Set%20Leverage"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/cswap/v1/market/openInterest",
+      "title": "Get Swap Open Positions",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Coin-M%20Futures/Market%20Data/Get%20Swap%20Open%20Positions"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/spot/v1/common/symbols",
+      "title": "Spot trading symbols",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Spot/Market%20Data/Spot%20trading%20symbols"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/swap/v1/ticker/price",
+      "title": "Symbol Price Ticker",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Market%20Data/Symbol%20Price%20Ticker"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/spot/v1/trade/historyOrders",
+      "title": "Query Order history",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Spot/Trades%20Endpoints/Query%20Order%20history"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/api/asset/v1/transfer",
+      "title": "Asset Transfer New",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Account%20and%20Wallet/Fund%20Account/Asset%20Transfer%20New"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/swap/v2/quote/premiumIndex",
+      "title": "Mark Price and Funding Rate",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Market%20Data/Mark%20Price%20and%20Funding%20Rate"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/wallets/v1/capital/innerTransfer/apply",
+      "title": "Main Accoun internal transfer",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Account%20and%20Wallet/Fund%20Account/Main%20Accoun%20internal%20transfer"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/swap/v1/twap/order",
+      "title": "Place TWAP Order",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Trades%20Endpoints/Place%20TWAP%20Order"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/swap/v2/trade/cancelAllAfter",
+      "title": "Cancel All After",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Trades%20Endpoints/Cancel%20All%20After"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/cswap/v2/trade/order",
+      "title": "Trade order",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Coin-M%20Futures/Trades%20Endpoints/Trade%20order"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/account/v1/uid",
+      "title": " Query Account UID",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Account%20and%20Wallet/Sub-account%20Management/%20Query%20Account%20UID"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/cswap/v1/trade/positionMargin",
+      "title": "Adjust Isolated Margin",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Coin-M%20Futures/Trades%20Endpoints/Adjust%20Isolated%20Margin"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/spot/v2/quote/price",
+      "title": "Symbol Price Ticker",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Spot/Market%20Data/Symbol%20Price%20Ticker"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/swap/v2/trade/marginType",
+      "title": "Change Margin Type",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Trades%20Endpoints/Change%20Margin%20Type"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/spot/v1/trade/order",
+      "title": "Place order",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Spot/Trades%20Endpoints/Place%20order"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/api/v3/capital/deposit/hisrec",
+      "title": "Deposit records",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Account%20and%20Wallet/Wallet%20Deposits%20and%20Withdrawals/Deposit%20records"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/copyTrading/v1/swap/trace/setTPSL",
+      "title": "Traders set take profit and stop loss based on order numbers",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Copy%20Trade/USDT-M%20Perpetual%20Contracts/Traders%20set%20take%20profit%20and%20stop%20loss%20based%20on%20order%20numbers"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/swap/v2/trade/openOrder",
+      "title": "Query pending order status",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Trades%20Endpoints/Query%20pending%20order%20status"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/api/v3/capital/deposit/hisrec",
+      "title": "Deposit records",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Account%20and%20Wallet/Wallet%20Deposits%20and%20Withdrawals/Deposit%20records"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/swap/v2/trade/getVst",
+      "title": "Apply VST",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Trades%20Endpoints/Apply%20VST"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/subAccount/v1/allAccountBalance",
+      "title": "Batch Query Sub-Account Asset Overview",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Account%20and%20Wallet/Sub-account%20Management/Batch%20Query%20Sub-Account%20Asset%20Overview"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/api/asset/v1/transfer/supportCoins",
+      "title": "Query transferable currency",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Account%20and%20Wallet/Fund%20Account/Query%20transferable%20currency"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/spot/v1/trade/cancelOrders",
+      "title": "Cancel multiple orders",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Spot/Trades%20Endpoints/Cancel%20multiple%20orders"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/wallets/v1/capital/subAccountInnerTransfer/apply",
+      "title": " Sub-account Internal Transfer",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Account%20and%20Wallet/Sub-account%20Management/%20Sub-account%20Internal%20Transfer"
+    },
+    {
+      "method": "DELETE",
+      "path": "/openApi/swap/v2/trade/batchOrders",
+      "title": "Cancel multiple orders",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Trades%20Endpoints/Cancel%20multiple%20orders"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/wallets/v1/capital/innerTransfer/records",
+      "title": "Main account internal transfer records",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Account%20and%20Wallet/Fund%20Account/Main%20account%20internal%20transfer%20records"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/cswap/v1/trade/marginType",
+      "title": "Set Margin Type",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Coin-M%20Futures/Trades%20Endpoints/Set%20Margin%20Type"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/swap/v2/user/income",
+      "title": "Get Account Profit and Loss Fund Flow",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Account%20Endpoints/Get%20Account%20Profit%20and%20Loss%20Fund%20Flow"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/v1/account/apiPermissions",
+      "title": " Query API KEY Permissions",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Account%20and%20Wallet/Sub-account%20Management/%20Query%20API%20KEY%20Permissions"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/wallets/v1/capital/deposit/address",
+      "title": "Main Account Deposit Address",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Account%20and%20Wallet/Wallet%20Deposits%20and%20Withdrawals/Main%20Account%20Deposit%20Address"
+    },
+    {
+      "method": "DELETE",
+      "path": "/openApi/cswap/v1/trade/allOpenOrders",
+      "title": "Cancel all orders",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Coin-M%20Futures/Trades%20Endpoints/Cancel%20all%20orders"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/copyTrading/v1/PFutures/tradingPairs",
+      "title": "Trader Gets Copy Trading Pairs",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Copy%20Trade/USDT-M%20Perpetual%20Contracts/Trader%20Gets%20Copy%20Trading%20Pairs"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/swap/v1/maintMarginRatio",
+      "title": "Position and Maintenance Margin Ratio",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Trades%20Endpoints/Position%20and%20Maintenance%20Margin%20Ratio"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/api/v3/asset/transferRecord",
+      "title": "Asset transfer records new",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Account%20and%20Wallet/Fund%20Account/Asset%20transfer%20records%20new"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/swap/v2/trade/order/test",
+      "title": "Test Order",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Trades%20Endpoints/Test%20Order"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/cswap/v1/user/balance",
+      "title": "Query Account Assets",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Coin-M%20Futures/Trades%20Endpoints/Query%20Account%20Assets"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/fund/v1/account/balance",
+      "title": "Query Fund Account Assets",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Account%20and%20Wallet/Fund%20Account/Query%20Fund%20Account%20Assets"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/wallets/v1/capital/innerTransfer/apply",
+      "title": "Main Accoun internal transfer",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Account%20and%20Wallet/Fund%20Account/Main%20Accoun%20internal%20transfer"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/cswap/v1/market/ticker",
+      "title": "Query 24-Hour Price Change",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Coin-M%20Futures/Market%20Data/Query%2024-Hour%20Price%20Change"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/subAccount/v1/assets",
+      "title": " Query Sub-account Asset Account",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Account%20and%20Wallet/Sub-account%20Management/%20Query%20Sub-account%20Asset%20Account"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/swap/v2/trade/allFillOrders",
+      "title": "Query historical transaction orders",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Trades%20Endpoints/Query%20historical%20transaction%20orders"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/wallets/v1/capital/withdraw/apply",
+      "title": "Withdraw",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Account%20and%20Wallet/Wallet%20Deposits%20and%20Withdrawals/Withdraw"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/cswap/v1/trade/orderDetail",
+      "title": "Query Order",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Coin-M%20Futures/Trades%20Endpoints/Query%20Order"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/account/transfer/v1/subAccount/asset/transferHistory",
+      "title": "Query Sub-Mother Account Transfer History",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Account%20and%20Wallet/Sub-account%20Management/Query%20Sub-Mother%20Account%20Transfer%20History"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/cswap/v1/trade/marginType",
+      "title": "Query Margin Type",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Coin-M%20Futures/Trades%20Endpoints/Query%20Margin%20Type"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/wealth/v1/product/dual-currency/order-records",
+      "title": "Dual-Currency Order Records",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Wealth/Dual-Currency/Dual-Currency%20Order%20Records"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/swap/v1/twap/openOrders",
+      "title": "Query TWAP Entrusted Order",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Trades%20Endpoints/Query%20TWAP%20Entrusted%20Order"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/spot/v2/quote/bookTicker",
+      "title": "Symbol Order Book Ticker",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Spot/Market%20Data/Symbol%20Order%20Book%20Ticker"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/swap/v2/quote/bookTicker",
+      "title": "Symbol Order Book Ticker",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Market%20Data/Symbol%20Order%20Book%20Ticker"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/wallets/v1/capital/deposit/address",
+      "title": "Main Account Deposit Address",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Account%20and%20Wallet/Wallet%20Deposits%20and%20Withdrawals/Main%20Account%20Deposit%20Address"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/spot/v1/trade/batchOrders",
+      "title": "Place multiple orders",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Spot/Trades%20Endpoints/Place%20multiple%20orders"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/wealth/v1/product/dual-currency/position",
+      "title": "Dual-Currency Position Query",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Wealth/Dual-Currency/Dual-Currency%20Position%20Query"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/swap/v2/quote/ticker",
+      "title": "24hr Ticker Price Change Statistics",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Market%20Data/24hr%20Ticker%20Price%20Change%20Statistics"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/swap/v1/trade/autoAddMargin",
+      "title": "Hedge mode Position - Automatic Margin Addition",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Trades%20Endpoints/Hedge%20mode%20Position%20-%20Automatic%20Margin%20Addition"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/spot/v1/oco/cancel",
+      "title": "Cancel an OCO Order List",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Spot/Trades%20Endpoints/Cancel%20an%20OCO%20Order%20List"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/account/v1/allAccountBalance",
+      "title": "Asset overview",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Account%20and%20Wallet/Fund%20Account/Asset%20overview"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/wallets/v1/capital/subAccount/deposit/address",
+      "title": "Query Sub-account Deposit Address",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Account%20and%20Wallet/Sub-account%20Management/Query%20Sub-account%20Deposit%20Address"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/spot/v1/trade/cancelOpenOrders",
+      "title": "Cancel all Open Orders on a Symbol",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Spot/Trades%20Endpoints/Cancel%20all%20Open%20Orders%20on%20a%20Symbol"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/spot/v1/account/balance",
+      "title": "Query Assets",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Account%20and%20Wallet/Fund%20Account/Query%20Assets"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/swap/v1/positionMargin/history",
+      "title": "Isolated Margin Change History",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Trades%20Endpoints/Isolated%20Margin%20Change%20History"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/cswap/v1/trade/leverage",
+      "title": "Query Leverage",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Coin-M%20Futures/Trades%20Endpoints/Query%20Leverage"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/copyTrading/v1/PFutures/profitHistorySummarys",
+      "title": "Profit Overview",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Copy%20Trade/USDT-M%20Perpetual%20Contracts/Profit%20Overview"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/api/asset/v1/transfer/supportCoins",
+      "title": "Query transferable currency",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Account%20and%20Wallet/Fund%20Account/Query%20transferable%20currency"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/wallets/v1/capital/deposit/subHisrec",
+      "title": "Get Sub-account Deposit Records",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Account%20and%20Wallet/Sub-account%20Management/Get%20Sub-account%20Deposit%20Records"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/swap/v2/user/income/export",
+      "title": "Export fund flow",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Account%20Endpoints/Export%20fund%20flow"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/wallets/v1/capital/innerTransfer/records",
+      "title": "Main account internal transfer records",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Account%20and%20Wallet/Fund%20Account/Main%20account%20internal%20transfer%20records"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/swap/v1/trade/assetMode",
+      "title": "Switch Multi-Assets Mode",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Trades%20Endpoints/Switch%20Multi-Assets%20Mode"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/copyTrading/v1/PFutures/profitDetail",
+      "title": "Profit Details",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Copy%20Trade/USDT-M%20Perpetual%20Contracts/Profit%20Details"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/cswap/v1/trade/orderHistory",
+      "title": "User's History Orders",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Coin-M%20Futures/Trades%20Endpoints/User%27s%20History%20Orders"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/spot/v1/account/balance",
+      "title": "Query Assets",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Account%20and%20Wallet/Fund%20Account/Query%20Assets"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/spot/v1/trade/cancel",
+      "title": "Cancel Order",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Spot/Trades%20Endpoints/Cancel%20Order"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/copyTrading/v1/PFutures/traderDetail",
+      "title": "Personal Trading Overview",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Copy%20Trade/USDT-M%20Perpetual%20Contracts/Personal%20Trading%20Overview"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/api/v3/capital/withdraw/history",
+      "title": "Withdraw records",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Account%20and%20Wallet/Wallet%20Deposits%20and%20Withdrawals/Withdraw%20records"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/copyTrading/v1/spot/traderDetail",
+      "title": "Personal Trading Overview",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Copy%20Trade/Spot%20Trading/Personal%20Trading%20Overview"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/swap/v1/trade/multiAssetsRules",
+      "title": "Query Multi-Assets Rules",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Trades%20Endpoints/Query%20Multi-Assets%20Rules"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/spot/v1/oco/openOrderList",
+      "title": "Query All Open OCO Orders",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Spot/Trades%20Endpoints/Query%20All%20Open%20OCO%20Orders"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/spot/v1/trade/openOrders",
+      "title": "Current Open Orders",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Spot/Trades%20Endpoints/Current%20Open%20Orders"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/swap/v2/trade/fillHistory",
+      "title": "Query historical transaction details",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Trades%20Endpoints/Query%20historical%20transaction%20details"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/swap/v1/positionSide/dual",
+      "title": "Query position mode",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Trades%20Endpoints/Query%20position%20mode"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/swap/v3/quote/klines",
+      "title": "Kline/Candlestick Data",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Market%20Data/Kline%2FCandlestick%20Data"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/api/v3/capital/withdraw/history",
+      "title": "Withdraw records",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Account%20and%20Wallet/Wallet%20Deposits%20and%20Withdrawals/Withdraw%20records"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/swap/v1/trade/closePosition",
+      "title": "Close position by position ID",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Trades%20Endpoints/Close%20position%20by%20position%20ID"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/swap/v2/trade/batchOrders",
+      "title": "Place multiple orders",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Trades%20Endpoints/Place%20multiple%20orders"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/spot/v1/market/depth",
+      "title": "Order Book",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Spot/Market%20Data/Order%20Book"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/wallets/v1/capital/withdraw/apply",
+      "title": "Withdraw",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Account%20and%20Wallet/Wallet%20Deposits%20and%20Withdrawals/Withdraw"
+    },
+    {
+      "method": "DELETE",
+      "path": "/openApi/cswap/v1/trade/cancelOrder",
+      "title": "Cancel an Order",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Coin-M%20Futures/Trades%20Endpoints/Cancel%20an%20Order"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/spot/v1/user/commissionRate",
+      "title": "Query Trading Commission Rate",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Spot/Trades%20Endpoints/Query%20Trading%20Commission%20Rate"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/swap/v2/trade/positionMargin",
+      "title": "Modify Isolated Position Margin",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Trades%20Endpoints/Modify%20Isolated%20Position%20Margin"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/spot/v2/quote/depth",
+      "title": "Order Book aggregation",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Spot/Market%20Data/Order%20Book%20aggregation"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/cswap/v1/trade/leverage",
+      "title": "Modify Leverage",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Coin-M%20Futures/Trades%20Endpoints/Modify%20Leverage"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/swap/v2/quote/fundingRate",
+      "title": "Get Funding Rate History",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Market%20Data/Get%20Funding%20Rate%20History"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/swap/v2/trade/forceOrders",
+      "title": "User's Force Orders",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Trades%20Endpoints/User%27s%20Force%20Orders"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/agent/v2/reward/commissionDataList",
+      "title": "Daily commission details",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Agent/Daily%20commission%20details"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/wealth/v1/product/dual-currency/invest-asset-list",
+      "title": "Dual-Currency Product List",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Wealth/Dual-Currency/Dual-Currency%20Product%20List"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/cswap/v1/trade/forceOrders",
+      "title": "Query force orders",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Coin-M%20Futures/Trades%20Endpoints/Query%20force%20orders"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/swap/v2/quote/depth",
+      "title": "Order Book",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Market%20Data/Order%20Book"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/wallets/v1/capital/deposit/riskRecords",
+      "title": "Deposit risk control records",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Account%20and%20Wallet/Wallet%20Deposits%20and%20Withdrawals/Deposit%20risk%20control%20records"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/wallets/v1/capital/deposit/querySubAddress",
+      "title": "Query Sub-account Deposit Address",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Account%20and%20Wallet/Sub-account%20Management/Query%20Sub-account%20Deposit%20Address"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/cswap/v1/market/contracts",
+      "title": "Contract Information",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Coin-M%20Futures/Market%20Data/Contract%20Information"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/wealth/v1/product/dual-currency/order",
+      "title": "Dual-Currency Place Order",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Wealth/Dual-Currency/Dual-Currency%20Place%20Order"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/swap/v1/user/marginAssets",
+      "title": "Query Multi-Assets Margin",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Trades%20Endpoints/Query%20Multi-Assets%20Margin"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/account/v1/allAccountBalance",
+      "title": "Asset overview",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Account%20and%20Wallet/Fund%20Account/Asset%20overview"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/agent/v1/reward/third/commissionDataList",
+      "title": "Query API transaction commission （non-invitation relationship）",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Agent/Query%20API%20transaction%20commission%20%EF%BC%88non-invitation%20relationship%EF%BC%89"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/swap/v1/twap/cancelOrder",
+      "title": "Cancel TWAP Order",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Trades%20Endpoints/Cancel%20TWAP%20Order"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/spot/v2/quote/historicalTrades",
+      "title": "Historical Trades",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Spot/Market%20Data/Historical%20Trades"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/copyTrading/v1/spot/profitDetail",
+      "title": "Profit Details",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Copy%20Trade/Spot%20Trading/Profit%20Details"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/wallets/v1/capital/deposit/riskRecords",
+      "title": "Deposit risk control records",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Account%20and%20Wallet/Wallet%20Deposits%20and%20Withdrawals/Deposit%20risk%20control%20records"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/api/v3/asset/transfer",
+      "title": "Asset transfer records",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Account%20and%20Wallet/Fund%20Account/Asset%20transfer%20records"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/spot/v2/quote/klines",
+      "title": "Kline/Candlestick Data",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Spot/Market%20Data/Kline%2FCandlestick%20Data"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/api/v3/asset/transferRecord",
+      "title": "Asset transfer records new",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Account%20and%20Wallet/Fund%20Account/Asset%20transfer%20records%20new"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/copyTrading/v1/spot/historyOrder",
+      "title": "Query Historical Orders",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Copy%20Trade/Spot%20Trading/Query%20Historical%20Orders"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/swap/v1/trade/assetMode",
+      "title": "Query Multi-Assets Mode",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Trades%20Endpoints/Query%20Multi-Assets%20Mode"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/spot/v1/oco/orderList",
+      "title": "Query an OCO Order List",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Spot/Trades%20Endpoints/Query%20an%20OCO%20Order%20List"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/wealth/v1/product/dual-currency/pre-order",
+      "title": "Dual-Currency Pre-Order Quote",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Wealth/Dual-Currency/Dual-Currency%20Pre-Order%20Quote"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/api/asset/v1/transfer",
+      "title": "Asset Transfer New",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Account%20and%20Wallet/Fund%20Account/Asset%20Transfer%20New"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/swap/v1/twap/orderDetail",
+      "title": "TWAP Order Details",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Trades%20Endpoints/TWAP%20Order%20Details"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/cswap/v1/market/premiumIndex",
+      "title": "Price & Current Funding Rate",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Coin-M%20Futures/Market%20Data/Price%20%26%20Current%20Funding%20Rate"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/copyTrading/v1/spot/trader/sellOrder",
+      "title": "Trader sells spot assets based on buy order number",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Copy%20Trade/Spot%20Trading/Trader%20sells%20spot%20assets%20based%20on%20buy%20order%20number"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/swap/v1/trade/amend",
+      "title": "Modify Order",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Trades%20Endpoints/Modify%20Order"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/swap/v2/trade/leverage",
+      "title": "Query Leverage and Available Positions",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Trades%20Endpoints/Query%20Leverage%20and%20Available%20Positions"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/swap/v2/trade/marginType",
+      "title": "Query Margin Type",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Trades%20Endpoints/Query%20Margin%20Type"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/agent/v1/commissionDataList/referralCode",
+      "title": "Invitation code data",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Agent/Invitation%20code%20data"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/swap/v1/positionSide/dual",
+      "title": "Set Position Mode",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Trades%20Endpoints/Set%20Position%20Mode"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/spot/v2/quote/ticker",
+      "title": "24hr Ticker Price Change Statistics",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Spot/Market%20Data/24hr%20Ticker%20Price%20Change%20Statistics"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/copyTrading/v1/PFutures/setCommission",
+      "title": "Set Commission Rate",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Copy%20Trade/USDT-M%20Perpetual%20Contracts/Set%20Commission%20Rate"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/account/v1/apiKey/query",
+      "title": " Query API Key Information",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Account%20and%20Wallet/Sub-account%20Management/%20Query%20API%20Key%20Information"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/wallets/v1/capital/subAccount/innerTransfer/records",
+      "title": "Query Sub-account Internal Transfer Records",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Account%20and%20Wallet/Sub-account%20Management/Query%20Sub-account%20Internal%20Transfer%20Records"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/swap/v2/quote/openInterest",
+      "title": "Open Interest Statistics",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Market%20Data/Open%20Interest%20Statistics"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/swap/v1/twap/historyOrders",
+      "title": "Query TWAP Historical Orders",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Trades%20Endpoints/Query%20TWAP%20Historical%20Orders"
+    },
+    {
+      "method": "DELETE",
+      "path": "/openApi/swap/v2/trade/order",
+      "title": "Cancel Order",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Trades%20Endpoints/Cancel%20Order"
+    },
+    {
+      "method": "DELETE",
+      "path": "/openApi/swap/v2/trade/allOpenOrders",
+      "title": "Cancel All Open Orders",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Trades%20Endpoints/Cancel%20All%20Open%20Orders"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/swap/v2/user/commissionRate",
+      "title": "Query Trading Commission Rate",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Account%20Endpoints/Query%20Trading%20Commission%20Rate"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/swap/v2/trade/closeAllPositions",
+      "title": "Close All Positions",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Trades%20Endpoints/Close%20All%20Positions"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/spot/v2/quote/historicalKlines",
+      "title": "Historical K-line",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Spot/Market%20Data/Historical%20K-line"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/copyTrading/v1/spot/profitHistorySummarys",
+      "title": "Profit Summary",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Copy%20Trade/Spot%20Trading/Profit%20Summary"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/swap/v1/market/markPriceKlines",
+      "title": "Mark Price Kline/Candlestick Data",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Market%20Data/Mark%20Price%20Kline%2FCandlestick%20Data"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/api/v3/asset/transfer",
+      "title": "Asset transfer records",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Account%20and%20Wallet/Fund%20Account/Asset%20transfer%20records"
+    },
+    {
+      "method": "DELETE",
+      "path": "/openApi/user/auth/userDataStream",
+      "title": "Close Listen Key",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Quick%20Start/WebSocket%20Rules/Close%20Listen%20Key"
+    },
+    {
+      "method": "PUT",
+      "path": "/openApi/user/auth/userDataStream",
+      "title": "Extend Listen Key Validity",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Quick%20Start/WebSocket%20Rules/Extend%20Listen%20Key%20Validity"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/user/auth/userDataStream",
+      "title": "Generate Listen Key",
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Quick%20Start/WebSocket%20Rules/Generate%20Listen%20Key"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/agent/v1/account/inviteAccountList",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/agent/api-reference.md#L14"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/agent/v1/account/inviteRelationCheck",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/agent/api-reference.md#L115"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/agent/v1/asset/depositDetailList",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/agent/api-reference.md#L242"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/agent/v1/account/superiorCheck",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/agent/api-reference.md#L333"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/content/v1/announcement",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/announcement/api-reference.md#L7"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/swap/v2/trade/order",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/bingx-dynamic-sl-tp/api-reference.md#L23"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/swap/v2/trade/allOrders",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/bingx-trade-review/api-reference.md#L7"
+    },
+    {
+      "method": "POST",
+      "path": "/api/lindorm/v1/ai/kline/query",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/bingx-trading-plan/api-reference.md#L3"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/copyTrading/v1/swap/trace/currentTrack",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/copytrade-swap/api-reference.md#L16"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/copyTrading/v1/swap/trace/closeTrackOrder",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/copytrade-swap/api-reference.md#L91"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/cswap/v1/trade/order",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/cswap-trade/api-reference.md#L11"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/cswap/v1/trade/allOpenOrders",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/cswap-trade/api-reference.md#L122"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/cswap/v1/trade/openOrders",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/cswap-trade/api-reference.md#L192"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/cswap/v1/trade/allFillOrders",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/cswap-trade/api-reference.md#L360"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/cswap/v1/user/positions",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/cswap-trade/api-reference.md#L694"
+    },
+    {
+      "method": "WS",
+      "path": "wss://open-api-cswap-ws.bingx.com/market?listenKey=<key>",
+      "channel": "listenKey Expired Push",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/cswap-ws-account/api-reference.md#L74"
+    },
+    {
+      "method": "WS",
+      "path": "wss://open-api-cswap-ws.bingx.com/market",
+      "channel": "Subscription: Trade Detail",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/cswap-ws-market/api-reference.md#L14"
+    },
+    {
+      "method": "WS",
+      "path": "wss://open-api-cswap-ws.bingx.com/market",
+      "channel": "Subscription: Latest Trade Price",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/cswap-ws-market/api-reference.md#L56"
+    },
+    {
+      "method": "WS",
+      "path": "wss://open-api-cswap-ws.bingx.com/market",
+      "channel": "Subscription: Mark Price",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/cswap-ws-market/api-reference.md#L95"
+    },
+    {
+      "method": "WS",
+      "path": "wss://open-api-cswap-ws.bingx.com/market",
+      "channel": "Subscription: Limited Depth",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/cswap-ws-market/api-reference.md#L134"
+    },
+    {
+      "method": "WS",
+      "path": "wss://open-api-cswap-ws.bingx.com/market",
+      "channel": "Subscription: Best Bid and Ask (Book Ticker)",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/cswap-ws-market/api-reference.md#L177"
+    },
+    {
+      "method": "WS",
+      "path": "wss://open-api-cswap-ws.bingx.com/market",
+      "channel": "Subscription: K-Line Data",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/cswap-ws-market/api-reference.md#L219"
+    },
+    {
+      "method": "WS",
+      "path": "wss://open-api-cswap-ws.bingx.com/market",
+      "channel": "Subscription: 24-Hour Price Change",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/cswap-ws-market/api-reference.md#L267"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/spot/v2/market/depth",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/spot-market/api-reference.md#L68"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/spot/v1/market/trades",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/spot-market/api-reference.md#L94"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/spot/v2/market/kline",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/spot-market/api-reference.md#L121"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/spot/v1/ticker/24hr",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/spot-market/api-reference.md#L157"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/spot/v2/ticker/price",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/spot-market/api-reference.md#L192"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/spot/v1/ticker/bookTicker",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/spot-market/api-reference.md#L226"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/market/his/v1/kline",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/spot-market/api-reference.md#L254"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/market/his/v1/trade",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/spot-market/api-reference.md#L287"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/spot/v1/trade/order/cancelReplace",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/spot-trade/api-reference.md#L73"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/spot/v1/trade/myTrades",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/spot-trade/api-reference.md#L197"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/wallets/v1/capital/config/getall",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/spot-wallet/api-reference.md#L97"
+    },
+    {
+      "method": "WS",
+      "path": "wss://open-api-ws.bingx.com/market?listenKey=<key>",
+      "channel": "Subscription: Order Update (spot.executionReport)",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/spot-ws-account/api-reference.md#L73"
+    },
+    {
+      "method": "WS",
+      "path": "wss://open-api-ws.bingx.com/market?listenKey=<key>",
+      "channel": "Subscription: Account Balance Update (ACCOUNT_UPDATE)",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/spot-ws-account/api-reference.md#L119"
+    },
+    {
+      "method": "WS",
+      "path": "wss://open-api-ws.bingx.com/market",
+      "channel": "Subscription: Trade Detail",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/spot-ws-market/api-reference.md#L13"
+    },
+    {
+      "method": "WS",
+      "path": "wss://open-api-ws.bingx.com/market",
+      "channel": "Subscription: K-Line Streams",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/spot-ws-market/api-reference.md#L55"
+    },
+    {
+      "method": "WS",
+      "path": "wss://open-api-ws.bingx.com/market",
+      "channel": "Subscription: Market Depth",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/spot-ws-market/api-reference.md#L105"
+    },
+    {
+      "method": "WS",
+      "path": "wss://open-api-ws.bingx.com/market",
+      "channel": "Subscription: 24-Hour Price Change",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/spot-ws-market/api-reference.md#L148"
+    },
+    {
+      "method": "WS",
+      "path": "wss://open-api-ws.bingx.com/market",
+      "channel": "Subscription: Latest Trade Price",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/spot-ws-market/api-reference.md#L191"
+    },
+    {
+      "method": "WS",
+      "path": "wss://open-api-ws.bingx.com/market",
+      "channel": "Subscription: Best Order Book (Book Ticker)",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/spot-ws-market/api-reference.md#L230"
+    },
+    {
+      "method": "WS",
+      "path": "wss://open-api-ws.bingx.com/market",
+      "channel": "Subscription: Incremental and Full Depth",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/spot-ws-market/api-reference.md#L272"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/contract/v1/allPosition",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/standard-trade/api-reference.md#L14"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/contract/v1/allOrders",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/standard-trade/api-reference.md#L41"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/contract/v1/balance",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/standard-trade/api-reference.md#L80"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/subAccount/v1/create",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/sub-account/api-reference.md#L107"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/subAccount/v1/list",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/sub-account/api-reference.md#L107"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/subAccount/v1/updateStatus",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/sub-account/api-reference.md#L107"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/subAccount/v1/apiKey/create",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/sub-account/api-reference.md#L233"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/subAccount/v1/apiKey/edit",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/sub-account/api-reference.md#L233"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/subAccount/v1/apiKey/del",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/sub-account/api-reference.md#L233"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/account/v1/innerTransfer/authorizeSubAccount",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/sub-account/api-reference.md#L308"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/account/transfer/v1/subAccount/transferAsset/supportCoins",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/sub-account/api-reference.md#L308"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/account/transfer/v1/subAccount/transferAsset",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/sub-account/api-reference.md#L308"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/v1/account/apiRestrictions",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/sub-account/api-reference.md#L541"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/wallets/v1/capital/deposit/createSubAddress",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/sub-account/api-reference.md#L541"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/swap/v2/user/positions",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/swap-account/api-reference.md#L65"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/swap/v2/quote/contracts",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/swap-market/api-reference.md#L16"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/swap/v2/quote/trades",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/swap-market/api-reference.md#L84"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/swap/v1/market/historicalTrades",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/swap-market/api-reference.md#L294"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/swap/v2/server/time",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/swap-market/api-reference.md#L408"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/swap/v2/trade/order",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/swap-trade/api-reference.md#L243"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/swap/v2/trade/openOrders",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/swap-trade/api-reference.md#L243"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/swap/v1/trade/cancelReplace",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/swap-trade/api-reference.md#L588"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/swap/v1/trade/batchCancelReplace",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/swap-trade/api-reference.md#L588"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/swap/v1/trade/fullOrder",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/swap-trade/api-reference.md#L909"
+    },
+    {
+      "method": "GET",
+      "path": "/openApi/swap/v1/trade/positionHistory",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/swap-trade/api-reference.md#L909"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/swap/v1/trade/reverse",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/swap-trade/api-reference.md#L909"
+    },
+    {
+      "method": "WS",
+      "path": "wss://open-api-swap.bingx.com/swap-market?listenKey=<key>",
+      "channel": "listenKey Expired Push",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/swap-ws-account/api-reference.md#L75"
+    },
+    {
+      "method": "WS",
+      "path": "wss://open-api-swap.bingx.com/swap-market",
+      "channel": "Subscribe to Book Ticker Streams",
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/swap-ws-market/api-reference.md#L264"
+    }
+  ],
+  "reviewed": "2026-09-28"
+}

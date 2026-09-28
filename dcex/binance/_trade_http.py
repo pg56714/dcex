@@ -7,12 +7,52 @@ from .._native_http import request_native_json
 from ..enums import OrderSide
 from ..utils.errors import FailedRequestError
 from ..utils.helpers import generate_timestamp
+from ._batch import encode_batch_orders
 from ._http_manager import HTTPManager
 from .enums import BinanceProductType
 
 
 class TradeHTTP(HTTPManager):
     """HTTP client for Binance trading API endpoints."""
+
+    def place_coin_futures_algo_order(self, fields: dict[str, Any]) -> Any:
+        """
+        Place a COIN-M algo order using explicit exchange field names.
+
+        Official specification incomplete; not verified live. The migration note
+        names /dapi/v1/algoOrder but provides no standalone parameter contract.
+        fields is forwarded without inferring USD-M field names. Authentication
+        fields are added by the client and must not be supplied here.
+        """
+        return self._native_private(
+            "place_coin_futures_algo_order", self._params(fields=dumps(fields))
+        )
+
+    def cancel_coin_futures_algo_order(self, fields: dict[str, Any]) -> Any:
+        """
+        Cancel a COIN-M algo order using explicit exchange field names.
+
+        Official specification incomplete; not verified live. The migration note
+        names /dapi/v1/algoOrder but provides no standalone parameter contract.
+        fields is forwarded without inferring USD-M field names. Authentication
+        fields are added by the client and must not be supplied here.
+        """
+        return self._native_private(
+            "cancel_coin_futures_algo_order", self._params(fields=dumps(fields))
+        )
+
+    def get_coin_futures_algo_order(self, fields: dict[str, Any]) -> Any:
+        """
+        Get a COIN-M algo order using explicit exchange field names.
+
+        Official specification incomplete; not verified live. The migration note
+        names /dapi/v1/algoOrder but provides no standalone parameter contract.
+        fields is forwarded without inferring USD-M field names. Authentication
+        fields are added by the client and must not be supplied here.
+        """
+        return self._native_private(
+            "get_coin_futures_algo_order", self._params(fields=dumps(fields))
+        )
 
     def place_equity_order(
         self,
@@ -178,11 +218,11 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
-    def place_options_batch_orders(self, orders: list[dict[str, Any]]) -> list[dict[str, Any]]:
-        """Place multiple Binance Options orders in one request."""
+    def place_options_batch_orders(self, orders: list[dict[str, Any]]) -> dict[str, Any]:
+        """Place options orders; inspect both the ok and errors result arrays."""
         return self._native_private(
             "place_options_batch_orders",
-            self._params(orders=dumps(orders, separators=(",", ":"))),
+            self._params(orders=encode_batch_orders(orders)),
         )
 
     def cancel_options_batch_orders(
@@ -191,8 +231,8 @@ class TradeHTTP(HTTPManager):
         *,
         orderIds: list[int] | None = None,
         clientOrderIds: list[str] | None = None,
-    ) -> list[dict[str, Any]]:
-        """Cancel multiple Binance Options orders."""
+    ) -> dict[str, Any]:
+        """Cancel options orders; inspect both the ok and errors result arrays."""
         return self._native_private(
             "cancel_options_batch_orders",
             self._params(
@@ -358,7 +398,9 @@ class TradeHTTP(HTTPManager):
             raise FailedRequestError(
                 request=f"BINANCE {method_name} | Params: {params}",
                 message=str(exc),
-                status_code="Unknown",
+                status_code=getattr(exc, "status_code", "Unknown"),
+                response_data=getattr(exc, "response_data", None),
+                resp_headers=dict(getattr(exc, "resp_headers", [])),
                 time=str(generate_timestamp(iso_format=True)),
             ) from exc
         self._store_response_headers(response)
@@ -2202,21 +2244,39 @@ class TradeHTTP(HTTPManager):
         )
 
     def set_coin_futures_margin_type(
-        self, symbol: str, margin_type: str, *, recv_window: int | None = None
+        self,
+        product_symbol: str | None = None,
+        margin_type: str | None = None,
+        *,
+        symbol: str | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any] | list[dict[str, Any]]:
         """Call ``POST /dapi/v1/marginType`` with signed authentication."""
         return self._native_private(
             "set_coin_futures_margin_type",
-            self._params(symbol=symbol, marginType=margin_type, recvWindow=recv_window),
+            self._params(
+                product_symbol=self._required_alias(product_symbol, symbol, "product_symbol"),
+                marginType=margin_type,
+                recvWindow=recv_window,
+            ),
         )
 
     def set_coin_futures_cancel_countdown(
-        self, symbol: str, countdown_time: int, *, recv_window: int | None = None
+        self,
+        product_symbol: str | None = None,
+        countdown_time: int | None = None,
+        *,
+        symbol: str | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any] | list[dict[str, Any]]:
         """Call ``POST /dapi/v1/countdownCancelAll`` with signed authentication."""
         return self._native_private(
             "set_coin_futures_cancel_countdown",
-            self._params(symbol=symbol, countdownTime=countdown_time, recvWindow=recv_window),
+            self._params(
+                product_symbol=self._required_alias(product_symbol, symbol, "product_symbol"),
+                countdownTime=countdown_time,
+                recvWindow=recv_window,
+            ),
         )
 
     def get_coin_futures_leverage_brackets(
@@ -2258,12 +2318,21 @@ class TradeHTTP(HTTPManager):
         )
 
     def set_coin_futures_leverage(
-        self, symbol: str, leverage: int, *, recv_window: int | None = None
+        self,
+        product_symbol: str | None = None,
+        leverage: int | None = None,
+        *,
+        symbol: str | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any] | list[dict[str, Any]]:
         """Call ``POST /dapi/v1/leverage`` with signed authentication."""
         return self._native_private(
             "set_coin_futures_leverage",
-            self._params(symbol=symbol, leverage=leverage, recvWindow=recv_window),
+            self._params(
+                product_symbol=self._required_alias(product_symbol, symbol, "product_symbol"),
+                leverage=leverage,
+                recvWindow=recv_window,
+            ),
         )
 
     def get_coin_futures_pair_leverage_brackets(
@@ -2329,20 +2398,34 @@ class TradeHTTP(HTTPManager):
 
     def place_futures_batch_orders(
         self, orders: list[dict[str, Any]], *, recv_window: int | None = None
-    ) -> list[dict[str, Any]]:
-        """Place a futures batch; each response item may independently fail."""
+    ) -> dict[str, list[dict[str, Any]]]:
+        """
+        Place a futures batch and return separate ``ok`` and ``errors`` lists.
+
+        Each entry has its zero-based request ``index`` and full ``response``.
+        Always inspect ``errors``: HTTP 200 does not mean every item succeeded.
+        Quantity and price fields require decimal strings or ``Decimal`` values.
+        Conditional orders must use the market's REST algo endpoint.
+        """
         return self._native_private(
             "place_futures_batch_orders",
-            self._params(batchOrders=dumps(orders), recvWindow=recv_window),
+            self._params(batchOrders=encode_batch_orders(orders), recvWindow=recv_window),
         )
 
     def amend_futures_batch_orders(
         self, orders: list[dict[str, Any]], *, recv_window: int | None = None
-    ) -> list[dict[str, Any]]:
-        """Amend a futures batch; each response item may independently fail."""
+    ) -> dict[str, list[dict[str, Any]]]:
+        """
+        Amend a futures batch and return separate ``ok`` and ``errors`` lists.
+
+        Each entry has its zero-based request ``index`` and full ``response``.
+        Always inspect ``errors``: HTTP 200 does not mean every item succeeded.
+        Quantity and price fields require decimal strings or ``Decimal`` values.
+        Conditional orders must use the market's REST algo endpoint.
+        """
         return self._native_private(
             "amend_futures_batch_orders",
-            self._params(batchOrders=dumps(orders), recvWindow=recv_window),
+            self._params(batchOrders=encode_batch_orders(orders), recvWindow=recv_window),
         )
 
     def cancel_futures_batch_orders(
@@ -2352,8 +2435,14 @@ class TradeHTTP(HTTPManager):
         order_ids: list[int] | None = None,
         client_order_ids: list[str] | None = None,
         recv_window: int | None = None,
-    ) -> list[dict[str, Any]]:
-        """Cancel a futures batch; each response item may independently fail."""
+    ) -> dict[str, list[dict[str, Any]]]:
+        """
+        Cancel a futures batch and return separate ``ok`` and ``errors`` lists.
+
+        Each entry has its zero-based request ``index`` and full ``response``.
+        Always inspect ``errors``: HTTP 200 does not mean every item succeeded.
+        Conditional orders must use the market's REST algo endpoint.
+        """
         return self._native_private(
             "cancel_futures_batch_orders",
             self._params(
@@ -2368,35 +2457,56 @@ class TradeHTTP(HTTPManager):
 
     def place_coin_futures_batch_orders(
         self, orders: list[dict[str, Any]], *, recv_window: int | None = None
-    ) -> list[dict[str, Any]]:
-        """Place a coin_futures batch; each response item may independently fail."""
+    ) -> dict[str, list[dict[str, Any]]]:
+        """
+        Place a coin_futures batch and return separate ``ok`` and ``errors`` lists.
+
+        Each entry has its zero-based request ``index`` and full ``response``.
+        Always inspect ``errors``: HTTP 200 does not mean every item succeeded.
+        Quantity and price fields require decimal strings or ``Decimal`` values.
+        Conditional orders must use the market's REST algo endpoint.
+        """
         return self._native_private(
             "place_coin_futures_batch_orders",
-            self._params(batchOrders=dumps(orders), recvWindow=recv_window),
+            self._params(batchOrders=encode_batch_orders(orders), recvWindow=recv_window),
         )
 
     def amend_coin_futures_batch_orders(
         self, orders: list[dict[str, Any]], *, recv_window: int | None = None
-    ) -> list[dict[str, Any]]:
-        """Amend a coin_futures batch; each response item may independently fail."""
+    ) -> dict[str, list[dict[str, Any]]]:
+        """
+        Amend a coin_futures batch and return separate ``ok`` and ``errors`` lists.
+
+        Each entry has its zero-based request ``index`` and full ``response``.
+        Always inspect ``errors``: HTTP 200 does not mean every item succeeded.
+        Quantity and price fields require decimal strings or ``Decimal`` values.
+        Conditional orders must use the market's REST algo endpoint.
+        """
         return self._native_private(
             "amend_coin_futures_batch_orders",
-            self._params(batchOrders=dumps(orders), recvWindow=recv_window),
+            self._params(batchOrders=encode_batch_orders(orders), recvWindow=recv_window),
         )
 
     def cancel_coin_futures_batch_orders(
         self,
-        symbol: str,
+        product_symbol: str | None = None,
         *,
+        symbol: str | None = None,
         order_ids: list[int] | None = None,
         client_order_ids: list[str] | None = None,
         recv_window: int | None = None,
-    ) -> list[dict[str, Any]]:
-        """Cancel a coin_futures batch; each response item may independently fail."""
+    ) -> dict[str, list[dict[str, Any]]]:
+        """
+        Cancel a coin_futures batch and return separate ``ok`` and ``errors`` lists.
+
+        Each entry has its zero-based request ``index`` and full ``response``.
+        Always inspect ``errors``: HTTP 200 does not mean every item succeeded.
+        Conditional orders must use the market's REST algo endpoint.
+        """
         return self._native_private(
             "cancel_coin_futures_batch_orders",
             self._params(
-                symbol=symbol,
+                product_symbol=self._required_alias(product_symbol, symbol, "product_symbol"),
                 orderIdList=dumps(order_ids) if order_ids is not None else None,
                 origClientOrderIdList=dumps(client_order_ids)
                 if client_order_ids is not None
@@ -2404,6 +2514,18 @@ class TradeHTTP(HTTPManager):
                 recvWindow=recv_window,
             ),
         )
+
+    def create_futures_listen_key(self) -> dict[str, Any]:
+        """Create a USD-M Futures user-data stream listen key."""
+        return self._native_private("create_futures_listen_key", [])
+
+    def keep_alive_futures_listen_key(self) -> dict[str, Any]:
+        """Keep the USD-M Futures user-data stream alive."""
+        return self._native_private("keep_alive_futures_listen_key", [])
+
+    def close_futures_listen_key(self) -> dict[str, Any]:
+        """Close the USD-M Futures user-data stream."""
+        return self._native_private("close_futures_listen_key", [])
 
     def create_coin_futures_listen_key(self) -> dict[str, Any]:
         """POST /dapi/v1/listenKey; uses the account API key without a signature."""
@@ -2502,7 +2624,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         GET /dapi/v1/income.
 
         Decimal amounts are strings; timestamps are milliseconds.
@@ -2527,7 +2648,6 @@ class TradeHTTP(HTTPManager):
         self, *, symbol: str, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         GET /dapi/v1/commissionRate.
 
         Decimal amounts are strings; timestamps are milliseconds.
@@ -2549,7 +2669,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         POST /dapi/v1/positionMargin.
 
         Decimal amounts are strings; timestamps are milliseconds.
@@ -2572,7 +2691,6 @@ class TradeHTTP(HTTPManager):
         self, *, symbol: str | None = None, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         GET /dapi/v1/adlQuantile.
 
         Decimal amounts are strings; timestamps are milliseconds.
@@ -2595,7 +2713,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         GET /dapi/v1/forceOrders.
 
         Decimal amounts are strings; timestamps are milliseconds.
@@ -2627,7 +2744,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         GET /papi/v1/cm/income.
 
         Decimal amounts are strings; timestamps are milliseconds.
@@ -2660,7 +2776,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         GET /papi/v1/margin/marginInterestHistory.
 
         Decimal amounts are strings; timestamps are milliseconds.
@@ -2693,7 +2808,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         GET /papi/v1/um/income.
 
         Decimal amounts are strings; timestamps are milliseconds.
@@ -2716,7 +2830,6 @@ class TradeHTTP(HTTPManager):
 
     def get_pm_coin_commission_rate(self, *, symbol: str, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
-
         GET /papi/v1/cm/commissionRate.
 
         Decimal amounts are strings; timestamps are milliseconds.
@@ -2732,7 +2845,6 @@ class TradeHTTP(HTTPManager):
         self, *, product_symbol: str, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         GET /papi/v1/um/commissionRate.
 
         Decimal amounts are strings; timestamps are milliseconds.
@@ -2758,7 +2870,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         GET /papi/v1/margin/marginLoan.
 
         Decimal amounts are strings; timestamps are milliseconds.
@@ -2784,7 +2895,6 @@ class TradeHTTP(HTTPManager):
         self, *, asset: str, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         GET /papi/v1/margin/maxWithdraw.
 
         Decimal amounts are strings; timestamps are milliseconds.
@@ -2809,7 +2919,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         GET /papi/v1/margin/repayLoan.
 
         Decimal amounts are strings; timestamps are milliseconds.
@@ -2833,7 +2942,6 @@ class TradeHTTP(HTTPManager):
 
     def get_pm_order_rate_limits(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
-
         GET /papi/v1/rateLimit/order.
 
         Decimal amounts are strings; timestamps are milliseconds.
@@ -2847,7 +2955,6 @@ class TradeHTTP(HTTPManager):
 
     def get_futures_account_config(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
-
         GET /fapi/v1/accountConfig.
 
         Decimal amounts are strings; timestamps are milliseconds.
@@ -2863,7 +2970,6 @@ class TradeHTTP(HTTPManager):
         self, *, product_symbol: str | None = None, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         GET /fapi/v1/apiTradingStatus.
 
         Decimal amounts are strings; timestamps are milliseconds.
@@ -2878,7 +2984,6 @@ class TradeHTTP(HTTPManager):
 
     def get_futures_multi_assets_mode(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
-
         GET /fapi/v1/multiAssetsMargin.
 
         Decimal amounts are strings; timestamps are milliseconds.
@@ -2892,7 +2997,6 @@ class TradeHTTP(HTTPManager):
 
     def get_futures_order_rate_limits(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
-
         GET /fapi/v1/rateLimit/order.
 
         Decimal amounts are strings; timestamps are milliseconds.
@@ -2908,7 +3012,6 @@ class TradeHTTP(HTTPManager):
         self, *, product_symbol: str | None = None, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         GET /fapi/v1/symbolConfig.
 
         Decimal amounts are strings; timestamps are milliseconds.
@@ -2925,7 +3028,6 @@ class TradeHTTP(HTTPManager):
         self, *, multi_assets_margin: str, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         POST /fapi/v1/multiAssetsMargin.
 
         Decimal amounts are strings; timestamps are milliseconds.
@@ -2948,7 +3050,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         POST /fapi/v1/positionMargin.
 
         Decimal amounts are strings; timestamps are milliseconds.
@@ -2971,7 +3072,6 @@ class TradeHTTP(HTTPManager):
         self, *, product_symbol: str | None = None, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         GET /fapi/v1/adlQuantile.
 
         Decimal amounts are strings; timestamps are milliseconds.
@@ -2995,7 +3095,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         GET /fapi/v1/forceOrders.
 
         Decimal amounts are strings; timestamps are milliseconds.
@@ -3017,7 +3116,6 @@ class TradeHTTP(HTTPManager):
 
     def get_margin_risk_coefficients(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
-
         GET /sapi/v1/margin/tradeCoeff.
 
         Decimal amounts are strings; timestamps are milliseconds.
@@ -3042,7 +3140,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         GET /sapi/v1/margin/capital-flow.
 
         Decimal amounts are strings; timestamps are milliseconds.
@@ -3075,7 +3172,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         GET /sapi/v1/margin/forceLiquidationRec.
 
         Decimal amounts are strings; timestamps are milliseconds.
@@ -3106,7 +3202,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         DELETE /sapi/v1/margin/orderList.
 
         Decimal amounts are strings; timestamps are milliseconds.
@@ -3134,7 +3229,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         GET /sapi/v1/margin/rateLimit/order.
 
         Decimal amounts are strings; timestamps are milliseconds.
@@ -3161,7 +3255,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         GET /sapi/v1/margin/allOrderList.
 
         Decimal amounts are strings; timestamps are milliseconds.
@@ -3192,7 +3285,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         GET /sapi/v1/margin/orderList.
 
         Decimal amounts are strings; timestamps are milliseconds.
@@ -3219,7 +3311,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         GET /sapi/v1/margin/openOrderList.
 
         Decimal amounts are strings; timestamps are milliseconds.
@@ -3236,7 +3327,6 @@ class TradeHTTP(HTTPManager):
 
     def close_margin_listen_key(self) -> Any:  # noqa: ANN401
         """
-
         DELETE /sapi/v1/margin/listen-key.
 
         Decimal amounts are strings; timestamps are milliseconds.
@@ -3248,7 +3338,6 @@ class TradeHTTP(HTTPManager):
 
     def keep_alive_margin_listen_key(self, *, listen_key: str) -> Any:  # noqa: ANN401
         """
-
         PUT /sapi/v1/margin/listen-key.
 
         Decimal amounts are strings; timestamps are milliseconds.
@@ -3262,7 +3351,6 @@ class TradeHTTP(HTTPManager):
 
     def create_margin_listen_key(self) -> Any:  # noqa: ANN401
         """
-
         POST /sapi/v1/margin/listen-key.
 
         Decimal amounts are strings; timestamps are milliseconds.
@@ -3274,7 +3362,6 @@ class TradeHTTP(HTTPManager):
 
     def get_account_trading_status(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
-
         GET /sapi/v1/account/apiTradingStatus.
 
         Decimal amounts are strings; timestamps are milliseconds.
@@ -3288,7 +3375,6 @@ class TradeHTTP(HTTPManager):
 
     def get_account_status(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
-
         GET /sapi/v1/account/status.
 
         Decimal amounts are strings; timestamps are milliseconds.
@@ -3300,7 +3386,6 @@ class TradeHTTP(HTTPManager):
 
     def get_api_key_permissions(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
-
         GET /sapi/v1/account/apiRestrictions.
 
         Decimal amounts are strings; timestamps are milliseconds.
@@ -3314,7 +3399,6 @@ class TradeHTTP(HTTPManager):
         self, *, product_symbol: str | None = None, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         GET /sapi/v1/asset/tradeFee.
 
         Decimal amounts are strings; timestamps are milliseconds.
@@ -3335,7 +3419,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         POST /sapi/v3/asset/getUserAsset.
 
         Decimal amounts are strings; timestamps are milliseconds.
@@ -3350,7 +3433,6 @@ class TradeHTTP(HTTPManager):
 
     def get_coin_network_config(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
-
         GET /sapi/v1/capital/config/getall.
 
         Decimal amounts are strings; timestamps are milliseconds.
@@ -3369,7 +3451,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         GET /sapi/v1/capital/deposit/address.
 
         Decimal amounts are strings; timestamps are milliseconds.
@@ -3396,7 +3477,6 @@ class TradeHTTP(HTTPManager):
         tx_id: str | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         GET /sapi/v1/capital/deposit/hisrec.
 
         Decimal amounts are strings; timestamps are milliseconds.
@@ -3442,7 +3522,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         Both legs share quantity; cancelling either leg cancels the entire list.
 
         POST /sapi/v1/margin/order/oco. Decimal values are strings.
@@ -3502,7 +3581,6 @@ class TradeHTTP(HTTPManager):
         pending_time_in_force: str | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         Pending orders activate only after the working order fully fills.
 
         POST /sapi/v1/margin/order/oto. Decimal values are strings.
@@ -3574,7 +3652,6 @@ class TradeHTTP(HTTPManager):
         pending_below_time_in_force: str | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         Pending orders activate only after the working order fully fills.
 
         POST /sapi/v1/margin/order/otoco. Decimal values are strings.
@@ -3653,7 +3730,6 @@ class TradeHTTP(HTTPManager):
         recv_window: str | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         Working BUY must fully fill before pending SELL orders use its received funds; no
         pending quantity is accepted.
 
@@ -3745,7 +3821,6 @@ class TradeHTTP(HTTPManager):
         recv_window: str | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         Working BUY must fully fill before pending SELL orders use its received funds; no
         pending quantity is accepted.
 
@@ -3806,7 +3881,6 @@ class TradeHTTP(HTTPManager):
         self, *, start_time: int, end_time: int, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Get Download Id For Futures Order History (USER_DATA).
 
         GET /dapi/v1/order/asyn. Native exchange symbols; decimal amounts are strings.
@@ -3823,7 +3897,6 @@ class TradeHTTP(HTTPManager):
         self, *, start_time: int, end_time: int, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Get Download Id For Futures Trade History (USER_DATA).
 
         GET /dapi/v1/trade/asyn. Native exchange symbols; decimal amounts are strings.
@@ -3840,7 +3913,6 @@ class TradeHTTP(HTTPManager):
         self, *, start_time: int, end_time: int, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Get Download Id For Futures Transaction History (USER_DATA).
 
         GET /dapi/v1/income/asyn. Native exchange symbols; decimal amounts are strings.
@@ -3857,7 +3929,6 @@ class TradeHTTP(HTTPManager):
         self, *, download_id: str, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Get Futures Order History Download Link by Id (USER_DATA).
 
         GET /dapi/v1/order/asyn/id. Native exchange symbols; decimal amounts are strings.
@@ -3874,7 +3945,6 @@ class TradeHTTP(HTTPManager):
         self, *, download_id: str, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Get Futures Trade Download Link by Id (USER_DATA).
 
         GET /dapi/v1/trade/asyn/id. Native exchange symbols; decimal amounts are strings.
@@ -3891,7 +3961,6 @@ class TradeHTTP(HTTPManager):
         self, *, download_id: str, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Get Futures Transaction History Download Link by Id (USER_DATA).
 
         GET /dapi/v1/income/asyn/id. Native exchange symbols; decimal amounts are strings.
@@ -3916,7 +3985,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         Get Order Modify History (USER_DATA).
 
         GET /dapi/v1/orderAmendment. Native exchange symbols; decimal amounts are strings.
@@ -3948,7 +4016,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         Get Position Margin Change History (TRADE).
 
         GET /dapi/v1/positionMargin/history. Native exchange symbols; decimal amounts are
@@ -3978,7 +4045,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         Query Current Open Order (USER_DATA).
 
         GET /dapi/v1/openOrder. Native exchange symbols; decimal amounts are strings.
@@ -4000,7 +4066,6 @@ class TradeHTTP(HTTPManager):
         self, *, amount: str, transfer_side: str, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         BNB transfer (TRADE).
 
         POST /papi/v1/bnb-transfer. Native exchange symbols; decimal amounts are strings.
@@ -4017,7 +4082,6 @@ class TradeHTTP(HTTPManager):
         self, *, auto_repay: str, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Change Auto-repay-futures Status (TRADE).
 
         POST /papi/v1/repay-futures-switch. Native exchange symbols; decimal amounts are
@@ -4033,7 +4097,6 @@ class TradeHTTP(HTTPManager):
 
     def pm_fund_auto_collection(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
-
         Fund Auto-collection (TRADE).
 
         POST /papi/v1/auto-collection. Native exchange symbols; decimal amounts are strings.
@@ -4045,7 +4108,6 @@ class TradeHTTP(HTTPManager):
 
     def pm_fund_collection_by_asset(self, *, asset: str, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
-
         Fund Collection by Asset (TRADE).
 
         POST /papi/v1/asset-collection. Native exchange symbols; decimal amounts are strings.
@@ -4059,7 +4121,6 @@ class TradeHTTP(HTTPManager):
 
     def get_pm_auto_repay_futures_status(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
-
         Get Auto-repay-futures Status (USER_DATA).
 
         GET /papi/v1/repay-futures-switch. Native exchange symbols; decimal amounts are strings.
@@ -4075,7 +4136,6 @@ class TradeHTTP(HTTPManager):
         self, *, start_time: int, end_time: int, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Get Download Id For UM Futures Order History (USER_DATA).
 
         GET /papi/v1/um/order/asyn. Native exchange symbols; decimal amounts are strings.
@@ -4092,7 +4152,6 @@ class TradeHTTP(HTTPManager):
         self, *, start_time: int, end_time: int, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Get Download Id For UM Futures Trade History (USER_DATA).
 
         GET /papi/v1/um/trade/asyn. Native exchange symbols; decimal amounts are strings.
@@ -4109,7 +4168,6 @@ class TradeHTTP(HTTPManager):
         self, *, start_time: int, end_time: int, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Get Download Id For UM Futures Transaction History (USER_DATA).
 
         GET /papi/v1/um/income/asyn. Native exchange symbols; decimal amounts are strings.
@@ -4124,7 +4182,6 @@ class TradeHTTP(HTTPManager):
 
     def get_pm_um_account_detail_v2(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
-
         Get UM Account Detail V2 (USER_DATA).
 
         GET /papi/v2/um/account. Native exchange symbols; decimal amounts are strings.
@@ -4140,7 +4197,6 @@ class TradeHTTP(HTTPManager):
         self, *, download_id: str, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Get UM Futures Order Download Link by Id (USER_DATA).
 
         GET /papi/v1/um/order/asyn/id. Native exchange symbols; decimal amounts are strings.
@@ -4157,7 +4213,6 @@ class TradeHTTP(HTTPManager):
         self, *, download_id: str, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Get UM Futures Trade Download Link by Id (USER_DATA).
 
         GET /papi/v1/um/trade/asyn/id. Native exchange symbols; decimal amounts are strings.
@@ -4174,7 +4229,6 @@ class TradeHTTP(HTTPManager):
         self, *, download_id: str, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Get UM Futures Transaction Download Link by Id (USER_DATA).
 
         GET /papi/v1/um/income/asyn/id. Native exchange symbols; decimal amounts are strings.
@@ -4197,7 +4251,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         Query Portfolio Margin Negative Balance Interest History (USER_DATA).
 
         GET /papi/v1/portfolio/interest-history. Native exchange symbols; decimal amounts are
@@ -4221,7 +4274,6 @@ class TradeHTTP(HTTPManager):
         self, *, start_time: int, end_time: int, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Query User Negative Balance Auto Exchange Record (USER_DATA).
 
         GET /papi/v1/portfolio/negative-balance-exchange-record. Native exchange symbols;
@@ -4237,7 +4289,6 @@ class TradeHTTP(HTTPManager):
 
     def repay_pm_futures_negative_balance(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
-
         Repay futures Negative Balance (USER_DATA).
 
         POST /papi/v1/repay-futures-negative-balance. Native exchange symbols; decimal amounts
@@ -4252,7 +4303,6 @@ class TradeHTTP(HTTPManager):
 
     def pm_futures_tradfi_perps_contract(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
-
         Futures TradFi Perps Contract (USER_DATA).
 
         POST /papi/v1/um/stock/contract. Native exchange symbols; decimal amounts are strings.
@@ -4266,7 +4316,6 @@ class TradeHTTP(HTTPManager):
 
     def get_pm_um_futures_bnb_burn_status(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
-
         Get UM Futures BNB Burn Status (USER_DATA).
 
         GET /papi/v1/um/feeBurn. Native exchange symbols; decimal amounts are strings.
@@ -4287,7 +4336,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         Query Current CM Open Order (USER_DATA).
 
         GET /papi/v1/cm/openOrder. Native exchange symbols; decimal amounts are strings.
@@ -4314,7 +4362,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         Query Current UM Open Order (USER_DATA).
 
         GET /papi/v1/um/openOrder. Native exchange symbols; decimal amounts are strings.
@@ -4336,7 +4383,6 @@ class TradeHTTP(HTTPManager):
         self, *, fee_burn: str, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Toggle BNB Burn On UM Futures Trade (TRADE).
 
         POST /papi/v1/um/feeBurn. Native exchange symbols; decimal amounts are strings.
@@ -4351,7 +4397,6 @@ class TradeHTTP(HTTPManager):
 
     def get_futures_bnb_burn_status(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
-
         Get BNB Burn Status (USER_DATA).
 
         GET /fapi/v1/feeBurn. Native exchange symbols; decimal amounts are strings.
@@ -4367,7 +4412,6 @@ class TradeHTTP(HTTPManager):
         self, *, start_time: int, end_time: int, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Get Download Id For Futures Order History (USER_DATA).
 
         GET /fapi/v1/order/asyn. Native exchange symbols; decimal amounts are strings.
@@ -4384,7 +4428,6 @@ class TradeHTTP(HTTPManager):
         self, *, start_time: int, end_time: int, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Get Download Id For Futures Trade History (USER_DATA).
 
         GET /fapi/v1/trade/asyn. Native exchange symbols; decimal amounts are strings.
@@ -4401,7 +4444,6 @@ class TradeHTTP(HTTPManager):
         self, *, start_time: int, end_time: int, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Get Download Id For Futures Transaction History (USER_DATA).
 
         GET /fapi/v1/income/asyn. Native exchange symbols; decimal amounts are strings.
@@ -4418,7 +4460,6 @@ class TradeHTTP(HTTPManager):
         self, *, download_id: str, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Get Futures Order History Download Link by Id (USER_DATA).
 
         GET /fapi/v1/order/asyn/id. Native exchange symbols; decimal amounts are strings.
@@ -4435,7 +4476,6 @@ class TradeHTTP(HTTPManager):
         self, *, download_id: str, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Get Futures Trade Download Link by Id (USER_DATA).
 
         GET /fapi/v1/trade/asyn/id. Native exchange symbols; decimal amounts are strings.
@@ -4452,7 +4492,6 @@ class TradeHTTP(HTTPManager):
         self, *, download_id: str, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Get Futures Transaction History Download Link by Id (USER_DATA).
 
         GET /fapi/v1/income/asyn/id. Native exchange symbols; decimal amounts are strings.
@@ -4469,7 +4508,6 @@ class TradeHTTP(HTTPManager):
         self, *, fee_burn: str, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Toggle BNB Burn On Futures Trade (TRADE).
 
         POST /fapi/v1/feeBurn. Native exchange symbols; decimal amounts are strings.
@@ -4486,7 +4524,6 @@ class TradeHTTP(HTTPManager):
         self, *, quote_id: str, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Accept the offered quote (USER_DATA).
 
         POST /fapi/v1/convert/acceptQuote. Native exchange symbols; decimal amounts are strings.
@@ -4503,7 +4540,6 @@ class TradeHTTP(HTTPManager):
         self, *, order_id: str | None = None, quote_id: str | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Order status (USER_DATA).
 
         GET /fapi/v1/convert/orderStatus. Native exchange symbols; decimal amounts are strings.
@@ -4526,7 +4562,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         Send Quote Request (USER_DATA).
 
         POST /fapi/v1/convert/getQuote. Native exchange symbols; decimal amounts are strings.
@@ -4550,7 +4585,6 @@ class TradeHTTP(HTTPManager):
         self, *, asset: str, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Classic Portfolio Margin Account Information (USER_DATA).
 
         GET /fapi/v1/pmAccountInfo. Native exchange symbols; decimal amounts are strings.
@@ -4563,9 +4597,8 @@ class TradeHTTP(HTTPManager):
             self._params(asset=asset, recvWindow=recv_window),
         )
 
-    def futures_futures_tradfi_perps_contract(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
+    def sign_futures_tradfi_perps_contract(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
-
         Futures TradFi Perps Contract (USER_DATA).
 
         POST /fapi/v1/stock/contract. Native exchange symbols; decimal amounts are strings.
@@ -4576,6 +4609,8 @@ class TradeHTTP(HTTPManager):
         return self._native_private(
             "futures_futures_tradfi_perps_contract", self._params(recvWindow=recv_window)
         )
+
+    futures_futures_tradfi_perps_contract = sign_futures_tradfi_perps_contract
 
     def get_futures_order_modify_history(
         self,
@@ -4589,7 +4624,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         Get Order Modify History (USER_DATA).
 
         GET /fapi/v1/orderAmendment. Native exchange symbols; decimal amounts are strings.
@@ -4621,7 +4655,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         Get Position Margin Change History (TRADE).
 
         GET /fapi/v1/positionMargin/history. Native exchange symbols; decimal amounts are
@@ -4644,7 +4677,6 @@ class TradeHTTP(HTTPManager):
 
     def adjust_margin_cross_margin_max_leverage(self, *, max_leverage: int) -> Any:  # noqa: ANN401
         """
-
         Adjust cross margin max leverage (USER_DATA).
 
         POST /sapi/v1/margin/max-leverage. Native exchange symbols; decimal amounts are strings.
@@ -4658,7 +4690,6 @@ class TradeHTTP(HTTPManager):
 
     def get_margin_bnb_burn_status(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
-
         Get BNB Burn Status (USER_DATA).
 
         GET /sapi/v1/bnbBurn. Native exchange symbols; decimal amounts are strings.
@@ -4678,7 +4709,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         Query Cross Margin Fee Data (USER_DATA).
 
         GET /sapi/v1/margin/crossMarginData. Native exchange symbols; decimal amounts are
@@ -4696,7 +4726,6 @@ class TradeHTTP(HTTPManager):
         self, *, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Query Enabled Isolated Margin Account Limit (USER_DATA).
 
         GET /sapi/v1/margin/isolated/accountLimit. Native exchange symbols; decimal amounts are
@@ -4718,7 +4747,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         Query Isolated Margin Fee Data (USER_DATA).
 
         GET /sapi/v1/margin/isolatedMarginData. Native exchange symbols; decimal amounts are
@@ -4734,7 +4762,6 @@ class TradeHTTP(HTTPManager):
 
     def get_margin_future_hourly_interest_rate(self, *, assets: str, is_isolated: str) -> Any:  # noqa: ANN401
         """
-
         Get future hourly interest rate (USER_DATA).
 
         GET /sapi/v1/margin/next-hourly-interest-rate. Native exchange symbols; decimal amounts
@@ -4758,7 +4785,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         Query Margin Interest Rate History (USER_DATA).
 
         GET /sapi/v1/margin/interestRateHistory. Native exchange symbols; decimal amounts are
@@ -4782,7 +4808,6 @@ class TradeHTTP(HTTPManager):
         self, *, symbol: str, tier: int | None = None, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Query Isolated Margin Tier Data (USER_DATA).
 
         GET /sapi/v1/margin/isolatedMarginTier. Native exchange symbols; decimal amounts are
@@ -4798,7 +4823,6 @@ class TradeHTTP(HTTPManager):
 
     def query_margin_margin_available_inventory(self, *, kind_type: str) -> Any:  # noqa: ANN401
         """
-
         Query Margin Available Inventory (USER_DATA).
 
         GET /sapi/v1/margin/available-inventory. Native exchange symbols; decimal amounts are
@@ -4822,13 +4846,13 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         Create Special Key(Low-Latency Trading) (TRADE).
 
         POST /sapi/v1/margin/apiKey. Native exchange symbols; decimal amounts are strings.
         Timestamps are milliseconds. Source:
         https://developers.binance.com/en/docs/catalog/core-trading-margin-trading/api/rest-api/trade#create-special-key
 
+        Warning: the response contains an API secret. Do not log the response.
         """
         return self._native_private(
             "create_margin_special_key",
@@ -4850,7 +4874,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         Delete Special Key(Low-Latency Trading) (TRADE).
 
         DELETE /sapi/v1/margin/apiKey. Native exchange symbols; decimal amounts are strings.
@@ -4867,7 +4890,6 @@ class TradeHTTP(HTTPManager):
         self, *, ip: str, symbol: str | None = None, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Edit ip for Special Key(Low-Latency Trading) (TRADE).
 
         PUT /sapi/v1/margin/apiKey/ip. Native exchange symbols; decimal amounts are strings.
@@ -4882,7 +4904,6 @@ class TradeHTTP(HTTPManager):
 
     def margin_exit_special_key_mode(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
-
         Exit Special Key Mode (TRADE).
 
         POST /sapi/v1/margin/exit-special-key-mode. Native exchange symbols; decimal amounts are
@@ -4899,7 +4920,6 @@ class TradeHTTP(HTTPManager):
         self, *, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Get Small Liability Exchange Coin List (USER_DATA).
 
         GET /sapi/v1/margin/exchange-small-liability. Native exchange symbols; decimal amounts
@@ -4922,7 +4942,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         Get Small Liability Exchange History (USER_DATA).
 
         GET /sapi/v1/margin/exchange-small-liability-history. Native exchange symbols; decimal
@@ -4946,7 +4965,6 @@ class TradeHTTP(HTTPManager):
         self, *, asset: str, amount: str, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Liquidation Loan Repay (MARGIN).
 
         POST /sapi/v1/margin/liquidation-loan/repay. Native exchange symbols; decimal amounts
@@ -4960,11 +4978,10 @@ class TradeHTTP(HTTPManager):
             self._params(asset=asset, amount=amount, recvWindow=recv_window),
         )
 
-    def margin_margin_manual_liquidation(
+    def liquidate_margin_account(
         self, *, kind_type: str, symbol: str | None = None, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Margin Manual Liquidation (TRADE).
 
         POST /sapi/v1/margin/manual-liquidation. Native exchange symbols; decimal amounts are
@@ -4978,9 +4995,10 @@ class TradeHTTP(HTTPManager):
             self._params(type=kind_type, symbol=symbol, recvWindow=recv_window),
         )
 
+    margin_margin_manual_liquidation = liquidate_margin_account
+
     def query_margin_liquidation_loan(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
-
         Query Liquidation Loan (USER_DATA).
 
         GET /sapi/v1/margin/liquidation-loan. Native exchange symbols; decimal amounts are
@@ -5003,7 +5021,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         Query Liquidation Loan Repay History (USER_DATA).
 
         GET /sapi/v1/margin/liquidation-loan/repay-history. Native exchange symbols; decimal
@@ -5034,7 +5051,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         Query Prevented Matches (USER_DATA).
 
         GET /sapi/v1/margin/myPreventedMatches. Native exchange symbols; decimal amounts are
@@ -5059,7 +5075,6 @@ class TradeHTTP(HTTPManager):
         self, *, symbol: str | None = None, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Query Special key(Low Latency Trading) (TRADE).
 
         GET /sapi/v1/margin/apiKey. Native exchange symbols; decimal amounts are strings.
@@ -5075,7 +5090,6 @@ class TradeHTTP(HTTPManager):
         self, *, symbol: str | None = None, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Query Special key List(Low Latency Trading) (TRADE).
 
         GET /sapi/v1/margin/api-key-list. Native exchange symbols; decimal amounts are strings.
@@ -5091,7 +5105,6 @@ class TradeHTTP(HTTPManager):
         self, *, asset_names: str, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Small Liability Exchange (MARGIN).
 
         POST /sapi/v1/margin/exchange-small-liability. Native exchange symbols; decimal amounts
@@ -5118,7 +5131,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         Get Cross Margin Transfer History (USER_DATA).
 
         GET /sapi/v1/margin/transfer. Native exchange symbols; decimal amounts are strings.
@@ -5142,7 +5154,6 @@ class TradeHTTP(HTTPManager):
 
     def spot_my_filters(self, *, symbol: str, recv_window: str | None = None) -> Any:  # noqa: ANN401
         """
-
         Query relevant filters (USER_DATA).
 
         GET /api/v3/myFilters. Native exchange symbols; decimal amounts are strings.
@@ -5164,7 +5175,6 @@ class TradeHTTP(HTTPManager):
         recv_window: str | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         Query Order Amendments (USER_DATA).
 
         GET /api/v3/order/amendments. Native exchange symbols; decimal amounts are strings.
@@ -5183,12 +5193,13 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
-    def spot_sor_order(
+    def place_spot_sor_order(
         self,
         *,
         symbol: str,
         side: str,
-        kind_type: str,
+        order_type: str | None = None,
+        kind_type: str | None = None,
         quantity: str,
         time_in_force: str | None = None,
         price: str | None = None,
@@ -5201,7 +5212,6 @@ class TradeHTTP(HTTPManager):
         recv_window: str | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         New order using SOR (TRADE).
 
         POST /api/v3/sor/order. Native exchange symbols; decimal amounts are strings.
@@ -5214,7 +5224,7 @@ class TradeHTTP(HTTPManager):
             self._params(
                 symbol=symbol,
                 side=side,
-                type=kind_type,
+                type=self._required_alias(order_type, kind_type, "order_type"),
                 quantity=quantity,
                 timeInForce=time_in_force,
                 price=price,
@@ -5228,12 +5238,15 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
-    def spot_sor_order_test(
+    spot_sor_order = place_spot_sor_order
+
+    def test_spot_sor_order(
         self,
         *,
         symbol: str,
         side: str,
-        kind_type: str,
+        order_type: str | None = None,
+        kind_type: str | None = None,
         quantity: str,
         compute_commission_rates: bool | None = None,
         time_in_force: str | None = None,
@@ -5247,7 +5260,6 @@ class TradeHTTP(HTTPManager):
         recv_window: str | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         Test new order using SOR (TRADE).
 
         POST /api/v3/sor/order/test. Native exchange symbols; decimal amounts are strings.
@@ -5260,7 +5272,7 @@ class TradeHTTP(HTTPManager):
             self._params(
                 symbol=symbol,
                 side=side,
-                type=kind_type,
+                type=self._required_alias(order_type, kind_type, "order_type"),
                 quantity=quantity,
                 computeCommissionRates=compute_commission_rates,
                 timeInForce=time_in_force,
@@ -5275,9 +5287,10 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
+    spot_sor_order_test = test_spot_sor_order
+
     def wallet_account_info(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
-
         Account info (USER_DATA).
 
         GET /sapi/v1/account/info. Native exchange symbols; decimal amounts are strings.
@@ -5297,7 +5310,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         Daily Account Snapshot (USER_DATA).
 
         GET /sapi/v1/accountSnapshot. Native exchange symbols; decimal amounts are strings.
@@ -5320,7 +5332,6 @@ class TradeHTTP(HTTPManager):
         self, *, asset: str | None = None, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Asset Detail (USER_DATA).
 
         GET /sapi/v1/asset/assetDetail. Native exchange symbols; decimal amounts are strings.
@@ -5342,7 +5353,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         Asset Dividend Record (USER_DATA).
 
         GET /sapi/v1/asset/assetDividend. Native exchange symbols; decimal amounts are strings.
@@ -5372,7 +5382,6 @@ class TradeHTTP(HTTPManager):
         dust_quota_asset_to_target_asset_price: str | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         Dust Convert (USER_DATA).
 
         POST /sapi/v1/asset/dust-convert/convert. Native exchange symbols; decimal amounts are
@@ -5401,7 +5410,6 @@ class TradeHTTP(HTTPManager):
         dust_quota_asset_to_target_asset_price: str | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         Dust Convertible Assets (USER_DATA).
 
         POST /sapi/v1/asset/dust-convert/query-convertible-assets. Native exchange symbols;
@@ -5420,10 +5428,13 @@ class TradeHTTP(HTTPManager):
         )
 
     def wallet_dust_transfer(
-        self, *, asset: str, account_type: str | None = None, recv_window: int | None = None
+        self,
+        *,
+        asset: str | list[str],
+        account_type: str | None = None,
+        recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         Dust Transfer (USER_DATA).
 
         POST /sapi/v1/asset/dust. Native exchange symbols; decimal amounts are strings.
@@ -5445,7 +5456,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         DustLog (USER_DATA).
 
         GET /sapi/v1/asset/dribblet. Native exchange symbols; decimal amounts are strings.
@@ -5467,7 +5477,6 @@ class TradeHTTP(HTTPManager):
         self, *, account_type: str | None = None, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Get Assets That Can Be Converted Into BNB (USER_DATA).
 
         POST /sapi/v1/asset/dust-btc. Native exchange symbols; decimal amounts are strings.
@@ -5488,7 +5497,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         Toggle BNB Burn On Spot Trade And Margin Interest (USER_DATA).
 
         POST /sapi/v1/bnbBurn. Native exchange symbols; decimal amounts are strings.
@@ -5507,7 +5515,6 @@ class TradeHTTP(HTTPManager):
         self, *, coin: str, network: str | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Fetch deposit address list with network (USER_DATA).
 
         GET /sapi/v1/capital/deposit/address/list. Native exchange symbols; decimal amounts are
@@ -5530,7 +5537,6 @@ class TradeHTTP(HTTPManager):
         sub_user_id: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         One click arrival deposit apply (for expired address deposit) (USER_DATA).
 
         POST /sapi/v1/capital/deposit/credit-apply. Native exchange symbols; decimal amounts are
@@ -5554,7 +5560,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         Cancel Futures Algo Order (TRADE).
 
         DELETE /sapi/v1/algo/futures/order. Native exchange symbols; decimal amounts are
@@ -5572,7 +5577,6 @@ class TradeHTTP(HTTPManager):
         self, *, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Query Current Futures Algo Open Orders (USER_DATA).
 
         GET /sapi/v1/algo/futures/openOrders. Native exchange symbols; decimal amounts are
@@ -5597,7 +5601,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         Query Historical Futures Algo Orders (USER_DATA).
 
         GET /sapi/v1/algo/futures/historicalOrders. Native exchange symbols; decimal amounts are
@@ -5628,7 +5631,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         Query Futures Sub Orders (USER_DATA).
 
         GET /sapi/v1/algo/futures/subOrders. Native exchange symbols; decimal amounts are
@@ -5656,7 +5658,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         Time-Weighted Futures Average Price (Twap) New Order (TRADE).
 
         POST /sapi/v1/algo/futures/newOrderTwap. Native exchange symbols; decimal amounts are
@@ -5694,7 +5695,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         Volume Participation (VP) New Order (TRADE).
 
         POST /sapi/v1/algo/futures/newOrderVp. Native exchange symbols; decimal amounts are
@@ -5726,7 +5726,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         Cancel Spot Algo Order (TRADE).
 
         DELETE /sapi/v1/algo/spot/order. Native exchange symbols; decimal amounts are strings.
@@ -5743,7 +5742,6 @@ class TradeHTTP(HTTPManager):
         self, *, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Query Current Spot Algo Open Orders (USER_DATA).
 
         GET /sapi/v1/algo/spot/openOrders. Native exchange symbols; decimal amounts are strings.
@@ -5767,7 +5765,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         Query Historical Spot Algo Orders (USER_DATA).
 
         GET /sapi/v1/algo/spot/historicalOrders. Native exchange symbols; decimal amounts are
@@ -5798,7 +5795,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         Query Spot Sub Orders (USER_DATA).
 
         GET /sapi/v1/algo/spot/subOrders. Native exchange symbols; decimal amounts are strings.
@@ -5822,7 +5818,6 @@ class TradeHTTP(HTTPManager):
         limit_price: str | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         Time-Weighted Spot Average Price(Twap) New Order (TRADE).
 
         POST /sapi/v1/algo/spot/newOrderTwap. Native exchange symbols; decimal amounts are
@@ -5847,7 +5842,6 @@ class TradeHTTP(HTTPManager):
         self, *, amount: str, transfer_side: str, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         BNB transfer (USER_DATA).
 
         POST /sapi/v1/portfolio/bnb-transfer. Native exchange symbols; decimal amounts are
@@ -5865,7 +5859,6 @@ class TradeHTTP(HTTPManager):
         self, *, auto_repay: str, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Change Auto-repay-futures Status (TRADE).
 
         POST /sapi/v1/portfolio/repay-futures-switch. Native exchange symbols; decimal amounts
@@ -5881,7 +5874,6 @@ class TradeHTTP(HTTPManager):
 
     def delete_pm_pro_margin_call_level(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
-
         Delete Margin Call Level (USER_DATA).
 
         DELETE /sapi/v1/portfolio/margin-call-level. Native exchange symbols; decimal amounts
@@ -5896,7 +5888,6 @@ class TradeHTTP(HTTPManager):
 
     def pm_pro_fund_auto_collection(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
-
         Fund Auto-collection (USER_DATA).
 
         POST /sapi/v1/portfolio/auto-collection. Native exchange symbols; decimal amounts are
@@ -5911,7 +5902,6 @@ class TradeHTTP(HTTPManager):
 
     def pm_pro_fund_collection_by_asset(self, *, asset: str, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
-
         Fund Collection by Asset (USER_DATA).
 
         POST /sapi/v1/portfolio/asset-collection. Native exchange symbols; decimal amounts are
@@ -5926,7 +5916,6 @@ class TradeHTTP(HTTPManager):
 
     def get_pm_pro_auto_repay_futures_status(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
-
         Get Auto-repay-futures Status (USER_DATA).
 
         GET /sapi/v1/portfolio/repay-futures-switch. Native exchange symbols; decimal amounts
@@ -5941,7 +5930,6 @@ class TradeHTTP(HTTPManager):
 
     def get_pm_pro_delta_mode_status(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
-
         Get Delta Mode Status (USER_DATA).
 
         GET /sapi/v1/portfolio/delta-mode. Native exchange symbols; decimal amounts are strings.
@@ -5955,7 +5943,6 @@ class TradeHTTP(HTTPManager):
 
     def get_pm_pro_margin_call_level(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
-
         Get Margin Call Level (USER_DATA).
 
         GET /sapi/v1/portfolio/margin-call-level. Native exchange symbols; decimal amounts are
@@ -5972,7 +5959,6 @@ class TradeHTTP(HTTPManager):
         self, *, asset: str | None = None, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Get Portfolio Margin Pro Account Balance (USER_DATA).
 
         GET /sapi/v1/portfolio/balance. Native exchange symbols; decimal amounts are strings.
@@ -5989,7 +5975,6 @@ class TradeHTTP(HTTPManager):
         self, *, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Get Portfolio Margin Pro Account Info (USER_DATA).
 
         GET /sapi/v1/portfolio/account. Native exchange symbols; decimal amounts are strings.
@@ -6005,7 +5990,6 @@ class TradeHTTP(HTTPManager):
         self, *, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Get Portfolio Margin Pro SPAN Account Info (USER_DATA).
 
         GET /sapi/v2/portfolio/account. Native exchange symbols; decimal amounts are strings.
@@ -6022,7 +6006,6 @@ class TradeHTTP(HTTPManager):
         self, *, var_from: str | None = None, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Portfolio Margin Pro Bankruptcy Loan Repay (TRADE).
 
         POST /sapi/v1/portfolio/repay. Native exchange symbols; decimal amounts are strings.
@@ -6039,7 +6022,6 @@ class TradeHTTP(HTTPManager):
         self, *, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Query Portfolio Margin Pro Bankruptcy Loan Amount (USER_DATA).
 
         GET /sapi/v1/portfolio/pmLoan. Native exchange symbols; decimal amounts are strings.
@@ -6062,7 +6044,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         Query Portfolio Margin Pro Bankruptcy Loan Repay History (USER_DATA).
 
         GET /sapi/v1/portfolio/pmloan-history. Native exchange symbols; decimal amounts are
@@ -6092,7 +6073,6 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-
         Query Portfolio Margin Pro Negative Balance Interest History (USER_DATA).
 
         GET /sapi/v1/portfolio/interest-history. Native exchange symbols; decimal amounts are
@@ -6116,7 +6096,6 @@ class TradeHTTP(HTTPManager):
         self, *, var_from: str | None = None, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Repay futures Negative Balance (USER_DATA).
 
         POST /sapi/v1/portfolio/repay-futures-negative-balance. Native exchange symbols; decimal
@@ -6134,7 +6113,6 @@ class TradeHTTP(HTTPManager):
         self, *, margin_call_level: str, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Set Margin Call Level (USER_DATA).
 
         POST /sapi/v1/portfolio/margin-call-level. Native exchange symbols; decimal amounts are
@@ -6152,7 +6130,6 @@ class TradeHTTP(HTTPManager):
         self, *, delta_enabled: str, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Switch Delta Mode (TRADE).
 
         POST /sapi/v1/portfolio/delta-mode. Native exchange symbols; decimal amounts are
@@ -6168,7 +6145,6 @@ class TradeHTTP(HTTPManager):
 
     def get_pm_pro_portfolio_margin_asset_leverage(self) -> Any:  # noqa: ANN401
         """
-
         Get Portfolio Margin Asset Leverage (USER_DATA).
 
         GET /sapi/v1/portfolio/margin-asset-leverage. Native exchange symbols; decimal amounts
@@ -6183,7 +6159,6 @@ class TradeHTTP(HTTPManager):
         self, *, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
-
         Portfolio Margin Pro Tiered Collateral Rate (USER_DATA).
 
         GET /sapi/v2/portfolio/collateralRate. Native exchange symbols; decimal amounts are
@@ -7701,4 +7676,450 @@ class TradeHTTP(HTTPManager):
         """Change availability of an existing isolated margin account for a symbol."""
         return self._native_private(
             "disable_isolated_margin_account", self._params(symbol=symbol, recvWindow=recv_window)
+        )
+
+    @staticmethod
+    def _required_alias(value: str | None, legacy: str | None, label: str) -> str:
+        """Resolve a required value while retaining a deprecated keyword alias."""
+        if value is not None and legacy is not None:
+            raise ValueError(f"Use only {label} or its legacy alias")
+        result = value if value is not None else legacy
+        if result is None:
+            raise ValueError(f"{label} is required")
+        return result
+
+    def get_options_cancel_countdown(
+        self, *, underlying: str | None = None, recv_window: int | None = None
+    ) -> Any:  # noqa: ANN401
+        """Get active options automatic-cancellation timers; disabled timers are omitted."""
+        return self._native_private(
+            "get_options_cancel_countdown",
+            self._params(underlying=underlying, recvWindow=recv_window),
+        )
+
+    def set_options_cancel_countdown(
+        self, *, underlying: str, countdown_time: int, recv_window: int | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        Set the options disconnection timer in milliseconds; 0 disables, minimum 5000.
+
+        Send recurring heartbeats before expiry. Expiry cancels all open orders for
+        this underlying and rejects new orders until a heartbeat or timer disable."""
+        return self._native_private(
+            "set_options_cancel_countdown",
+            self._params(
+                underlying=underlying, countdownTime=countdown_time, recvWindow=recv_window
+            ),
+        )
+
+    def send_options_cancel_heartbeat(
+        self, *, underlyings: str | list[str], recv_window: int | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        Refresh the options cancellation timers for comma-separated underlying symbols.
+
+        The response lists only successfully refreshed symbols; inspect every result."""
+        if isinstance(underlyings, list):
+            underlyings = ",".join(underlyings)
+        return self._native_private(
+            "send_options_cancel_heartbeat",
+            self._params(underlyings=underlyings, recvWindow=recv_window),
+        )
+
+    def get_options_mmp_config(self, *, underlying: str, recv_window: int | None = None) -> Any:  # noqa: ANN401
+        """Get market-maker protection settings for the native underlying symbol."""
+        return self._native_private(
+            "get_options_mmp_config",
+            self._params(underlying=underlying, recvWindow=recv_window),
+        )
+
+    def reset_options_mmp(self, *, underlying: str, recv_window: int | None = None) -> Any:  # noqa: ANN401
+        """Reset triggered options market-maker protection and permit new MMP orders."""
+        return self._native_private(
+            "reset_options_mmp", self._params(underlying=underlying, recvWindow=recv_window)
+        )
+
+    def set_options_mmp_config(
+        self,
+        *,
+        underlying: str,
+        window_time: int,
+        frozen_time: int,
+        qty_limit: str,
+        delta_limit: str,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        Set options MMP limits; window_time is 0..5000 milliseconds.
+
+        frozen_time=0 requires a manual reset after MMP triggers. Only MMP orders
+        are cancelled when these limits trigger. Quantity/delta limits are decimals."""
+        return self._native_private(
+            "set_options_mmp_config",
+            self._params(
+                underlying=underlying,
+                windowTimeInMilliseconds=window_time,
+                frozenTimeInMilliseconds=frozen_time,
+                qtyLimit=qty_limit,
+                deltaLimit=delta_limit,
+                recvWindow=recv_window,
+            ),
+        )
+
+    def accept_options_block_order(
+        self,
+        *,
+        block_order_matching_key: str,
+        recv_window: int | None = None,
+    ) -> dict:
+        """
+        POST /eapi/v1/block/order/execute.
+
+        https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-options/api/rest-api/market-maker-block-trade#accept-block-trade-order
+        """
+        return self._native_private(
+            "accept_options_block_order",
+            self._params(
+                blockOrderMatchingKey=block_order_matching_key,
+                recvWindow=recv_window,
+            ),
+        )
+
+    def get_options_account_block_trades(
+        self,
+        *,
+        end_time: int | None = None,
+        start_time: int | None = None,
+        underlying: str | None = None,
+        recv_window: int | None = None,
+    ) -> dict:
+        """
+        GET /eapi/v1/block/user-trades.
+
+        https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-options/api/rest-api/market-maker-block-trade#account-block-trade-list
+        """
+        return self._native_private(
+            "get_options_account_block_trades",
+            self._params(
+                endTime=end_time,
+                startTime=start_time,
+                underlying=underlying,
+                recvWindow=recv_window,
+            ),
+        )
+
+    def cancel_options_block_order(
+        self,
+        *,
+        block_order_matching_key: str,
+        recv_window: int | None = None,
+    ) -> dict:
+        """
+        DELETE /eapi/v1/block/order/create.
+
+        https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-options/api/rest-api/market-maker-block-trade#cancel-block-trade-order
+        """
+        return self._native_private(
+            "cancel_options_block_order",
+            self._params(
+                blockOrderMatchingKey=block_order_matching_key,
+                recvWindow=recv_window,
+            ),
+        )
+
+    def extend_options_block_order(
+        self,
+        *,
+        block_order_matching_key: str,
+        recv_window: int | None = None,
+    ) -> dict:
+        """
+        PUT /eapi/v1/block/order/create.
+
+        https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-options/api/rest-api/market-maker-block-trade#extend-block-trade-order
+        """
+        return self._native_private(
+            "extend_options_block_order",
+            self._params(
+                blockOrderMatchingKey=block_order_matching_key,
+                recvWindow=recv_window,
+            ),
+        )
+
+    def create_options_block_order(
+        self,
+        *,
+        liquidity: str,
+        legs: list[dict[str, Any]],
+        recv_window: int | None = None,
+    ) -> dict:
+        """
+        POST /eapi/v1/block/order/create.
+
+        https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-options/api/rest-api/market-maker-block-trade#new-block-trade-order
+        """
+        return self._native_private(
+            "create_options_block_order",
+            self._params(
+                liquidity=liquidity,
+                legs=dumps(legs, separators=(",", ":"), allow_nan=False),
+                recvWindow=recv_window,
+            ),
+        )
+
+    def get_options_block_order_details(
+        self,
+        *,
+        block_order_matching_key: str,
+        recv_window: int | None = None,
+    ) -> dict:
+        """
+        GET /eapi/v1/block/order/execute.
+
+        https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-options/api/rest-api/market-maker-block-trade#query-block-trade-details
+        """
+        return self._native_private(
+            "get_options_block_order_details",
+            self._params(
+                blockOrderMatchingKey=block_order_matching_key,
+                recvWindow=recv_window,
+            ),
+        )
+
+    def get_options_block_orders(
+        self,
+        *,
+        block_order_matching_key: str | None = None,
+        end_time: int | None = None,
+        start_time: int | None = None,
+        underlying: str | None = None,
+        recv_window: int | None = None,
+    ) -> dict:
+        """
+        GET /eapi/v1/block/order/orders.
+
+        https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-options/api/rest-api/market-maker-block-trade#query-block-trade-order
+        """
+        return self._native_private(
+            "get_options_block_orders",
+            self._params(
+                blockOrderMatchingKey=block_order_matching_key,
+                endTime=end_time,
+                startTime=start_time,
+                underlying=underlying,
+                recvWindow=recv_window,
+            ),
+        )
+
+    def withdraw_managed_sub_account(
+        self,
+        *,
+        from_email: str,
+        asset: str,
+        amount: str,
+        transfer_date: int | None = None,
+        recv_window: int | None = None,
+    ) -> dict:
+        """
+        POST /sapi/v1/managed-subaccount/withdraw.
+
+        API withdrawals have no second confirmation; they execute on submit.
+        transfer_date schedules execution at the specified UTC date.
+
+        https://developers.binance.com/en/docs/catalog/vip-and-institutional-sub-account/api/rest-api/managed-sub-account#withdrawl-assets-from-the-managed-sub-account
+        """
+        return self._native_private(
+            "withdraw_managed_sub_account",
+            self._params(
+                fromEmail=from_email,
+                asset=asset,
+                amount=amount,
+                transferDate=transfer_date,
+                recvWindow=recv_window,
+            ),
+        )
+
+    def disable_fast_withdraw_switch(
+        self,
+        *,
+        recv_window: int | None = None,
+    ) -> dict:
+        """
+        POST /sapi/v1/account/disableFastWithdrawSwitch.
+
+        https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/account#disable-fast-withdraw-switch
+        """
+        return self._native_private(
+            "disable_fast_withdraw_switch",
+            self._params(
+                recvWindow=recv_window,
+            ),
+        )
+
+    def enable_fast_withdraw_switch(
+        self,
+        *,
+        recv_window: int | None = None,
+    ) -> dict:
+        """
+        POST /sapi/v1/account/enableFastWithdrawSwitch.
+
+        https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/account#enable-fast-withdraw-switch
+        """
+        return self._native_private(
+            "enable_fast_withdraw_switch",
+            self._params(
+                recvWindow=recv_window,
+            ),
+        )
+
+    def create_withdrawal(
+        self,
+        *,
+        coin: str,
+        address: str,
+        amount: str,
+        withdraw_order_id: str | None = None,
+        network: str | None = None,
+        address_tag: str | None = None,
+        transaction_fee_flag: bool | None = None,
+        name: str | None = None,
+        wallet_type: int | None = None,
+        recv_window: int | None = None,
+    ) -> dict:
+        """
+        POST /sapi/v1/capital/withdraw/apply.
+
+        API withdrawals have no second confirmation; they execute on submit.
+
+        https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/capital#withdraw
+        """
+        return self._native_private(
+            "create_withdrawal",
+            self._params(
+                coin=coin,
+                address=address,
+                amount=amount,
+                withdrawOrderId=withdraw_order_id,
+                network=network,
+                addressTag=address_tag,
+                transactionFeeFlag=transaction_fee_flag,
+                name=name,
+                walletType=wallet_type,
+                recvWindow=recv_window,
+            ),
+        )
+
+    def create_broker_withdrawal(
+        self,
+        *,
+        address: str,
+        coin: str,
+        amount: str,
+        withdraw_order_id: str,
+        questionnaire: dict[str, Any],
+        originator_pii: dict[str, Any],
+        address_tag: str | None = None,
+        network: str | None = None,
+        address_name: str | None = None,
+        transaction_fee_flag: bool | None = None,
+        wallet_type: int | None = None,
+    ) -> dict:
+        """
+        POST /sapi/v1/localentity/broker/withdraw/apply.
+
+        API withdrawals have no second confirmation; they execute on submit.
+        Pass JSON objects; URL encoding is applied exactly once by the transport.
+
+        https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/travel-rule#broker-withdraw
+        """
+        return self._native_private(
+            "create_broker_withdrawal",
+            self._params(
+                address=address,
+                coin=coin,
+                amount=amount,
+                withdrawOrderId=withdraw_order_id,
+                questionnaire=dumps(questionnaire, separators=(",", ":"), allow_nan=False),
+                originatorPii=dumps(originator_pii, separators=(",", ":"), allow_nan=False),
+                addressTag=address_tag,
+                network=network,
+                addressName=address_name,
+                transactionFeeFlag=transaction_fee_flag,
+                walletType=wallet_type,
+            ),
+        )
+
+    def submit_broker_deposit_questionnaire(
+        self,
+        *,
+        sub_account_id: str,
+        deposit_id: int,
+        questionnaire: dict[str, Any],
+        beneficiary_pii: dict[str, Any],
+        network: str | None = None,
+        coin: str | None = None,
+        amount: str | None = None,
+        address: str | None = None,
+        address_tag: str | None = None,
+    ) -> dict:
+        """
+        PUT /sapi/v1/localentity/broker/deposit/provide-info.
+        Pass JSON objects; URL encoding is applied exactly once by the transport.
+
+        https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/travel-rule#submit-deposit-questionnaire
+        """
+        return self._native_private(
+            "submit_broker_deposit_questionnaire",
+            self._params(
+                subAccountId=sub_account_id,
+                depositId=deposit_id,
+                questionnaire=dumps(questionnaire, separators=(",", ":"), allow_nan=False),
+                beneficiaryPii=dumps(beneficiary_pii, separators=(",", ":"), allow_nan=False),
+                network=network,
+                coin=coin,
+                amount=amount,
+                address=address,
+                addressTag=address_tag,
+            ),
+        )
+
+    def create_travel_rule_withdrawal(
+        self,
+        *,
+        coin: str,
+        address: str,
+        amount: str,
+        questionnaire: dict[str, Any],
+        withdraw_order_id: str | None = None,
+        network: str | None = None,
+        address_tag: str | None = None,
+        transaction_fee_flag: bool | None = None,
+        name: str | None = None,
+        wallet_type: int | None = None,
+        recv_window: int | None = None,
+    ) -> dict:
+        """
+        POST /sapi/v1/localentity/withdraw/apply.
+
+        API withdrawals have no second confirmation; they execute on submit.
+        Pass JSON objects; URL encoding is applied exactly once by the transport.
+
+        https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/travel-rule#withdraw-travel-rule
+        """
+        return self._native_private(
+            "create_travel_rule_withdrawal",
+            self._params(
+                coin=coin,
+                address=address,
+                amount=amount,
+                questionnaire=dumps(questionnaire, separators=(",", ":"), allow_nan=False),
+                withdrawOrderId=withdraw_order_id,
+                network=network,
+                addressTag=address_tag,
+                transactionFeeFlag=transaction_fee_flag,
+                name=name,
+                walletType=wallet_type,
+                recvWindow=recv_window,
+            ),
         )

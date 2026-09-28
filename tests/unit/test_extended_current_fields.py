@@ -186,9 +186,7 @@ def test_extended_rfq_order_uses_the_dedicated_official_route() -> None:
     }
     with _http_server({"status": "OK", "data": {"id": 1}}) as (base_url, received):
         client = _native_client(base_url=base_url, private=True)
-        response = client.private_request_json(
-            "place_rfq_order", [("body", json.dumps(body))]
-        )[2]
+        response = client.private_request_json("place_rfq_order", [("body", json.dumps(body))])[2]
 
     request = received.get_nowait()
     assert request["path"] == "/api/v1/user/order/rfq"

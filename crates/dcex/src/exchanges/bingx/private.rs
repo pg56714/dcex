@@ -10,7 +10,14 @@ impl BingxClient {
         method_name: &str,
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
+        let params = super::super::operation_guards::validate("bingx", method_name, params)?;
         let params = BingxParams::from_pairs(params);
+        if let Some(response) = self.inventory_request(method_name, &params, false).await? {
+            return Ok(response);
+        }
+        if let Some(response) = self.wallet_completion_request(method_name, &params).await? {
+            return Ok(response);
+        }
         if let Some(response) = self.additional_request(method_name, &params, false).await? {
             return Ok(response);
         }

@@ -296,12 +296,11 @@ impl ProductTable {
         if let Some(exchange_symbol) = exchange_symbol {
             if let Some(indexes) =
                 lookup_multi_index(&self.by_exchange_exchange_symbol, exchange, exchange_symbol)
+                && indexes.len() == 1
             {
-                if indexes.len() == 1 {
-                    return row_value(&self.rows[indexes[0]], key)
-                        .map(str::to_string)
-                        .ok_or_else(|| product_table_error(format!("Key not found: {key}")));
-                }
+                return row_value(&self.rows[indexes[0]], key)
+                    .map(str::to_string)
+                    .ok_or_else(|| product_table_error(format!("Key not found: {key}")));
             }
             return self.get(
                 key,

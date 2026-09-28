@@ -487,7 +487,7 @@ const PRIVATE_CASES: &[Case] = &[
     private(
         "set_uta_account_mode",
         Host::Spot,
-        &[("accountType", "UNIFIED")],
+        &[("accountType", "UNIFIED"), ("confirm", "true")],
         "POST /api/ua/v2/account/mode",
     ),
     private(

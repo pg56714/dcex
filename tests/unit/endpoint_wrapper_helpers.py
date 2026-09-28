@@ -767,6 +767,34 @@ def _required_kwargs(case: EndpointCase, method: Any) -> dict[str, Any]:
 
 def _case_kwargs(case: EndpointCase, method: Any) -> dict[str, Any]:
     kwargs = _required_kwargs(case, method)
+    signature = inspect.signature(method)
+    if "confirm" in signature.parameters:
+        kwargs["confirm"] = True
+    if "all_symbols" in signature.parameters and not kwargs.get("product_symbol"):
+        kwargs["all_symbols"] = True
+    if case.exchange == "backpack" and case.method_name == "vault_redeem":
+        kwargs["all"] = True
+    if case.exchange == "bybit" and case.method_name == "modify_api_key":
+        kwargs["read_only"] = 1
+    if case.exchange == "hyperliquid" and case.method_name == "transfer_vault_usd":
+        kwargs["target_vault"] = "0x" + "22" * 20
+    if case.exchange == "binance":
+        if case.method_name in {
+            "cancel_coin_futures_batch_orders",
+            "set_coin_futures_cancel_countdown",
+            "set_coin_futures_leverage",
+            "set_coin_futures_margin_type",
+        }:
+            kwargs["product_symbol"] = "BTCUSD_PERP"
+        if case.method_name == "set_coin_futures_cancel_countdown":
+            kwargs["countdown_time"] = 10000
+        if case.method_name == "set_coin_futures_leverage":
+            kwargs["leverage"] = 2
+        if case.method_name == "set_coin_futures_margin_type":
+            kwargs["margin_type"] = "ISOLATED"
+        if case.method_name in {"place_spot_sor_order", "test_spot_sor_order"}:
+            kwargs["order_type"] = "MARKET"
+
     if case.exchange == "bybit" and case.method_name == "set_auto_add_margin":
         kwargs["enabled"] = True
     if case.exchange == "aster" and case.method_name in {

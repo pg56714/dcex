@@ -1,1 +1,3 @@
-pub use crate::exchanges::kucoin::{KucoinPrivateWebSocket, KucoinPublicWebSocket};
+pub use crate::exchanges::kucoin::{
+    KucoinPrivateWebSocket, KucoinProWebSocket, KucoinPublicWebSocket,
+};

@@ -434,7 +434,25 @@ impl BinanceClient {
             }
             "place_options_batch_orders" => {
                 params.ensure_allowed(&["orders", "recvWindow"])?;
-                params.required("orders")?;
+                let orders: Vec<serde_json::Value> =
+                    serde_json::from_str(params.required("orders")?)
+                        .map_err(|e| DcexError::InvalidInput(e.to_string()))?;
+                if orders.is_empty() {
+                    return Err(DcexError::InvalidInput("orders must not be empty".into()));
+                }
+                for order in orders {
+                    for key in ["quantity", "price"] {
+                        if !order
+                            .get(key)
+                            .and_then(serde_json::Value::as_str)
+                            .is_some_and(crate::common::is_positive_plain_decimal)
+                        {
+                            return Err(DcexError::InvalidInput(format!(
+                                "{key} must be a positive decimal string"
+                            )));
+                        }
+                    }
+                }
                 self.options_signed_request(HttpMethod::Post, OPTIONS_BATCH_ORDERS, params, &[])
                     .await
             }
@@ -606,8 +624,13 @@ impl BinanceClient {
                 *value = value.to_ascii_uppercase();
             }
         }
-        self.request(method, BinanceMarket::Options, path, query, true)
-            .await
+        let mut response = self
+            .request(method, BinanceMarket::Options, path, query, true)
+            .await?;
+        if path == OPTIONS_BATCH_ORDERS {
+            response.data = super::batch::split_batch_results(response.data)?;
+        }
+        Ok(response)
     }
 }
 

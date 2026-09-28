@@ -365,7 +365,7 @@ CASES: dict[str, tuple[dict[str, Any], str, str, str]] = {
         FUTURES,
     ),
     "set_futures_leverage_preference": (
-        {"product_symbol": "BTC-USD-SWAP", "max_leverage": "3"},
+        {"product_symbol": "BTC-USD-SWAP", "margin_mode": "isolated", "max_leverage": "3"},
         "PUT",
         "/derivatives/api/v3/leveragepreferences",
         FUTURES,
@@ -643,6 +643,22 @@ CASES: dict[str, tuple[dict[str, Any], str, str, str]] = {
 }
 
 
+COMPLETION_CASES = json.loads(
+    (ROOT / "tests/fixtures/kraken_completion.json").read_text(encoding="utf-8")
+)
+CASES.update(
+    {
+        c["name"]: (
+            c["kwargs"],
+            c["method"],
+            c["path"],
+            FUTURES if c["auth"] == "futures" else SPOT,
+        )
+        for c in COMPLETION_CASES
+    }
+)
+
+
 def _wrapper_names(mode: str) -> set[str]:
     base = ROOT / "dcex"
     if mode == "async":
@@ -676,6 +692,9 @@ def _route_server() -> Iterator[tuple[str, queue.Queue[dict[str, Any]]]]:
                     "body": body,
                     "api_sign": self.headers.get("API-Sign"),
                     "authent": self.headers.get("Authent"),
+                    "nonce": self.headers.get("Nonce"),
+                    "api_nonce": self.headers.get("API-Nonce"),
+                    "api_otp": self.headers.get("API-OTP"),
                 }
             )
             if self.path.startswith("/0/"):
@@ -725,6 +744,48 @@ def _client_kwargs(base_url: str) -> dict[str, Any]:
 
 def _assert_route(request: dict[str, Any], method_name: str) -> None:
     _kwargs, http_method, path, family = CASES[method_name]
+    completion = next((c for c in COMPLETION_CASES if c["name"] == method_name), None)
+    if completion is not None:
+        import hashlib
+        import hmac
+
+        assert request["method"] == http_method
+        assert urlsplit(request["path"]).path == path
+        if completion["auth"] == "header":
+            assert dict(parse_qsl(urlsplit(request["path"]).query)) == completion["query"]
+            assert (json.loads(request["body"]) if request["body"] else None) == completion["body"]
+            digest = hashlib.sha256((request["api_nonce"] + request["body"]).encode()).digest()
+            expected = base64.b64encode(
+                hmac.new(b"secret", request["path"].encode() + digest, hashlib.sha512).digest()
+            ).decode()
+            assert request["api_sign"] == expected
+            assert request["api_otp"] == "123456"
+            assert not request["authent"]
+        elif completion["auth"] == "spot":
+            sent = json.loads(request["body"])
+            nonce = sent.pop("nonce")
+            assert sent == completion["body"]
+            assert not urlsplit(request["path"]).query
+            digest = hashlib.sha256((str(nonce) + request["body"]).encode()).digest()
+            expected = base64.b64encode(
+                hmac.new(b"secret", path.encode() + digest, hashlib.sha512).digest()
+            ).decode()
+            assert request["api_sign"] == expected
+        else:
+            data = request["body"] if http_method == "POST" else urlsplit(request["path"]).query
+            assert dict(parse_qsl(data)) == completion["query"]
+            if http_method != "POST":
+                assert request["body"] == ""
+            else:
+                assert not urlsplit(request["path"]).query
+            digest = hashlib.sha256(
+                (data + request["nonce"] + path.removeprefix("/derivatives")).encode()
+            ).digest()
+            expected = base64.b64encode(
+                hmac.new(b"secret", digest, hashlib.sha512).digest()
+            ).decode()
+            assert request["authent"] == expected
+        return
     if method_name in RISK_FIELDS:
         sent = parse_qsl(request["body"] or urlsplit(request["path"]).query)
         assert sorted((k, v) for k, v in sent if k != "nonce") == sorted(RISK_FIELDS[method_name])
@@ -761,8 +822,21 @@ def _assert_route(request: dict[str, Any], method_name: str) -> None:
         expected[0]["symbol"] = "PF_XBTUSD"
         assert value == {"batchOrder": expected}
     if family == FUTURES:
+        if http_method in {"GET", "DELETE", "PUT"}:
+            assert request["body"] == "", method_name
+        else:
+            assert urlsplit(request["path"]).query == "", method_name
         if method_name in _PRIVATE_FUTURES:
-            assert request["authent"], method_name
+            import hashlib
+            import hmac
+
+            post_data = urlsplit(request["path"]).query or request["body"]
+            auth_path = path.removeprefix("/derivatives")
+            digest = hashlib.sha256(f"{post_data}{request['nonce']}{auth_path}".encode()).digest()
+            signature = base64.b64encode(
+                hmac.new(b"secret", digest, hashlib.sha512).digest()
+            ).decode()
+            assert request["authent"] == signature, method_name
         else:
             assert request["authent"] is None, method_name
 
@@ -1026,6 +1100,7 @@ RISK_FIELDS.update(
         "get_spot_maintenance_schedule": [],
         "get_futures_self_trade_strategy": [],
         "set_futures_self_trade_strategy": [("strategy", "CANCEL_MAKER_SELF")],
+        "set_futures_leverage_preference": [("symbol", "PF_XBTUSD"), ("maxLeverage", "3")],
         "get_futures_trading_instruments": [
             ("contractType", "futures_inverse"),
             ("contractType", "flexible_futures"),

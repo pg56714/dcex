@@ -2,6 +2,8 @@
 
 from typing import Any
 
+from dcex._keyword_aliases import legacy_keywords
+
 from ..._native_http import request_native_json_async
 from ._http_manager import HTTPManager
 
@@ -74,12 +76,13 @@ class MarketHTTP(HTTPManager):
             ),
         )
 
+    @legacy_keywords({"startTime": "start_time", "endTime": "end_time"})
     async def get_spot_kline(
         self,
         product_symbol: str,
         granularity: str,
-        startTime: int | str | None = None,
-        endTime: int | str | None = None,
+        start_time: int | str | None = None,
+        end_time: int | str | None = None,
         limit: int | None = None,
     ) -> dict[str, Any]:
         """Retrieve Bitget spot candles."""
@@ -88,17 +91,18 @@ class MarketHTTP(HTTPManager):
             self._native_params(
                 product_symbol=product_symbol,
                 granularity=granularity,
-                startTime=startTime,
-                endTime=endTime,
+                startTime=start_time,
+                endTime=end_time,
                 limit=limit,
             ),
         )
 
+    @legacy_keywords({"endTime": "end_time"})
     async def get_spot_history_kline(
         self,
         product_symbol: str,
         granularity: str,
-        endTime: int | str,
+        end_time: int | str,
         limit: int | None = None,
     ) -> dict[str, Any]:
         """Retrieve Bitget historical spot candles."""
@@ -107,7 +111,7 @@ class MarketHTTP(HTTPManager):
             self._native_params(
                 product_symbol=product_symbol,
                 granularity=granularity,
-                endTime=endTime,
+                endTime=end_time,
                 limit=limit,
             ),
         )
@@ -123,13 +127,16 @@ class MarketHTTP(HTTPManager):
             self._native_params(product_symbol=product_symbol, limit=limit),
         )
 
+    @legacy_keywords(
+        {"idLessThan": "id_less_than", "startTime": "start_time", "endTime": "end_time"}
+    )
     async def get_spot_market_trades(
         self,
         product_symbol: str,
         limit: int | None = None,
-        idLessThan: str | None = None,
-        startTime: int | str | None = None,
-        endTime: int | str | None = None,
+        id_less_than: str | None = None,
+        start_time: int | str | None = None,
+        end_time: int | str | None = None,
     ) -> dict[str, Any]:
         """Retrieve Bitget historical spot market trades."""
         return await self._native_public(
@@ -137,51 +144,55 @@ class MarketHTTP(HTTPManager):
             self._native_params(
                 product_symbol=product_symbol,
                 limit=limit,
-                idLessThan=idLessThan,
-                startTime=startTime,
-                endTime=endTime,
+                idLessThan=id_less_than,
+                startTime=start_time,
+                endTime=end_time,
             ),
         )
 
+    @legacy_keywords({"productType": "product_type"})
     async def get_futures_contracts(
         self,
         product_symbol: str | None = None,
-        productType: str = "USDT-FUTURES",
+        product_type: str = "USDT-FUTURES",
     ) -> dict[str, Any]:
         """Retrieve Bitget futures contract metadata."""
         return await self._native_public(
             "get_futures_contracts",
             self._native_params(
                 product_symbol=product_symbol if product_symbol is not None else None,
-                productType=productType,
+                productType=product_type,
             ),
         )
 
+    @legacy_keywords({"productType": "product_type"})
     async def get_futures_ticker(
         self,
         product_symbol: str,
-        productType: str = "USDT-FUTURES",
+        product_type: str = "USDT-FUTURES",
     ) -> dict[str, Any]:
         """Retrieve Bitget futures ticker for one symbol."""
         return await self._native_public(
             "get_futures_ticker",
             self._native_params(
                 product_symbol=product_symbol,
-                productType=productType,
+                productType=product_type,
             ),
         )
 
-    async def get_futures_tickers(self, productType: str = "USDT-FUTURES") -> dict[str, Any]:
+    @legacy_keywords({"productType": "product_type"})
+    async def get_futures_tickers(self, product_type: str = "USDT-FUTURES") -> dict[str, Any]:
         """Retrieve Bitget futures tickers."""
         return await self._native_public(
             "get_futures_tickers",
-            self._native_params(productType=productType),
+            self._native_params(productType=product_type),
         )
 
+    @legacy_keywords({"productType": "product_type"})
     async def get_futures_orderbook(
         self,
         product_symbol: str,
-        productType: str = "USDT-FUTURES",
+        product_type: str = "USDT-FUTURES",
         precision: str = "scale0",
         limit: int | None = None,
     ) -> dict[str, Any]:
@@ -190,20 +201,28 @@ class MarketHTTP(HTTPManager):
             "get_futures_orderbook",
             self._native_params(
                 product_symbol=product_symbol,
-                productType=productType,
+                productType=product_type,
                 precision=precision,
                 limit=limit,
             ),
         )
 
+    @legacy_keywords(
+        {
+            "productType": "product_type",
+            "startTime": "start_time",
+            "endTime": "end_time",
+            "kLineType": "k_line_type",
+        }
+    )
     async def get_futures_kline(
         self,
         product_symbol: str,
         granularity: str,
-        productType: str = "USDT-FUTURES",
-        startTime: int | str | None = None,
-        endTime: int | str | None = None,
-        kLineType: str | None = None,
+        product_type: str = "USDT-FUTURES",
+        start_time: int | str | None = None,
+        end_time: int | str | None = None,
+        k_line_type: str | None = None,
         limit: int | None = None,
     ) -> dict[str, Any]:
         """Retrieve Bitget futures candles."""
@@ -211,22 +230,25 @@ class MarketHTTP(HTTPManager):
             "get_futures_kline",
             self._native_params(
                 product_symbol=product_symbol,
-                productType=productType,
+                productType=product_type,
                 granularity=granularity,
-                startTime=startTime,
-                endTime=endTime,
-                kLineType=kLineType,
+                startTime=start_time,
+                endTime=end_time,
+                kLineType=k_line_type,
                 limit=limit,
             ),
         )
 
+    @legacy_keywords(
+        {"productType": "product_type", "startTime": "start_time", "endTime": "end_time"}
+    )
     async def get_futures_history_kline(
         self,
         product_symbol: str,
         granularity: str,
-        productType: str = "USDT-FUTURES",
-        startTime: int | str | None = None,
-        endTime: int | str | None = None,
+        product_type: str = "USDT-FUTURES",
+        start_time: int | str | None = None,
+        end_time: int | str | None = None,
         limit: int | None = None,
     ) -> dict[str, Any]:
         """Retrieve Bitget historical futures candles."""
@@ -234,18 +256,19 @@ class MarketHTTP(HTTPManager):
             "get_futures_history_kline",
             self._native_params(
                 product_symbol=product_symbol,
-                productType=productType,
+                productType=product_type,
                 granularity=granularity,
-                startTime=startTime,
-                endTime=endTime,
+                startTime=start_time,
+                endTime=end_time,
                 limit=limit,
             ),
         )
 
+    @legacy_keywords({"productType": "product_type"})
     async def get_futures_recent_trades(
         self,
         product_symbol: str,
-        productType: str = "USDT-FUTURES",
+        product_type: str = "USDT-FUTURES",
         limit: int | None = None,
     ) -> dict[str, Any]:
         """Retrieve Bitget recent futures trades."""
@@ -253,54 +276,57 @@ class MarketHTTP(HTTPManager):
             "get_futures_recent_trades",
             self._native_params(
                 product_symbol=product_symbol,
-                productType=productType,
+                productType=product_type,
                 limit=limit,
             ),
         )
 
+    @legacy_keywords({"productType": "product_type"})
     async def get_futures_current_funding_rate(
         self,
         product_symbol: str | None = None,
-        productType: str = "USDT-FUTURES",
+        product_type: str = "USDT-FUTURES",
     ) -> dict[str, Any]:
         """Retrieve Bitget current futures funding rate."""
         return await self._native_public(
             "get_futures_current_funding_rate",
             self._native_params(
                 product_symbol=product_symbol if product_symbol is not None else None,
-                productType=productType,
+                productType=product_type,
             ),
         )
 
+    @legacy_keywords({"productType": "product_type", "pageSize": "page_size", "pageNo": "page_no"})
     async def get_futures_history_funding_rate(
         self,
         product_symbol: str,
-        productType: str = "USDT-FUTURES",
-        pageSize: int | None = None,
-        pageNo: int | None = None,
+        product_type: str = "USDT-FUTURES",
+        page_size: int | None = None,
+        page_no: int | None = None,
     ) -> dict[str, Any]:
         """Retrieve Bitget historical futures funding rates."""
         return await self._native_public(
             "get_futures_history_funding_rate",
             self._native_params(
                 product_symbol=product_symbol,
-                productType=productType,
-                pageSize=pageSize,
-                pageNo=pageNo,
+                productType=product_type,
+                pageSize=page_size,
+                pageNo=page_no,
             ),
         )
 
+    @legacy_keywords({"productType": "product_type"})
     async def get_futures_open_interest(
         self,
         product_symbol: str,
-        productType: str = "USDT-FUTURES",
+        product_type: str = "USDT-FUTURES",
     ) -> dict[str, Any]:
         """Retrieve Bitget futures open interest."""
         return await self._native_public(
             "get_futures_open_interest",
             self._native_params(
                 product_symbol=product_symbol,
-                productType=productType,
+                productType=product_type,
             ),
         )
 
@@ -360,13 +386,14 @@ class MarketHTTP(HTTPManager):
             self._native_params(category=category, product_symbol=product_symbol, limit=limit),
         )
 
+    @legacy_keywords({"startTime": "start_time", "endTime": "end_time"})
     async def get_uta_kline(
         self,
         category: str,
         product_symbol: str,
         interval: str,
-        startTime: int | str | None = None,
-        endTime: int | str | None = None,
+        start_time: int | str | None = None,
+        end_time: int | str | None = None,
         type_: str | None = None,
         limit: int | None = None,
     ) -> dict[str, Any]:
@@ -377,20 +404,21 @@ class MarketHTTP(HTTPManager):
                 category=category,
                 product_symbol=product_symbol,
                 interval=interval,
-                startTime=startTime,
-                endTime=endTime,
+                startTime=start_time,
+                endTime=end_time,
                 type=type_,
                 limit=limit,
             ),
         )
 
+    @legacy_keywords({"startTime": "start_time", "endTime": "end_time"})
     async def get_uta_history_kline(
         self,
         category: str,
         product_symbol: str,
         interval: str,
-        startTime: int | str | None = None,
-        endTime: int | str | None = None,
+        start_time: int | str | None = None,
+        end_time: int | str | None = None,
         type_: str | None = None,
         limit: int | None = None,
     ) -> dict[str, Any]:
@@ -401,8 +429,8 @@ class MarketHTTP(HTTPManager):
                 category=category,
                 product_symbol=product_symbol,
                 interval=interval,
-                startTime=startTime,
-                endTime=endTime,
+                startTime=start_time,
+                endTime=end_time,
                 type=type_,
                 limit=limit,
             ),

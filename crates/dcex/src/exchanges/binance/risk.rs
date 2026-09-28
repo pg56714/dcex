@@ -34,6 +34,13 @@ impl BinanceClient {
         params: &PublicParams,
         public: bool,
     ) -> Result<Option<ValidatedResponse>> {
+        let name = match name {
+            "place_spot_sor_order" => "spot_sor_order",
+            "test_spot_sor_order" => "spot_sor_order_test",
+            "sign_futures_tradfi_perps_contract" => "futures_futures_tradfi_perps_contract",
+            "liquidate_margin_account" => "margin_margin_manual_liquidation",
+            other => other,
+        };
         let Some(endpoint) = ENDPOINTS
             .iter()
             .find(|e| e.name == name && e.public == public)
@@ -41,8 +48,14 @@ impl BinanceClient {
             return Ok(None);
         };
         params.ensure_allowed(endpoint.allowed)?;
-        let keys: std::collections::BTreeSet<_> = params.0.iter().map(|(k, _)| k).collect();
-        if keys.len() != params.0.len() {
+        let singleton_keys: Vec<_> = params
+            .0
+            .iter()
+            .filter(|(k, _)| !(name == "wallet_dust_transfer" && k == "asset"))
+            .map(|(k, _)| k)
+            .collect();
+        let keys: std::collections::BTreeSet<_> = singleton_keys.iter().collect();
+        if keys.len() != singleton_keys.len() {
             return Err(invalid("duplicate parameter"));
         }
         if params.get("product_symbol").is_some() && params.get("symbol").is_some() {
@@ -50,6 +63,14 @@ impl BinanceClient {
         }
         let mut query = Vec::new();
         for field in endpoint.fields {
+            if name == "wallet_dust_transfer" && field.key == "asset" {
+                let assets: Vec<_> = params.0.iter().filter(|(key, _)| key == "asset").collect();
+                if assets.is_empty() || assets.iter().any(|(_, value)| value.trim().is_empty()) {
+                    return Err(invalid("asset must contain at least one nonempty asset"));
+                }
+                query.extend(assets.into_iter().cloned());
+                continue;
+            }
             let canonical = if field.key == "symbol" {
                 params.get("product_symbol")
             } else {
@@ -182,17 +203,49 @@ fn validate(endpoint: &Endpoint, p: &PublicParams) -> Result<()> {
             return Err(invalid(format!("{key} must be positive")));
         }
     }
-    if let Some(value) = p.get("recvWindow") {
-        if !value
+    if let Some(value) = p.get("recvWindow")
+        && (!value
             .parse::<f64>()
             .is_ok_and(|n| n.is_finite() && n > 0.0 && n <= 60_000.0)
             || value
                 .split_once('.')
-                .is_some_and(|(_, fraction)| fraction.len() > 3)
-        {
+                .is_some_and(|(_, fraction)| fraction.len() > 3))
+    {
+        return Err(invalid(
+            "recvWindow must be at most 60000 milliseconds with up to three decimals",
+        ));
+    }
+    if endpoint.name == "set_options_cancel_countdown" {
+        let countdown = p
+            .u64("countdownTime")?
+            .ok_or_else(|| invalid("countdownTime is required"))?;
+        if countdown != 0 && countdown < 5000 {
             return Err(invalid(
-                "recvWindow must be at most 60000 milliseconds with up to three decimals",
+                "countdownTime must be 0 or at least 5000 milliseconds",
             ));
+        }
+    }
+    if endpoint.name == "send_options_cancel_heartbeat" {
+        let value = p.required("underlyings")?;
+        if value.split(',').any(|s| {
+            s.is_empty()
+                || !s
+                    .bytes()
+                    .all(|b| b.is_ascii_uppercase() || b.is_ascii_digit())
+        }) {
+            return Err(invalid(
+                "underlyings must be comma-separated native asset symbols",
+            ));
+        }
+    }
+    if endpoint.name == "set_options_mmp_config" {
+        p.optional_u64_range("windowTimeInMilliseconds", 0, 5000)?;
+        for key in ["qtyLimit", "deltaLimit"] {
+            if !crate::common::is_positive_plain_decimal(p.required(key)?) {
+                return Err(invalid(format!(
+                    "{key} must be a positive plain decimal string"
+                )));
+            }
         }
     }
     let path = endpoint.path;
@@ -222,10 +275,11 @@ fn validate(endpoint: &Endpoint, p: &PublicParams) -> Result<()> {
         {
             return Err(invalid("algoId or clientAlgoId is required"));
         }
-        if let Some(duration) = p.u64("duration")? {
-            if path.contains("/futures/") && !(300..=86_400).contains(&duration) {
-                return Err(invalid("futures TWAP duration must be 300..86400 seconds"));
-            }
+        if let Some(duration) = p.u64("duration")?
+            && path.contains("/futures/")
+            && !(300..=86_400).contains(&duration)
+        {
+            return Err(invalid("futures TWAP duration must be 300..86400 seconds"));
         }
         if p.get("positionSide")
             .is_some_and(|s| matches!(s, "LONG" | "SHORT"))
@@ -325,12 +379,12 @@ fn validate(endpoint: &Endpoint, p: &PublicParams) -> Result<()> {
                 "aggregate trades require fromId or time filters, exclusively",
             ));
         }
-        if let (Some(start), Some(end)) = (p.u64("startTime")?, p.u64("endTime")?) {
-            if end - start >= 3_600_000 {
-                return Err(invalid(
-                    "aggregate trade time range must be less than one hour",
-                ));
-            }
+        if let (Some(start), Some(end)) = (p.u64("startTime")?, p.u64("endTime")?)
+            && end - start >= 3_600_000
+        {
+            return Err(invalid(
+                "aggregate trade time range must be less than one hour",
+            ));
         }
     }
     let max_days = match path {
@@ -345,19 +399,17 @@ fn validate(endpoint: &Endpoint, p: &PublicParams) -> Result<()> {
         _ => None,
     };
     if let (Some(days), Some(start), Some(end)) = (max_days, p.u64("startTime")?, p.u64("endTime")?)
+        && end - start > days * 86_400_000
     {
-        if end - start > days * 86_400_000 {
-            return Err(invalid(
-                "time range exceeds this endpoint's documented limit",
-            ));
-        }
+        return Err(invalid(
+            "time range exceeds this endpoint's documented limit",
+        ));
     }
-    if path == "/sapi/v1/capital/deposit/hisrec" {
-        if let (Some(start), Some(end)) = (p.u64("startTime")?, p.u64("endTime")?) {
-            if end - start >= 90 * 86_400_000 {
-                return Err(invalid("deposit history range must be less than 90 days"));
-            }
-        }
+    if path == "/sapi/v1/capital/deposit/hisrec"
+        && let (Some(start), Some(end)) = (p.u64("startTime")?, p.u64("endTime")?)
+        && end - start >= 90 * 86_400_000
+    {
+        return Err(invalid("deposit history range must be less than 90 days"));
     }
     if path == "/sapi/v1/capital/deposit/address" && p.get("network") == Some("LIGHTNING") {
         p.required("amount")?;

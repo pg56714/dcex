@@ -1,0 +1,506 @@
+{
+  "reviewed": "2026-09-28",
+  "source": "https://docs.backpack.exchange/",
+  "source_sha256": "38b9830ae771aa828a8eee03055d847e11d1f4033f4bc7be316b593bf242a93d",
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/api/v1/account",
+      "official_source": "https://docs.backpack.exchange/#tag/Account/operation/get_account",
+      "operation_id": "get_account"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/account",
+      "official_source": "https://docs.backpack.exchange/#tag/Account/operation/update_account_settings",
+      "operation_id": "update_account_settings"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/account/convertDust",
+      "official_source": "https://docs.backpack.exchange/#tag/Capital/operation/convert_dust",
+      "operation_id": "convert_dust"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/account/limits/borrow",
+      "official_source": "https://docs.backpack.exchange/#tag/Account/operation/get_max_borrow_quantity",
+      "operation_id": "get_max_borrow_quantity"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/account/limits/order",
+      "official_source": "https://docs.backpack.exchange/#tag/Account/operation/get_max_order_quantity",
+      "operation_id": "get_max_order_quantity"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/account/limits/withdrawal",
+      "official_source": "https://docs.backpack.exchange/#tag/Account/operation/get_max_withdrawal_quantity",
+      "operation_id": "get_max_withdrawal_quantity"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets",
+      "official_source": "https://docs.backpack.exchange/#tag/Assets/operation/get_assets",
+      "operation_id": "get_assets"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/collateral",
+      "official_source": "https://docs.backpack.exchange/#tag/Assets/operation/get_collateral_parameters",
+      "operation_id": "get_collateral_parameters"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/borrowLend/positions",
+      "official_source": "https://docs.backpack.exchange/#tag/Borrow-Lend/operation/get_borrow_lend_positions",
+      "operation_id": "get_borrow_lend_positions"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/borrowLend/position/liquidationPrice",
+      "official_source": "https://docs.backpack.exchange/#tag/Borrow-Lend/operation/get_borrow_lend_estimated_liquidation_price",
+      "operation_id": "get_borrow_lend_estimated_liquidation_price"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/borrowLend",
+      "official_source": "https://docs.backpack.exchange/#tag/Borrow-Lend/operation/execute_borrow_lend",
+      "operation_id": "execute_borrow_lend"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/borrowLend/markets",
+      "official_source": "https://docs.backpack.exchange/#tag/Borrow-Lend-Markets/operation/get_borrow_lend_markets",
+      "operation_id": "get_borrow_lend_markets"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/borrowLend/markets/history",
+      "official_source": "https://docs.backpack.exchange/#tag/Borrow-Lend-Markets/operation/get_borrow_lend_markets_history",
+      "operation_id": "get_borrow_lend_markets_history"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/borrowLend/apy",
+      "official_source": "https://docs.backpack.exchange/#tag/Borrow-Lend-Markets/operation/get_apy_rates",
+      "operation_id": "get_apy_rates"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/capital",
+      "official_source": "https://docs.backpack.exchange/#tag/Capital/operation/get_balances",
+      "operation_id": "get_balances"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/capital/collateral",
+      "official_source": "https://docs.backpack.exchange/#tag/Capital/operation/get_collateral",
+      "operation_id": "get_collateral"
+    },
+    {
+      "method": "GET",
+      "path": "/wapi/v1/capital/deposits",
+      "official_source": "https://docs.backpack.exchange/#tag/Capital/operation/get_deposits",
+      "operation_id": "get_deposits"
+    },
+    {
+      "method": "GET",
+      "path": "/wapi/v1/capital/deposit/address",
+      "official_source": "https://docs.backpack.exchange/#tag/Capital/operation/get_deposit_address",
+      "operation_id": "get_deposit_address"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/markets",
+      "official_source": "https://docs.backpack.exchange/#tag/Markets/operation/get_markets",
+      "operation_id": "get_markets"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/market",
+      "official_source": "https://docs.backpack.exchange/#tag/Markets/operation/get_market",
+      "operation_id": "get_market"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/depth",
+      "official_source": "https://docs.backpack.exchange/#tag/Markets/operation/get_depth",
+      "operation_id": "get_depth"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/prediction",
+      "official_source": "https://docs.backpack.exchange/#tag/Markets/operation/get_prediction_events",
+      "operation_id": "get_prediction_events"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/prediction/tags",
+      "official_source": "https://docs.backpack.exchange/#tag/Markets/operation/get_prediction_tags",
+      "operation_id": "get_prediction_tags"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/market-sessions",
+      "official_source": "https://docs.backpack.exchange/#tag/Markets/operation/get_market_sessions",
+      "operation_id": "get_market_sessions"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/market-holidays",
+      "official_source": "https://docs.backpack.exchange/#tag/Markets/operation/get_market_holidays",
+      "operation_id": "get_market_holidays"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/securities",
+      "official_source": "https://docs.backpack.exchange/#tag/Markets/operation/get_securities",
+      "operation_id": "get_securities"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/markPrices",
+      "official_source": "https://docs.backpack.exchange/#tag/Markets/operation/get_mark_prices",
+      "operation_id": "get_mark_prices"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/openInterest",
+      "official_source": "https://docs.backpack.exchange/#tag/Markets/operation/get_open_interest",
+      "operation_id": "get_open_interest"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/fundingRates",
+      "official_source": "https://docs.backpack.exchange/#tag/Markets/operation/get_funding_interval_rates",
+      "operation_id": "get_funding_interval_rates"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/order",
+      "official_source": "https://docs.backpack.exchange/#tag/Order/operation/get_order",
+      "operation_id": "get_order"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/order",
+      "official_source": "https://docs.backpack.exchange/#tag/Order/operation/execute_order",
+      "operation_id": "execute_order"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/order",
+      "official_source": "https://docs.backpack.exchange/#tag/Order/operation/cancel_order",
+      "operation_id": "cancel_order"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/orders",
+      "official_source": "https://docs.backpack.exchange/#tag/Order/operation/execute_order_batch",
+      "operation_id": "execute_order_batch"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/orders",
+      "official_source": "https://docs.backpack.exchange/#tag/Order/operation/get_open_orders",
+      "operation_id": "get_open_orders"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/orders",
+      "official_source": "https://docs.backpack.exchange/#tag/Order/operation/cancel_open_orders",
+      "operation_id": "cancel_open_orders"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/position",
+      "official_source": "https://docs.backpack.exchange/#tag/Position/operation/get_positions",
+      "operation_id": "get_positions"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/rfq/quote",
+      "official_source": "https://docs.backpack.exchange/#tag/RFQ/operation/submit_quote",
+      "operation_id": "submit_quote"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/rfqs",
+      "official_source": "https://docs.backpack.exchange/#tag/RFQ/operation/get_open_rfqs",
+      "operation_id": "get_open_rfqs"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/rfq",
+      "official_source": "https://docs.backpack.exchange/#tag/RFQ/operation/submit_rfq",
+      "operation_id": "submit_rfq"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/rfq/accept",
+      "official_source": "https://docs.backpack.exchange/#tag/RFQ/operation/accept_quote",
+      "operation_id": "accept_quote"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/rfq/refresh",
+      "official_source": "https://docs.backpack.exchange/#tag/RFQ/operation/refresh_rfq",
+      "operation_id": "refresh_rfq"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/rfq/cancel",
+      "official_source": "https://docs.backpack.exchange/#tag/RFQ/operation/cancel_rfq",
+      "operation_id": "cancel_rfq"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/strategy",
+      "official_source": "https://docs.backpack.exchange/#tag/Strategy/operation/get_strategy",
+      "operation_id": "get_strategy"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/strategy",
+      "official_source": "https://docs.backpack.exchange/#tag/Strategy/operation/strategy_create",
+      "operation_id": "strategy_create"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/strategy",
+      "official_source": "https://docs.backpack.exchange/#tag/Strategy/operation/cancel_strategy",
+      "operation_id": "cancel_strategy"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/strategies",
+      "official_source": "https://docs.backpack.exchange/#tag/Strategy/operation/get_open_strategies",
+      "operation_id": "get_open_strategies"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/strategies",
+      "official_source": "https://docs.backpack.exchange/#tag/Strategy/operation/cancel_open_strategies",
+      "operation_id": "cancel_open_strategies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/status",
+      "official_source": "https://docs.backpack.exchange/#tag/System/operation/get_status",
+      "operation_id": "get_status"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/ping",
+      "official_source": "https://docs.backpack.exchange/#tag/System/operation/ping",
+      "operation_id": "ping"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/time",
+      "official_source": "https://docs.backpack.exchange/#tag/System/operation/get_time",
+      "operation_id": "get_time"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/trades",
+      "official_source": "https://docs.backpack.exchange/#tag/Trades/operation/get_recent_trades",
+      "operation_id": "get_recent_trades"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/trades/history",
+      "official_source": "https://docs.backpack.exchange/#tag/Trades/operation/get_historical_trades",
+      "operation_id": "get_historical_trades"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/vaults",
+      "official_source": "https://docs.backpack.exchange/#tag/Vaults/operation/get_vaults",
+      "operation_id": "get_vaults"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/vault/mint",
+      "official_source": "https://docs.backpack.exchange/#tag/Vaults/operation/vault_mint",
+      "operation_id": "vault_mint"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/vault/redeem",
+      "official_source": "https://docs.backpack.exchange/#tag/Vaults/operation/vault_redeem",
+      "operation_id": "vault_redeem"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/vault/redeem",
+      "official_source": "https://docs.backpack.exchange/#tag/Vaults/operation/vault_redeem_cancel",
+      "operation_id": "vault_redeem_cancel"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/vault/redeems/pending",
+      "official_source": "https://docs.backpack.exchange/#tag/Vaults/operation/get_vault_pending_redeems",
+      "operation_id": "get_vault_pending_redeems"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/vault/nav",
+      "official_source": "https://docs.backpack.exchange/#tag/Vaults/operation/get_vault_nav",
+      "operation_id": "get_vault_nav"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/vaults/history",
+      "official_source": "https://docs.backpack.exchange/#tag/Vaults/operation/get_vault_history",
+      "operation_id": "get_vault_history"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/wallets",
+      "official_source": "https://docs.backpack.exchange/#tag/System/operation/get_wallets",
+      "operation_id": "get_wallets"
+    },
+    {
+      "method": "GET",
+      "path": "/wapi/v1/capital/withdrawals",
+      "official_source": "https://docs.backpack.exchange/#tag/Capital/operation/get_withdrawals",
+      "operation_id": "get_withdrawals"
+    },
+    {
+      "method": "POST",
+      "path": "/wapi/v1/capital/withdrawals",
+      "official_source": "https://docs.backpack.exchange/#tag/Capital/operation/request_withdrawal",
+      "operation_id": "request_withdrawal"
+    },
+    {
+      "method": "GET",
+      "path": "/wapi/v1/capital/withdrawals/delay",
+      "official_source": "https://docs.backpack.exchange/#tag/Withdrawal-Delays/operation/get_withdrawal_delay",
+      "operation_id": "get_withdrawal_delay"
+    },
+    {
+      "method": "POST",
+      "path": "/wapi/v1/capital/withdrawals/delay",
+      "official_source": "https://docs.backpack.exchange/#tag/Withdrawal-Delays/operation/create_withdrawal_delay",
+      "operation_id": "create_withdrawal_delay"
+    },
+    {
+      "method": "PATCH",
+      "path": "/wapi/v1/capital/withdrawals/delay",
+      "official_source": "https://docs.backpack.exchange/#tag/Withdrawal-Delays/operation/update_withdrawal_delay",
+      "operation_id": "update_withdrawal_delay"
+    },
+    {
+      "method": "GET",
+      "path": "/wapi/v1/history/borrowLend",
+      "official_source": "https://docs.backpack.exchange/#tag/Borrow-Lend/operation/get_borrow_lend_history",
+      "operation_id": "get_borrow_lend_history"
+    },
+    {
+      "method": "GET",
+      "path": "/wapi/v1/history/interest",
+      "official_source": "https://docs.backpack.exchange/#tag/Borrow-Lend/operation/get_interest_history",
+      "operation_id": "get_interest_history"
+    },
+    {
+      "method": "GET",
+      "path": "/wapi/v1/history/borrowLend/positions",
+      "official_source": "https://docs.backpack.exchange/#tag/Borrow-Lend/operation/get_borrow_lend_position_history",
+      "operation_id": "get_borrow_lend_position_history"
+    },
+    {
+      "method": "GET",
+      "path": "/wapi/v1/history/dust",
+      "official_source": "https://docs.backpack.exchange/#tag/Capital/operation/get_dust_history",
+      "operation_id": "get_dust_history"
+    },
+    {
+      "method": "GET",
+      "path": "/wapi/v1/history/fills",
+      "official_source": "https://docs.backpack.exchange/#tag/Order/operation/get_fills",
+      "operation_id": "get_fills"
+    },
+    {
+      "method": "GET",
+      "path": "/wapi/v1/history/funding",
+      "official_source": "https://docs.backpack.exchange/#tag/Position/operation/get_funding_payments",
+      "operation_id": "get_funding_payments"
+    },
+    {
+      "method": "GET",
+      "path": "/wapi/v1/history/orders",
+      "official_source": "https://docs.backpack.exchange/#tag/Order/operation/get_order_history",
+      "operation_id": "get_order_history"
+    },
+    {
+      "method": "GET",
+      "path": "/wapi/v1/history/rfq",
+      "official_source": "https://docs.backpack.exchange/#tag/RFQ/operation/get_rfq_history",
+      "operation_id": "get_rfq_history"
+    },
+    {
+      "method": "GET",
+      "path": "/wapi/v1/history/quote",
+      "official_source": "https://docs.backpack.exchange/#tag/RFQ/operation/get_quote_history",
+      "operation_id": "get_quote_history"
+    },
+    {
+      "method": "GET",
+      "path": "/wapi/v1/history/rfq/fill",
+      "official_source": "https://docs.backpack.exchange/#tag/RFQ/operation/get_rfq_fill_history",
+      "operation_id": "get_rfq_fill_history"
+    },
+    {
+      "method": "GET",
+      "path": "/wapi/v1/history/quote/fill",
+      "official_source": "https://docs.backpack.exchange/#tag/RFQ/operation/get_quote_fill_history",
+      "operation_id": "get_quote_fill_history"
+    },
+    {
+      "method": "GET",
+      "path": "/wapi/v1/history/settlement",
+      "official_source": "https://docs.backpack.exchange/#tag/Capital/operation/get_settlement_history",
+      "operation_id": "get_settlement_history"
+    },
+    {
+      "method": "GET",
+      "path": "/wapi/v1/history/strategies",
+      "official_source": "https://docs.backpack.exchange/#tag/Strategy/operation/get_strategies_history",
+      "operation_id": "get_strategies_history"
+    },
+    {
+      "method": "GET",
+      "path": "/wapi/v1/history/position",
+      "official_source": "https://docs.backpack.exchange/#tag/Position/operation/get_position_history",
+      "operation_id": "get_position_history"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/klines",
+      "official_source": "https://docs.backpack.exchange/#tag/Markets/operation/get_klines",
+      "operation_id": "get_klines"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/ticker",
+      "official_source": "https://docs.backpack.exchange/#tag/Markets/operation/get_ticker",
+      "operation_id": "get_ticker"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickers",
+      "official_source": "https://docs.backpack.exchange/#tag/Markets/operation/get_tickers",
+      "operation_id": "get_tickers"
+    },
+    {
+      "method": "WS",
+      "path": "/",
+      "channel": "Streams",
+      "title": "Streams",
+      "official_source": "https://docs.backpack.exchange/#tag/Streams"
+    }
+  ]
+}

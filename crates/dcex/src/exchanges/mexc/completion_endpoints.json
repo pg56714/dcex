@@ -1,0 +1,776 @@
+[
+  {
+    "name": "create_contract_stp_group",
+    "method": "POST",
+    "path": "/api/v1/private/market_maker/self_trade/blacklist/create",
+    "fields": [
+      {
+        "name": "configName",
+        "python_name": "config_name",
+        "type": "string",
+        "required": true,
+        "description": "Blacklist group id"
+      },
+      {
+        "name": "blacklist",
+        "python_name": "blacklist",
+        "type": "number[]",
+        "required": true,
+        "description": "List of sub-account UIDs. At least two UIDs must be provided"
+      }
+    ],
+    "title": "Create STP Group Only supported for market maker accounts",
+    "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/create-stp-group"
+  },
+  {
+    "name": "delete_contract_stp_group",
+    "method": "POST",
+    "path": "/api/v1/private/market_maker/self_trade/blacklist/delete",
+    "fields": [
+      {
+        "name": "configName",
+        "python_name": "config_name",
+        "type": "string",
+        "required": true,
+        "description": "Blacklist group id"
+      }
+    ],
+    "title": "Delete STP Group Only supported for market maker accounts",
+    "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/delete-stp-group"
+  },
+  {
+    "name": "get_current_contract_stp_group",
+    "method": "GET",
+    "path": "/api/v1/private/market_maker/self_trade/blacklist/search",
+    "fields": [],
+    "title": "Get Current User STP Group Only supported for market maker accounts",
+    "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/get-current-user-stp-group"
+  },
+  {
+    "name": "get_contract_stp_groups",
+    "method": "GET",
+    "path": "/api/v1/private/market_maker/self_trade/blacklist",
+    "fields": [
+      {
+        "name": "configName",
+        "python_name": "config_name",
+        "type": "string",
+        "required": false,
+        "description": "Blacklist group id"
+      }
+    ],
+    "title": "Query STP Groups and Group Members Only supported for market maker accounts",
+    "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/query-stp-groups-and-group-members"
+  },
+  {
+    "name": "update_contract_stp_group",
+    "method": "POST",
+    "path": "/api/v1/private/market_maker/self_trade/blacklist/update",
+    "fields": [
+      {
+        "name": "configName",
+        "python_name": "config_name",
+        "type": "string",
+        "required": true,
+        "description": "Blacklist group id"
+      },
+      {
+        "name": "blacklist",
+        "python_name": "blacklist",
+        "type": "number[]",
+        "required": true,
+        "description": "Sub-account UID list"
+      }
+    ],
+    "title": "Update STP Group Only supported for market maker accounts",
+    "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/update-stp-group"
+  },
+  {
+    "name": "get_rebate_affiliate_campaign",
+    "method": "GET",
+    "path": "/api/v3/rebate/affiliate/campaign",
+    "fields": [
+      {
+        "name": "startTime",
+        "python_name": "start_time",
+        "type": "long",
+        "required": false,
+        "description": "Start time, Unix millisecond timestamp"
+      },
+      {
+        "name": "endTime",
+        "python_name": "end_time",
+        "type": "long",
+        "required": false,
+        "description": "End time, Unix millisecond timestamp"
+      },
+      {
+        "name": "page",
+        "python_name": "page",
+        "type": "int",
+        "required": false,
+        "description": "page"
+      },
+      {
+        "name": "pageSize",
+        "python_name": "page_size",
+        "type": "int",
+        "required": false,
+        "description": "pageSize,default: 10"
+      },
+      {
+        "name": "recvWindow",
+        "python_name": "recv_window",
+        "type": "long",
+        "required": false,
+        "description": "Signature validity window in milliseconds, up to 60000."
+      }
+    ],
+    "title": "Get Affiliate Campaign Data (affiliate only)",
+    "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-affiliate-campaign-data-affiliate-only"
+  },
+  {
+    "name": "get_rebate_affiliate_commission_detail",
+    "method": "GET",
+    "path": "/api/v3/rebate/affiliate/commission/detail",
+    "fields": [
+      {
+        "name": "startTime",
+        "python_name": "start_time",
+        "type": "long",
+        "required": false,
+        "description": "Start time, Unix millisecond timestamp"
+      },
+      {
+        "name": "endTime",
+        "python_name": "end_time",
+        "type": "long",
+        "required": false,
+        "description": "End time, Unix millisecond timestamp"
+      },
+      {
+        "name": "uid",
+        "python_name": "uid",
+        "type": "string",
+        "required": false,
+        "description": "UID"
+      },
+      {
+        "name": "inviteCode",
+        "python_name": "invite_code",
+        "type": "string",
+        "required": false,
+        "description": "inviteCode"
+      },
+      {
+        "name": "page",
+        "python_name": "page",
+        "type": "int",
+        "required": false,
+        "description": "page"
+      },
+      {
+        "name": "pageSize",
+        "python_name": "page_size",
+        "type": "int",
+        "required": false,
+        "description": "pageSize,default: 10"
+      },
+      {
+        "name": "type",
+        "python_name": "type_",
+        "type": "int",
+        "required": false,
+        "description": "commission type,1:spot,2:futures,3:ETF"
+      },
+      {
+        "name": "recvWindow",
+        "python_name": "recv_window",
+        "type": "long",
+        "required": false,
+        "description": "Signature validity window in milliseconds, up to 60000."
+      }
+    ],
+    "title": "Get Affiliate Commission Detail Record (affiliate only)",
+    "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-affiliate-commission-detail-record-affiliate-only"
+  },
+  {
+    "name": "get_rebate_affiliate_commission",
+    "method": "GET",
+    "path": "/api/v3/rebate/affiliate/commission",
+    "fields": [
+      {
+        "name": "startTime",
+        "python_name": "start_time",
+        "type": "long",
+        "required": true,
+        "description": "Start time, Unix millisecond timestamp"
+      },
+      {
+        "name": "endTime",
+        "python_name": "end_time",
+        "type": "long",
+        "required": true,
+        "description": "End time, Unix millisecond timestamp"
+      },
+      {
+        "name": "uid",
+        "python_name": "uid",
+        "type": "string",
+        "required": false,
+        "description": "UID"
+      },
+      {
+        "name": "inviteCode",
+        "python_name": "invite_code",
+        "type": "string",
+        "required": false,
+        "description": "invite Code"
+      },
+      {
+        "name": "page",
+        "python_name": "page",
+        "type": "int",
+        "required": false,
+        "description": "page"
+      },
+      {
+        "name": "pageSize",
+        "python_name": "page_size",
+        "type": "int",
+        "required": false,
+        "description": "pageSize，default:10"
+      },
+      {
+        "name": "recvWindow",
+        "python_name": "recv_window",
+        "type": "long",
+        "required": false,
+        "description": "Signature validity window in milliseconds, up to 60000."
+      }
+    ],
+    "title": "Get Affiliate Commission Record (affiliate only)",
+    "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-affiliate-commission-record-affiliate-only"
+  },
+  {
+    "name": "get_rebate_affiliate_referral",
+    "method": "GET",
+    "path": "/api/v3/rebate/affiliate/referral",
+    "fields": [
+      {
+        "name": "startTime",
+        "python_name": "start_time",
+        "type": "long",
+        "required": false,
+        "description": "Start time, Unix millisecond timestamp"
+      },
+      {
+        "name": "endTime",
+        "python_name": "end_time",
+        "type": "long",
+        "required": false,
+        "description": "End time, Unix millisecond timestamp"
+      },
+      {
+        "name": "uid",
+        "python_name": "uid",
+        "type": "string",
+        "required": false,
+        "description": "uid"
+      },
+      {
+        "name": "inviteCode",
+        "python_name": "invite_code",
+        "type": "string",
+        "required": false,
+        "description": "invite code"
+      },
+      {
+        "name": "page",
+        "python_name": "page",
+        "type": "int",
+        "required": false,
+        "description": "page"
+      },
+      {
+        "name": "pageSize",
+        "python_name": "page_size",
+        "type": "int",
+        "required": false,
+        "description": "pageSize,default: 10"
+      },
+      {
+        "name": "recvWindow",
+        "python_name": "recv_window",
+        "type": "long",
+        "required": false,
+        "description": "Signature validity window in milliseconds, up to 60000."
+      }
+    ],
+    "title": "Get Affiliate Referral Data（affiliate only）",
+    "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-affiliate-referral-dataaffiliate-only"
+  },
+  {
+    "name": "get_rebate_affiliate_withdraw",
+    "method": "GET",
+    "path": "/api/v3/rebate/affiliate/withdraw",
+    "fields": [
+      {
+        "name": "startTime",
+        "python_name": "start_time",
+        "type": "long",
+        "required": false,
+        "description": "Start time, Unix millisecond timestamp"
+      },
+      {
+        "name": "endTime",
+        "python_name": "end_time",
+        "type": "long",
+        "required": false,
+        "description": "End time, Unix millisecond timestamp"
+      },
+      {
+        "name": "page",
+        "python_name": "page",
+        "type": "int",
+        "required": false,
+        "description": "page"
+      },
+      {
+        "name": "pageSize",
+        "python_name": "page_size",
+        "type": "int",
+        "required": false,
+        "description": "pageSize,default: 10"
+      },
+      {
+        "name": "recvWindow",
+        "python_name": "recv_window",
+        "type": "long",
+        "required": false,
+        "description": "Signature validity window in milliseconds, up to 60000."
+      }
+    ],
+    "title": "Get Affiliate Withdraw Record (affiliate only)",
+    "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-affiliate-withdraw-record-affiliate-only"
+  },
+  {
+    "name": "get_rebate_affiliate_list",
+    "method": "GET",
+    "path": "/api/v3/rebate/affiliate/list",
+    "fields": [
+      {
+        "name": "memberInfo",
+        "python_name": "member_info",
+        "type": "string",
+        "required": true,
+        "description": "memberInfo"
+      },
+      {
+        "name": "recvWindow",
+        "python_name": "recv_window",
+        "type": "long",
+        "required": false,
+        "description": "Signature validity window in milliseconds, up to 60000."
+      }
+    ],
+    "title": "Get Direct Sub-affiliate Data",
+    "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-direct-subaffiliate-data-affiliate-only"
+  },
+  {
+    "name": "get_rebate_tax_query",
+    "method": "GET",
+    "path": "/api/v3/rebate/taxQuery",
+    "fields": [
+      {
+        "name": "startTime",
+        "python_name": "start_time",
+        "type": "long",
+        "required": false,
+        "description": "Start time, Unix millisecond timestamp"
+      },
+      {
+        "name": "endTime",
+        "python_name": "end_time",
+        "type": "long",
+        "required": false,
+        "description": "End time, Unix millisecond timestamp"
+      },
+      {
+        "name": "page",
+        "python_name": "page",
+        "type": "int",
+        "required": false,
+        "description": "default 1"
+      },
+      {
+        "name": "recvWindow",
+        "python_name": "recv_window",
+        "type": "long",
+        "required": false,
+        "description": ""
+      }
+    ],
+    "title": "Get Rebate History Records",
+    "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-rebate-history-records"
+  },
+  {
+    "name": "get_rebate_detail",
+    "method": "GET",
+    "path": "/api/v3/rebate/detail",
+    "fields": [
+      {
+        "name": "startTime",
+        "python_name": "start_time",
+        "type": "long",
+        "required": false,
+        "description": "Start time, Unix millisecond timestamp"
+      },
+      {
+        "name": "endTime",
+        "python_name": "end_time",
+        "type": "long",
+        "required": false,
+        "description": "End time, Unix millisecond timestamp"
+      },
+      {
+        "name": "page",
+        "python_name": "page",
+        "type": "int",
+        "required": false,
+        "description": "default 1"
+      },
+      {
+        "name": "recvWindow",
+        "python_name": "recv_window",
+        "type": "long",
+        "required": false,
+        "description": ""
+      }
+    ],
+    "title": "Get Rebate Records Detail",
+    "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-rebate-records-detail"
+  },
+  {
+    "name": "get_rebate_detail_kickback",
+    "method": "GET",
+    "path": "/api/v3/rebate/detail/kickback",
+    "fields": [
+      {
+        "name": "startTime",
+        "python_name": "start_time",
+        "type": "long",
+        "required": false,
+        "description": "Start time, Unix millisecond timestamp"
+      },
+      {
+        "name": "endTime",
+        "python_name": "end_time",
+        "type": "long",
+        "required": false,
+        "description": "End time, Unix millisecond timestamp"
+      },
+      {
+        "name": "page",
+        "python_name": "page",
+        "type": "int",
+        "required": false,
+        "description": "default 1"
+      },
+      {
+        "name": "recvWindow",
+        "python_name": "recv_window",
+        "type": "long",
+        "required": false,
+        "description": ""
+      }
+    ],
+    "title": "Get Self Rebate Records Detail",
+    "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-self-rebate-records-detail"
+  },
+  {
+    "name": "get_rebate_affiliate_subaffiliates",
+    "method": "GET",
+    "path": "/api/v3/rebate/affiliate/subaffiliates",
+    "fields": [
+      {
+        "name": "startTime",
+        "python_name": "start_time",
+        "type": "long",
+        "required": false,
+        "description": "Start time, Unix millisecond timestamp"
+      },
+      {
+        "name": "endTime",
+        "python_name": "end_time",
+        "type": "long",
+        "required": false,
+        "description": "End time, Unix millisecond timestamp"
+      },
+      {
+        "name": "uid",
+        "python_name": "uid",
+        "type": "string",
+        "required": false,
+        "description": "UID"
+      },
+      {
+        "name": "inviteCode",
+        "python_name": "invite_code",
+        "type": "string",
+        "required": false,
+        "description": "inviteCode"
+      },
+      {
+        "name": "page",
+        "python_name": "page",
+        "type": "int",
+        "required": false,
+        "description": "page"
+      },
+      {
+        "name": "pageSize",
+        "python_name": "page_size",
+        "type": "int",
+        "required": false,
+        "description": "pageSize,default: 10"
+      },
+      {
+        "name": "recvWindow",
+        "python_name": "recv_window",
+        "type": "long",
+        "required": false,
+        "description": "Signature validity window in milliseconds, up to 60000."
+      }
+    ],
+    "title": "Get Subaffiliates Data (affiliate only)",
+    "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-subaffiliates-data-affiliate-only"
+  },
+  {
+    "name": "get_rebate_refer_code",
+    "method": "GET",
+    "path": "/api/v3/rebate/referCode",
+    "fields": [
+      {
+        "name": "recvWindow",
+        "python_name": "recv_window",
+        "type": "long",
+        "required": false,
+        "description": ""
+      }
+    ],
+    "title": "Query ReferCode",
+    "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/query-refercode"
+  },
+  {
+    "name": "cancel_spot_withdrawal",
+    "method": "DELETE",
+    "path": "/api/v3/capital/withdraw",
+    "fields": [
+      {
+        "name": "id",
+        "python_name": "id",
+        "type": "string",
+        "required": true,
+        "description": "withdraw id"
+      },
+      {
+        "name": "recvWindow",
+        "python_name": "recv_window",
+        "type": "long",
+        "required": false,
+        "description": "Signature validity window in milliseconds, up to 60000."
+      }
+    ],
+    "title": "Cancel withdraw",
+    "official_source": "https://www.mexc.com/api-docs/spot-v3/wallet-endpoints/cancel-withdraw"
+  },
+  {
+    "name": "transfer_spot_internal",
+    "method": "POST",
+    "path": "/api/v3/capital/transfer/internal",
+    "fields": [
+      {
+        "name": "toAccountType",
+        "python_name": "to_account_type",
+        "type": "string",
+        "required": true,
+        "description": "toAccountTyp:EMAIL/UID/MOBILE"
+      },
+      {
+        "name": "toAccount",
+        "python_name": "to_account",
+        "type": "string",
+        "required": true,
+        "description": "toAccount:EMAIL/UID/MOBILE"
+      },
+      {
+        "name": "areaCode",
+        "python_name": "area_code",
+        "type": "string",
+        "required": false,
+        "description": "areaCode of mobile"
+      },
+      {
+        "name": "asset",
+        "python_name": "asset",
+        "type": "string",
+        "required": true,
+        "description": "asset"
+      },
+      {
+        "name": "amount",
+        "python_name": "amount",
+        "type": "string",
+        "required": true,
+        "description": "amount"
+      },
+      {
+        "name": "recvWindow",
+        "python_name": "recv_window",
+        "type": "long",
+        "required": false,
+        "description": "Signature validity window in milliseconds, up to 60000."
+      }
+    ],
+    "title": "Internal Transfer",
+    "official_source": "https://www.mexc.com/api-docs/spot-v3/wallet-endpoints/internal-transfer"
+  },
+  {
+    "name": "create_spot_withdrawal",
+    "method": "POST",
+    "path": "/api/v3/capital/withdraw",
+    "fields": [
+      {
+        "name": "coin",
+        "python_name": "coin",
+        "type": "string",
+        "required": true,
+        "description": "coin"
+      },
+      {
+        "name": "withdrawOrderId",
+        "python_name": "withdraw_order_id",
+        "type": "string",
+        "required": false,
+        "description": "withdrawOrderId"
+      },
+      {
+        "name": "netWork",
+        "python_name": "network",
+        "type": "string",
+        "required": false,
+        "description": "withdraw network"
+      },
+      {
+        "name": "contractAddress",
+        "python_name": "contract_address",
+        "type": "string",
+        "required": false,
+        "description": "coin contract address"
+      },
+      {
+        "name": "address",
+        "python_name": "address",
+        "type": "string",
+        "required": true,
+        "description": "withdraw address"
+      },
+      {
+        "name": "memo",
+        "python_name": "memo",
+        "type": "string",
+        "required": false,
+        "description": "memo(If memo is required in the address, it must be passed in)"
+      },
+      {
+        "name": "amount",
+        "python_name": "amount",
+        "type": "string",
+        "required": true,
+        "description": "withdraw amount"
+      },
+      {
+        "name": "remark",
+        "python_name": "remark",
+        "type": "string",
+        "required": false,
+        "description": "remark"
+      },
+      {
+        "name": "recvWindow",
+        "python_name": "recv_window",
+        "type": "long",
+        "required": false,
+        "description": "Signature validity window in milliseconds, up to 60000."
+      }
+    ],
+    "title": "Withdraw(new)",
+    "official_source": "https://www.mexc.com/api-docs/spot-v3/wallet-endpoints/withdrawnew"
+  },
+  {
+    "name": "create_spot_withdrawal_legacy",
+    "method": "POST",
+    "path": "/api/v3/capital/withdraw/apply",
+    "fields": [
+      {
+        "name": "coin",
+        "python_name": "coin",
+        "type": "string",
+        "required": true,
+        "description": "coin"
+      },
+      {
+        "name": "withdrawOrderId",
+        "python_name": "withdraw_order_id",
+        "type": "string",
+        "required": false,
+        "description": "withdrawOrderId"
+      },
+      {
+        "name": "network",
+        "python_name": "network",
+        "type": "string",
+        "required": false,
+        "description": "withdraw network"
+      },
+      {
+        "name": "address",
+        "python_name": "address",
+        "type": "string",
+        "required": true,
+        "description": "withdraw address"
+      },
+      {
+        "name": "memo",
+        "python_name": "memo",
+        "type": "string",
+        "required": false,
+        "description": "memo(If memo is required in the address, it must be passed in)"
+      },
+      {
+        "name": "amount",
+        "python_name": "amount",
+        "type": "string",
+        "required": true,
+        "description": "withdraw amount"
+      },
+      {
+        "name": "remark",
+        "python_name": "remark",
+        "type": "string",
+        "required": false,
+        "description": "remark"
+      },
+      {
+        "name": "recvWindow",
+        "python_name": "recv_window",
+        "type": "long",
+        "required": false,
+        "description": "Signature validity window in milliseconds, up to 60000."
+      }
+    ],
+    "title": "Withdraw(previous,offline soon)",
+    "official_source": "https://www.mexc.com/api-docs/spot-v3/wallet-endpoints/withdrawpreviousoffline-soon"
+  }
+]

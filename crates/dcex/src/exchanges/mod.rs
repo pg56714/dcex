@@ -1604,7 +1604,7 @@ macro_rules! impl_exchange_method_wrappers {
     (
         $client:ty;
         public [$($public_method:ident($($public_param:ident => $public_key:literal),*)),* $(,)?];
-        private [$($private_method:ident($($private_param:ident => $private_key:literal),*)),* $(,)?] $(;)?
+        private [$($(#[$private_meta:meta])* $private_method:ident($($private_param:ident => $private_key:literal),*)),* $(,)?] $(;)?
     ) => {
         impl crate::exchanges::ExchangeMethodRequestClient for $client {
             fn public_request_boxed<'a>(
@@ -1626,13 +1626,13 @@ macro_rules! impl_exchange_method_wrappers {
 
         crate::exchanges::impl_exchange_method_wrappers! {@extend; $client;
             public [$($public_method($($public_param => $public_key),*)),*];
-            private [$($private_method($($private_param => $private_key),*)),*];
+            private [$($(#[$private_meta])* $private_method($($private_param => $private_key),*)),*];
         }
     };
     (@extend;
         $client:ty;
         public [$($public_method:ident($($public_param:ident => $public_key:literal),*)),* $(,)?];
-        private [$($private_method:ident($($private_param:ident => $private_key:literal),*)),* $(,)?] $(;)?
+        private [$($(#[$private_meta:meta])* $private_method:ident($($private_param:ident => $private_key:literal),*)),* $(,)?] $(;)?
     ) => {
         impl $client {
             $(
@@ -1651,6 +1651,7 @@ macro_rules! impl_exchange_method_wrappers {
             )*
 
             $(
+                $(#[$private_meta])*
                 #[allow(clippy::too_many_arguments)]
                 pub fn $private_method(
                     &self
@@ -1834,3 +1835,5 @@ pub mod lighter;
 pub mod mexc;
 pub mod okx;
 pub mod ondo;
+
+mod operation_guards;

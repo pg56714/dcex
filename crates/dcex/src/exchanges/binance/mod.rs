@@ -6,6 +6,8 @@ mod convert;
 mod earn;
 mod endpoints;
 mod equity;
+mod inventory_completion;
+mod inventory_wrappers;
 mod loan;
 mod margin;
 mod market;
@@ -58,3 +60,6 @@ mod order_lists;
 mod risk;
 mod risk_endpoints;
 mod risk_wrappers;
+
+mod completion;
+mod completion_wrappers;

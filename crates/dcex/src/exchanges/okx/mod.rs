@@ -2,6 +2,7 @@ mod account;
 mod algo;
 mod asset;
 mod client;
+mod completion_wrappers;
 mod endpoints;
 mod finance;
 mod market;

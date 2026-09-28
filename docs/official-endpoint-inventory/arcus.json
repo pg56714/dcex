@@ -1,0 +1,640 @@
+{
+  "source": "https://docs.arcus.xyz/llms.txt",
+  "endpoints": [
+    {
+      "method": "POST",
+      "path": "/v1/adjustIsolatedMargin",
+      "official_source": "https://docs.arcus.xyz/api-reference/exchange/add-or-remove-margin-on-an-isolated-mode-position",
+      "title": "Add or remove margin on an isolated-mode position"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/batchCancelOrders",
+      "official_source": "https://docs.arcus.xyz/api-reference/exchange/batch-cancel-orders",
+      "title": "Batch cancel orders"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/batchModifyOrders",
+      "official_source": "https://docs.arcus.xyz/api-reference/exchange/batch-modify-orders",
+      "title": "Batch modify orders"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/cancelAllOrders",
+      "official_source": "https://docs.arcus.xyz/api-reference/exchange/cancel-all-open-orders",
+      "title": "Cancel all open orders"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/cancelOrder",
+      "official_source": "https://docs.arcus.xyz/api-reference/exchange/cancel-order",
+      "title": "Cancel order"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/modifyOrder",
+      "official_source": "https://docs.arcus.xyz/api-reference/exchange/modify-order",
+      "title": "Modify order"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/batchPlaceOrders",
+      "official_source": "https://docs.arcus.xyz/api-reference/exchange/place-batch-orders",
+      "title": "Place batch orders"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/placeOrder",
+      "official_source": "https://docs.arcus.xyz/api-reference/exchange/place-order",
+      "title": "Place order"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/scheduleCancel",
+      "official_source": "https://docs.arcus.xyz/api-reference/exchange/schedule-cancel-all-dead-mans-switch",
+      "title": "Schedule cancel-all (dead man's switch)"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/settleLoan",
+      "official_source": "https://docs.arcus.xyz/api-reference/exchange/sell-spot-collateral-to-settle-the-accounts-loan",
+      "title": "Sell spot collateral to settle the account's loan"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/setLeverage",
+      "official_source": "https://docs.arcus.xyz/api-reference/exchange/set-leverage-for-a-market",
+      "title": "Set leverage for a market"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/transfer",
+      "official_source": "https://docs.arcus.xyz/api-reference/exchange/submit-internal-transfer",
+      "title": "Submit internal transfer"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/withdraw",
+      "official_source": "https://docs.arcus.xyz/api-reference/exchange/submit-withdrawal",
+      "title": "Submit withdrawal"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/api-meta/markets",
+      "official_source": "https://docs.arcus.xyz/api-reference/marketmetadata/get-market-metadata",
+      "title": "Get market metadata"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/api-meta/overview",
+      "official_source": "https://docs.arcus.xyz/api-reference/marketmetadata/get-market-overview",
+      "title": "Get market overview"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/api-meta/candles",
+      "official_source": "https://docs.arcus.xyz/api-reference/marketmetadata/get-spot-candles",
+      "title": "Get spot candles"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/api-meta/spot/overview",
+      "official_source": "https://docs.arcus.xyz/api-reference/marketmetadata/get-spot-market-overview",
+      "title": "Get spot market overview"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/createApiKey",
+      "official_source": "https://docs.arcus.xyz/api-reference/onboarding/create-api-key",
+      "title": "Create API key"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/apiKeys",
+      "official_source": "https://docs.arcus.xyz/api-reference/onboarding/get-api-keys",
+      "title": "Get API keys"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/revokeApiKey",
+      "official_source": "https://docs.arcus.xyz/api-reference/onboarding/revoke-api-key",
+      "title": "Revoke API key"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/trade/{tradeId}",
+      "official_source": "https://docs.arcus.xyz/api-reference/public/get-a-single-trade-by-id",
+      "title": "Get a single trade by ID"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/account/stats",
+      "official_source": "https://docs.arcus.xyz/api-reference/public/get-account-stats",
+      "title": "Get account stats"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/accountTransferUpdates",
+      "official_source": "https://docs.arcus.xyz/api-reference/public/get-account-transfer-updates",
+      "title": "Get account transfer updates"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/account",
+      "official_source": "https://docs.arcus.xyz/api-reference/public/get-account",
+      "title": "Get account"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/mids",
+      "official_source": "https://docs.arcus.xyz/api-reference/public/get-all-mid-prices",
+      "title": "Get all mid prices"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/bbo/{market}",
+      "official_source": "https://docs.arcus.xyz/api-reference/public/get-best-bid-offer-bbo",
+      "title": "Get Best Bid Offer (BBO)"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/compliance",
+      "official_source": "https://docs.arcus.xyz/api-reference/public/get-compliance-status",
+      "title": "Get compliance status"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/rateLimit",
+      "official_source": "https://docs.arcus.xyz/api-reference/public/get-current-rate-limit-usage",
+      "title": "Get current rate-limit usage"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/time",
+      "official_source": "https://docs.arcus.xyz/api-reference/public/get-current-server-time",
+      "title": "Get current server time"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/feetiers",
+      "official_source": "https://docs.arcus.xyz/api-reference/public/get-fee-tier-table",
+      "title": "Get fee tier table"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/fill/{tradeId}",
+      "official_source": "https://docs.arcus.xyz/api-reference/public/get-fill-by-id",
+      "title": "Get fill by ID"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/fills",
+      "official_source": "https://docs.arcus.xyz/api-reference/public/get-fills",
+      "title": "Get fills"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/funding",
+      "official_source": "https://docs.arcus.xyz/api-reference/public/get-funding-payments",
+      "title": "Get funding payments"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/interest",
+      "official_source": "https://docs.arcus.xyz/api-reference/public/get-interest-payments",
+      "title": "Get interest payments"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/l2OrderBook/{market}",
+      "official_source": "https://docs.arcus.xyz/api-reference/public/get-l2-orderbook-snapshot",
+      "title": "Get L2 orderbook snapshot"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/leverages",
+      "official_source": "https://docs.arcus.xyz/api-reference/public/get-leverage-and-margin-mode-for-an-account-across-all-markets",
+      "title": "Get leverage and margin mode for an account across all markets"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/prices",
+      "official_source": "https://docs.arcus.xyz/api-reference/public/get-live-prices-for-all-markets",
+      "title": "Get live prices for all markets"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/fundingRates",
+      "official_source": "https://docs.arcus.xyz/api-reference/public/get-market-funding-rates",
+      "title": "Get market funding rates"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/markets",
+      "official_source": "https://docs.arcus.xyz/api-reference/public/get-markets",
+      "title": "Get markets"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/candles",
+      "official_source": "https://docs.arcus.xyz/api-reference/public/get-ohlcv-candles",
+      "title": "Get OHLCV candles"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/openOrders",
+      "official_source": "https://docs.arcus.xyz/api-reference/public/get-open-orders",
+      "title": "Get open orders"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/orders",
+      "official_source": "https://docs.arcus.xyz/api-reference/public/get-order-history",
+      "title": "Get order history"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/order/{orderId}",
+      "official_source": "https://docs.arcus.xyz/api-reference/public/get-order-status",
+      "title": "Get order status"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/portfolio",
+      "official_source": "https://docs.arcus.xyz/api-reference/public/get-portfolio-history",
+      "title": "Get portfolio history"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/positions",
+      "official_source": "https://docs.arcus.xyz/api-reference/public/get-positions",
+      "title": "Get positions"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/trades",
+      "official_source": "https://docs.arcus.xyz/api-reference/public/get-recent-public-trades",
+      "title": "Get recent public trades"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/commissionrates",
+      "official_source": "https://docs.arcus.xyz/api-reference/public/get-referral-commission-rate-schedule",
+      "title": "Get referral commission rate schedule"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/spotAssets",
+      "official_source": "https://docs.arcus.xyz/api-reference/public/get-spot-collateral-assets",
+      "title": "Get spot collateral assets"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/spotFills",
+      "official_source": "https://docs.arcus.xyz/api-reference/public/get-spot-fills",
+      "title": "Get spot fills"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/spotPositions",
+      "official_source": "https://docs.arcus.xyz/api-reference/public/get-spot-positions",
+      "title": "Get spot positions"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/leaderboard",
+      "official_source": "https://docs.arcus.xyz/api-reference/public/get-the-all-traders-leaderboard",
+      "title": "Get the all-traders leaderboard"
+    },
+    {
+      "method": "GET",
+      "path": "/health",
+      "official_source": "https://docs.arcus.xyz/api-reference/public/health-check",
+      "title": "Health check"
+    },
+    {
+      "method": "GET",
+      "path": "/",
+      "official_source": "https://docs.arcus.xyz/api-reference/public/service-info",
+      "title": "Service info"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/affiliate/codeAvailable",
+      "official_source": "https://docs.arcus.xyz/api-reference/referral/check-whether-a-referral-code-is-available",
+      "title": "Check whether a referral code is available"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/affiliate/claim",
+      "official_source": "https://docs.arcus.xyz/api-reference/referral/claim-accrued-commission",
+      "title": "Claim accrued commission"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/affiliate/createCode",
+      "official_source": "https://docs.arcus.xyz/api-reference/referral/create-referral-code",
+      "title": "Create referral code"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/affiliate/claims",
+      "official_source": "https://docs.arcus.xyz/api-reference/referral/get-affiliate-claim-history",
+      "title": "Get affiliate claim history"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/affiliate/commissions",
+      "official_source": "https://docs.arcus.xyz/api-reference/referral/get-affiliate-commission-history",
+      "title": "Get affiliate commission history"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/affiliate/info",
+      "official_source": "https://docs.arcus.xyz/api-reference/referral/get-affiliate-info",
+      "title": "Get affiliate info"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/affiliate/leaderboard",
+      "official_source": "https://docs.arcus.xyz/api-reference/referral/get-affiliate-leaderboard",
+      "title": "Get affiliate leaderboard"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/affiliate/myReferrer",
+      "official_source": "https://docs.arcus.xyz/api-reference/referral/get-my-referrer",
+      "title": "Get my referrer"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/affiliate/referees",
+      "official_source": "https://docs.arcus.xyz/api-reference/referral/get-referees",
+      "title": "Get referees"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/affiliate/code",
+      "official_source": "https://docs.arcus.xyz/api-reference/referral/get-the-callers-referral-code",
+      "title": "Get the caller's referral code"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/affiliate/inviteCodes",
+      "official_source": "https://docs.arcus.xyz/api-reference/referral/list-the-callers-invite-codes",
+      "title": "List the caller's invite codes"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/affiliate/claimStatus",
+      "official_source": "https://docs.arcus.xyz/api-reference/referral/look-up-a-single-claim",
+      "title": "Look up a single claim"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/affiliate/redeemInvite",
+      "official_source": "https://docs.arcus.xyz/api-reference/referral/redeem-an-invite-code",
+      "title": "Redeem an invite code"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/affiliate/registerAffiliate",
+      "official_source": "https://docs.arcus.xyz/api-reference/referral/register-as-referee",
+      "title": "Register as referee"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/affiliate/modifyCode",
+      "official_source": "https://docs.arcus.xyz/api-reference/referral/rename-referral-code",
+      "title": "Rename referral code"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/affiliate/revokeCode",
+      "official_source": "https://docs.arcus.xyz/api-reference/referral/revoke-referral-code",
+      "title": "Revoke referral code"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/affiliate/kickback",
+      "official_source": "https://docs.arcus.xyz/api-reference/referral/update-kickback-rate",
+      "title": "Update kickback rate"
+    },
+    {
+      "method": "DELETE",
+      "path": "/v1/api-meta/userPreferences",
+      "official_source": "https://docs.arcus.xyz/api-reference/userpreferences/delete-a-user-preference",
+      "title": "Delete a user preference"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/api-meta/userPreferences",
+      "official_source": "https://docs.arcus.xyz/api-reference/userpreferences/get-user-preferences",
+      "title": "Get user preferences"
+    },
+    {
+      "method": "PATCH",
+      "path": "/v1/api-meta/userPreferences",
+      "official_source": "https://docs.arcus.xyz/api-reference/userpreferences/upsert-user-preferences",
+      "title": "Upsert user preferences"
+    },
+    {
+      "method": "GET",
+      "path": "/health",
+      "host": "spot",
+      "title": "Health",
+      "official_source": "https://github.com/arcus-xyz/arcus-spot-sdk/blob/7f91c67e1a93f3dd62964bdbee08e41ea4c8b8e0/go/client.go#L92"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/price",
+      "host": "spot",
+      "title": "GetPrice",
+      "official_source": "https://github.com/arcus-xyz/arcus-spot-sdk/blob/7f91c67e1a93f3dd62964bdbee08e41ea4c8b8e0/go/client.go#L101"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/quote",
+      "host": "spot",
+      "title": "GetQuote",
+      "official_source": "https://github.com/arcus-xyz/arcus-spot-sdk/blob/7f91c67e1a93f3dd62964bdbee08e41ea4c8b8e0/go/client.go#L112"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/submit",
+      "host": "spot",
+      "title": "SubmitSignedQuote",
+      "official_source": "https://github.com/arcus-xyz/arcus-spot-sdk/blob/7f91c67e1a93f3dd62964bdbee08e41ea4c8b8e0/go/client.go#L130"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/status",
+      "host": "spot",
+      "title": "GetStatus",
+      "official_source": "https://github.com/arcus-xyz/arcus-spot-sdk/blob/7f91c67e1a93f3dd62964bdbee08e41ea4c8b8e0/go/client.go#L143"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/tokens",
+      "host": "spot",
+      "title": "GetTokenList",
+      "official_source": "https://github.com/arcus-xyz/arcus-spot-sdk/blob/7f91c67e1a93f3dd62964bdbee08e41ea4c8b8e0/go/client.go#L158"
+    },
+    {
+      "method": "WS",
+      "path": "/v1/ws",
+      "channel": "account",
+      "title": "account",
+      "official_source": "https://docs.arcus.xyz/api-reference/account/account"
+    },
+    {
+      "method": "WS",
+      "path": "/v1/ws",
+      "channel": "accountAttributeUpdates",
+      "title": "accountAttributeUpdates",
+      "official_source": "https://docs.arcus.xyz/api-reference/account/accountattributeupdates"
+    },
+    {
+      "method": "WS",
+      "path": "/v1/ws",
+      "channel": "accountTransferUpdates",
+      "title": "accountTransferUpdates",
+      "official_source": "https://docs.arcus.xyz/api-reference/account/accounttransferupdates"
+    },
+    {
+      "method": "WS",
+      "path": "/v1/ws",
+      "channel": "funding",
+      "title": "funding",
+      "official_source": "https://docs.arcus.xyz/api-reference/account/funding"
+    },
+    {
+      "method": "WS",
+      "path": "/v1/ws",
+      "channel": "orders",
+      "title": "orders",
+      "official_source": "https://docs.arcus.xyz/api-reference/account/orders"
+    },
+    {
+      "method": "WS",
+      "path": "/v1/ws",
+      "channel": "positions",
+      "title": "positions",
+      "official_source": "https://docs.arcus.xyz/api-reference/account/positions"
+    },
+    {
+      "method": "WS",
+      "path": "/v1/ws",
+      "channel": "settleLoanResults",
+      "title": "settleLoanResults",
+      "official_source": "https://docs.arcus.xyz/api-reference/account/settleloanresults"
+    },
+    {
+      "method": "WS",
+      "path": "/v1/ws",
+      "channel": "spotFills",
+      "title": "spotFills",
+      "official_source": "https://docs.arcus.xyz/api-reference/account/spotfills"
+    },
+    {
+      "method": "WS",
+      "path": "/v1/ws",
+      "channel": "spotPositions",
+      "title": "spotPositions",
+      "official_source": "https://docs.arcus.xyz/api-reference/account/spotpositions"
+    },
+    {
+      "method": "WS",
+      "path": "/v1/ws",
+      "channel": "userFills",
+      "title": "userFills",
+      "official_source": "https://docs.arcus.xyz/api-reference/account/userfills"
+    },
+    {
+      "method": "WS",
+      "path": "/v1/ws",
+      "channel": "bbo",
+      "title": "bbo",
+      "official_source": "https://docs.arcus.xyz/api-reference/market-data/bbo"
+    },
+    {
+      "method": "WS",
+      "path": "/v1/ws",
+      "channel": "candles",
+      "title": "candles",
+      "official_source": "https://docs.arcus.xyz/api-reference/market-data/candles"
+    },
+    {
+      "method": "WS",
+      "path": "/v1/ws",
+      "channel": "exchangeAttributeUpdates",
+      "title": "exchangeAttributeUpdates",
+      "official_source": "https://docs.arcus.xyz/api-reference/market-data/exchangeattributeupdates"
+    },
+    {
+      "method": "WS",
+      "path": "/v1/ws",
+      "channel": "l2Orderbook",
+      "title": "l2Orderbook",
+      "official_source": "https://docs.arcus.xyz/api-reference/market-data/l2orderbook"
+    },
+    {
+      "method": "WS",
+      "path": "/v1/ws",
+      "channel": "l2OrderbookUpdates",
+      "title": "l2OrderbookUpdates",
+      "official_source": "https://docs.arcus.xyz/api-reference/market-data/l2orderbookupdates"
+    },
+    {
+      "method": "WS",
+      "path": "/v1/ws",
+      "channel": "lendingRates",
+      "title": "lendingRates",
+      "official_source": "https://docs.arcus.xyz/api-reference/market-data/lendingrates"
+    },
+    {
+      "method": "WS",
+      "path": "/v1/ws",
+      "channel": "marketAttributes",
+      "title": "marketAttributes",
+      "official_source": "https://docs.arcus.xyz/api-reference/market-data/marketattributes"
+    },
+    {
+      "method": "WS",
+      "path": "/v1/ws",
+      "channel": "markets",
+      "title": "markets",
+      "official_source": "https://docs.arcus.xyz/api-reference/market-data/markets"
+    },
+    {
+      "method": "WS",
+      "path": "/v1/ws",
+      "channel": "oraclePrices",
+      "title": "oraclePrices",
+      "official_source": "https://docs.arcus.xyz/api-reference/market-data/oracleprices"
+    },
+    {
+      "method": "WS",
+      "path": "/v1/ws",
+      "channel": "predictedFunding",
+      "title": "predictedFunding",
+      "official_source": "https://docs.arcus.xyz/api-reference/market-data/predictedfunding"
+    },
+    {
+      "method": "WS",
+      "path": "/v1/ws",
+      "channel": "trades",
+      "title": "trades",
+      "official_source": "https://docs.arcus.xyz/api-reference/market-data/trades"
+    },
+    {
+      "method": "WS",
+      "path": "/v1/ws",
+      "channel": "orderOperations",
+      "title": "orderOperations",
+      "official_source": "https://docs.arcus.xyz/api-reference/trading/orderoperations"
+    }
+  ],
+  "reviewed": "2026-09-28"
+}

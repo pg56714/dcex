@@ -3,6 +3,8 @@ use url::Url;
 
 use crate::{DcexError, Result};
 
+mod pro;
+pub use pro::KucoinProWebSocket;
 mod private;
 mod public;
 

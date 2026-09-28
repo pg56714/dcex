@@ -302,22 +302,22 @@ fn validate_signing_params(params: &ExtendedParams) -> Result<()> {
     params.required_positive_decimal("price")?;
     let qty = params.first_required(&["qty", "quantity", "amount", "amount_of_synthetic"])?;
     validate_positive_decimal("qty", qty)?;
-    if let Some(order_type) = params.first(&["type", "order_type", "orderType"]) {
-        if !order_type.eq_ignore_ascii_case("LIMIT") {
-            return Err(DcexError::InvalidInput(
-                "Extended automatic order signing currently supports LIMIT orders only".to_string(),
-            ));
-        }
+    if let Some(order_type) = params.first(&["type", "order_type", "orderType"])
+        && !order_type.eq_ignore_ascii_case("LIMIT")
+    {
+        return Err(DcexError::InvalidInput(
+            "Extended automatic order signing currently supports LIMIT orders only".to_string(),
+        ));
     }
     for key in ["post_only", "postOnly", "reduce_only", "reduceOnly"] {
         params.optional_bool(key)?;
     }
-    if let Some(time_in_force) = params.first(&["time_in_force", "timeInForce"]) {
-        if !matches!(time_in_force, "GTT" | "IOC") {
-            return Err(DcexError::InvalidInput(format!(
-                "unsupported Extended time_in_force: {time_in_force}"
-            )));
-        }
+    if let Some(time_in_force) = params.first(&["time_in_force", "timeInForce"])
+        && !matches!(time_in_force, "GTT" | "IOC")
+    {
+        return Err(DcexError::InvalidInput(format!(
+            "unsupported Extended time_in_force: {time_in_force}"
+        )));
     }
     for key in ["expiry_epoch_millis", "expiryEpochMillis", "expire_time_ms"] {
         params.optional_u64_range(key, 1, u64::MAX)?;
@@ -327,12 +327,11 @@ fn validate_signing_params(params: &ExtendedParams) -> Result<()> {
         validate_fraction("fee", fee)?;
     }
     if let Some(level) = params.first(&["self_trade_protection_level", "selfTradeProtectionLevel"])
+        && !matches!(level, "DISABLED" | "ACCOUNT" | "CLIENT")
     {
-        if !matches!(level, "DISABLED" | "ACCOUNT" | "CLIENT") {
-            return Err(DcexError::InvalidInput(format!(
-                "unsupported Extended self trade protection level: {level}"
-            )));
-        }
+        return Err(DcexError::InvalidInput(format!(
+            "unsupported Extended self trade protection level: {level}"
+        )));
     }
     if let Some(builder_fee) = params.first(&["builder_fee", "builderFee"]) {
         validate_fraction("builderFee", builder_fee)?;
@@ -421,10 +420,10 @@ fn validate_order_body(body: &Value, domain: StarknetDomain) -> Result<()> {
         }
         validate_positive_decimal("rfqStartPrice", rfq_start_price)?;
     }
-    if let Some(cancel_id) = body.get("cancelId") {
-        if !cancel_id.is_null() {
-            json_string(body, "cancelId", false)?;
-        }
+    if let Some(cancel_id) = body.get("cancelId")
+        && !cancel_id.is_null()
+    {
+        json_string(body, "cancelId", false)?;
     }
     if let Some(builder_fee) = json_decimal(body, "builderFee", false)? {
         validate_fraction("builderFee", builder_fee)?;

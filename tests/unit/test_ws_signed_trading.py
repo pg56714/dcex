@@ -5,7 +5,6 @@ import importlib
 import json
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
-from typing import Any
 
 import pytest
 from aiohttp import WSMsgType, web

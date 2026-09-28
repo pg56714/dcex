@@ -68,7 +68,7 @@ get_spot_level3_orderbook(product_symbol => "product_symbol"),
         cancel_spot_batch_orders(),
         get_spot_extended_balance(),
         get_futures_leverage_preferences(),
-        set_futures_leverage_preference(product_symbol => "product_symbol"),
+        set_futures_leverage_preference(product_symbol => "product_symbol", margin_mode => "margin_mode"),
         cancel_futures_all_orders(),
         cancel_futures_all_orders_after(timeout => "timeout"),
         cancel_futures_order(),
@@ -120,6 +120,7 @@ get_spot_level3_orderbook(product_symbol => "product_symbol"),
         place_spot_post_only_limit_order(product_symbol => "product_symbol", side => "side", volume => "volume", price => "price"),
         place_spot_post_only_limit_sell_order(product_symbol => "product_symbol", volume => "volume", price => "price"),
         wallet_transfer_to_futures(asset => "asset", amount => "amount"),
+        /// API withdrawals and external transfers have no second confirmation; they execute on submit.
         withdraw_futures_to_spot_wallet(amount => "amount", currency => "currency"),
     ];
 }

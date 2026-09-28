@@ -525,7 +525,9 @@ fn websocket_timestamp(timestamp_ms: u64) -> String {
 fn normalize_inst_type(inst_type: &str) -> Result<String> {
     let inst_type = inst_type.trim().to_ascii_uppercase();
     match inst_type.as_str() {
-        "SPOT" | "USDT-FUTURES" | "COIN-FUTURES" | "USDC-FUTURES" | UTA_INST_TYPE => Ok(inst_type),
+        "MARGIN" | "SPOT" | "USDT-FUTURES" | "COIN-FUTURES" | "USDC-FUTURES" | UTA_INST_TYPE => {
+            Ok(inst_type)
+        }
         "MIX" | "SWAP" | "FUTURES" => Ok("USDT-FUTURES".to_string()),
         _ => Err(DcexError::InvalidInput(format!(
             "unsupported Bitget WebSocket instrument type: {inst_type}"

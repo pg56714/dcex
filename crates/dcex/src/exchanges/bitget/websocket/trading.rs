@@ -11,7 +11,7 @@ fn identifier(value: &str, max: usize) -> Result<()> {
         || value.len() > max
         || !value
             .bytes()
-            .all(|c| c.is_ascii_alphanumeric() || b"_:#-+ \t\r\n".contains(&c))
+            .all(|c| c.is_ascii_alphanumeric() || b"._:/-".contains(&c))
     {
         return Err(invalid("invalid request or client order identifier"));
     }
@@ -38,9 +38,9 @@ fn fields(arg: &Map<String, Value>, allowed: &[&str]) -> Result<()> {
             return Err(invalid(&format!("unsupported field {key}")));
         }
         if key == "requestId" {
-            if !value
+            if value
                 .as_u64()
-                .is_some_and(|n| n < 1_000_000_000_000_000_000)
+                .is_none_or(|n| n >= 1_000_000_000_000_000_000)
             {
                 return Err(invalid("requestId must be an integer of at most 18 digits"));
             }
@@ -62,14 +62,13 @@ fn fields(arg: &Map<String, Value>, allowed: &[&str]) -> Result<()> {
         "presetStopSurplusPrice",
         "presetStopLossPrice",
     ] {
-        if let Some(value) = arg.get(key) {
-            if !value
+        if let Some(value) = arg.get(key)
+            && !value
                 .as_str()
                 .and_then(|v| v.parse::<f64>().ok())
                 .is_some_and(|n| n.is_finite() && n > 0.0)
-            {
-                return Err(invalid(&format!("{key} must be a positive decimal string")));
-            }
+        {
+            return Err(invalid(&format!("{key} must be a positive decimal string")));
         }
     }
     choice(arg, "side", &["buy", "sell"])?;
@@ -158,8 +157,8 @@ pub(super) fn uta(
     request_time: Option<u64>,
 ) -> Result<Value> {
     identifier(id, 40)?;
-    if let Some(category) = category {
-        if ![
+    if let Some(category) = category
+        && ![
             "spot",
             "margin",
             "usdt-futures",
@@ -167,9 +166,8 @@ pub(super) fn uta(
             "usdc-futures",
         ]
         .contains(&category)
-        {
-            return Err(invalid("invalid lowercase category"));
-        }
+    {
+        return Err(invalid("invalid lowercase category"));
     }
     let allowed = match topic {
         "place-order" | "batch-place" => PLACE,
@@ -216,17 +214,16 @@ pub(super) fn uta(
             {
                 return Err(invalid("unsupported batch-place field"));
             }
-            if let Some(window) = arg.get("receiveWindow") {
-                if request_time.is_none()
+            if let Some(window) = arg.get("receiveWindow")
+                && (request_time.is_none()
                     || !window
                         .as_str()
                         .and_then(|v| v.parse::<u64>().ok())
-                        .is_some_and(|n| (10..=60000).contains(&n))
-                {
-                    return Err(invalid(
-                        "receiveWindow requires requestTime and a value between 10 and 60000",
-                    ));
-                }
+                        .is_some_and(|n| (10..=60000).contains(&n)))
+            {
+                return Err(invalid(
+                    "receiveWindow requires requestTime and a value between 10 and 60000",
+                ));
             }
         } else {
             order_id(arg)?;
@@ -330,6 +327,13 @@ pub(super) fn classic(
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn identifiers_reject_whitespace_and_accept_rest_characters() {
+        for id in ["a b", "a\tb", "a\rb", "a\nb", "a#b", "a+b"] {
+            assert!(identifier(id, 64).is_err(), "{id:?}");
+        }
+        assert!(identifier("Aa09._:/-", 64).is_ok());
+    }
     #[test]
     fn uta_and_classic_have_distinct_wire_envelopes() {
         let order = json!({"symbol":"BTCUSDT","orderType":"limit","qty":"0.001","side":"buy","price":"123.4500","receiveWindow":"5000"});

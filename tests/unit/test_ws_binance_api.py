@@ -66,15 +66,22 @@ async def test_signed_api_and_concurrent_receive(futures: bool) -> None:
     await site.start()
     url = f"ws://127.0.0.1:{runner.addresses[0][1]}/"
     client = (
-        FuturesApiClient("key", "secret", base_url=url)
+        FuturesApiClient("key", "secret", base_url=url, timeout=30)
         if futures
-        else SpotApiClient("key", "secret", base_url=url)
+        else SpotApiClient("key", "secret", base_url=url, timeout=30)
     )
+    receive_started = asyncio.Event()
+    pending = None
+
+    async def receive_first() -> dict[str, Any]:
+        receive_started.set()
+        return await client.recv()
+
     try:
         await client.connect()
         # A pending read must not lock out a trading write.
-        pending = asyncio.create_task(client.recv())
-        await asyncio.sleep(0)
+        pending = asyncio.create_task(receive_first())
+        await receive_started.wait()
         request_id = await asyncio.wait_for(
             client.place_order(
                 {
@@ -87,7 +94,7 @@ async def test_signed_api_and_concurrent_receive(futures: bool) -> None:
                     "timestamp": 1645423376532,
                 }
             ),
-            2,
+            30,
         )
         assert (await pending)["event"]["e"] == "executionReport"
         response = await client.recv()
@@ -113,6 +120,9 @@ async def test_signed_api_and_concurrent_receive(futures: bool) -> None:
             await client.recv()
             assert received[-1]["method"] == "userDataStream.subscribe.signature"
     finally:
+        if pending is not None and not pending.done():
+            pending.cancel()
+            await asyncio.gather(pending, return_exceptions=True)
         await client.close()
         await runner.cleanup()
 

@@ -15,6 +15,143 @@ impl ExtendedClient {
         params: &ExtendedParams,
     ) -> Result<Option<ValidatedResponse>> {
         let response = match method_name {
+            "create_withdrawal_signed" => {
+                params.ensure_allowed(&["body"], &[])?;
+                let body: Value = serde_json::from_str(params.required("body")?).map_err(|_| {
+                    DcexError::InvalidInput("Extended body must be valid JSON".into())
+                })?;
+                let object = body_object(&body, "withdrawal")?;
+                for key in object.keys() {
+                    if ![
+                        "chainId",
+                        "accountId",
+                        "amount",
+                        "asset",
+                        "settlement",
+                        "quoteId",
+                        "description",
+                    ]
+                    .contains(&key.as_str())
+                    {
+                        return Err(DcexError::InvalidInput(format!(
+                            "unsupported Extended withdrawal field: {key}"
+                        )));
+                    }
+                }
+                for key in ["chainId", "amount", "asset"] {
+                    json_string(object, key, true)?;
+                }
+                json_u64(object, "accountId", true)?;
+                if !crate::common::is_positive_plain_decimal(
+                    json_string(object, "amount", true)?.expect("required"),
+                ) {
+                    return Err(DcexError::InvalidInput(
+                        "Extended amount requires a positive plain decimal string".into(),
+                    ));
+                }
+                if object["chainId"] != "STRK" {
+                    json_string(object, "quoteId", true)?;
+                }
+                if let Some(description) = json_string(object, "description", false)?
+                    && description.chars().count() > 250
+                {
+                    return Err(DcexError::InvalidInput(
+                        "Extended description must not exceed 250 characters".into(),
+                    ));
+                }
+                let settlement = object_required(object, "settlement")?
+                    .as_object()
+                    .ok_or_else(|| {
+                        DcexError::InvalidInput("Extended settlement must be an object".into())
+                    })?;
+                for key in ["recipient", "collateralId", "amount"] {
+                    json_string(settlement, key, true)?;
+                }
+                for key in ["positionId", "salt"] {
+                    json_u64(settlement, key, true)?;
+                }
+                let expiration = object_required(settlement, "expiration")?
+                    .as_object()
+                    .ok_or_else(|| {
+                        DcexError::InvalidInput("Extended expiration must be an object".into())
+                    })?;
+                json_u64(expiration, "seconds", true)?;
+                let signature = object_required(settlement, "signature")?
+                    .as_object()
+                    .ok_or_else(|| {
+                        DcexError::InvalidInput("Extended signature must be an object".into())
+                    })?;
+                for key in ["r", "s"] {
+                    json_string(signature, key, true)?;
+                }
+                self.private_post_value(
+                    "/api/v1/user/withdrawal",
+                    Value::Object(object.clone()),
+                    Vec::new(),
+                )
+                .await
+            }
+            "get_affiliate_data"
+            | "get_referral_status"
+            | "get_referral_links"
+            | "get_referral_dashboard" => {
+                let path = match method_name {
+                    "get_affiliate_data" => "/api/v1/user/affiliate",
+                    "get_referral_status" => "/api/v1/user/referrals/status",
+                    "get_referral_links" => "/api/v1/user/referrals/links",
+                    _ => "/api/v1/user/referrals/dashboard",
+                };
+                let keys: &[&str] = if method_name == "get_referral_dashboard" {
+                    &["period"]
+                } else {
+                    &[]
+                };
+                params.ensure_allowed(keys, &[])?;
+                if method_name == "get_referral_dashboard" {
+                    params.required("period")?;
+                }
+                self.private_get(path, params.only(keys)).await
+            }
+            "use_referral_code" | "create_referral_code" | "update_referral_code" => {
+                let keys: &[&str] = if method_name == "use_referral_code" {
+                    &["code"]
+                } else {
+                    &["id", "isDefault", "hiddenAtUi"]
+                };
+                params.ensure_allowed(keys, &[])?;
+                let key = if method_name == "use_referral_code" {
+                    "code"
+                } else {
+                    "id"
+                };
+                let mut body = serde_json::Map::new();
+                body.insert(key.into(), Value::String(params.required(key)?.into()));
+                for key in ["isDefault", "hiddenAtUi"] {
+                    if let Some(raw) = params.get(key) {
+                        body.insert(
+                            key.into(),
+                            Value::Bool(raw.parse::<bool>().map_err(|_| {
+                                DcexError::InvalidInput(format!("{key} must be a boolean"))
+                            })?),
+                        );
+                    }
+                }
+                if method_name == "update_referral_code" {
+                    self.private_put_value("/api/v1/user/referrals", Value::Object(body))
+                        .await
+                } else {
+                    self.private_post_value(
+                        if method_name == "use_referral_code" {
+                            "/api/v1/user/referrals/use"
+                        } else {
+                            "/api/v1/user/referrals"
+                        },
+                        Value::Object(body),
+                        Vec::new(),
+                    )
+                    .await
+                }
+            }
             "get_account_info" | "get_account_details" => {
                 params.ensure_allowed(&[], &[])?;
                 self.private_get(ACCOUNT_INFO, Vec::new()).await
@@ -204,6 +341,19 @@ impl ExtendedClient {
             "get_bridge_config" => {
                 params.ensure_allowed(&[], &[])?;
                 self.private_get(BRIDGE_CONFIG, Vec::new()).await
+            }
+            "commit_bridge_quote" => {
+                params.ensure_allowed(&["id"], &[])?;
+                let id = params.required("id")?;
+                self.request(
+                    crate::http::HttpMethod::Post,
+                    BRIDGE_QUOTE,
+                    vec![("id".into(), id.into())],
+                    None,
+                    true,
+                    Default::default(),
+                )
+                .await
             }
             "get_bridge_quote" => {
                 params.ensure_allowed(&["chainIn", "chainOut", "amount", "asset"], &[])?;

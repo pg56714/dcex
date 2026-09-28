@@ -502,7 +502,11 @@ const ROUTE_CASES: &[(bool, &str, &[(&str, &str)], &str, &str)] = &[
     (
         false,
         "set_futures_leverage_preference",
-        &[("product_symbol", "BTC-USD-SWAP"), ("maxLeverage", "3")],
+        &[
+            ("product_symbol", "BTC-USD-SWAP"),
+            ("margin_mode", "isolated"),
+            ("maxLeverage", "3"),
+        ],
         "PUT",
         "/derivatives/api/v3/leveragepreferences",
     ),

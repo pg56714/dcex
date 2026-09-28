@@ -23,7 +23,7 @@ import pytest
 pytest.importorskip("dcex._native")
 
 ROOT = Path(__file__).resolve().parents[2]
-WRAPPER_FILES = ("_account_http.py", "_earn_http.py", "_market_http.py", "_trade_http.py")
+WRAPPER_FILES = ("_account_http.py", "_earn_http.py", "_market_http.py", "_trade_http.py", "_inventory_http.py")
 
 PLACE_SPOT = ("POST", "/api/v2/spot/trade/place-order")
 PLACE_FUTURES = ("POST", "/api/v2/mix/order/place-order")
@@ -561,6 +561,7 @@ CONTROL_CASES = [
             "new_client_oid": "replacement",
             "order_id": "123",
             "new_price": "61000",
+            "new_size": "1",
         },
         "POST",
         "/api/v2/mix/order/modify-order",
@@ -571,11 +572,12 @@ CONTROL_CASES = [
             "newClientOid": "replacement",
             "orderId": "123",
             "newPrice": "61000",
+            "newSize": "1",
         },
     ),
     (
         "close_futures_positions",
-        {"product_type": "USDT-FUTURES"},
+        {"product_type": "USDT-FUTURES", "all_symbols": True},
         "POST",
         "/api/v2/mix/order/close-positions",
         False,
@@ -675,7 +677,7 @@ CONTROL_CASES = [
     ),
     (
         "close_uta_positions",
-        {"category": "USDT-FUTURES"},
+        {"category": "USDT-FUTURES", "all_symbols": True},
         "POST",
         "/api/v3/trade/close-positions",
         False,
@@ -923,7 +925,7 @@ CONTROL_CASES.extend(
         ),
         (
             "set_futures_asset_mode",
-            {"product_type": "USDT-FUTURES", "asset_mode": "single"},
+            {"product_type": "USDT-FUTURES", "asset_mode": "single", "confirm": True},
             "POST",
             "/api/v2/mix/account/set-asset-mode",
             False,
@@ -977,6 +979,7 @@ CONTROL_CASES.extend(
                 "margin_coin": "USDT",
                 "product_type": "USDT-FUTURES",
                 "side": "buy",
+                "confirm": True,
             },
             "POST",
             "/api/v2/mix/order/click-backhand",
@@ -1555,7 +1558,7 @@ CONTROL_CASES.extend(
         ("get_uta_convert_records", {}, "GET", "/api/v3/account/convert-records", False, {}),
         (
             "set_uta_account_mode",
-            {"mode": "advanced"},
+            {"mode": "advanced", "confirm": True},
             "POST",
             "/api/v3/account/adjust-account-mode",
             False,
@@ -1797,7 +1800,7 @@ CONTROL_CASES.extend(
             {"deduct": "on"},
         ),
         ("get_uta_fee_deduction", {}, "GET", "/api/v3/account/deduct-info", False, {}),
-        ("upgrade_to_uta", {}, "POST", "/api/v3/account/switch", False, {}),
+        ("upgrade_to_uta", {"confirm": True}, "POST", "/api/v3/account/switch", False, {}),
         ("get_uta_upgrade_status", {}, "GET", "/api/v3/account/switch-status", False, {}),
         (
             "get_futures_margin_mode_switch_quota",
@@ -1831,7 +1834,14 @@ CONTROL_CASES.extend(
             False,
             {},
         ),
-        ("upgrade_classic_account", {}, "POST", "/api/v2/spot/account/upgrade", False, {}),
+        (
+            "upgrade_classic_account",
+            {"confirm": True},
+            "POST",
+            "/api/v2/spot/account/upgrade",
+            False,
+            {},
+        ),
         ("get_spot_fee_deduction", {}, "GET", "/api/v2/spot/account/deduct-info", False, {}),
         (
             "set_spot_fee_deduction",
@@ -2004,7 +2014,7 @@ CONTROL_CASES.extend(
         ),
         (
             "uta_delete_sub",
-            {"sub_uid": "2"},
+            {"sub_uid": "2", "confirm": True},
             "POST",
             "/api/v3/user/delete-sub",
             False,
@@ -2311,6 +2321,7 @@ CONTROL_CASES.extend(
                 "to_uid": "2",
                 "category": "USDT-FUTURES",
                 "position_list": [{"symbol": "BTCUSDT", "side": "sell", "qty": "0.01"}],
+                "confirm": True,
             },
             "POST",
             "/api/v3/account/move-positions",
@@ -2805,6 +2816,28 @@ CONTROL_CASES.extend(
 ROUTES.update({name: (verb, path) for name, _, verb, path, _, _ in CONTROL_CASES})
 PUBLIC_METHODS.update(name for name, _, _, _, public, _ in CONTROL_CASES if public)
 PUBLIC_METHODS.difference_update(name for name, _, _, _, public, _ in CONTROL_CASES if not public)
+ALIASES = {
+    "classic_trade": "convert_classic_asset",
+    "uta_small_assets_trade": "convert_uta_small_assets",
+    "classic_earn_elite_subscribe": "subscribe_classic_elite",
+    "classic_earn_elite_redeem": "redeem_classic_elite",
+    "classic_earn_loan_borrow": "borrow_classic_earn_loan",
+    "classic_earn_loan_repay": "repay_classic_earn_loan",
+    "uta_delete_sub": "delete_uta_subaccount",
+}
+CONTROL_CASES.extend(
+    (ALIASES[name], kwargs, verb, path, public, body)
+    for name, kwargs, verb, path, public, body in tuple(CONTROL_CASES)
+    if name in ALIASES
+)
+ROUTES.update({name: (verb, path) for name, _, verb, path, _, _ in CONTROL_CASES})
+COMPLETION_CASES = json.loads(
+    (Path(__file__).parents[1] / "fixtures/bitget_completion.json").read_text(encoding="utf-8")
+)
+CONTROL_CASES.extend(
+    (c["method"], c["kwargs"], "POST", c["path"], False, c["body"]) for c in COMPLETION_CASES
+)
+ROUTES.update({name: (verb, path) for name, _, verb, path, _, _ in CONTROL_CASES})
 EXTRA.update({name: kwargs for name, kwargs, *_ in CONTROL_CASES})
 
 
@@ -2821,6 +2854,12 @@ def _wrapper_names(mode: str) -> set[str]:
                     node.name.startswith("_")
                 ):
                     names.add(node.name)
+                elif isinstance(node, ast.Assign) and isinstance(node.value, ast.Name):
+                    names.update(
+                        target.id
+                        for target in node.targets
+                        if isinstance(target, ast.Name) and not target.id.startswith("_")
+                    )
     return names
 
 
@@ -2838,6 +2877,7 @@ class _Recorder(BaseHTTPRequestHandler):
                 "query": dict(parse_qsl(split.query)),
                 "body": body,
                 "signed": bool(self.headers.get("ACCESS-SIGN")),
+                "headers": dict(self.headers),
             }
         )
         payload = json.dumps({"code": "00000", "msg": "success", "data": {}}).encode()
@@ -2886,13 +2926,15 @@ def _kwargs(method: Any, name: str) -> dict[str, Any]:  # noqa: ANN401
     if name in {case[0] for case in CONTROL_CASES}:
         return EXTRA[name].copy()
     kwargs: dict[str, Any] = {}
+    aliases = {new: old for old, new in getattr(method, "__legacy_keywords__", {}).items()}
     for parameter in inspect.signature(method).parameters.values():
         if parameter.kind in {inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD}:
             continue
         if parameter.default is inspect.Parameter.empty:
-            if parameter.name not in VALUES:
+            sample_name = aliases.get(parameter.name, parameter.name)
+            if sample_name not in VALUES:
                 raise AssertionError(f"{name}: no sample value for {parameter.name}")
-            kwargs[parameter.name] = VALUES[parameter.name]
+            kwargs[sample_name] = VALUES[sample_name]
     kwargs.update(EXTRA.get(name, {}))
     return kwargs
 
@@ -2910,6 +2952,20 @@ def _assert_route(name: str, request: dict[str, Any]) -> None:
         assert request["body"] == "", name
     else:
         json.loads(request["body"])
+    if name in {c["method"] for c in COMPLETION_CASES}:
+        import base64
+        import hashlib
+        import hmac
+
+        headers = {key.lower(): value for key, value in request["headers"].items()}
+        preimage = headers["access-timestamp"] + method + path + request["body"]
+        assert (
+            headers["access-sign"]
+            == base64.b64encode(
+                hmac.new(b"api-secret", preimage.encode(), hashlib.sha256).digest()
+            ).decode()
+        )
+        assert request["query"] == {}
     for case_name, _, _, _, _, expected in CONTROL_CASES:
         if case_name == name:
             actual = request["query"] if method == "GET" else json.loads(request["body"])
@@ -2921,7 +2977,8 @@ def test_route_table_matches_python_surface() -> None:
     sync_names = _wrapper_names("sync")
     async_names = _wrapper_names("async")
     assert sync_names == async_names
-    assert sync_names == set(ROUTES)
+    from tests.unit.test_bitget_inventory_completion import NAMES
+    assert sync_names == set(ROUTES) | NAMES
 
 
 @pytest.mark.parametrize("name", sorted(ROUTES))
@@ -2953,7 +3010,9 @@ def test_async_wrapper_reaches_documented_route(
     async def call() -> Any:  # noqa: ANN401
         async with Client(**_client_kwargs(base_url)) as client:
             method = getattr(client, name)
-            return await method(**_kwargs(method, name))
+            aliases = getattr(method, "__legacy_keywords__", {})
+            kwargs = {aliases.get(key, key): value for key, value in _kwargs(method, name).items()}
+            return await method(**kwargs)
 
     result = asyncio.run(call())
     assert result["code"] == "00000"
@@ -3052,8 +3111,12 @@ def test_python_validation_rejects_ambiguous_leverage_and_loan_calls(
             "openPrice",
         ),
         ("set_uta_collateral_type", {"collateral_type": "custom"}, "collateralCoins"),
-        ("set_uta_account_mode", {"mode": "delta"}, "unsupported mode"),
-        ("set_uta_account_mode", {"mode": "basic", "delta_switch": "yes"}, "advanced mode"),
+        ("set_uta_account_mode", {"mode": "delta", "confirm": True}, "unsupported mode"),
+        (
+            "set_uta_account_mode",
+            {"mode": "basic", "delta_switch": "yes", "confirm": True},
+            "advanced mode",
+        ),
         (
             "borrow_cross_margin_asset",
             {"coin": "USDT", "borrow_amount": "0.000000001"},
@@ -3208,7 +3271,7 @@ def test_python_validation_rejects_ambiguous_leverage_and_loan_calls(
             {"product_type": "USDT-FUTURES", "product_symbol": "BTCUSDT", "order_id_list": []},
             "must not be empty",
         ),
-        ("cancel_spot_plan_orders", {"symbol_list": []}, "must not be empty"),
+        ("cancel_spot_plan_orders", {"symbol_list": []}, "provide"),
         (
             "modify_uta_order",
             {

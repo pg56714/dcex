@@ -9,8 +9,7 @@ use crate::{DcexError, Result};
 use super::endpoints::{FUTURES_BASE_URL, SPOT_BASE_URL};
 use super::params::{KrakenParams, exchange_symbol_fallback, is_canonical_product_symbol};
 use super::signing::{
-    encode_params, futures_signature, http_method_name, spot_signature, unix_timestamp_ns,
-    validate_response,
+    encode_params, futures_signature, http_method_name, spot_signature, validate_response,
 };
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -32,6 +31,48 @@ pub struct KrakenClient {
 }
 
 impl KrakenClient {
+    /// Header-nonce authentication documented by the Funding and Affiliate guides.
+    /// The signed path includes the encoded query; the nonce is not in the body.
+    pub(super) async fn request_header_nonce(
+        &self,
+        method: HttpMethod,
+        path: String,
+        query: Vec<(String, String)>,
+        body: Option<serde_json::Value>,
+        otp: Option<&str>,
+    ) -> Result<ValidatedResponse> {
+        let (api_key, api_secret) = self.spot_credentials()?;
+        let nonce = super::signing::next_nonce()?.to_string();
+        let encoded = encode_params(&query);
+        let path = if encoded.is_empty() {
+            path
+        } else {
+            format!("{path}?{encoded}")
+        };
+        let body = body
+            .map(|value| serde_json::to_string(&value))
+            .transpose()
+            .map_err(|e| DcexError::InvalidInput(e.to_string()))?;
+        let signature = spot_signature(&path, &nonce, body.as_deref().unwrap_or(""), api_secret)?;
+        let mut request = HttpRequest::new(method, &self.spot_base_url, path)
+            .header("API-Key", api_key)
+            .header("API-Sign", signature)
+            .header("API-Nonce", nonce);
+        if let Some(otp) = otp {
+            request = request.header("API-OTP", otp);
+        }
+        if let Some(body) = body {
+            request = request.header("Content-Type", "application/json");
+            request.body = RequestBody::Raw(body.into_bytes());
+        }
+        let response = self.transport.execute(request).await?;
+        let data = validate_response(&response)?;
+        Ok(ValidatedResponse {
+            status: response.status,
+            headers: response.headers,
+            data,
+        })
+    }
     pub fn new(
         spot_api_key: Option<String>,
         spot_api_secret: Option<String>,
@@ -114,7 +155,7 @@ impl KrakenClient {
         json_body: Option<Vec<u8>>,
         signed: bool,
     ) -> Result<HttpResponse> {
-        let nonce = unix_timestamp_ns()?.to_string();
+        let nonce = super::signing::next_nonce()?.to_string();
         let request = self.build_request(method, auth, path, params, json_body, signed, &nonce)?;
         self.transport.execute(request).await
     }
@@ -197,13 +238,13 @@ impl KrakenClient {
             if !encoded_query.is_empty() {
                 request.path = format!("{path}?{encoded_query}");
             }
-            if matches!(method, HttpMethod::Post | HttpMethod::Put) {
-                if let Some(json_body) = json_body {
-                    request
-                        .headers
-                        .insert("Content-Type".to_string(), "application/json".to_string());
-                    request.body = RequestBody::Raw(json_body);
-                }
+            if matches!(method, HttpMethod::Post | HttpMethod::Put)
+                && let Some(json_body) = json_body
+            {
+                request
+                    .headers
+                    .insert("Content-Type".to_string(), "application/json".to_string());
+                request.body = RequestBody::Raw(json_body);
             }
             return Ok(request);
         }
@@ -268,7 +309,10 @@ impl KrakenClient {
                 request
                     .headers
                     .insert("Nonce".to_string(), nonce.to_string());
-                if matches!(method, HttpMethod::Get | HttpMethod::Delete) {
+                if matches!(
+                    method,
+                    HttpMethod::Get | HttpMethod::Delete | HttpMethod::Put
+                ) {
                     if !encoded_query.is_empty() {
                         request.path = format!("{path}?{encoded_query}");
                     }
@@ -304,10 +348,10 @@ impl KrakenClient {
         product_symbol: &str,
         futures_prefix: &str,
     ) -> Result<String> {
-        if is_canonical_product_symbol(product_symbol) {
-            if let Some(table) = &self.product_table {
-                return table.get_exchange_symbol("kraken", product_symbol);
-            }
+        if is_canonical_product_symbol(product_symbol)
+            && let Some(table) = &self.product_table
+        {
+            return table.get_exchange_symbol("kraken", product_symbol);
         }
         Ok(exchange_symbol_fallback(product_symbol, futures_prefix))
     }

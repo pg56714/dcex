@@ -169,3 +169,59 @@ def private(
 
 
 __all__ = ["PrivateClient", "PublicClient", "private", "public"]
+
+
+class ProClient(AsyncWebSocketMixin):
+    """
+    KuCoin action/channel push and V2 UTA trading WebSockets.
+
+    Profiles: public_spot, public_futures, private, trade (V2), trade_v1. `connect` returns
+    the welcome event with heartbeat intervals. Schedule `ping` accordingly;
+    reconnect and resubscribe after a disconnect. Trading responses must be
+    read with `recv` and checked for code 200000 by the caller.
+    """
+
+    def __init__(
+        self,
+        profile: str = "public_spot",
+        *,
+        api_key: str | None = None,
+        api_secret: str | None = None,
+        passphrase: str | None = None,
+        timeout: float = 10.0,
+        base_url: str | None = None,
+    ) -> None:
+        """Select a push/trade endpoint and optional private credentials."""
+        self._native_client = _native.KucoinProWebSocketClient(
+            profile, api_key, api_secret, passphrase, timeout, base_url
+        )
+
+    async def connect(self) -> dict[str, Any]:
+        """Connect, validate the welcome event and authenticate private profiles."""
+        return json.loads(await self._native_client.connect())
+
+    async def close(self) -> None:
+        """Close this connection."""
+        await self._native_client.close()
+
+    async def subscribe(self, message: dict[str, Any]) -> None:
+        """Send channel/tradeType and optional symbol, symbols, interval or id."""
+        await self._native_client.subscription(json.dumps(message), True)
+
+    async def unsubscribe(self, message: dict[str, Any]) -> None:
+        """Send the same subscription filters with action UNSUBSCRIBE."""
+        await self._native_client.subscription(json.dumps(message), False)
+
+    async def send_operation(
+        self, request_id: str, operation: str, args: dict[str, Any] | list[dict[str, Any]]
+    ) -> None:
+        """Send an operation supported by the selected version; check its recv response."""
+        await self._native_client.send_operation(request_id, operation, json.dumps(args))
+
+    async def ping(self, request_id: str = "ping") -> None:
+        """Send one heartbeat; follow the server's advertised pingInterval."""
+        await self._native_client.ping(request_id)
+
+    async def recv(self) -> dict[str, Any]:
+        """Receive a raw subscription acknowledgement, trading response or event."""
+        return json.loads(bytes(await self._native_client.recv()))

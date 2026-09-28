@@ -223,35 +223,35 @@ impl PublicParams {
     }
 
     pub(super) fn optional_one_of(&self, key: &str, allowed: &[&str]) -> Result<()> {
-        if let Some(value) = self.get(key) {
-            if !allowed.contains(&value) {
-                return Err(DcexError::InvalidInput(format!(
-                    "invalid Binance {key}: {value}; expected one of {}",
-                    allowed.join(", ")
-                )));
-            }
+        if let Some(value) = self.get(key)
+            && !allowed.contains(&value)
+        {
+            return Err(DcexError::InvalidInput(format!(
+                "invalid Binance {key}: {value}; expected one of {}",
+                allowed.join(", ")
+            )));
         }
         Ok(())
     }
 
     pub(super) fn optional_bool(&self, key: &str) -> Result<()> {
-        if let Some(value) = self.get(key) {
-            if !matches!(value, "true" | "false" | "True" | "False" | "1" | "0") {
-                return Err(DcexError::InvalidInput(format!(
-                    "invalid Binance boolean {key}: {value}"
-                )));
-            }
+        if let Some(value) = self.get(key)
+            && !matches!(value, "true" | "false" | "True" | "False" | "1" | "0")
+        {
+            return Err(DcexError::InvalidInput(format!(
+                "invalid Binance boolean {key}: {value}"
+            )));
         }
         Ok(())
     }
 
     pub(super) fn optional_u64_range(&self, key: &str, min: u64, max: u64) -> Result<()> {
-        if let Some(value) = self.u64(key)? {
-            if value < min || value > max {
-                return Err(DcexError::InvalidInput(format!(
-                    "Binance parameter {key} must be between {min} and {max}"
-                )));
-            }
+        if let Some(value) = self.u64(key)?
+            && (value < min || value > max)
+        {
+            return Err(DcexError::InvalidInput(format!(
+                "Binance parameter {key} must be between {min} and {max}"
+            )));
         }
         Ok(())
     }
@@ -259,12 +259,12 @@ impl PublicParams {
     pub(super) fn ensure_time_order(&self, start_key: &str, end_key: &str) -> Result<()> {
         let start = self.u64(start_key)?;
         let end = self.u64(end_key)?;
-        if let (Some(start), Some(end)) = (start, end) {
-            if start > end {
-                return Err(DcexError::InvalidInput(format!(
-                    "Binance {start_key} must not be after {end_key}"
-                )));
-            }
+        if let (Some(start), Some(end)) = (start, end)
+            && start > end
+        {
+            return Err(DcexError::InvalidInput(format!(
+                "Binance {start_key} must not be after {end_key}"
+            )));
         }
         Ok(())
     }

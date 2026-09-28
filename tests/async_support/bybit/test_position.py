@@ -1,8 +1,10 @@
+import os
+
 import pytest
 import pytest_asyncio
-from dcex.async_support.bybit.client import Client
-import os
 from dotenv import load_dotenv
+
+from dcex.async_support.bybit.client import Client
 
 load_dotenv()
 

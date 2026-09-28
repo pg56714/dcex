@@ -19,3 +19,6 @@ pub use trade::LighterSignedTransaction;
 
 #[cfg(test)]
 mod tests;
+
+mod completion;
+mod completion_wrappers;

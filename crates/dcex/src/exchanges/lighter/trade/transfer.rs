@@ -1,4 +1,4 @@
-//! Same-master-account transfers follow lighter-go L2TransferTxInfo without an L1 signature.
+//! L2 transfers follow lighter-go L2TransferTxInfo; account-family eligibility is exchange-enforced.
 use super::*;
 impl LighterClient {
     pub(super) async fn sign_internal_transfer(

@@ -40,6 +40,29 @@ const INTEGERS: &[&str] = &[
 const BOOLEANS: &[&str] = &["reduceOnly", "isRandom"];
 
 impl BybitClient {
+    fn strategy_category(&self, symbol: &str, requested: Option<&str>) -> Result<String> {
+        let parts: Vec<_> = symbol.split('-').collect();
+        if parts.len() == 1 {
+            let category =
+                requested.ok_or_else(|| invalid("category is required for native symbols"))?;
+            return Ok(category.into());
+        }
+        let market = self.category_for_product_symbol(symbol, "linear")?;
+        let derived = match (market.as_str(), parts.as_slice()) {
+            ("spot", [_, _, "SPOT"]) => "UTA_SPOT",
+            ("inverse", [_, "USD", "SWAP"]) => "UTA_INVERSE",
+            ("inverse", [_, "USD", _, "SWAP"]) => "UTA_INVERSE_FUTURE",
+            ("linear", [_, "USDT", "SWAP"]) => "UTA_USDT",
+            ("linear", [_, "USDC", "SWAP"]) => "UTA_USDC",
+            ("linear", [_, "USDT", _, "SWAP"]) => "UTA_USDT_FUTURE",
+            _ => return Err(invalid("unsupported strategy product symbol/category")),
+        };
+        if requested.is_some_and(|category| category != derived) {
+            return Err(invalid("category does not match product_symbol"));
+        }
+        Ok(derived.into())
+    }
+
     pub(super) async fn strategy_private_request(
         &self,
         name: &str,
@@ -48,9 +71,49 @@ impl BybitClient {
         let result = match name {
             "create_strategy" => {
                 let mut allowed = [STRINGS, INTEGERS, BOOLEANS].concat();
-                allowed.extend(["product_symbol", "symbol", "povParams"]);
+                allowed.extend(["product_symbol", "symbol", "povParams", "maker_only"]);
                 ensure_allowed(params, &allowed)?;
+                let symbol = params
+                    .get("product_symbol")
+                    .or_else(|| params.get("symbol"))
+                    .ok_or_else(|| invalid("product_symbol or symbol is required"))?;
+                if params.get("product_symbol").is_some() && params.get("symbol").is_some() {
+                    return Err(invalid("provide only one symbol parameter"));
+                }
+                let category = self.strategy_category(symbol, params.get("category"))?;
+                let mut normalized = params.without(&["category", "maker_only"]);
+                normalized.push(("category".into(), category));
+                if let Some(maker_only) = params.get("maker_only") {
+                    if params.get("postOnly").is_some() {
+                        return Err(invalid(
+                            "maker_only and deprecated postOnly are mutually exclusive",
+                        ));
+                    }
+                    let value = match maker_only {
+                        "true" => "0",
+                        "false" => "1",
+                        _ => return Err(invalid("maker_only must be boolean")),
+                    };
+                    normalized.push(("postOnly".into(), value.into()));
+                }
+                let normalized = BybitParams::from_pairs(normalized);
+                let params = &normalized;
                 required_enum(params, "category", CATEGORIES)?;
+                if params.get("chaseDistance").is_some() && params.get("chasePercentE4").is_some() {
+                    return Err(invalid(
+                        "chaseDistance and chasePercentE4 are mutually exclusive",
+                    ));
+                }
+                if ["subSize", "subPositionValue", "orderCount"]
+                    .iter()
+                    .filter(|key| params.get(key).is_some())
+                    .count()
+                    > 1
+                {
+                    return Err(invalid(
+                        "subSize, subPositionValue and orderCount are mutually exclusive",
+                    ));
+                }
                 required_enum(params, "side", &["Buy", "Sell"])?;
                 required_enum(params, "strategyType", TYPES)?;
                 let strategy = params.required("strategyType")?;

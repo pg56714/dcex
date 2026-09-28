@@ -369,6 +369,137 @@ impl OkxPrivateWebSocket {
         self.connection.recv_json().await
     }
 
+    /// Send a complete documented subscription, preserving extraParams and algoId.
+    pub async fn subscription_args(&mut self, op: &str, args: Vec<Value>) -> Result<()> {
+        super::validate_raw_subscriptions(op, &args)?;
+        let typed = args
+            .iter()
+            .map(|value| {
+                let field = |key| value[key].as_str().map(str::to_owned);
+                let mut arg = OkxPrivateWebSocketArg::with_filters(
+                    value["channel"].as_str().unwrap(),
+                    field("instType"),
+                    field("instFamily"),
+                    field("instId"),
+                    field("ccy"),
+                )?;
+                if let Some(id) = field("sprdId") {
+                    arg = arg.and_sprd_id(id)?;
+                }
+                Ok(arg)
+            })
+            .collect::<Result<Vec<_>>>()?;
+        validate_subscription_args(&typed)?;
+        if op == "subscribe" {
+            self.prepare_subscription_route(&typed).await?;
+        } else {
+            self.validate_subscription_route(&typed)?;
+        }
+        self.connection
+            .send_json(&json!({"op":op,"args":args}))
+            .await?;
+        if op == "subscribe" {
+            self.subscription_count += typed.len();
+        } else {
+            self.subscription_count = self.subscription_count.saturating_sub(typed.len());
+        }
+        Ok(())
+    }
+
+    /// Send a documented trading operation; consume the exchange acknowledgement with recv.
+    pub async fn send_operation(
+        &mut self,
+        id: &str,
+        op: &str,
+        args: Vec<Value>,
+        exp_time: Option<u64>,
+        all_symbols: bool,
+    ) -> Result<()> {
+        let invalid = |s: &str| DcexError::InvalidInput(format!("OKX: {s}"));
+        if !matches!(
+            op,
+            "order"
+                | "batch-orders"
+                | "cancel-order"
+                | "batch-cancel-orders"
+                | "amend-order"
+                | "batch-amend-orders"
+                | "mass-cancel"
+                | "sprd-order"
+                | "sprd-amend-order"
+                | "sprd-cancel-order"
+                | "sprd-mass-cancel"
+        ) {
+            return Err(invalid("unsupported trading operation"));
+        }
+        if id.is_empty() || id.len() > 32 || !id.bytes().all(|c| c.is_ascii_alphanumeric()) {
+            return Err(invalid("id must be 1..32 alphanumeric characters"));
+        }
+        if args.is_empty() || args.len() > 20 || (!op.starts_with("batch-") && args.len() != 1) {
+            return Err(invalid("invalid number of operation arguments"));
+        }
+        for arg in &args {
+            let object = arg
+                .as_object()
+                .ok_or_else(|| invalid("operation arguments must be objects"))?;
+            if op.ends_with("mass-cancel") {
+                let scoped = object
+                    .get(if op.starts_with("sprd-") {
+                        "sprdId"
+                    } else {
+                        "instFamily"
+                    })
+                    .and_then(Value::as_str)
+                    .is_some_and(|s| !s.is_empty());
+                if scoped == all_symbols {
+                    return Err(invalid(
+                        "provide an instrument family/spread or all_symbols=true exclusively",
+                    ));
+                }
+            } else if all_symbols {
+                return Err(invalid(
+                    "all_symbols is only supported for mass cancellation",
+                ));
+            }
+            for key in ["sz", "px", "newSz", "newPx"] {
+                if let Some(value) = object.get(key)
+                    && !value
+                        .as_str()
+                        .is_some_and(crate::common::is_positive_plain_decimal)
+                {
+                    // Spread prices can be negative or zero; quantities cannot.
+                    if !(op.starts_with("sprd-")
+                        && matches!(key, "px" | "newPx")
+                        && value.as_str().is_some_and(|s| {
+                            s.parse::<f64>().is_ok_and(f64::is_finite) && !s.contains(['e', 'E'])
+                        }))
+                    {
+                        return Err(invalid(
+                            "prices and quantities require plain decimal strings",
+                        ));
+                    }
+                }
+            }
+        }
+        let channel = if op.starts_with("sprd-") {
+            "sprd-orders"
+        } else {
+            "orders"
+        };
+        self.prepare_subscription_route(&[OkxPrivateWebSocketArg::new(channel)?])
+            .await?;
+        if !self.logged_in {
+            return Err(invalid(
+                "trading operations require an authenticated connection",
+            ));
+        }
+        let mut payload = json!({"id":id,"op":op,"args":args});
+        if let Some(exp_time) = exp_time {
+            payload["expTime"] = exp_time.to_string().into();
+        }
+        self.connection.send_json(&payload).await
+    }
+
     pub async fn recv_bytes(&mut self) -> Result<Vec<u8>> {
         self.connection.recv_bytes().await
     }

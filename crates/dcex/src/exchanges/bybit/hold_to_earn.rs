@@ -40,12 +40,12 @@ impl BybitClient {
         }
         let start = parse_optional_time(params, "timeStart")?;
         let end = parse_optional_time(params, "timeEnd")?;
-        if let (Some(start), Some(end)) = (start, end) {
-            if end < start {
-                return Err(DcexError::InvalidInput(
-                    "timeEnd must not be earlier than timeStart".to_string(),
-                ));
-            }
+        if let (Some(start), Some(end)) = (start, end)
+            && end < start
+        {
+            return Err(DcexError::InvalidInput(
+                "timeEnd must not be earlier than timeStart".to_string(),
+            ));
         }
         let result = self
             .get_request(

@@ -282,7 +282,18 @@ impl BackpackClient {
         instruction: &str,
         extra_headers: BTreeMap<String, String>,
     ) -> Result<ValidatedResponse> {
-        let signature_payload = signature_payload_from_value(&body);
+        // The official withdrawal schema explicitly excludes recipientInformation
+        // (Travel Rule reporting) from the signature, but retains it in the body.
+        // https://docs.backpack.exchange/#tag/Capital/operation/request_withdrawal
+        let signature_payload = if instruction == "withdraw" {
+            let mut signing_body = body.clone();
+            if let Some(object) = signing_body.as_object_mut() {
+                object.remove("recipientInformation");
+            }
+            signature_payload_from_value(&signing_body)
+        } else {
+            signature_payload_from_value(&body)
+        };
         let body = serde_json::to_vec(&body)
             .map_err(|error| DcexError::InvalidInput(format!("invalid JSON body: {error}")))?;
         self.request(
@@ -339,10 +350,9 @@ impl BackpackClient {
         if matches!(
             method,
             HttpMethod::Post | HttpMethod::Patch | HttpMethod::Delete
-        ) {
-            if let Some(body) = body {
-                request.body = RequestBody::Raw(body);
-            }
+        ) && let Some(body) = body
+        {
+            request.body = RequestBody::Raw(body);
         }
 
         if signed {

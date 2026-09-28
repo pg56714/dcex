@@ -118,21 +118,12 @@ impl OndoClient {
             &timestamp,
         )?;
         let response = self.transport.execute(request).await?;
-        if signed {
-            if let Some(offset) = timestamp_rejection_offset(&response) {
-                self.timestamp_offset_ms.store(offset, Ordering::Relaxed);
-                let timestamp = adjusted_timestamp_ms(offset)?;
-                let retry = self.build_request(
-                    method,
-                    path,
-                    params,
-                    body,
-                    true,
-                    extra_headers,
-                    &timestamp,
-                )?;
-                return self.transport.execute(retry).await;
-            }
+        if signed && let Some(offset) = timestamp_rejection_offset(&response) {
+            self.timestamp_offset_ms.store(offset, Ordering::Relaxed);
+            let timestamp = adjusted_timestamp_ms(offset)?;
+            let retry =
+                self.build_request(method, path, params, body, true, extra_headers, &timestamp)?;
+            return self.transport.execute(retry).await;
         }
         Ok(response)
     }
@@ -295,10 +286,10 @@ impl OndoClient {
         if product_symbol.ends_with(".P") {
             return Ok(product_symbol.to_string());
         }
-        if let Some(table) = &self.product_table {
-            if let Ok(symbol) = table.get_exchange_symbol("ondo", product_symbol) {
-                return Ok(symbol);
-            }
+        if let Some(table) = &self.product_table
+            && let Ok(symbol) = table.get_exchange_symbol("ondo", product_symbol)
+        {
+            return Ok(symbol);
         }
         let parts = product_symbol.split('-').collect::<Vec<_>>();
         match parts.as_slice() {

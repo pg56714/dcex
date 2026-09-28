@@ -1,5 +1,6 @@
-from dcex.hyperliquid.client import Client
 import pytest
+
+from dcex.hyperliquid.client import Client
 
 
 @pytest.fixture

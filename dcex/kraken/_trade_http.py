@@ -368,7 +368,7 @@ class TradeHTTP(HTTPManager):
         post_only: bool | None = None,
         deadline: str | None = None,
     ) -> dict[str, Any]:
-        """Amend a spot order in place, retaining its identifier where possible."""
+        """Amend in place with AmendOrder; legacy edit_spot_order replaces the order ID."""
         return self._native_private("amend_spot_order", self._native_params(**locals()))
 
     def cancel_spot_order(
@@ -728,12 +728,18 @@ class TradeHTTP(HTTPManager):
         return self._native_private("get_futures_leverage_preferences", [])
 
     def set_futures_leverage_preference(
-        self, product_symbol: str, *, max_leverage: str | None = None
+        self,
+        product_symbol: str,
+        *,
+        margin_mode: str | None = None,
+        max_leverage: str | None = None,
     ) -> dict[str, Any]:
-        """Set isolated margin with max_leverage; omit it to select cross margin."""
+        """Select margin_mode explicitly: isolated requires max_leverage; cross forbids it."""
         return self._native_private(
             "set_futures_leverage_preference",
-            self._native_params(product_symbol=product_symbol, maxLeverage=max_leverage),
+            self._native_params(
+                product_symbol=product_symbol, margin_mode=margin_mode, maxLeverage=max_leverage
+            ),
         )
 
     def manage_futures_batch_orders(
@@ -963,6 +969,8 @@ class TradeHTTP(HTTPManager):
     ) -> dict[str, Any]:
         """
         POST /0/private/DepositAddresses. Legacy funding API: active but no longer updated.
+
+        new_address=True creates a new deposit address; it is not a read-only request.
 
         Source: https://docs.kraken.com/api-reference/funding/get-deposit-addresses
         """
@@ -1438,7 +1446,10 @@ class TradeHTTP(HTTPManager):
         cancel_response: bool | None = None,
         validate: bool | None = None,
     ) -> dict[str, Any] | list[Any]:
-        """Cancel and replace an order, returning a new txid; queue priority is lost."""
+        """
+        Legacy EditOrder cancels and replaces an order with a new txid and loses queue priority.
+
+        Use amend_spot_order for in-place AmendOrder updates."""
         return self._native_private(
             "edit_spot_order",
             self._native_params(
@@ -1455,4 +1466,691 @@ class TradeHTTP(HTTPManager):
                 cancel_response=cancel_response,
                 validate=validate,
             ),
+        )
+
+    def get_affiliate_daily_activity(
+        self,
+        *,
+        activity_date: str | None = None,
+        iiban: str | None = None,
+        start_date: str | None = None,
+        end_date: str | None = None,
+        all_users: bool | None = None,
+        cursor: str | None = None,
+        limit: int | None = None,
+        otp: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /affiliate/v1/daily-activity.
+
+        Requires the corresponding account permission. Uses the documented API-Nonce header and
+        signs the complete path including its query.
+        Source: https://docs.kraken.com/api-reference/affiliate/get-daily-activity
+        """
+        return self._native_private(
+            "get_affiliate_daily_activity",
+            self._native_params(
+                activity_date=activity_date,
+                iiban=iiban,
+                start_date=start_date,
+                end_date=end_date,
+                all_users=all_users,
+                cursor=cursor,
+                limit=limit,
+                otp=otp,
+            ),
+        )
+
+    def add_assignment_program(
+        self,
+        *,
+        contract_type: str,
+        accept_long: bool,
+        accept_short: bool,
+        time_frame: str,
+        enabled: bool,
+        contract: str | None = None,
+        max_size: str | None = None,
+        max_position: str | None = None,
+        base_currency: str | None = None,
+        quote_currency: str | None = None,
+        cash_account_open_position_max_notional: str | None = None,
+        minimum_profitability_per_assignment_long_bps: int | None = None,
+        minimum_profitability_per_assignment_short_bps: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /derivatives/api/v3/assignmentprogram/add.
+
+        Requires the corresponding account permission.
+        Source: https://docs.kraken.com/api-reference/assignment-program/add-assignment-preference
+        """
+        return self._native_private(
+            "add_assignment_program",
+            self._native_params(
+                contractType=contract_type,
+                contract=contract,
+                maxSize=max_size,
+                maxPosition=max_position,
+                acceptLong=accept_long,
+                acceptShort=accept_short,
+                timeFrame=time_frame,
+                enabled=enabled,
+                baseCurrency=base_currency,
+                quoteCurrency=quote_currency,
+                cashAccountOpenPositionMaxNotional=cash_account_open_position_max_notional,
+                minimumProfitabilityPerAssignmentLongBps=minimum_profitability_per_assignment_long_bps,
+                minimumProfitabilityPerAssignmentShortBps=minimum_profitability_per_assignment_short_bps,
+            ),
+        )
+
+    def delete_assignment_program(self, *, assignment_id: str) -> Any:  # noqa: ANN401
+        """
+        POST /derivatives/api/v3/assignmentprogram/delete.
+
+        Requires the corresponding account permission.
+        Source: https://docs.kraken.com/api-reference/assignment-program/deletes-assignment-preference
+        """
+        return self._native_private(
+            "delete_assignment_program", self._native_params(id=assignment_id)
+        )
+
+    def get_assignment_program_history(self) -> Any:  # noqa: ANN401
+        """
+        GET /derivatives/api/v3/assignmentprogram/history.
+
+        Requires the corresponding account permission.
+        Source: https://docs.kraken.com/api-reference/assignment-program/list-assignment-preferences-history
+        """
+        return self._native_private("get_assignment_program_history", self._native_params())
+
+    def get_assignment_program_current(self) -> Any:  # noqa: ANN401
+        """
+        GET /derivatives/api/v3/assignmentprogram/current.
+
+        Requires the corresponding account permission.
+        Source: https://docs.kraken.com/api-reference/assignment-program/list-assignment-programs
+        """
+        return self._native_private("get_assignment_program_current", self._native_params())
+
+    def calculate_funding_fees(
+        self,
+        *,
+        method_id: str,
+        amount: str,
+        fee_included: bool | None = None,
+        withdrawal_fee_token: str | None = None,
+        rebase_multiplier: str | None = None,
+        account_id: str | None = None,
+        otp: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /funding/v1/fees/{method_id}.
+
+        Requires the corresponding account permission. Uses the documented API-Nonce header and
+        signs the complete path including its query.
+        Source: https://docs.kraken.com/api-reference/funding-beta/calculate-funding-fees
+        """
+        return self._native_private(
+            "calculate_funding_fees",
+            self._native_params(
+                method_id=method_id,
+                amount=amount,
+                fee_included=fee_included,
+                withdrawal_fee_token=withdrawal_fee_token,
+                rebase_multiplier=rebase_multiplier,
+                account_id=account_id,
+                otp=otp,
+            ),
+        )
+
+    def claim_funding_deposit_address(
+        self, *, body: dict[str, Any], account_id: str | None = None, otp: str | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        PUT /funding/v1/deposit/address.
+
+        Requires the corresponding account permission. Uses the documented API-Nonce header and
+        signs the complete path including its query.
+        Source: https://docs.kraken.com/api-reference/funding-beta/claim-funding-deposit-address
+        """
+        return self._native_private(
+            "claim_funding_deposit_address",
+            self._native_params(
+                account_id=account_id,
+                body=dumps(body, separators=(",", ":"), allow_nan=False),
+                otp=otp,
+            ),
+        )
+
+    def create_funding_address(
+        self, *, body: dict[str, Any], account_id: str | None = None, otp: str | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /funding/v1/addresses.
+
+        Requires the corresponding account permission. Uses the documented API-Nonce header and
+        signs the complete path including its query.
+        Source: https://docs.kraken.com/api-reference/funding-beta/create-funding-address
+        """
+        return self._native_private(
+            "create_funding_address",
+            self._native_params(
+                account_id=account_id,
+                body=dumps(body, separators=(",", ":"), allow_nan=False),
+                otp=otp,
+            ),
+        )
+
+    def create_funding_withdrawal(
+        self, *, body: dict[str, Any], account_id: str | None = None, otp: str | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /funding/v1/withdrawals.
+
+        API withdrawals have no second confirmation; they execute on submit. Uses the documented
+        API-Nonce header and signs the complete path including its query.
+        Source: https://docs.kraken.com/api-reference/funding-beta/create-funding-withdrawal
+        """
+        return self._native_private(
+            "create_funding_withdrawal",
+            self._native_params(
+                account_id=account_id,
+                body=dumps(body, separators=(",", ":"), allow_nan=False),
+                otp=otp,
+            ),
+        )
+
+    def delete_funding_address(
+        self, *, address_id: str, account_id: str | None = None, otp: str | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        DELETE /funding/v1/addresses/{id}.
+
+        Requires the corresponding account permission. Uses the documented API-Nonce header and
+        signs the complete path including its query.
+        Source: https://docs.kraken.com/api-reference/funding-beta/delete-funding-address
+        """
+        return self._native_private(
+            "delete_funding_address",
+            self._native_params(id=address_id, account_id=account_id, otp=otp),
+        )
+
+    def get_funding_addresses(
+        self,
+        *,
+        scope: dict[str, Any] | None = None,
+        cursor: str | None = None,
+        limit: int | None = None,
+        account_id: str | None = None,
+        otp: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /funding/v1/addresses.
+
+        Requires the corresponding account permission. Uses the documented API-Nonce header and
+        signs the complete path including its query.
+        Source: https://docs.kraken.com/api-reference/funding-beta/list-funding-addresses
+        """
+        return self._native_private(
+            "get_funding_addresses",
+            self._native_params(
+                scope=dumps(scope, separators=(",", ":"), allow_nan=False)
+                if scope is not None
+                else None,
+                cursor=cursor,
+                limit=limit,
+                account_id=account_id,
+                otp=otp,
+            ),
+        )
+
+    def get_funding_assets(
+        self,
+        *,
+        direction: str,
+        asset_class: str | None = None,
+        account_id: str | None = None,
+        otp: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /funding/v1/assets/{direction}.
+
+        Requires the corresponding account permission. Uses the documented API-Nonce header and
+        signs the complete path including its query.
+        Source: https://docs.kraken.com/api-reference/funding-beta/list-funding-assets
+        """
+        return self._native_private(
+            "get_funding_assets",
+            self._native_params(
+                direction=direction, asset_class=asset_class, account_id=account_id, otp=otp
+            ),
+        )
+
+    def get_funding_deposit_addresses(
+        self,
+        *,
+        scope: dict[str, Any] | None = None,
+        cursor: str | None = None,
+        limit: int | None = None,
+        asset: dict[str, Any] | None = None,
+        account_id: str | None = None,
+        otp: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /funding/v2/deposit/addresses.
+
+        Requires the corresponding account permission. Uses the documented API-Nonce header and
+        signs the complete path including its query.
+        Source: https://docs.kraken.com/api-reference/funding-beta/list-funding-claimed-addresses-v2
+        """
+        return self._native_private(
+            "get_funding_deposit_addresses",
+            self._native_params(
+                scope=dumps(scope, separators=(",", ":"), allow_nan=False)
+                if scope is not None
+                else None,
+                cursor=cursor,
+                limit=limit,
+                asset=dumps(asset, separators=(",", ":"), allow_nan=False)
+                if asset is not None
+                else None,
+                account_id=account_id,
+                otp=otp,
+            ),
+        )
+
+    def get_funding_deposit_limits(
+        self,
+        *,
+        asset_class: str,
+        asset: str,
+        preferred_asset: dict[str, Any] | None = None,
+        account_id: str | None = None,
+        otp: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /funding/v1/limits/deposit/{asset_class}/{asset}.
+
+        Requires the corresponding account permission. Uses the documented API-Nonce header and
+        signs the complete path including its query.
+        Source: https://docs.kraken.com/api-reference/funding-beta/list-funding-deposit-limits
+        """
+        return self._native_private(
+            "get_funding_deposit_limits",
+            self._native_params(
+                asset_class=asset_class,
+                asset=asset,
+                preferred_asset=dumps(preferred_asset, separators=(",", ":"), allow_nan=False)
+                if preferred_asset is not None
+                else None,
+                account_id=account_id,
+                otp=otp,
+            ),
+        )
+
+    def get_funding_deposits(
+        self,
+        *,
+        asset: dict[str, Any] | None = None,
+        scope: dict[str, Any] | None = None,
+        status: dict[str, Any] | None = None,
+        cursor: str | None = None,
+        limit: int | None = None,
+        start_time: str | None = None,
+        end_time: str | None = None,
+        rebase_multiplier: str | None = None,
+        account_id: str | None = None,
+        otp: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /funding/v1/deposits.
+
+        Requires the corresponding account permission. Uses the documented API-Nonce header and
+        signs the complete path including its query. The status.list encoding follows the official
+        Python helper but is not verified live; status.range uses documented nested keys.
+        Source: https://docs.kraken.com/api-reference/funding-beta/list-funding-deposits
+        """
+        return self._native_private(
+            "get_funding_deposits",
+            self._native_params(
+                asset=dumps(asset, separators=(",", ":"), allow_nan=False)
+                if asset is not None
+                else None,
+                scope=dumps(scope, separators=(",", ":"), allow_nan=False)
+                if scope is not None
+                else None,
+                status=dumps(status, separators=(",", ":"), allow_nan=False)
+                if status is not None
+                else None,
+                cursor=cursor,
+                limit=limit,
+                start_time=start_time,
+                end_time=end_time,
+                rebase_multiplier=rebase_multiplier,
+                account_id=account_id,
+                otp=otp,
+            ),
+        )
+
+    def get_funding_methods(
+        self,
+        *,
+        direction: str,
+        asset: dict[str, Any] | None = None,
+        rebase_multiplier: str | None = None,
+        limit: int | None = None,
+        cursor: str | None = None,
+        account_id: str | None = None,
+        otp: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /funding/v1/methods/{direction}.
+
+        Requires the corresponding account permission. Uses the documented API-Nonce header and
+        signs the complete path including its query.
+        Source: https://docs.kraken.com/api-reference/funding-beta/list-funding-methods
+        """
+        return self._native_private(
+            "get_funding_methods",
+            self._native_params(
+                direction=direction,
+                asset=dumps(asset, separators=(",", ":"), allow_nan=False)
+                if asset is not None
+                else None,
+                rebase_multiplier=rebase_multiplier,
+                limit=limit,
+                cursor=cursor,
+                account_id=account_id,
+                otp=otp,
+            ),
+        )
+
+    def get_funding_networks(self, *, account_id: str | None = None, otp: str | None = None) -> Any:  # noqa: ANN401
+        """
+        GET /funding/v1/networks.
+
+        Requires the corresponding account permission. Uses the documented API-Nonce header and
+        signs the complete path including its query.
+        Source: https://docs.kraken.com/api-reference/funding-beta/list-funding-networks
+        """
+        return self._native_private(
+            "get_funding_networks", self._native_params(account_id=account_id, otp=otp)
+        )
+
+    def get_funding_withdrawal_limits(
+        self,
+        *,
+        asset_class: str,
+        asset: str,
+        preferred_asset: dict[str, Any] | None = None,
+        account_id: str | None = None,
+        otp: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /funding/v1/limits/withdrawal/{asset_class}/{asset}.
+
+        Requires the corresponding account permission. Uses the documented API-Nonce header and
+        signs the complete path including its query.
+        Source: https://docs.kraken.com/api-reference/funding-beta/list-funding-withdrawal-limits
+        """
+        return self._native_private(
+            "get_funding_withdrawal_limits",
+            self._native_params(
+                asset_class=asset_class,
+                asset=asset,
+                preferred_asset=dumps(preferred_asset, separators=(",", ":"), allow_nan=False)
+                if preferred_asset is not None
+                else None,
+                account_id=account_id,
+                otp=otp,
+            ),
+        )
+
+    def get_funding_withdrawals(
+        self,
+        *,
+        asset: dict[str, Any] | None = None,
+        scope: dict[str, Any] | None = None,
+        status: str | None = None,
+        cursor: str | None = None,
+        limit: int | None = None,
+        start_time: str | None = None,
+        end_time: str | None = None,
+        rebase_multiplier: str | None = None,
+        account_id: str | None = None,
+        otp: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /funding/v1/withdrawals.
+
+        Requires the corresponding account permission. Uses the documented API-Nonce header and
+        signs the complete path including its query.
+        Source: https://docs.kraken.com/api-reference/funding-beta/list-funding-withdrawals
+        """
+        return self._native_private(
+            "get_funding_withdrawals",
+            self._native_params(
+                asset=dumps(asset, separators=(",", ":"), allow_nan=False)
+                if asset is not None
+                else None,
+                scope=dumps(scope, separators=(",", ":"), allow_nan=False)
+                if scope is not None
+                else None,
+                status=status,
+                cursor=cursor,
+                limit=limit,
+                start_time=start_time,
+                end_time=end_time,
+                rebase_multiplier=rebase_multiplier,
+                account_id=account_id,
+                otp=otp,
+            ),
+        )
+
+    def update_funding_address(
+        self,
+        *,
+        address_id: str,
+        body: dict[str, Any],
+        account_id: str | None = None,
+        otp: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        PUT /funding/v1/addresses/{id}.
+
+        Requires the corresponding account permission. Uses the documented API-Nonce header and
+        signs the complete path including its query.
+        Source: https://docs.kraken.com/api-reference/funding-beta/update-funding-address
+        """
+        return self._native_private(
+            "update_funding_address",
+            self._native_params(
+                id=address_id,
+                account_id=account_id,
+                body=dumps(body, separators=(",", ":"), allow_nan=False),
+                otp=otp,
+            ),
+        )
+
+    def cancel_spot_withdrawal(self, *, asset: str, refid: str) -> Any:  # noqa: ANN401
+        """
+        POST /0/private/WithdrawCancel.
+
+        Requires the corresponding account permission.
+        Source: https://docs.kraken.com/api-reference/funding/request-withdrawal-cancellation
+        """
+        return self._native_private(
+            "cancel_spot_withdrawal", self._native_params(asset=asset, refid=refid)
+        )
+
+    def create_spot_withdrawal(
+        self,
+        *,
+        asset: str,
+        key: str,
+        amount: str,
+        aclass: str | None = None,
+        address: str | None = None,
+        max_fee: str | None = None,
+        rebase_multiplier: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /0/private/Withdraw.
+
+        API withdrawals have no second confirmation; they execute on submit.
+        Source: https://docs.kraken.com/api-reference/funding/withdraw-funds
+        """
+        return self._native_private(
+            "create_spot_withdrawal",
+            self._native_params(
+                asset=asset,
+                aclass=aclass,
+                key=key,
+                address=address,
+                amount=amount,
+                max_fee=max_fee,
+                rebase_multiplier=rebase_multiplier,
+            ),
+        )
+
+    def accept_rfq_offer(
+        self, *, rfq_uid: str, bid_accepted: str | None = None, ask_accepted: str | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /derivatives/api/v3/rfqs/open-rfqs/accept-offer/{rfqUid}.
+
+        Requires the corresponding account permission.
+        Source: https://docs.kraken.com/api-reference/rfqs/accept-an-offer-on-an-open-rfq
+        """
+        return self._native_private(
+            "accept_rfq_offer",
+            self._native_params(rfqUid=rfq_uid, bidAccepted=bid_accepted, askAccepted=ask_accepted),
+        )
+
+    def cancel_user_rfq(self, *, rfq_uid: str) -> Any:  # noqa: ANN401
+        """
+        DELETE /derivatives/api/v3/rfqs/open-rfqs/{rfqUid}.
+
+        Requires the corresponding account permission.
+        Source: https://docs.kraken.com/api-reference/rfqs/cancel-an-open-rfq
+        """
+        return self._native_private("cancel_user_rfq", self._native_params(rfqUid=rfq_uid))
+
+    def cancel_rfq_offer(self, *, rfq_uid: str, offer_uid: str | None = None) -> Any:  # noqa: ANN401
+        """
+        DELETE /derivatives/api/v3/rfqs/cancel-offer/{rfqUid}.
+
+        Requires the corresponding account permission.
+        Source: https://docs.kraken.com/api-reference/rfqs/cancel-open-offer-on-open-rfq
+        """
+        return self._native_private(
+            "cancel_rfq_offer", self._native_params(rfqUid=rfq_uid, offerUid=offer_uid)
+        )
+
+    def create_user_rfq(self, *, request: dict[str, Any]) -> Any:  # noqa: ANN401
+        """
+        POST /derivatives/api/v3/rfqs/open-rfqs.
+
+        Requires the corresponding account permission.
+        Source: https://docs.kraken.com/api-reference/rfqs/create-a-new-rfq
+        """
+        return self._native_private(
+            "create_user_rfq",
+            self._native_params(json=dumps(request, separators=(",", ":"), allow_nan=False)),
+        )
+
+    def get_open_rfqs(self) -> Any:  # noqa: ANN401
+        """
+        GET /derivatives/api/v3/rfqs.
+
+        Requires the corresponding account permission.
+        Source: https://docs.kraken.com/api-reference/rfqs/list-all-open-rfqs
+        """
+        return self._native_private("get_open_rfqs", self._native_params())
+
+    def get_closed_rfq_offers(self) -> Any:  # noqa: ANN401
+        """
+        GET /derivatives/api/v3/rfqs/closed-offers.
+
+        Requires the corresponding account permission.
+        Source: https://docs.kraken.com/api-reference/rfqs/list-offers-placed-by-the-account-on-closed-rfqs
+        """
+        return self._native_private("get_closed_rfq_offers", self._native_params())
+
+    def get_open_rfq_offers(self) -> Any:  # noqa: ANN401
+        """
+        GET /derivatives/api/v3/rfqs/open-offers.
+
+        Requires the corresponding account permission.
+        Source: https://docs.kraken.com/api-reference/rfqs/list-open-offers-on-open-rfqs
+        """
+        return self._native_private("get_open_rfq_offers", self._native_params())
+
+    def get_open_rfqs_for_account(self) -> Any:  # noqa: ANN401
+        """
+        GET /derivatives/api/v3/rfqs/open-rfqs.
+
+        Requires the corresponding account permission.
+        Source: https://docs.kraken.com/api-reference/rfqs/list-open-rfqs-for-account
+        """
+        return self._native_private("get_open_rfqs_for_account", self._native_params())
+
+    def place_rfq_offer(
+        self,
+        *,
+        rfq_uid: str,
+        bid: str | None = None,
+        ask: str | None = None,
+        bid_side: str | None = None,
+        ask_side: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /derivatives/api/v3/rfqs/place-offer/{rfqUid}.
+
+        Requires the corresponding account permission.
+        Source: https://docs.kraken.com/api-reference/rfqs/place-new-offer-on-an-open-rfq
+        """
+        return self._native_private(
+            "place_rfq_offer",
+            self._native_params(
+                rfqUid=rfq_uid, bid=bid, ask=ask, bidSide=bid_side, askSide=ask_side
+            ),
+        )
+
+    def get_rfq(self, *, rfq_uid: str) -> Any:  # noqa: ANN401
+        """
+        GET /derivatives/api/v3/rfqs/{rfqUid}.
+
+        Requires the corresponding account permission.
+        Source: https://docs.kraken.com/api-reference/rfqs/retrieve-a-single-rfq-open-or-recently-closed
+        """
+        return self._native_private("get_rfq", self._native_params(rfqUid=rfq_uid))
+
+    def delete_rfq_assignment_max_leverage(self) -> Any:  # noqa: ANN401
+        """
+        DELETE /derivatives/api/v3/rfq-assignment/max-leverage.
+
+        Requires the corresponding account permission.
+        Source: https://docs.kraken.com/api-reference/trading-settings/clear-the-off-book-max-leverage-cap
+        """
+        return self._native_private("delete_rfq_assignment_max_leverage", self._native_params())
+
+    def get_rfq_assignment_max_leverage(self) -> Any:  # noqa: ANN401
+        """
+        GET /derivatives/api/v3/rfq-assignment/max-leverage.
+
+        Requires the corresponding account permission.
+        Source: https://docs.kraken.com/api-reference/trading-settings/get-the-off-book-max-leverage-cap
+        """
+        return self._native_private("get_rfq_assignment_max_leverage", self._native_params())
+
+    def update_rfq_assignment_max_leverage(self, *, max_leverage: str) -> Any:  # noqa: ANN401
+        """
+        PUT /derivatives/api/v3/rfq-assignment/max-leverage.
+
+        Requires the corresponding account permission.
+        Source: https://docs.kraken.com/api-reference/trading-settings/set-the-off-book-max-leverage-cap
+        """
+        return self._native_private(
+            "update_rfq_assignment_max_leverage", self._native_params(maxLeverage=max_leverage)
         )

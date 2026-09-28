@@ -24,15 +24,14 @@ fn exactly_one(params: &PublicParams, first: &str, second: &str) -> Result<()> {
 }
 
 fn positive_amount(params: &PublicParams, key: &str) -> Result<()> {
-    if let Some(value) = params.get(key) {
-        if !value
+    if let Some(value) = params.get(key)
+        && !value
             .parse::<f64>()
             .is_ok_and(|amount| amount.is_finite() && amount > 0.0)
-        {
-            return Err(DcexError::InvalidInput(format!(
-                "Binance {key} must be a positive finite amount"
-            )));
-        }
+    {
+        return Err(DcexError::InvalidInput(format!(
+            "Binance {key} must be a positive finite amount"
+        )));
     }
     Ok(())
 }

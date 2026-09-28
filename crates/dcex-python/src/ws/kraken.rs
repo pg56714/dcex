@@ -546,7 +546,94 @@ impl PythonKrakenFuturesWebSocketClient {
 }
 
 pub(super) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
+    m.add_class::<PythonKrakenV1WebSocketClient>()?;
     m.add_class::<PythonKrakenFuturesWebSocketClient>()?;
     m.add_class::<PythonKrakenPublicWebSocketClient>()?;
     m.add_class::<PythonKrakenPrivateWebSocketClient>()
+}
+
+#[pyclass(name = "KrakenV1WebSocketClient")]
+struct PythonKrakenV1WebSocketClient {
+    client: Arc<Mutex<dcex::ws::kraken::KrakenV1WebSocket>>,
+}
+#[pymethods]
+impl PythonKrakenV1WebSocketClient {
+    #[new]
+    #[pyo3(signature = (token=None, timeout=10.0, base_url=None))]
+    fn new(token: Option<String>, timeout: f64, base_url: Option<String>) -> PyResult<Self> {
+        let client =
+            dcex::ws::kraken::KrakenV1WebSocket::new(token, base_url, websocket_timeout(timeout)?)
+                .map_err(to_py_runtime_error)?;
+        Ok(Self {
+            client: Arc::new(Mutex::new(client)),
+        })
+    }
+    fn is_connected(&self) -> PyResult<bool> {
+        Ok(self
+            .client
+            .try_lock()
+            .map_err(|_| PyRuntimeError::new_err("Kraken V1 WS is busy."))?
+            .is_connected())
+    }
+    fn url(&self) -> PyResult<String> {
+        Ok(self
+            .client
+            .try_lock()
+            .map_err(|_| PyRuntimeError::new_err("Kraken V1 WS is busy."))?
+            .url()
+            .into())
+    }
+    fn connect<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client
+                .lock()
+                .await
+                .connect()
+                .await
+                .map_err(to_py_runtime_error)
+        })
+    }
+    fn close<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client
+                .lock()
+                .await
+                .close()
+                .await
+                .map_err(to_py_runtime_error)
+        })
+    }
+    fn recv<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let bytes = client
+                .lock()
+                .await
+                .recv_bytes()
+                .await
+                .map_err(to_py_runtime_error)?;
+            Python::with_gil(|py| Ok(PyBytes::new(py, &bytes).unbind()))
+        })
+    }
+    #[pyo3(signature = (message, all_symbols=false))]
+    fn send_message<'py>(
+        &self,
+        py: Python<'py>,
+        message: String,
+        all_symbols: bool,
+    ) -> PyResult<Bound<'py, PyAny>> {
+        let message = serde_json::from_str(&message)
+            .map_err(|e| PyValueError::new_err(format!("Invalid JSON: {e}")))?;
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client
+                .lock()
+                .await
+                .send_message(message, all_symbols)
+                .await
+                .map_err(to_py_runtime_error)
+        })
+    }
 }

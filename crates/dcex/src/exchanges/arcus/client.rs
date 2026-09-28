@@ -49,12 +49,12 @@ impl ArcusClient {
         let derived_key = signing_key
             .as_ref()
             .map(|key| hex::encode(key.verifying_key().to_bytes()));
-        if let (Some(configured), Some(derived)) = (&api_key, &derived_key) {
-            if !configured.eq_ignore_ascii_case(derived) {
-                return Err(DcexError::InvalidInput(
-                    "Arcus API key does not match signing key".into(),
-                ));
-            }
+        if let (Some(configured), Some(derived)) = (&api_key, &derived_key)
+            && !configured.eq_ignore_ascii_case(derived)
+        {
+            return Err(DcexError::InvalidInput(
+                "Arcus API key does not match signing key".into(),
+            ));
         }
         let api_key = derived_key.or(api_key);
         let address = address

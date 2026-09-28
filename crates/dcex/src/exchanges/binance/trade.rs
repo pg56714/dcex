@@ -54,6 +54,11 @@ impl BinanceClient {
         extra_params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         let market = self.market_for_product_symbol(product_symbol)?;
+        if market == BinanceMarket::CoinFutures && is_futures_conditional_order(order_type) {
+            return Err(DcexError::InvalidInput(
+                "COIN-M conditional orders require place_coin_futures_algo_order; supply the exchange's algo fields explicitly".into(),
+            ));
+        }
         if market == BinanceMarket::Equity {
             return self
                 .send_place_equity_order(product_symbol, side, order_type, extra_params)

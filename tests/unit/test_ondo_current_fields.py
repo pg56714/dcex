@@ -145,7 +145,8 @@ def test_ondo_account_management_fields_are_encoded() -> None:
     client._native_client = native
 
     assert not hasattr(client, "withdraw")
-    assert not hasattr(client, "sandbox_withdrawal")
+    assert callable(client.sandbox_withdrawal)
+    assert callable(client.create_withdrawal)
     client.create_api_key("trader", ["trade", "transfer"])
     client.get_withdrawal_status(customer_withdrawal_id="withdrawal-id")
     client.set_api_key_ip_whitelist("api-key-id", "192.0.2.1")

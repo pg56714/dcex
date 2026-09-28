@@ -26,9 +26,13 @@ def _http_server(
                 "method": self.command,
                 "header": self.headers.get("X-Test"),
                 "api_key": self.headers.get("X-MBX-APIKEY"),
+                "authorization": self.headers.get("Authorization"),
             }
             if bingx_api_key := self.headers.get("X-BX-APIKEY"):
                 request["bingx_api_key"] = bingx_api_key
+            for header in ("access_token", "proxy_user"):
+                if value := self.headers.get(header):
+                    request[header] = value
             for header in (
                 "X-MEXC-APIKEY",
                 "ApiKey",
@@ -71,6 +75,10 @@ def _http_server(
                 "KC-API-TIMESTAMP",
                 "KC-API-PASSPHRASE",
                 "KC-API-KEY-VERSION",
+                "KC-API-PARTNER",
+                "KC-API-PARTNER-SIGN",
+                "KC-BROKER-NAME",
+                "KC-API-PARTNER-VERIFY",
             ):
                 if value := self.headers.get(header):
                     request[header] = value
@@ -103,7 +111,7 @@ def _http_server(
                 if response_bytes is not None
                 else json.dumps(payload, separators=(",", ":")).encode()
             )
-            self.send_response(response_status)
+            self.send_response(200 if payload == {"serverTime": 1} else response_status)
             self.send_header("Content-Type", content_type)
             self.send_header("X-Response", "native")
             self.send_header("Content-Length", str(len(body)))

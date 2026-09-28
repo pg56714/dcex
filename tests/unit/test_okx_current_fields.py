@@ -180,9 +180,7 @@ def test_sync_okx_spot_borrow_repay_fields_are_forwarded() -> None:
 
     client.spot_manual_borrow_repay("USDT", "borrow", "1")
     client.set_spot_auto_repay(True)
-    client.get_spot_borrow_repay_history(
-        ccy="USDT", type="manual_borrow", limit="1"
-    )
+    client.get_spot_borrow_repay_history(ccy="USDT", type="manual_borrow", limit="1")
 
     assert dict(calls[0]["query"]) == {
         "ccy": "USDT",

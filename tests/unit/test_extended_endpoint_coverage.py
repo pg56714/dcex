@@ -25,6 +25,10 @@ from typing import Any
 
 import pytest
 
+from tests.unit.wire_expectations import EXPECTED_VERBS as _ALL_VERBS
+
+EXPECTED_VERBS = _ALL_VERBS["extended"]
+
 from dcex.async_support.extended.client import Client as AsyncClient
 from dcex.extended.client import Client
 from dcex.utils.errors import FailedRequestError
@@ -136,8 +140,53 @@ def priv(
 
 
 PRESIGNED = _presigned_order()
+WITHDRAWAL = {
+    "accountId": "100006",
+    "amount": "2",
+    "chainId": "STRK",
+    "asset": "USD",
+    "settlement": {
+        "recipient": "0x123",
+        "positionId": 300006,
+        "collateralId": "0x456",
+        "amount": "2000000",
+        "expiration": {"seconds": 1900000000},
+        "salt": 93763903,
+        "signature": {"r": "123", "s": "456"},
+    },
+}
 
 CASES = [
+    priv(
+        "create_withdrawal_signed",
+        "/api/v1/user/withdrawal",
+        expect_body=WITHDRAWAL,
+        body=WITHDRAWAL,
+    ),
+    priv("get_affiliate_data", "/api/v1/user/affiliate"),
+    priv("get_referral_status", "/api/v1/user/referrals/status"),
+    priv("get_referral_links", "/api/v1/user/referrals/links"),
+    priv("get_referral_dashboard", "/api/v1/user/referrals/dashboard?period=WEEK", period="WEEK"),
+    priv(
+        "use_referral_code", "/api/v1/user/referrals/use", expect_body={"code": "TEST"}, code="TEST"
+    ),
+    priv(
+        "create_referral_code",
+        "/api/v1/user/referrals",
+        expect_body={"id": "TEST", "isDefault": True, "hiddenAtUi": False},
+        id="TEST",
+        is_default=True,
+        hidden_at_ui=False,
+    ),
+    priv(
+        "update_referral_code",
+        "/api/v1/user/referrals",
+        expect_body={"id": "TEST", "isDefault": False, "hiddenAtUi": True},
+        id="TEST",
+        is_default=False,
+        hidden_at_ui=True,
+    ),
+    priv("commit_bridge_quote", "/api/v1/user/bridge/quote?id=quote-1", quote_id="quote-1"),
     pub("get_vault_performance", "/api/v1/vault/public/performance?interval=WEEK", interval="WEEK"),
     pub("get_vault_summary", "/api/v1/vault/public/summary"),
     priv("get_earned_points", "/api/v1/user/rewards/earned"),
@@ -427,7 +476,12 @@ def _fail_if_native_is_stale(method: str, error: Exception) -> None:
 def _assert_request(case: WireCase, requests: list[dict[str, Any]]) -> None:
     assert len(requests) == 1, requests
     request = requests[0]
+    assert request["method"] == EXPECTED_VERBS[case.method]
     assert request["path"] == case.target
+    if case.method == "update_referral_code":
+        assert request["method"] == "PUT"
+    elif case.method in {"create_withdrawal_signed", "use_referral_code", "create_referral_code"}:
+        assert request["method"] == "POST"
     if case.private:
         assert request.get("extended_x-api-key") == API_KEY
     if case.body is not None:
@@ -504,6 +558,7 @@ def _assert_signed_order_flow(requests: list[dict[str, Any]], *, posted: bool) -
     if posted:
         expected.append("/api/v1/user/order")
     assert paths == expected
+    assert [request["method"] for request in requests] == (["GET", "GET", "POST"] if posted else ["GET", "GET"])
     if posted:
         order = json.loads(requests[-1]["body"])
         assert order["market"] == "BTC-USD"

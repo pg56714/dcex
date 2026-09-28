@@ -73,7 +73,7 @@ pub(super) fn validate(method: &str, params: &Value) -> Result<()> {
             }
         }
         "cancel_after" => {
-            if !params["timeout"].as_u64().is_some_and(|v| v < 86_400) {
+            if params["timeout"].as_u64().is_none_or(|v| v >= 86_400) {
                 return Err(invalid("timeout must be an integer from 0 to 86399"));
             }
         }
@@ -286,17 +286,17 @@ fn validate_order(params: &Value, has_symbol: bool) -> Result<()> {
 }
 fn validate_scalars(object: &Map<String, Value>) -> Result<()> {
     for k in ["order_qty", "cash_order_qty", "display_qty"] {
-        if let Some(v) = object.get(k) {
-            if !v.as_f64().is_some_and(|v| v.is_finite() && v > 0.0) {
-                return Err(invalid("quantity must be a positive JSON number"));
-            }
+        if let Some(v) = object.get(k)
+            && !v.as_f64().is_some_and(|v| v.is_finite() && v > 0.0)
+        {
+            return Err(invalid("quantity must be a positive JSON number"));
         }
     }
     for k in ["limit_price", "trigger_price"] {
-        if let Some(v) = object.get(k) {
-            if !v.as_f64().is_some_and(f64::is_finite) {
-                return Err(invalid("price must be a JSON number"));
-            }
+        if let Some(v) = object.get(k)
+            && !v.as_f64().is_some_and(f64::is_finite)
+        {
+            return Err(invalid("price must be a JSON number"));
         }
     }
     for k in ["margin", "post_only", "reduce_only", "validate"] {
@@ -309,10 +309,11 @@ fn validate_scalars(object: &Map<String, Value>) -> Result<()> {
             return Err(invalid(&format!("{k} cannot be empty")));
         }
     }
-    if let Some(v) = object.get("order_userref") {
-        if !v.is_array() && !v.as_i64().is_some_and(|v| i32::try_from(v).is_ok()) {
-            return Err(invalid("order_userref must be int32"));
-        }
+    if let Some(v) = object.get("order_userref")
+        && !v.is_array()
+        && v.as_i64().is_none_or(|v| i32::try_from(v).is_err())
+    {
+        return Err(invalid("order_userref must be int32"));
     }
     enum_field(object, "time_in_force", &["gtc", "gtd", "ioc", "fok"])?;
     enum_field(object, "fee_preference", &["base", "quote"])?;
@@ -332,10 +333,10 @@ fn allowed(object: &Map<String, Value>, keys: &[&str]) -> Result<()> {
     Ok(())
 }
 fn enum_field(object: &Map<String, Value>, key: &str, values: &[&str]) -> Result<()> {
-    if let Some(v) = object.get(key) {
-        if !v.as_str().is_some_and(|v| values.contains(&v)) {
-            return Err(invalid(&format!("unsupported {key}")));
-        }
+    if let Some(v) = object.get(key)
+        && !v.as_str().is_some_and(|v| values.contains(&v))
+    {
+        return Err(invalid(&format!("unsupported {key}")));
     }
     Ok(())
 }

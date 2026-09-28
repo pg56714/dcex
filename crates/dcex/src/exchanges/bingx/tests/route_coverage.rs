@@ -1390,7 +1390,10 @@ async fn swap_trading_controls_use_documented_parameters() {
     client
         .private_request(
             "set_swap_asset_mode",
-            vec![("assetMode".into(), "multiAssetsMode".into())],
+            vec![
+                ("confirm".into(), "true".into()),
+                ("assetMode".into(), "multiAssetsMode".into()),
+            ],
         )
         .await
         .expect("set_swap_asset_mode");
@@ -1662,7 +1665,11 @@ fn coin_swap_and_oco_routes_match_official_paths() {
         (
             false,
             "reverse_swap_position",
-            &[("type_", "Reverse"), ("product_symbol", "BTC-USDT-SWAP")],
+            &[
+                ("confirm", "true"),
+                ("type_", "Reverse"),
+                ("product_symbol", "BTC-USDT-SWAP"),
+            ],
             "POST",
             "/openApi/swap/v1/trade/reverse",
         ),
@@ -1721,7 +1728,7 @@ fn coin_swap_and_oco_routes_match_official_paths() {
             &[
                 ("subUid", "123"),
                 ("note", "trading"),
-                ("permissions", "[1,2,3]"),
+                ("permissions", "[4,5]"),
             ],
             "POST",
             "/openApi/subAccount/v1/apiKey/create",
@@ -1733,7 +1740,7 @@ fn coin_swap_and_oco_routes_match_official_paths() {
                 ("subUid", "123"),
                 ("apiKey", "query-key"),
                 ("note", "trading"),
-                ("permissions", "[1,2,3]"),
+                ("permissions", "[4,5]"),
             ],
             "POST",
             "/openApi/subAccount/v1/apiKey/edit",
@@ -2061,7 +2068,7 @@ fn coin_swap_and_oco_routes_match_official_paths() {
 }
 
 #[test]
-fn batch_replacement_keeps_json_number_quantity_for_conditional_close() {
+fn batch_replacement_keeps_json_number_quantity_for_conditional_order() {
     let (url, receiver) = recording_server();
     let client = BingxClient::with_base_url(
         Some("api-key".into()),
@@ -2070,7 +2077,7 @@ fn batch_replacement_keeps_json_number_quantity_for_conditional_close() {
         url,
     )
     .unwrap();
-    let orders = r#"[{"product_symbol":"BTC-USDT-SWAP","cancelOrderId":"1","side":"SELL","positionSide":"BOTH","type":"STOP_MARKET","stopPrice":90,"quantity":1,"closePosition":"true","cancelReplaceMode":"STOP_ON_FAILURE"}]"#;
+    let orders = r#"[{"product_symbol":"BTC-USDT-SWAP","cancelOrderId":"1","side":"SELL","positionSide":"BOTH","type":"STOP_MARKET","stopPrice":90,"quantity":1,"cancelReplaceMode":"STOP_ON_FAILURE"}]"#;
     block_on(async move {
         client
             .private_request(
@@ -2086,6 +2093,6 @@ fn batch_replacement_keeps_json_number_quantity_for_conditional_close() {
         serde_json::from_str(request.get("batchOrders").unwrap()).unwrap();
     assert_eq!(batch[0]["quantity"], 1);
     assert_eq!(batch[0]["symbol"], "BTC-USDT");
-    assert_eq!(batch[0]["closePosition"], "true");
+    assert!(batch[0].get("closePosition").is_none());
     assert!(request.get("signature").is_some());
 }

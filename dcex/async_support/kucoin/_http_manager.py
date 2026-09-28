@@ -20,6 +20,10 @@ class HTTPManager(BaseHTTPManager):
 
     base_url: str = field(default="https://api.kucoin.com")
     futures_base_url: str = field(default="https://api-futures.kucoin.com")
+    broker_base_url: str = field(default="https://api-broker.kucoin.com")
+    broker_partner: str | None = field(default=None)
+    broker_key: str | None = field(default=None, repr=False)
+    broker_name: str | None = field(default=None)
     api_key: str | None = field(default=None, repr=False)
     api_secret: str | None = field(default=None, repr=False)
     passphrase: str | None = field(default=None, repr=False)
@@ -46,6 +50,16 @@ class HTTPManager(BaseHTTPManager):
                 futures_base_url=self.futures_base_url,
             )
 
+        if self._native_client is not None and (
+            self.broker_base_url != "https://api-broker.kucoin.com"
+            or any(
+                value is not None
+                for value in (self.broker_partner, self.broker_key, self.broker_name)
+            )
+        ):
+            self._native_client.configure_broker(
+                self.broker_base_url, self.broker_partner, self.broker_key, self.broker_name
+            )
         if self.preload_product_table:
             self.ptm = await ProductTableManager.get_instance(Common.KUCOIN)
         if (

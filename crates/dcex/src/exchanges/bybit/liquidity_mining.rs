@@ -231,38 +231,37 @@ fn validate_account_type(value: &str) -> Result<()> {
 }
 
 fn validate_optional_enum(params: &BybitParams, key: &str, values: &[&str]) -> Result<()> {
-    if let Some(value) = params.get(key) {
-        if !values.contains(&value) {
-            return Err(DcexError::InvalidInput(format!(
-                "{key} must be one of {}",
-                values.join(", ")
-            )));
-        }
+    if let Some(value) = params.get(key)
+        && !values.contains(&value)
+    {
+        return Err(DcexError::InvalidInput(format!(
+            "{key} must be one of {}",
+            values.join(", ")
+        )));
     }
     Ok(())
 }
 
 fn validate_optional_leverage(params: &BybitParams) -> Result<()> {
-    if let Some(leverage) = params.get("leverage") {
-        if !leverage.parse::<u16>().is_ok_and(|value| value > 0) {
-            return Err(DcexError::InvalidInput(
-                "leverage must be a positive integer".to_string(),
-            ));
-        }
+    if let Some(leverage) = params.get("leverage")
+        && !leverage.parse::<u16>().is_ok_and(|value| value > 0)
+    {
+        return Err(DcexError::InvalidInput(
+            "leverage must be a positive integer".to_string(),
+        ));
     }
     Ok(())
 }
 
 fn validate_history(params: &BybitParams) -> Result<()> {
-    if let Some(limit) = params.get("limit") {
-        if !limit
+    if let Some(limit) = params.get("limit")
+        && !limit
             .parse::<u16>()
             .is_ok_and(|value| (1..=50).contains(&value))
-        {
-            return Err(DcexError::InvalidInput(
-                "limit must be between 1 and 50".to_string(),
-            ));
-        }
+    {
+        return Err(DcexError::InvalidInput(
+            "limit must be between 1 and 50".to_string(),
+        ));
     }
     if let (Some(start), Some(end)) = (params.get("startTime"), params.get("endTime")) {
         let start = start

@@ -24,7 +24,7 @@ from dataclasses import dataclass, field
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any
-from urllib.parse import parse_qsl, urlsplit
+from urllib.parse import parse_qsl, urlencode, urlsplit
 
 import pytest
 
@@ -52,6 +52,60 @@ class Case:
 
 CASES: tuple[Case, ...] = (
     Case(
+        "submit_rfq_quote",
+        {
+            "rfq_id": "rfq-1",
+            "bid_price": "100.000000000000000001",
+            "ask_price": "101",
+            "client_id": 17,
+            "auto_lend": False,
+            "auto_borrow_repay": True,
+        },
+        "POST /api/v1/rfq/quote",
+        body={
+            "rfqId": "rfq-1",
+            "bidPrice": "100.000000000000000001",
+            "askPrice": "101",
+            "clientId": 17,
+            "autoLend": False,
+            "autoBorrowRepay": True,
+        },
+    ),
+    Case(
+        "create_withdrawal",
+        {
+            "address": "offline-address",
+            "blockchain": "Solana",
+            "symbol": "USDC",
+            "quantity": "1.000000000000000001",
+            "client_id": "offline-1",
+            "two_factor_token": "fixture-token",
+            "auto_borrow": False,
+            "auto_lend_redeem": True,
+            "recipient_information": {
+                "withdrawal_address_id": 123,
+                "withdrawal_purpose": "test",
+                "sanctions_representation": True,
+            },
+        },
+        "POST /wapi/v1/capital/withdrawals",
+        body={
+            "address": "offline-address",
+            "blockchain": "Solana",
+            "symbol": "USDC",
+            "quantity": "1.000000000000000001",
+            "clientId": "offline-1",
+            "twoFactorToken": "fixture-token",
+            "autoBorrow": False,
+            "autoLendRedeem": True,
+            "recipientInformation": {
+                "withdrawal_address_id": 123,
+                "withdrawal_purpose": "test",
+                "sanctions_representation": True,
+            },
+        },
+    ),
+    Case(
         "execute_borrow_lend",
         {"quantity": "1", "side": "Borrow", "symbol": "BTC"},
         "POST /api/v1/borrowLend",
@@ -69,7 +123,7 @@ CASES: tuple[Case, ...] = (
     ),
     Case(
         "vault_redeem",
-        {"vault_id": 1},
+        {"vault_id": 1, "all": True},
         "POST /api/v1/vault/redeem",
         signed=True,
         body={"vaultId": 1},
@@ -561,6 +615,24 @@ def _assert_request(case: Case, received: queue.Queue[dict[str, Any]]) -> None:
         assert len(base64.b64decode(headers["x-signature"])) == 64
         assert headers.get("x-timestamp")
         assert headers.get("x-window") == "5000"
+        if case.method_name in {"create_withdrawal", "submit_rfq_quote"}:
+            from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+
+            assert json.loads(request["body"]) == case.body
+            instruction = "withdraw" if case.method_name == "create_withdrawal" else "quoteSubmit"
+            fields = {
+                key: str(value).lower() if isinstance(value, bool) else str(value)
+                for key, value in case.body.items()
+                if key != "recipientInformation"
+            }
+            message = (
+                f"instruction={instruction}&{urlencode(sorted(fields.items()))}"
+                f"&timestamp={headers['x-timestamp']}&window=5000"
+            )
+            key = Ed25519PrivateKey.from_private_bytes(
+                base64.b64decode(_client_kwargs("")["api_secret"])
+            )
+            key.public_key().verify(base64.b64decode(headers["x-signature"]), message.encode())
     else:
         assert "x-signature" not in headers
 

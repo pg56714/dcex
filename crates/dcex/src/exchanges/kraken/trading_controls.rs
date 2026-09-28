@@ -98,16 +98,23 @@ impl KrakenClient {
                 .await?
             }
             "set_futures_leverage_preference" => {
-                params.ensure_allowed(&["product_symbol", "maxLeverage"])?;
+                params.ensure_allowed(&["product_symbol", "margin_mode", "maxLeverage"])?;
+                match params.required("margin_mode")? {
+                    "cross" if params.get("maxLeverage").is_none() => {}
+                    "isolated" if params.get("maxLeverage").is_some() => {}
+                    _ => {
+                        return Err(invalid(
+                            "margin_mode must be cross without maxLeverage, or isolated with maxLeverage",
+                        ));
+                    }
+                }
                 let symbol = self.exchange_symbol(params.required("product_symbol")?, "PF_")?;
                 let mut query = params.only(&["maxLeverage"]);
                 if params
                     .get("maxLeverage")
                     .is_some_and(|v| !v.parse::<f64>().is_ok_and(|v| v.is_finite() && v > 0.0))
                 {
-                    return Err(invalid(
-                        "maxLeverage must be positive; omit it for cross margin",
-                    ));
+                    return Err(invalid("maxLeverage must be positive for isolated margin"));
                 }
                 query.push(("symbol".into(), symbol));
                 self.request(
@@ -173,7 +180,7 @@ impl KrakenClient {
                             return Err(invalid("explicit cancellation lists must not be empty"));
                         }
                         for value in &values {
-                            if !value.as_str().is_some_and(|s| !s.is_empty())
+                            if value.as_str().is_none_or(|s| s.is_empty())
                                 && !(key == "orders"
                                     && value.as_i64().is_some_and(|v| i32::try_from(v).is_ok()))
                             {
@@ -232,7 +239,7 @@ fn validate_batch_order(value: &Value) -> Result<()> {
         return Err(invalid("unsupported batch order field"));
     }
     for key in ["ordertype", "type", "volume"] {
-        if !value[key].as_str().is_some_and(|s| !s.is_empty()) {
+        if value[key].as_str().is_none_or(|s| s.is_empty()) {
             return Err(invalid("ordertype, type and volume are required strings"));
         }
     }
@@ -274,7 +281,7 @@ fn validate_batch_order(value: &Value) -> Result<()> {
         return Err(invalid("reduce_only must be a JSON boolean"));
     }
     if !["market", "settle-position"].contains(&kind)
-        && !value["price"].as_str().is_some_and(|s| !s.is_empty())
+        && value["price"].as_str().is_none_or(|s| s.is_empty())
     {
         return Err(invalid("price is required for this order type"));
     }
@@ -284,7 +291,7 @@ fn validate_batch_order(value: &Value) -> Result<()> {
         "trailing-stop-limit",
     ]
     .contains(&kind)
-        && !value["price2"].as_str().is_some_and(|s| !s.is_empty())
+        && value["price2"].as_str().is_none_or(|s| s.is_empty())
     {
         return Err(invalid("price2 is required"));
     }
@@ -348,12 +355,12 @@ fn validate_futures_instruction(value: &Value) -> Result<()> {
         "stopPrice",
         "trailingStopMaxDeviation",
     ] {
-        if let Some(v) = object.get(k) {
-            if !v.as_f64().is_some_and(|v| v.is_finite() && v > 0.0) {
-                return Err(invalid(
-                    "batch price and size fields require positive JSON numbers",
-                ));
-            }
+        if let Some(v) = object.get(k)
+            && !v.as_f64().is_some_and(|v| v.is_finite() && v > 0.0)
+        {
+            return Err(invalid(
+                "batch price and size fields require positive JSON numbers",
+            ));
         }
     }
     for k in [
@@ -367,12 +374,12 @@ fn validate_futures_instruction(value: &Value) -> Result<()> {
         "trailingStopDeviationUnit",
         "qtyMode",
     ] {
-        if let Some(v) = object.get(k) {
-            if !v.as_str().is_some_and(|v| !v.trim().is_empty()) {
-                return Err(invalid(
-                    "batch identifiers and enums must be nonempty strings",
-                ));
-            }
+        if let Some(v) = object.get(k)
+            && v.as_str().is_none_or(|v| v.trim().is_empty())
+        {
+            return Err(invalid(
+                "batch identifiers and enums must be nonempty strings",
+            ));
         }
     }
     if value
@@ -407,10 +414,10 @@ fn validate_futures_instruction(value: &Value) -> Result<()> {
         ),
         ("qtyMode", &["ABSOLUTE", "RELATIVE"][..]),
     ] {
-        if let Some(v) = object.get(k) {
-            if !v.as_str().is_some_and(|v| allowed.contains(&v)) {
-                return Err(invalid("unsupported batch enum"));
-            }
+        if let Some(v) = object.get(k)
+            && !v.as_str().is_some_and(|v| allowed.contains(&v))
+        {
+            return Err(invalid("unsupported batch enum"));
         }
     }
     if order == "send" {
@@ -426,9 +433,11 @@ fn validate_futures_instruction(value: &Value) -> Result<()> {
                 }
             }
             "stp" | "take_profit" => {
-                if !object.contains_key("stopPrice") || !object.contains_key("limitPrice") {
+                if !object.contains_key("stopPrice")
+                    || (value["orderType"] == "stp" && !object.contains_key("limitPrice"))
+                {
                     return Err(invalid(
-                        "conditional batch order requires stopPrice and limitPrice",
+                        "conditional batch order requires stopPrice; stp also requires limitPrice",
                     ));
                 }
             }

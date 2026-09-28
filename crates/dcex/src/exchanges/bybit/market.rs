@@ -12,6 +12,12 @@ impl BybitClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         if let Some(result) = self
+            .completion_request(method_name, &BybitParams::from_pairs(params.clone()), true)
+            .await?
+        {
+            return Ok(result);
+        }
+        if let Some(result) = self
             .risk_request(method_name, &BybitParams::from_pairs(params.clone()), true)
             .await?
         {
@@ -107,10 +113,10 @@ impl BybitClient {
                         return Err(DcexError::InvalidInput(format!("limit must be 1..={max}")));
                     }
                 }
-                if let (Some(start), Some(end)) = (values.get("start"), values.get("end")) {
-                    if start.parse::<u64>().unwrap() > end.parse::<u64>().unwrap() {
-                        return Err(DcexError::InvalidInput("start must not exceed end".into()));
-                    }
+                if let (Some(start), Some(end)) = (values.get("start"), values.get("end"))
+                    && start.parse::<u64>().unwrap() > end.parse::<u64>().unwrap()
+                {
+                    return Err(DcexError::InvalidInput("start must not exceed end".into()));
                 }
                 let path = match method_name {
                     "get_mark_price_kline" => "/v5/market/mark-price-kline",

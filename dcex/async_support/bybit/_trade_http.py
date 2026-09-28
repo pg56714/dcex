@@ -884,10 +884,10 @@ class TradeHTTP(HTTPManager):
 
     async def create_strategy(
         self,
-        category: str,
-        product_symbol: str,
-        side: str,
-        strategy_type: str,
+        category: str | None = None,
+        product_symbol: str | None = None,
+        side: str | None = None,
+        strategy_type: str | None = None,
         *,
         size: str | None = None,
         position_value: str | None = None,
@@ -904,11 +904,25 @@ class TradeHTTP(HTTPManager):
         sub_size: str | None = None,
         sub_position_value: str | None = None,
         order_count: int | None = None,
+        maker_only: bool | None = None,
         post_only: int | None = None,
         limit_price: str | None = None,
         pov_params: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
-        """Create a TWAP, chase, iceberg or POV strategy; category uses UTA_* values."""
+        """
+        Create a strategy; derive category from the canonical product_symbol when omitted.
+
+        maker_only=True selects postOnly=0; False allows takers (postOnly=1).
+        post_only is a deprecated raw exchange integer; do not combine it with maker_only.
+        """
+        if maker_only is not None and type(maker_only) is not bool:
+            raise ValueError("maker_only must be a boolean")
+        if post_only is not None:
+            import warnings
+
+            warnings.warn(
+                "post_only is deprecated; use maker_only", DeprecationWarning, stacklevel=2
+            )
         return await self._native_private(
             "create_strategy",
             self._native_params(
@@ -932,6 +946,7 @@ class TradeHTTP(HTTPManager):
                 subPositionValue=sub_position_value,
                 orderCount=order_count,
                 postOnly=post_only,
+                maker_only=maker_only,
                 limitPrice=limit_price,
                 povParams=dumps(pov_params) if pov_params is not None else None,
             ),

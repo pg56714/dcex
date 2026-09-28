@@ -1,0 +1,328 @@
+[
+  {
+    "method": "create_withdrawal_signed",
+    "kwargs": {
+      "ethereum_address": "0x4444444444444444444444444444444444444444",
+      "account_index": 0,
+      "spot_asset_id": 1,
+      "amount": "70000000",
+      "nonce": "1730000000000000000",
+      "signature": {
+        "r": "0x1111111111111111111111111111111111111111111111111111111111111111",
+        "s": "0x2222222222222222222222222222222222222222222222222222222222222222",
+        "v": "0x1b"
+      }
+    },
+    "http_method": "POST",
+    "path": "/v1/withdraw",
+    "query": {},
+    "body": {
+      "ethereumAddress": "0x4444444444444444444444444444444444444444",
+      "accountIndex": 0,
+      "spotAssetId": 1,
+      "amount": "70000000",
+      "nonce": "1730000000000000000",
+      "signature": {
+        "r": "0x1111111111111111111111111111111111111111111111111111111111111111",
+        "s": "0x2222222222222222222222222222222222222222222222222222222222222222",
+        "v": "0x1b"
+      }
+    },
+    "signed": false
+  },
+  {
+    "method": "create_withdrawal",
+    "kwargs": {
+      "ethereum_address": "0x4444444444444444444444444444444444444444",
+      "account_index": 0,
+      "amount": "1000000000",
+      "nonce": "1730000000000000000"
+    },
+    "http_method": "POST",
+    "path": "/v1/withdraw",
+    "query": {},
+    "body": {
+      "ethereumAddress": "0x4444444444444444444444444444444444444444",
+      "accountIndex": 0,
+      "amount": "1000000000",
+      "nonce": "1730000000000000000"
+    },
+    "signed": true
+  },
+  {
+    "method": "get_commission_rates",
+    "kwargs": {},
+    "http_method": "GET",
+    "path": "/v1/commissionrates",
+    "query": {},
+    "body": null,
+    "signed": false
+  },
+  {
+    "method": "check_referral_code",
+    "kwargs": {
+      "code": "DESK_1"
+    },
+    "http_method": "GET",
+    "path": "/v1/affiliate/codeAvailable",
+    "query": {
+      "code": "DESK_1"
+    },
+    "body": null,
+    "signed": false
+  },
+  {
+    "method": "claim_affiliate_commission",
+    "kwargs": {
+      "address": "0x4444444444444444444444444444444444444444",
+      "cutoff_fill_id": 20,
+      "amount_quantums": 70000000
+    },
+    "http_method": "POST",
+    "path": "/v1/affiliate/claim",
+    "query": {},
+    "body": {
+      "address": "0x4444444444444444444444444444444444444444",
+      "cutoffFillId": 20,
+      "amountQuantums": 70000000
+    },
+    "signed": true
+  },
+  {
+    "method": "create_referral_code",
+    "kwargs": {
+      "address": "0x4444444444444444444444444444444444444444",
+      "code": "DESK_1",
+      "kickback_bps": 125
+    },
+    "http_method": "POST",
+    "path": "/v1/affiliate/createCode",
+    "query": {},
+    "body": {
+      "address": "0x4444444444444444444444444444444444444444",
+      "code": "DESK_1",
+      "kickbackBps": 125
+    },
+    "signed": true
+  },
+  {
+    "method": "get_affiliate_claims",
+    "kwargs": {
+      "address": "0x4444444444444444444444444444444444444444",
+      "from_": 1700000000000,
+      "to": 1700000060000,
+      "limit": 10
+    },
+    "http_method": "GET",
+    "path": "/v1/affiliate/claims",
+    "query": {
+      "address": "0x4444444444444444444444444444444444444444",
+      "from": 1700000000000,
+      "to": 1700000060000,
+      "limit": 10
+    },
+    "body": null,
+    "signed": false
+  },
+  {
+    "method": "get_affiliate_commissions",
+    "kwargs": {
+      "address": "0x4444444444444444444444444444444444444444",
+      "from_": 1700000000000,
+      "to": 1700000060000,
+      "limit": 10,
+      "cursor": "cursor-1"
+    },
+    "http_method": "GET",
+    "path": "/v1/affiliate/commissions",
+    "query": {
+      "address": "0x4444444444444444444444444444444444444444",
+      "from": 1700000000000,
+      "to": 1700000060000,
+      "limit": 10,
+      "cursor": "cursor-1"
+    },
+    "body": null,
+    "signed": true
+  },
+  {
+    "method": "get_affiliate_info",
+    "kwargs": {
+      "address": "0x4444444444444444444444444444444444444444"
+    },
+    "http_method": "GET",
+    "path": "/v1/affiliate/info",
+    "query": {
+      "address": "0x4444444444444444444444444444444444444444"
+    },
+    "body": null,
+    "signed": true
+  },
+  {
+    "method": "get_affiliate_leaderboard",
+    "kwargs": {
+      "limit": 10
+    },
+    "http_method": "GET",
+    "path": "/v1/affiliate/leaderboard",
+    "query": {
+      "limit": 10
+    },
+    "body": null,
+    "signed": false
+  },
+  {
+    "method": "get_referrer",
+    "kwargs": {
+      "address": "0x4444444444444444444444444444444444444444"
+    },
+    "http_method": "GET",
+    "path": "/v1/affiliate/myReferrer",
+    "query": {
+      "address": "0x4444444444444444444444444444444444444444"
+    },
+    "body": null,
+    "signed": false
+  },
+  {
+    "method": "get_referees",
+    "kwargs": {
+      "address": "0x4444444444444444444444444444444444444444",
+      "from_": 1700000000000,
+      "to": 1700000060000,
+      "limit": 10,
+      "cursor": "cursor-1"
+    },
+    "http_method": "GET",
+    "path": "/v1/affiliate/referees",
+    "query": {
+      "address": "0x4444444444444444444444444444444444444444",
+      "from": 1700000000000,
+      "to": 1700000060000,
+      "limit": 10,
+      "cursor": "cursor-1"
+    },
+    "body": null,
+    "signed": true
+  },
+  {
+    "method": "get_referral_code",
+    "kwargs": {
+      "address": "0x4444444444444444444444444444444444444444"
+    },
+    "http_method": "GET",
+    "path": "/v1/affiliate/code",
+    "query": {
+      "address": "0x4444444444444444444444444444444444444444"
+    },
+    "body": null,
+    "signed": true
+  },
+  {
+    "method": "get_invite_codes",
+    "kwargs": {
+      "address": "0x4444444444444444444444444444444444444444",
+      "status": "available",
+      "limit": 10,
+      "offset": 0
+    },
+    "http_method": "GET",
+    "path": "/v1/affiliate/inviteCodes",
+    "query": {
+      "address": "0x4444444444444444444444444444444444444444",
+      "status": "available",
+      "limit": 10,
+      "offset": 0
+    },
+    "body": null,
+    "signed": true
+  },
+  {
+    "method": "get_affiliate_claim",
+    "kwargs": {
+      "address": "0x4444444444444444444444444444444444444444",
+      "id": "claim-1"
+    },
+    "http_method": "GET",
+    "path": "/v1/affiliate/claimStatus",
+    "query": {
+      "address": "0x4444444444444444444444444444444444444444",
+      "id": "claim-1"
+    },
+    "body": null,
+    "signed": false
+  },
+  {
+    "method": "redeem_invite_code",
+    "kwargs": {
+      "address": "0x4444444444444444444444444444444444444444",
+      "invite_code": "A B-C123"
+    },
+    "http_method": "POST",
+    "path": "/v1/affiliate/redeemInvite",
+    "query": {},
+    "body": {
+      "address": "0x4444444444444444444444444444444444444444",
+      "inviteCode": "A B-C123"
+    },
+    "signed": true
+  },
+  {
+    "method": "register_referral",
+    "kwargs": {
+      "address": "0x4444444444444444444444444444444444444444",
+      "code": "DESK_1"
+    },
+    "http_method": "POST",
+    "path": "/v1/affiliate/registerAffiliate",
+    "query": {},
+    "body": {
+      "address": "0x4444444444444444444444444444444444444444",
+      "code": "DESK_1"
+    },
+    "signed": true
+  },
+  {
+    "method": "rename_referral_code",
+    "kwargs": {
+      "address": "0x4444444444444444444444444444444444444444",
+      "code": "DESK_1"
+    },
+    "http_method": "POST",
+    "path": "/v1/affiliate/modifyCode",
+    "query": {},
+    "body": {
+      "address": "0x4444444444444444444444444444444444444444",
+      "code": "DESK_1"
+    },
+    "signed": true
+  },
+  {
+    "method": "revoke_referral_code",
+    "kwargs": {
+      "address": "0x4444444444444444444444444444444444444444"
+    },
+    "http_method": "POST",
+    "path": "/v1/affiliate/revokeCode",
+    "query": {},
+    "body": {
+      "address": "0x4444444444444444444444444444444444444444"
+    },
+    "signed": true
+  },
+  {
+    "method": "update_referral_kickback",
+    "kwargs": {
+      "address": "0x4444444444444444444444444444444444444444",
+      "kickback_bps": 125
+    },
+    "http_method": "POST",
+    "path": "/v1/affiliate/kickback",
+    "query": {},
+    "body": {
+      "address": "0x4444444444444444444444444444444444444444",
+      "kickbackBps": 125
+    },
+    "signed": true
+  }
+]

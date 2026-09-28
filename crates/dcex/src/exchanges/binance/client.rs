@@ -1,3 +1,4 @@
+use serde_json::Value;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
@@ -67,6 +68,7 @@ pub struct BinanceClient {
     options_base_url: String,
     portfolio_margin_base_url: String,
     spot_base_url: String,
+    alpha_base_url: String,
     api_key: Option<String>,
     timestamp_offset_ms: Arc<Mutex<Option<i64>>>,
     product_table: Option<Arc<ProductTable>>,
@@ -135,6 +137,7 @@ impl BinanceClient {
             options_base_url,
             portfolio_margin_base_url: PORTFOLIO_MARGIN_BASE_URL.to_string(),
             spot_base_url,
+            alpha_base_url: "https://www.binance.com".into(),
             api_key: api_key_header,
             timestamp_offset_ms,
             product_table: None,
@@ -144,6 +147,55 @@ impl BinanceClient {
     pub fn with_product_table(mut self, product_table: ProductTable) -> Self {
         self.product_table = Some(Arc::new(product_table));
         self
+    }
+
+    pub fn with_alpha_base_url(mut self, base_url: impl Into<String>) -> Self {
+        self.alpha_base_url = base_url.into();
+        self
+    }
+
+    pub(super) async fn inventory_transport(
+        &self,
+        method: HttpMethod,
+        path: &str,
+        query: Vec<(String, String)>,
+        body: Option<Value>,
+        signed: bool,
+    ) -> Result<ValidatedResponse> {
+        if signed {
+            self.sync_server_time(BinanceMarket::Spot).await?;
+        }
+        let mut request = self.build_request(method, BinanceMarket::Spot, path, query.clone());
+        if path.starts_with("/bapi/") {
+            request.base_url = self.alpha_base_url.clone();
+        }
+        if let Some(body) = body {
+            request = request.json(body);
+            request.query = query;
+        }
+        let response = self.inner.execute_raw(request, signed).await?;
+        response.ensure_success()?;
+        let data = response.json()?;
+        let failed = data.get("success") == Some(&Value::Bool(false))
+            || data.get("code").is_some_and(|code| {
+                !matches!(
+                    super::signing::json_value_string(code).as_str(),
+                    "0" | "000000" | "200"
+                )
+            });
+        if failed {
+            return Err(DcexError::ExchangeResponse {
+                status: response.status,
+                message: format!("BINANCE API Error: {data}"),
+                headers: response.headers.into_iter().collect(),
+                data,
+            });
+        }
+        Ok(ValidatedResponse {
+            status: response.status,
+            headers: response.headers,
+            data,
+        })
     }
 
     pub fn with_portfolio_margin_base_url(mut self, base_url: impl Into<String>) -> Self {
@@ -363,25 +415,25 @@ impl BinanceClient {
     }
 
     pub(super) fn exchange_symbol(&self, product_symbol: &str) -> Result<String> {
-        if let Some(table) = &self.product_table {
-            if is_canonical_product_symbol(product_symbol) {
-                return table.get_exchange_symbol("binance", product_symbol);
-            }
+        if let Some(table) = &self.product_table
+            && is_canonical_product_symbol(product_symbol)
+        {
+            return table.get_exchange_symbol("binance", product_symbol);
         }
         Ok(exchange_symbol_fallback(product_symbol))
     }
 
     pub(super) fn market_for_product_symbol(&self, product_symbol: &str) -> Result<BinanceMarket> {
-        if let Some(table) = &self.product_table {
-            if is_canonical_product_symbol(product_symbol) {
-                let product_type = table.get_product_type("binance", Some(product_symbol), None)?;
-                return Ok(match product_type.as_str() {
-                    "equity" | "stock" => BinanceMarket::Equity,
-                    "option" | "options" => BinanceMarket::Options,
-                    "spot" => BinanceMarket::Spot,
-                    _ => BinanceMarket::Futures,
-                });
-            }
+        if let Some(table) = &self.product_table
+            && is_canonical_product_symbol(product_symbol)
+        {
+            let product_type = table.get_product_type("binance", Some(product_symbol), None)?;
+            return Ok(match product_type.as_str() {
+                "equity" | "stock" => BinanceMarket::Equity,
+                "option" | "options" => BinanceMarket::Options,
+                "spot" => BinanceMarket::Spot,
+                _ => BinanceMarket::Futures,
+            });
         }
         Ok(market_for_product_symbol_fallback(product_symbol))
     }

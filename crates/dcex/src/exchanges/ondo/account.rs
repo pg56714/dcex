@@ -17,6 +17,58 @@ impl OndoClient {
         params: &OndoParams,
     ) -> Result<Option<ValidatedResponse>> {
         let response = match method_name {
+            "create_withdrawal" | "sandbox_withdrawal" => {
+                let sandbox = method_name == "sandbox_withdrawal";
+                let required: &[&str] = if sandbox {
+                    &["customer_withdrawal_id", "symbol", "amount", "from"]
+                } else {
+                    &[
+                        "customer_withdrawal_id",
+                        "symbol",
+                        "network",
+                        "amount",
+                        "address",
+                    ]
+                };
+                let allowed: &[&str] = if sandbox {
+                    required
+                } else {
+                    &[
+                        "customer_withdrawal_id",
+                        "symbol",
+                        "network",
+                        "amount",
+                        "address",
+                        "from",
+                    ]
+                };
+                let body = params.body(allowed, required, &[], &[], &["from"])?;
+                require_string_fields(&body, &["customer_withdrawal_id", "symbol", "amount"])?;
+                if !body["amount"]
+                    .as_str()
+                    .is_some_and(crate::common::is_positive_plain_decimal)
+                {
+                    return Err(DcexError::InvalidInput(
+                        "Ondo withdrawal amount must be a positive plain decimal string".into(),
+                    ));
+                }
+                if !sandbox {
+                    require_string_fields(&body, &["address"])?;
+                    require_enum_field(&body, "network", &["avalanche", "ethereum", "solana"])?;
+                }
+                if body.get("from").is_some() {
+                    validate_account_wallet_key(&body, "from")?;
+                }
+                self.private_post(
+                    if sandbox {
+                        "/v1/sandbox_withdrawal"
+                    } else {
+                        "/v1/withdraw"
+                    },
+                    body,
+                )
+                .await
+            }
             "invalidate_jwt" => {
                 self.empty_private_get(params, "/v1/auth/invalidate_jwt")
                     .await
@@ -283,10 +335,10 @@ impl OndoClient {
 
 fn require_string_fields(body: &Value, keys: &[&str]) -> Result<()> {
     for key in keys {
-        if !body
+        if body
             .get(*key)
             .and_then(Value::as_str)
-            .is_some_and(|value| !value.trim().is_empty())
+            .is_none_or(|value| value.trim().is_empty())
         {
             return Err(DcexError::InvalidInput(format!(
                 "Ondo body field {key} must be a nonempty string"
@@ -298,10 +350,10 @@ fn require_string_fields(body: &Value, keys: &[&str]) -> Result<()> {
 
 fn optional_string_field(body: &Value, key: &str) -> Result<()> {
     if body.get(key).is_some()
-        && !body
+        && body
             .get(key)
             .and_then(Value::as_str)
-            .is_some_and(|value| !value.trim().is_empty())
+            .is_none_or(|value| value.trim().is_empty())
     {
         return Err(DcexError::InvalidInput(format!(
             "Ondo body field {key} must be a nonempty string"
@@ -334,10 +386,10 @@ fn validate_account_wallet_key(body: &Value, key: &str) -> Result<()> {
             )));
         }
     }
-    if !wallet_key
+    if wallet_key
         .get("id")
         .and_then(Value::as_str)
-        .is_some_and(|value| !value.trim().is_empty())
+        .is_none_or(|value| value.trim().is_empty())
     {
         return Err(DcexError::InvalidInput(format!(
             "Ondo body field {key}.id must be a nonempty string"

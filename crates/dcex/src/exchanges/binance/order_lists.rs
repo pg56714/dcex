@@ -55,12 +55,11 @@ pub(super) fn validate(path: &str, p: &PublicParams) -> Result<()> {
             ));
         }
         for key in ["limitIcebergQty", "stopIcebergQty"] {
-            if let Some(value) = p.get(key) {
-                if value.parse::<f64>().map_err(invalid)?
+            if let Some(value) = p.get(key)
+                && value.parse::<f64>().map_err(invalid)?
                     > p.required("quantity")?.parse::<f64>().map_err(invalid)?
-                {
-                    return Err(invalid("iceberg quantity exceeds order quantity"));
-                }
+            {
+                return Err(invalid("iceberg quantity exceeds order quantity"));
             }
         }
         return Ok(());
@@ -118,12 +117,11 @@ pub(super) fn validate(path: &str, p: &PublicParams) -> Result<()> {
             if p.get(&tif) != Some("GTC") && !(path.starts_with("/api/") && kind == "LIMIT_MAKER") {
                 return Err(invalid(format!("{iceberg} requires GTC")));
             }
-            if let Some(quantity) = p.get(&format!("{prefix}Quantity")) {
-                if value.parse::<f64>().map_err(invalid)?
+            if let Some(quantity) = p.get(&format!("{prefix}Quantity"))
+                && value.parse::<f64>().map_err(invalid)?
                     > quantity.parse::<f64>().map_err(invalid)?
-                {
-                    return Err(invalid("iceberg quantity exceeds order quantity"));
-                }
+            {
+                return Err(invalid("iceberg quantity exceeds order quantity"));
             }
         }
         if p.get(&offset_type).is_some() != p.get(&offset_value).is_some()

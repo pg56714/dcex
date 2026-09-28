@@ -186,14 +186,13 @@ impl BitgetClient {
                 if entry.get("qty").is_none() && entry.get("price").is_none() {
                     return Err(invalid("qty or price is required for amendment"));
                 }
-                if let Some(id) = entry.get("clientOid") {
-                    if id.len() > 32
+                if let Some(id) = entry.get("clientOid")
+                    && (id.len() > 32
                         || !id.chars().all(|c| {
                             c.is_ascii_alphanumeric() || matches!(c, '.' | ':' | '/' | '_' | '-')
-                        })
-                    {
-                        return Err(invalid("invalid clientOid"));
-                    }
+                        }))
+                {
+                    return Err(invalid("invalid clientOid"));
                 }
                 super::trading_controls::validate("modify_uta_order", &entry)?;
             } else {

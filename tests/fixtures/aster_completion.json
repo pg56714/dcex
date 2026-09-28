@@ -1,0 +1,208 @@
+[
+  {
+    "name": "get_builder_user_accounts",
+    "path": "/fapi/v3/builder/userAccounts",
+    "kwargs": {
+      "page": 1,
+      "limit": 1000,
+      "symbol": "BTCUSDT"
+    },
+    "wire": {
+      "page": "1",
+      "limit": "1000",
+      "symbol": "BTCUSDT"
+    },
+    "verb": "GET"
+  },
+  {
+    "name": "get_builder_user_open_orders",
+    "path": "/fapi/v3/builder/userOpenOrders",
+    "kwargs": {
+      "page": 1,
+      "limit": 1000,
+      "symbol": "BTCUSDT"
+    },
+    "wire": {
+      "page": "1",
+      "limit": "1000",
+      "symbol": "BTCUSDT"
+    },
+    "verb": "GET"
+  },
+  {
+    "name": "get_builder_user_balances",
+    "path": "/fapi/v3/builder/userBalances",
+    "kwargs": {
+      "page": 1,
+      "limit": 1000
+    },
+    "wire": {
+      "page": "1",
+      "limit": "1000"
+    },
+    "verb": "GET"
+  },
+  {
+    "name": "get_builder_user_position_risk",
+    "path": "/fapi/v3/builder/userPositionRisk",
+    "kwargs": {
+      "page": 1,
+      "limit": 1000,
+      "symbol": "BTCUSDT"
+    },
+    "wire": {
+      "page": "1",
+      "limit": "1000",
+      "symbol": "BTCUSDT"
+    },
+    "verb": "GET"
+  },
+  {
+    "name": "get_builder_user_commission_rates",
+    "path": "/fapi/v3/builder/userCommissionRates",
+    "kwargs": {
+      "page": 1,
+      "limit": 1000,
+      "symbol": "BTCUSDT"
+    },
+    "wire": {
+      "page": "1",
+      "limit": "1000",
+      "symbol": "BTCUSDT"
+    },
+    "verb": "GET"
+  },
+  {
+    "name": "get_builder_user_trades",
+    "path": "/fapi/v3/builder/userTrades",
+    "kwargs": {
+      "page": 1,
+      "limit": 1000
+    },
+    "wire": {
+      "page": "1",
+      "limit": "1000"
+    },
+    "verb": "GET"
+  },
+  {
+    "name": "get_builder_user_all_orders",
+    "path": "/fapi/v3/builder/userAllOrders",
+    "kwargs": {
+      "page": 1,
+      "limit": 1000,
+      "symbol": "BTCUSDT"
+    },
+    "wire": {
+      "page": "1",
+      "limit": "1000",
+      "symbol": "BTCUSDT"
+    },
+    "verb": "GET"
+  },
+  {
+    "name": "get_builder_approved_users",
+    "path": "/fapi/v3/builder/approvedUserList",
+    "kwargs": {
+      "page": 1,
+      "limit": 1000
+    },
+    "wire": {
+      "page": "1",
+      "limit": "1000"
+    },
+    "verb": "GET"
+  },
+  {
+    "name": "withdraw_spot_signed",
+    "path": "/api/v3/aster/user-withdraw",
+    "kwargs": {
+      "chain_id": 56,
+      "asset": "USDT",
+      "amount": "0.97",
+      "fee": "0.5",
+      "receiver": "0x2222222222222222222222222222222222222222",
+      "user_nonce": "1773741793787000",
+      "user_signature": "0x1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+    },
+    "wire": {
+      "chainId": "56",
+      "asset": "USDT",
+      "amount": "0.97",
+      "fee": "0.5",
+      "receiver": "0x2222222222222222222222222222222222222222",
+      "userNonce": "1773741793787000",
+      "userSignature": "0x1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+    },
+    "verb": "POST"
+  },
+  {
+    "name": "withdraw_spot_solana_signed",
+    "path": "/api/v3/aster/user-solana-withdraw",
+    "kwargs": {
+      "chain_id": 101,
+      "asset": "USDT",
+      "amount": "0.97",
+      "fee": "0.5",
+      "receiver": "BzsJhmtg2UtQWNw6764DkK5Y4GPjc1XMzRqAGqSziymK",
+      "user_nonce": "1773741793787000",
+      "user_signature": "51pM5A46n5NzHYTtuzB7gh8FFfbkh4Aij1fceCZV2NtkiVvE7DADMnSvXFiUJvauKawdWaCfPhzCTVfXYcf1iteQ"
+    },
+    "wire": {
+      "chainId": "101",
+      "asset": "USDT",
+      "amount": "0.97",
+      "fee": "0.5",
+      "receiver": "BzsJhmtg2UtQWNw6764DkK5Y4GPjc1XMzRqAGqSziymK",
+      "userNonce": "1773741793787000",
+      "userSignature": "51pM5A46n5NzHYTtuzB7gh8FFfbkh4Aij1fceCZV2NtkiVvE7DADMnSvXFiUJvauKawdWaCfPhzCTVfXYcf1iteQ"
+    },
+    "verb": "POST"
+  },
+  {
+    "name": "withdraw_futures_signed",
+    "path": "/fapi/v3/aster/user-withdraw",
+    "kwargs": {
+      "chain_id": 56,
+      "asset": "USDT",
+      "amount": "0.97",
+      "fee": "0.5",
+      "receiver": "0x2222222222222222222222222222222222222222",
+      "user_nonce": "1773741793787000",
+      "user_signature": "0x1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+    },
+    "wire": {
+      "chainId": "56",
+      "asset": "USDT",
+      "amount": "0.97",
+      "fee": "0.5",
+      "receiver": "0x2222222222222222222222222222222222222222",
+      "userNonce": "1773741793787000",
+      "userSignature": "0x1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+    },
+    "verb": "POST"
+  },
+  {
+    "name": "withdraw_futures_solana_signed",
+    "path": "/fapi/v3/aster/user-solana-withdraw",
+    "kwargs": {
+      "chain_id": 101,
+      "asset": "USDT",
+      "amount": "0.97",
+      "fee": "0.5",
+      "receiver": "BzsJhmtg2UtQWNw6764DkK5Y4GPjc1XMzRqAGqSziymK",
+      "user_nonce": "1773741793787000",
+      "user_signature": "51pM5A46n5NzHYTtuzB7gh8FFfbkh4Aij1fceCZV2NtkiVvE7DADMnSvXFiUJvauKawdWaCfPhzCTVfXYcf1iteQ"
+    },
+    "wire": {
+      "chainId": "101",
+      "asset": "USDT",
+      "amount": "0.97",
+      "fee": "0.5",
+      "receiver": "BzsJhmtg2UtQWNw6764DkK5Y4GPjc1XMzRqAGqSziymK",
+      "userNonce": "1773741793787000",
+      "userSignature": "51pM5A46n5NzHYTtuzB7gh8FFfbkh4Aij1fceCZV2NtkiVvE7DADMnSvXFiUJvauKawdWaCfPhzCTVfXYcf1iteQ"
+    },
+    "verb": "POST"
+  }
+]

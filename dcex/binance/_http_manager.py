@@ -102,6 +102,7 @@ class HTTPManager(BaseHTTPManager):
                 status_code=status_code,
                 time=query.get("timestamp", "Unknown"),
                 resp_headers=resp_headers,
+                response_data=getattr(exc, "response_data", None),
             ) from exc
 
         timestamp = generate_timestamp(iso_format=True)
@@ -115,6 +116,7 @@ class HTTPManager(BaseHTTPManager):
                 status_code=status_code,
                 time=str(timestamp),
                 resp_headers=response_headers,
+                response_data=data.get("data") if isinstance(data, dict) else data,
             )
 
         if not status_code // 100 == 2:
@@ -129,6 +131,7 @@ class HTTPManager(BaseHTTPManager):
                 status_code=status_code,
                 time=str(timestamp),
                 resp_headers=response_headers,
+                response_data=data.get("data") if isinstance(data, dict) else data,
             )
         return data
 

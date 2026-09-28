@@ -169,10 +169,10 @@ pub(super) fn body_value(value: &str, number: bool, boolean: bool) -> Value {
         if let Ok(value) = value.parse::<i64>() {
             return Value::Number(Number::from(value));
         }
-        if let Ok(value) = value.parse::<f64>() {
-            if let Some(number) = Number::from_f64(value) {
-                return Value::Number(number);
-            }
+        if let Ok(value) = value.parse::<f64>()
+            && let Some(number) = Number::from_f64(value)
+        {
+            return Value::Number(number);
         }
     }
     Value::String(value.to_string())

@@ -1,0 +1,30 @@
+{
+  "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/deduction-info",
+  "sha256": "5a0b5576ca894e440f6b9b0a4af64822f76761dabc2441d63b80f5d5d0fd02c1",
+  "routes": [],
+  "text": "Deduction info Sample { \"channel\" : \"push.personal.plan.order\" , \"data\" : { \"currency\" : \"USDT\" , \"deductFee\" : 0.1125 , \"convertSettleFee\" : 0.1125 } , \"ts\" : 1760942212000 } channel = push.personal.position Response Parameters Field Type Description currency string Deduction currency deductFee decimal Fee in deduction currency convertSettleFee decimal Fee converted to settlement currency",
+  "tables": [
+    [
+      [
+        "Field",
+        "Type",
+        "Description"
+      ],
+      [
+        "currency",
+        "string",
+        "Deduction currency"
+      ],
+      [
+        "deductFee",
+        "decimal",
+        "Fee in deduction currency"
+      ],
+      [
+        "convertSettleFee",
+        "decimal",
+        "Fee converted to settlement currency"
+      ]
+    ]
+  ]
+}

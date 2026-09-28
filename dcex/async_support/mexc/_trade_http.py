@@ -2,6 +2,7 @@
 
 from typing import Any
 
+from ..._operation_guards import require_scope
 from ._http_manager import HTTPManager
 
 
@@ -1199,10 +1200,29 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
-    async def cancel_spot_all_orders(self, recvWindow: int | None = None) -> dict[str, Any]:
-        """Cancel all open Spot orders across the account."""
+    async def cancel_spot_all_orders(
+        self,
+        recv_window: int | None = None,
+        *,
+        all_symbols: bool = False,
+        product_symbol: str | None = None,
+        recvWindow: int | None = None,
+    ) -> dict[str, Any]:
+        """
+        Cancel Spot open orders.
+
+        Provide product_symbol, or all_symbols=True to cancel all open spot orders.
+        """
+        require_scope(product_symbol, all_symbols)
+        if recv_window is not None and recvWindow is not None:
+            raise ValueError("use only recv_window or its legacy recvWindow alias")
         return await self._native_private(
-            "cancel_spot_all_orders", self._native_params(recvWindow=recvWindow)
+            "cancel_spot_all_orders",
+            self._native_params(
+                all_symbols=all_symbols,
+                product_symbol=product_symbol,
+                recvWindow=recv_window if recv_window is not None else recvWindow,
+            ),
         )
 
     async def get_contract_open_stop_orders(
@@ -1217,8 +1237,9 @@ class TradeHTTP(HTTPManager):
         self, *, orders: list[dict[str, Any]]
     ) -> dict[str, Any]:
         """
-        POST /api/v1/private/order/batch_cancel_with_external. Preserve item-level results for
-        batch operations.
+        POST /api/v1/private/order/batch_cancel_with_external.
+
+        Inspect every returned item for individual failures.
         """
         return await self._native_private(
             "cancel_contract_batch_orders_by_external_id", self._native_params(orders=orders)
@@ -1228,8 +1249,9 @@ class TradeHTTP(HTTPManager):
         self, *, orders: list[dict[str, Any]]
     ) -> dict[str, Any]:
         """
-        POST /api/v1/private/order/batch_query_with_external. Preserve item-level results for
-        batch operations.
+        POST /api/v1/private/order/batch_query_with_external.
+
+        Inspect every returned item for individual failures.
         """
         return await self._native_private(
             "get_contract_batch_orders_by_external_id", self._native_params(orders=orders)
@@ -1245,8 +1267,7 @@ class TradeHTTP(HTTPManager):
         page_size: int | None = None,
     ) -> dict[str, Any]:
         """
-        GET /api/v1/private/order/list/close_orders. Preserve item-level results for batch
-        operations.
+        GET /api/v1/private/order/list/close_orders.
         """
         return await self._native_private(
             "get_contract_closed_orders",
@@ -1270,7 +1291,7 @@ class TradeHTTP(HTTPManager):
         ids: list[int] | None = None,
     ) -> dict[str, Any]:
         """
-        GET /api/v1/private/order/fee_details. Preserve item-level results for batch operations.
+        GET /api/v1/private/order/fee_details.
         """
         return await self._native_private(
             "get_contract_fee_details",
@@ -1286,19 +1307,18 @@ class TradeHTTP(HTTPManager):
 
     async def get_contract_30_day_fee_statistics(self) -> dict[str, Any]:
         """
-        GET /api/v1/private/account/asset_book/order_deal_fee/total. Preserve item-level results
-        for batch operations.
+        Get aggregate contract trading fees over the last 30 days.
         """
         return await self._native_private(
             "get_contract_30_day_fee_statistics", self._native_params()
         )
 
     async def get_uid(self) -> dict[str, Any] | list[Any]:
-        """GET /api/v3/uid. Timestamps use milliseconds; asset/IP lists use commas."""
+        """GET /api/v3/uid."""
         return await self._native_private("get_uid", self._native_params())
 
     async def get_api_key_info(self, *, access_key: str) -> dict[str, Any] | list[Any]:
-        """GET /api/v3/apiKeyInfo. Timestamps use milliseconds; asset/IP lists use commas."""
+        """GET /api/v3/apiKeyInfo."""
         return await self._native_private(
             "get_api_key_info", self._native_params(accessKey=access_key)
         )
@@ -1306,7 +1326,7 @@ class TradeHTTP(HTTPManager):
     async def set_api_key_ip_whitelist(
         self, *, api_key: str, ip_whitelist: str, note: str | None = None
     ) -> dict[str, Any] | list[Any]:
-        """POST /api/v3/apiKeyInfo. Timestamps use milliseconds; asset/IP lists use commas."""
+        """POST /api/v3/apiKeyInfo."""
         return await self._native_private(
             "set_api_key_ip_whitelist",
             self._native_params(apiKey=api_key, ipWhiteList=ip_whitelist, note=note),
@@ -1314,13 +1334,12 @@ class TradeHTTP(HTTPManager):
 
     async def get_convertible_assets(self) -> dict[str, Any] | list[Any]:
         """
-        GET /api/v3/capital/convert/list. Timestamps use milliseconds; asset/IP lists use
-        commas.
+        GET /api/v3/capital/convert/list.
         """
         return await self._native_private("get_convertible_assets", self._native_params())
 
     async def convert_dust(self, *, assets: str) -> dict[str, Any] | list[Any]:
-        """POST /api/v3/capital/convert. Timestamps use milliseconds; asset/IP lists use commas."""
+        """POST /api/v3/capital/convert."""
         return await self._native_private("convert_dust", self._native_params(asset=assets))
 
     async def get_dust_conversion_history(
@@ -1331,7 +1350,7 @@ class TradeHTTP(HTTPManager):
         page: int | None = None,
         limit: int | None = None,
     ) -> dict[str, Any] | list[Any]:
-        """GET /api/v3/capital/convert. Timestamps use milliseconds; asset/IP lists use commas."""
+        """GET /api/v3/capital/convert."""
         return await self._native_private(
             "get_dust_conversion_history",
             self._native_params(startTime=start_time, endTime=end_time, page=page, limit=limit),
@@ -1341,8 +1360,7 @@ class TradeHTTP(HTTPManager):
         self, *, sub_account: str, note: str, recv_window: int | None = None
     ) -> dict[str, Any] | list[Any]:
         """
-        POST /api/v3/sub-account/virtualSubAccount. Timestamps use milliseconds; asset/IP lists
-        use commas.
+        Create a virtual sub-account with its name and note.
         """
         return await self._native_private(
             "create_sub_account",
@@ -1351,8 +1369,7 @@ class TradeHTTP(HTTPManager):
 
     async def get_contract_profit_rate(self, *, period_type: int) -> dict[str, Any] | list[Any]:
         """
-        GET /api/v1/private/account/profit_rate/{type}. Timestamps use milliseconds; asset/IP
-        lists use commas.
+        GET /api/v1/private/account/profit_rate/{type}.
         """
         return await self._native_private(
             "get_contract_profit_rate", self._native_params(type=period_type)
@@ -1360,8 +1377,7 @@ class TradeHTTP(HTTPManager):
 
     async def get_contract_fee_deduction_config(self) -> dict[str, Any] | list[Any]:
         """
-        GET /api/v1/private/account/feeDeductConfigs. Timestamps use milliseconds; asset/IP
-        lists use commas.
+        GET /api/v1/private/account/feeDeductConfigs.
         """
         return await self._native_private(
             "get_contract_fee_deduction_config", self._native_params()
@@ -1369,20 +1385,18 @@ class TradeHTTP(HTTPManager):
 
     async def get_contract_fee_discount_config(self) -> dict[str, Any] | list[Any]:
         """
-        GET /api/v1/private/account/config/contractFeeDiscountConfig. Timestamps use
-        milliseconds; asset/IP lists use commas.
+        GET /api/v1/private/account/config/contractFeeDiscountConfig.
         """
         return await self._native_private("get_contract_fee_discount_config", self._native_params())
 
     async def get_contract_discount_usage(self) -> dict[str, Any] | list[Any]:
         """
-        GET /api/v1/private/account/discountType. Timestamps use milliseconds; asset/IP lists
-        use commas.
+        Get the discount type currently used for contract trading fees.
         """
         return await self._native_private("get_contract_discount_usage", self._native_params())
 
     async def get_stp_strategy_group(self, *, trade_group_name: str) -> dict[str, Any] | list[Any]:
-        """GET /api/v3/strategy/group. Timestamps use milliseconds; asset/IP lists use commas."""
+        """GET /api/v3/strategy/group."""
         return await self._native_private(
             "get_stp_strategy_group", self._native_params(tradeGroupName=trade_group_name)
         )
@@ -1391,8 +1405,7 @@ class TradeHTTP(HTTPManager):
         self, *, uid: str, trade_group_id: str
     ) -> dict[str, Any] | list[Any]:
         """
-        DELETE /api/v3/strategy/group/uid. Timestamps use milliseconds; asset/IP lists use
-        commas.
+        DELETE /api/v3/strategy/group/uid.
         """
         return await self._native_private(
             "remove_stp_strategy_group_members",
@@ -1403,15 +1416,14 @@ class TradeHTTP(HTTPManager):
         self, *, coin: str | None = None, page: int | None = None, limit: int | None = None
     ) -> dict[str, Any] | list[Any]:
         """
-        GET /api/v3/capital/withdraw/address. Timestamps use milliseconds; asset/IP lists use
-        commas.
+        GET /api/v3/capital/withdraw/address.
         """
         return await self._native_private(
             "get_withdrawal_addresses", self._native_params(coin=coin, page=page, limit=limit)
         )
 
     async def delete_stp_strategy_group(self, *, trade_group_id: str) -> dict[str, Any] | list[Any]:
-        """DELETE /api/v3/strategy/group. Timestamps use milliseconds; asset/IP lists use commas."""
+        """DELETE /api/v3/strategy/group."""
         return await self._native_private(
             "delete_stp_strategy_group", self._native_params(tradeGroupId=trade_group_id)
         )
@@ -1419,7 +1431,7 @@ class TradeHTTP(HTTPManager):
     async def create_stp_strategy_group(
         self, *, trade_group_name: str
     ) -> dict[str, Any] | list[Any]:
-        """POST /api/v3/strategy/group. Timestamps use milliseconds; asset/IP lists use commas."""
+        """POST /api/v3/strategy/group."""
         return await self._native_private(
             "create_stp_strategy_group", self._native_params(tradeGroupName=trade_group_name)
         )
@@ -1428,7 +1440,7 @@ class TradeHTTP(HTTPManager):
         self, *, uid: str, trade_group_id: str
     ) -> dict[str, Any] | list[Any]:
         """
-        POST /api/v3/strategy/group/uid. Timestamps use milliseconds; asset/IP lists use commas.
+        POST /api/v3/strategy/group/uid.
         """
         return await self._native_private(
             "add_stp_strategy_group_members",
@@ -1439,8 +1451,7 @@ class TradeHTTP(HTTPManager):
         self, *, sub_account: str, api_key: str, recv_window: int | None = None
     ) -> dict[str, Any] | list[Any]:
         """
-        DELETE /api/v3/sub-account/apiKey. Timestamps use milliseconds; asset/IP lists use
-        commas.
+        DELETE /api/v3/sub-account/apiKey.
         """
         return await self._native_private(
             "delete_sub_account_api_key",
@@ -1457,7 +1468,7 @@ class TradeHTTP(HTTPManager):
         recv_window: int | None = None,
     ) -> dict[str, Any] | list[Any]:
         """
-        POST /api/v3/sub-account/apiKey. Timestamps use milliseconds; asset/IP lists use commas.
+        POST /api/v3/sub-account/apiKey.
         """
         return await self._native_private(
             "create_sub_account_api_key",
@@ -1474,7 +1485,7 @@ class TradeHTTP(HTTPManager):
         self, *, sub_account: str, recv_window: int | None = None
     ) -> dict[str, Any] | list[Any]:
         """
-        GET /api/v3/sub-account/apiKey. Timestamps use milliseconds; asset/IP lists use commas.
+        GET /api/v3/sub-account/apiKey.
         """
         return await self._native_private(
             "get_sub_account_api_keys",
@@ -1505,4 +1516,530 @@ class TradeHTTP(HTTPManager):
         """Manage the Spot user-data listen key through signed REST."""
         return await self._native_private(
             "close_spot_listen_key", self._native_params(listenKey=listen_key)
+        )
+
+    async def create_contract_stp_group(
+        self,
+        *,
+        config_name: str,
+        blacklist: list[int],
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /api/v1/private/market_maker/self_trade/blacklist/create.
+
+        Source: https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/create-stp-group
+        """
+        return await self._native_private(
+            "create_contract_stp_group",
+            self._native_params(
+                **{
+                    "configName": config_name,
+                    "blacklist": blacklist,
+                }
+            ),
+        )
+
+    async def delete_contract_stp_group(
+        self,
+        *,
+        config_name: str,
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /api/v1/private/market_maker/self_trade/blacklist/delete.
+
+        Source: https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/delete-stp-group
+        """
+        return await self._native_private(
+            "delete_contract_stp_group",
+            self._native_params(
+                **{
+                    "configName": config_name,
+                }
+            ),
+        )
+
+    async def get_current_contract_stp_group(
+        self,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /api/v1/private/market_maker/self_trade/blacklist/search.
+
+        Source: https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/get-current-user-stp-group
+        """
+        return await self._native_private(
+            "get_current_contract_stp_group",
+            self._native_params(**{}),
+        )
+
+    async def get_contract_stp_groups(
+        self,
+        *,
+        config_name: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /api/v1/private/market_maker/self_trade/blacklist.
+
+        Source: https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/query-stp-groups-and-group-members
+        """
+        return await self._native_private(
+            "get_contract_stp_groups",
+            self._native_params(
+                **{
+                    "configName": config_name,
+                }
+            ),
+        )
+
+    async def update_contract_stp_group(
+        self,
+        *,
+        config_name: str,
+        blacklist: list[int],
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /api/v1/private/market_maker/self_trade/blacklist/update.
+
+        Source: https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/update-stp-group
+        """
+        return await self._native_private(
+            "update_contract_stp_group",
+            self._native_params(
+                **{
+                    "configName": config_name,
+                    "blacklist": blacklist,
+                }
+            ),
+        )
+
+    async def get_rebate_affiliate_campaign(
+        self,
+        *,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        page: int | None = None,
+        page_size: int | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /api/v3/rebate/affiliate/campaign.
+
+        Source: https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-affiliate-campaign-data-affiliate-only
+        """
+        return await self._native_private(
+            "get_rebate_affiliate_campaign",
+            self._native_params(
+                **{
+                    "startTime": start_time,
+                    "endTime": end_time,
+                    "page": page,
+                    "pageSize": page_size,
+                    "recvWindow": recv_window,
+                }
+            ),
+        )
+
+    async def get_rebate_affiliate_commission_detail(
+        self,
+        *,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        uid: str | None = None,
+        invite_code: str | None = None,
+        page: int | None = None,
+        page_size: int | None = None,
+        type_: int | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /api/v3/rebate/affiliate/commission/detail.
+
+        Source: https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-affiliate-commission-detail-record-affiliate-only
+        """
+        return await self._native_private(
+            "get_rebate_affiliate_commission_detail",
+            self._native_params(
+                **{
+                    "startTime": start_time,
+                    "endTime": end_time,
+                    "uid": uid,
+                    "inviteCode": invite_code,
+                    "page": page,
+                    "pageSize": page_size,
+                    "type": type_,
+                    "recvWindow": recv_window,
+                }
+            ),
+        )
+
+    async def get_rebate_affiliate_commission(
+        self,
+        *,
+        start_time: int,
+        end_time: int,
+        uid: str | None = None,
+        invite_code: str | None = None,
+        page: int | None = None,
+        page_size: int | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /api/v3/rebate/affiliate/commission.
+
+        Source: https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-affiliate-commission-record-affiliate-only
+        """
+        return await self._native_private(
+            "get_rebate_affiliate_commission",
+            self._native_params(
+                **{
+                    "startTime": start_time,
+                    "endTime": end_time,
+                    "uid": uid,
+                    "inviteCode": invite_code,
+                    "page": page,
+                    "pageSize": page_size,
+                    "recvWindow": recv_window,
+                }
+            ),
+        )
+
+    async def get_rebate_affiliate_referral(
+        self,
+        *,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        uid: str | None = None,
+        invite_code: str | None = None,
+        page: int | None = None,
+        page_size: int | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /api/v3/rebate/affiliate/referral.
+
+        Source: https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-affiliate-referral-dataaffiliate-only
+        """
+        return await self._native_private(
+            "get_rebate_affiliate_referral",
+            self._native_params(
+                **{
+                    "startTime": start_time,
+                    "endTime": end_time,
+                    "uid": uid,
+                    "inviteCode": invite_code,
+                    "page": page,
+                    "pageSize": page_size,
+                    "recvWindow": recv_window,
+                }
+            ),
+        )
+
+    async def get_rebate_affiliate_withdraw(
+        self,
+        *,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        page: int | None = None,
+        page_size: int | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /api/v3/rebate/affiliate/withdraw.
+
+        Source: https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-affiliate-withdraw-record-affiliate-only
+        """
+        return await self._native_private(
+            "get_rebate_affiliate_withdraw",
+            self._native_params(
+                **{
+                    "startTime": start_time,
+                    "endTime": end_time,
+                    "page": page,
+                    "pageSize": page_size,
+                    "recvWindow": recv_window,
+                }
+            ),
+        )
+
+    async def get_rebate_affiliate_list(
+        self,
+        *,
+        member_info: str,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /api/v3/rebate/affiliate/list.
+
+        Source: https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-direct-subaffiliate-data-affiliate-only
+        """
+        return await self._native_private(
+            "get_rebate_affiliate_list",
+            self._native_params(
+                **{
+                    "memberInfo": member_info,
+                    "recvWindow": recv_window,
+                }
+            ),
+        )
+
+    async def get_rebate_tax_query(
+        self,
+        *,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        page: int | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /api/v3/rebate/taxQuery.
+
+        Source: https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-rebate-history-records
+        """
+        return await self._native_private(
+            "get_rebate_tax_query",
+            self._native_params(
+                **{
+                    "startTime": start_time,
+                    "endTime": end_time,
+                    "page": page,
+                    "recvWindow": recv_window,
+                }
+            ),
+        )
+
+    async def get_rebate_detail(
+        self,
+        *,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        page: int | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /api/v3/rebate/detail.
+
+        Source: https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-rebate-records-detail
+        """
+        return await self._native_private(
+            "get_rebate_detail",
+            self._native_params(
+                **{
+                    "startTime": start_time,
+                    "endTime": end_time,
+                    "page": page,
+                    "recvWindow": recv_window,
+                }
+            ),
+        )
+
+    async def get_rebate_detail_kickback(
+        self,
+        *,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        page: int | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /api/v3/rebate/detail/kickback.
+
+        Source: https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-self-rebate-records-detail
+        """
+        return await self._native_private(
+            "get_rebate_detail_kickback",
+            self._native_params(
+                **{
+                    "startTime": start_time,
+                    "endTime": end_time,
+                    "page": page,
+                    "recvWindow": recv_window,
+                }
+            ),
+        )
+
+    async def get_rebate_affiliate_subaffiliates(
+        self,
+        *,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        uid: str | None = None,
+        invite_code: str | None = None,
+        page: int | None = None,
+        page_size: int | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /api/v3/rebate/affiliate/subaffiliates.
+
+        Source: https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-subaffiliates-data-affiliate-only
+        """
+        return await self._native_private(
+            "get_rebate_affiliate_subaffiliates",
+            self._native_params(
+                **{
+                    "startTime": start_time,
+                    "endTime": end_time,
+                    "uid": uid,
+                    "inviteCode": invite_code,
+                    "page": page,
+                    "pageSize": page_size,
+                    "recvWindow": recv_window,
+                }
+            ),
+        )
+
+    async def get_rebate_refer_code(
+        self,
+        *,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /api/v3/rebate/referCode.
+
+        Source: https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/query-refercode
+        """
+        return await self._native_private(
+            "get_rebate_refer_code",
+            self._native_params(
+                **{
+                    "recvWindow": recv_window,
+                }
+            ),
+        )
+
+    async def cancel_spot_withdrawal(
+        self,
+        *,
+        id: str,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        DELETE /api/v3/capital/withdraw.
+
+        Source: https://www.mexc.com/api-docs/spot-v3/wallet-endpoints/cancel-withdraw
+        """
+        return await self._native_private(
+            "cancel_spot_withdrawal",
+            self._native_params(
+                **{
+                    "id": id,
+                    "recvWindow": recv_window,
+                }
+            ),
+        )
+
+    async def transfer_spot_internal(
+        self,
+        *,
+        to_account_type: str,
+        to_account: str,
+        area_code: str | None = None,
+        asset: str,
+        amount: str,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /api/v3/capital/transfer/internal.
+
+        Source: https://www.mexc.com/api-docs/spot-v3/wallet-endpoints/internal-transfer
+
+
+        The recipient is a different user. API transfers have no second confirmation;
+        they execute on submit. Verify the recipient UID, email, or phone first.
+        """
+        return await self._native_private(
+            "transfer_spot_internal",
+            self._native_params(
+                **{
+                    "toAccountType": to_account_type,
+                    "toAccount": to_account,
+                    "areaCode": area_code,
+                    "asset": asset,
+                    "amount": amount,
+                    "recvWindow": recv_window,
+                }
+            ),
+        )
+
+    async def create_spot_withdrawal(
+        self,
+        *,
+        coin: str,
+        withdraw_order_id: str | None = None,
+        network: str | None = None,
+        contract_address: str | None = None,
+        address: str,
+        memo: str | None = None,
+        amount: str,
+        remark: str | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /api/v3/capital/withdraw.
+
+        API withdrawals have no second confirmation; they execute on submit.
+        Source: https://www.mexc.com/api-docs/spot-v3/wallet-endpoints/withdrawnew
+        """
+        return await self._native_private(
+            "create_spot_withdrawal",
+            self._native_params(
+                **{
+                    "coin": coin,
+                    "withdrawOrderId": withdraw_order_id,
+                    "netWork": network,
+                    "contractAddress": contract_address,
+                    "address": address,
+                    "memo": memo,
+                    "amount": amount,
+                    "remark": remark,
+                    "recvWindow": recv_window,
+                }
+            ),
+        )
+
+    async def create_spot_withdrawal_legacy(
+        self,
+        *,
+        coin: str,
+        withdraw_order_id: str | None = None,
+        network: str | None = None,
+        address: str,
+        memo: str | None = None,
+        amount: str,
+        remark: str | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /api/v3/capital/withdraw/apply.
+
+        API withdrawals have no second confirmation; they execute on submit.
+        Legacy endpoint; the exchange documents that it will be taken offline.
+        Source: https://www.mexc.com/api-docs/spot-v3/wallet-endpoints/withdrawpreviousoffline-soon
+        """
+        return await self._native_private(
+            "create_spot_withdrawal_legacy",
+            self._native_params(
+                **{
+                    "coin": coin,
+                    "withdrawOrderId": withdraw_order_id,
+                    "network": network,
+                    "address": address,
+                    "memo": memo,
+                    "amount": amount,
+                    "remark": remark,
+                    "recvWindow": recv_window,
+                }
+            ),
+        )
+
+    async def place_contract_batch_orders(self, orders: list[dict[str, Any]]) -> Any:  # noqa: ANN401
+        """
+        Submit up to 50 native-symbol futures orders.
+
+        Previously documented as under maintenance; the current official page restricts
+        this endpoint to market maker accounts. Inspect each item errorCode in the response.
+        Decimal prices and quantities must be plain strings.
+        Source: https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/batch-place-order
+        """
+        return await self._native_private(
+            "place_contract_batch_orders", self._native_params(orders=orders)
         )

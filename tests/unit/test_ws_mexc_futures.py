@@ -84,6 +84,13 @@ async def test_contract_stream_wire_protocol(private: bool) -> None:
             await call(*args)
             await client.recv()
             assert received[-1] == {"method": f"sub.{channel}", "param": params, "gzip": False}
+        for channel in ["contract", "event.contract"]:
+            await client.subscribe(channel)
+            await client.recv()
+            assert received[-1] == {"method": f"sub.{channel}"}
+            await client.unsubscribe(channel)
+            await client.recv()
+            assert received[-1] == {"method": f"unsub.{channel}"}
         if isinstance(client, FuturesPrivateClient):
             await client.set_private_filters([{"filter": "position", "rules": ["BTC-USDT-SWAP"]}])
             await client.recv()

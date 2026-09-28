@@ -36,10 +36,10 @@ pub(crate) fn subscription_payload(
     let mut payload = Map::new();
     payload.insert("type".to_string(), Value::String(operation.to_string()));
     payload.insert("channel".to_string(), Value::String(channel));
-    if operation == "subscribe" {
-        if let Some(auth) = auth {
-            payload.insert("auth".to_string(), Value::String(normalize_auth(&auth)?));
-        }
+    if operation == "subscribe"
+        && let Some(auth) = auth
+    {
+        payload.insert("auth".to_string(), Value::String(normalize_auth(&auth)?));
     }
     Ok(Value::Object(payload))
 }

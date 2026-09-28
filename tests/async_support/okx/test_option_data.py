@@ -21,9 +21,7 @@ async def test_option_public_data_endpoints():
         )
         assert instruments["data"]
         _assert_ok(
-            await client.get_delivery_exercise_history(
-                "OPTION", instFamily="BTC-USD", limit=20
-            )
+            await client.get_delivery_exercise_history("OPTION", instFamily="BTC-USD", limit=20)
         )
         _assert_ok(await client.get_option_summary(instFamily="BTC-USD"))
         _assert_ok(await client.get_option_tick_bands(instFamily="BTC-USD"))
@@ -36,7 +34,5 @@ async def test_option_public_data_endpoints():
         )
         cutoff = (datetime.now(UTC) + timedelta(days=1)).strftime("%Y%m%d")
         expiry_time = next(row[1] for row in expiry_distribution["data"] if row[1] > cutoff)
-        _assert_ok(
-            await client.get_option_open_interest_and_volume_by_strike("BTC", expiry_time)
-        )
+        _assert_ok(await client.get_option_open_interest_and_volume_by_strike("BTC", expiry_time))
         _assert_ok(await client.get_option_taker_block_volume("BTC"))

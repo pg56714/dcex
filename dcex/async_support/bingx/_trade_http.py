@@ -2,6 +2,8 @@
 
 from typing import Any
 
+from ..._keyword_aliases import legacy_keywords, wire_keywords
+from ..._operation_guards import require_confirmation, require_scope
 from ._http_manager import HTTPManager
 
 
@@ -12,867 +14,1863 @@ class TradeHTTP(HTTPManager):
         values.pop("self", None)
         return self._native_params(**values)
 
+    @legacy_keywords(
+        {
+            "timeInForce": "time_in_force",
+            "quoteOrderQty": "quote_order_qty",
+            "stopPrice": "stop_price",
+            "newClientOrderId": "new_client_order_id",
+            "clientOrderId": "client_order_id",
+            "recvWindow": "recv_window",
+        }
+    )
     async def place_spot_order(
         self,
         product_symbol: str,
         side: str,
         type_: str,
-        timeInForce: str | None = None,
+        time_in_force: str | None = None,
         quantity: float | str | None = None,
-        quoteOrderQty: float | str | None = None,
+        quote_order_qty: float | str | None = None,
         price: float | str | None = None,
-        stopPrice: float | str | None = None,
-        newClientOrderId: str | None = None,
-        clientOrderId: str | None = None,
-        recvWindow: int | None = None,
+        stop_price: float | str | None = None,
+        new_client_order_id: str | None = None,
+        client_order_id: str | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
-        return await self._native_private("place_spot_order", self._native_call_params(locals()))
+        return await self._native_private(
+            "place_spot_order",
+            self._native_call_params(
+                wire_keywords(
+                    locals(),
+                    {
+                        "timeInForce": "time_in_force",
+                        "quoteOrderQty": "quote_order_qty",
+                        "stopPrice": "stop_price",
+                        "newClientOrderId": "new_client_order_id",
+                        "clientOrderId": "client_order_id",
+                        "recvWindow": "recv_window",
+                    },
+                )
+            ),
+        )
 
+    @legacy_keywords(
+        {
+            "quoteOrderQty": "quote_order_qty",
+            "clientOrderId": "client_order_id",
+            "newClientOrderId": "new_client_order_id",
+            "recvWindow": "recv_window",
+        }
+    )
     async def place_spot_market_buy_order(
         self,
         product_symbol: str,
-        quoteOrderQty: float | str,
-        clientOrderId: str | None = None,
-        newClientOrderId: str | None = None,
-        recvWindow: int | None = None,
+        quote_order_qty: float | str,
+        client_order_id: str | None = None,
+        new_client_order_id: str | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
         return await self._native_private(
             "place_spot_market_buy_order",
-            self._native_call_params(locals()),
+            self._native_call_params(
+                wire_keywords(
+                    locals(),
+                    {
+                        "quoteOrderQty": "quote_order_qty",
+                        "clientOrderId": "client_order_id",
+                        "newClientOrderId": "new_client_order_id",
+                        "recvWindow": "recv_window",
+                    },
+                )
+            ),
         )
 
+    @legacy_keywords(
+        {
+            "clientOrderId": "client_order_id",
+            "newClientOrderId": "new_client_order_id",
+            "recvWindow": "recv_window",
+        }
+    )
     async def place_spot_market_sell_order(
         self,
         product_symbol: str,
         quantity: float | str,
-        clientOrderId: str | None = None,
-        newClientOrderId: str | None = None,
-        recvWindow: int | None = None,
+        client_order_id: str | None = None,
+        new_client_order_id: str | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
         return await self._native_private(
             "place_spot_market_sell_order",
-            self._native_call_params(locals()),
+            self._native_call_params(
+                wire_keywords(
+                    locals(),
+                    {
+                        "clientOrderId": "client_order_id",
+                        "newClientOrderId": "new_client_order_id",
+                        "recvWindow": "recv_window",
+                    },
+                )
+            ),
         )
 
+    @legacy_keywords(
+        {
+            "timeInForce": "time_in_force",
+            "clientOrderId": "client_order_id",
+            "newClientOrderId": "new_client_order_id",
+            "recvWindow": "recv_window",
+        }
+    )
     async def place_spot_limit_order(
         self,
         product_symbol: str,
         side: str,
         quantity: float | str,
         price: float | str,
-        timeInForce: str | None = None,
-        clientOrderId: str | None = None,
-        newClientOrderId: str | None = None,
-        recvWindow: int | None = None,
+        time_in_force: str | None = None,
+        client_order_id: str | None = None,
+        new_client_order_id: str | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
         return await self._native_private(
             "place_spot_limit_order",
-            self._native_call_params(locals()),
+            self._native_call_params(
+                wire_keywords(
+                    locals(),
+                    {
+                        "timeInForce": "time_in_force",
+                        "clientOrderId": "client_order_id",
+                        "newClientOrderId": "new_client_order_id",
+                        "recvWindow": "recv_window",
+                    },
+                )
+            ),
         )
 
+    @legacy_keywords(
+        {
+            "timeInForce": "time_in_force",
+            "clientOrderId": "client_order_id",
+            "newClientOrderId": "new_client_order_id",
+            "recvWindow": "recv_window",
+        }
+    )
     async def place_spot_limit_buy_order(
         self,
         product_symbol: str,
         quantity: float | str,
         price: float | str,
-        timeInForce: str | None = None,
-        clientOrderId: str | None = None,
-        newClientOrderId: str | None = None,
-        recvWindow: int | None = None,
+        time_in_force: str | None = None,
+        client_order_id: str | None = None,
+        new_client_order_id: str | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
         return await self._native_private(
             "place_spot_limit_buy_order",
-            self._native_call_params(locals()),
+            self._native_call_params(
+                wire_keywords(
+                    locals(),
+                    {
+                        "timeInForce": "time_in_force",
+                        "clientOrderId": "client_order_id",
+                        "newClientOrderId": "new_client_order_id",
+                        "recvWindow": "recv_window",
+                    },
+                )
+            ),
         )
 
+    @legacy_keywords(
+        {
+            "timeInForce": "time_in_force",
+            "clientOrderId": "client_order_id",
+            "newClientOrderId": "new_client_order_id",
+            "recvWindow": "recv_window",
+        }
+    )
     async def place_spot_limit_sell_order(
         self,
         product_symbol: str,
         quantity: float | str,
         price: float | str,
-        timeInForce: str | None = None,
-        clientOrderId: str | None = None,
-        newClientOrderId: str | None = None,
-        recvWindow: int | None = None,
+        time_in_force: str | None = None,
+        client_order_id: str | None = None,
+        new_client_order_id: str | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
         return await self._native_private(
             "place_spot_limit_sell_order",
-            self._native_call_params(locals()),
+            self._native_call_params(
+                wire_keywords(
+                    locals(),
+                    {
+                        "timeInForce": "time_in_force",
+                        "clientOrderId": "client_order_id",
+                        "newClientOrderId": "new_client_order_id",
+                        "recvWindow": "recv_window",
+                    },
+                )
+            ),
         )
 
+    @legacy_keywords(
+        {
+            "clientOrderId": "client_order_id",
+            "newClientOrderId": "new_client_order_id",
+            "recvWindow": "recv_window",
+        }
+    )
     async def place_spot_post_only_order(
         self,
         product_symbol: str,
         side: str,
         quantity: float | str,
         price: float | str,
-        clientOrderId: str | None = None,
-        newClientOrderId: str | None = None,
-        recvWindow: int | None = None,
+        client_order_id: str | None = None,
+        new_client_order_id: str | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
         return await self._native_private(
             "place_spot_post_only_order",
-            self._native_call_params(locals()),
+            self._native_call_params(
+                wire_keywords(
+                    locals(),
+                    {
+                        "clientOrderId": "client_order_id",
+                        "newClientOrderId": "new_client_order_id",
+                        "recvWindow": "recv_window",
+                    },
+                )
+            ),
         )
 
+    @legacy_keywords(
+        {
+            "clientOrderId": "client_order_id",
+            "newClientOrderId": "new_client_order_id",
+            "recvWindow": "recv_window",
+        }
+    )
     async def place_spot_post_only_buy_order(
         self,
         product_symbol: str,
         quantity: float | str,
         price: float | str,
-        clientOrderId: str | None = None,
-        newClientOrderId: str | None = None,
-        recvWindow: int | None = None,
+        client_order_id: str | None = None,
+        new_client_order_id: str | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
         return await self._native_private(
             "place_spot_post_only_buy_order",
-            self._native_call_params(locals()),
+            self._native_call_params(
+                wire_keywords(
+                    locals(),
+                    {
+                        "clientOrderId": "client_order_id",
+                        "newClientOrderId": "new_client_order_id",
+                        "recvWindow": "recv_window",
+                    },
+                )
+            ),
         )
 
+    @legacy_keywords(
+        {
+            "clientOrderId": "client_order_id",
+            "newClientOrderId": "new_client_order_id",
+            "recvWindow": "recv_window",
+        }
+    )
     async def place_spot_post_only_sell_order(
         self,
         product_symbol: str,
         quantity: float | str,
         price: float | str,
-        clientOrderId: str | None = None,
-        newClientOrderId: str | None = None,
-        recvWindow: int | None = None,
+        client_order_id: str | None = None,
+        new_client_order_id: str | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
         return await self._native_private(
             "place_spot_post_only_sell_order",
-            self._native_call_params(locals()),
+            self._native_call_params(
+                wire_keywords(
+                    locals(),
+                    {
+                        "clientOrderId": "client_order_id",
+                        "newClientOrderId": "new_client_order_id",
+                        "recvWindow": "recv_window",
+                    },
+                )
+            ),
         )
 
+    @legacy_keywords({"recvWindow": "recv_window"})
     async def place_spot_batch_order(
         self,
         data: list[dict],
         sync: bool | None = None,
-        recvWindow: int | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
         return await self._native_private(
             "place_spot_batch_order",
-            self._native_call_params(locals()),
+            self._native_call_params(wire_keywords(locals(), {"recvWindow": "recv_window"})),
         )
 
+    @legacy_keywords(
+        {
+            "cancelReplaceMode": "cancel_replace_mode",
+            "cancelOrderId": "cancel_order_id",
+            "cancelClientOrderID": "cancel_client_order_id",
+            "cancelRestrictions": "cancel_restrictions",
+            "quoteOrderQty": "quote_order_qty",
+            "stopPrice": "stop_price",
+            "timeInForce": "time_in_force",
+            "newClientOrderId": "new_client_order_id",
+            "recvWindow": "recv_window",
+        }
+    )
     async def replace_spot_order(
         self,
         product_symbol: str,
-        cancelReplaceMode: str,  # noqa: N803
+        cancel_replace_mode: str,  # noqa: N803
         side: str,
         type_: str,
-        cancelOrderId: int | str | None = None,  # noqa: N803
-        cancelClientOrderID: str | None = None,  # noqa: N803
-        cancelRestrictions: str | None = None,  # noqa: N803
+        cancel_order_id: int | str | None = None,  # noqa: N803
+        cancel_client_order_id: str | None = None,  # noqa: N803
+        cancel_restrictions: str | None = None,  # noqa: N803
         quantity: float | str | None = None,
-        quoteOrderQty: float | str | None = None,  # noqa: N803
+        quote_order_qty: float | str | None = None,  # noqa: N803
         price: float | str | None = None,
-        stopPrice: float | str | None = None,  # noqa: N803
-        timeInForce: str | None = None,  # noqa: N803
-        newClientOrderId: str | None = None,  # noqa: N803
-        recvWindow: int | None = None,  # noqa: N803
+        stop_price: float | str | None = None,  # noqa: N803
+        time_in_force: str | None = None,  # noqa: N803
+        new_client_order_id: str | None = None,  # noqa: N803
+        recv_window: int | None = None,  # noqa: N803
     ) -> dict[str, Any]:
         """Atomically request spot order cancellation and replacement."""
-        return await self._native_private("replace_spot_order", self._native_call_params(locals()))
+        return await self._native_private(
+            "replace_spot_order",
+            self._native_call_params(
+                wire_keywords(
+                    locals(),
+                    {
+                        "cancelReplaceMode": "cancel_replace_mode",
+                        "cancelOrderId": "cancel_order_id",
+                        "cancelClientOrderID": "cancel_client_order_id",
+                        "cancelRestrictions": "cancel_restrictions",
+                        "quoteOrderQty": "quote_order_qty",
+                        "stopPrice": "stop_price",
+                        "timeInForce": "time_in_force",
+                        "newClientOrderId": "new_client_order_id",
+                        "recvWindow": "recv_window",
+                    },
+                )
+            ),
+        )
 
+    @legacy_keywords(
+        {
+            "orderId": "order_id",
+            "clientOrderID": "client_order_id",
+            "clientOrderId": "client_order_id",
+            "cancelRestrictions": "cancel_restrictions",
+            "recvWindow": "recv_window",
+        }
+    )
     async def cancel_spot_order(
         self,
         product_symbol: str,
-        orderId: int | str | None = None,
-        clientOrderID: str | None = None,
-        clientOrderId: str | None = None,
-        cancelRestrictions: str | None = None,
-        recvWindow: int | None = None,
+        order_id: int | str | None = None,
+        client_order_id: str | None = None,
+        cancel_restrictions: str | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
-        return await self._native_private("cancel_spot_order", self._native_call_params(locals()))
+        return await self._native_private(
+            "cancel_spot_order",
+            self._native_call_params(
+                wire_keywords(
+                    locals(),
+                    {
+                        "orderId": "order_id",
+                        "clientOrderID": "client_order_id",
+                        "cancelRestrictions": "cancel_restrictions",
+                        "recvWindow": "recv_window",
+                    },
+                )
+            ),
+        )
 
+    @legacy_keywords(
+        {
+            "orderIds": "order_ids",
+            "clientOrderIDs": "client_order_ids",
+            "recvWindow": "recv_window",
+        }
+    )
     async def cancel_spot_batch_orders(
         self,
         product_symbol: str,
-        orderIds: list[int | str] | str,
-        clientOrderIDs: list[str] | str | None = None,
+        order_ids: list[int | str] | str,
+        client_order_ids: list[str] | str | None = None,
         process: int | None = None,
-        recvWindow: int | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
         return await self._native_private(
             "cancel_spot_batch_orders",
-            self._native_call_params(locals()),
+            self._native_call_params(
+                wire_keywords(
+                    locals(),
+                    {
+                        "orderIds": "order_ids",
+                        "clientOrderIDs": "client_order_ids",
+                        "recvWindow": "recv_window",
+                    },
+                )
+            ),
         )
 
+    @legacy_keywords({"recvWindow": "recv_window"})
     async def cancel_spot_open_orders(
         self,
         product_symbol: str | None = None,
-        recvWindow: int | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
         return await self._native_private(
             "cancel_spot_open_orders",
-            self._native_call_params(locals()),
+            self._native_call_params(wire_keywords(locals(), {"recvWindow": "recv_window"})),
         )
 
+    @legacy_keywords({"timeOut": "time_out", "recvWindow": "recv_window"})
     async def set_spot_cancel_all_after(
         self,
         type_: str,
-        timeOut: int | None = None,  # noqa: N803
-        recvWindow: int | None = None,  # noqa: N803
+        time_out: int | None = None,  # noqa: N803
+        recv_window: int | None = None,  # noqa: N803
     ) -> dict[str, Any]:
         """Activate or close the spot order dead man's switch."""
         return await self._native_private(
-            "set_spot_cancel_all_after", self._native_call_params(locals())
+            "set_spot_cancel_all_after",
+            self._native_call_params(
+                wire_keywords(locals(), {"timeOut": "time_out", "recvWindow": "recv_window"})
+            ),
         )
 
+    @legacy_keywords(
+        {
+            "orderId": "order_id",
+            "clientOrderID": "client_order_id",
+            "clientOrderId": "client_order_id",
+            "recvWindow": "recv_window",
+        }
+    )
     async def get_spot_order(
         self,
         product_symbol: str,
-        orderId: int | str | None = None,
-        clientOrderID: str | None = None,
-        clientOrderId: str | None = None,
-        recvWindow: int | None = None,
+        order_id: int | str | None = None,
+        client_order_id: str | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
-        return await self._native_private("get_spot_order", self._native_call_params(locals()))
+        return await self._native_private(
+            "get_spot_order",
+            self._native_call_params(
+                wire_keywords(
+                    locals(),
+                    {
+                        "orderId": "order_id",
+                        "clientOrderID": "client_order_id",
+                        "recvWindow": "recv_window",
+                    },
+                )
+            ),
+        )
 
+    @legacy_keywords({"recvWindow": "recv_window"})
     async def get_spot_open_orders(
         self,
         product_symbol: str | None = None,
-        recvWindow: int | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
         return await self._native_private(
             "get_spot_open_orders",
-            self._native_call_params(locals()),
+            self._native_call_params(wire_keywords(locals(), {"recvWindow": "recv_window"})),
         )
 
+    @legacy_keywords(
+        {
+            "orderId": "order_id",
+            "startTime": "start_time",
+            "endTime": "end_time",
+            "pageIndex": "page_index",
+            "pageSize": "page_size",
+            "recvWindow": "recv_window",
+        }
+    )
     async def get_spot_order_history(
         self,
         product_symbol: str | None = None,
-        orderId: int | str | None = None,
-        startTime: int | None = None,
-        endTime: int | None = None,
-        pageIndex: int = 1,
-        pageSize: int = 100,
+        order_id: int | str | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        page_index: int = 1,
+        page_size: int = 100,
         status: str | None = None,
         type_: str | None = None,
-        recvWindow: int | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
         return await self._native_private(
             "get_spot_order_history",
-            self._native_call_params(locals()),
+            self._native_call_params(
+                wire_keywords(
+                    locals(),
+                    {
+                        "orderId": "order_id",
+                        "startTime": "start_time",
+                        "endTime": "end_time",
+                        "pageIndex": "page_index",
+                        "pageSize": "page_size",
+                        "recvWindow": "recv_window",
+                    },
+                )
+            ),
         )
 
+    @legacy_keywords(
+        {
+            "orderId": "order_id",
+            "startTime": "start_time",
+            "endTime": "end_time",
+            "fromId": "from_id",
+            "recvWindow": "recv_window",
+        }
+    )
     async def get_spot_my_trades(
         self,
         product_symbol: str,
-        orderId: int | str | None = None,
-        startTime: int | None = None,
-        endTime: int | None = None,
-        fromId: int | None = None,
+        order_id: int | str | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        from_id: int | None = None,
         limit: int | None = None,
-        recvWindow: int | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
         return await self._native_private(
             "get_spot_my_trades",
-            self._native_call_params(locals()),
+            self._native_call_params(
+                wire_keywords(
+                    locals(),
+                    {
+                        "orderId": "order_id",
+                        "startTime": "start_time",
+                        "endTime": "end_time",
+                        "fromId": "from_id",
+                        "recvWindow": "recv_window",
+                    },
+                )
+            ),
         )
 
+    @legacy_keywords({"recvWindow": "recv_window"})
     async def get_spot_commission_rate(
         self,
         product_symbol: str,
-        recvWindow: int | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
         return await self._native_private(
             "get_spot_commission_rate",
-            self._native_call_params(locals()),
+            self._native_call_params(wire_keywords(locals(), {"recvWindow": "recv_window"})),
         )
 
+    @legacy_keywords(
+        {
+            "positionSide": "position_side",
+            "reduceOnly": "reduce_only",
+            "quoteOrderQty": "quote_order_qty",
+            "stopPrice": "stop_price",
+            "priceRate": "price_rate",
+            "stopLoss": "stop_loss",
+            "takeProfit": "take_profit",
+            "workingType": "working_type",
+            "clientOrderId": "client_order_id",
+            "recvWindow": "recv_window",
+            "timeInForce": "time_in_force",
+            "closePosition": "close_position",
+            "activationPrice": "activation_price",
+            "stopGuaranteed": "stop_guaranteed",
+            "positionId": "position_id",
+        }
+    )
     async def place_swap_order(
         self,
         product_symbol: str,
         type_: str,
         side: str,
-        positionSide: str | None = None,
-        reduceOnly: str | None = None,
+        position_side: str | None = None,
+        reduce_only: str | None = None,
         price: float | None = None,
         quantity: float | None = None,
-        quoteOrderQty: float | None = None,
-        stopPrice: float | None = None,
-        priceRate: float | None = None,
-        stopLoss: str | None = None,
-        takeProfit: str | None = None,
-        workingType: str | None = None,
-        clientOrderId: str | None = None,
-        recvWindow: int | None = None,
-        timeInForce: str | None = None,
-        closePosition: str | None = None,
-        activationPrice: float | None = None,
-        stopGuaranteed: str | None = None,
-        positionId: int | None = None,
+        quote_order_qty: float | None = None,
+        stop_price: float | None = None,
+        price_rate: float | None = None,
+        stop_loss: str | None = None,
+        take_profit: str | None = None,
+        working_type: str | None = None,
+        client_order_id: str | None = None,
+        recv_window: int | None = None,
+        time_in_force: str | None = None,
+        close_position: str | None = None,
+        activation_price: float | None = None,
+        stop_guaranteed: str | None = None,
+        position_id: int | None = None,
     ) -> dict[str, Any]:
-        return await self._native_private("place_swap_order", self._native_call_params(locals()))
+        return await self._native_private(
+            "place_swap_order",
+            self._native_call_params(
+                wire_keywords(
+                    locals(),
+                    {
+                        "positionSide": "position_side",
+                        "reduceOnly": "reduce_only",
+                        "quoteOrderQty": "quote_order_qty",
+                        "stopPrice": "stop_price",
+                        "priceRate": "price_rate",
+                        "stopLoss": "stop_loss",
+                        "takeProfit": "take_profit",
+                        "workingType": "working_type",
+                        "clientOrderId": "client_order_id",
+                        "recvWindow": "recv_window",
+                        "timeInForce": "time_in_force",
+                        "closePosition": "close_position",
+                        "activationPrice": "activation_price",
+                        "stopGuaranteed": "stop_guaranteed",
+                        "positionId": "position_id",
+                    },
+                )
+            ),
+        )
 
+    @legacy_keywords(
+        {
+            "positionSide": "position_side",
+            "reduceOnly": "reduce_only",
+            "quoteOrderQty": "quote_order_qty",
+            "stopPrice": "stop_price",
+            "priceRate": "price_rate",
+            "stopLoss": "stop_loss",
+            "takeProfit": "take_profit",
+            "workingType": "working_type",
+            "clientOrderId": "client_order_id",
+            "recvWindow": "recv_window",
+            "timeInForce": "time_in_force",
+            "closePosition": "close_position",
+            "activationPrice": "activation_price",
+            "stopGuaranteed": "stop_guaranteed",
+            "positionId": "position_id",
+        }
+    )
     async def test_swap_order(
         self,
         product_symbol: str,
         type_: str,
         side: str,
-        positionSide: str | None = None,
-        reduceOnly: str | None = None,
+        position_side: str | None = None,
+        reduce_only: str | None = None,
         price: float | None = None,
         quantity: float | None = None,
-        quoteOrderQty: float | None = None,
-        stopPrice: float | None = None,
-        priceRate: float | None = None,
-        stopLoss: str | None = None,
-        takeProfit: str | None = None,
-        workingType: str | None = None,
-        clientOrderId: str | None = None,
-        recvWindow: int | None = None,
-        timeInForce: str | None = None,
-        closePosition: str | None = None,
-        activationPrice: float | None = None,
-        stopGuaranteed: str | None = None,
-        positionId: int | None = None,
+        quote_order_qty: float | None = None,
+        stop_price: float | None = None,
+        price_rate: float | None = None,
+        stop_loss: str | None = None,
+        take_profit: str | None = None,
+        working_type: str | None = None,
+        client_order_id: str | None = None,
+        recv_window: int | None = None,
+        time_in_force: str | None = None,
+        close_position: str | None = None,
+        activation_price: float | None = None,
+        stop_guaranteed: str | None = None,
+        position_id: int | None = None,
     ) -> dict[str, Any]:
-        return await self._native_private("test_swap_order", self._native_call_params(locals()))
+        return await self._native_private(
+            "test_swap_order",
+            self._native_call_params(
+                wire_keywords(
+                    locals(),
+                    {
+                        "positionSide": "position_side",
+                        "reduceOnly": "reduce_only",
+                        "quoteOrderQty": "quote_order_qty",
+                        "stopPrice": "stop_price",
+                        "priceRate": "price_rate",
+                        "stopLoss": "stop_loss",
+                        "takeProfit": "take_profit",
+                        "workingType": "working_type",
+                        "clientOrderId": "client_order_id",
+                        "recvWindow": "recv_window",
+                        "timeInForce": "time_in_force",
+                        "closePosition": "close_position",
+                        "activationPrice": "activation_price",
+                        "stopGuaranteed": "stop_guaranteed",
+                        "positionId": "position_id",
+                    },
+                )
+            ),
+        )
 
+    @legacy_keywords(
+        {
+            "clientOrderId": "client_order_id",
+            "reduceOnly": "reduce_only",
+            "positionSide": "position_side",
+            "recvWindow": "recv_window",
+        }
+    )
     async def place_swap_market_order(
         self,
         product_symbol: str,
         side: str,
         quantity: float,
-        clientOrderId: str | None = None,
-        reduceOnly: str | None = None,
-        positionSide: str | None = None,
-        recvWindow: int | None = None,
+        client_order_id: str | None = None,
+        reduce_only: str | None = None,
+        position_side: str | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
         return await self._native_private(
             "place_swap_market_order",
-            self._native_call_params(locals()),
+            self._native_call_params(
+                wire_keywords(
+                    locals(),
+                    {
+                        "clientOrderId": "client_order_id",
+                        "reduceOnly": "reduce_only",
+                        "positionSide": "position_side",
+                        "recvWindow": "recv_window",
+                    },
+                )
+            ),
         )
 
+    @legacy_keywords(
+        {
+            "positionSide": "position_side",
+            "clientOrderId": "client_order_id",
+            "reduceOnly": "reduce_only",
+            "recvWindow": "recv_window",
+        }
+    )
     async def place_swap_market_buy_order(
         self,
         product_symbol: str,
         quantity: float,
-        positionSide: str = "LONG",
-        clientOrderId: str | None = None,
-        reduceOnly: str | None = None,
-        recvWindow: int | None = None,
+        position_side: str = "LONG",
+        client_order_id: str | None = None,
+        reduce_only: str | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
         return await self._native_private(
             "place_swap_market_buy_order",
-            self._native_call_params(locals()),
+            self._native_call_params(
+                wire_keywords(
+                    locals(),
+                    {
+                        "positionSide": "position_side",
+                        "clientOrderId": "client_order_id",
+                        "reduceOnly": "reduce_only",
+                        "recvWindow": "recv_window",
+                    },
+                )
+            ),
         )
 
+    @legacy_keywords(
+        {
+            "positionSide": "position_side",
+            "clientOrderId": "client_order_id",
+            "reduceOnly": "reduce_only",
+            "recvWindow": "recv_window",
+        }
+    )
     async def place_swap_market_sell_order(
         self,
         product_symbol: str,
         quantity: float,
-        positionSide: str = "SHORT",
-        clientOrderId: str | None = None,
-        reduceOnly: str | None = None,
-        recvWindow: int | None = None,
+        position_side: str = "SHORT",
+        client_order_id: str | None = None,
+        reduce_only: str | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
         return await self._native_private(
             "place_swap_market_sell_order",
-            self._native_call_params(locals()),
+            self._native_call_params(
+                wire_keywords(
+                    locals(),
+                    {
+                        "positionSide": "position_side",
+                        "clientOrderId": "client_order_id",
+                        "reduceOnly": "reduce_only",
+                        "recvWindow": "recv_window",
+                    },
+                )
+            ),
         )
 
+    @legacy_keywords(
+        {
+            "clientOrderId": "client_order_id",
+            "timeInForce": "time_in_force",
+            "reduceOnly": "reduce_only",
+            "positionSide": "position_side",
+            "recvWindow": "recv_window",
+        }
+    )
     async def place_swap_limit_order(
         self,
         product_symbol: str,
         side: str,
         quantity: float,
         price: float,
-        clientOrderId: str | None = None,
-        timeInForce: str = "GTC",
-        reduceOnly: str | None = None,
-        positionSide: str | None = None,
-        recvWindow: int | None = None,
+        client_order_id: str | None = None,
+        time_in_force: str = "GTC",
+        reduce_only: str | None = None,
+        position_side: str | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
         return await self._native_private(
             "place_swap_limit_order",
-            self._native_call_params(locals()),
+            self._native_call_params(
+                wire_keywords(
+                    locals(),
+                    {
+                        "clientOrderId": "client_order_id",
+                        "timeInForce": "time_in_force",
+                        "reduceOnly": "reduce_only",
+                        "positionSide": "position_side",
+                        "recvWindow": "recv_window",
+                    },
+                )
+            ),
         )
 
+    @legacy_keywords(
+        {
+            "positionSide": "position_side",
+            "timeInForce": "time_in_force",
+            "clientOrderId": "client_order_id",
+            "reduceOnly": "reduce_only",
+            "recvWindow": "recv_window",
+        }
+    )
     async def place_swap_limit_buy_order(
         self,
         product_symbol: str,
         quantity: float,
         price: float,
-        positionSide: str = "LONG",
-        timeInForce: str = "GTC",
-        clientOrderId: str | None = None,
-        reduceOnly: str | None = None,
-        recvWindow: int | None = None,
+        position_side: str = "LONG",
+        time_in_force: str = "GTC",
+        client_order_id: str | None = None,
+        reduce_only: str | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
         return await self._native_private(
             "place_swap_limit_buy_order",
-            self._native_call_params(locals()),
+            self._native_call_params(
+                wire_keywords(
+                    locals(),
+                    {
+                        "positionSide": "position_side",
+                        "timeInForce": "time_in_force",
+                        "clientOrderId": "client_order_id",
+                        "reduceOnly": "reduce_only",
+                        "recvWindow": "recv_window",
+                    },
+                )
+            ),
         )
 
+    @legacy_keywords(
+        {
+            "positionSide": "position_side",
+            "timeInForce": "time_in_force",
+            "clientOrderId": "client_order_id",
+            "reduceOnly": "reduce_only",
+            "recvWindow": "recv_window",
+        }
+    )
     async def place_swap_limit_sell_order(
         self,
         product_symbol: str,
         quantity: float,
         price: float,
-        positionSide: str = "SHORT",
-        timeInForce: str = "GTC",
-        clientOrderId: str | None = None,
-        reduceOnly: str | None = None,
-        recvWindow: int | None = None,
+        position_side: str = "SHORT",
+        time_in_force: str = "GTC",
+        client_order_id: str | None = None,
+        reduce_only: str | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
         return await self._native_private(
             "place_swap_limit_sell_order",
-            self._native_call_params(locals()),
+            self._native_call_params(
+                wire_keywords(
+                    locals(),
+                    {
+                        "positionSide": "position_side",
+                        "timeInForce": "time_in_force",
+                        "clientOrderId": "client_order_id",
+                        "reduceOnly": "reduce_only",
+                        "recvWindow": "recv_window",
+                    },
+                )
+            ),
         )
 
+    @legacy_keywords(
+        {
+            "clientOrderId": "client_order_id",
+            "timeInForce": "time_in_force",
+            "reduceOnly": "reduce_only",
+            "positionSide": "position_side",
+            "recvWindow": "recv_window",
+        }
+    )
     async def place_swap_post_only_order(
         self,
         product_symbol: str,
         side: str,
         quantity: float,
         price: float,
-        clientOrderId: str | None = None,
-        timeInForce: str = "PostOnly",
-        reduceOnly: str | None = None,
-        positionSide: str | None = None,
-        recvWindow: int | None = None,
+        client_order_id: str | None = None,
+        time_in_force: str = "PostOnly",
+        reduce_only: str | None = None,
+        position_side: str | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
         return await self._native_private(
             "place_swap_post_only_order",
-            self._native_call_params(locals()),
+            self._native_call_params(
+                wire_keywords(
+                    locals(),
+                    {
+                        "clientOrderId": "client_order_id",
+                        "timeInForce": "time_in_force",
+                        "reduceOnly": "reduce_only",
+                        "positionSide": "position_side",
+                        "recvWindow": "recv_window",
+                    },
+                )
+            ),
         )
 
+    @legacy_keywords(
+        {
+            "positionSide": "position_side",
+            "clientOrderId": "client_order_id",
+            "reduceOnly": "reduce_only",
+            "recvWindow": "recv_window",
+        }
+    )
     async def place_swap_post_only_buy_order(
         self,
         product_symbol: str,
         quantity: float,
         price: float,
-        positionSide: str = "LONG",
-        clientOrderId: str | None = None,
-        reduceOnly: str | None = None,
-        recvWindow: int | None = None,
+        position_side: str = "LONG",
+        client_order_id: str | None = None,
+        reduce_only: str | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
         return await self._native_private(
             "place_swap_post_only_buy_order",
-            self._native_call_params(locals()),
+            self._native_call_params(
+                wire_keywords(
+                    locals(),
+                    {
+                        "positionSide": "position_side",
+                        "clientOrderId": "client_order_id",
+                        "reduceOnly": "reduce_only",
+                        "recvWindow": "recv_window",
+                    },
+                )
+            ),
         )
 
+    @legacy_keywords(
+        {
+            "positionSide": "position_side",
+            "clientOrderId": "client_order_id",
+            "reduceOnly": "reduce_only",
+            "recvWindow": "recv_window",
+        }
+    )
     async def place_swap_post_only_sell_order(
         self,
         product_symbol: str,
         quantity: float,
         price: float,
-        positionSide: str = "SHORT",
-        clientOrderId: str | None = None,
-        reduceOnly: str | None = None,
-        recvWindow: int | None = None,
+        position_side: str = "SHORT",
+        client_order_id: str | None = None,
+        reduce_only: str | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
         return await self._native_private(
             "place_swap_post_only_sell_order",
-            self._native_call_params(locals()),
+            self._native_call_params(
+                wire_keywords(
+                    locals(),
+                    {
+                        "positionSide": "position_side",
+                        "clientOrderId": "client_order_id",
+                        "reduceOnly": "reduce_only",
+                        "recvWindow": "recv_window",
+                    },
+                )
+            ),
         )
 
+    @legacy_keywords({"batchOrders": "batch_orders", "recvWindow": "recv_window"})
     async def place_swap_batch_order(
         self,
-        batchOrders: list,
-        recvWindow: int | None = None,
+        batch_orders: list,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
         return await self._native_private(
             "place_swap_batch_order",
-            self._native_call_params(locals()),
+            self._native_call_params(
+                wire_keywords(
+                    locals(), {"batchOrders": "batch_orders", "recvWindow": "recv_window"}
+                )
+            ),
         )
 
+    @legacy_keywords(
+        {"orderId": "order_id", "clientOrderId": "client_order_id", "recvWindow": "recv_window"}
+    )
     async def cancel_swap_order(
         self,
         product_symbol: str,
-        orderId: int | None = None,
-        clientOrderId: str | None = None,
-        recvWindow: int | None = None,
+        order_id: int | None = None,
+        client_order_id: str | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
-        return await self._native_private("cancel_swap_order", self._native_call_params(locals()))
+        return await self._native_private(
+            "cancel_swap_order",
+            self._native_call_params(
+                wire_keywords(
+                    locals(),
+                    {
+                        "orderId": "order_id",
+                        "clientOrderId": "client_order_id",
+                        "recvWindow": "recv_window",
+                    },
+                )
+            ),
+        )
 
+    @legacy_keywords(
+        {
+            "orderIdList": "order_id_list",
+            "clientOrderIdList": "client_order_id_list",
+            "recvWindow": "recv_window",
+        }
+    )
     async def cancel_swap_batch_order(
         self,
         product_symbol: str,
-        orderIdList: list | None = None,
-        clientOrderIdList: list | None = None,
-        recvWindow: int | None = None,
+        order_id_list: list | None = None,
+        client_order_id_list: list | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
         return await self._native_private(
             "cancel_swap_batch_order",
-            self._native_call_params(locals()),
+            self._native_call_params(
+                wire_keywords(
+                    locals(),
+                    {
+                        "orderIdList": "order_id_list",
+                        "clientOrderIdList": "client_order_id_list",
+                        "recvWindow": "recv_window",
+                    },
+                )
+            ),
         )
 
+    @legacy_keywords({"recvWindow": "recv_window"})
     async def cancel_swap_all_orders(
         self,
         product_symbol: str | None = None,
         type_: str | None = None,
-        recvWindow: int | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
         return await self._native_private(
             "cancel_swap_all_orders",
-            self._native_call_params(locals()),
+            self._native_call_params(wire_keywords(locals(), {"recvWindow": "recv_window"})),
         )
 
+    @legacy_keywords(
+        {
+            "cancelReplaceMode": "cancel_replace_mode",
+            "positionSide": "position_side",
+            "orderId": "order_id",
+            "cancelClientOrderId": "cancel_client_order_id",
+            "cancelOrderId": "cancel_order_id",
+            "cancelRestrictions": "cancel_restrictions",
+            "reduceOnly": "reduce_only",
+            "quoteOrderQty": "quote_order_qty",
+            "stopPrice": "stop_price",
+            "priceRate": "price_rate",
+            "workingType": "working_type",
+            "stopLoss": "stop_loss",
+            "takeProfit": "take_profit",
+            "clientOrderId": "client_order_id",
+            "closePosition": "close_position",
+            "activationPrice": "activation_price",
+            "stopGuaranteed": "stop_guaranteed",
+            "timeInForce": "time_in_force",
+            "positionId": "position_id",
+            "recvWindow": "recv_window",
+        }
+    )
     async def replace_swap_order(
         self,
         product_symbol: str,
-        cancelReplaceMode: str,
+        cancel_replace_mode: str,
         type_: str,
         side: str,
-        positionSide: str,
-        orderId: str | None = None,
-        cancelClientOrderId: str | None = None,
-        cancelOrderId: str | None = None,
-        cancelRestrictions: str | None = None,
-        reduceOnly: str | None = None,
+        position_side: str,
+        order_id: str | None = None,
+        cancel_client_order_id: str | None = None,
+        cancel_order_id: str | None = None,
+        cancel_restrictions: str | None = None,
+        reduce_only: str | None = None,
         price: float | None = None,
         quantity: float | None = None,
-        quoteOrderQty: float | None = None,
-        stopPrice: float | None = None,
-        priceRate: float | None = None,
-        workingType: str | None = None,
-        stopLoss: str | None = None,
-        takeProfit: str | None = None,
-        clientOrderId: str | None = None,
-        closePosition: str | None = None,
-        activationPrice: float | None = None,
-        stopGuaranteed: str | None = None,
-        timeInForce: str | None = None,
-        positionId: int | None = None,
-        recvWindow: int | None = None,
+        quote_order_qty: float | None = None,
+        stop_price: float | None = None,
+        price_rate: float | None = None,
+        working_type: str | None = None,
+        stop_loss: str | None = None,
+        take_profit: str | None = None,
+        client_order_id: str | None = None,
+        close_position: str | None = None,
+        activation_price: float | None = None,
+        stop_guaranteed: str | None = None,
+        time_in_force: str | None = None,
+        position_id: int | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
-        return await self._native_private("replace_swap_order", self._native_call_params(locals()))
+        return await self._native_private(
+            "replace_swap_order",
+            self._native_call_params(
+                wire_keywords(
+                    locals(),
+                    {
+                        "cancelReplaceMode": "cancel_replace_mode",
+                        "positionSide": "position_side",
+                        "orderId": "order_id",
+                        "cancelClientOrderId": "cancel_client_order_id",
+                        "cancelOrderId": "cancel_order_id",
+                        "cancelRestrictions": "cancel_restrictions",
+                        "reduceOnly": "reduce_only",
+                        "quoteOrderQty": "quote_order_qty",
+                        "stopPrice": "stop_price",
+                        "priceRate": "price_rate",
+                        "workingType": "working_type",
+                        "stopLoss": "stop_loss",
+                        "takeProfit": "take_profit",
+                        "clientOrderId": "client_order_id",
+                        "closePosition": "close_position",
+                        "activationPrice": "activation_price",
+                        "stopGuaranteed": "stop_guaranteed",
+                        "timeInForce": "time_in_force",
+                        "positionId": "position_id",
+                        "recvWindow": "recv_window",
+                    },
+                )
+            ),
+        )
 
+    @legacy_keywords({"positionId": "position_id", "recvWindow": "recv_window"})
     async def close_swap_position(
         self,
-        positionId: str,
-        recvWindow: int | None = None,
+        position_id: str,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
-        return await self._native_private("close_swap_position", self._native_call_params(locals()))
+        return await self._native_private(
+            "close_swap_position",
+            self._native_call_params(
+                wire_keywords(locals(), {"positionId": "position_id", "recvWindow": "recv_window"})
+            ),
+        )
 
+    @legacy_keywords({"recvWindow": "recv_window"})
     async def close_swap_all_positions(
         self,
         product_symbol: str | None = None,
-        recvWindow: int | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
         return await self._native_private(
             "close_swap_all_positions",
-            self._native_call_params(locals()),
+            self._native_call_params(wire_keywords(locals(), {"recvWindow": "recv_window"})),
         )
 
+    @legacy_keywords(
+        {"orderId": "order_id", "clientOrderId": "client_order_id", "recvWindow": "recv_window"}
+    )
     async def get_order_detail(
         self,
         product_symbol: str,
-        orderId: int | None = None,
-        clientOrderId: str | None = None,
-        recvWindow: int | None = None,
+        order_id: int | None = None,
+        client_order_id: str | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
-        return await self._native_private("get_order_detail", self._native_call_params(locals()))
+        return await self._native_private(
+            "get_order_detail",
+            self._native_call_params(
+                wire_keywords(
+                    locals(),
+                    {
+                        "orderId": "order_id",
+                        "clientOrderId": "client_order_id",
+                        "recvWindow": "recv_window",
+                    },
+                )
+            ),
+        )
 
+    @legacy_keywords({"recvWindow": "recv_window"})
     async def get_open_orders(
         self,
         product_symbol: str | None = None,
         type_: str | None = None,
-        recvWindow: int | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
-        return await self._native_private("get_open_orders", self._native_call_params(locals()))
+        return await self._native_private(
+            "get_open_orders",
+            self._native_call_params(wire_keywords(locals(), {"recvWindow": "recv_window"})),
+        )
 
+    @legacy_keywords(
+        {
+            "orderId": "order_id",
+            "startTime": "start_time",
+            "endTime": "end_time",
+            "recvWindow": "recv_window",
+        }
+    )
     async def get_order_history(
         self,
         product_symbol: str | None = None,
         currency: str | None = None,
-        orderId: int | None = None,
-        startTime: int | None = None,
-        endTime: int | None = None,
+        order_id: int | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
         limit: int | None = None,
-        recvWindow: int | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
-        return await self._native_private("get_order_history", self._native_call_params(locals()))
+        return await self._native_private(
+            "get_order_history",
+            self._native_call_params(
+                wire_keywords(
+                    locals(),
+                    {
+                        "orderId": "order_id",
+                        "startTime": "start_time",
+                        "endTime": "end_time",
+                        "recvWindow": "recv_window",
+                    },
+                )
+            ),
+        )
 
+    @legacy_keywords({"marginType": "margin_type", "recvWindow": "recv_window"})
     async def change_margin_type(
         self,
         product_symbol: str,
-        marginType: str,
-        recvWindow: int | None = None,
+        margin_type: str,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
-        return await self._native_private("change_margin_type", self._native_call_params(locals()))
+        return await self._native_private(
+            "change_margin_type",
+            self._native_call_params(
+                wire_keywords(locals(), {"marginType": "margin_type", "recvWindow": "recv_window"})
+            ),
+        )
 
+    @legacy_keywords({"recvWindow": "recv_window"})
     async def get_margin_type(
         self,
         product_symbol: str,
-        recvWindow: int | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
-        return await self._native_private("get_margin_type", self._native_call_params(locals()))
+        return await self._native_private(
+            "get_margin_type",
+            self._native_call_params(wire_keywords(locals(), {"recvWindow": "recv_window"})),
+        )
 
+    @legacy_keywords({"recvWindow": "recv_window"})
     async def set_leverage(
         self,
         product_symbol: str,
         side: str,
         leverage: int,
-        recvWindow: int | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
-        return await self._native_private("set_leverage", self._native_call_params(locals()))
+        return await self._native_private(
+            "set_leverage",
+            self._native_call_params(wire_keywords(locals(), {"recvWindow": "recv_window"})),
+        )
 
+    @legacy_keywords({"recvWindow": "recv_window"})
     async def get_leverage(
         self,
         product_symbol: str,
-        recvWindow: int | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
-        return await self._native_private("get_leverage", self._native_call_params(locals()))
-
-    async def set_position_mode(
-        self,
-        dualSidePosition: str,
-        recvWindow: int | None = None,
-    ) -> dict[str, Any]:
-        return await self._native_private("set_position_mode", self._native_call_params(locals()))
-
-    async def get_position_mode(self, recvWindow: int | None = None) -> dict[str, Any]:
         return await self._native_private(
-            "get_position_mode",
-            self._native_call_params(locals()),
+            "get_leverage",
+            self._native_call_params(wire_keywords(locals(), {"recvWindow": "recv_window"})),
         )
 
+    @legacy_keywords({"dualSidePosition": "dual_side_position", "recvWindow": "recv_window"})
+    async def set_position_mode(
+        self,
+        dual_side_position: str,
+        recv_window: int | None = None,
+    ) -> dict[str, Any]:
+        return await self._native_private(
+            "set_position_mode",
+            self._native_call_params(
+                wire_keywords(
+                    locals(),
+                    {"dualSidePosition": "dual_side_position", "recvWindow": "recv_window"},
+                )
+            ),
+        )
+
+    @legacy_keywords({"recvWindow": "recv_window"})
+    async def get_position_mode(self, recv_window: int | None = None) -> dict[str, Any]:
+        return await self._native_private(
+            "get_position_mode",
+            self._native_call_params(wire_keywords(locals(), {"recvWindow": "recv_window"})),
+        )
+
+    @legacy_keywords({"timeOut": "time_out", "recvWindow": "recv_window"})
     async def set_swap_cancel_all_after(
-        self, type_: str, timeOut: int, *, recvWindow: int | None = None
+        self, type_: str, time_out: int, *, recv_window: int | None = None
     ) -> dict[str, Any]:
         """Call ``POST /openApi/swap/v2/trade/cancelAllAfter``."""
         return await self._native_private(
-            "set_swap_cancel_all_after", self._native_call_params(locals())
+            "set_swap_cancel_all_after",
+            self._native_call_params(
+                wire_keywords(locals(), {"timeOut": "time_out", "recvWindow": "recv_window"})
+            ),
         )
 
+    @legacy_keywords(
+        {"orderId": "order_id", "clientOrderId": "client_order_id", "recvWindow": "recv_window"}
+    )
     async def get_swap_open_order(
         self,
         product_symbol: str,
         *,
-        orderId: int | None = None,
-        clientOrderId: str | None = None,
-        recvWindow: int | None = None,
+        order_id: int | None = None,
+        client_order_id: str | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
         """Call ``GET /openApi/swap/v2/trade/openOrder``."""
-        return await self._native_private("get_swap_open_order", self._native_call_params(locals()))
+        return await self._native_private(
+            "get_swap_open_order",
+            self._native_call_params(
+                wire_keywords(
+                    locals(),
+                    {
+                        "orderId": "order_id",
+                        "clientOrderId": "client_order_id",
+                        "recvWindow": "recv_window",
+                    },
+                )
+            ),
+        )
 
+    @legacy_keywords(
+        {
+            "autoCloseType": "auto_close_type",
+            "startTime": "start_time",
+            "endTime": "end_time",
+            "recvWindow": "recv_window",
+        }
+    )
     async def get_swap_force_orders(
         self,
         *,
         product_symbol: str | None = None,
         currency: str | None = None,
-        autoCloseType: str | None = None,
-        startTime: int | None = None,
-        endTime: int | None = None,
+        auto_close_type: str | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
         limit: int | None = None,
-        recvWindow: int | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
         """Call ``GET /openApi/swap/v2/trade/forceOrders``."""
         return await self._native_private(
-            "get_swap_force_orders", self._native_call_params(locals())
+            "get_swap_force_orders",
+            self._native_call_params(
+                wire_keywords(
+                    locals(),
+                    {
+                        "autoCloseType": "auto_close_type",
+                        "startTime": "start_time",
+                        "endTime": "end_time",
+                        "recvWindow": "recv_window",
+                    },
+                )
+            ),
         )
 
+    @legacy_keywords(
+        {
+            "tradingUnit": "trading_unit",
+            "startTs": "start_ts",
+            "endTs": "end_ts",
+            "orderId": "order_id",
+            "recvWindow": "recv_window",
+        }
+    )
     async def get_swap_trade_fills(
         self,
-        tradingUnit: str,
-        startTs: int,
-        endTs: int,
+        trading_unit: str,
+        start_ts: int,
+        end_ts: int,
         *,
-        orderId: int | None = None,
+        order_id: int | None = None,
         currency: str | None = None,
-        recvWindow: int | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
         """Call ``GET /openApi/swap/v2/trade/allFillOrders``."""
         return await self._native_private(
-            "get_swap_trade_fills", self._native_call_params(locals())
+            "get_swap_trade_fills",
+            self._native_call_params(
+                wire_keywords(
+                    locals(),
+                    {
+                        "tradingUnit": "trading_unit",
+                        "startTs": "start_ts",
+                        "endTs": "end_ts",
+                        "orderId": "order_id",
+                        "recvWindow": "recv_window",
+                    },
+                )
+            ),
         )
 
+    @legacy_keywords(
+        {"positionSide": "position_side", "positionId": "position_id", "recvWindow": "recv_window"}
+    )
     async def adjust_swap_position_margin(
         self,
         product_symbol: str,
         amount: str,
         type_: int,
         *,
-        positionSide: str | None = None,
-        positionId: int | None = None,
-        recvWindow: int | None = None,
+        position_side: str | None = None,
+        position_id: int | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
         """Call ``POST /openApi/swap/v2/trade/positionMargin``."""
         return await self._native_private(
-            "adjust_swap_position_margin", self._native_call_params(locals())
+            "adjust_swap_position_margin",
+            self._native_call_params(
+                wire_keywords(
+                    locals(),
+                    {
+                        "positionSide": "position_side",
+                        "positionId": "position_id",
+                        "recvWindow": "recv_window",
+                    },
+                )
+            ),
         )
 
+    @legacy_keywords(
+        {"orderId": "order_id", "clientOrderId": "client_order_id", "recvWindow": "recv_window"}
+    )
     async def amend_swap_order(
         self,
         product_symbol: str,
         quantity: str,
         *,
-        orderId: str | None = None,
-        clientOrderId: str | None = None,
-        recvWindow: int | None = None,
+        order_id: str | None = None,
+        client_order_id: str | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
         """Call ``POST /openApi/swap/v1/trade/amend``."""
-        return await self._native_private("amend_swap_order", self._native_call_params(locals()))
+        return await self._native_private(
+            "amend_swap_order",
+            self._native_call_params(
+                wire_keywords(
+                    locals(),
+                    {
+                        "orderId": "order_id",
+                        "clientOrderId": "client_order_id",
+                        "recvWindow": "recv_window",
+                    },
+                )
+            ),
+        )
 
+    @legacy_keywords(
+        {
+            "positionSide": "position_side",
+            "priceType": "price_type",
+            "priceVariance": "price_variance",
+            "triggerPrice": "trigger_price",
+            "amountPerOrder": "amount_per_order",
+            "totalAmount": "total_amount",
+            "recvWindow": "recv_window",
+        }
+    )
     async def place_swap_twap_order(
         self,
         product_symbol: str,
         side: str,
-        positionSide: str,
-        priceType: str,
-        priceVariance: str,
-        triggerPrice: str,
+        position_side: str,
+        price_type: str,
+        price_variance: str,
+        trigger_price: str,
         interval: int,
-        amountPerOrder: str,
-        totalAmount: str,
+        amount_per_order: str,
+        total_amount: str,
         *,
-        recvWindow: int | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
         """Call ``POST /openApi/swap/v1/twap/order``."""
         return await self._native_private(
-            "place_swap_twap_order", self._native_call_params(locals())
+            "place_swap_twap_order",
+            self._native_call_params(
+                wire_keywords(
+                    locals(),
+                    {
+                        "positionSide": "position_side",
+                        "priceType": "price_type",
+                        "priceVariance": "price_variance",
+                        "triggerPrice": "trigger_price",
+                        "amountPerOrder": "amount_per_order",
+                        "totalAmount": "total_amount",
+                        "recvWindow": "recv_window",
+                    },
+                )
+            ),
         )
 
+    @legacy_keywords({"mainOrderId": "main_order_id", "recvWindow": "recv_window"})
     async def cancel_swap_twap_order(
-        self, mainOrderId: str, *, recvWindow: int | None = None
+        self, main_order_id: str, *, recv_window: int | None = None
     ) -> dict[str, Any]:
         """Call ``POST /openApi/swap/v1/twap/cancelOrder``."""
         return await self._native_private(
-            "cancel_swap_twap_order", self._native_call_params(locals())
+            "cancel_swap_twap_order",
+            self._native_call_params(
+                wire_keywords(
+                    locals(), {"mainOrderId": "main_order_id", "recvWindow": "recv_window"}
+                )
+            ),
         )
 
+    @legacy_keywords({"recvWindow": "recv_window"})
     async def get_swap_open_twap_orders(
-        self, *, product_symbol: str | None = None, recvWindow: int | None = None
+        self, *, product_symbol: str | None = None, recv_window: int | None = None
     ) -> dict[str, Any]:
         """Call ``GET /openApi/swap/v1/twap/openOrders``."""
         return await self._native_private(
-            "get_swap_open_twap_orders", self._native_call_params(locals())
+            "get_swap_open_twap_orders",
+            self._native_call_params(wire_keywords(locals(), {"recvWindow": "recv_window"})),
         )
 
+    @legacy_keywords(
+        {
+            "pageIndex": "page_index",
+            "pageSize": "page_size",
+            "startTime": "start_time",
+            "endTime": "end_time",
+            "recvWindow": "recv_window",
+        }
+    )
     async def get_swap_twap_order_history(
         self,
-        pageIndex: int,
-        pageSize: int,
-        startTime: int,
-        endTime: int,
+        page_index: int,
+        page_size: int,
+        start_time: int,
+        end_time: int,
         *,
         product_symbol: str | None = None,
-        recvWindow: int | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
         """Call ``GET /openApi/swap/v1/twap/historyOrders``."""
         return await self._native_private(
-            "get_swap_twap_order_history", self._native_call_params(locals())
+            "get_swap_twap_order_history",
+            self._native_call_params(
+                wire_keywords(
+                    locals(),
+                    {
+                        "pageIndex": "page_index",
+                        "pageSize": "page_size",
+                        "startTime": "start_time",
+                        "endTime": "end_time",
+                        "recvWindow": "recv_window",
+                    },
+                )
+            ),
         )
 
+    @legacy_keywords({"mainOrderId": "main_order_id", "recvWindow": "recv_window"})
     async def get_swap_twap_order(
-        self, mainOrderId: str, *, recvWindow: int | None = None
+        self, main_order_id: str, *, recv_window: int | None = None
     ) -> dict[str, Any]:
         """Call ``GET /openApi/swap/v1/twap/orderDetail``."""
-        return await self._native_private("get_swap_twap_order", self._native_call_params(locals()))
+        return await self._native_private(
+            "get_swap_twap_order",
+            self._native_call_params(
+                wire_keywords(
+                    locals(), {"mainOrderId": "main_order_id", "recvWindow": "recv_window"}
+                )
+            ),
+        )
 
-    async def get_swap_asset_mode(self, *, recvWindow: int | None = None) -> dict[str, Any]:
+    @legacy_keywords({"recvWindow": "recv_window"})
+    async def get_swap_asset_mode(self, *, recv_window: int | None = None) -> dict[str, Any]:
         """Call ``GET /openApi/swap/v1/trade/assetMode``."""
-        return await self._native_private("get_swap_asset_mode", self._native_call_params(locals()))
+        return await self._native_private(
+            "get_swap_asset_mode",
+            self._native_call_params(wire_keywords(locals(), {"recvWindow": "recv_window"})),
+        )
 
+    @legacy_keywords({"assetMode": "asset_mode", "recvWindow": "recv_window"})
     async def set_swap_asset_mode(
-        self, assetMode: str, *, recvWindow: int | None = None
+        self, asset_mode: str, *, recv_window: int | None = None, confirm: bool = False
     ) -> dict[str, Any]:
-        """Call ``POST /openApi/swap/v1/trade/assetMode``."""
-        return await self._native_private("set_swap_asset_mode", self._native_call_params(locals()))
+        """
+        Call ``POST /openApi/swap/v1/trade/assetMode``.
 
-    async def get_swap_multi_asset_rules(self, *, recvWindow: int | None = None) -> dict[str, Any]:
+        Requires confirm=True. This changes collateral accounting for swaps.
+        """
+        require_confirmation(confirm)
+        return await self._native_private(
+            "set_swap_asset_mode",
+            self._native_call_params(
+                wire_keywords(locals(), {"assetMode": "asset_mode", "recvWindow": "recv_window"})
+            ),
+        )
+
+    @legacy_keywords({"recvWindow": "recv_window"})
+    async def get_swap_multi_asset_rules(self, *, recv_window: int | None = None) -> dict[str, Any]:
         """Call ``GET /openApi/swap/v1/trade/multiAssetsRules``."""
         return await self._native_private(
-            "get_swap_multi_asset_rules", self._native_call_params(locals())
+            "get_swap_multi_asset_rules",
+            self._native_call_params(wire_keywords(locals(), {"recvWindow": "recv_window"})),
         )
 
-    async def get_swap_margin_assets(self, *, recvWindow: int | None = None) -> dict[str, Any]:
+    @legacy_keywords({"recvWindow": "recv_window"})
+    async def get_swap_margin_assets(self, *, recv_window: int | None = None) -> dict[str, Any]:
         """Call ``GET /openApi/swap/v1/user/marginAssets``."""
         return await self._native_private(
-            "get_swap_margin_assets", self._native_call_params(locals())
+            "get_swap_margin_assets",
+            self._native_call_params(wire_keywords(locals(), {"recvWindow": "recv_window"})),
         )
 
+    @legacy_keywords(
+        {
+            "orderId": "order_id",
+            "startTime": "start_time",
+            "endTime": "end_time",
+            "recvWindow": "recv_window",
+        }
+    )
     async def get_swap_full_orders(
         self,
         limit: int,
         *,
         product_symbol: str | None = None,
-        orderId: int | None = None,
-        startTime: int | None = None,
-        endTime: int | None = None,
-        recvWindow: int | None = None,
+        order_id: int | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
         """Call ``GET /openApi/swap/v1/trade/fullOrder``."""
         return await self._native_private(
-            "get_swap_full_orders", self._native_call_params(locals())
+            "get_swap_full_orders",
+            self._native_call_params(
+                wire_keywords(
+                    locals(),
+                    {
+                        "orderId": "order_id",
+                        "startTime": "start_time",
+                        "endTime": "end_time",
+                        "recvWindow": "recv_window",
+                    },
+                )
+            ),
         )
 
+    @legacy_keywords(
+        {
+            "startTs": "start_ts",
+            "endTs": "end_ts",
+            "orderId": "order_id",
+            "lastFillId": "last_fill_id",
+            "pageIndex": "page_index",
+            "pageSize": "page_size",
+            "recvWindow": "recv_window",
+        }
+    )
     async def get_swap_fill_history(
         self,
         product_symbol: str,
-        startTs: int,
-        endTs: int,
+        start_ts: int,
+        end_ts: int,
         *,
         currency: str | None = None,
-        orderId: int | None = None,
-        lastFillId: int | None = None,
-        pageIndex: int | None = None,
-        pageSize: int | None = None,
-        recvWindow: int | None = None,
+        order_id: int | None = None,
+        last_fill_id: int | None = None,
+        page_index: int | None = None,
+        page_size: int | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
         """Call ``GET /openApi/swap/v2/trade/fillHistory``."""
         return await self._native_private(
-            "get_swap_fill_history", self._native_call_params(locals())
+            "get_swap_fill_history",
+            self._native_call_params(
+                wire_keywords(
+                    locals(),
+                    {
+                        "startTs": "start_ts",
+                        "endTs": "end_ts",
+                        "orderId": "order_id",
+                        "lastFillId": "last_fill_id",
+                        "pageIndex": "page_index",
+                        "pageSize": "page_size",
+                        "recvWindow": "recv_window",
+                    },
+                )
+            ),
         )
 
+    @legacy_keywords(
+        {
+            "startTs": "start_ts",
+            "endTs": "end_ts",
+            "positionId": "position_id",
+            "pageIndex": "page_index",
+            "pageSize": "page_size",
+            "recvWindow": "recv_window",
+        }
+    )
     async def get_swap_position_history(
         self,
         product_symbol: str,
-        startTs: int,
-        endTs: int,
+        start_ts: int,
+        end_ts: int,
         *,
         currency: str | None = None,
-        positionId: int | None = None,
-        pageIndex: int | None = None,
-        pageSize: int | None = None,
-        recvWindow: int | None = None,
+        position_id: int | None = None,
+        page_index: int | None = None,
+        page_size: int | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
         """Call ``GET /openApi/swap/v1/trade/positionHistory``."""
         return await self._native_private(
-            "get_swap_position_history", self._native_call_params(locals())
+            "get_swap_position_history",
+            self._native_call_params(
+                wire_keywords(
+                    locals(),
+                    {
+                        "startTs": "start_ts",
+                        "endTs": "end_ts",
+                        "positionId": "position_id",
+                        "pageIndex": "page_index",
+                        "pageSize": "page_size",
+                        "recvWindow": "recv_window",
+                    },
+                )
+            ),
         )
 
+    @legacy_keywords(
+        {
+            "positionId": "position_id",
+            "startTime": "start_time",
+            "endTime": "end_time",
+            "pageIndex": "page_index",
+            "pageSize": "page_size",
+            "recvWindow": "recv_window",
+        }
+    )
     async def get_swap_margin_history(
         self,
         product_symbol: str,
-        positionId: str,
-        startTime: int,
-        endTime: int,
-        pageIndex: int,
-        pageSize: int,
+        position_id: str,
+        start_time: int,
+        end_time: int,
+        page_index: int,
+        page_size: int,
         *,
-        recvWindow: int | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
         """Call ``GET /openApi/swap/v1/positionMargin/history``."""
         return await self._native_private(
-            "get_swap_margin_history", self._native_call_params(locals())
+            "get_swap_margin_history",
+            self._native_call_params(
+                wire_keywords(
+                    locals(),
+                    {
+                        "positionId": "position_id",
+                        "startTime": "start_time",
+                        "endTime": "end_time",
+                        "pageIndex": "page_index",
+                        "pageSize": "page_size",
+                        "recvWindow": "recv_window",
+                    },
+                )
+            ),
         )
 
+    @legacy_keywords({"recvWindow": "recv_window"})
     async def get_swap_maintenance_margin_ratios(
-        self, product_symbol: str, *, recvWindow: int | None = None
+        self, product_symbol: str, *, recv_window: int | None = None
     ) -> dict[str, Any]:
         """Call ``GET /openApi/swap/v1/maintMarginRatio``."""
         return await self._native_private(
-            "get_swap_maintenance_margin_ratios", self._native_call_params(locals())
+            "get_swap_maintenance_margin_ratios",
+            self._native_call_params(wire_keywords(locals(), {"recvWindow": "recv_window"})),
         )
 
+    @legacy_keywords(
+        {
+            "positionId": "position_id",
+            "functionSwitch": "function_switch",
+            "recvWindow": "recv_window",
+        }
+    )
     async def set_swap_auto_add_margin(
         self,
         product_symbol: str,
-        positionId: int,
-        functionSwitch: str,
+        position_id: int,
+        function_switch: str,
         *,
         amount: str | None = None,
-        recvWindow: int | None = None,
+        recv_window: int | None = None,
     ) -> dict[str, Any]:
         """Call ``POST /openApi/swap/v1/trade/autoAddMargin``."""
         return await self._native_private(
-            "set_swap_auto_add_margin", self._native_call_params(locals())
+            "set_swap_auto_add_margin",
+            self._native_call_params(
+                wire_keywords(
+                    locals(),
+                    {
+                        "positionId": "position_id",
+                        "functionSwitch": "function_switch",
+                        "recvWindow": "recv_window",
+                    },
+                )
+            ),
         )
 
     async def place_coin_swap_order(
@@ -946,35 +1944,53 @@ class TradeHTTP(HTTPManager):
         )
 
     async def cancel_coin_swap_all_orders(
-        self, *, product_symbol: str | None = None, recv_window: int | None = None
+        self,
+        *,
+        product_symbol: str | None = None,
+        recv_window: int | None = None,
+        all_symbols: bool = False,
     ) -> dict[str, Any]:
         """
 
         POST /openApi/cswap/v1/trade/allOpenOrders.
 
+        Provide product_symbol, or all_symbols=True to cancel Coin-M orders across all symbols.
+
         Source:
         https://github.com/BingX-API/api-ai-skills/blob/main/skills/cswap-trade/api-reference.md
 
         """
+        require_scope(product_symbol, all_symbols)
         return await self._native_private(
             "cancel_coin_swap_all_orders",
-            self._native_params(product_symbol=product_symbol, recvWindow=recv_window),
+            self._native_params(
+                all_symbols=all_symbols, product_symbol=product_symbol, recvWindow=recv_window
+            ),
         )
 
     async def close_coin_swap_all_positions(
-        self, *, product_symbol: str | None = None, recv_window: int | None = None
+        self,
+        *,
+        product_symbol: str | None = None,
+        recv_window: int | None = None,
+        all_symbols: bool = False,
     ) -> dict[str, Any]:
         """
 
         POST /openApi/cswap/v1/trade/closeAllPositions.
 
+        Provide product_symbol, or all_symbols=True to close Coin-M positions across all symbols.
+
         Source:
         https://github.com/BingX-API/api-ai-skills/blob/main/skills/cswap-trade/api-reference.md
 
         """
+        require_scope(product_symbol, all_symbols)
         return await self._native_private(
             "close_coin_swap_all_positions",
-            self._native_params(product_symbol=product_symbol, recvWindow=recv_window),
+            self._native_params(
+                all_symbols=all_symbols, product_symbol=product_symbol, recvWindow=recv_window
+            ),
         )
 
     async def get_coin_swap_open_orders(
@@ -1459,11 +2475,18 @@ class TradeHTTP(HTTPManager):
         trigger_price: str | None = None,
         working_type: str | None = None,
         recv_window: int | None = None,
+        confirm: bool = False,
     ) -> dict[str, Any]:
-        """POST /openApi/swap/v1/trade/reverse. Timestamps use milliseconds."""
+        """
+        POST /openApi/swap/v1/trade/reverse. Timestamps use milliseconds.
+
+        Requires confirm=True. This closes and reverses the selected position.
+        """
+        require_confirmation(confirm)
         return await self._native_private(
             "reverse_swap_position",
             self._native_params(
+                confirm=confirm,
                 type_=type_,
                 product_symbol=product_symbol,
                 triggerPrice=trigger_price,
@@ -1800,5 +2823,123 @@ class TradeHTTP(HTTPManager):
                 offset=offset,
                 limit=limit,
                 recvWindow=recv_window,
+            ),
+        )
+
+    async def transfer_master_internal(
+        self,
+        *,
+        coin: str,
+        user_account_type: int,
+        user_account: str,
+        amount: str,
+        calling_code: str | None = None,
+        wallet_type: int,
+        transfer_client_id: str | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /openApi/wallets/v1/capital/innerTransfer/apply.
+
+        The English and Chinese docs disagree on the spot walletType code (4/15).
+        This wrapper preserves the caller-selected integer without choosing either.
+        Source: https://bingx-api.github.io/docs-v3/
+
+
+        The recipient is a different user. API transfers have no second confirmation;
+        they execute on submit. Verify the recipient UID, email, or phone first.
+        """
+        return await self._native_private(
+            "transfer_master_internal",
+            self._native_params(
+                **{
+                    "coin": coin,
+                    "userAccountType": user_account_type,
+                    "userAccount": user_account,
+                    "amount": amount,
+                    "callingCode": calling_code,
+                    "walletType": wallet_type,
+                    "transferClientId": transfer_client_id,
+                    "recvWindow": recv_window,
+                }
+            ),
+        )
+
+    async def transfer_sub_account_internal(
+        self,
+        *,
+        coin: str,
+        user_account_type: int,
+        user_account: str,
+        amount: str,
+        calling_code: str | None = None,
+        wallet_type: int,
+        transfer_client_id: str | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /openApi/wallets/v1/capital/subAccountInnerTransfer/apply.
+
+        Sub-account-only operation; uses a signed JSON body.
+        Source: https://bingx-api.github.io/docs-v3/
+        """
+        return await self._native_private(
+            "transfer_sub_account_internal",
+            self._native_params(
+                **{
+                    "coin": coin,
+                    "userAccountType": user_account_type,
+                    "userAccount": user_account,
+                    "amount": amount,
+                    "callingCode": calling_code,
+                    "walletType": wallet_type,
+                    "transferClientId": transfer_client_id,
+                    "recvWindow": recv_window,
+                }
+            ),
+        )
+
+    async def create_withdrawal(
+        self,
+        *,
+        coin: str,
+        network: str | None = None,
+        address: str,
+        address_tag: str | None = None,
+        amount: str,
+        wallet_type: int,
+        withdraw_order_id: str | None = None,
+        vasp_entity_id: str | None = None,
+        recipient_last_name: str | None = None,
+        recipient_first_name: str | None = None,
+        date_ofbirth: str | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /openApi/wallets/v1/capital/withdraw/apply.
+
+        API withdrawals have no second confirmation; they execute on submit.
+        Supply destination-specific memo and required Travel Rule information.
+        The English and Chinese docs disagree on the spot walletType code (4/15).
+        This wrapper preserves the caller-selected integer without choosing either.
+        Source: https://bingx-api.github.io/docs-v3/
+        """
+        return await self._native_private(
+            "create_withdrawal",
+            self._native_params(
+                **{
+                    "coin": coin,
+                    "network": network,
+                    "address": address,
+                    "addressTag": address_tag,
+                    "amount": amount,
+                    "walletType": wallet_type,
+                    "withdrawOrderId": withdraw_order_id,
+                    "vaspEntityId": vasp_entity_id,
+                    "recipientLastName": recipient_last_name,
+                    "recipientFirstName": recipient_first_name,
+                    "dateOfbirth": date_ofbirth,
+                    "recvWindow": recv_window,
+                }
             ),
         )

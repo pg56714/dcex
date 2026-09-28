@@ -107,13 +107,13 @@ impl BackpackParams {
     }
 
     pub(super) fn optional_one_of(&self, key: &str, allowed: &[&str]) -> Result<()> {
-        if let Some(value) = self.get(key) {
-            if !allowed.contains(&value) {
-                return Err(DcexError::InvalidInput(format!(
-                    "invalid Backpack {key}: {value}; expected one of {}",
-                    allowed.join(", ")
-                )));
-            }
+        if let Some(value) = self.get(key)
+            && !allowed.contains(&value)
+        {
+            return Err(DcexError::InvalidInput(format!(
+                "invalid Backpack {key}: {value}; expected one of {}",
+                allowed.join(", ")
+            )));
         }
         Ok(())
     }
@@ -168,12 +168,12 @@ impl BackpackParams {
     }
 
     pub(super) fn optional_bool(&self, key: &str) -> Result<()> {
-        if let Some(value) = self.get(key) {
-            if bool_value(value).is_none() {
-                return Err(DcexError::InvalidInput(format!(
-                    "invalid Backpack boolean {key}: {value}"
-                )));
-            }
+        if let Some(value) = self.get(key)
+            && bool_value(value).is_none()
+        {
+            return Err(DcexError::InvalidInput(format!(
+                "invalid Backpack boolean {key}: {value}"
+            )));
         }
         Ok(())
     }

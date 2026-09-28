@@ -1,0 +1,85 @@
+{
+  "cases": [
+    {
+      "hash": "3bec74d066165518bc9a60e201de72c0b56f800c3cbb82d8c683dc6599b5bdeaa65edede62ec1402",
+      "payload": {
+        "FromAccountIndex": 12,
+        "ApiKeyIndex": 3,
+        "AssetIndex": 3,
+        "RouteType": 1,
+        "Amount": 1099511627899,
+        "ExpiredAt": 1700000600000,
+        "Nonce": 5,
+        "Sig": null,
+        "L2TxAttributes": {}
+      },
+      "skip_nonce": false,
+      "tx_type": 13
+    },
+    {
+      "hash": "d58e59ca75a1ff0d02d636969b973909b3364552337f5f76432e93ef90dcd47d8bff4c3aed8b5bbb",
+      "l1_message": "Approve Integrator\n\nnonce: 0x0000000000000005\naccount index: 0x000000000000000c\napi key index: 0x0000000000000003\nintegrator account index: 0x0000000000000063\nmax perps taker fee: 0x0000000000000064\nmax perps maker fee: 0x0000000000000014\nmax spot taker fee: 0x0000000000000032\nmax spot maker fee: 0x000000000000000a\napproval expiry: 0x000001ba60d33800\nchainId: 0x0000000000000130\nOnly sign this message for a trusted client!",
+      "payload": {
+        "AccountIndex": 12,
+        "ApiKeyIndex": 3,
+        "IntegratorAccountIndex": 99,
+        "MaxPerpsTakerFee": 100,
+        "MaxPerpsMakerFee": 20,
+        "MaxSpotTakerFee": 50,
+        "MaxSpotMakerFee": 10,
+        "ApprovalExpiry": 1900000000000,
+        "ExpiredAt": 1700000600000,
+        "Nonce": 5,
+        "Sig": null,
+        "L1Sig": "",
+        "L2TxAttributes": {}
+      },
+      "skip_nonce": false,
+      "tx_type": 45
+    },
+    {
+      "hash": "f07d8eedca351c1e98e54f1d95cf7f09c33ebda9da2bc1ffacd8967d6b743d9c74d495643577c8b0",
+      "payload": {
+        "FromAccountIndex": 12,
+        "ApiKeyIndex": 3,
+        "AssetIndex": 3,
+        "RouteType": 1,
+        "Amount": 1099511627899,
+        "ExpiredAt": 1700000600000,
+        "Nonce": 5,
+        "Sig": null,
+        "L2TxAttributes": {
+          "4": 1
+        }
+      },
+      "skip_nonce": true,
+      "tx_type": 13
+    },
+    {
+      "hash": "d7d97ddfe97702275aabab70de63462be86f95237ad022b6c3c9d9c2ca2085e6deca248762f5fcfe",
+      "l1_message": "Approve Integrator\n\nnonce: 0x0000000000000005\naccount index: 0x000000000000000c\napi key index: 0x0000000000000003\nintegrator account index: 0x0000000000000063\nmax perps taker fee: 0x0000000000000064\nmax perps maker fee: 0x0000000000000014\nmax spot taker fee: 0x0000000000000032\nmax spot maker fee: 0x000000000000000a\napproval expiry: 0x000001ba60d33800\nchainId: 0x0000000000000130\nOnly sign this message for a trusted client!",
+      "payload": {
+        "AccountIndex": 12,
+        "ApiKeyIndex": 3,
+        "IntegratorAccountIndex": 99,
+        "MaxPerpsTakerFee": 100,
+        "MaxPerpsMakerFee": 20,
+        "MaxSpotTakerFee": 50,
+        "MaxSpotMakerFee": 10,
+        "ApprovalExpiry": 1900000000000,
+        "ExpiredAt": 1700000600000,
+        "Nonce": 5,
+        "Sig": null,
+        "L1Sig": "",
+        "L2TxAttributes": {
+          "4": 1
+        }
+      },
+      "skip_nonce": true,
+      "tx_type": 45
+    }
+  ],
+  "chain_id": 304,
+  "commit": "9d38261d1a4cc5c7211b383ba07a4d6e41604708",
+  "source": "https://github.com/elliottech/lighter-go"
+}

@@ -1385,6 +1385,7 @@ async fn additional_trading_controls_preserve_wire_types() {
                 ("newClientOid".into(), "replacement".into()),
                 ("orderId".into(), "123".into()),
                 ("newPrice".into(), "61000".into()),
+                ("newSize".into(), "1".into()),
             ],
         )
         .await
@@ -1400,12 +1401,15 @@ async fn additional_trading_controls_preserve_wire_types() {
     );
     assert_eq!(
         json_body(&request),
-        serde_json::json!({"symbol": "BTCUSDT", "productType": "USDT-FUTURES", "newClientOid": "replacement", "orderId": "123", "newPrice": "61000"})
+        serde_json::json!({"symbol": "BTCUSDT", "productType": "USDT-FUTURES", "newClientOid": "replacement", "orderId": "123", "newPrice": "61000", "newSize": "1"})
     );
     client
         .private_request(
             "close_futures_positions",
-            vec![("productType".into(), "USDT-FUTURES".into())],
+            vec![
+                ("all_symbols".into(), "true".into()),
+                ("productType".into(), "USDT-FUTURES".into()),
+            ],
         )
         .await
         .expect("close_futures_positions");
@@ -1608,7 +1612,10 @@ async fn additional_trading_controls_preserve_wire_types() {
     client
         .private_request(
             "close_uta_positions",
-            vec![("category".into(), "USDT-FUTURES".into())],
+            vec![
+                ("all_symbols".into(), "true".into()),
+                ("category".into(), "USDT-FUTURES".into()),
+            ],
         )
         .await
         .expect("close_uta_positions");
@@ -1942,7 +1949,11 @@ async fn ordinary_risk_routes_preserve_parameters_and_authentication() {
             "POST",
             "/api/v2/mix/account/set-asset-mode",
             false,
-            &[("productType", "USDT-FUTURES"), ("assetMode", "single")],
+            &[
+                ("confirm", "true"),
+                ("productType", "USDT-FUTURES"),
+                ("assetMode", "single"),
+            ],
             "{\"productType\":\"USDT-FUTURES\",\"assetMode\":\"single\"}",
         ),
         (
@@ -1999,6 +2010,7 @@ async fn ordinary_risk_routes_preserve_parameters_and_authentication() {
             "/api/v2/mix/order/click-backhand",
             false,
             &[
+                ("confirm", "true"),
                 ("product_symbol", "BTC-USDT-SWAP"),
                 ("marginCoin", "USDT"),
                 ("productType", "USDT-FUTURES"),
@@ -2677,7 +2689,7 @@ async fn ordinary_risk_routes_preserve_parameters_and_authentication() {
             "POST",
             "/api/v3/account/adjust-account-mode",
             false,
-            &[("mode", "advanced")],
+            &[("confirm", "true"), ("mode", "advanced")],
             "{\"mode\":\"advanced\"}",
         ),
         (
@@ -3023,7 +3035,7 @@ async fn supplementary_routes_preserve_parameters_and_authentication() {
             "POST",
             "/api/v3/account/switch",
             false,
-            &[],
+            &[("confirm", "true")],
             "{}",
         ),
         (
@@ -3071,7 +3083,7 @@ async fn supplementary_routes_preserve_parameters_and_authentication() {
             "POST",
             "/api/v2/spot/account/upgrade",
             false,
-            &[],
+            &[("confirm", "true")],
             "{}",
         ),
         (
@@ -3315,7 +3327,7 @@ async fn remaining_routes_preserve_parameters_and_authentication() {
             "POST",
             "/api/v3/user/delete-sub",
             false,
-            &[("subUid", "2")],
+            &[("confirm", "true"), ("subUid", "2")],
             "{\"subUid\":\"2\"}",
         ),
         (
@@ -3653,6 +3665,7 @@ async fn nested_sub_account_and_position_requests() {
             "move_uta_positions",
             "/api/v3/account/move-positions",
             &[
+                ("confirm", "true"),
                 ("fromUid", "1"),
                 ("toUid", "2"),
                 ("category", "USDT-FUTURES"),

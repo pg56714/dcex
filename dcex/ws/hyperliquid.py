@@ -113,6 +113,7 @@ class PrivateClient(AsyncWebSocketMixin):
         preload_product_table: bool = False,
     ) -> None:
         """Create a Hyperliquid private WebSocket client."""
+        self._testnet = testnet
         self._native_client = _native.HyperliquidPrivateWebSocketClient(
             user=user,
             testnet=testnet,
@@ -134,6 +135,59 @@ class PrivateClient(AsyncWebSocketMixin):
     async def post_info(self, request_id: int, payload: dict[str, Any]) -> None:
         """Send an info request; read the response with recv and match its id."""
         await self._native_client.post_info(request_id, json.dumps(payload, allow_nan=False))
+
+    def sign_order(
+        self,
+        orders: list[dict[str, Any]],
+        *,
+        nonce: int,
+        private_key: str,
+        grouping: str = "na",
+        vault_address: str | None = None,
+        expires_after: int | None = None,
+    ) -> dict[str, Any]:
+        """
+        Sign wire-format orders offline for post_action on this client's network.
+
+        Prices and sizes must be decimal strings. Supply a unique millisecond nonce;
+        the returned envelope is signed but has not been submitted.
+        """
+        return json.loads(
+            self._native_client.sign_order(
+                json.dumps(orders, allow_nan=False),
+                grouping,
+                nonce,
+                private_key,
+                self._testnet,
+                vault_address,
+                expires_after,
+            )
+        )
+
+    def sign_cancel(
+        self,
+        cancels: list[dict[str, int]],
+        *,
+        nonce: int,
+        private_key: str,
+        vault_address: str | None = None,
+        expires_after: int | None = None,
+    ) -> dict[str, Any]:
+        """
+        Sign {a: asset_id, o: order_id} cancellations offline for post_action.
+
+        Supply a unique millisecond nonce. This method sends no request.
+        """
+        return json.loads(
+            self._native_client.sign_cancel(
+                json.dumps(cancels, allow_nan=False),
+                nonce,
+                private_key,
+                self._testnet,
+                vault_address,
+                expires_after,
+            )
+        )
 
     async def post_action(self, request_id: int, payload: dict[str, Any]) -> None:
         """

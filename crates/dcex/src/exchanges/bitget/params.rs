@@ -23,7 +23,7 @@ impl BitgetParams {
 
     pub(super) fn ensure_allowed(&self, keys: &[&str], allow_product_symbol: bool) -> Result<()> {
         for (key, _) in &self.0 {
-            if !keys.contains(&key.as_str()) && !(allow_product_symbol && key == "product_symbol") {
+            if !(keys.contains(&key.as_str()) || allow_product_symbol && key == "product_symbol") {
                 return Err(DcexError::InvalidInput(format!(
                     "unsupported parameter: {key}"
                 )));

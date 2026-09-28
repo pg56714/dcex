@@ -1,0 +1,290 @@
+[
+  {
+    "name": "accept_options_block_order",
+    "kwargs": {
+      "block_order_matching_key": "block-test",
+      "recv_window": 5000
+    },
+    "method": "POST",
+    "path": "/eapi/v1/block/order/execute",
+    "expected": {
+      "blockOrderMatchingKey": "block-test",
+      "recvWindow": "5000"
+    }
+  },
+  {
+    "name": "get_options_account_block_trades",
+    "kwargs": {
+      "end_time": 1700000100000,
+      "start_time": 1700000000000,
+      "underlying": "BTCUSDT",
+      "recv_window": 5000
+    },
+    "method": "GET",
+    "path": "/eapi/v1/block/user-trades",
+    "expected": {
+      "endTime": "1700000100000",
+      "startTime": "1700000000000",
+      "underlying": "BTCUSDT",
+      "recvWindow": "5000"
+    }
+  },
+  {
+    "name": "cancel_options_block_order",
+    "kwargs": {
+      "block_order_matching_key": "block-test",
+      "recv_window": 5000
+    },
+    "method": "DELETE",
+    "path": "/eapi/v1/block/order/create",
+    "expected": {
+      "blockOrderMatchingKey": "block-test",
+      "recvWindow": "5000"
+    }
+  },
+  {
+    "name": "extend_options_block_order",
+    "kwargs": {
+      "block_order_matching_key": "block-test",
+      "recv_window": 5000
+    },
+    "method": "PUT",
+    "path": "/eapi/v1/block/order/create",
+    "expected": {
+      "blockOrderMatchingKey": "block-test",
+      "recvWindow": "5000"
+    }
+  },
+  {
+    "name": "create_options_block_order",
+    "kwargs": {
+      "liquidity": "MAKER",
+      "legs": [
+        {
+          "symbol": "BTC-261225-90000-C",
+          "side": "BUY",
+          "type": "LIMIT",
+          "quantity": "0.000000000000000123",
+          "price": "100.123456789123456789"
+        }
+      ],
+      "recv_window": 5000
+    },
+    "method": "POST",
+    "path": "/eapi/v1/block/order/create",
+    "expected": {
+      "liquidity": "MAKER",
+      "legs": "[{\"symbol\":\"BTC-261225-90000-C\",\"side\":\"BUY\",\"type\":\"LIMIT\",\"quantity\":\"0.000000000000000123\",\"price\":\"100.123456789123456789\"}]",
+      "recvWindow": "5000"
+    }
+  },
+  {
+    "name": "get_options_block_order_details",
+    "kwargs": {
+      "block_order_matching_key": "block-test",
+      "recv_window": 5000
+    },
+    "method": "GET",
+    "path": "/eapi/v1/block/order/execute",
+    "expected": {
+      "blockOrderMatchingKey": "block-test",
+      "recvWindow": "5000"
+    }
+  },
+  {
+    "name": "get_options_block_orders",
+    "kwargs": {
+      "block_order_matching_key": "block-test",
+      "end_time": 1700000100000,
+      "start_time": 1700000000000,
+      "underlying": "BTCUSDT",
+      "recv_window": 5000
+    },
+    "method": "GET",
+    "path": "/eapi/v1/block/order/orders",
+    "expected": {
+      "blockOrderMatchingKey": "block-test",
+      "endTime": "1700000100000",
+      "startTime": "1700000000000",
+      "underlying": "BTCUSDT",
+      "recvWindow": "5000"
+    }
+  },
+  {
+    "name": "withdraw_managed_sub_account",
+    "kwargs": {
+      "from_email": "account@example.test",
+      "asset": "USDT",
+      "amount": "1.23456789123456789",
+      "transfer_date": 1900000000000,
+      "recv_window": 5000
+    },
+    "method": "POST",
+    "path": "/sapi/v1/managed-subaccount/withdraw",
+    "expected": {
+      "fromEmail": "account@example.test",
+      "asset": "USDT",
+      "amount": "1.23456789123456789",
+      "transferDate": "1900000000000",
+      "recvWindow": "5000"
+    }
+  },
+  {
+    "name": "disable_fast_withdraw_switch",
+    "kwargs": {
+      "recv_window": 5000
+    },
+    "method": "POST",
+    "path": "/sapi/v1/account/disableFastWithdrawSwitch",
+    "expected": {
+      "recvWindow": "5000"
+    }
+  },
+  {
+    "name": "enable_fast_withdraw_switch",
+    "kwargs": {
+      "recv_window": 5000
+    },
+    "method": "POST",
+    "path": "/sapi/v1/account/enableFastWithdrawSwitch",
+    "expected": {
+      "recvWindow": "5000"
+    }
+  },
+  {
+    "name": "create_withdrawal",
+    "kwargs": {
+      "coin": "USDT",
+      "address": "0x4444444444444444444444444444444444444444",
+      "amount": "1.23456789123456789",
+      "withdraw_order_id": "withdraw-test",
+      "network": "ETH",
+      "address_tag": "memo-test",
+      "transaction_fee_flag": false,
+      "name": "Test & account",
+      "wallet_type": 1,
+      "recv_window": 5000
+    },
+    "method": "POST",
+    "path": "/sapi/v1/capital/withdraw/apply",
+    "expected": {
+      "coin": "USDT",
+      "address": "0x4444444444444444444444444444444444444444",
+      "amount": "1.23456789123456789",
+      "withdrawOrderId": "withdraw-test",
+      "network": "ETH",
+      "addressTag": "memo-test",
+      "transactionFeeFlag": "false",
+      "name": "Test & account",
+      "walletType": "1",
+      "recvWindow": "5000"
+    }
+  },
+  {
+    "name": "create_broker_withdrawal",
+    "kwargs": {
+      "address": "0x4444444444444444444444444444444444444444",
+      "coin": "USDT",
+      "amount": "1.23456789123456789",
+      "withdraw_order_id": "withdraw-test",
+      "questionnaire": {
+        "answer": "A & B + %20"
+      },
+      "originator_pii": {
+        "piiType": 0,
+        "latinNames": [
+          {
+            "firstName": "Test"
+          }
+        ],
+        "residenceCountry": "TW"
+      },
+      "address_tag": "memo-test",
+      "network": "ETH",
+      "address_name": "Test & account",
+      "transaction_fee_flag": false,
+      "wallet_type": 1
+    },
+    "method": "POST",
+    "path": "/sapi/v1/localentity/broker/withdraw/apply",
+    "expected": {
+      "address": "0x4444444444444444444444444444444444444444",
+      "coin": "USDT",
+      "amount": "1.23456789123456789",
+      "withdrawOrderId": "withdraw-test",
+      "questionnaire": "{\"answer\":\"A & B + %20\"}",
+      "originatorPii": "{\"piiType\":0,\"latinNames\":[{\"firstName\":\"Test\"}],\"residenceCountry\":\"TW\"}",
+      "addressTag": "memo-test",
+      "network": "ETH",
+      "addressName": "Test & account",
+      "transactionFeeFlag": "false",
+      "walletType": "1"
+    }
+  },
+  {
+    "name": "submit_broker_deposit_questionnaire",
+    "kwargs": {
+      "sub_account_id": "sub-test",
+      "deposit_id": 123,
+      "questionnaire": {
+        "answer": "A & B + %20"
+      },
+      "beneficiary_pii": {
+        "piiType": 1,
+        "latinName": "Test Company",
+        "registrationCountry": "TW"
+      },
+      "network": "ETH",
+      "coin": "USDT",
+      "amount": "1.23456789123456789",
+      "address": "0x4444444444444444444444444444444444444444",
+      "address_tag": "memo-test"
+    },
+    "method": "PUT",
+    "path": "/sapi/v1/localentity/broker/deposit/provide-info",
+    "expected": {
+      "subAccountId": "sub-test",
+      "depositId": "123",
+      "questionnaire": "{\"answer\":\"A & B + %20\"}",
+      "beneficiaryPii": "{\"piiType\":1,\"latinName\":\"Test Company\",\"registrationCountry\":\"TW\"}",
+      "network": "ETH",
+      "coin": "USDT",
+      "amount": "1.23456789123456789",
+      "address": "0x4444444444444444444444444444444444444444",
+      "addressTag": "memo-test"
+    }
+  },
+  {
+    "name": "create_travel_rule_withdrawal",
+    "kwargs": {
+      "coin": "USDT",
+      "address": "0x4444444444444444444444444444444444444444",
+      "amount": "1.23456789123456789",
+      "questionnaire": {
+        "answer": "A & B + %20"
+      },
+      "withdraw_order_id": "withdraw-test",
+      "network": "ETH",
+      "address_tag": "memo-test",
+      "transaction_fee_flag": false,
+      "name": "Test & account",
+      "wallet_type": 1,
+      "recv_window": 5000
+    },
+    "method": "POST",
+    "path": "/sapi/v1/localentity/withdraw/apply",
+    "expected": {
+      "coin": "USDT",
+      "address": "0x4444444444444444444444444444444444444444",
+      "amount": "1.23456789123456789",
+      "questionnaire": "{\"answer\":\"A & B + %20\"}",
+      "withdrawOrderId": "withdraw-test",
+      "network": "ETH",
+      "addressTag": "memo-test",
+      "transactionFeeFlag": "false",
+      "name": "Test & account",
+      "walletType": "1",
+      "recvWindow": "5000"
+    }
+  }
+]

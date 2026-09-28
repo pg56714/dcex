@@ -680,7 +680,7 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
-    async def transfer_same_master_account(
+    async def transfer_l2_account(
         self,
         *,
         to_account_index: int,
@@ -695,12 +695,14 @@ class TradeHTTP(HTTPManager):
         api_key_index: int | None = None,
         price_protection: bool | None = None,
     ) -> dict[str, Any] | list[Any]:
-        """Transfer within one master account; amounts and fees use raw integer units."""
-        return await self._native_private(
-            "transfer_same_master_account", self._native_params(**locals())
-        )
+        """
+        Transfer between L2 account indices using raw integer amount and fee units.
 
-    async def sign_transfer_same_master_account(
+        Account-family membership is not verified locally. The exchange enforces eligibility.
+        """
+        return await self._native_private("transfer_l2_account", self._native_params(**locals()))
+
+    async def sign_transfer_l2_account(
         self,
         *,
         to_account_index: int,
@@ -714,10 +716,12 @@ class TradeHTTP(HTTPManager):
         nonce: int | None = None,
         api_key_index: int | None = None,
     ) -> tuple[Any, Any, Any, Any]:
-        """Transfer within one master account; amounts and fees use raw integer units."""
-        return await self._native_sign(
-            "sign_transfer_same_master_account", self._native_params(**locals())
-        )
+        """
+        Transfer between L2 account indices using raw integer amount and fee units.
+
+        Account-family membership is not verified locally. The exchange enforces eligibility.
+        """
+        return await self._native_sign("sign_transfer_l2_account", self._native_params(**locals()))
 
     async def set_maker_only_api_keys(
         self, *, account_index: int, api_key_indexes: list[int], authorization: str | None = None
@@ -731,3 +735,218 @@ class TradeHTTP(HTTPManager):
                 authorization=authorization,
             ),
         )
+
+    transfer_same_master_account = transfer_l2_account
+    sign_transfer_same_master_account = sign_transfer_l2_account
+
+    async def submit_fast_withdrawal(
+        self,
+        *,
+        tx_info: str,
+        to_address: str,
+        authorization: str | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """
+        POST /api/v1/fastwithdraw.
+
+        API withdrawals have no second confirmation; they execute on submit.
+        tx_info must be an already signed L2 transfer to the fast-withdraw service.
+
+        https://apidocs.lighter.xyz/reference/fastwithdraw
+        """
+        return await self._native_private("submit_fast_withdrawal", self._native_params(**locals()))
+
+    async def create_referral_code(
+        self,
+        *,
+        account_index: int,
+        authorization: str | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """
+        POST /api/v1/referral/create.
+
+        https://apidocs.lighter.xyz/reference/referral_create
+        """
+        return await self._native_private("create_referral_code", self._native_params(**locals()))
+
+    async def get_referral_code(
+        self,
+        *,
+        account_index: int,
+        authorization: str | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """
+        GET /api/v1/referral/get.
+
+        https://apidocs.lighter.xyz/reference/referral_get
+        """
+        return await self._native_private("get_referral_code", self._native_params(**locals()))
+
+    async def update_referral_kickback(
+        self,
+        *,
+        account_index: int,
+        kickback_percentage: str,
+        authorization: str | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """
+        POST /api/v1/referral/kickback/update.
+
+        https://apidocs.lighter.xyz/reference/referral_kickback_update
+        """
+        return await self._native_private(
+            "update_referral_kickback", self._native_params(**locals())
+        )
+
+    async def get_referral_stats(
+        self,
+        *,
+        l1_address: str,
+        auth: str | None = None,
+        is_eligible: bool | None = None,
+        authorization: str | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """
+        GET /api/v1/referral/stats.
+
+        https://apidocs.lighter.xyz/reference/referral_stats
+        """
+        return await self._native_private("get_referral_stats", self._native_params(**locals()))
+
+    async def update_referral_code(
+        self,
+        *,
+        account_index: int,
+        new_referral_code: str,
+        authorization: str | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """
+        POST /api/v1/referral/update.
+
+        https://apidocs.lighter.xyz/reference/referral_update
+        """
+        return await self._native_private("update_referral_code", self._native_params(**locals()))
+
+    async def use_referral_code(
+        self,
+        *,
+        l1_address: str,
+        referral_code: str,
+        discord: str | None = None,
+        telegram: str | None = None,
+        x: str | None = None,
+        signature: str | None = None,
+        source: str | None = None,
+        authorization: str | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """
+        POST /api/v1/referral/use.
+
+        Pass signature unchanged when required by the service; this method does not sign a wallet
+        message.
+
+        https://apidocs.lighter.xyz/reference/referral_use
+        """
+        return await self._native_private("use_referral_code", self._native_params(**locals()))
+
+    async def respond_to_rfq(
+        self,
+        *,
+        rfq_id: int,
+        status: str,
+        authorization: str | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """
+        POST /api/v1/rfq/respond.
+
+        https://apidocs.lighter.xyz/reference/rfq_respond
+        """
+        return await self._native_private("respond_to_rfq", self._native_params(**locals()))
+
+    async def withdraw_l2(
+        self,
+        *,
+        asset_index: int,
+        route_type: int,
+        amount: int,
+        nonce: int | None = None,
+        api_key_index: int | None = None,
+        skip_nonce: int = 0,
+    ) -> dict[str, Any] | list[Any]:
+        """
+        Submit L2 withdrawal transaction 13; amount uses raw integer asset units.
+
+        API withdrawals have no second confirmation; they execute on submit.
+
+        https://github.com/elliottech/lighter-go/blob/main/types/txtypes/withdraw.go
+        """
+        return await self._native_private("withdraw_l2", self._native_params(**locals()))
+
+    async def sign_withdraw_l2(
+        self,
+        *,
+        asset_index: int,
+        route_type: int,
+        amount: int,
+        nonce: int | None = None,
+        api_key_index: int | None = None,
+        skip_nonce: int = 0,
+    ) -> tuple[Any, Any, Any, Any]:
+        """
+        Sign L2 withdrawal transaction 13; amount uses raw integer asset units.
+
+        https://github.com/elliottech/lighter-go/blob/main/types/txtypes/withdraw.go
+        """
+        return await self._native_sign("sign_withdraw_l2", self._native_params(**locals()))
+
+    async def approve_integrator(
+        self,
+        *,
+        integrator_account_index: int,
+        max_perps_taker_fee: int,
+        max_perps_maker_fee: int,
+        max_spot_taker_fee: int,
+        max_spot_maker_fee: int,
+        approval_expiry: int,
+        l1_signature: str,
+        nonce: int,
+        api_key_index: int | None = None,
+        skip_nonce: int = 0,
+    ) -> dict[str, Any] | list[Any]:
+        """
+        Submit integrator approval transaction 45; fee ticks use 1,000,000 per 100%.
+
+        l1_signature is the caller-provided Ethereum signature of the official
+        GetL1SignatureBody message, using the same nonce, account, key and chain.
+        approval_expiry is the SDK millisecond timestamp; zero revokes approval
+        and requires all four fee caps to be zero.
+
+        https://github.com/elliottech/lighter-go/blob/main/types/txtypes/approve_integrator.go
+        """
+        return await self._native_private("approve_integrator", self._native_params(**locals()))
+
+    async def sign_approve_integrator(
+        self,
+        *,
+        integrator_account_index: int,
+        max_perps_taker_fee: int,
+        max_perps_maker_fee: int,
+        max_spot_taker_fee: int,
+        max_spot_maker_fee: int,
+        approval_expiry: int,
+        l1_signature: str,
+        nonce: int,
+        api_key_index: int | None = None,
+        skip_nonce: int = 0,
+    ) -> tuple[Any, Any, Any, Any]:
+        """
+        Sign integrator approval transaction 45; fee ticks use 1,000,000 per 100%.
+
+        l1_signature is the caller-provided Ethereum signature of the official
+        GetL1SignatureBody message, using the same nonce, account, key and chain.
+        approval_expiry is the SDK millisecond timestamp; zero revokes approval
+        and requires all four fee caps to be zero.
+
+        https://github.com/elliottech/lighter-go/blob/main/types/txtypes/approve_integrator.go
+        """
+        return await self._native_sign("sign_approve_integrator", self._native_params(**locals()))

@@ -125,6 +125,22 @@ impl BingxClient {
             .await
     }
 
+    pub(super) async fn lindorm_request(
+        &self,
+        path: &str,
+        body: Value,
+        headers: Vec<(String, String)>,
+    ) -> Result<ValidatedResponse> {
+        let base = if self.base_url.trim_end_matches('/') == BASE_URL {
+            "https://ox-bigdata-api.houtai.io"
+        } else {
+            &self.base_url
+        };
+        let mut request = HttpRequest::new(HttpMethod::Post, base, path).json(body);
+        request.headers.extend(headers);
+        self.inner.execute(request, false).await
+    }
+
     pub(super) async fn private_post(
         &self,
         path: &str,
@@ -207,10 +223,10 @@ impl BingxClient {
     }
 
     pub(super) fn exchange_symbol(&self, product_symbol: &str) -> Result<String> {
-        if is_canonical_product_symbol(product_symbol) {
-            if let Some(table) = &self.product_table {
-                return table.get_exchange_symbol("bingx", product_symbol);
-            }
+        if is_canonical_product_symbol(product_symbol)
+            && let Some(table) = &self.product_table
+        {
+            return table.get_exchange_symbol("bingx", product_symbol);
         }
         Ok(exchange_symbol_fallback(product_symbol))
     }

@@ -324,7 +324,7 @@ impl PythonLighterPrivateWebSocketClient {
                 api_private_key,
                 ws_base_url.unwrap_or_else(|| {
                     network
-                        .unwrap_or_else(|| {
+                        .unwrap_or({
                             if testnet {
                                 LighterNetwork::Testnet
                             } else {
@@ -337,7 +337,7 @@ impl PythonLighterPrivateWebSocketClient {
                 }),
                 http_base_url.unwrap_or_else(|| {
                     network
-                        .unwrap_or_else(|| {
+                        .unwrap_or({
                             if testnet {
                                 LighterNetwork::Testnet
                             } else {

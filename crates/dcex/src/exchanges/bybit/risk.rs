@@ -174,7 +174,7 @@ fn validate(name: &str, p: &BybitParams) -> Result<()> {
                 || !item["bizType"]
                     .as_str()
                     .is_some_and(|s| ["SPOT", "DERIVATIVES", "OPTIONS"].contains(&s))
-                || !item["rate"].as_u64().is_some_and(|n| n > 0)
+                || item["rate"].as_u64().is_none_or(|n| n == 0)
             {
                 return Err(invalid(
                     "rate limit entries require UIDs, bizType and a positive integer rate",
@@ -183,13 +183,12 @@ fn validate(name: &str, p: &BybitParams) -> Result<()> {
         }
     }
     for key in ["page", "index", "size", "pageSize"] {
-        if let Some(v) = p.get(key) {
-            if !v
+        if let Some(v) = p.get(key)
+            && !v
                 .parse::<u64>()
                 .is_ok_and(|n| n > 0 && (!matches!(key, "size" | "pageSize") || n <= 100))
-            {
-                return Err(invalid("invalid pagination value"));
-            }
+        {
+            return Err(invalid("invalid pagination value"));
         }
     }
     if name == "get_fee_group_info" && p.required("productType")? != "contract" {
@@ -263,16 +262,15 @@ fn validate(name: &str, p: &BybitParams) -> Result<()> {
         if !matches!(p.required("memberType")?, "1" | "6") {
             return Err(invalid("memberType must be 1 or 6"));
         }
-        if let Some(password) = p.get("password") {
-            if !(8..=30).contains(&password.len())
+        if let Some(password) = p.get("password")
+            && (!(8..=30).contains(&password.len())
                 || !password.bytes().any(|b| b.is_ascii_uppercase())
                 || !password.bytes().any(|b| b.is_ascii_lowercase())
-                || !password.bytes().any(|b| b.is_ascii_digit())
-            {
-                return Err(invalid(
-                    "password requires 8..30 characters with upper/lowercase letters and digits",
-                ));
-            }
+                || !password.bytes().any(|b| b.is_ascii_digit()))
+        {
+            return Err(invalid(
+                "password requires 8..30 characters with upper/lowercase letters and digits",
+            ));
         }
     }
     if name == "sign_trading_agreement"
@@ -294,21 +292,24 @@ fn validate(name: &str, p: &BybitParams) -> Result<()> {
     }
     if let Some(category) = p.get("category") {
         let categories: &[&str] = match name {
-            "get_account_instruments"
-            | "get_full_orderbook"
-            | "get_rpi_orderbook"
-            | "set_price_limit_behavior" => &["spot", "linear", "inverse"],
-            "get_closed_option_positions" => &["option"],
-            "get_option_delivery_prices" | "get_pre_upgrade_delivery_records" => &["option"],
-            "get_pre_upgrade_executions" | "get_pre_upgrade_order_history" => {
-                &["spot", "linear", "inverse", "option"]
-            }
-            "get_pre_upgrade_transaction_log" => &["linear", "option"],
-            "get_pre_upgrade_settlement_records" => &["linear"],
-            "get_move_position_history" => &["spot", "linear", "inverse", "option"],
-            "get_delivery_records" => &["linear", "inverse", "option"],
+            "get_account_instruments" => &["spot", "linear", "inverse"],
+            "get_delivery_records" => &["inverse", "linear", "option"],
             "get_settlement_records" => &["linear"],
-            _ => &["linear", "inverse"],
+            "get_full_orderbook" => &["spot", "linear", "inverse"],
+            "get_rpi_orderbook" => &["spot", "linear", "inverse"],
+            "confirm_pending_mmr" => &["linear", "inverse"],
+            "get_position_symbol_info" => &["linear", "inverse"],
+            "set_price_limit_behavior" => &["linear", "inverse", "spot"],
+            "get_closed_option_positions" => &["option"],
+            "get_move_position_history" => &["linear", "inverse", "spot", "option"],
+            "get_option_delivery_prices" => &["option"],
+            "get_pre_upgrade_closed_pnl" => &["linear", "inverse"],
+            "get_pre_upgrade_delivery_records" => &["option"],
+            "get_pre_upgrade_executions" => &["linear", "inverse", "option", "spot"],
+            "get_pre_upgrade_order_history" => &["linear", "inverse", "option", "spot"],
+            "get_pre_upgrade_settlement_records" => &["linear"],
+            "get_pre_upgrade_transaction_log" => &["linear", "option"],
+            _ => return Err(invalid("category is not supported for this endpoint")),
         };
         if !categories.contains(&category) {
             return Err(invalid("unsupported category"));
@@ -316,16 +317,45 @@ fn validate(name: &str, p: &BybitParams) -> Result<()> {
     }
     if let Some(limit) = p.get("limit") {
         let max = match name {
-            "get_all_api_rate_limits" => 1000,
-            "get_account_instruments" | "get_move_position_history" => 200,
-            "get_funding_account_history"
-            | "get_closed_option_positions"
-            | "get_convert_history"
-            | "get_pre_upgrade_closed_pnl"
-            | "get_pre_upgrade_executions" => 100,
-            "get_sub_account_api_keys" => 20,
+            "get_fixed_loan_supply_contract_info" => 100,
+            "get_account_instruments" => 200,
+            "get_delivery_records" => 50,
+            "get_settlement_records" => 50,
+            "get_funding_account_history" => 100,
+            "get_rpi_orderbook" => 50,
+            "get_closed_option_positions" => 100,
+            "get_move_position_history" => 200,
             "get_announcements" => u64::MAX,
-            _ => 50,
+            "get_convert_history" => 100,
+            "get_exchange_order_records" => 50,
+            "get_pre_upgrade_closed_pnl" => 100,
+            "get_pre_upgrade_delivery_records" => 50,
+            "get_pre_upgrade_executions" => 100,
+            "get_pre_upgrade_order_history" => 50,
+            "get_pre_upgrade_settlement_records" => 50,
+            "get_pre_upgrade_transaction_log" => 50,
+            "get_sub_account_api_keys" => 20,
+            "get_all_api_rate_limits" => 1000,
+            "get_asset_withdraw_query_address" => 50,
+            "get_asset_withdraw_query_record" => 50,
+            "get_crypto_loan_borrow_history" => 100,
+            "get_crypto_loan_adjustment_history" => 100,
+            "get_crypto_loan_repayment_history" => 100,
+            "get_crypto_loan_ongoing_orders" => 100,
+            "get_spot_x_puzzle_project_list" => 10,
+            "get_spot_x_token_splash_project_list" => 10,
+            "get_crypto_loan_fixed_borrow_contract_info" => 100,
+            "get_crypto_loan_fixed_borrow_order_quote" => 100,
+            "get_crypto_loan_fixed_borrow_order_info" => 100,
+            "get_crypto_loan_fixed_renew_info" => 100,
+            "get_crypto_loan_fixed_repayment_history" => 100,
+            "get_crypto_loan_fixed_supply_order_quote" => 100,
+            "get_crypto_loan_fixed_supply_order_info" => 100,
+            "get_crypto_loan_flexible_borrow_history" => 100,
+            "get_crypto_loan_flexible_repayment_history" => 100,
+            "get_crypto_loan_common_adjustment_history" => 100,
+            "get_spot_lever_token_order_record" => 500,
+            _ => return Err(invalid("limit is not supported for this endpoint")),
         };
         if !limit.parse::<u64>().is_ok_and(|n| (1..=max).contains(&n)) {
             return Err(invalid("limit is outside the documented range"));

@@ -12,11 +12,16 @@ from __future__ import annotations
 import inspect
 import json
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 from unittest.mock import AsyncMock, Mock
 from urllib.parse import parse_qsl, urlsplit
 
 import pytest
+
+from tests.unit.wire_expectations import EXPECTED_VERBS as _ALL_VERBS
+
+EXPECTED_VERBS = _ALL_VERBS["lighter"]
 
 from dcex.async_support.lighter.client import Client as AsyncClient
 from dcex.lighter.client import Client
@@ -996,6 +1001,25 @@ def _public_methods(cls: type) -> set[str]:
     } - NON_ENDPOINT_METHODS
 
 
+from dataclasses import replace
+
+COMPLETION_CASES = json.loads(
+    (Path(__file__).parents[1] / "fixtures/lighter_completion.json").read_text(encoding="utf-8")
+)
+WRAPPER_CASES.extend(
+    _case(x["kind"], x["name"], (), [tuple(p) for p in x["params"]], x["path"], **x["kwargs"])
+    for x in COMPLETION_CASES
+)
+
+ALIASES = {
+    "transfer_same_master_account": "transfer_l2_account",
+    "sign_transfer_same_master_account": "sign_transfer_l2_account",
+}
+WRAPPER_CASES = tuple(WRAPPER_CASES) + tuple(
+    replace(case, method=ALIASES[case.method]) for case in WRAPPER_CASES if case.method in ALIASES
+)
+
+
 def test_every_lighter_wrapper_has_a_coverage_case() -> None:
     """New sync or async wrappers must be added to this offline coverage table."""
     covered = {case.method for case in WRAPPER_CASES}
@@ -1025,7 +1049,9 @@ def test_sync_wrapper_forwards_native_name_and_params(case: WrapperCase) -> None
     mocks = _mocks(asynchronous=False)
     _install(client, mocks)
     getattr(client, case.method)(*case.args, **case.kwargs)
-    native_name = "create_order" if case.method == "place_order" else case.method
+    native_name = (
+        "create_order" if case.method == "place_order" else ALIASES.get(case.method, case.method)
+    )
     for kind, mock in mocks.items():
         if kind == case.kind:
             mock.assert_called_once_with(native_name, case.params)
@@ -1041,7 +1067,9 @@ async def test_async_wrapper_forwards_native_name_and_params(case: WrapperCase) 
     mocks = _mocks(asynchronous=True)
     _install(client, mocks)
     await getattr(client, case.method)(*case.args, **case.kwargs)
-    native_name = "create_order" if case.method == "place_order" else case.method
+    native_name = (
+        "create_order" if case.method == "place_order" else ALIASES.get(case.method, case.method)
+    )
     for kind, mock in mocks.items():
         if kind == case.kind:
             mock.assert_awaited_once_with(native_name, case.params)
@@ -1065,7 +1093,9 @@ def _signing_native(base_url: str) -> Any:  # noqa: ANN401
 @pytest.mark.parametrize("case", WRAPPER_CASES, ids=lambda case: case.id)
 def test_wrapper_params_reach_official_route(case: WrapperCase) -> None:
     """The Rust client accepts the wrapper params and emits the official route."""
-    native_name = "create_order" if case.method == "place_order" else case.method
+    native_name = (
+        "create_order" if case.method == "place_order" else ALIASES.get(case.method, case.method)
+    )
     if case.kind == "sign":
         tx_type, tx_info, tx_hash, error = _signing_native("http://127.0.0.1:1").sign_request(
             native_name, case.params
@@ -1084,6 +1114,7 @@ def test_wrapper_params_reach_official_route(case: WrapperCase) -> None:
     while not received.empty():
         requests.append(received.get_nowait())
     assert len(requests) == 1
+    assert requests[0]["method"] == EXPECTED_VERBS[case.method]
     url = urlsplit(requests[0]["path"])
     query = parse_qsl(url.query)
     assert not any(key in {"authorization", "product_symbol", "type_", "from_"} for key, _ in query)
@@ -1093,13 +1124,23 @@ def test_wrapper_params_reach_official_route(case: WrapperCase) -> None:
         assert int(body["tx_type"]) == case.route
         info = json.loads(body["tx_info"])
         assert (
-            info["FromAccountIndex" if case.route == 12 else "AccountIndex"],
+            info["FromAccountIndex" if case.route in {12, 13} else "AccountIndex"],
             info["ApiKeyIndex"],
             info["Nonce"],
         ) == (ACCOUNT, API_KEY, 5)
         assert info["Sig"]
         return
     assert url.path == case.route
+    completion = next((x for x in COMPLETION_CASES if x["name"] == case.method), None)
+    if completion is not None:
+        assert requests[0]["method"] == completion["method"]
+        expected = {key: value for key, value in completion["params"] if key != "authorization"}
+        assert dict(parse_qsl(url.query or requests[0]["body"], keep_blank_values=True)) == expected
+        assert requests[0]["authorization"] == TOKEN
+        if completion["method"] == "POST":
+            assert not url.query
+        else:
+            assert not requests[0]["body"]
 
 
 @pytest.mark.parametrize("market_index", [256, 2048, 4095, 32767])

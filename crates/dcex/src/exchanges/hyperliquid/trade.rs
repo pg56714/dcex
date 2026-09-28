@@ -16,8 +16,47 @@ impl HyperliquidClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         let params = HyperliquidParams::from_pairs(params);
+        if let Some(response) = self.inventory_request(method_name, &params, false).await? {
+            return Ok(response);
+        }
+        if let Some(response) = self
+            .completion_private_request(method_name, &params)
+            .await?
+        {
+            return Ok(response);
+        }
         validate_private_params(method_name, &params)?;
         match method_name {
+            "borrow_lend_signed" => {
+                let action: Value = serde_json::from_str(params.required("action")?)
+                    .map_err(|e| DcexError::InvalidInput(e.to_string()))?;
+                if action.get("type").and_then(Value::as_str) != Some("borrowLend") {
+                    return Err(DcexError::InvalidInput(
+                        "action.type must be borrowLend".into(),
+                    ));
+                }
+                let nonce = params.required_u64("nonce")?;
+                let signature = signature_param(&params)?;
+                // The public exchange docs and official SDK do not currently specify
+                // borrowLend signing. Preserve a caller-signed envelope; do not guess
+                // whether it uses L1 or user EIP-712 signing.
+                let mut payload =
+                    serde_json::json!({"action":action,"nonce":nonce,"signature":signature});
+                if params.get("vaultAddress").is_some() {
+                    payload["vaultAddress"] = params.address("vaultAddress")?.into();
+                }
+                if params.get("expiresAfter").is_some() {
+                    payload["expiresAfter"] = params.required_u64("expiresAfter")?.into();
+                }
+                self.request(
+                    HttpMethod::Post,
+                    EXCHANGE,
+                    serde_json::to_vec(&payload).map_err(|e| DcexError::Decode(e.to_string()))?,
+                    None,
+                    false,
+                )
+                .await
+            }
             "approve_agent_signed" => self.additional_user_action("approveAgent", &params).await,
             "create_sub_account" => {
                 self.submit_action(
@@ -190,33 +229,7 @@ impl HyperliquidClient {
         kind: &str,
         params: &HyperliquidParams,
     ) -> Result<ValidatedResponse> {
-        let nonce = params.required_u64("nonce")?;
-        let chain_id = params.required("signatureChainId")?;
-        if !chain_id.starts_with("0x")
-            || chain_id.len() <= 2
-            || !chain_id[2..].bytes().all(|b| b.is_ascii_hexdigit())
-        {
-            return Err(DcexError::InvalidInput(
-                "signatureChainId must be a hexadecimal chain ID".into(),
-            ));
-        }
-        let signature: Value = serde_json::from_str(params.required("signature")?)
-            .map_err(|e| DcexError::InvalidInput(e.to_string()))?;
-        if !signature.as_object().is_some_and(|s| {
-            s.len() == 3
-                && ["r", "s"].iter().all(|k| {
-                    s.get(*k).and_then(Value::as_str).is_some_and(|v| {
-                        v.len() == 66
-                            && v.starts_with("0x")
-                            && v[2..].bytes().all(|b| b.is_ascii_hexdigit())
-                    })
-                })
-                && matches!(s.get("v").and_then(Value::as_u64), Some(27 | 28))
-        }) {
-            return Err(DcexError::InvalidInput(
-                "signature requires 32-byte r/s and v 27 or 28".into(),
-            ));
-        }
+        let (nonce, chain_id, signature) = user_signed_fields(params)?;
 
         let mut action = serde_json::json!({"type":kind,"hyperliquidChain":if self.is_testnet(){"Testnet"}else{"Mainnet"},"signatureChainId":chain_id,"nonce":nonce});
         if kind == "approveAgent" {
@@ -491,36 +504,7 @@ impl HyperliquidClient {
     ) -> Result<ValidatedResponse> {
         let amount = params.positive_decimal("amount")?;
         let to_perp = params.required_bool("toPerp")?;
-        let nonce = params.required_u64("nonce")?;
-        let signature_chain_id = params.required("signatureChainId")?;
-        if signature_chain_id.len() <= 2
-            || !signature_chain_id.starts_with("0x")
-            || !signature_chain_id[2..]
-                .chars()
-                .all(|ch| ch.is_ascii_hexdigit())
-        {
-            return Err(DcexError::InvalidInput(
-                "Hyperliquid signatureChainId must be a hexadecimal chain ID".into(),
-            ));
-        }
-        let signature: Value =
-            serde_json::from_str(params.required("signature")?).map_err(|error| {
-                DcexError::InvalidInput(format!("invalid Hyperliquid signature JSON: {error}"))
-            })?;
-        let valid_signature = signature.as_object().is_some_and(|value| {
-            ["r", "s"].iter().all(|key| {
-                value.get(*key).and_then(Value::as_str).is_some_and(|part| {
-                    part.len() == 66
-                        && part.starts_with("0x")
-                        && part[2..].chars().all(|ch| ch.is_ascii_hexdigit())
-                })
-            }) && matches!(value.get("v").and_then(Value::as_u64), Some(27 | 28))
-        });
-        if !valid_signature {
-            return Err(DcexError::InvalidInput(
-                "Hyperliquid signature requires r, s, and v".into(),
-            ));
-        }
+        let (nonce, signature_chain_id, signature) = user_signed_fields(params)?;
         let chain = if self.is_testnet() {
             "Testnet"
         } else {
@@ -553,33 +537,7 @@ impl HyperliquidClient {
             "abstraction",
             &["disabled", "unifiedAccount", "portfolioMargin"],
         )?;
-        let nonce = params.required_u64("nonce")?;
-        let chain_id = params.required("signatureChainId")?;
-        if !chain_id.starts_with("0x")
-            || chain_id.len() <= 2
-            || !chain_id[2..].bytes().all(|b| b.is_ascii_hexdigit())
-        {
-            return Err(DcexError::InvalidInput(
-                "signatureChainId must be a hexadecimal chain ID".into(),
-            ));
-        }
-        let signature: Value = serde_json::from_str(params.required("signature")?)
-            .map_err(|e| DcexError::InvalidInput(e.to_string()))?;
-        if !signature.as_object().is_some_and(|s| {
-            s.len() == 3
-                && ["r", "s"].iter().all(|k| {
-                    s.get(*k).and_then(Value::as_str).is_some_and(|v| {
-                        v.len() == 66
-                            && v.starts_with("0x")
-                            && v[2..].bytes().all(|b| b.is_ascii_hexdigit())
-                    })
-                })
-                && matches!(s.get("v").and_then(Value::as_u64), Some(27 | 28))
-        }) {
-            return Err(DcexError::InvalidInput(
-                "signature requires 32-byte r/s and v 27 or 28".into(),
-            ));
-        }
+        let (nonce, chain_id, signature) = user_signed_fields(params)?;
         let payload = serde_json::json!({"action":{"type":"userSetAbstraction","hyperliquidChain":if self.is_testnet(){"Testnet"}else{"Mainnet"},"signatureChainId":chain_id,"user":user,"abstraction":abstraction,"nonce":nonce},"nonce":nonce,"signature":signature});
         let body = serde_json::to_vec(&payload).map_err(|e| DcexError::Decode(e.to_string()))?;
         self.request(HttpMethod::Post, EXCHANGE, body, None, false)
@@ -804,7 +762,7 @@ impl HyperliquidClient {
         Ok(object(fields))
     }
 
-    async fn submit_action(
+    pub(super) async fn submit_action(
         &self,
         action: OrderedValue,
         params: &HyperliquidParams,
@@ -1043,6 +1001,43 @@ fn positive_u64(params: &HyperliquidParams, key: &str) -> Result<u64> {
     Ok(value)
 }
 
+pub(super) fn signature_param(params: &HyperliquidParams) -> Result<Value> {
+    let signature: Value = serde_json::from_str(params.required("signature")?)
+        .map_err(|e| DcexError::InvalidInput(e.to_string()))?;
+    if !signature.as_object().is_some_and(|s| {
+        s.len() == 3
+            && ["r", "s"].iter().all(|k| {
+                s.get(*k).and_then(Value::as_str).is_some_and(|v| {
+                    v.len() == 66
+                        && v.starts_with("0x")
+                        && v[2..].bytes().all(|b| b.is_ascii_hexdigit())
+                })
+            })
+            && matches!(s.get("v").and_then(Value::as_u64), Some(27 | 28))
+    }) {
+        return Err(DcexError::InvalidInput(
+            "signature requires 32-byte r/s and v 27 or 28".into(),
+        ));
+    }
+
+    Ok(signature)
+}
+
+pub(super) fn user_signed_fields(params: &HyperliquidParams) -> Result<(u64, &str, Value)> {
+    let nonce = params.required_u64("nonce")?;
+    let chain_id = params.required("signatureChainId")?;
+    if !chain_id.starts_with("0x")
+        || chain_id.len() <= 2
+        || !chain_id[2..].bytes().all(|b| b.is_ascii_hexdigit())
+    {
+        return Err(DcexError::InvalidInput(
+            "signatureChainId must be a hexadecimal chain ID".into(),
+        ));
+    }
+    let signature = signature_param(params)?;
+    Ok((nonce, chain_id, signature))
+}
+
 fn validate_private_params(method_name: &str, params: &HyperliquidParams) -> Result<()> {
     const ORDER_FIELDS: &[&str] = &[
         "product_symbol",
@@ -1078,6 +1073,13 @@ fn validate_private_params(method_name: &str, params: &HyperliquidParams) -> Res
     ];
 
     let allowed: &[&str] = match method_name {
+        "borrow_lend_signed" => &[
+            "action",
+            "nonce",
+            "signature",
+            "vaultAddress",
+            "expiresAfter",
+        ],
         "approve_agent_signed" => &[
             "agentAddress",
             "agentName",
@@ -1174,7 +1176,7 @@ fn validate_private_params(method_name: &str, params: &HyperliquidParams) -> Res
         "schedule_cancel" => &["time", "vaultAddress", "expiresAfter"],
         "noop" => &["nonce", "vaultAddress", "expiresAfter"],
         "reserve_request_weight" => &["weight", "expiresAfter"],
-        "set_agent_abstraction" => &["abstraction"],
+        "set_agent_abstraction" => &["abstraction", "vaultAddress", "expiresAfter"],
         "set_user_abstraction" => &[
             "user",
             "abstraction",
@@ -1306,7 +1308,7 @@ fn normalize_modify(value: &OrderedValue) -> Result<OrderedValue> {
     ]))
 }
 
-fn normalize_wire_order(value: &OrderedValue) -> Result<OrderedValue> {
+pub(super) fn normalize_wire_order(value: &OrderedValue) -> Result<OrderedValue> {
     let fields = exact_object(
         value,
         "modify order",

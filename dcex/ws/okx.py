@@ -27,6 +27,14 @@ class PublicClient(AsyncWebSocketMixin):
         """Close the WebSocket connection."""
         await self._native_client.close()
 
+    async def subscribe_args(self, args: list[dict[str, str]]) -> None:
+        """Subscribe using complete native channel arguments, including algoId and extraParams."""
+        await self._native_client.subscription_args("subscribe", json.dumps(args))
+
+    async def unsubscribe_args(self, args: list[dict[str, str]]) -> None:
+        """Unsubscribe using the exact native arguments used for subscription."""
+        await self._native_client.subscription_args("unsubscribe", json.dumps(args))
+
     async def subscribe_channel(
         self,
         channel: str,
@@ -136,6 +144,34 @@ class PrivateClient(AsyncWebSocketMixin):
     async def close(self) -> None:
         """Close the WebSocket connection."""
         await self._native_client.close()
+
+    async def send_operation(
+        self,
+        request_id: str,
+        operation: str,
+        args: list[dict[str, Any]],
+        *,
+        exp_time: int | None = None,
+        all_symbols: bool = False,
+    ) -> None:
+        """
+        Send an OKX order, amend, cancel or spread trading operation.
+
+        Arguments use native OKX names and symbols; prices and quantities are decimal strings.
+        Call recv() and inspect the acknowledgement, including each per-order sCode.
+        Mass cancellations require an instrument family/spread or all_symbols=True.
+        """
+        await self._native_client.send_operation(
+            request_id, operation, json.dumps(args), exp_time, all_symbols
+        )
+
+    async def subscribe_args(self, args: list[dict[str, str]]) -> None:
+        """Subscribe using complete native channel arguments, including algoId and extraParams."""
+        await self._native_client.subscription_args("subscribe", json.dumps(args))
+
+    async def unsubscribe_args(self, args: list[dict[str, str]]) -> None:
+        """Unsubscribe using the exact native arguments used for subscription."""
+        await self._native_client.subscription_args("unsubscribe", json.dumps(args))
 
     async def subscribe_channel(
         self,

@@ -12,6 +12,8 @@ https://www.mexc.com/api-docs/futures/.
 from __future__ import annotations
 
 import ast
+import hashlib
+import hmac
 import json
 import queue
 import threading
@@ -197,7 +199,7 @@ CASES: dict[str, tuple[dict[str, Any], str, str, bool]] = {
         "/api/v1/private/account/asset_book/order_deal_fee/total",
         True,
     ),
-    "cancel_spot_all_orders": ({}, "DELETE", "/api/v3/order/all", True),
+    "cancel_spot_all_orders": ({"all_symbols": True}, "DELETE", "/api/v3/order/all", True),
     "get_contract_open_stop_orders": (
         {"product_symbol": "BTC-USDT-SWAP"},
         "GET",
@@ -757,6 +759,18 @@ CASES: dict[str, tuple[dict[str, Any], str, str, bool]] = {
 }
 
 
+COMPLETION_CASES = json.loads(
+    (ROOT / "tests/fixtures/mexc_completion.json").read_text(encoding="utf-8")
+)
+CASES.update(
+    {
+        case["name"]: (case["kwargs"], case["method"], case["path"], True)
+        for case in COMPLETION_CASES
+    }
+)
+COMPLETION_BY_NAME = {case["name"]: case for case in COMPLETION_CASES}
+
+
 def _wrapper_names(mode: str) -> set[str]:
     base = ROOT / "dcex"
     if mode == "async":
@@ -803,6 +817,7 @@ def _route_server() -> Iterator[tuple[str, queue.Queue[dict[str, Any]]]]:
                         "spot_key": self.headers.get("X-MEXC-APIKEY"),
                         "contract_key": self.headers.get("ApiKey"),
                         "contract_signature": self.headers.get("Signature"),
+                        "contract_timestamp": self.headers.get("Request-Time"),
                     }
                 )
             data = json.dumps(payload).encode()
@@ -861,6 +876,33 @@ def _assert_route(requests: list[dict[str, Any]], method_name: str) -> None:
     request = endpoint[0]
     assert request["method"] == http_method, method_name
     assert urlsplit(request["path"]).path == path, method_name
+    if method_name in COMPLETION_BY_NAME:
+        case = COMPLETION_BY_NAME[method_name]
+        encoded = urlsplit(request["path"]).query
+        if path.startswith("/api/v3/"):
+            fields = dict(parse_qsl(encoded))
+            signature = fields.pop("signature")
+            assert int(fields.pop("timestamp")) > 0
+            assert fields == {key: str(value) for key, value in case["wire"].items()}
+            unsigned = "&".join(
+                part for part in encoded.split("&") if not part.startswith("signature=")
+            )
+            assert (
+                signature == hmac.new(b"api-secret", unsigned.encode(), hashlib.sha256).hexdigest()
+            )
+            assert request["body"] == ""
+        else:
+            if http_method == "POST":
+                assert json.loads(request["body"]) == case["wire"]
+                assert encoded == ""
+            else:
+                assert dict(parse_qsl(encoded)) == case["wire"]
+                assert request["body"] == ""
+            payload = "api-key" + request["contract_timestamp"] + (request["body"] or encoded)
+            assert (
+                request["contract_signature"]
+                == hmac.new(b"api-secret", payload.encode(), hashlib.sha256).hexdigest()
+            )
     if not signed or method_name == "get_spot_time":
         return
     if path.startswith("/api/v3/"):

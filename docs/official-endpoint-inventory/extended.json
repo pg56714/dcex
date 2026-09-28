@@ -1,0 +1,505 @@
+{
+  "reviewed": "2026-09-28",
+  "source": "https://api.docs.extended.exchange/",
+  "source_sha256": "0b52be116a1f74769ad49d296db9065d6de7b0896f1ffeb4ff0072e2b9e5ed8c",
+  "endpoints": [
+    {
+      "method": "WS",
+      "title": "Order book stream",
+      "official_source": "https://api.docs.extended.exchange/#order-book-stream",
+      "path": "/v1/orderbooks/rfq/{market}"
+    },
+    {
+      "method": "POST",
+      "title": "Create or edit order",
+      "official_source": "https://api.docs.extended.exchange/#create-or-edit-order",
+      "path": "/api/v1/user/order/rfq"
+    },
+    {
+      "method": "POST",
+      "title": "Create or edit order",
+      "official_source": "https://api.docs.extended.exchange/#create-or-edit-order",
+      "path": "/api/v1/user/order"
+    },
+    {
+      "method": "WS",
+      "title": "Order book stream",
+      "official_source": "https://api.docs.extended.exchange/#order-book-stream",
+      "path": "/v1/orderbooks/{market}"
+    },
+    {
+      "method": "GET",
+      "title": "Get markets",
+      "official_source": "https://api.docs.extended.exchange/#get-markets",
+      "path": "/api/v1/info/markets"
+    },
+    {
+      "method": "GET",
+      "title": "Get assets",
+      "official_source": "https://api.docs.extended.exchange/#get-assets",
+      "path": "/api/v1/info/assets"
+    },
+    {
+      "method": "GET",
+      "title": "Get asset index price",
+      "official_source": "https://api.docs.extended.exchange/#get-asset-index-price",
+      "path": "/api/v1/info/assets/{asset}/price"
+    },
+    {
+      "method": "GET",
+      "title": "Get market statistics",
+      "official_source": "https://api.docs.extended.exchange/#get-market-statistics",
+      "path": "/api/v1/info/markets/{market}/stats"
+    },
+    {
+      "method": "GET",
+      "title": "Get market order book",
+      "official_source": "https://api.docs.extended.exchange/#get-market-order-book",
+      "path": "/api/v1/info/markets/{market}/orderbook"
+    },
+    {
+      "method": "GET",
+      "title": "Get market last trades",
+      "official_source": "https://api.docs.extended.exchange/#get-market-last-trades",
+      "path": "/api/v1/info/markets/{market}/trades"
+    },
+    {
+      "method": "GET",
+      "title": "Get candles history",
+      "official_source": "https://api.docs.extended.exchange/#get-candles-history",
+      "path": "/api/v1/info/candles/{market}/{candleType}"
+    },
+    {
+      "method": "GET",
+      "title": "Get candles history",
+      "official_source": "https://api.docs.extended.exchange/#get-candles-history",
+      "path": "/api/v1/info/candles/{market}/trades"
+    },
+    {
+      "method": "GET",
+      "title": "Get candles history",
+      "official_source": "https://api.docs.extended.exchange/#get-candles-history",
+      "path": "/api/v1/info/candles/{market}/mark-prices"
+    },
+    {
+      "method": "GET",
+      "title": "Get candles history",
+      "official_source": "https://api.docs.extended.exchange/#get-candles-history",
+      "path": "/api/v1/info/candles/{market}/index-prices"
+    },
+    {
+      "method": "GET",
+      "title": "Get funding rates history",
+      "official_source": "https://api.docs.extended.exchange/#get-funding-rates-history",
+      "path": "/api/v1/info/{market}/funding"
+    },
+    {
+      "method": "GET",
+      "title": "Get open interest history",
+      "official_source": "https://api.docs.extended.exchange/#get-open-interest-history",
+      "path": "/api/v1/info/{market}/open-interests"
+    },
+    {
+      "method": "GET",
+      "title": "Get builder dashboard",
+      "official_source": "https://api.docs.extended.exchange/#get-builder-dashboard",
+      "path": "/api/v1/info/builder/dashboard"
+    },
+    {
+      "method": "GET",
+      "title": "Get builder trades",
+      "official_source": "https://api.docs.extended.exchange/#get-builder-trades",
+      "path": "/api/v1/builder/trades"
+    },
+    {
+      "method": "GET",
+      "title": "Get account details",
+      "official_source": "https://api.docs.extended.exchange/#get-account-details",
+      "path": "/api/v1/user/account/info"
+    },
+    {
+      "method": "GET",
+      "title": "Get sub-accounts",
+      "official_source": "https://api.docs.extended.exchange/#get-sub-accounts",
+      "path": "/api/v1/user/accounts"
+    },
+    {
+      "method": "GET",
+      "title": "Get balance",
+      "official_source": "https://api.docs.extended.exchange/#get-balance",
+      "path": "/api/v1/user/balance"
+    },
+    {
+      "method": "GET",
+      "title": "Get spot balances",
+      "official_source": "https://api.docs.extended.exchange/#get-spot-balances",
+      "path": "/api/v1/user/spot/balances"
+    },
+    {
+      "method": "GET",
+      "title": "Get deposits, withdrawals, transfers history",
+      "official_source": "https://api.docs.extended.exchange/#get-deposits-withdrawals-transfers-history",
+      "path": "/api/v1/user/assetOperations"
+    },
+    {
+      "method": "GET",
+      "title": "Get positions",
+      "official_source": "https://api.docs.extended.exchange/#get-positions",
+      "path": "/api/v1/user/positions"
+    },
+    {
+      "method": "GET",
+      "title": "Get positions history",
+      "official_source": "https://api.docs.extended.exchange/#get-positions-history",
+      "path": "/api/v1/user/positions/history"
+    },
+    {
+      "method": "GET",
+      "title": "Get open orders",
+      "official_source": "https://api.docs.extended.exchange/#get-open-orders",
+      "path": "/api/v1/user/orders"
+    },
+    {
+      "method": "GET",
+      "title": "Get orders history",
+      "official_source": "https://api.docs.extended.exchange/#get-orders-history",
+      "path": "/api/v1/user/orders/history"
+    },
+    {
+      "method": "GET",
+      "title": "Get order by id",
+      "official_source": "https://api.docs.extended.exchange/#get-order-by-id",
+      "path": "/api/v1/user/orders/{id}"
+    },
+    {
+      "method": "GET",
+      "title": "Get orders by external id",
+      "official_source": "https://api.docs.extended.exchange/#get-orders-by-external-id",
+      "path": "/api/v1/user/orders/external/{externalId}"
+    },
+    {
+      "method": "GET",
+      "title": "Get trades",
+      "official_source": "https://api.docs.extended.exchange/#get-trades",
+      "path": "/api/v1/user/trades"
+    },
+    {
+      "method": "GET",
+      "title": "Get funding payments",
+      "official_source": "https://api.docs.extended.exchange/#get-funding-payments",
+      "path": "/api/v1/user/funding/history"
+    },
+    {
+      "method": "GET",
+      "title": "Get rebates",
+      "official_source": "https://api.docs.extended.exchange/#get-rebates",
+      "path": "/api/v1/user/rebates/stats"
+    },
+    {
+      "method": "GET",
+      "title": "Get current leverage",
+      "official_source": "https://api.docs.extended.exchange/#get-current-leverage",
+      "path": "/api/v1/user/leverage"
+    },
+    {
+      "method": "PATCH",
+      "title": "Update leverage",
+      "official_source": "https://api.docs.extended.exchange/#update-leverage",
+      "path": "/api/v1/user/leverage"
+    },
+    {
+      "method": "GET",
+      "title": "Get fees",
+      "official_source": "https://api.docs.extended.exchange/#get-fees",
+      "path": "/api/v1/user/fees"
+    },
+    {
+      "method": "DELETE",
+      "title": "Cancel order by ID",
+      "official_source": "https://api.docs.extended.exchange/#cancel-order-by-id",
+      "path": "/api/v1/user/order/{id}"
+    },
+    {
+      "method": "DELETE",
+      "title": "Cancel order by external id",
+      "official_source": "https://api.docs.extended.exchange/#cancel-order-by-external-id",
+      "path": "/api/v1/user/order"
+    },
+    {
+      "method": "POST",
+      "title": "Mass Cancel",
+      "official_source": "https://api.docs.extended.exchange/#mass-cancel",
+      "path": "/api/v1/user/order/massCancel"
+    },
+    {
+      "method": "POST",
+      "title": "Mass auto-cancel (dead man's switch)",
+      "official_source": "https://api.docs.extended.exchange/#mass-auto-cancel-dead-man-39-s-switch",
+      "path": "/api/v1/user/deadmanswitch"
+    },
+    {
+      "method": "GET",
+      "title": "Bridge Config",
+      "official_source": "https://api.docs.extended.exchange/#bridge-config",
+      "path": "/api/v1/user/bridge/config"
+    },
+    {
+      "method": "GET",
+      "title": "Get bridge quote",
+      "official_source": "https://api.docs.extended.exchange/#get-bridge-quote",
+      "path": "/api/v1/user/bridge/quote"
+    },
+    {
+      "method": "POST",
+      "title": "Commit quote",
+      "official_source": "https://api.docs.extended.exchange/#commit-quote",
+      "path": "/api/v1/user/bridge/quote"
+    },
+    {
+      "method": "POST",
+      "title": "Withdrawals",
+      "official_source": "https://api.docs.extended.exchange/#withdrawals",
+      "path": "/api/v1/user/withdrawal"
+    },
+    {
+      "method": "POST",
+      "title": "Create transfer",
+      "official_source": "https://api.docs.extended.exchange/#create-transfer",
+      "path": "/api/v1/user/transfer"
+    },
+    {
+      "method": "GET",
+      "title": "Get affiliate data",
+      "official_source": "https://api.docs.extended.exchange/#get-affiliate-data",
+      "path": "/api/v1/user/affiliate"
+    },
+    {
+      "method": "GET",
+      "title": "Get referral status",
+      "official_source": "https://api.docs.extended.exchange/#get-referral-status",
+      "path": "/api/v1/user/referrals/status"
+    },
+    {
+      "method": "GET",
+      "title": "Get referral links",
+      "official_source": "https://api.docs.extended.exchange/#get-referral-links",
+      "path": "/api/v1/user/referrals/links"
+    },
+    {
+      "method": "GET",
+      "title": "Get referral dashboard",
+      "official_source": "https://api.docs.extended.exchange/#get-referral-dashboard",
+      "path": "/api/v1/user/referrals/dashboard"
+    },
+    {
+      "method": "POST",
+      "title": "Use referral link",
+      "official_source": "https://api.docs.extended.exchange/#use-referral-link",
+      "path": "/api/v1/user/referrals/use"
+    },
+    {
+      "method": "POST",
+      "title": "Create referral link code",
+      "official_source": "https://api.docs.extended.exchange/#create-referral-link-code",
+      "path": "/api/v1/user/referrals"
+    },
+    {
+      "method": "PUT",
+      "title": "Update referral link code",
+      "official_source": "https://api.docs.extended.exchange/#update-referral-link-code",
+      "path": "/api/v1/user/referrals"
+    },
+    {
+      "method": "GET",
+      "title": "Get Earned Points",
+      "official_source": "https://api.docs.extended.exchange/#get-earned-points",
+      "path": "/api/v1/user/rewards/earned"
+    },
+    {
+      "method": "GET",
+      "title": "Get points leaderboard stats",
+      "official_source": "https://api.docs.extended.exchange/#get-points-leaderboard-stats",
+      "path": "/api/v1/user/rewards/leaderboard/stats"
+    },
+    {
+      "method": "GET",
+      "title": "Get account equity history",
+      "official_source": "https://api.docs.extended.exchange/#get-account-equity-history",
+      "path": "/api/v1/portfolio/charts/equities"
+    },
+    {
+      "method": "GET",
+      "title": "Get account PnL history",
+      "official_source": "https://api.docs.extended.exchange/#get-account-pnl-history",
+      "path": "/api/v1/portfolio/charts/pnl"
+    },
+    {
+      "method": "GET",
+      "title": "Get account PnL percentage history",
+      "official_source": "https://api.docs.extended.exchange/#get-account-pnl-percentage-history",
+      "path": "/api/v1/portfolio/charts/pnl/percentage"
+    },
+    {
+      "method": "GET",
+      "title": "Get cumulative account PnL history",
+      "official_source": "https://api.docs.extended.exchange/#get-cumulative-account-pnl-history",
+      "path": "/api/v1/portfolio/charts/pnl/cumulative"
+    },
+    {
+      "method": "GET",
+      "title": "Get cumulative account PnL percentage history",
+      "official_source": "https://api.docs.extended.exchange/#get-cumulative-account-pnl-percentage-history",
+      "path": "/api/v1/portfolio/charts/pnl/cumulative/percentage"
+    },
+    {
+      "method": "GET",
+      "title": "Get account vault equity history",
+      "official_source": "https://api.docs.extended.exchange/#get-account-vault-equity-history",
+      "path": "/api/v1/portfolio/charts/vault-equities"
+    },
+    {
+      "method": "GET",
+      "title": "Get account max drawdown history",
+      "official_source": "https://api.docs.extended.exchange/#get-account-max-drawdown-history",
+      "path": "/api/v1/portfolio/charts/max-drawdown"
+    },
+    {
+      "method": "GET",
+      "title": "Get account funding chart",
+      "official_source": "https://api.docs.extended.exchange/#get-account-funding-chart",
+      "path": "/api/v1/portfolio/charts/funding"
+    },
+    {
+      "method": "GET",
+      "title": "Get account portfolio summary",
+      "official_source": "https://api.docs.extended.exchange/#get-account-portfolio-summary",
+      "path": "/api/v1/portfolio/accounts/summary"
+    },
+    {
+      "method": "GET",
+      "title": "Get account health",
+      "official_source": "https://api.docs.extended.exchange/#get-account-health",
+      "path": "/api/v1/portfolio/accounts/health"
+    },
+    {
+      "method": "GET",
+      "title": "Get account performance",
+      "official_source": "https://api.docs.extended.exchange/#get-account-performance",
+      "path": "/api/v1/portfolio/accounts/performance"
+    },
+    {
+      "method": "GET",
+      "title": "Get account funding stats",
+      "official_source": "https://api.docs.extended.exchange/#get-account-funding-stats",
+      "path": "/api/v1/portfolio/funding/stats"
+    },
+    {
+      "method": "GET",
+      "title": "Get account funding history",
+      "official_source": "https://api.docs.extended.exchange/#get-account-funding-history",
+      "path": "/api/v1/portfolio/funding/history"
+    },
+    {
+      "method": "GET",
+      "title": "Get Vault performance",
+      "official_source": "https://api.docs.extended.exchange/#get-vault-performance",
+      "path": "/api/v1/vault/public/performance"
+    },
+    {
+      "method": "GET",
+      "title": "Get Vault summary",
+      "official_source": "https://api.docs.extended.exchange/#get-vault-summary",
+      "path": "/api/v1/vault/public/summary"
+    },
+    {
+      "method": "GET",
+      "title": "Get interest rate curves history",
+      "official_source": "https://api.docs.extended.exchange/#get-interest-rate-curves-history",
+      "path": "/api/v1/interest/info/rate-curves"
+    },
+    {
+      "method": "GET",
+      "title": "Get latest interest rate curve",
+      "official_source": "https://api.docs.extended.exchange/#get-latest-interest-rate-curve",
+      "path": "/api/v1/interest/info/latest-rate-curves"
+    },
+    {
+      "method": "GET",
+      "title": "Get interest key metrics",
+      "official_source": "https://api.docs.extended.exchange/#get-interest-key-metrics",
+      "path": "/api/v1/interest/key-metrics"
+    },
+    {
+      "method": "GET",
+      "title": "Get interest daily metrics",
+      "official_source": "https://api.docs.extended.exchange/#get-interest-daily-metrics",
+      "path": "/api/v1/interest/daily-metrics"
+    },
+    {
+      "method": "GET",
+      "title": "Get interest payment chart",
+      "official_source": "https://api.docs.extended.exchange/#get-interest-payment-chart",
+      "path": "/api/v1/interest/payment-chart"
+    },
+    {
+      "method": "GET",
+      "title": "Get interest payments history",
+      "official_source": "https://api.docs.extended.exchange/#get-interest-payments-history",
+      "path": "/api/v1/interest/payments"
+    },
+    {
+      "method": "WS",
+      "title": "Trades stream",
+      "official_source": "https://api.docs.extended.exchange/#trades-stream",
+      "path": "/v1/publicTrades/{market}"
+    },
+    {
+      "method": "WS",
+      "title": "Funding rates stream",
+      "official_source": "https://api.docs.extended.exchange/#funding-rates-stream",
+      "path": "/v1/funding/{market}"
+    },
+    {
+      "method": "WS",
+      "title": "Candles stream",
+      "official_source": "https://api.docs.extended.exchange/#candles-stream",
+      "path": "/v1/candles/{market}/{candleType}"
+    },
+    {
+      "method": "WS",
+      "title": "Candles stream",
+      "official_source": "https://api.docs.extended.exchange/#candles-stream",
+      "path": "/v1/candles/{market}/trades"
+    },
+    {
+      "method": "WS",
+      "title": "Candles stream",
+      "official_source": "https://api.docs.extended.exchange/#candles-stream",
+      "path": "/v1/candles/{market}/mark-prices"
+    },
+    {
+      "method": "WS",
+      "title": "Candles stream",
+      "official_source": "https://api.docs.extended.exchange/#candles-stream",
+      "path": "/v1/candles/{market}/index-prices"
+    },
+    {
+      "method": "WS",
+      "title": "Mark price stream",
+      "official_source": "https://api.docs.extended.exchange/#mark-price-stream",
+      "path": "/v1/prices/mark/{market}"
+    },
+    {
+      "method": "WS",
+      "title": "Index price stream",
+      "official_source": "https://api.docs.extended.exchange/#index-price-stream",
+      "path": "/v1/prices/index/{market}"
+    },
+    {
+      "method": "WS",
+      "title": "Account updates stream",
+      "official_source": "https://api.docs.extended.exchange/#account-updates-stream",
+      "path": "/v1/account"
+    }
+  ]
+}

@@ -147,24 +147,23 @@ impl ArcusSpotClient {
                         }
                         entries.push(entry);
                     }
-                    if include_wrapped {
-                        if let Some(wrapped) = token["wrappedTokenAddress"]
+                    if include_wrapped
+                        && let Some(wrapped) = token["wrappedTokenAddress"]
                             .as_str()
                             .filter(|wrapped| !wrapped.is_empty())
-                        {
-                            validate_address(wrapped)?;
-                            if seen.insert(wrapped.to_ascii_lowercase()) {
-                                let mut entry = json!({
-                                    "token": wrapped, "kind": "wrapped", "underlyingToken": token_address,
-                                });
-                                if let Some(symbol) = token["symbol"].as_str() {
-                                    entry["underlyingSymbol"] = json!(symbol);
-                                }
-                                if let Some(decimals) = token["decimals"].as_u64() {
-                                    entry["decimals"] = json!(decimals);
-                                }
-                                entries.push(entry);
+                    {
+                        validate_address(wrapped)?;
+                        if seen.insert(wrapped.to_ascii_lowercase()) {
+                            let mut entry = json!({
+                                "token": wrapped, "kind": "wrapped", "underlyingToken": token_address,
+                            });
+                            if let Some(symbol) = token["symbol"].as_str() {
+                                entry["underlyingSymbol"] = json!(symbol);
                             }
+                            if let Some(decimals) = token["decimals"].as_u64() {
+                                entry["decimals"] = json!(decimals);
+                            }
+                            entries.push(entry);
                         }
                     }
                 }

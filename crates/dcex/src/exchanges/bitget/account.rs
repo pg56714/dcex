@@ -124,15 +124,14 @@ impl BitgetClient {
                 self.get_private(REALITY_ORDERBOOK, query).await
             }
             "get_reality_fills" => {
-                if let Some(limit) = params.get("limit") {
-                    if !limit
+                if let Some(limit) = params.get("limit")
+                    && !limit
                         .parse::<u16>()
                         .is_ok_and(|value| (1..=100).contains(&value))
-                    {
-                        return Err(crate::DcexError::InvalidInput(
-                            "Bitget Reality fills limit must be between 1 and 100.".to_string(),
-                        ));
-                    }
+                {
+                    return Err(crate::DcexError::InvalidInput(
+                        "Bitget Reality fills limit must be between 1 and 100.".to_string(),
+                    ));
                 }
                 let mut query = params.only(&["limit"]);
                 self.push_required_product_symbol(&mut query, params)?;

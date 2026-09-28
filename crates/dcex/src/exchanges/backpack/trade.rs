@@ -47,7 +47,14 @@ impl BackpackClient {
         method_name: &str,
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
+        let params = super::super::operation_guards::validate("backpack", method_name, params)?;
         let params = BackpackParams::from_pairs(params);
+        if let Some(response) = self
+            .completion_private_request(method_name, &params)
+            .await?
+        {
+            return Ok(response);
+        }
         if let Some(response) = self.additional_request(method_name, &params, false).await? {
             return Ok(response);
         }
@@ -491,10 +498,8 @@ fn order_headers(params: &BackpackParams, include_key: bool) -> BTreeMap<String,
     if let Some(broker_id) = params.get("brokerId") {
         headers.insert("X-Broker-ID".to_string(), broker_id.to_string());
     }
-    if include_key {
-        if let Some(broker_key) = params.get("brokerKey") {
-            headers.insert("X-Broker-Key".to_string(), broker_key.to_string());
-        }
+    if include_key && let Some(broker_key) = params.get("brokerKey") {
+        headers.insert("X-Broker-Key".to_string(), broker_key.to_string());
     }
     headers
 }

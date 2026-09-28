@@ -103,9 +103,7 @@ def test_mexc_current_kline_and_pagination_defaults() -> None:
     for client in (sync_client, async_client):
         assert inspect.signature(client.get_spot_klines).parameters["interval"].default == "1m"
         assert (
-            inspect.signature(client.get_contract_fair_price_kline)
-            .parameters["interval"]
-            .default
+            inspect.signature(client.get_contract_fair_price_kline).parameters["interval"].default
             == "Min1"
         )
         history = inspect.signature(client.get_contract_history_orders).parameters
@@ -144,8 +142,6 @@ async def test_async_mexc_serializes_plan_order_cancellation_array() -> None:
     client = _client_class("async", "mexc")(**_client_kwargs("mexc"))
     calls = _wire_async(client)
 
-    await client.cancel_contract_plan_orders(
-        [{"symbol": "BTC_USDT", "orderId": "123"}]
-    )
+    await client.cancel_contract_plan_orders([{"symbol": "BTC_USDT", "orderId": "123"}])
 
     assert dict(calls[0]["query"])["orders"] == '[{"symbol":"BTC_USDT","orderId":"123"}]'

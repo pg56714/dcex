@@ -1,0 +1,1387 @@
+[
+  {
+    "name": "reset_mmp",
+    "method": "POST",
+    "path": "/api/v5/account/mmp-reset",
+    "public": false,
+    "fields": [
+      {
+        "name": "instType",
+        "python_name": "inst_type",
+        "type": "string",
+        "required": false,
+        "description": "Instrument type OPTION The default is `OPTION"
+      },
+      {
+        "name": "instFamily",
+        "python_name": "inst_family",
+        "type": "string",
+        "required": true,
+        "description": "Instrument family"
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "instType": {
+          "type": "string"
+        },
+        "instFamily": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "instFamily"
+      ]
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-reset-mmp-status",
+    "row": 1066
+  },
+  {
+    "name": "set_mmp_config",
+    "method": "POST",
+    "path": "/api/v5/account/mmp-config",
+    "public": false,
+    "fields": [
+      {
+        "name": "instFamily",
+        "python_name": "inst_family",
+        "type": "string",
+        "required": true,
+        "description": "Instrument family"
+      },
+      {
+        "name": "timeInterval",
+        "python_name": "time_interval",
+        "type": "string",
+        "required": true,
+        "description": "Time window (ms). MMP interval where monitoring is done \"0\" means disable MMP"
+      },
+      {
+        "name": "frozenInterval",
+        "python_name": "frozen_interval",
+        "type": "string",
+        "required": true,
+        "description": "Frozen period (ms). \"0\" means the trade will remain frozen until you request \"Reset MMP Status\" to unfrozen"
+      },
+      {
+        "name": "qtyLimit",
+        "python_name": "qty_limit",
+        "type": "string",
+        "required": true,
+        "description": "Trade qty limit in number of contracts Must be > 0"
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "instFamily": {
+          "type": "string"
+        },
+        "timeInterval": {
+          "type": "string"
+        },
+        "frozenInterval": {
+          "type": "string"
+        },
+        "qtyLimit": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "instFamily",
+        "timeInterval",
+        "frozenInterval",
+        "qtyLimit"
+      ]
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-set-mmp",
+    "row": 1067
+  },
+  {
+    "name": "get_mmp_config",
+    "method": "GET",
+    "path": "/api/v5/account/mmp-config",
+    "public": false,
+    "fields": [
+      {
+        "name": "instFamily",
+        "python_name": "inst_family",
+        "type": "string",
+        "required": false,
+        "description": "Instrument Family"
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "instFamily": {
+          "type": "string"
+        }
+      },
+      "required": []
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-mmp-config",
+    "row": 1068
+  },
+  {
+    "name": "get_glp_today_performance",
+    "method": "GET",
+    "path": "/api/v5/users/glp/todayperformance",
+    "public": false,
+    "fields": [],
+    "schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-get-glp-today-performance",
+    "row": 1076
+  },
+  {
+    "name": "get_glp_historical_performance",
+    "method": "GET",
+    "path": "/api/v5/users/glp/historicalperformance",
+    "public": false,
+    "fields": [
+      {
+        "name": "program",
+        "python_name": "program",
+        "type": "string",
+        "required": true,
+        "description": "GLP business line identifier. SPOT PERP FUT_NTO"
+      },
+      {
+        "name": "begin",
+        "python_name": "begin",
+        "type": "string",
+        "required": false,
+        "description": "Begin date filter (inclusive). Unix ms String, e.g. \"1751299200000\" . Default: first day of current month (UTC+8)"
+      },
+      {
+        "name": "end",
+        "python_name": "end",
+        "type": "string",
+        "required": false,
+        "description": "End date filter (inclusive). Unix ms String. Default: today (UTC+8)"
+      },
+      {
+        "name": "limit",
+        "python_name": "limit",
+        "type": "string",
+        "required": false,
+        "description": "Max records per page. Default \"31\" , max \"100\""
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "program": {
+          "type": "string"
+        },
+        "begin": {
+          "type": "string"
+        },
+        "end": {
+          "type": "string"
+        },
+        "limit": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "program"
+      ]
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-get-glp-historical-performance",
+    "row": 1077
+  },
+  {
+    "name": "mass_cancel_options_orders",
+    "method": "POST",
+    "path": "/api/v5/trade/mass-cancel",
+    "public": false,
+    "fields": [
+      {
+        "name": "instType",
+        "python_name": "inst_type",
+        "type": "string",
+        "required": true,
+        "description": "Instrument type OPTION"
+      },
+      {
+        "name": "instFamily",
+        "python_name": "inst_family",
+        "type": "string",
+        "required": true,
+        "description": "Instrument family"
+      },
+      {
+        "name": "lockInterval",
+        "python_name": "lock_interval",
+        "type": "string",
+        "required": false,
+        "description": "Lock interval(ms) The range should be [0, 10 000] The default is 0. You can set it as \"0\" if you want to unlock it immediately. Error 54008 will be returned when placing order during lock interval, it is different from 51034 which is thrown when MMP is triggered"
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "instType": {
+          "type": "string"
+        },
+        "instFamily": {
+          "type": "string"
+        },
+        "lockInterval": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "instType",
+        "instFamily"
+      ]
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-trade-post-mass-cancel-order",
+    "row": 1101
+  },
+  {
+    "name": "create_rfq_quote",
+    "method": "POST",
+    "path": "/api/v5/rfq/create-quote",
+    "public": false,
+    "fields": [
+      {
+        "name": "rfqId",
+        "python_name": "rfq_id",
+        "type": "string",
+        "required": true,
+        "description": "RFQ ID ."
+      },
+      {
+        "name": "clQuoteId",
+        "python_name": "cl_quote_id",
+        "type": "string",
+        "required": false,
+        "description": "Client-supplied Quote ID. A combination of case-sensitive alphanumerics, all numbers, or all letters of up to 32 characters."
+      },
+      {
+        "name": "tag",
+        "python_name": "tag",
+        "type": "string",
+        "required": false,
+        "description": "Quote tag. The block trade associated with the Quote will have the same tag. A combination of case-sensitive alphanumerics, all numbers, or all letters of up to 16 characters."
+      },
+      {
+        "name": "anonymous",
+        "python_name": "anonymous",
+        "type": "boolean",
+        "required": false,
+        "description": "Submit Quote on a disclosed or anonymous basis. Valid value is true or false . false by default."
+      },
+      {
+        "name": "quoteSide",
+        "python_name": "quote_side",
+        "type": "string",
+        "required": true,
+        "description": "The trading direction of the Quote. Its value can be buy or sell . For example, if quoteSide is buy , all the legs are executed in their leg sides; otherwise, all the legs are executed in the opposite of their leg sides."
+      },
+      {
+        "name": "expiresIn",
+        "python_name": "expires_in",
+        "type": "string",
+        "required": false,
+        "description": "Seconds that a quote expires in. Must be an integer between 10-120. Default is 60."
+      },
+      {
+        "name": "legs",
+        "python_name": "legs",
+        "type": "array",
+        "required": true,
+        "description": "The legs of the Quote."
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "rfqId": {
+          "type": "string"
+        },
+        "clQuoteId": {
+          "type": "string"
+        },
+        "tag": {
+          "type": "string"
+        },
+        "anonymous": {
+          "type": "boolean"
+        },
+        "quoteSide": {
+          "type": "string"
+        },
+        "expiresIn": {
+          "type": "string"
+        },
+        "legs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "instId": {
+                "type": "string"
+              },
+              "tdMode": {
+                "type": "string"
+              },
+              "ccy": {
+                "type": "string"
+              },
+              "sz": {
+                "type": "string"
+              },
+              "px": {
+                "type": "string"
+              },
+              "side": {
+                "type": "string"
+              },
+              "posSide": {
+                "type": "string"
+              },
+              "tgtCcy": {
+                "type": "string"
+              },
+              "tradeQuoteCcy": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "instId",
+              "sz",
+              "px",
+              "side"
+            ]
+          }
+        }
+      },
+      "required": [
+        "rfqId",
+        "quoteSide",
+        "legs"
+      ]
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-create-quote",
+    "row": 1218
+  },
+  {
+    "name": "cancel_rfq_quote",
+    "method": "POST",
+    "path": "/api/v5/rfq/cancel-quote",
+    "public": false,
+    "fields": [
+      {
+        "name": "quoteId",
+        "python_name": "quote_id",
+        "type": "string",
+        "required": false,
+        "description": "Quote ID."
+      },
+      {
+        "name": "clQuoteId",
+        "python_name": "cl_quote_id",
+        "type": "string",
+        "required": false,
+        "description": "Client-supplied Quote ID. Either quoteId or clQuoteId is required. If both clQuoteId and quoteId are passed, quoteId will be treated as primary identifier."
+      },
+      {
+        "name": "rfqId",
+        "python_name": "rfq_id",
+        "type": "string",
+        "required": false,
+        "description": "RFQ ID."
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "quoteId": {
+          "type": "string"
+        },
+        "clQuoteId": {
+          "type": "string"
+        },
+        "rfqId": {
+          "type": "string"
+        }
+      },
+      "required": []
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-cancel-quote",
+    "row": 1219
+  },
+  {
+    "name": "get_rfq_maker_instrument_settings",
+    "method": "GET",
+    "path": "/api/v5/rfq/maker-instrument-settings",
+    "public": false,
+    "fields": [],
+    "schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-get-quote-products",
+    "row": 1222
+  },
+  {
+    "name": "set_rfq_maker_instrument_settings",
+    "method": "POST",
+    "path": "/api/v5/rfq/maker-instrument-settings",
+    "public": false,
+    "fields": [
+      {
+        "name": "instType",
+        "python_name": "inst_type",
+        "type": "string",
+        "required": true,
+        "description": "Type of instrument. Valid value can be FUTURES , OPTION , SWAP or SPOT ."
+      },
+      {
+        "name": "includeAll",
+        "python_name": "include_all",
+        "type": "boolean",
+        "required": false,
+        "description": "Receive all instruments or not under specific instType setting. Valid value can be boolean ( True / False ). By default, the value will be false ."
+      },
+      {
+        "name": "data",
+        "python_name": "data",
+        "type": "array",
+        "required": true,
+        "description": "Elements of the instType."
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "instType": {
+          "type": "string"
+        },
+        "includeAll": {
+          "type": "boolean"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "instFamily": {
+                "type": "string"
+              },
+              "instId": {
+                "type": "string"
+              },
+              "maxBlockSz": {
+                "type": "string"
+              },
+              "makerPxBand": {
+                "type": "string"
+              }
+            },
+            "required": []
+          }
+        }
+      },
+      "required": [
+        "instType",
+        "data"
+      ]
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-set-quote-products",
+    "row": 1223
+  },
+  {
+    "name": "reset_rfq_mmp",
+    "method": "POST",
+    "path": "/api/v5/rfq/mmp-reset",
+    "public": false,
+    "fields": [],
+    "schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-reset-mmp-status",
+    "row": 1224
+  },
+  {
+    "name": "set_rfq_mmp_config",
+    "method": "POST",
+    "path": "/api/v5/rfq/mmp-config",
+    "public": false,
+    "fields": [
+      {
+        "name": "timeInterval",
+        "python_name": "time_interval",
+        "type": "string",
+        "required": true,
+        "description": "Time window (ms). MMP interval where monitoring is done. \"0\" means disable MMP. Maximum time interval is 600,000."
+      },
+      {
+        "name": "frozenInterval",
+        "python_name": "frozen_interval",
+        "type": "string",
+        "required": true,
+        "description": "Frozen period (ms). \"0\" means the trade will remain frozen until you request \"Reset MMP Status\" to unfrozen."
+      },
+      {
+        "name": "countLimit",
+        "python_name": "count_limit",
+        "type": "string",
+        "required": true,
+        "description": "Limit in number of execution attempts."
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "timeInterval": {
+          "type": "string"
+        },
+        "frozenInterval": {
+          "type": "string"
+        },
+        "countLimit": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "timeInterval",
+        "frozenInterval",
+        "countLimit"
+      ]
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-set-mmp",
+    "row": 1225
+  },
+  {
+    "name": "get_rfq_mmp_config",
+    "method": "GET",
+    "path": "/api/v5/rfq/mmp-config",
+    "public": false,
+    "fields": [],
+    "schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-get-mmp-config",
+    "row": 1226
+  },
+  {
+    "name": "cancel_rfq_batch_quotes",
+    "method": "POST",
+    "path": "/api/v5/rfq/cancel-batch-quotes",
+    "public": false,
+    "fields": [
+      {
+        "name": "quoteIds",
+        "python_name": "quote_ids",
+        "type": "array",
+        "required": false,
+        "description": "Quote IDs ."
+      },
+      {
+        "name": "clQuoteIds",
+        "python_name": "cl_quote_ids",
+        "type": "array",
+        "required": false,
+        "description": "Client-supplied Quote IDs. Either quoteIds or clQuoteIds is required.If both attributes are sent, quoteIds will be used as primary identifier."
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "quoteIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "clQuoteIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": []
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-cancel-multiple-quotes",
+    "row": 1227
+  },
+  {
+    "name": "cancel_all_rfq_quotes",
+    "method": "POST",
+    "path": "/api/v5/rfq/cancel-all-quotes",
+    "public": false,
+    "fields": [],
+    "schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-cancel-all-quotes",
+    "row": 1228
+  },
+  {
+    "name": "set_rfq_cancel_all_after",
+    "method": "POST",
+    "path": "/api/v5/rfq/cancel-all-after",
+    "public": false,
+    "fields": [
+      {
+        "name": "timeOut",
+        "python_name": "time_out",
+        "type": "string",
+        "required": true,
+        "description": "The countdown for quotes cancellation, with second as the unit. Range of value can be 0, [10, 120]. Setting timeOut to 0 disables Cancel All After."
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "timeOut": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "timeOut"
+      ]
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-cancel-all-after",
+    "row": 1229
+  },
+  {
+    "name": "get_mm_instrument_types",
+    "method": "GET",
+    "path": "/api/v5/public/mm-instrument-types",
+    "public": true,
+    "fields": [
+      {
+        "name": "instType",
+        "python_name": "inst_type",
+        "type": "string",
+        "required": false,
+        "description": "Instrument type. SPOT SWAP When not specified, returns all types."
+      },
+      {
+        "name": "instId",
+        "python_name": "inst_id",
+        "type": "string",
+        "required": false,
+        "description": "Instrument ID, e.g. BTC-USDT , BTC-USDT-SWAP . When specified, returns at most one record."
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "instType": {
+          "type": "string"
+        },
+        "instId": {
+          "type": "string"
+        }
+      },
+      "required": []
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#public-data-rest-api-get-mm-instrument-types",
+    "row": 1282
+  },
+  {
+    "name": "create_withdrawal",
+    "method": "POST",
+    "path": "/api/v5/asset/withdrawal",
+    "public": false,
+    "fields": [
+      {
+        "name": "ccy",
+        "python_name": "ccy",
+        "type": "string",
+        "required": true,
+        "description": "Currency, e.g. USDT"
+      },
+      {
+        "name": "amt",
+        "python_name": "amt",
+        "type": "string",
+        "required": true,
+        "description": "Withdrawal amount Withdrawal fee is not included in withdrawal amount. Please reserve sufficient transaction fees when withdrawing. You can get fee amount by Get currencies . For internal transfer , transaction fee is always 0 ."
+      },
+      {
+        "name": "dest",
+        "python_name": "dest",
+        "type": "string",
+        "required": true,
+        "description": "Withdrawal method 3 : internal transfer 4 : on-chain withdrawal"
+      },
+      {
+        "name": "toAddr",
+        "python_name": "to_addr",
+        "type": "string",
+        "required": true,
+        "description": "toAddr should be a trusted address/account. If your dest is 4 , some crypto currency addresses are formatted as 'address:tag' , e.g. 'ARDOR-7JF3-8F2E-QUWZ-CAN7F:123456' If your dest is 3 , toAddr should be a recipient address which can be UID, email, phone or login account name (account name is only for sub-account)."
+      },
+      {
+        "name": "toAddrType",
+        "python_name": "to_addr_type",
+        "type": "string",
+        "required": false,
+        "description": "Address type 1 : wallet address, email, phone, or login account name 2 : UID (applicable only when dest= 3 )"
+      },
+      {
+        "name": "chain",
+        "python_name": "chain",
+        "type": "string",
+        "required": false,
+        "description": "Chain name There are multiple chains under some currencies, such as USDT has USDT-ERC20 , USDT-TRC20 If the parameter is not filled in, the default will be the main chain. When you withdrawal the non-tradable asset, if the parameter is not filled in, the default will be the unique withdrawal chain. Apply to on-chain withdrawal . You can get supported chain name by the endpoint of Get currencies ."
+      },
+      {
+        "name": "areaCode",
+        "python_name": "area_code",
+        "type": "string",
+        "required": false,
+        "description": "Area code for the phone number, e.g. 86 If toAddr is a phone number, this parameter is required. Apply to internal transfer"
+      },
+      {
+        "name": "rcvrInfo",
+        "python_name": "rcvr_info",
+        "type": "object",
+        "required": false,
+        "description": "Recipient information For the specific entity users to do on-chain withdrawal/lightning withdrawal, this information is required."
+      },
+      {
+        "name": "clientId",
+        "python_name": "client_id",
+        "type": "string",
+        "required": false,
+        "description": "Client-supplied ID A combination of case-sensitive alphanumerics, all numbers, or all letters of up to 32 characters."
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "ccy": {
+          "type": "string"
+        },
+        "amt": {
+          "type": "string"
+        },
+        "dest": {
+          "type": "string"
+        },
+        "toAddr": {
+          "type": "string"
+        },
+        "toAddrType": {
+          "type": "string"
+        },
+        "chain": {
+          "type": "string"
+        },
+        "areaCode": {
+          "type": "string"
+        },
+        "rcvrInfo": {
+          "type": "object",
+          "properties": {
+            "walletType": {
+              "type": "string"
+            },
+            "exchId": {
+              "type": "string"
+            },
+            "rcvrFirstName": {
+              "type": "string"
+            },
+            "rcvrLastName": {
+              "type": "string"
+            },
+            "rcvrCountry": {
+              "type": "string"
+            },
+            "rcvrCountrySubDivision": {
+              "type": "string"
+            },
+            "rcvrTownName": {
+              "type": "string"
+            },
+            "rcvrStreetName": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "walletType"
+          ]
+        },
+        "clientId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "ccy",
+        "amt",
+        "dest",
+        "toAddr"
+      ]
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-withdrawal",
+    "row": 1309
+  },
+  {
+    "name": "cancel_withdrawal",
+    "method": "POST",
+    "path": "/api/v5/asset/cancel-withdrawal",
+    "public": false,
+    "fields": [
+      {
+        "name": "wdId",
+        "python_name": "wd_id",
+        "type": "string",
+        "required": true,
+        "description": "Withdrawal ID"
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "wdId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "wdId"
+      ]
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-cancel-withdrawal",
+    "row": 1310
+  },
+  {
+    "name": "create_fiat_withdrawal",
+    "method": "POST",
+    "path": "/api/v5/fiat/create-withdrawal",
+    "public": false,
+    "fields": [
+      {
+        "name": "paymentAcctId",
+        "python_name": "payment_acct_id",
+        "type": "string",
+        "required": true,
+        "description": "Payment account id to withdraw to, retrieved from get withdrawal payment methods API"
+      },
+      {
+        "name": "ccy",
+        "python_name": "ccy",
+        "type": "string",
+        "required": true,
+        "description": "Currency for withdrawal, must match currency allowed for paymentMethod"
+      },
+      {
+        "name": "amt",
+        "python_name": "amt",
+        "type": "string",
+        "required": true,
+        "description": "Requested withdrawal amount before fees. Has to be less than or equal to 2 decimal points double"
+      },
+      {
+        "name": "paymentMethod",
+        "python_name": "payment_method",
+        "type": "string",
+        "required": true,
+        "description": "Payment method to use for withdrawal TR_BANKS PIX SEPA XPULSE NPP US_WIRE SG_FAST"
+      },
+      {
+        "name": "clientId",
+        "python_name": "client_id",
+        "type": "string",
+        "required": true,
+        "description": "Client-supplied ID, A combination of case-sensitive alphanumerics, all numbers, or all letters of up to 32 characters e.g. 194a6975e98246538faeb0fab0d502df"
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "paymentAcctId": {
+          "type": "string"
+        },
+        "ccy": {
+          "type": "string"
+        },
+        "amt": {
+          "type": "string"
+        },
+        "paymentMethod": {
+          "type": "string"
+        },
+        "clientId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "paymentAcctId",
+        "ccy",
+        "amt",
+        "paymentMethod",
+        "clientId"
+      ]
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-create-withdrawal-order",
+    "row": 1323
+  },
+  {
+    "name": "cancel_fiat_withdrawal",
+    "method": "POST",
+    "path": "/api/v5/fiat/cancel-withdrawal",
+    "public": false,
+    "fields": [
+      {
+        "name": "ordId",
+        "python_name": "ord_id",
+        "type": "string",
+        "required": true,
+        "description": "Payment Order Id"
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "ordId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "ordId"
+      ]
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-cancel-withdrawal-order",
+    "row": 1324
+  },
+  {
+    "name": "get_affiliate_performance_summary",
+    "method": "GET",
+    "path": "/api/v5/affiliate/performance/summary",
+    "public": false,
+    "fields": [
+      {
+        "name": "periodType",
+        "python_name": "period_type",
+        "type": "string",
+        "required": false,
+        "description": "Stats window for all summary fields except uTime . last_7d last_30d this_month last_month total today this_week custom : pass begin and end to define a custom window. The default is total ."
+      },
+      {
+        "name": "begin",
+        "python_name": "begin",
+        "type": "string",
+        "required": false,
+        "description": "Custom stats-window start, Unix timestamp in millisecond format. Required when periodType=custom , together with end . Inclusive."
+      },
+      {
+        "name": "end",
+        "python_name": "end",
+        "type": "string",
+        "required": false,
+        "description": "Custom stats-window end, Unix timestamp in millisecond format. Required when periodType=custom , together with begin . Inclusive."
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "periodType": {
+          "type": "string"
+        },
+        "begin": {
+          "type": "string"
+        },
+        "end": {
+          "type": "string"
+        }
+      },
+      "required": []
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#affiliate-rest-api-get-performance-summary",
+    "row": 1405
+  },
+  {
+    "name": "get_affiliate_invitee_detail",
+    "method": "GET",
+    "path": "/api/v5/affiliate/invitee/detail",
+    "public": false,
+    "fields": [
+      {
+        "name": "uid",
+        "python_name": "uid",
+        "type": "string",
+        "required": true,
+        "description": "UID of the invitee. Only applicable to the UID of invitee master account. The data returned covers invitee master account and invitee sub-accounts."
+      },
+      {
+        "name": "periodType",
+        "python_name": "period_type",
+        "type": "string",
+        "required": false,
+        "description": "Stats window for volPeriod . last_7d last_30d this_month last_month total today this_week When omitted, volPeriod is not returned. custom is not supported on this endpoint; custom or any unknown value returns 51000 ."
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string"
+        },
+        "periodType": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "uid"
+      ]
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#affiliate-rest-api-get-the-invitee-39-s-detail",
+    "row": 1406
+  },
+  {
+    "name": "get_affiliate_invitee_list",
+    "method": "GET",
+    "path": "/api/v5/affiliate/invitee/list",
+    "public": false,
+    "fields": [
+      {
+        "name": "page",
+        "python_name": "page",
+        "type": "string",
+        "required": false,
+        "description": "1-indexed page number. Non-numeric values fall back to 1 . The default is 1 ."
+      },
+      {
+        "name": "limit",
+        "python_name": "limit",
+        "type": "string",
+        "required": false,
+        "description": "Items per page. Clamped to [1, 100] . The default is 100 ."
+      },
+      {
+        "name": "periodType",
+        "python_name": "period_type",
+        "type": "string",
+        "required": false,
+        "description": "Stats window. last_7d last_30d this_month last_month total today this_week custom : pass begin and end to define a custom window."
+      },
+      {
+        "name": "begin",
+        "python_name": "begin",
+        "type": "string",
+        "required": false,
+        "description": "Custom stats-window start, Unix timestamp in millisecond format. Required when periodType=custom , together with end . Inclusive."
+      },
+      {
+        "name": "end",
+        "python_name": "end",
+        "type": "string",
+        "required": false,
+        "description": "Custom stats-window end, Unix timestamp in millisecond format. Required when periodType=custom , together with begin . Inclusive."
+      },
+      {
+        "name": "keyword",
+        "python_name": "keyword",
+        "type": "string",
+        "required": false,
+        "description": "Search by UID or channel name."
+      },
+      {
+        "name": "commissionCategory",
+        "python_name": "commission_category",
+        "type": "string",
+        "required": false,
+        "description": "Commission calculation category. SPOT DERIVATIVE BSC"
+      },
+      {
+        "name": "orderBy",
+        "python_name": "order_by",
+        "type": "string",
+        "required": false,
+        "description": "Sort field. cTime depAmt vol fee rebate The default is cTime ."
+      },
+      {
+        "name": "orderDir",
+        "python_name": "order_dir",
+        "type": "string",
+        "required": false,
+        "description": "Sort direction. asc desc The default is desc ."
+      },
+      {
+        "name": "kycStatus",
+        "python_name": "kyc_status",
+        "type": "string",
+        "required": false,
+        "description": "KYC status. unverified verified (passed at least KYC2)"
+      },
+      {
+        "name": "subAffiliateUid",
+        "python_name": "sub_affiliate_uid",
+        "type": "string",
+        "required": false,
+        "description": "Filter invitees under a specific sub-affiliate (external UID)."
+      },
+      {
+        "name": "uid",
+        "python_name": "uid",
+        "type": "string",
+        "required": false,
+        "description": "External user UIDs for exact match — the same UID returned as uid in the response. Single UID or up to 100 UIDs, comma-separated, e.g. 835449167911924693,835449167911924700 . Unknown UIDs are silently skipped; if none resolve, an empty page is returned (never the full list)."
+      },
+      {
+        "name": "joinTimeBegin",
+        "python_name": "join_time_begin",
+        "type": "string",
+        "required": false,
+        "description": "Filter lower bound on joinTime (the relationship-established time), Unix timestamp in millisecond format. Inclusive. Required when joinTimeEnd is supplied; the two must be sent together. Independent of the periodType / begin / end stats window."
+      },
+      {
+        "name": "joinTimeEnd",
+        "python_name": "join_time_end",
+        "type": "string",
+        "required": false,
+        "description": "Filter upper bound on joinTime (the relationship-established time), Unix timestamp in millisecond format. Inclusive. Required when joinTimeBegin is supplied; the two must be sent together. Independent of the periodType / begin / end stats window."
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "string"
+        },
+        "limit": {
+          "type": "string"
+        },
+        "periodType": {
+          "type": "string"
+        },
+        "begin": {
+          "type": "string"
+        },
+        "end": {
+          "type": "string"
+        },
+        "keyword": {
+          "type": "string"
+        },
+        "commissionCategory": {
+          "type": "string"
+        },
+        "orderBy": {
+          "type": "string"
+        },
+        "orderDir": {
+          "type": "string"
+        },
+        "kycStatus": {
+          "type": "string"
+        },
+        "subAffiliateUid": {
+          "type": "string"
+        },
+        "uid": {
+          "type": "string"
+        },
+        "joinTimeBegin": {
+          "type": "string"
+        },
+        "joinTimeEnd": {
+          "type": "string"
+        }
+      },
+      "required": []
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#affiliate-rest-api-get-invitee-list",
+    "row": 1407
+  },
+  {
+    "name": "get_affiliate_links",
+    "method": "GET",
+    "path": "/api/v5/affiliate/link/list",
+    "public": false,
+    "fields": [
+      {
+        "name": "page",
+        "python_name": "page",
+        "type": "string",
+        "required": false,
+        "description": "1-indexed page number. Non-numeric values fall back to 1 . The default is 1 ."
+      },
+      {
+        "name": "limit",
+        "python_name": "limit",
+        "type": "string",
+        "required": false,
+        "description": "Items per page. Clamped to [1, 100] . The default is 100 ."
+      },
+      {
+        "name": "linkType",
+        "python_name": "link_type",
+        "type": "string",
+        "required": false,
+        "description": "Link kind filter. standard : regular affiliate invite link co_inviter : co-inviter shared link"
+      },
+      {
+        "name": "linkStatus",
+        "python_name": "link_status",
+        "type": "string",
+        "required": false,
+        "description": "Link status. normal abnormal"
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "string"
+        },
+        "limit": {
+          "type": "string"
+        },
+        "linkType": {
+          "type": "string"
+        },
+        "linkStatus": {
+          "type": "string"
+        }
+      },
+      "required": []
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#affiliate-rest-api-get-link-list",
+    "row": 1408
+  },
+  {
+    "name": "get_affiliate_co_inviters",
+    "method": "GET",
+    "path": "/api/v5/affiliate/co-inviter/list",
+    "public": false,
+    "fields": [
+      {
+        "name": "page",
+        "python_name": "page",
+        "type": "string",
+        "required": false,
+        "description": "1-indexed page number. Non-numeric values fall back to 1 . The default is 1 ."
+      },
+      {
+        "name": "limit",
+        "python_name": "limit",
+        "type": "string",
+        "required": false,
+        "description": "Items per page. Clamped to [1, 100] . The default is 100 ."
+      },
+      {
+        "name": "linkStatus",
+        "python_name": "link_status",
+        "type": "string",
+        "required": false,
+        "description": "Link status. normal abnormal"
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "string"
+        },
+        "limit": {
+          "type": "string"
+        },
+        "linkStatus": {
+          "type": "string"
+        }
+      },
+      "required": []
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#affiliate-rest-api-get-co-inviter-link-list",
+    "row": 1409
+  },
+  {
+    "name": "get_sub_affiliates",
+    "method": "GET",
+    "path": "/api/v5/affiliate/sub-affiliate/list",
+    "public": false,
+    "fields": [
+      {
+        "name": "page",
+        "python_name": "page",
+        "type": "string",
+        "required": false,
+        "description": "1-indexed page number. Non-numeric values fall back to 1 . The default is 1 ."
+      },
+      {
+        "name": "limit",
+        "python_name": "limit",
+        "type": "string",
+        "required": false,
+        "description": "Items per page. Clamped to [1, 100] . The default is 100 ."
+      },
+      {
+        "name": "keyword",
+        "python_name": "keyword",
+        "type": "string",
+        "required": false,
+        "description": "Search by sub-affiliate UID."
+      },
+      {
+        "name": "commissionCategory",
+        "python_name": "commission_category",
+        "type": "string",
+        "required": false,
+        "description": "Commission calculation category. SPOT DERIVATIVE BSC"
+      },
+      {
+        "name": "orderBy",
+        "python_name": "order_by",
+        "type": "string",
+        "required": false,
+        "description": "Sort field. cTime depAmt vol fee rebate The default sorts by joinTime (most recently joined first)."
+      },
+      {
+        "name": "orderDir",
+        "python_name": "order_dir",
+        "type": "string",
+        "required": false,
+        "description": "Sort direction. asc desc The default is desc ."
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "string"
+        },
+        "limit": {
+          "type": "string"
+        },
+        "keyword": {
+          "type": "string"
+        },
+        "commissionCategory": {
+          "type": "string"
+        },
+        "orderBy": {
+          "type": "string"
+        },
+        "orderDir": {
+          "type": "string"
+        }
+      },
+      "required": []
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#affiliate-rest-api-get-sub-affiliate-list",
+    "row": 1410
+  }
+]

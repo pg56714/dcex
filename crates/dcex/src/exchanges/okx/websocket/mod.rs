@@ -4,6 +4,43 @@ mod public;
 pub use private::{OkxPrivateWebSocket, OkxPrivateWebSocketArg};
 pub use public::{OkxPublicWebSocket, OkxWebSocketArg};
 
+fn validate_raw_subscriptions(op: &str, args: &[serde_json::Value]) -> crate::Result<()> {
+    use crate::DcexError;
+    if !matches!(op, "subscribe" | "unsubscribe") || args.is_empty() {
+        return Err(DcexError::InvalidInput(
+            "subscribe/unsubscribe requires at least one argument".into(),
+        ));
+    }
+    for arg in args {
+        let object = arg.as_object().ok_or_else(|| {
+            DcexError::InvalidInput("subscription argument must be an object".into())
+        })?;
+        if !object
+            .get("channel")
+            .is_some_and(serde_json::Value::is_string)
+            || object.iter().any(|(key, value)| {
+                ![
+                    "channel",
+                    "instType",
+                    "instFamily",
+                    "instId",
+                    "ccy",
+                    "sprdId",
+                    "algoId",
+                    "extraParams",
+                ]
+                .contains(&key.as_str())
+                    || !value.is_string()
+            })
+        {
+            return Err(DcexError::InvalidInput(
+                "unsupported subscription field or value type".into(),
+            ));
+        }
+    }
+    Ok(())
+}
+
 /// Channels served on `/ws/v5/business` per the OKX v5 WebSocket docs.
 ///
 /// Spread trading channels (`sprd-orders`, `sprd-trades`, `sprd-books5`,

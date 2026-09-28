@@ -1,7 +1,9 @@
-from dcex.bybit.client import Client
 import os
-from dotenv import load_dotenv
+
 import pytest
+from dotenv import load_dotenv
+
+from dcex.bybit.client import Client
 
 load_dotenv()
 

@@ -6,6 +6,8 @@ from __future__ import annotations
 import hashlib
 import hmac
 import inspect
+import json
+from pathlib import Path
 from typing import Any
 from urllib.parse import parse_qsl, urlsplit
 
@@ -16,6 +18,9 @@ from dcex.binance.client import Client
 from tests.unit.native_http_helpers import _http_server
 
 CASES = [
+    ("create_futures_listen_key", {}, "POST", "/fapi/v1/listenKey", {}, False, True),
+    ("keep_alive_futures_listen_key", {}, "PUT", "/fapi/v1/listenKey", {}, False, True),
+    ("close_futures_listen_key", {}, "DELETE", "/fapi/v1/listenKey", {}, False, True),
     (
         "disable_isolated_margin_account",
         {"symbol": "BTCUSDT"},
@@ -2522,6 +2527,15 @@ CASES = [
 ]
 
 
+COMPLETION_CASES = json.loads(
+    (Path(__file__).parents[1] / "fixtures/binance_completion.json").read_text(encoding="utf-8")
+)
+CASES.extend(
+    (x["name"], x["kwargs"], x["method"], x["path"], x["expected"], True, False)
+    for x in COMPLETION_CASES
+)
+
+
 @pytest.mark.asyncio
 @pytest.mark.parametrize("asynchronous", [False, True])
 @pytest.mark.parametrize(
@@ -2626,6 +2640,39 @@ INVALID_CASES = [
     ),
     ("set_futures_multi_assets_mode", {"multi_assets_margin": "yes"}),
 ]
+
+INVALID_CASES.extend(
+    [
+        ("create_withdrawal", {"coin": "USDT", "address": "test", "amount": "1e-8"}),
+        ("create_withdrawal", {"coin": "USDT", "address": "test", "amount": "1", "wallet_type": 2}),
+        ("create_options_block_order", {"liquidity": "MAKER", "legs": []}),
+        (
+            "create_options_block_order",
+            {
+                "liquidity": "MAKER",
+                "legs": [
+                    {
+                        "symbol": "BTC-261225-90000-C",
+                        "side": "BUY",
+                        "type": "LIMIT",
+                        "quantity": 0.1,
+                    }
+                ],
+            },
+        ),
+        (
+            "create_broker_withdrawal",
+            {
+                "coin": "USDT",
+                "address": "test",
+                "amount": "1",
+                "withdraw_order_id": "test",
+                "questionnaire": {},
+                "originator_pii": {"piiType": 0},
+            },
+        ),
+    ]
+)
 
 for case in CASES:
     name, kwargs = case[:2]

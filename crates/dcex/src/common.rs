@@ -372,3 +372,35 @@ mod tests {
         );
     }
 }
+
+/// Positive base-10 notation, validated without floating-point conversion.
+pub(crate) fn is_positive_plain_decimal(value: &str) -> bool {
+    let mut parts = value.split('.');
+    let whole = parts.next().unwrap_or_default();
+    let fraction = parts.next();
+    !whole.is_empty()
+        && whole.bytes().all(|b| b.is_ascii_digit())
+        && fraction.is_none_or(|part| !part.is_empty() && part.bytes().all(|b| b.is_ascii_digit()))
+        && parts.next().is_none()
+        && value.bytes().any(|b| matches!(b, b'1'..=b'9'))
+}
+
+#[cfg(test)]
+mod plain_decimal_tests {
+    use super::is_positive_plain_decimal;
+    #[test]
+    fn rejects_exponents_without_losing_tiny_values_or_precision() {
+        for value in [
+            "1e-3", "1E3", "NaN", "inf", " 1", "1 ", "+1", "-1", ".1", "1.", "0", "0.00", "1.2.3",
+        ] {
+            assert!(!is_positive_plain_decimal(value), "{value}");
+        }
+        for value in ["1", "00.1", "123456789012345678901234567890.1234567890"] {
+            assert!(is_positive_plain_decimal(value), "{value}");
+        }
+        assert!(is_positive_plain_decimal(&format!(
+            "0.{}1",
+            "0".repeat(400)
+        )));
+    }
+}

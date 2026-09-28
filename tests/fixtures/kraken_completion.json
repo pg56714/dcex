@@ -1,0 +1,689 @@
+[
+  {
+    "name": "get_affiliate_daily_activity",
+    "method": "GET",
+    "path": "/affiliate/v1/daily-activity",
+    "auth": "header",
+    "kwargs": {
+      "activity_date": "2026-09-28",
+      "all_users": true,
+      "cursor": "cursor-1",
+      "limit": 10,
+      "otp": "123456"
+    },
+    "query": {
+      "activity_date": "2026-09-28",
+      "all_users": "true",
+      "cursor": "cursor-1",
+      "limit": "10"
+    },
+    "body": null
+  },
+  {
+    "name": "add_assignment_program",
+    "method": "POST",
+    "path": "/derivatives/api/v3/assignmentprogram/add",
+    "auth": "futures",
+    "kwargs": {
+      "contract_type": "flex",
+      "contract": "PF_XBTUSD",
+      "max_size": "1.2500",
+      "max_position": "10.0000",
+      "accept_long": true,
+      "accept_short": false,
+      "time_frame": "ALL",
+      "enabled": true,
+      "base_currency": "XBT",
+      "quote_currency": "USD",
+      "cash_account_open_position_max_notional": "1000.0001",
+      "minimum_profitability_per_assignment_long_bps": 1,
+      "minimum_profitability_per_assignment_short_bps": 2
+    },
+    "query": {
+      "contractType": "flex",
+      "contract": "PF_XBTUSD",
+      "maxSize": "1.2500",
+      "maxPosition": "10.0000",
+      "acceptLong": "true",
+      "acceptShort": "false",
+      "timeFrame": "ALL",
+      "enabled": "true",
+      "baseCurrency": "XBT",
+      "quoteCurrency": "USD",
+      "cashAccountOpenPositionMaxNotional": "1000.0001",
+      "minimumProfitabilityPerAssignmentLongBps": "1",
+      "minimumProfitabilityPerAssignmentShortBps": "2"
+    },
+    "body": null
+  },
+  {
+    "name": "delete_assignment_program",
+    "method": "POST",
+    "path": "/derivatives/api/v3/assignmentprogram/delete",
+    "auth": "futures",
+    "kwargs": {
+      "assignment_id": "12"
+    },
+    "query": {
+      "id": "12"
+    },
+    "body": null
+  },
+  {
+    "name": "get_assignment_program_history",
+    "method": "GET",
+    "path": "/derivatives/api/v3/assignmentprogram/history",
+    "auth": "futures",
+    "kwargs": {},
+    "query": {},
+    "body": null
+  },
+  {
+    "name": "get_assignment_program_current",
+    "method": "GET",
+    "path": "/derivatives/api/v3/assignmentprogram/current",
+    "auth": "futures",
+    "kwargs": {},
+    "query": {},
+    "body": null
+  },
+  {
+    "name": "calculate_funding_fees",
+    "method": "GET",
+    "path": "/funding/v1/fees/d4ec4d52-b159-428e-ba64-f45455a978a1",
+    "auth": "header",
+    "kwargs": {
+      "method_id": "d4ec4d52-b159-428e-ba64-f45455a978a1",
+      "amount": "1.230000000000000001",
+      "fee_included": true,
+      "withdrawal_fee_token": "fee-token",
+      "rebase_multiplier": "base",
+      "account_id": "account-1",
+      "otp": "123456"
+    },
+    "query": {
+      "amount": "1.230000000000000001",
+      "fee_included": "true",
+      "withdrawal_fee_token": "fee-token",
+      "rebase_multiplier": "base",
+      "account_id": "account-1"
+    },
+    "body": null
+  },
+  {
+    "name": "claim_funding_deposit_address",
+    "method": "PUT",
+    "path": "/funding/v1/deposit/address",
+    "auth": "header",
+    "kwargs": {
+      "account_id": "account-1",
+      "body": {
+        "method_id": "27ede8db-804b-4d91-8e25-46b7b9668730"
+      },
+      "otp": "123456"
+    },
+    "query": {
+      "account_id": "account-1"
+    },
+    "body": {
+      "method_id": "27ede8db-804b-4d91-8e25-46b7b9668730"
+    }
+  },
+  {
+    "name": "create_funding_address",
+    "method": "POST",
+    "path": "/funding/v1/addresses",
+    "auth": "header",
+    "kwargs": {
+      "account_id": "account-1",
+      "body": {
+        "scope": {
+          "network_id": "d9d375da-44b7-4be1-8a00-8b281acfe366"
+        },
+        "address_details": {
+          "crypto": {
+            "address": "0x1212121212121212121212121212121212121212"
+          }
+        },
+        "name": "Personal Wallet",
+        "description": "My hardware wallet address"
+      },
+      "otp": "123456"
+    },
+    "query": {
+      "account_id": "account-1"
+    },
+    "body": {
+      "scope": {
+        "network_id": "d9d375da-44b7-4be1-8a00-8b281acfe366"
+      },
+      "address_details": {
+        "crypto": {
+          "address": "0x1212121212121212121212121212121212121212"
+        }
+      },
+      "name": "Personal Wallet",
+      "description": "My hardware wallet address"
+    }
+  },
+  {
+    "name": "create_funding_withdrawal",
+    "method": "POST",
+    "path": "/funding/v1/withdrawals",
+    "auth": "header",
+    "kwargs": {
+      "account_id": "account-1",
+      "body": {
+        "scope": {
+          "method_id": "d4ec4d52-b159-428e-ba64-f45455a978a1"
+        },
+        "address_id": "ABR6SXP-SF6CY-VJMONY",
+        "amount": {
+          "asset_amount": {
+            "asset": {
+              "class": "currency",
+              "name": "USDC"
+            },
+            "amount": "5"
+          }
+        },
+        "fee": {
+          "quoted_fee": {
+            "token": "YOUR_WITHDRAWAL_FEE_TOKEN"
+          },
+          "fee_included": true
+        }
+      },
+      "otp": "123456"
+    },
+    "query": {
+      "account_id": "account-1"
+    },
+    "body": {
+      "scope": {
+        "method_id": "d4ec4d52-b159-428e-ba64-f45455a978a1"
+      },
+      "address_id": "ABR6SXP-SF6CY-VJMONY",
+      "amount": {
+        "asset_amount": {
+          "asset": {
+            "class": "currency",
+            "name": "USDC"
+          },
+          "amount": "5"
+        }
+      },
+      "fee": {
+        "quoted_fee": {
+          "token": "YOUR_WITHDRAWAL_FEE_TOKEN"
+        },
+        "fee_included": true
+      }
+    }
+  },
+  {
+    "name": "delete_funding_address",
+    "method": "DELETE",
+    "path": "/funding/v1/addresses/ABR6SXP-SF6CY-VJMONY",
+    "auth": "header",
+    "kwargs": {
+      "address_id": "ABR6SXP-SF6CY-VJMONY",
+      "account_id": "account-1",
+      "otp": "123456"
+    },
+    "query": {
+      "account_id": "account-1"
+    },
+    "body": null
+  },
+  {
+    "name": "get_funding_addresses",
+    "method": "GET",
+    "path": "/funding/v1/addresses",
+    "auth": "header",
+    "kwargs": {
+      "scope": {
+        "method_id": "d4ec4d52-b159-428e-ba64-f45455a978a1"
+      },
+      "cursor": "cursor-1",
+      "limit": 10,
+      "account_id": "account-1",
+      "otp": "123456"
+    },
+    "query": {
+      "scope[method_id]": "d4ec4d52-b159-428e-ba64-f45455a978a1",
+      "cursor": "cursor-1",
+      "limit": "10",
+      "account_id": "account-1"
+    },
+    "body": null
+  },
+  {
+    "name": "get_funding_assets",
+    "method": "GET",
+    "path": "/funding/v1/assets/withdraw",
+    "auth": "header",
+    "kwargs": {
+      "direction": "withdraw",
+      "asset_class": "currency",
+      "account_id": "account-1",
+      "otp": "123456"
+    },
+    "query": {
+      "asset_class": "currency",
+      "account_id": "account-1"
+    },
+    "body": null
+  },
+  {
+    "name": "get_funding_deposit_addresses",
+    "method": "GET",
+    "path": "/funding/v2/deposit/addresses",
+    "auth": "header",
+    "kwargs": {
+      "scope": {
+        "method_id": "d4ec4d52-b159-428e-ba64-f45455a978a1"
+      },
+      "cursor": "cursor-1",
+      "limit": 10,
+      "asset": {
+        "class": "currency",
+        "name": "USDC"
+      },
+      "account_id": "account-1",
+      "otp": "123456"
+    },
+    "query": {
+      "scope[method_id]": "d4ec4d52-b159-428e-ba64-f45455a978a1",
+      "cursor": "cursor-1",
+      "limit": "10",
+      "asset[class]": "currency",
+      "asset[name]": "USDC",
+      "account_id": "account-1"
+    },
+    "body": null
+  },
+  {
+    "name": "get_funding_deposit_limits",
+    "method": "GET",
+    "path": "/funding/v1/limits/deposit/currency/XBT",
+    "auth": "header",
+    "kwargs": {
+      "asset_class": "currency",
+      "asset": "XBT",
+      "preferred_asset": {
+        "class": "currency",
+        "name": "USD"
+      },
+      "account_id": "account-1",
+      "otp": "123456"
+    },
+    "query": {
+      "preferred_asset[class]": "currency",
+      "preferred_asset[name]": "USD",
+      "account_id": "account-1"
+    },
+    "body": null
+  },
+  {
+    "name": "get_funding_deposits",
+    "method": "GET",
+    "path": "/funding/v1/deposits",
+    "auth": "header",
+    "kwargs": {
+      "asset": {
+        "class": "currency",
+        "name": "USDC"
+      },
+      "scope": {
+        "method_id": "d4ec4d52-b159-428e-ba64-f45455a978a1"
+      },
+      "status": {
+        "range": {
+          "start": "pending",
+          "end": "success"
+        }
+      },
+      "cursor": "cursor-1",
+      "limit": 10,
+      "start_time": "2026-09-27T00:00:00Z",
+      "end_time": "2026-09-28T00:00:00Z",
+      "rebase_multiplier": "base",
+      "account_id": "account-1",
+      "otp": "123456"
+    },
+    "query": {
+      "asset[class]": "currency",
+      "asset[name]": "USDC",
+      "scope[method_id]": "d4ec4d52-b159-428e-ba64-f45455a978a1",
+      "status[range][start]": "pending",
+      "status[range][end]": "success",
+      "cursor": "cursor-1",
+      "limit": "10",
+      "start_time": "2026-09-27T00:00:00Z",
+      "end_time": "2026-09-28T00:00:00Z",
+      "rebase_multiplier": "base",
+      "account_id": "account-1"
+    },
+    "body": null
+  },
+  {
+    "name": "get_funding_methods",
+    "method": "GET",
+    "path": "/funding/v1/methods/withdraw",
+    "auth": "header",
+    "kwargs": {
+      "direction": "withdraw",
+      "asset": {
+        "class": "currency",
+        "name": "USDC"
+      },
+      "rebase_multiplier": "base",
+      "limit": 10,
+      "cursor": "cursor-1",
+      "account_id": "account-1",
+      "otp": "123456"
+    },
+    "query": {
+      "asset[class]": "currency",
+      "asset[name]": "USDC",
+      "rebase_multiplier": "base",
+      "limit": "10",
+      "cursor": "cursor-1",
+      "account_id": "account-1"
+    },
+    "body": null
+  },
+  {
+    "name": "get_funding_networks",
+    "method": "GET",
+    "path": "/funding/v1/networks",
+    "auth": "header",
+    "kwargs": {
+      "account_id": "account-1",
+      "otp": "123456"
+    },
+    "query": {
+      "account_id": "account-1"
+    },
+    "body": null
+  },
+  {
+    "name": "get_funding_withdrawal_limits",
+    "method": "GET",
+    "path": "/funding/v1/limits/withdrawal/currency/XBT",
+    "auth": "header",
+    "kwargs": {
+      "asset_class": "currency",
+      "asset": "XBT",
+      "preferred_asset": {
+        "class": "currency",
+        "name": "USD"
+      },
+      "account_id": "account-1",
+      "otp": "123456"
+    },
+    "query": {
+      "preferred_asset[class]": "currency",
+      "preferred_asset[name]": "USD",
+      "account_id": "account-1"
+    },
+    "body": null
+  },
+  {
+    "name": "get_funding_withdrawals",
+    "method": "GET",
+    "path": "/funding/v1/withdrawals",
+    "auth": "header",
+    "kwargs": {
+      "asset": {
+        "class": "currency",
+        "name": "USDC"
+      },
+      "scope": {
+        "method_id": "d4ec4d52-b159-428e-ba64-f45455a978a1"
+      },
+      "status": "pending",
+      "cursor": "cursor-1",
+      "limit": 10,
+      "start_time": "2026-09-27T00:00:00Z",
+      "end_time": "2026-09-28T00:00:00Z",
+      "rebase_multiplier": "base",
+      "account_id": "account-1",
+      "otp": "123456"
+    },
+    "query": {
+      "asset[class]": "currency",
+      "asset[name]": "USDC",
+      "scope[method_id]": "d4ec4d52-b159-428e-ba64-f45455a978a1",
+      "status": "pending",
+      "cursor": "cursor-1",
+      "limit": "10",
+      "start_time": "2026-09-27T00:00:00Z",
+      "end_time": "2026-09-28T00:00:00Z",
+      "rebase_multiplier": "base",
+      "account_id": "account-1"
+    },
+    "body": null
+  },
+  {
+    "name": "update_funding_address",
+    "method": "PUT",
+    "path": "/funding/v1/addresses/ABR6SXP-SF6CY-VJMONY",
+    "auth": "header",
+    "kwargs": {
+      "address_id": "ABR6SXP-SF6CY-VJMONY",
+      "account_id": "account-1",
+      "body": {
+        "name": "Personal Wallet",
+        "description": "My hardware wallet address"
+      },
+      "otp": "123456"
+    },
+    "query": {
+      "account_id": "account-1"
+    },
+    "body": {
+      "name": "Personal Wallet",
+      "description": "My hardware wallet address"
+    }
+  },
+  {
+    "name": "cancel_spot_withdrawal",
+    "method": "POST",
+    "path": "/0/private/WithdrawCancel",
+    "auth": "spot",
+    "kwargs": {
+      "asset": "XBT",
+      "refid": "withdraw-1"
+    },
+    "query": {},
+    "body": {
+      "asset": "XBT",
+      "refid": "withdraw-1"
+    }
+  },
+  {
+    "name": "create_spot_withdrawal",
+    "method": "POST",
+    "path": "/0/private/Withdraw",
+    "auth": "spot",
+    "kwargs": {
+      "asset": "XBT",
+      "aclass": "currency",
+      "key": "saved-address",
+      "address": "bc1testaddress",
+      "amount": "1.230000000000000001",
+      "max_fee": "0.0100",
+      "rebase_multiplier": "base"
+    },
+    "query": {},
+    "body": {
+      "asset": "XBT",
+      "aclass": "currency",
+      "key": "saved-address",
+      "address": "bc1testaddress",
+      "amount": "1.230000000000000001",
+      "max_fee": "0.0100",
+      "rebase_multiplier": "base"
+    }
+  },
+  {
+    "name": "accept_rfq_offer",
+    "method": "POST",
+    "path": "/derivatives/api/v3/rfqs/open-rfqs/accept-offer/d4ec4d52-b159-428e-ba64-f45455a978a1",
+    "auth": "futures",
+    "kwargs": {
+      "rfq_uid": "d4ec4d52-b159-428e-ba64-f45455a978a1",
+      "bid_accepted": "101.0000"
+    },
+    "query": {
+      "bidAccepted": "101.0000"
+    },
+    "body": null
+  },
+  {
+    "name": "cancel_user_rfq",
+    "method": "DELETE",
+    "path": "/derivatives/api/v3/rfqs/open-rfqs/d4ec4d52-b159-428e-ba64-f45455a978a1",
+    "auth": "futures",
+    "kwargs": {
+      "rfq_uid": "d4ec4d52-b159-428e-ba64-f45455a978a1"
+    },
+    "query": {},
+    "body": null
+  },
+  {
+    "name": "cancel_rfq_offer",
+    "method": "DELETE",
+    "path": "/derivatives/api/v3/rfqs/cancel-offer/d4ec4d52-b159-428e-ba64-f45455a978a1",
+    "auth": "futures",
+    "kwargs": {
+      "rfq_uid": "d4ec4d52-b159-428e-ba64-f45455a978a1",
+      "offer_uid": "27ede8db-804b-4d91-8e25-46b7b9668730"
+    },
+    "query": {
+      "offerUid": "27ede8db-804b-4d91-8e25-46b7b9668730"
+    },
+    "body": null
+  },
+  {
+    "name": "create_user_rfq",
+    "method": "POST",
+    "path": "/derivatives/api/v3/rfqs/open-rfqs",
+    "auth": "futures",
+    "kwargs": {
+      "request": {
+        "legs": [
+          {
+            "tradeable": "PF_XBTUSD",
+            "size": 1
+          },
+          {
+            "tradeable": "PF_ETHUSD",
+            "size": -2
+          }
+        ],
+        "expiry": "2026-10-01T00:00:00Z"
+      }
+    },
+    "query": {
+      "json": "{\"legs\":[{\"tradeable\":\"PF_XBTUSD\",\"size\":1},{\"tradeable\":\"PF_ETHUSD\",\"size\":-2}],\"expiry\":\"2026-10-01T00:00:00Z\"}"
+    },
+    "body": null
+  },
+  {
+    "name": "get_open_rfqs",
+    "method": "GET",
+    "path": "/derivatives/api/v3/rfqs",
+    "auth": "futures",
+    "kwargs": {},
+    "query": {},
+    "body": null
+  },
+  {
+    "name": "get_closed_rfq_offers",
+    "method": "GET",
+    "path": "/derivatives/api/v3/rfqs/closed-offers",
+    "auth": "futures",
+    "kwargs": {},
+    "query": {},
+    "body": null
+  },
+  {
+    "name": "get_open_rfq_offers",
+    "method": "GET",
+    "path": "/derivatives/api/v3/rfqs/open-offers",
+    "auth": "futures",
+    "kwargs": {},
+    "query": {},
+    "body": null
+  },
+  {
+    "name": "get_open_rfqs_for_account",
+    "method": "GET",
+    "path": "/derivatives/api/v3/rfqs/open-rfqs",
+    "auth": "futures",
+    "kwargs": {},
+    "query": {},
+    "body": null
+  },
+  {
+    "name": "place_rfq_offer",
+    "method": "POST",
+    "path": "/derivatives/api/v3/rfqs/place-offer/d4ec4d52-b159-428e-ba64-f45455a978a1",
+    "auth": "futures",
+    "kwargs": {
+      "rfq_uid": "d4ec4d52-b159-428e-ba64-f45455a978a1",
+      "bid": "100.0000",
+      "ask": "101.0000"
+    },
+    "query": {
+      "bid": "100.0000",
+      "ask": "101.0000"
+    },
+    "body": null
+  },
+  {
+    "name": "get_rfq",
+    "method": "GET",
+    "path": "/derivatives/api/v3/rfqs/d4ec4d52-b159-428e-ba64-f45455a978a1",
+    "auth": "futures",
+    "kwargs": {
+      "rfq_uid": "d4ec4d52-b159-428e-ba64-f45455a978a1"
+    },
+    "query": {},
+    "body": null
+  },
+  {
+    "name": "delete_rfq_assignment_max_leverage",
+    "method": "DELETE",
+    "path": "/derivatives/api/v3/rfq-assignment/max-leverage",
+    "auth": "futures",
+    "kwargs": {},
+    "query": {},
+    "body": null
+  },
+  {
+    "name": "get_rfq_assignment_max_leverage",
+    "method": "GET",
+    "path": "/derivatives/api/v3/rfq-assignment/max-leverage",
+    "auth": "futures",
+    "kwargs": {},
+    "query": {},
+    "body": null
+  },
+  {
+    "name": "update_rfq_assignment_max_leverage",
+    "method": "PUT",
+    "path": "/derivatives/api/v3/rfq-assignment/max-leverage",
+    "auth": "futures",
+    "kwargs": {
+      "max_leverage": "2.5"
+    },
+    "query": {
+      "maxLeverage": "2.5"
+    },
+    "body": null
+  }
+]

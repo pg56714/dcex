@@ -30,6 +30,7 @@ impl OndoClient {
         method_name: &str,
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
+        let params = super::super::operation_guards::validate("ondo", method_name, params)?;
         let params = OndoParams::from_pairs(params);
         if let Some(response) = self.account_private_request(method_name, &params).await? {
             return Ok(response);
@@ -323,12 +324,12 @@ fn validate_order_value(order: &Value) -> Result<()> {
     let price = string("price")?;
     let size = string("size")?;
     let quote_size = string("quoteSize")?;
-    if let Some(time_in_force) = string("timeInForce")? {
-        if !matches!(time_in_force, "GTC" | "IOC") {
-            return Err(DcexError::InvalidInput(
-                "Ondo timeInForce must be GTC or IOC".to_string(),
-            ));
-        }
+    if let Some(time_in_force) = string("timeInForce")?
+        && !matches!(time_in_force, "GTC" | "IOC")
+    {
+        return Err(DcexError::InvalidInput(
+            "Ondo timeInForce must be GTC or IOC".to_string(),
+        ));
     }
     for key in ["postOnly", "reduceOnly"] {
         if object.get(key).is_some_and(|value| !value.is_boolean()) {

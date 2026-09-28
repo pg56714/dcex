@@ -1,9 +1,11 @@
 """OKX SBE bytes and JSON API errors through both public Python clients."""
 
 from __future__ import annotations
+
 import pytest
-from dcex.okx.client import Client
+
 from dcex.async_support.okx.client import Client as AsyncClient
+from dcex.okx.client import Client
 from tests.unit.native_http_helpers import _http_server
 
 

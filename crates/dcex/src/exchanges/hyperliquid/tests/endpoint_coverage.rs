@@ -1496,7 +1496,7 @@ fn account_risk_queries_and_actions_reject_invalid_parameters() {
         (
             false,
             "set_agent_abstraction",
-            vec![("abstraction", "p"), ("vaultAddress", USER)],
+            vec![("abstraction", "p"), ("vaultAddress", "invalid")],
         ),
         (
             false,
@@ -1537,15 +1537,51 @@ fn vault_staking_and_abstraction_actions() {
             ("usd", "100"),
         ],
     );
-    assert_eq!(body.body["action"]["type"], "vaultTransfer");
+    assert_eq!(
+        body.body["action"],
+        json!({"type":"vaultTransfer","vaultAddress":"0xabababababababababababababababababababab","isDeposit":true,"usd":100})
+    );
+    assert_eq!(
+        body.body["action"]
+            .as_object()
+            .unwrap()
+            .keys()
+            .map(String::as_str)
+            .collect::<Vec<_>>(),
+        vec!["type", "vaultAddress", "isDeposit", "usd"]
+    );
     assert!(body.body.get("vaultAddress").is_none());
     let body = private_payload("enable_agent_dex_abstraction", &[]);
-    assert_eq!(body.body["action"]["type"], "agentEnableDexAbstraction");
+    assert_eq!(
+        body.body["action"],
+        json!({"type":"agentEnableDexAbstraction"})
+    );
+    assert_eq!(
+        body.body["action"]
+            .as_object()
+            .unwrap()
+            .keys()
+            .map(String::as_str)
+            .collect::<Vec<_>>(),
+        vec!["type"]
+    );
     let body = private_payload(
         "transfer_hip3_liquidator",
         &[("dex", "xyz"), ("ntl", "100"), ("isDeposit", "true")],
     );
-    assert_eq!(body.body["action"]["type"], "hip3LiquidatorTransfer");
+    assert_eq!(
+        body.body["action"],
+        json!({"type":"hip3LiquidatorTransfer","dex":"xyz","ntl":100,"isDeposit":true})
+    );
+    assert_eq!(
+        body.body["action"]
+            .as_object()
+            .unwrap()
+            .keys()
+            .map(String::as_str)
+            .collect::<Vec<_>>(),
+        vec!["type", "dex", "ntl", "isDeposit"]
+    );
     let body = private_payload(
         "deposit_staking_signed",
         &[
@@ -1558,7 +1594,25 @@ fn vault_staking_and_abstraction_actions() {
             ("signatureChainId", "0xa4b1"),
         ],
     );
-    assert_eq!(body.body["action"]["type"], "cDeposit");
+    assert_eq!(
+        body.body["action"],
+        json!({"type":"cDeposit","hyperliquidChain":"Mainnet","signatureChainId":"0xa4b1","nonce":100,"wei":100})
+    );
+    assert_eq!(
+        body.body["action"]
+            .as_object()
+            .unwrap()
+            .keys()
+            .map(String::as_str)
+            .collect::<Vec<_>>(),
+        vec![
+            "type",
+            "hyperliquidChain",
+            "signatureChainId",
+            "nonce",
+            "wei"
+        ]
+    );
     let body = private_payload(
         "withdraw_staking_signed",
         &[
@@ -1571,7 +1625,25 @@ fn vault_staking_and_abstraction_actions() {
             ("signatureChainId", "0xa4b1"),
         ],
     );
-    assert_eq!(body.body["action"]["type"], "cWithdraw");
+    assert_eq!(
+        body.body["action"],
+        json!({"type":"cWithdraw","hyperliquidChain":"Mainnet","signatureChainId":"0xa4b1","nonce":100,"wei":100})
+    );
+    assert_eq!(
+        body.body["action"]
+            .as_object()
+            .unwrap()
+            .keys()
+            .map(String::as_str)
+            .collect::<Vec<_>>(),
+        vec![
+            "type",
+            "hyperliquidChain",
+            "signatureChainId",
+            "nonce",
+            "wei"
+        ]
+    );
     let body = private_payload(
         "delegate_tokens_signed",
         &[
@@ -1586,7 +1658,27 @@ fn vault_staking_and_abstraction_actions() {
             ("signatureChainId", "0xa4b1"),
         ],
     );
-    assert_eq!(body.body["action"]["type"], "tokenDelegate");
+    assert_eq!(
+        body.body["action"],
+        json!({"type":"tokenDelegate","hyperliquidChain":"Mainnet","signatureChainId":"0xa4b1","nonce":100,"wei":100,"validator":"0xabababababababababababababababababababab","isUndelegate":true})
+    );
+    assert_eq!(
+        body.body["action"]
+            .as_object()
+            .unwrap()
+            .keys()
+            .map(String::as_str)
+            .collect::<Vec<_>>(),
+        vec![
+            "type",
+            "hyperliquidChain",
+            "signatureChainId",
+            "nonce",
+            "wei",
+            "validator",
+            "isUndelegate"
+        ]
+    );
     let body = private_payload(
         "set_user_dex_abstraction_signed",
         &[
@@ -1600,13 +1692,44 @@ fn vault_staking_and_abstraction_actions() {
             ("signatureChainId", "0xa4b1"),
         ],
     );
-    assert_eq!(body.body["action"]["type"], "userDexAbstraction");
+    assert_eq!(
+        body.body["action"],
+        json!({"type":"userDexAbstraction","hyperliquidChain":"Mainnet","signatureChainId":"0xa4b1","nonce":100,"user":"0xabababababababababababababababababababab","enabled":true})
+    );
+    assert_eq!(
+        body.body["action"]
+            .as_object()
+            .unwrap()
+            .keys()
+            .map(String::as_str)
+            .collect::<Vec<_>>(),
+        vec![
+            "type",
+            "hyperliquidChain",
+            "signatureChainId",
+            "nonce",
+            "user",
+            "enabled"
+        ]
+    );
 }
 
 #[test]
 fn subaccount_actions_use_master_signer() {
     let r = private_payload("create_sub_account", &[("name", "desk")]);
-    assert_eq!(r.body["action"]["type"], "createSubAccount");
+    assert_eq!(
+        r.body["action"],
+        json!({"type":"createSubAccount","name":"desk"})
+    );
+    assert_eq!(
+        r.body["action"]
+            .as_object()
+            .unwrap()
+            .keys()
+            .map(String::as_str)
+            .collect::<Vec<_>>(),
+        vec!["type", "name"]
+    );
     assert!(r.body.get("vaultAddress").is_none());
     let r = private_payload(
         "transfer_sub_account_usd",
@@ -1619,7 +1742,19 @@ fn subaccount_actions_use_master_signer() {
             ("usd", "100"),
         ],
     );
-    assert_eq!(r.body["action"]["type"], "subAccountTransfer");
+    assert_eq!(
+        r.body["action"],
+        json!({"type":"subAccountTransfer","subAccountUser":"0xabababababababababababababababababababab","isDeposit":true,"usd":100})
+    );
+    assert_eq!(
+        r.body["action"]
+            .as_object()
+            .unwrap()
+            .keys()
+            .map(String::as_str)
+            .collect::<Vec<_>>(),
+        vec!["type", "subAccountUser", "isDeposit", "usd"]
+    );
     assert!(r.body.get("vaultAddress").is_none());
     let r = private_payload(
         "transfer_sub_account_spot",
@@ -1633,7 +1768,19 @@ fn subaccount_actions_use_master_signer() {
             ("amount", "1"),
         ],
     );
-    assert_eq!(r.body["action"]["type"], "subAccountSpotTransfer");
+    assert_eq!(
+        r.body["action"],
+        json!({"type":"subAccountSpotTransfer","subAccountUser":"0xabababababababababababababababababababab","isDeposit":true,"token":"USDC","amount":"1"})
+    );
+    assert_eq!(
+        r.body["action"]
+            .as_object()
+            .unwrap()
+            .keys()
+            .map(String::as_str)
+            .collect::<Vec<_>>(),
+        vec!["type", "subAccountUser", "isDeposit", "token", "amount"]
+    );
     assert!(r.body.get("vaultAddress").is_none());
 }
 
@@ -1651,7 +1798,25 @@ fn agent_approval_preserves_wallet_signature() {
             ("signatureChainId", "0xa4b1"),
         ],
     );
-    assert_eq!(body.body["action"]["type"], "approveAgent");
+    assert_eq!(
+        body.body["action"],
+        json!({"type":"approveAgent","hyperliquidChain":"Mainnet","signatureChainId":"0xa4b1","nonce":100,"agentAddress":"0xabababababababababababababababababababab"})
+    );
+    assert_eq!(
+        body.body["action"]
+            .as_object()
+            .unwrap()
+            .keys()
+            .map(String::as_str)
+            .collect::<Vec<_>>(),
+        vec![
+            "type",
+            "hyperliquidChain",
+            "signatureChainId",
+            "nonce",
+            "agentAddress"
+        ]
+    );
     assert!(body.body["action"].get("agentName").is_none());
 }
 

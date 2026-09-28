@@ -81,17 +81,17 @@ impl OndoPrivateWebSocket {
                 self.authenticated = true;
                 return Ok(());
             }
-            if attempt == 0 && response.get("type").and_then(Value::as_str) == Some("error") {
-                if let Some(offset) = response
+            if attempt == 0
+                && response.get("type").and_then(Value::as_str) == Some("error")
+                && let Some(offset) = response
                     .get("msg")
                     .and_then(Value::as_str)
                     .and_then(|message| server_clock_offset_ms(message, unix_timestamp_ms().ok()?))
-                {
-                    self.timestamp_offset_ms = offset;
-                    self.connection.close().await?;
-                    self.connection.connect().await?;
-                    continue;
-                }
+            {
+                self.timestamp_offset_ms = offset;
+                self.connection.close().await?;
+                self.connection.connect().await?;
+                continue;
             }
             self.connection.close().await?;
             return Err(DcexError::Runtime(format!(

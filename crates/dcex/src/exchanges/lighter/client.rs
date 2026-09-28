@@ -29,7 +29,7 @@ pub enum LighterContentType {
 pub struct LighterClient {
     pub(super) transport: AsyncHttpClient,
     pub(super) base_url: String,
-    pub(super) explorer_base_url: String,
+    pub(super) explorer_base_url: Option<String>,
     pub(super) network: Option<LighterNetwork>,
     pub(super) chain_id: Option<u64>,
     pub(super) account_index: Option<u64>,
@@ -45,7 +45,7 @@ impl LighterClient {
         if !matches!(url.scheme(), "http" | "https") || url.host_str().is_none() {
             return Err(DcexError::InvalidInput("invalid explorer base URL".into()));
         }
-        self.explorer_base_url = base_url;
+        self.explorer_base_url = Some(base_url);
         Ok(self)
     }
     pub fn new(timeout: Duration) -> Result<Self> {
@@ -148,12 +148,12 @@ impl LighterClient {
             ));
         }
         let network = LighterNetwork::from_api_url(&base_url);
-        if let Some(expected) = network.map(|network| network.profile().chain_id) {
-            if chain_id != expected {
-                return Err(DcexError::InvalidInput(format!(
-                    "Lighter chain_id {chain_id} does not match the selected endpoint (expected {expected})."
-                )));
-            }
+        if let Some(expected) = network.map(|network| network.profile().chain_id)
+            && chain_id != expected
+        {
+            return Err(DcexError::InvalidInput(format!(
+                "Lighter chain_id {chain_id} does not match the selected endpoint (expected {expected})."
+            )));
         }
         Self::build(
             timeout,
@@ -199,7 +199,11 @@ impl LighterClient {
         Ok(Self {
             transport: AsyncHttpClient::new(timeout)?,
             base_url,
-            explorer_base_url: "https://explorer.elliot.ai/api".into(),
+            // No documented explorer origin for the other networks: require an override.
+            explorer_base_url: match network {
+                Some(LighterNetwork::Mainnet) => Some("https://explorer.elliot.ai/api".into()),
+                _ => None,
+            },
             network,
             chain_id,
             account_index,
@@ -573,4 +577,47 @@ pub(super) fn validate_response(response: &HttpResponse) -> Result<Value> {
         }
     }
     Ok(data)
+}
+
+#[cfg(test)]
+mod review_explorer_tests {
+    use super::*;
+
+    #[test]
+    fn explorer_default_does_not_cross_networks() {
+        for network in LighterNetwork::ALL {
+            let client = LighterClient::with_network_and_credentials(
+                Duration::from_secs(1),
+                network,
+                None,
+                None,
+                None,
+            )
+            .unwrap();
+            assert_eq!(
+                client.explorer_base_url.is_some(),
+                network == LighterNetwork::Mainnet
+            );
+            if network != LighterNetwork::Mainnet {
+                let error = crate::http::block_on(async move {
+                    client.public_request("get_explorer_batches", vec![]).await
+                })
+                .unwrap_err();
+                assert!(
+                    error
+                        .to_string()
+                        .contains("explorer_base_url must be configured")
+                );
+            }
+        }
+        let custom = LighterClient::with_base_url_and_credentials(
+            Duration::from_secs(1),
+            "http://127.0.0.1:1".into(),
+            None,
+            None,
+            None,
+        )
+        .unwrap();
+        assert!(custom.explorer_base_url.is_none());
+    }
 }

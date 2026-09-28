@@ -1,4 +1,18 @@
+use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::{SystemTime, UNIX_EPOCH};
+
+static LAST_NONCE: AtomicU64 = AtomicU64::new(0);
+
+pub(super) fn next_nonce() -> Result<u64> {
+    let now = u64::try_from(unix_timestamp_ns()?)
+        .map_err(|_| DcexError::Runtime("Kraken nonce overflow".into()))?;
+    LAST_NONCE
+        .fetch_update(Ordering::SeqCst, Ordering::SeqCst, |last| {
+            last.checked_add(1).map(|next| next.max(now))
+        })
+        .map(|last| now.max(last + 1))
+        .map_err(|_| DcexError::Runtime("Kraken nonce overflow".into()))
+}
 
 use base64::Engine;
 use serde_json::Value;

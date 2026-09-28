@@ -132,10 +132,10 @@ pub(super) fn batch_orders_query(value: &str) -> Result<String> {
             ));
         };
         for key in ["symbol", "side", "type"] {
-            if !order
+            if order
                 .get(key)
                 .and_then(Value::as_str)
-                .is_some_and(|value| !value.trim().is_empty())
+                .is_none_or(|value| value.trim().is_empty())
             {
                 return Err(DcexError::InvalidInput(format!(
                     "BingX batch order is missing required field: {key}"
@@ -351,12 +351,11 @@ fn normalize_batch_value(value: &mut Value) {
             continue;
         };
         for field in BATCH_NUMERIC_FIELDS {
-            if let Some(Value::String(raw)) = order.get(*field) {
-                if let Ok(number) = raw.parse::<f64>() {
-                    if let Some(number) = Number::from_f64(number) {
-                        order.insert((*field).to_string(), Value::Number(number));
-                    }
-                }
+            if let Some(Value::String(raw)) = order.get(*field)
+                && let Ok(number) = raw.parse::<f64>()
+                && let Some(number) = Number::from_f64(number)
+            {
+                order.insert((*field).to_string(), Value::Number(number));
             }
         }
     }

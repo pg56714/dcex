@@ -3773,3 +3773,520 @@ class TradeHTTP(HTTPManager):
         return await self._native_private(
             "get_finance_stable_rewards_apy_history", self._native_params(ccy=ccy, days=days)
         )
+
+    async def reset_mmp(
+        self,
+        *,
+        inst_type: str | None = None,
+        inst_family: str,
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /api/v5/account/mmp-reset.
+
+        Source: https://www.okx.com/docs-v5/en/#trading-account-rest-api-reset-mmp-status
+        """
+        return await self._native_private(
+            "reset_mmp",
+            self._native_params(**{"instType": inst_type, "instFamily": inst_family}),
+        )
+
+    async def set_mmp_config(
+        self,
+        *,
+        inst_family: str,
+        time_interval: str,
+        frozen_interval: str,
+        qty_limit: str,
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /api/v5/account/mmp-config.
+
+        Source: https://www.okx.com/docs-v5/en/#trading-account-rest-api-set-mmp
+        """
+        return await self._native_private(
+            "set_mmp_config",
+            self._native_params(
+                **{
+                    "instFamily": inst_family,
+                    "timeInterval": time_interval,
+                    "frozenInterval": frozen_interval,
+                    "qtyLimit": qty_limit,
+                }
+            ),
+        )
+
+    async def get_mmp_config(
+        self,
+        *,
+        inst_family: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /api/v5/account/mmp-config.
+
+        Source: https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-mmp-config
+        """
+        return await self._native_private(
+            "get_mmp_config",
+            self._native_params(**{"instFamily": inst_family}),
+        )
+
+    async def get_glp_today_performance(
+        self,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /api/v5/users/glp/todayperformance.
+
+        Source: https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-get-glp-today-performance
+        """
+        return await self._native_private(
+            "get_glp_today_performance",
+            self._native_params(**{}),
+        )
+
+    async def get_glp_historical_performance(
+        self,
+        *,
+        program: str,
+        begin: str | None = None,
+        end: str | None = None,
+        limit: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /api/v5/users/glp/historicalperformance.
+
+        Source: https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-get-glp-historical-performance
+        """
+        return await self._native_private(
+            "get_glp_historical_performance",
+            self._native_params(**{"program": program, "begin": begin, "end": end, "limit": limit}),
+        )
+
+    async def mass_cancel_options_orders(
+        self,
+        *,
+        inst_type: str,
+        inst_family: str,
+        lock_interval: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /api/v5/trade/mass-cancel.
+
+        Cancels all options orders for the specified instrument family.
+        Source: https://www.okx.com/docs-v5/en/#order-book-trading-trade-post-mass-cancel-order
+        """
+        return await self._native_private(
+            "mass_cancel_options_orders",
+            self._native_params(
+                **{"instType": inst_type, "instFamily": inst_family, "lockInterval": lock_interval}
+            ),
+        )
+
+    async def create_rfq_quote(
+        self,
+        *,
+        rfq_id: str,
+        cl_quote_id: str | None = None,
+        tag: str | None = None,
+        anonymous: bool | None = None,
+        quote_side: str,
+        expires_in: str | None = None,
+        legs: list[Any],
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /api/v5/rfq/create-quote.
+
+        Source: https://www.okx.com/docs-v5/en/#block-trading-rest-api-create-quote
+        """
+        return await self._native_private(
+            "create_rfq_quote",
+            self._native_params(
+                **{
+                    "rfqId": rfq_id,
+                    "clQuoteId": cl_quote_id,
+                    "tag": tag,
+                    "anonymous": anonymous,
+                    "quoteSide": quote_side,
+                    "expiresIn": expires_in,
+                    "legs": legs,
+                }
+            ),
+        )
+
+    async def cancel_rfq_quote(
+        self,
+        *,
+        quote_id: str | None = None,
+        cl_quote_id: str | None = None,
+        rfq_id: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /api/v5/rfq/cancel-quote.
+
+        Source: https://www.okx.com/docs-v5/en/#block-trading-rest-api-cancel-quote
+        """
+        return await self._native_private(
+            "cancel_rfq_quote",
+            self._native_params(**{"quoteId": quote_id, "clQuoteId": cl_quote_id, "rfqId": rfq_id}),
+        )
+
+    async def get_rfq_maker_instrument_settings(
+        self,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /api/v5/rfq/maker-instrument-settings.
+
+        Source: https://www.okx.com/docs-v5/en/#block-trading-rest-api-get-quote-products
+        """
+        return await self._native_private(
+            "get_rfq_maker_instrument_settings",
+            self._native_params(**{}),
+        )
+
+    async def set_rfq_maker_instrument_settings(
+        self,
+        *,
+        inst_type: str,
+        include_all: bool | None = None,
+        data: list[Any],
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /api/v5/rfq/maker-instrument-settings.
+
+        Source: https://www.okx.com/docs-v5/en/#block-trading-rest-api-set-quote-products
+        """
+        return await self._native_private(
+            "set_rfq_maker_instrument_settings",
+            self._native_params(**{"instType": inst_type, "includeAll": include_all, "data": data}),
+        )
+
+    async def reset_rfq_mmp(
+        self,
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /api/v5/rfq/mmp-reset.
+
+        Source: https://www.okx.com/docs-v5/en/#block-trading-rest-api-reset-mmp-status
+        """
+        return await self._native_private(
+            "reset_rfq_mmp",
+            self._native_params(**{}),
+        )
+
+    async def set_rfq_mmp_config(
+        self,
+        *,
+        time_interval: str,
+        frozen_interval: str,
+        count_limit: str,
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /api/v5/rfq/mmp-config.
+
+        Source: https://www.okx.com/docs-v5/en/#block-trading-rest-api-set-mmp
+        """
+        return await self._native_private(
+            "set_rfq_mmp_config",
+            self._native_params(
+                **{
+                    "timeInterval": time_interval,
+                    "frozenInterval": frozen_interval,
+                    "countLimit": count_limit,
+                }
+            ),
+        )
+
+    async def get_rfq_mmp_config(
+        self,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /api/v5/rfq/mmp-config.
+
+        Source: https://www.okx.com/docs-v5/en/#block-trading-rest-api-get-mmp-config
+        """
+        return await self._native_private(
+            "get_rfq_mmp_config",
+            self._native_params(**{}),
+        )
+
+    async def cancel_rfq_batch_quotes(
+        self,
+        *,
+        quote_ids: list[Any] | None = None,
+        cl_quote_ids: list[Any] | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /api/v5/rfq/cancel-batch-quotes.
+
+        Source: https://www.okx.com/docs-v5/en/#block-trading-rest-api-cancel-multiple-quotes
+        """
+        return await self._native_private(
+            "cancel_rfq_batch_quotes",
+            self._native_params(**{"quoteIds": quote_ids, "clQuoteIds": cl_quote_ids}),
+        )
+
+    async def cancel_all_rfq_quotes(
+        self,
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /api/v5/rfq/cancel-all-quotes.
+
+        Cancels every open RFQ quote on the account.
+        Source: https://www.okx.com/docs-v5/en/#block-trading-rest-api-cancel-all-quotes
+        """
+        return await self._native_private(
+            "cancel_all_rfq_quotes",
+            self._native_params(**{}),
+        )
+
+    async def set_rfq_cancel_all_after(
+        self,
+        *,
+        time_out: str,
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /api/v5/rfq/cancel-all-after.
+
+        Source: https://www.okx.com/docs-v5/en/#block-trading-rest-api-cancel-all-after
+        """
+        return await self._native_private(
+            "set_rfq_cancel_all_after",
+            self._native_params(**{"timeOut": time_out}),
+        )
+
+    async def create_withdrawal(
+        self,
+        *,
+        ccy: str,
+        amt: str,
+        dest: str,
+        to_addr: str,
+        to_addr_type: str | None = None,
+        chain: str | None = None,
+        area_code: str | None = None,
+        rcvr_info: dict[str, Any] | None = None,
+        client_id: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /api/v5/asset/withdrawal.
+
+        API withdrawals have no second confirmation; they execute on submit.
+        Source: https://www.okx.com/docs-v5/en/#funding-account-rest-api-withdrawal
+        """
+        return await self._native_private(
+            "create_withdrawal",
+            self._native_params(
+                **{
+                    "ccy": ccy,
+                    "amt": amt,
+                    "dest": dest,
+                    "toAddr": to_addr,
+                    "toAddrType": to_addr_type,
+                    "chain": chain,
+                    "areaCode": area_code,
+                    "rcvrInfo": rcvr_info,
+                    "clientId": client_id,
+                }
+            ),
+        )
+
+    async def cancel_withdrawal(
+        self,
+        *,
+        wd_id: str,
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /api/v5/asset/cancel-withdrawal.
+
+        Source: https://www.okx.com/docs-v5/en/#funding-account-rest-api-cancel-withdrawal
+        """
+        return await self._native_private(
+            "cancel_withdrawal",
+            self._native_params(**{"wdId": wd_id}),
+        )
+
+    async def create_fiat_withdrawal(
+        self,
+        *,
+        payment_acct_id: str,
+        ccy: str,
+        amt: str,
+        payment_method: str,
+        client_id: str,
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /api/v5/fiat/create-withdrawal.
+
+        API withdrawals have no second confirmation; they execute on submit.
+        Source: https://www.okx.com/docs-v5/en/#funding-account-rest-api-create-withdrawal-order
+        """
+        return await self._native_private(
+            "create_fiat_withdrawal",
+            self._native_params(
+                **{
+                    "paymentAcctId": payment_acct_id,
+                    "ccy": ccy,
+                    "amt": amt,
+                    "paymentMethod": payment_method,
+                    "clientId": client_id,
+                }
+            ),
+        )
+
+    async def cancel_fiat_withdrawal(
+        self,
+        *,
+        ord_id: str,
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /api/v5/fiat/cancel-withdrawal.
+
+        Source: https://www.okx.com/docs-v5/en/#funding-account-rest-api-cancel-withdrawal-order
+        """
+        return await self._native_private(
+            "cancel_fiat_withdrawal",
+            self._native_params(**{"ordId": ord_id}),
+        )
+
+    async def get_affiliate_performance_summary(
+        self,
+        *,
+        period_type: str | None = None,
+        begin: str | None = None,
+        end: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /api/v5/affiliate/performance/summary.
+
+        Source: https://www.okx.com/docs-v5/en/#affiliate-rest-api-get-performance-summary
+        """
+        return await self._native_private(
+            "get_affiliate_performance_summary",
+            self._native_params(**{"periodType": period_type, "begin": begin, "end": end}),
+        )
+
+    async def get_affiliate_invitee_detail(
+        self,
+        *,
+        uid: str,
+        period_type: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /api/v5/affiliate/invitee/detail.
+
+        Source: https://www.okx.com/docs-v5/en/#affiliate-rest-api-get-the-invitee-39-s-detail
+        """
+        return await self._native_private(
+            "get_affiliate_invitee_detail",
+            self._native_params(**{"uid": uid, "periodType": period_type}),
+        )
+
+    async def get_affiliate_invitee_list(
+        self,
+        *,
+        page: str | None = None,
+        limit: str | None = None,
+        period_type: str | None = None,
+        begin: str | None = None,
+        end: str | None = None,
+        keyword: str | None = None,
+        commission_category: str | None = None,
+        order_by: str | None = None,
+        order_dir: str | None = None,
+        kyc_status: str | None = None,
+        sub_affiliate_uid: str | None = None,
+        uid: str | None = None,
+        join_time_begin: str | None = None,
+        join_time_end: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /api/v5/affiliate/invitee/list.
+
+        Source: https://www.okx.com/docs-v5/en/#affiliate-rest-api-get-invitee-list
+        """
+        return await self._native_private(
+            "get_affiliate_invitee_list",
+            self._native_params(
+                **{
+                    "page": page,
+                    "limit": limit,
+                    "periodType": period_type,
+                    "begin": begin,
+                    "end": end,
+                    "keyword": keyword,
+                    "commissionCategory": commission_category,
+                    "orderBy": order_by,
+                    "orderDir": order_dir,
+                    "kycStatus": kyc_status,
+                    "subAffiliateUid": sub_affiliate_uid,
+                    "uid": uid,
+                    "joinTimeBegin": join_time_begin,
+                    "joinTimeEnd": join_time_end,
+                }
+            ),
+        )
+
+    async def get_affiliate_links(
+        self,
+        *,
+        page: str | None = None,
+        limit: str | None = None,
+        link_type: str | None = None,
+        link_status: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /api/v5/affiliate/link/list.
+
+        Source: https://www.okx.com/docs-v5/en/#affiliate-rest-api-get-link-list
+        """
+        return await self._native_private(
+            "get_affiliate_links",
+            self._native_params(
+                **{"page": page, "limit": limit, "linkType": link_type, "linkStatus": link_status}
+            ),
+        )
+
+    async def get_affiliate_co_inviters(
+        self,
+        *,
+        page: str | None = None,
+        limit: str | None = None,
+        link_status: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /api/v5/affiliate/co-inviter/list.
+
+        Source: https://www.okx.com/docs-v5/en/#affiliate-rest-api-get-co-inviter-link-list
+        """
+        return await self._native_private(
+            "get_affiliate_co_inviters",
+            self._native_params(**{"page": page, "limit": limit, "linkStatus": link_status}),
+        )
+
+    async def get_sub_affiliates(
+        self,
+        *,
+        page: str | None = None,
+        limit: str | None = None,
+        keyword: str | None = None,
+        commission_category: str | None = None,
+        order_by: str | None = None,
+        order_dir: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /api/v5/affiliate/sub-affiliate/list.
+
+        Source: https://www.okx.com/docs-v5/en/#affiliate-rest-api-get-sub-affiliate-list
+        """
+        return await self._native_private(
+            "get_sub_affiliates",
+            self._native_params(
+                **{
+                    "page": page,
+                    "limit": limit,
+                    "keyword": keyword,
+                    "commissionCategory": commission_category,
+                    "orderBy": order_by,
+                    "orderDir": order_dir,
+                }
+            ),
+        )

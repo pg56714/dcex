@@ -1,6 +1,8 @@
 //! Arcus perpetuals REST API and the separate Spot RFQ router.
 
 mod client;
+mod completion;
+mod completion_wrappers;
 mod endpoints;
 mod market;
 mod metadata;

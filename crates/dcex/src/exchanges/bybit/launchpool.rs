@@ -89,23 +89,23 @@ fn parse_u64(params: &BybitParams, key: &str) -> Result<Option<u64>> {
 }
 
 fn validate_bounded(params: &BybitParams, key: &str, maximum: u64) -> Result<()> {
-    if let Some(value) = parse_u64(params, key)? {
-        if !(1..=maximum).contains(&value) {
-            return Err(DcexError::InvalidInput(format!(
-                "{key} must be between 1 and {maximum}"
-            )));
-        }
+    if let Some(value) = parse_u64(params, key)?
+        && !(1..=maximum).contains(&value)
+    {
+        return Err(DcexError::InvalidInput(format!(
+            "{key} must be between 1 and {maximum}"
+        )));
     }
     Ok(())
 }
 
 fn validate_optional_max(params: &BybitParams, key: &str, maximum: u64) -> Result<()> {
-    if let Some(value) = parse_u64(params, key)? {
-        if value > maximum {
-            return Err(DcexError::InvalidInput(format!(
-                "{key} must not exceed {maximum}"
-            )));
-        }
+    if let Some(value) = parse_u64(params, key)?
+        && value > maximum
+    {
+        return Err(DcexError::InvalidInput(format!(
+            "{key} must not exceed {maximum}"
+        )));
     }
     Ok(())
 }

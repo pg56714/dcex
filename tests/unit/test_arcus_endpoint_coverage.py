@@ -17,10 +17,15 @@ import queue
 import time
 from collections.abc import Iterator
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 from urllib.parse import parse_qsl, urlsplit
 
 import pytest
+
+from tests.unit.wire_expectations import EXPECTED_VERBS as _ALL_VERBS
+
+EXPECTED_VERBS = _ALL_VERBS["arcus"]
 
 from dcex.arcus.client import Client
 from dcex.async_support.arcus.client import Client as AsyncClient
@@ -374,6 +379,22 @@ CASES.extend(
 )
 
 
+COMPLETION_CASES = json.loads(
+    (Path(__file__).parents[1] / "fixtures/arcus_completion.json").read_text(encoding="utf-8")
+)
+CASES.extend(
+    WireCase(
+        c["method"],
+        c["kwargs"],
+        c["path"],
+        {k: str(v) for k, v in c["query"].items()},
+        c["body"],
+        c["signed"],
+    )
+    for c in COMPLETION_CASES
+)
+
+
 def _client_kwargs(base_url: str) -> dict[str, Any]:
     return {"api_secret": SECRET, "address": ADDRESS, "base_url": base_url}
 
@@ -402,12 +423,49 @@ def _assert_wire(wire: WireCase, requests: list[dict[str, Any]]) -> dict[str, An
     paths = [urlsplit(request["path"]).path for request in requests]
     assert paths[: wire.lookups] == ["/v1/markets"] * wire.lookups, paths
     assert len(requests) == wire.lookups + 1, paths
+    assert all(request["method"] == "GET" for request in requests[:wire.lookups])
     final = requests[-1]
+    assert final["method"] == EXPECTED_VERBS[wire.method]
     target = urlsplit(final["path"])
     assert target.path == wire.http_method_path
     query = dict(parse_qsl(target.query))
     for key, value in wire.query.items():
         assert query.get(key) == value, (key, query)
+    completion = next((c for c in COMPLETION_CASES if c["method"] == wire.method), None)
+    if completion is not None:
+        from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
+
+        assert final["method"] == completion["http_method"]
+        assert query == wire.query
+        sent = json.loads(final["body"]) if wire.body is not None else None
+        assert sent == wire.body
+        if wire.signed:
+            timestamp = final["x-timestamp"]
+            action = target.path.rsplit("/", 1)[-1]
+            if wire.method == "create_withdrawal":
+                typed = {
+                    "ad": ADDRESS,
+                    "ai": 0,
+                    "ct": int(timestamp),
+                    "n": wire.body["nonce"],
+                    "op": 5,
+                    "q": int(wire.body["amount"]),
+                    "v": 1,
+                }
+                message = json.dumps(typed, sort_keys=True, separators=(",", ":")).encode()
+            elif sent is None:
+                message = (timestamp + action).encode()
+            else:
+                message = (
+                    timestamp + action + json.dumps(sent, sort_keys=True, separators=(",", ":"))
+                ).encode()
+            Ed25519PublicKey.from_public_bytes(bytes.fromhex(final["x-api-key"])).verify(
+                bytes.fromhex(final["x-signature"]), message
+            )
+        else:
+            assert not final.get("x-api-key")
+            assert not final.get("x-signature")
+        return sent or {}
     if wire.method in {"get_api_keys", "create_api_key_signed", "revoke_api_key_signed"}:
         assert not final.get("x-api-key")
         assert not final.get("x-signature")

@@ -37,12 +37,14 @@ class APIRequestError(Exception):
         status_code: str | int | None = None,
         time: str | None = None,
         resp_headers: dict | None = None,
+        response_data: object = None,
     ) -> None:
         self.request = _sanitize_request(request)
         self.message = sanitize_message(message)
         self.status_code = status_code if status_code is not None else "Unknown"
         self.time = time if time is not None else "Unknown"
         self.resp_headers = resp_headers
+        self.response_data = response_data
         super().__init__(
             f"{self.message} (ErrCode: {self.status_code}) (ErrTime: {self.time}).\n"
             f"Request: {self.request}."

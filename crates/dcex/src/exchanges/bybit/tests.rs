@@ -633,7 +633,7 @@ const CASES: &[RouteCase] = &[
     RouteCase {
         public: false,
         name: "modify_api_key",
-        params: &[],
+        params: &[("confirm", "true"), ("readOnly", "1")],
         verb: "POST",
         path: "/v5/user/update-api",
     },
@@ -654,7 +654,7 @@ const CASES: &[RouteCase] = &[
     RouteCase {
         public: false,
         name: "delete_api_key",
-        params: &[],
+        params: &[("confirm", "true")],
         verb: "POST",
         path: "/v5/user/delete-api",
     },

@@ -518,3 +518,46 @@ class MarketHTTP(HTTPManager):
         return self._native_public(
             "get_prediction_ticker_book_ticker", self._native_params(symbol=symbol)
         )
+
+    def get_futures_market_klines(self, symbol: str, **params: object) -> Any:  # noqa: ANN401
+        """
+        Query the documented marketKlines route with caller-supplied wire parameters.
+
+        Official spec incomplete; not verified live. The public BTCUSDT probe returned
+        Invalid symbol. Use native symbol identifiers supplied by the exchange.
+        """
+        return self._native_public(
+            "get_futures_market_klines", self._params(symbol=symbol, **params)
+        )
+
+    def get_spot_optimized_ticker_24hr(self, *, symbol: str | None = None, **params: object) -> Any:  # noqa: ANN401
+        """
+        Query the alternative spot ticker using native symbols.
+
+        Official spec incomplete; not verified live beyond a public BTCUSDT GET probe.
+        """
+        return self._native_public(
+            "get_spot_optimized_ticker_24hr", self._params(symbol=symbol, **params)
+        )
+
+    def get_chain_locked_aster(self) -> Any:  # noqa: ANN401
+        """Query the total ASTER locked in 208-week staking positions."""
+        return self._native_public("get_chain_locked_aster", self._params())
+
+    def get_chain_withdraw_fee(self, *, chain_id: int, asset: str) -> Any:  # noqa: ANN401
+        """Estimate the Aster Chain withdrawal fee for an asset and chain."""
+        return self._native_public(
+            "get_chain_withdraw_fee", self._params(chainId=chain_id, asset=asset)
+        )
+
+    def get_announcement(self, *, id: int) -> Any:  # noqa: ANN401
+        """Get a public Aster announcement by its numeric ID."""
+        return self._native_public("get_announcement", self._params(id=id))
+
+    def search_announcements(
+        self, *, page: int = 1, size: int = 10, category: str | None = None
+    ) -> Any:  # noqa: ANN401
+        """Search public Aster announcements by page and optional category."""
+        return self._native_public(
+            "search_announcements", self._params(page=page, size=size, category=category)
+        )

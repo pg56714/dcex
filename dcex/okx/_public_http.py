@@ -378,3 +378,19 @@ class PublicHTTP(HTTPManager):
         return self._native_public(
             "get_option_taker_block_volume", self._params(ccy=ccy, period=period)
         )
+
+    def get_mm_instrument_types(
+        self,
+        *,
+        inst_type: str | None = None,
+        inst_id: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /api/v5/public/mm-instrument-types.
+
+        Source: https://www.okx.com/docs-v5/en/#public-data-rest-api-get-mm-instrument-types
+        """
+        return self._native_public(
+            "get_mm_instrument_types",
+            self._native_params(**{"instType": inst_type, "instId": inst_id}),
+        )

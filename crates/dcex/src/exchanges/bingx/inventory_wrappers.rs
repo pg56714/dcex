@@ -1,0 +1,46 @@
+use super::BingxClient;
+crate::exchanges::impl_exchange_method_wrappers! {
+    @extend; BingxClient;
+    public [
+        get_spot_v2_quote_price(),
+        get_spot_v2_quote_book_ticker(),
+        get_spot_v2_quote_depth(symbol => "symbol", type_ => "type"),
+        get_spot_v2_quote_historical_trades(symbol => "symbol"),
+        get_spot_v2_quote_klines(symbol => "symbol", interval => "interval"),
+        get_spot_v2_quote_ticker(),
+        get_spot_v2_quote_historical_klines(symbol => "symbol", interval => "interval"),
+        get_content_v1_announcement(),
+    ];
+    private [
+        get_agent_v1_asset_partner_data(),
+        post_cswap_v2_trade_order(symbol => "symbol", type_ => "type", side => "side", position_side => "positionSide"),
+        post_copy_trading_v1_swap_trace_set_tpsl(position_id => "positionId", take_profit_mark_price => "takeProfitMarkPrice", stop_loss_mark_price => "stopLossMarkPrice", recv_window => "recvWindow"),
+        delete_cswap_v1_trade_all_open_orders(),
+        get_copy_trading_v1_p_futures_trading_pairs(contract_type => "contractType"),
+        get_wealth_v1_product_dual_currency_order_records(page_id => "pageId", page_size => "pageSize"),
+        get_wealth_v1_product_dual_currency_position(),
+        get_copy_trading_v1_p_futures_profit_history_summarys(),
+        get_copy_trading_v1_p_futures_profit_detail(page_index => "pageIndex", page_size => "pageSize"),
+        get_copy_trading_v1_p_futures_trader_detail(),
+        get_copy_trading_v1_spot_trader_detail(),
+        get_agent_v2_reward_commission_data_list(start_time => "startTime", end_time => "endTime", page_index => "pageIndex", page_size => "pageSize", recv_window => "recvWindow"),
+        post_wealth_v1_product_dual_currency_invest_asset_list(),
+        get_wallets_v1_capital_deposit_query_sub_address(coin => "coin", sub_uid => "subUid", network => "network", wallet_type => "walletType"),
+        post_wealth_v1_product_dual_currency_order(amount => "amount", sku => "sku", product_id => "productId", strike_price => "strikePrice", quote_id => "quoteId"),
+        get_agent_v1_reward_third_commission_data_list(commission_biz_type => "commissionBizType", start_time => "startTime", end_time => "endTime", page_index => "pageIndex", page_size => "pageSize"),
+        get_copy_trading_v1_spot_profit_detail(page_index => "pageIndex", page_size => "pageSize"),
+        get_copy_trading_v1_spot_history_order(page_index => "pageIndex", page_size => "pageSize"),
+        get_wealth_v1_product_dual_currency_pre_order(sku => "sku", strike_price => "strikePrice", product_id => "productId"),
+        post_copy_trading_v1_spot_trader_sell_order(order_id => "orderId"),
+        get_agent_v1_commission_data_list_referral_code(direct_invitation => "directInvitation"),
+        post_copy_trading_v1_p_futures_set_commission(new_commission => "newCommission"),
+        get_copy_trading_v1_spot_profit_history_summarys(),
+        get_agent_v1_account_invite_account_list(page_index => "pageIndex", page_size => "pageSize"),
+        get_agent_v1_account_invite_relation_check(uid => "uid"),
+        get_agent_v1_asset_deposit_detail_list(uid => "uid", biz_type => "bizType", start_time => "startTime", end_time => "endTime", page_index => "pageIndex", page_size => "pageSize"),
+        get_agent_v1_account_superior_check(uid => "uid"),
+        post_api_lindorm_v1_ai_kline_query(indicator_type => "indicatorType", access_token => "access_token", proxy_user => "proxy_user"),
+        get_copy_trading_v1_swap_trace_current_track(symbol => "symbol"),
+        post_copy_trading_v1_swap_trace_close_track_order(position_id => "positionId"),
+    ];
+}

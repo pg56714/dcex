@@ -47,12 +47,12 @@ impl OkxClient {
                         "action must be turn_on or turn_off".to_string(),
                     ));
                 }
-                if let Some(earn_type) = params.get("earnType") {
-                    if !["0", "1"].contains(&earn_type) {
-                        return Err(DcexError::InvalidInput(
-                            "earnType must be 0 or 1".to_string(),
-                        ));
-                    }
+                if let Some(earn_type) = params.get("earnType")
+                    && !["0", "1"].contains(&earn_type)
+                {
+                    return Err(DcexError::InvalidInput(
+                        "earnType must be 0 or 1".to_string(),
+                    ));
                 }
                 let mut body = params.required_body(&["ccy", "action"])?;
                 insert_optional_string(&mut body, "earnType", params.get("earnType"));

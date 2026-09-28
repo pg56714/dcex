@@ -1,5 +1,6 @@
 import pytest
 import pytest_asyncio
+
 from dcex.async_support.okx.client import Client
 
 
@@ -30,6 +31,7 @@ async def test_get_orderbook(client):
 async def test_get_tickers(client):
     res = await client.get_tickers(instType="SPOT")
     assert res is not None
+
 
 @pytest.mark.asyncio
 async def test_get_public_trades(client):

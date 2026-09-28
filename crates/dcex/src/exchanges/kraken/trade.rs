@@ -128,12 +128,12 @@ impl KrakenClient {
                         "Kraken amend requires at least one changed field".into(),
                     ));
                 }
-                if let Some(post_only) = params.get("post_only") {
-                    if !matches!(post_only, "true" | "false") {
-                        return Err(crate::DcexError::InvalidInput(
-                            "Kraken post_only must be true or false".into(),
-                        ));
-                    }
+                if let Some(post_only) = params.get("post_only")
+                    && !matches!(post_only, "true" | "false")
+                {
+                    return Err(crate::DcexError::InvalidInput(
+                        "Kraken post_only must be true or false".into(),
+                    ));
                 }
                 let mut query = params.only(&[
                     "txid",
@@ -243,12 +243,12 @@ impl KrakenClient {
                         "Kraken futures edit requires at least one changed field".into(),
                     ));
                 }
-                if let Some(mode) = params.get("qtyMode") {
-                    if !matches!(mode, "ABSOLUTE" | "RELATIVE") {
-                        return Err(crate::DcexError::InvalidInput(
-                            "Kraken qtyMode must be ABSOLUTE or RELATIVE".into(),
-                        ));
-                    }
+                if let Some(mode) = params.get("qtyMode")
+                    && !matches!(mode, "ABSOLUTE" | "RELATIVE")
+                {
+                    return Err(crate::DcexError::InvalidInput(
+                        "Kraken qtyMode must be ABSOLUTE or RELATIVE".into(),
+                    ));
                 }
                 self.private_post(
                     KrakenAuth::Futures,
@@ -534,12 +534,12 @@ impl KrakenClient {
                 &["PERCENT", "QUOTE_CURRENCY"],
             )?;
         }
-        if let Some(cli_ord_id) = params.get("cliOrdId") {
-            if cli_ord_id.len() > 100 {
-                return Err(crate::DcexError::InvalidInput(
-                    "Kraken Futures cliOrdId must be at most 100 characters.".to_string(),
-                ));
-            }
+        if let Some(cli_ord_id) = params.get("cliOrdId")
+            && cli_ord_id.len() > 100
+        {
+            return Err(crate::DcexError::InvalidInput(
+                "Kraken Futures cliOrdId must be at most 100 characters.".to_string(),
+            ));
         }
 
         let limit_price = params

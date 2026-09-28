@@ -286,14 +286,11 @@ impl HyperliquidClient {
         if let Ok(parts) = parse_exchange_symbol(product_symbol) {
             return Ok(parts);
         }
-        if is_canonical_product_symbol(product_symbol) {
-            if let Some(table) = &self.product_table {
-                if let Ok(exchange_symbol) =
-                    table.get_exchange_symbol("hyperliquid", product_symbol)
-                {
-                    return parse_exchange_symbol(&exchange_symbol);
-                }
-            }
+        if is_canonical_product_symbol(product_symbol)
+            && let Some(table) = &self.product_table
+            && let Ok(exchange_symbol) = table.get_exchange_symbol("hyperliquid", product_symbol)
+        {
+            return parse_exchange_symbol(&exchange_symbol);
         }
         let coin = fallback_coin(product_symbol);
         if coin == "BTC" && !product_symbol.to_ascii_uppercase().ends_with("-SPOT") {
@@ -309,12 +306,11 @@ impl HyperliquidClient {
             return Ok(coin);
         }
         if is_canonical_product_symbol(product_symbol) {
-            if let Some(table) = &self.product_table {
-                if let Ok(exchange_symbol) =
+            if let Some(table) = &self.product_table
+                && let Ok(exchange_symbol) =
                     table.get_exchange_symbol("hyperliquid", product_symbol)
-                {
-                    return Ok(parse_exchange_symbol(&exchange_symbol)?.0);
-                }
+            {
+                return Ok(parse_exchange_symbol(&exchange_symbol)?.0);
             }
             if product_symbol.to_ascii_uppercase().ends_with("-SPOT") {
                 return Err(DcexError::InvalidInput(format!(

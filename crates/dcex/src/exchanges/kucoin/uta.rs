@@ -141,6 +141,18 @@ impl KucoinClient {
                     .await
             }
             "get_uta_margin_mode" => {
+                // Official UTA v2 margin-mode endpoints apply to futures only.
+                // https://www.kucoin.com/docs-new/v2/rest/ua/get-margin-mode
+                if params
+                    .get("product_symbol")
+                    .or_else(|| params.get("symbol"))
+                    .is_some_and(is_spot_symbol)
+                {
+                    return Err(DcexError::InvalidInput(
+                        "UTA margin mode supports futures only".into(),
+                    ));
+                }
+
                 params.ensure_allowed(&["symbol", "product_symbol"])?;
                 let mut query = Vec::new();
                 self.push_optional_symbol(&mut query, params, true)?;
@@ -148,6 +160,18 @@ impl KucoinClient {
                     .await
             }
             "set_uta_margin_mode" => {
+                // Official UTA v2 margin-mode endpoints apply to futures only.
+                // https://www.kucoin.com/docs-new/v2/rest/ua/get-margin-mode
+                if params
+                    .get("product_symbol")
+                    .or_else(|| params.get("symbol"))
+                    .is_some_and(is_spot_symbol)
+                {
+                    return Err(DcexError::InvalidInput(
+                        "UTA margin mode supports futures only".into(),
+                    ));
+                }
+
                 params.ensure_allowed(&["symbol", "product_symbol", "marginMode"])?;
                 params.required("marginMode")?;
                 validate_enum(params, "marginMode", &["CROSS", "ISOLATED"])?;
@@ -205,9 +229,10 @@ impl KucoinClient {
                 ])?;
                 params.required("tradeType")?;
                 validate_enum(params, "tradeType", &["FUTURES", "MARGIN"])?;
+                validate_trade_type(params)?;
                 validate_enum(params, "marginMode", &["CROSS", "ISOLATED"])?;
                 let mut query = params.only(&["tradeType", "currency", "marginMode"]);
-                self.push_optional_symbol(&mut query, params, true)?;
+                self.push_optional_symbol(&mut query, params, uta_is_futures(params))?;
                 self.private_get(KucoinMarket::Spot, UTA_V2_LEVERAGE, query)
                     .await
             }
@@ -409,7 +434,17 @@ impl KucoinClient {
 
 fn validate_trade_type(params: &KucoinParams) -> Result<()> {
     params.required("tradeType")?;
-    validate_enum(params, "tradeType", &["SPOT", "MARGIN", "FUTURES"])
+    validate_enum(params, "tradeType", &["SPOT", "MARGIN", "FUTURES"])?;
+    if let Some(symbol) = params
+        .get("product_symbol")
+        .or_else(|| params.get("symbol"))
+        && is_spot_symbol(symbol) == uta_is_futures(params)
+    {
+        return Err(DcexError::InvalidInput(
+            "symbol does not match tradeType".into(),
+        ));
+    }
+    Ok(())
 }
 
 /// Canonical spot product symbols end in `-SPOT`; raw KuCoin spot pairs are

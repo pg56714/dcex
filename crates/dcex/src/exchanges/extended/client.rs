@@ -210,6 +210,15 @@ impl ExtendedClient {
             .await
     }
 
+    pub(super) async fn private_put_value(
+        &self,
+        path: &str,
+        body: Value,
+    ) -> Result<ValidatedResponse> {
+        self.private_body_request(HttpMethod::Put, path, body, Vec::new())
+            .await
+    }
+
     pub(super) async fn private_delete(
         &self,
         path: &str,

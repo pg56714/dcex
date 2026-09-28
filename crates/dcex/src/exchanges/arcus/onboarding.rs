@@ -61,7 +61,7 @@ impl ArcusClient {
             .ok_or_else(|| invalid("body must be an object"))?;
         let create = name == "create_api_key_signed";
         for key in object.keys() {
-            if ![
+            if !([
                 "address",
                 "publicKey",
                 "apiWalletName",
@@ -70,7 +70,7 @@ impl ArcusClient {
                 "signature",
             ]
             .contains(&key.as_str())
-                && !(create && key == "validUntil")
+                || (create && key == "validUntil"))
             {
                 return Err(invalid("unknown signed API key field"));
             }
@@ -88,25 +88,24 @@ impl ArcusClient {
         {
             return Err(invalid("apiWalletName must contain 1..64 characters"));
         }
-        if let Some(index) = body.get("accountIndex") {
-            if !index.as_u64().is_some_and(|v| v <= 9 || v == 255) {
-                return Err(invalid("API key scope must be 0..9 or 255"));
-            }
+        if let Some(index) = body.get("accountIndex")
+            && !index.as_u64().is_some_and(|v| v <= 9 || v == 255)
+        {
+            return Err(invalid("API key scope must be 0..9 or 255"));
         }
-        if let Some(until) = body.get("validUntil") {
-            if !until.as_u64().is_some_and(|v| v > 0) {
-                return Err(invalid(
-                    "validUntil must be a positive millisecond timestamp",
-                ));
-            }
+        if let Some(until) = body.get("validUntil")
+            && until.as_u64().is_none_or(|v| v == 0)
+        {
+            return Err(invalid(
+                "validUntil must be a positive millisecond timestamp",
+            ));
         }
-        if let Some(nonce) = body.get("nonce") {
-            if !nonce
+        if let Some(nonce) = body.get("nonce")
+            && !nonce
                 .as_str()
                 .is_some_and(|s| !s.is_empty() && s.len() <= 64)
-            {
-                return Err(invalid("nonce must contain 1..64 characters"));
-            }
+        {
+            return Err(invalid("nonce must contain 1..64 characters"));
         }
         let signature = body["signature"]
             .as_object()

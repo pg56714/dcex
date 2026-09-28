@@ -34,9 +34,7 @@ def test_get_open_interest(client):
 
 
 def test_get_position_tiers(client):
-    res = client.get_position_tiers(
-        instType="SWAP", tdMode="cross", product_symbol="BTC-USDT-SWAP"
-    )
+    res = client.get_position_tiers(instType="SWAP", tdMode="cross", product_symbol="BTC-USDT-SWAP")
     assert res is not None
 
 

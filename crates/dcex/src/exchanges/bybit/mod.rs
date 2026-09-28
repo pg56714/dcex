@@ -3,6 +3,8 @@ mod advanced_earn;
 mod asset;
 mod byusdt;
 mod client;
+mod completion;
+mod completion_wrappers;
 mod earn;
 mod endpoints;
 mod fixed_earn;

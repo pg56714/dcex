@@ -2,6 +2,7 @@
 
 from typing import Any
 
+from .._operation_guards import require_scope
 from ..utils.common import Common
 from ._http_manager import HTTPManager
 
@@ -537,12 +538,23 @@ class TradeHTTP(HTTPManager):
         )
 
     def cancel_open_strategies(
-        self, product_symbol: str | None = None, *, strategy_type: str | None = None
+        self,
+        product_symbol: str | None = None,
+        *,
+        strategy_type: str | None = None,
+        all_symbols: bool = False,
     ) -> dict[str, Any] | list[Any] | str:
-        """Cancel open strategies using the dedicated Strategy API instruction."""
+        """
+        Cancel open strategies using the dedicated Strategy API instruction.
+
+        Provide a product symbol or all_symbols=True to cancel across all symbols.
+        """
+        require_scope(product_symbol, all_symbols)
         return self._native_private(
             "cancel_open_strategies",
-            self._native_params(product_symbol=product_symbol, strategyType=strategy_type),
+            self._native_params(
+                all_symbols=all_symbols, product_symbol=product_symbol, strategyType=strategy_type
+            ),
         )
 
     def get_strategy_history(
@@ -589,11 +601,19 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
-    def vault_redeem(self, *, vault_id: int, vault_token_quantity: str | None = None) -> Any:  # noqa: ANN401
-        """POST /api/v1/vault/redeem. Native asset symbols; vault operator permissions may apply."""
+    def vault_redeem(
+        self, *, vault_id: int, vault_token_quantity: str | None = None, all: bool = False
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /api/v1/vault/redeem.
+
+        Provide vault_token_quantity, or all=True to redeem the entire vault token balance.
+        Vault operator permissions may apply.
+        """
+        require_scope(vault_token_quantity, all, flag="all")
         return self._native_private(
             "vault_redeem",
-            self._native_params(vaultId=vault_id, vaultTokenQuantity=vault_token_quantity),
+            self._native_params(all=all, vaultId=vault_id, vaultTokenQuantity=vault_token_quantity),
         )
 
     def vault_redeem_cancel(self, *, vault_id: int) -> Any:  # noqa: ANN401
@@ -621,4 +641,76 @@ class TradeHTTP(HTTPManager):
         """
         return self._native_private(
             "execute_borrow_lend", self._native_params(quantity=quantity, side=side, symbol=symbol)
+        )
+
+    def submit_rfq_quote(
+        self,
+        *,
+        rfq_id: str,
+        bid_price: str,
+        ask_price: str,
+        client_id: int | None = None,
+        auto_lend: bool | None = None,
+        auto_lend_redeem: bool | None = None,
+        auto_borrow: bool | None = None,
+        auto_borrow_repay: bool | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """
+        Submit a maker quote before the RFQ submission deadline.
+
+        API quotes settle immediately on acceptance; inventory must be available.
+        Source: https://docs.backpack.exchange/#tag/RFQ/operation/submit_quote
+        """
+        return self._native_private(
+            "submit_rfq_quote",
+            self._native_params(
+                **{
+                    "rfqId": rfq_id,
+                    "bidPrice": bid_price,
+                    "askPrice": ask_price,
+                    "clientId": client_id,
+                    "autoLend": auto_lend,
+                    "autoLendRedeem": auto_lend_redeem,
+                    "autoBorrow": auto_borrow,
+                    "autoBorrowRepay": auto_borrow_repay,
+                }
+            ),
+        )
+
+    def create_withdrawal(
+        self,
+        *,
+        address: str,
+        blockchain: str,
+        quantity: str,
+        symbol: str,
+        client_id: str | None = None,
+        two_factor_token: str | None = None,
+        auto_borrow: bool | None = None,
+        auto_lend_redeem: bool | None = None,
+        recipient_information: dict[str, Any] | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """
+        Submit a withdrawal with the documented withdraw signing instruction.
+
+        API withdrawals have no second confirmation; they execute on submit.
+        two_factor_token is required unless the exchange exempts the destination.
+        recipient_information is sent in the body but excluded from the signature.
+        Source: https://docs.backpack.exchange/#tag/Capital/operation/request_withdrawal
+        """
+        return self._native_private(
+            "create_withdrawal",
+            self._native_params(
+                **{
+                    "address": address,
+                    "blockchain": blockchain,
+                    "quantity": quantity,
+                    "symbol": symbol,
+                    "clientId": client_id,
+                    "twoFactorToken": two_factor_token,
+                    "autoBorrow": auto_borrow,
+                    "autoLendRedeem": auto_lend_redeem,
+                    "recipientInformation": recipient_information,
+                }
+            ),
         )

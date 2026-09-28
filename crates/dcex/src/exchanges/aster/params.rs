@@ -166,13 +166,13 @@ impl AsterParams {
     }
 
     pub(super) fn optional_one_of(&self, key: &str, allowed: &[&str]) -> Result<()> {
-        if let Some(value) = self.get(key) {
-            if !allowed.contains(&value) {
-                return Err(DcexError::InvalidInput(format!(
-                    "invalid Aster {key}: {value}; expected one of {}",
-                    allowed.join(", ")
-                )));
-            }
+        if let Some(value) = self.get(key)
+            && !allowed.contains(&value)
+        {
+            return Err(DcexError::InvalidInput(format!(
+                "invalid Aster {key}: {value}; expected one of {}",
+                allowed.join(", ")
+            )));
         }
         Ok(())
     }
@@ -183,23 +183,23 @@ impl AsterParams {
     }
 
     pub(super) fn optional_bool(&self, key: &str) -> Result<()> {
-        if let Some(value) = self.get(key) {
-            if !matches!(value.to_ascii_lowercase().as_str(), "true" | "false") {
-                return Err(DcexError::InvalidInput(format!(
-                    "invalid Aster boolean {key}: {value}"
-                )));
-            }
+        if let Some(value) = self.get(key)
+            && !matches!(value.to_ascii_lowercase().as_str(), "true" | "false")
+        {
+            return Err(DcexError::InvalidInput(format!(
+                "invalid Aster boolean {key}: {value}"
+            )));
         }
         Ok(())
     }
 
     pub(super) fn optional_u64_range(&self, key: &str, min: u64, max: u64) -> Result<()> {
-        if let Some(value) = self.u64(key)? {
-            if value < min || value > max {
-                return Err(DcexError::InvalidInput(format!(
-                    "Aster parameter {key} must be between {min} and {max}"
-                )));
-            }
+        if let Some(value) = self.u64(key)?
+            && (value < min || value > max)
+        {
+            return Err(DcexError::InvalidInput(format!(
+                "Aster parameter {key} must be between {min} and {max}"
+            )));
         }
         Ok(())
     }
@@ -275,12 +275,12 @@ impl AsterParams {
         max_millis: u64,
     ) -> Result<()> {
         self.ensure_time_order(start_key, end_key)?;
-        if let (Some(start), Some(end)) = (self.u64(start_key)?, self.u64(end_key)?) {
-            if end - start > max_millis {
-                return Err(DcexError::InvalidInput(format!(
-                    "Aster {start_key}/{end_key} range exceeds {max_millis} milliseconds"
-                )));
-            }
+        if let (Some(start), Some(end)) = (self.u64(start_key)?, self.u64(end_key)?)
+            && end - start > max_millis
+        {
+            return Err(DcexError::InvalidInput(format!(
+                "Aster {start_key}/{end_key} range exceeds {max_millis} milliseconds"
+            )));
         }
         Ok(())
     }

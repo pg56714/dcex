@@ -122,8 +122,8 @@ impl LighterClient {
             return Err(invalid("OCO orders require equal sizes and the same side"));
         }
         if children.len() == 2
-            && (!(2..=3).contains(&children[0].order_type)
-                == !(2..=3).contains(&children[1].order_type)
+            && ((2..=3).contains(&children[0].order_type)
+                == (2..=3).contains(&children[1].order_type)
                 || children[0].order_expiry != children[1].order_expiry)
         {
             return Err(invalid(

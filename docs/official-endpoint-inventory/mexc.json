@@ -1,0 +1,1460 @@
+{
+  "reviewed": "2026-09-28",
+  "source": "https://www.mexc.com/api-docs/",
+  "documentation_pages": 227,
+  "endpoints": [
+    {
+      "method": "DELETE",
+      "path": "/api/v3/capital/withdraw",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/wallet-endpoints/cancel-withdraw",
+      "source_sha256": "105b2ffe06b8843c9ac1f1b60c418ea19a616bb95c48b333441c2c3b6ba29d3e"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v3/openOrders",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/spot-account-trade/cancel-all-open-orders-on-a-symbol",
+      "source_sha256": "6ec67578c9a0725d167fd017eb51842f7378e6995cdde03bbfa49b1f520db837"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v3/order",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/spot-account-trade/cancel-order",
+      "source_sha256": "45531201cd948e7b4f2f035da2909e303fcc0db6337251f0a5039fade12d0499"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v3/order/all",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/spot-account-trade/cancel-all-orders",
+      "source_sha256": "320c59a1893409a37d39ae4996fb85db0e1858880780cfd1f94ccf497d4f7a23"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v3/strategy/group",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/spot-account-trade/delete-stp-strategy-group",
+      "source_sha256": "cc41d69073d76fc70c4c4dcc892aba76273056d7741d557fcebea0487c3a65d4"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v3/strategy/group/uid",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/spot-account-trade/delete-uid-to-stp-strategy-group",
+      "source_sha256": "63d32123b6488ba4b40f164024127c57055505fe635725cd8e67e12a29cd3808"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v3/sub-account/apiKey",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/subaccount-endpoints/delete-the-apikey-of-a-sub-account-for-master-account",
+      "source_sha256": "5eeaec41284d71666092d70cd2056e7041b2b3b678975f6b3fcabece211dfddf"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v3/userDataStream",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/websocket-user-data-streams/listen-key",
+      "source_sha256": "4c01ae78b2a7d9db11b6ef009aec678b5f3edcf11e9613a9c585fe524c908c24"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/contract/deals/{symbol}",
+      "official_source": "https://www.mexc.com/api-docs/futures/market-endpoints/get-recent-trades",
+      "source_sha256": "4700c73e4c080a7908a9e2a2468442c94b075662518c84c704dce9501e3b9470"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/contract/depth/{symbol}",
+      "official_source": "https://www.mexc.com/api-docs/futures/market-endpoints/get-contract-order-book-depth",
+      "source_sha256": "6131b185ff7f7f392f4fe2f6f96d64af8b217c535911e750155f7a614ef47226"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/contract/depth_commits/{symbol}/{limit}",
+      "official_source": "https://www.mexc.com/api-docs/futures/market-endpoints/get-the-last-n-depth-snapshots",
+      "source_sha256": "4677d8617e149428b6117bdda5db584485c95a846c08977e0cdad1afe33292ea"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/contract/detail/country",
+      "official_source": "https://www.mexc.com/api-docs/futures/market-endpoints/get-contract-info",
+      "source_sha256": "b75a3b94e09bd96f6d9f9251d87d947333f1dea492e02de6bad40f9338d8c397"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/contract/fair_price/{symbol}",
+      "official_source": "https://www.mexc.com/api-docs/futures/market-endpoints/get-fair-price",
+      "source_sha256": "c60ea04ff987e0498a409e699f0043db1a25cb2d0c1a472c4cbbc168d0fb063b"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/contract/funding_rate/history",
+      "official_source": "https://www.mexc.com/api-docs/futures/market-endpoints/get-funding-rate-history",
+      "source_sha256": "0c2db6b8e8efb9533b4e131210c4d26b4a9c934d3a2dcf60572d7d1efc7b1bda"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/contract/funding_rate/{symbol}",
+      "official_source": "https://www.mexc.com/api-docs/futures/market-endpoints/get-funding-rate",
+      "source_sha256": "546f29c31c8843d421ba5dffd658f7241e2c2ae4923cf291be7dc16318eae63f"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/contract/index_price/{symbol}",
+      "official_source": "https://www.mexc.com/api-docs/futures/market-endpoints/get-index-price",
+      "source_sha256": "edd7497f6534b0ef2e0170c11cf83fbff91f653a931223d3274eeefe0a197488"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/contract/kline/fair_price/{symbol}",
+      "official_source": "https://www.mexc.com/api-docs/futures/market-endpoints/get-fair-price-candles",
+      "source_sha256": "6f95f02528b3dc673c91f4235862d7c09093370ed098bf494ffb567e88d5f954"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/contract/kline/index_price/{symbol}",
+      "official_source": "https://www.mexc.com/api-docs/futures/market-endpoints/get-index-price-candles",
+      "source_sha256": "ea4b9da88973be1d40d42eda5b9c98e6472937f7cd7bcdf1cb17fce77d6d1410"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/contract/kline/{symbol}",
+      "official_source": "https://www.mexc.com/api-docs/futures/market-endpoints/get-candlestick-data",
+      "source_sha256": "25d078303ff8e9ea2519f4db3604a1e0c6b1557ddd831eed7d90ad67fa89a906"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/contract/ping",
+      "official_source": "https://www.mexc.com/api-docs/futures/market-endpoints/get-server-time",
+      "source_sha256": "afbabc54bf9530b83dff8d975cf36cf8038bfc3df18dd29dfb58d0761df24927"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/contract/risk_reverse/history",
+      "official_source": "https://www.mexc.com/api-docs/futures/market-endpoints/get-insurance-fund-balance-history",
+      "source_sha256": "cb54ef2c1e3580f2970e1e73fdf83e392a63e6cc2d25b1b3dcd3ee465323b38d"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/contract/risk_reverse/{symbol}",
+      "official_source": "https://www.mexc.com/api-docs/futures/market-endpoints/get-insurance-fund-balance",
+      "source_sha256": "fe8cc2845fed7af06b42d8a964bf2d9d93d3e63763776238daea5500ca3f8be1"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/contract/support_currencies",
+      "official_source": "https://www.mexc.com/api-docs/futures/market-endpoints/get-transferable-currencies",
+      "source_sha256": "c5c604a1c17bc13a5ee76a8695a9307608c7a2ea90cc0261d1dafaa394fda27d"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/contract/ticker",
+      "official_source": "https://www.mexc.com/api-docs/futures/market-endpoints/get-ticker-contract-market-data",
+      "source_sha256": "7e473f4d68d83f3daf73225dd5e8927ab801c261d19da9539fa1864eefd69fad"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/private/account/asset/{currency}",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/get-single-currency-asset-information",
+      "source_sha256": "0648d951ae5f4a9a7a51d0b1754e4720239b57206f18a3c1474ac1b77e93e5d6"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/private/account/asset_book/order_deal_fee/total",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/api-30-day-fee-statistics",
+      "source_sha256": "1537dad1242e7186ac02ad1829e0cb21e4fd72b28baffb0edfa9a7f20364c8c5"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/private/account/assets",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/get-all-account-assets",
+      "source_sha256": "60717b22987fae278218695fe176fd04de288c33d3a7952f6a87d8979323c90d"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/private/account/config/contractFeeDiscountConfig",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/query-all-spot-discount-configuration-information",
+      "source_sha256": "9baecde01046e52e7e9204be471cb2d4c109040b7c420b743b5c2a4e2dcb9b37"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/private/account/discountType",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/query-user-discount-usage",
+      "source_sha256": "380c8405bd764eeb46d98dbf4f65861fb8bc2fdd2ab63b2b7914c85ceddd6bb5"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/private/account/feeDeductConfigs",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/deduction-configuration",
+      "source_sha256": "525aebadea9e12490ed25e1632d68b88b4aee69a69a7b08de164a863f448c754"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/private/account/profit_rate/{type}",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/view-personal-profit-rate",
+      "source_sha256": "1275d6aee8d520efb7f980a0d6bf0dc0172fce15a7a1481d7547a92380b30a5e"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/private/account/risk_limit",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/get-risk-limits",
+      "source_sha256": "7be178fcd164c74703336535dcb57e411939b686db5f48de08fc9658be2541c3"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/private/account/tiered_fee_rate/v2",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/get-fee-details",
+      "source_sha256": "af5b6f5c1018eb46d6eb23e906e2f3f8421c08ea1deab3e91eb465e74976e669"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/private/account/transfer_record",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/get-asset-transfer-records",
+      "source_sha256": "359844b4d28f687d559810e1dfbec9556d1365ca030ab24b29267c7e0e4de3c9"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/private/market_maker/self_trade/blacklist",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/query-stp-groups-and-group-members",
+      "source_sha256": "e6bb9610e5211baf15e2408ac21de124cf8de8fbe2e50420e03115af3d44b015"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/private/market_maker/self_trade/blacklist/search",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/get-current-user-stp-group",
+      "source_sha256": "4fd0d6d88edca1bced1db3afc175987a3bbdb3e6aea441b9a77090e765ff7561"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/private/order/batch_query",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/batch-query-orders-by-order-id",
+      "source_sha256": "657ad8851de1e15e6b5196c67e103b62a3c5af3c0da522252e3eff90cec8ec9f"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/private/order/deal_details/{orderId}",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/get-trade-records-by-order-id",
+      "source_sha256": "de1a78cd8b6b04c0177339762f0cda2bfd8070f276c9419b9a8237aa5848b5a6"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/private/order/external/{symbol}/{external_oid}",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/get-order-by-external-id",
+      "source_sha256": "29568238a0ca48a3e7dd49d8340d161f44da6bbd4f1348af9607150ff47bdd15"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/private/order/fee_details",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/query-contract-fee-deduction-details",
+      "source_sha256": "ea9b8458b73bfcd0027dee4b059169717f3715ab1088dbf8c0c965e784c2df27"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/private/order/get/{orderId}",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/get-order-information-by-order-id",
+      "source_sha256": "a82a4db742f49fcdc435841f9488cd731d041a162d84bb04a341b4c30f9bf0a9"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/private/order/list/close_orders",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/query-historical-orders",
+      "source_sha256": "95578a966d75de06e25111567662400947ef4484ee09c70dcae66ead8b343c44"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/private/order/list/history_orders",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/get-all-historical-orders",
+      "source_sha256": "27d12bad718ddffae24794429dff1b30f89ba8bb3263eba18bb649cf3c3d6f5b"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/private/order/list/open_orders",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/get-current-orders",
+      "source_sha256": "2cc9158fd3744e929818953b4b1c509a2843cc8cbdf380b00f3ae0d7ad59f2c2"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/private/order/list/order_deals/v3",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/get-historical-order-deal-details",
+      "source_sha256": "20659692bb061f08ea18312b779fc85110a3bb5a441e6897ffa7ebaa02899ef4"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/private/planorder/list/orders",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/get-plan-order-list",
+      "source_sha256": "55b1abe9c08ca22e3bdab86f1f90be9cece0321b820de0f50519a1e5019bdc40"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/private/position/funding_records",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/get-funding-fee-details",
+      "source_sha256": "afde84308652970e89fe5bdc467b3bc7f770da66599a9a2aa99f80254a5c9e1e"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/private/position/leverage",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/get-position-leverage-multipliers",
+      "source_sha256": "936d34317b7dc6f1162c16a88ba9bbcd1fdf6a415bd9e8f952e74f063fd76468"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/private/position/list/history_positions",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/get-historical-positions",
+      "source_sha256": "c32804fec700a5e26bbaad38375206170be5e840f23e1614f1556a44ccba50d5"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/private/position/open_positions",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/get-open-positions",
+      "source_sha256": "e76c42d08bde197ee67700668e9acdaf7053426bac9cd5ac3ef2bd439b9e1fe9"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/private/position/position_mode",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/get-user-position-mode",
+      "source_sha256": "d177a7137568ae7ec15ac72d0bedec87aa4bd443f71f1a62891901ed05ab0aa0"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/private/stoporder/list/orders",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/get-take-profitstop-loss-order-list",
+      "source_sha256": "474c5113c1e7dcbb3de1e98102b6bc2d8f98fe17046f092f96e26a6b440c9eb8"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/private/stoporder/open_orders",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/get-current-take-profitstop-loss-order-list",
+      "source_sha256": "ad7a806d71dfbe7228ce535ced2671a97a9273f34ede5839665298ff8af8005d"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/private/trackorder/list/orders",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/query-trailing-orders",
+      "source_sha256": "79d6a3122ad63a383937bc634aa3fd894754f11170345a69d7f96290d39815af"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/account",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/spot-account-trade/account-information",
+      "source_sha256": "9cc169bf9a6c02c059b43744c3345de41f5a02ca47e2d731aad90914297f2b46"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/aggTrades",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/market-data-endpoints/compressedaggregate-trades-list",
+      "source_sha256": "65d7d8e90a12a8c1e76a9ac064daa91a33a032daec5a73a6952ed194aee8de93"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/allOrders",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/spot-account-trade/all-orders",
+      "source_sha256": "65b29775e09e24e94ff3773f9d66c2229ee25d412eea862249d01873fa5c34ab"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/announcements",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/mexc-platform/get-announcements",
+      "source_sha256": "087533dd1039c6f64a7bd5602f9c0ce6d757d5f99d291e7866ae60bd0e0f7de4"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/apiKeyInfo",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/spot-account-trade/query-api-key-info",
+      "source_sha256": "00b7356bfc912e8860805854a374c2e93116606f7d26fedd922a4cb03a3b5779"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/avgPrice",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/market-data-endpoints/current-average-price",
+      "source_sha256": "ec4e5b3887cfc2fb3c1780f7b97633b5c6af631f06c2365b6e767b55dcaffacf"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/capital/config/getall",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/wallet-endpoints/query-the-currency-information",
+      "source_sha256": "766b43189f783efc404b193aaab4150f5cb9b5fb826501e3b1623ce251ea30c2"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/capital/convert",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/wallet-endpoints/dustlog",
+      "source_sha256": "4e1368b66ded9df71707720cfe20a6a57a448d6bcd946a5b1f41f8c5e2de8577"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/capital/convert/list",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/wallet-endpoints/get-assets-that-can-be-converted-into-mx",
+      "source_sha256": "4829fce55dc3e8fac36eb54f3f0ce594f730381839f38a41e50fb07926f34ea3"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/capital/deposit/address",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/wallet-endpoints/deposit-address-supporting-network",
+      "source_sha256": "67aeba35cfe04ec3e31c4ba489233109206ba9f630db3145097e7feb7396dd13"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/capital/deposit/hisrec",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/wallet-endpoints/deposit-historysupporting-network",
+      "source_sha256": "842ab859d08a5b5888ecf6eef5afd8de4f044ebff012e8142f48d726e22a9f46"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/capital/sub-account/universalTransfer",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/subaccount-endpoints/query-universal-transfer-history-for-master-account",
+      "source_sha256": "680cb7329e4ce312b1138e89bfed946130022a4c3d2a8e7dfcdfdb0694312abb"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/capital/transfer",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/wallet-endpoints/query-user-universal-transfer-history",
+      "source_sha256": "02d6119a53e92cfe1ad36b56e2446e6d4738ccb3539359534f1f3cafbf5ef0f1"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/capital/transfer/internal",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/wallet-endpoints/query-internal-transfer-history",
+      "source_sha256": "d5ec5889d3d1aed4ae7769ad4cd8c378bb83cb622396078fd293218ff49d3a0a"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/capital/transfer/tranId",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/wallet-endpoints/query-user-universal-transfer-history-by-tranid",
+      "source_sha256": "a846a13a5c02ca6524432762c28cb0664bf87cdb69f1ffebb100e4e25bd1e34d"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/capital/withdraw/address",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/wallet-endpoints/withdraw-address-supporting-network",
+      "source_sha256": "5f8b18e67f5a5a1554d08fddfb5e2f741c6205cc1847155fb019b651d09edee8"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/capital/withdraw/history",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/wallet-endpoints/withdraw-history-supporting-network",
+      "source_sha256": "0d47e41fae413b1d955a771735dbf3984e4b7f111b5df2594a5a6cc28bf7669e"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/defaultSymbols",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/market-data-endpoints/api-default-symbol",
+      "source_sha256": "860c807d6183b42fac339807cf8dad0352c6149167b3d731dc07dd0458f57f5a"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/depth",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/market-data-endpoints/order-book",
+      "source_sha256": "1857a866e03fe1bbdfd7598a82621b38ea324a240837b1eddcfe45b4709f9c93"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/exchangeInfo",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/market-data-endpoints/exchange-information",
+      "source_sha256": "4f2db6c5e4a0fdefe83c807ff2174dc59477f1b770243be43bafe655f2f7ca20"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/klines",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/market-data-endpoints/klinecandlestick-data",
+      "source_sha256": "169a90ca345b3b9604e7bc0c1a6546253ed6096b7c853887c3d4d56bdb549b83"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/kyc/status",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/spot-account-trade/query-kyc-status",
+      "source_sha256": "5dce423f73441a1b52e2c8e115960bde68002d6b70613cd9e36da12a4f3f0aae"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/mxDeduct/enable",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/spot-account-trade/query-mx-deduct-status",
+      "source_sha256": "04319ad97c28b33887aab452094b2bf3bf5f5f6e953a5067a54d894490f91170"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/myTrades",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/spot-account-trade/account-trade-list",
+      "source_sha256": "676cb44621b1b62bcca0695211cf38a6ae0aa235eff9f4773988434c8aa989ac"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/openOrders",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/spot-account-trade/current-open-orders",
+      "source_sha256": "d9079efa02b2129f8020ffaab39db922609232679b222c10cb8f118c855b3806"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/order",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/spot-account-trade/query-order",
+      "source_sha256": "fc3e4992fbe2cd7009cde26b6b32829acd9fb50fbfc183f6be9a1636ae981d02"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/ping",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/market-data-endpoints/test-connectivity",
+      "source_sha256": "b841a32304721730fd521c0f12702ed3780140b6c47e2a72a9a8924b7e6b1ed3"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/rebate/affiliate/campaign",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-affiliate-campaign-data-affiliate-only",
+      "source_sha256": "e80ab2f8fd7d23b70f86d556066dcdf2e2e1dd85eb4b4ec39c019db0505d4bb0"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/rebate/affiliate/commission",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-affiliate-commission-record-affiliate-only",
+      "source_sha256": "69383a965a49a75080a21c698e6cd60c2e5a8310ec0b3f6a212bebbd21381560"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/rebate/affiliate/commission/detail",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-affiliate-commission-detail-record-affiliate-only",
+      "source_sha256": "ccfc318c1c8d48293d12a1a17b35d4eacdaa95ea343def1d0cb41d35006ef756"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/rebate/affiliate/list",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-direct-subaffiliate-data-affiliate-only",
+      "source_sha256": "274456c6408e4f55075aa657ec234cd0c74eab4894a5a979338ece91a3a988b3"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/rebate/affiliate/referral",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-affiliate-referral-dataaffiliate-only",
+      "source_sha256": "ae0ed222eabd586f7d4e70a1960196a8ceb11cba6139f9155a5151eba593e4f2"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/rebate/affiliate/subaffiliates",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-subaffiliates-data-affiliate-only",
+      "source_sha256": "a685d1ecd039fdc094a8c5116579b3f0d698a4fb1bd6902b11ad307574870984"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/rebate/affiliate/withdraw",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-affiliate-withdraw-record-affiliate-only",
+      "source_sha256": "a212909d7e3f955a55659b3fedbc41d6b86ebe28af24af50f7045aeb88a0b614"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/rebate/detail",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-rebate-records-detail",
+      "source_sha256": "e09d5235acf94882c442acd30b20b2690bf5370a28d31a56222396159c8df695"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/rebate/detail/kickback",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-self-rebate-records-detail",
+      "source_sha256": "2a7d007c26c00b6a0729198844b5b2178f419f4c59446277f41a2320fb5686d2"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/rebate/referCode",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/query-refercode",
+      "source_sha256": "b81159a8ffc5d47e73c2509a423640c0dc58fc66e9729b45eb63ce36bdc4cee3"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/rebate/taxQuery",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-rebate-history-records",
+      "source_sha256": "4593b4b09291300afdf36f90729779b7e85eece2f2ccc49b31bc3ca2e30d9100"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/selfSymbols",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/spot-account-trade/user-api-default-symbol",
+      "source_sha256": "ab48e67aa0088bf6e08574d184fd582e19e2329657582573a529748451d9de4a"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/strategy/group",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/spot-account-trade/query-stp-strategy-group",
+      "source_sha256": "fb6f5b6f1d802b6e43d43863c5daaa028d4fc691a5b023cb23a2445eef613569"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/sub-account/apiKey",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/subaccount-endpoints/query-the-apikey-of-a-sub-account-for-master-account",
+      "source_sha256": "1bef09e0741d07da6832f924ed222c9473926a2c2080fec119ab2b1a21a897f7"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/sub-account/asset",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/subaccount-endpoints/query-sub-account-asset",
+      "source_sha256": "e18c80f0bf17708268f3015f63d64cd2e809a3d68d80e5e9a16dd2f6d52fe3fc"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/sub-account/list",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/subaccount-endpoints/query-sub-account-list-for-master-account",
+      "source_sha256": "008ed3e46424b33bb80ad2c3323825531f3afa5042d765798f74e551713f5a2c"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/symbol/offline",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/market-data-endpoints/query-offline-symbols",
+      "source_sha256": "9c1596c6a3a6baef438b0948cae14b12649348f7dec1dc9bf17e7020f939cd13"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/ticker/24hr",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/market-data-endpoints/api-24hr-ticker-price-change-statistics",
+      "source_sha256": "66ce471066fffcdb43bdaaa8d761c042ef7bbcead80eaac61f0831e103dee5d0"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/ticker/bookTicker",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/market-data-endpoints/symbol-order-book-ticker",
+      "source_sha256": "d326f83cb4e5d2bf99adf1a343e8b8cf28488efde604f6ba3e40a7448718cefe"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/ticker/price",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/market-data-endpoints/symbol-price-ticker",
+      "source_sha256": "c258775943a7cb8c91e8feb9593814da04714e680bc299b66910968118591319"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/time",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/market-data-endpoints/check-server-time",
+      "source_sha256": "8d6479b9cfe22dcc705f970380680f368b55bf0abc074890e56125d1a0c9ff24"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/tradeFee",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/spot-account-trade/query-symbol-commission",
+      "source_sha256": "e1f42e2a70e1d3609fd95148899a5997eef2c90b850a38d5992accb1eda170e1"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/trades",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/market-data-endpoints/recent-trades-list",
+      "source_sha256": "c1b8ffac709c1c014936995b446129123f139b8a3236e0a4e04b8a207b54f692"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/uid",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/spot-account-trade/query-uid",
+      "source_sha256": "40cbf10aca3224f8836c60e254bdd403817b8e34f6ab517b1ce5069a0f21950d"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/userDataStream",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/websocket-user-data-streams/listen-key",
+      "source_sha256": "4c01ae78b2a7d9db11b6ef009aec678b5f3edcf11e9613a9c585fe524c908c24"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/private/market_maker/self_trade/blacklist/create",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/create-stp-group",
+      "source_sha256": "822b674e04c458abacb1032b6efc832fdb8a71c14be39f588089c5d5fa6a0af3"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/private/market_maker/self_trade/blacklist/delete",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/delete-stp-group",
+      "source_sha256": "634409024f08593b30f92b6cf9417b19e19f821a6754c7a3569841872e0b9e46"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/private/market_maker/self_trade/blacklist/update",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/update-stp-group",
+      "source_sha256": "f755f2a03fbaf345e18b33d4af63a45c317411851673c2b4964b50eb7455ccbe"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/private/multiAssets/changeMultiAssetMode/{isMultiAssetMode}",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/change-multi-asset-mode",
+      "source_sha256": "4f81ad965abcec1d59a146a9b96cc565d1275c2c4ef3ef587be8d918158302aa"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/private/order/batch_cancel_with_external",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/batch-cancel-by-external-order-id",
+      "source_sha256": "10f3f425295568e63e330cec53e98f4910d3606cd87e782e0dd233808839a9fe"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/private/order/batch_query_with_external",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/batch-query-orders-by-external-order-id",
+      "source_sha256": "d74d1bb3b44bed24ec1c52c232827a308d7e939385870d848ec83e92ce3f0e6a"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/private/order/cancel",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/cancel-orders",
+      "source_sha256": "741d1145a66d9442edba9932eebc2791dc1809c4e3fad5f829735a5d8625db58"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/private/order/cancel_all",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/cancel-all-orders-under-a-contract",
+      "source_sha256": "f4839d592ad708ec61523c7ae2d113aed138e2d792e04d33481e5f3afa92423e"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/private/order/cancel_with_external",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/cancel-by-external-order-id",
+      "source_sha256": "1ac394e307f437be4d9b1cf6094bd733702346d79fe8f4bd98405f97ab728575"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/private/order/change_limit_order",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/modify-order-price-quantity",
+      "source_sha256": "ad1921156063e928d8fe68cb5ff0bdb8806648f55bef9f61be88d0eaeebd5b3a"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/private/order/chase_limit_order",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/chase-order",
+      "source_sha256": "c8b531db35fe052feb015ca463514af673fb1904dc7a136c7d0c1801b2681a5d"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/private/order/create",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/place-order",
+      "source_sha256": "1f10781892a59f07da02f8cc07800d8a1755284dde13581149b42e7333c16c41"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/private/order/open_order_total_count",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/query-in-flight-order-counts",
+      "source_sha256": "2eeb36a8af6f7801da27e3b76c24bd97c55b48c5934a784f0238503c8ecbf096"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/private/order/submit_batch",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/batch-place-order",
+      "source_sha256": "11418a71f72b5c906682627c8d64ec5e4d4d20224d423fa265f063bb0b0060c2"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/private/planorder/cancel",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/cancel-planned-orders",
+      "source_sha256": "dd90da60ecee6f9ed620b6e16ac6a677c8ab6c932e89cffcd84eeaaa91d64a34"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/private/planorder/cancel_all",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/cancel-all-planned-orders",
+      "source_sha256": "dff7aebdd2ea9cec06975919bb1aa9fc30167eb457cf04aa57a6005331793b53"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/private/planorder/change_price",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/modify-plan-order",
+      "source_sha256": "deb2081b00aaabf5b8869a2c68bf1f42fd01582bb428ce2a9137b5658965e040"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/private/planorder/change_stop_order",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/modify-take-profitstop-loss-on-plan-order",
+      "source_sha256": "87b76dee57e36b52105cf6253d0e2104b8beffd53f021042aed80c0d1439515e"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/private/planorder/place/v2",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/place-plan-order",
+      "source_sha256": "2c5514467ae8b88eb3c8c4ee6d44f327606e49dc9c5a13bbd54c93d32475a238"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/private/position/change_auto_add_im",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/enable-or-disable-auto-add-margin",
+      "source_sha256": "582c0cab822763891b55fa4bd974a5fb2348cdd06aadab8ec36a66b23ca1b386"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/private/position/change_leverage",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/modify-leverage",
+      "source_sha256": "36490344463b057eb441c523776d48ee3c72a36da01e383a559e61b31a21fcd7"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/private/position/change_margin",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/modify-position-margin",
+      "source_sha256": "3942b6b894dd294a89d03ffd0703f1e358a2df27d14ca85bf48f9124f3996950"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/private/position/change_position_mode",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/modify-user-position-mode",
+      "source_sha256": "b488eb55f83a7ea5ecb24c0c8418877ea238dffc6a6ba62cd8f854b472bff1d7"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/private/position/close_all",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/close-all",
+      "source_sha256": "64cbf25a1e969534b294c49b948bd40be561f94d9b71dd1a46d75c5978b0b550"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/private/position/reverse",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/reverse-open-position",
+      "source_sha256": "29d10d0bc1d1fc6763ffc3776f2adb79ea9a20e1f86cd52461a87e3740916058"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/private/stoporder/cancel",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/cancel-tpsl-planned-orders",
+      "source_sha256": "a650c0ebf565cbbb9ac710958c70789aeffd713aabfcac718a748bece322980b"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/private/stoporder/cancel_all",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/cancel-all-tpsl-planned-orders",
+      "source_sha256": "e71b8d677f70f563d632cf6bc93f147dced7e3fcb347a6ef56760fb4aba834f6"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/private/stoporder/change_plan_price",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/modify-tpsl-prices-on-a-tpsl-planned-order",
+      "source_sha256": "b696b062c3839853b4757f6e31ac7bdfdd178cd6b74804de3d9f1aa85280a5ee"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/private/stoporder/change_price",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/modify-tpsl-prices-on-a-limit-order",
+      "source_sha256": "657c195b888589003a5086a05b1781950546813f950e2aeb1c09521d84698aa6"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/private/stoporder/place",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/place-tpsl-order-by-position",
+      "source_sha256": "e986741cec40576c5509e45dd284819e8871b781310b3259960f39e57d642a26"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/private/trackorder/cancel",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/cancel-trailing-order",
+      "source_sha256": "5717983c9fc9676c95b77911ff4b9cabbc5436b5a61071ddeb6fcdf443748ad3"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/private/trackorder/change_order",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/modify-trailing-order",
+      "source_sha256": "d2042288aaa666e2a69123a626dc983db9b9763660b1b3f7585986b39f904b01"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/private/trackorder/place",
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/place-trailing-order",
+      "source_sha256": "697903a689f3179b495e0af5d499f56eaf05708801c9ae51e1891261c10bcc90"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/apiKeyInfo",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/spot-account-trade/api-key-info",
+      "source_sha256": "4918b69ff40f4f543f0ab825c4e3d591a38e958d681951dd90b5f5747f7cc0d1"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/batchOrders",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/spot-account-trade/batch-orders",
+      "source_sha256": "65a2aedb653bc85d500afacc34f684ce33ed9e67a32b4cf7b2728c09d2256b9c"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/capital/convert",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/wallet-endpoints/dust-transfer",
+      "source_sha256": "57d3f1bfeb2f43cee5bed256cf82ea6148b6173766fd9ed4276effc0ef71de0c"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/capital/deposit/address",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/wallet-endpoints/generate-deposit-address-supporting-network",
+      "source_sha256": "bd02080bb846b206cbb6c857bd6543139c88196b5c1334b1f72b604ffaae86ff"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/capital/sub-account/universalTransfer",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/subaccount-endpoints/universal-transfer-for-master-account",
+      "source_sha256": "2dfeb0b0667b21ec06d908b9d329e077aec737f8b009fdc4e1ad685bf4d813b0"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/capital/transfer",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/wallet-endpoints/user-universal-transfer",
+      "source_sha256": "8cef63b57412c7efd3c4d51e852eeccfcb8e309ff3ac3c8172eba9bcdba24fbe"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/capital/transfer/internal",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/wallet-endpoints/internal-transfer",
+      "source_sha256": "d96b0bd561f8666be6fa20456f944983785e80ba5a4acd5ebc40db762c44fab4"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/capital/withdraw",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/wallet-endpoints/withdrawnew",
+      "source_sha256": "4201402df3beed0536692b53589d0f54641e75ee79402dba39e3c05fc19a8c7e"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/capital/withdraw/apply",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/wallet-endpoints/withdrawpreviousoffline-soon",
+      "source_sha256": "1b6eb96287c3034b675f118305e8466a8d986cc78ca7162e090832f2049f0698"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/mxDeduct/enable",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/spot-account-trade/enable-mx-deduct",
+      "source_sha256": "ddb84343b059996a485b12ffe148af008b8bdfc1b7dafa22299e49ca5048f7ba"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/order",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/spot-account-trade/new-order",
+      "source_sha256": "79ec313e2d9151451fe23925376d20465e0b6eede926dc8ebe1d586a94ee6778"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/order/test",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/spot-account-trade/test-new-order",
+      "source_sha256": "8fec0f956fed113856a3c8801b8fb3ea9eead8a2cd8b2f21f01a7dcf146df99d"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/strategy/group",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/spot-account-trade/create-stp-strategy-group",
+      "source_sha256": "9183ac12675cce6d5b76871bfbfeca994275e4dfe594122c3f8c4e5f5a1cfbc1"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/strategy/group/uid",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/spot-account-trade/add-uid-to-stp-strategy-group",
+      "source_sha256": "63fc8c46b43350b24bdb4818a16c4dcfb141bc054e1bdbfe92584951a206091e"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/sub-account/apiKey",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/subaccount-endpoints/create-an-apikey-for-a-sub-account-for-master-account",
+      "source_sha256": "44d98c4c95ea7340c4022e63182ce34ac78434c7874ae2af69f274939427c078"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/sub-account/virtualSubAccount",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/subaccount-endpoints/create-a-sub-accountfor-master-account",
+      "source_sha256": "2249fb4f1e497f585dff81460023058a47474ce5844022e4be80fe96018e51a0"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v3/userDataStream",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/websocket-user-data-streams/listen-key",
+      "source_sha256": "4c01ae78b2a7d9db11b6ef009aec678b5f3edcf11e9613a9c585fe524c908c24"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v3/userDataStream",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/websocket-user-data-streams/listen-key",
+      "source_sha256": "4c01ae78b2a7d9db11b6ef009aec678b5f3edcf11e9613a9c585fe524c908c24"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "",
+      "title": "",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "command-details-for-data-exchange",
+      "title": "command-details-for-data-exchange",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/command-details-for-data-exchange"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "enum-definitions",
+      "title": "enum-definitions",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/enum-definitions"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "incremental-order-book-maintenance-mechanism",
+      "title": "incremental-order-book-maintenance-mechanism",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/incremental-order-book-maintenance-mechanism"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "native-ws-endpoint",
+      "title": "native-ws-endpoint",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/native-ws-endpoint"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "signature-string",
+      "title": "signature-string",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/signature-string"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "subscription-filtering",
+      "title": "subscription-filtering",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/subscription-filtering"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "tickers",
+      "title": "tickers",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/tickers"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "diffdepth-stream",
+      "title": "diffdepth-stream",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/websocket-market-streams/diffdepth-stream"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "how-to-properly-maintain-a-local-copy-of-the-order-book",
+      "title": "how-to-properly-maintain-a-local-copy-of-the-order-book",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/websocket-market-streams/how-to-properly-maintain-a-local-copy-of-the-order-book"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "individual-symbol-book-ticker-streams",
+      "title": "individual-symbol-book-ticker-streams",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/websocket-market-streams/individual-symbol-book-ticker-streams"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "individual-symbol-book-ticker-streamsbatch-aggregation",
+      "title": "individual-symbol-book-ticker-streamsbatch-aggregation",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/websocket-market-streams/individual-symbol-book-ticker-streamsbatch-aggregation"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "k-line-streams",
+      "title": "k-line-streams",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/websocket-market-streams/k-line-streams"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "live-subscriptionunsubscription-to-data-streams",
+      "title": "live-subscriptionunsubscription-to-data-streams",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/websocket-market-streams/live-subscriptionunsubscription-to-data-streams"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "miniticker",
+      "title": "miniticker",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/websocket-market-streams/miniticker"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "minitickers",
+      "title": "minitickers",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/websocket-market-streams/minitickers"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "partial-book-depth-streams",
+      "title": "partial-book-depth-streams",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/websocket-market-streams/partial-book-depth-streams"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "protocol-buffers-integration",
+      "title": "protocol-buffers-integration",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/websocket-market-streams/protocol-buffers-integration"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "trade-streams",
+      "title": "trade-streams",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/websocket-market-streams/trade-streams"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "spot-account-deals",
+      "title": "spot-account-deals",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/websocket-user-data-streams/spot-account-deals"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "spot-account-orders",
+      "title": "spot-account-orders",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/websocket-user-data-streams/spot-account-orders"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "spot-account-update",
+      "title": "spot-account-update",
+      "official_source": "https://www.mexc.com/api-docs/spot-v3/websocket-user-data-streams/spot-account-update"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "assets",
+      "title": "assets",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/assets"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "chase-order-failure",
+      "title": "chase-order-failure",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/chase-order-failure"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "close-all-failure",
+      "title": "close-all-failure",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/close-all-failure"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "contract-data",
+      "title": "contract-data",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/contract-data"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "deal",
+      "title": "deal",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/deal"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "deduction-info",
+      "title": "deduction-info",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/deduction-info"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "depth-specify-minimum-notional-step",
+      "title": "depth-specify-minimum-notional-step",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/depth-specify-minimum-notional-step"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "event-contract-positions",
+      "title": "event-contract-positions",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/event-contract-positions"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "event-contracts",
+      "title": "event-contracts",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/event-contracts"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "fair-price",
+      "title": "fair-price",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/fair-price"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "fill-details",
+      "title": "fill-details",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/fill-details"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "funding-rate",
+      "title": "funding-rate",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/funding-rate"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "get-a-single-ticker",
+      "title": "get-a-single-ticker",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/get-a-single-ticker"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "index-price",
+      "title": "index-price",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/index-price"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "k-line-data",
+      "title": "k-line-data",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/k-line-data"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "leverage-mode-change",
+      "title": "leverage-mode-change",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/leverage-mode-change"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "liquidation-risk-change",
+      "title": "liquidation-risk-change",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/liquidation-risk-change"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "login-authentication",
+      "title": "login-authentication",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/login-authentication"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "order",
+      "title": "order",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/order"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "order-book-depth",
+      "title": "order-book-depth",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/order-book-depth"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "plan-orders",
+      "title": "plan-orders",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/plan-orders"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "position",
+      "title": "position",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/position"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "position-mode-change",
+      "title": "position-mode-change",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/position-mode-change"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "reverse-position",
+      "title": "reverse-position",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/reverse-position"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "risk-limit",
+      "title": "risk-limit",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/risk-limit"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "tpsl-plan-orders",
+      "title": "tpsl-plan-orders",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/tpsl-plan-orders"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "tpsl-prices",
+      "title": "tpsl-prices",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/tpsl-prices"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "trailing-orders",
+      "title": "trailing-orders",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/trailing-orders"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "trial-bonus-notification",
+      "title": "trial-bonus-notification",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/trial-bonus-notification"
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "user-notifications-liquidation-warningnotice",
+      "title": "user-notifications-liquidation-warningnotice",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/user-notifications-liquidation-warningnotice"
+    }
+  ],
+  "websocket": [
+    {
+      "channel": "sub.tickers",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/tickers",
+      "source_sha256": "d001a0a27d7344356437d1eb8e1d674929fff9c153c32c078510433079f7ec10"
+    },
+    {
+      "channel": "push.personal.asset",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/assets",
+      "source_sha256": "27099a9b0b17d01ece39ec6e454d09f264a1a9edfddd2a9f7cffafcfd87a74d2"
+    },
+    {
+      "channel": "push.personal.order.chase",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/chase-order-failure",
+      "source_sha256": "ba0a31d0c6ca27e88d977c12eeadf267ab39a018020ae029f4d22aa59ae0679a"
+    },
+    {
+      "channel": "push.personal.position.closeall.fail",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/close-all-failure",
+      "source_sha256": "6a28abb390abcb5b5c64d5e732c7a4d05751325b2575e8887bb42f7ad1c6aa30"
+    },
+    {
+      "channel": "sub.contract",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/contract-data",
+      "source_sha256": "7446aa1258b6930cb688460a1609d708af43777538cd6635227d125ac1d3f5e5"
+    },
+    {
+      "channel": "sub.deal",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/deal",
+      "source_sha256": "4d05a1e7f2d380f67609e596af2938ba76b52114842c400a4a1400dfa2413efb"
+    },
+    {
+      "channel": "sub.depth.step",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/depth-specify-minimum-notional-step",
+      "source_sha256": "35562deb2fd71aa90621c04b83ed7afd30c10592da19d5689ed09cc07ce735be"
+    },
+    {
+      "channel": "push.personal.event.contract.position",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/event-contract-positions",
+      "source_sha256": "1ef28a4abbd5c3c7554686e722da9805a0f9a685d3c5176469d9b4611bf99a77"
+    },
+    {
+      "channel": "sub.event.contract",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/event-contracts",
+      "source_sha256": "752c5aa9908bd210ad87073cc7b99285a6cd5056985e2e54d2bca47ee62b44ac"
+    },
+    {
+      "channel": "sub.fair.price",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/fair-price",
+      "source_sha256": "977619d7b68bb42bc0cc1a42f47a3edc37690a954a08aab40d8343abbda424d9"
+    },
+    {
+      "channel": "push.personal.order.deal",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/fill-details",
+      "source_sha256": "d9393df5a24fb95d97f0ad3d2559c2d1c86c8c2d762853470a36f6575ae5f100"
+    },
+    {
+      "channel": "sub.funding.rate",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/funding-rate",
+      "source_sha256": "f2018f420389e80dde5d00401c8e8d4c6cbdf43eb70f1822f0e46c1f676a34ee"
+    },
+    {
+      "channel": "sub.ticker",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/get-a-single-ticker",
+      "source_sha256": "2ddf499956a8c0728549126b2c1f68d939a500a594fb14a40d39daa480690d8b"
+    },
+    {
+      "channel": "sub.index.price",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/index-price",
+      "source_sha256": "53ae4ad935a67945f9a99c72f382a0f3766e06de308913df8ddf69bb9348c1ff"
+    },
+    {
+      "channel": "sub.kline",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/k-line-data",
+      "source_sha256": "59210027c384d5eaf9e15d61260c1b14ce5ea2f3b0538e2cdf27b0d788551a7b"
+    },
+    {
+      "channel": "push.personal.leverage.mode",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/leverage-mode-change",
+      "source_sha256": "ceb902a8f3199f8ed2ef1983f3f4da75361e611b7e60947b352a228c09d32397"
+    },
+    {
+      "channel": "push.personal.liquidate.risk",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/liquidation-risk-change",
+      "source_sha256": "9a042e02c92dd7497471707caa2818cd7c6381a49e326bdb8ec30dcf320801aa"
+    },
+    {
+      "channel": "push.personal.order",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/order",
+      "source_sha256": "c97ad2ee863d09db655ffdcfefcda5a74a481a97d7ee7175bba69043156d3abe"
+    },
+    {
+      "channel": "sub.depth",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/order-book-depth",
+      "source_sha256": "92671bd9e0b40bb21005c52edbd7c9b2ddca5b23aedf94828f246e975d978328"
+    },
+    {
+      "channel": "push.personal.plan.order",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/plan-orders",
+      "source_sha256": "49c0532d9ddd7ce535b9320ad732806ba1b01e1ad9a5ca76f74593cd27472507"
+    },
+    {
+      "channel": "push.personal.position",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/position",
+      "source_sha256": "df7dbfb42708446c9f0d73285ce1c2099a4a0438bfcaec85db3923ce5751e0f2"
+    },
+    {
+      "channel": "push.personal.position.mode",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/position-mode-change",
+      "source_sha256": "53e2b816bdd26c212b5cf7e8c49876afc11e6ae40f07afc0bd086a860a30f1bd"
+    },
+    {
+      "channel": "push.personal.reverse.position",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/reverse-position",
+      "source_sha256": "2575548d86058fb8b17bffca0d1c043e74294aab05e6300e5b338349548f8338"
+    },
+    {
+      "channel": "push.personal.risk.limit",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/risk-limit",
+      "source_sha256": "48981620ffac305785304ee644007975bdfc4c08ce607d3d2789cadb4f275b3f"
+    },
+    {
+      "channel": "push.personal.stop.planorder",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/tpsl-plan-orders",
+      "source_sha256": "06adf98df4459c215eb7ac2e30d74f99378c35954a031647567a1755b86e5b64"
+    },
+    {
+      "channel": "push.personal.stop.order",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/tpsl-prices",
+      "source_sha256": "562c36c6968ce5f08522d0e11761b490151a242818ee9712a7e4b7df143ee021"
+    },
+    {
+      "channel": "push.personal.track.order",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/trailing-orders",
+      "source_sha256": "6c6e2a2ec9303a5717fbbe4ec7eeeb75342615addb77b4c4ef98109a05b17b41"
+    },
+    {
+      "channel": "push.personal.bonus",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/trial-bonus-notification",
+      "source_sha256": "7bcf1a4a3cedae8050fc47db43edaa856e36242179950efe9aa2974de1c9fd8e"
+    },
+    {
+      "channel": "push.personal.generic.notify",
+      "official_source": "https://www.mexc.com/api-docs/futures/websocket-api/user-notifications-liquidation-warningnotice",
+      "source_sha256": "e40338e385aa04871ed7595f18c498e6f276b51ed2b044fa3a7807a054678d82"
+    }
+  ]
+}

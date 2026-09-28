@@ -270,23 +270,23 @@ pub(super) async fn fetch_binance(timeout: Duration) -> Result<Vec<MarketInfo>> 
         .public_request("get_options_exchange_info", vec![])
         .await?;
     for market in response_array(&options, &["optionSymbols"]) {
-        if value_string(market, "status", "") == "TRADING" {
-            if let Some(row) = binance_option_market_info(market) {
-                rows.push(row);
-            }
+        if value_string(market, "status", "") == "TRADING"
+            && let Some(row) = binance_option_market_info(market)
+        {
+            rows.push(row);
         }
     }
     // The Equity metadata endpoint requires an API key even though it is unsigned.
-    if let Ok(api_key) = std::env::var("BINANCE_API_KEY") {
-        if !api_key.is_empty() {
-            let equity_client = BinanceClient::new(Some(api_key), None, timeout)?;
-            if let Ok(equity) = equity_client
-                .public_request("get_equity_exchange_info", vec![])
-                .await
-            {
-                for market in response_array(&equity, &["symbols"]) {
-                    rows.push(binance_equity_market_info(market)?);
-                }
+    if let Ok(api_key) = std::env::var("BINANCE_API_KEY")
+        && !api_key.is_empty()
+    {
+        let equity_client = BinanceClient::new(Some(api_key), None, timeout)?;
+        if let Ok(equity) = equity_client
+            .public_request("get_equity_exchange_info", vec![])
+            .await
+        {
+            for market in response_array(&equity, &["symbols"]) {
+                rows.push(binance_equity_market_info(market)?);
             }
         }
     }
@@ -689,10 +689,10 @@ pub(super) async fn fetch_bybit(timeout: Duration) -> Result<Vec<MarketInfo>> {
         let markets = bybit_instruments(&client, category).await?;
         for market in markets {
             if category == "option" {
-                if value_string(&market, "status", "") == "Trading" {
-                    if let Some(row) = bybit_option_market_info(&market) {
-                        rows.push(row);
-                    }
+                if value_string(&market, "status", "") == "Trading"
+                    && let Some(row) = bybit_option_market_info(&market)
+                {
+                    rows.push(row);
                 }
                 continue;
             }
@@ -1365,10 +1365,10 @@ pub(super) async fn fetch_okx(timeout: Duration) -> Result<Vec<MarketInfo>> {
                 Err(error) => return Err(error),
             };
             for market in response_array(&options, &["data"]) {
-                if value_string(market, "state", "") == "live" {
-                    if let Some(row) = okx_option_market_info(market) {
-                        rows.push(row);
-                    }
+                if value_string(market, "state", "") == "live"
+                    && let Some(row) = okx_option_market_info(market)
+                {
+                    rows.push(row);
                 }
             }
         }

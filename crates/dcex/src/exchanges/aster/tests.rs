@@ -71,6 +71,7 @@ fn signed_futures_request_includes_user_before_signer() {
         Duration::from_secs(1),
     )
     .expect("client");
+    let nonce = client.reserve_nonce().unwrap();
     let request = client
         .build_request(
             HttpMethod::Get,
@@ -78,7 +79,7 @@ fn signed_futures_request_includes_user_before_signer() {
             "/fapi/v3/balance",
             Vec::new(),
             true,
-            Some(1_700_000_000_000_000),
+            Some(nonce),
         )
         .expect("request");
 
@@ -86,7 +87,7 @@ fn signed_futures_request_includes_user_before_signer() {
         request.headers.get("Accept").map(String::as_str),
         Some("application/json")
     );
-    assert!(request.path.contains("nonce=1700000000000000"));
+    assert!(request.path.contains(&format!("nonce={nonce}")));
     assert!(
         request
             .path

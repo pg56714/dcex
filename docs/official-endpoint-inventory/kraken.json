@@ -1,0 +1,1223 @@
+{
+  "source": "https://docs.kraken.com/llms.txt",
+  "endpoints": [
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "GET",
+      "path": "/0/public/Time",
+      "official_source": "https://docs.kraken.com/api-reference/market-data/get-server-time"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "GET",
+      "path": "/0/public/SystemStatus",
+      "official_source": "https://docs.kraken.com/api-reference/market-data/get-system-status"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "GET",
+      "path": "/0/public/MaintenanceSchedule",
+      "official_source": "https://docs.kraken.com/api-reference/market-data/get-maintenance-schedule"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "GET",
+      "path": "/0/public/Assets",
+      "official_source": "https://docs.kraken.com/api-reference/market-data/get-asset-info"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "GET",
+      "path": "/0/public/AssetPairs",
+      "official_source": "https://docs.kraken.com/api-reference/market-data/get-tradable-asset-pairs"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "GET",
+      "path": "/0/public/Ticker",
+      "official_source": "https://docs.kraken.com/api-reference/market-data/get-ticker-information"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "GET",
+      "path": "/0/public/OHLC",
+      "official_source": "https://docs.kraken.com/api-reference/market-data/get-ohlc-data"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "GET",
+      "path": "/0/public/Depth",
+      "official_source": "https://docs.kraken.com/api-reference/market-data/get-order-book"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "POST",
+      "path": "/0/private/Level3",
+      "official_source": "https://docs.kraken.com/api-reference/market-data/query-l3-order-book"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "GET",
+      "path": "/0/public/GroupedBook",
+      "official_source": "https://docs.kraken.com/api-reference/market-data/get-grouped-order-book"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "GET",
+      "path": "/0/public/Trades",
+      "official_source": "https://docs.kraken.com/api-reference/market-data/get-recent-trades"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "GET",
+      "path": "/0/public/Spread",
+      "official_source": "https://docs.kraken.com/api-reference/market-data/get-recent-spreads"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "POST",
+      "path": "/0/private/Balance",
+      "official_source": "https://docs.kraken.com/api-reference/account-data/get-account-balance"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "POST",
+      "path": "/0/private/BalanceEx",
+      "official_source": "https://docs.kraken.com/api-reference/account-data/get-extended-balance"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "POST",
+      "path": "/0/private/CreditLines",
+      "official_source": "https://docs.kraken.com/api-reference/account-data/get-credit-lines"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "POST",
+      "path": "/0/private/TradeBalance",
+      "official_source": "https://docs.kraken.com/api-reference/account-data/get-trade-balance"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "POST",
+      "path": "/0/private/OpenOrders",
+      "official_source": "https://docs.kraken.com/api-reference/account-data/get-open-orders"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "POST",
+      "path": "/0/private/ClosedOrders",
+      "official_source": "https://docs.kraken.com/api-reference/account-data/get-closed-orders"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "POST",
+      "path": "/0/private/QueryOrders",
+      "official_source": "https://docs.kraken.com/api-reference/account-data/query-orders-info"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "POST",
+      "path": "/0/private/OrderAmends",
+      "official_source": "https://docs.kraken.com/api-reference/account-data/get-order-amends"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "POST",
+      "path": "/0/private/TradesHistory",
+      "official_source": "https://docs.kraken.com/api-reference/account-data/get-trades-history"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "POST",
+      "path": "/0/private/QueryTrades",
+      "official_source": "https://docs.kraken.com/api-reference/account-data/query-trades-info"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "POST",
+      "path": "/0/private/OpenPositions",
+      "official_source": "https://docs.kraken.com/api-reference/account-data/get-open-positions"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "POST",
+      "path": "/0/private/Ledgers",
+      "official_source": "https://docs.kraken.com/api-reference/account-data/get-ledgers-info"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "POST",
+      "path": "/0/private/QueryLedgers",
+      "official_source": "https://docs.kraken.com/api-reference/account-data/query-ledgers"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "POST",
+      "path": "/0/private/TradeVolume",
+      "official_source": "https://docs.kraken.com/api-reference/account-data/get-trade-volume"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "POST",
+      "path": "/0/private/AddExport",
+      "official_source": "https://docs.kraken.com/api-reference/account-data/request-export-report"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "POST",
+      "path": "/0/private/ExportStatus",
+      "official_source": "https://docs.kraken.com/api-reference/account-data/get-export-report-status"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "POST",
+      "path": "/0/private/RetrieveExport",
+      "official_source": "https://docs.kraken.com/api-reference/account-data/retrieve-data-export"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "POST",
+      "path": "/0/private/RemoveExport",
+      "official_source": "https://docs.kraken.com/api-reference/account-data/delete-export-report"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "POST",
+      "path": "/0/private/GetApiKeyInfo",
+      "official_source": "https://docs.kraken.com/api-reference/account-data/get-api-key-info"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "POST",
+      "path": "/0/private/ListWalletAccounts",
+      "official_source": "https://docs.kraken.com/api-reference/account-data/list-wallet-accounts"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "POST",
+      "path": "/0/private/AddOrder",
+      "official_source": "https://docs.kraken.com/api-reference/trading/add-order"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "POST",
+      "path": "/0/private/AmendOrder",
+      "official_source": "https://docs.kraken.com/api-reference/trading/amend-order"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "POST",
+      "path": "/0/private/EditOrder",
+      "official_source": "https://docs.kraken.com/api-reference/trading/edit-order"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "POST",
+      "path": "/0/private/CancelOrder",
+      "official_source": "https://docs.kraken.com/api-reference/trading/cancel-order"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "POST",
+      "path": "/0/private/CancelAll",
+      "official_source": "https://docs.kraken.com/api-reference/trading/cancel-all-orders"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "POST",
+      "path": "/0/private/CancelAllOrdersAfter",
+      "official_source": "https://docs.kraken.com/api-reference/trading/cancel-all-orders-after-x"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "POST",
+      "path": "/0/private/AddOrderBatch",
+      "official_source": "https://docs.kraken.com/api-reference/trading/add-order-batch"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "POST",
+      "path": "/0/private/CancelOrderBatch",
+      "official_source": "https://docs.kraken.com/api-reference/trading/cancel-order-batch"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "POST",
+      "path": "/0/private/GetWebSocketsToken",
+      "official_source": "https://docs.kraken.com/api-reference/trading/get-websockets-token"
+    },
+    {
+      "method": "GET",
+      "path": "/funding/v1/fees/{method_id}",
+      "official_source": "https://docs.kraken.com/api-reference/funding-beta/calculate-funding-fees",
+      "title": "Calculate Funding Fees"
+    },
+    {
+      "method": "PUT",
+      "path": "/funding/v1/deposit/address",
+      "official_source": "https://docs.kraken.com/api-reference/funding-beta/claim-funding-deposit-address",
+      "title": "Claim Funding Deposit Address"
+    },
+    {
+      "method": "POST",
+      "path": "/funding/v1/addresses",
+      "official_source": "https://docs.kraken.com/api-reference/funding-beta/create-funding-address",
+      "title": "Create Funding Address"
+    },
+    {
+      "method": "POST",
+      "path": "/funding/v1/withdrawals",
+      "official_source": "https://docs.kraken.com/api-reference/funding-beta/create-funding-withdrawal",
+      "title": "Create Funding Withdrawal"
+    },
+    {
+      "method": "DELETE",
+      "path": "/funding/v1/addresses/{id}",
+      "official_source": "https://docs.kraken.com/api-reference/funding-beta/delete-funding-address",
+      "title": "Delete Funding Address"
+    },
+    {
+      "method": "GET",
+      "path": "/funding/v1/addresses",
+      "official_source": "https://docs.kraken.com/api-reference/funding-beta/list-funding-addresses",
+      "title": "List Funding Addresses"
+    },
+    {
+      "method": "GET",
+      "path": "/funding/v1/assets/{direction}",
+      "official_source": "https://docs.kraken.com/api-reference/funding-beta/list-funding-assets",
+      "title": "List Funding Assets"
+    },
+    {
+      "method": "GET",
+      "path": "/funding/v2/deposit/addresses",
+      "official_source": "https://docs.kraken.com/api-reference/funding-beta/list-funding-claimed-addresses-v2",
+      "title": "List Funding Claimed Addresses (v2)"
+    },
+    {
+      "method": "GET",
+      "path": "/funding/v1/limits/deposit/{asset_class}/{asset}",
+      "official_source": "https://docs.kraken.com/api-reference/funding-beta/list-funding-deposit-limits",
+      "title": "List Funding Deposit Limits"
+    },
+    {
+      "method": "GET",
+      "path": "/funding/v1/deposits",
+      "official_source": "https://docs.kraken.com/api-reference/funding-beta/list-funding-deposits",
+      "title": "List Funding Deposits"
+    },
+    {
+      "method": "GET",
+      "path": "/funding/v1/methods/{direction}",
+      "official_source": "https://docs.kraken.com/api-reference/funding-beta/list-funding-methods",
+      "title": "List Funding Methods"
+    },
+    {
+      "method": "GET",
+      "path": "/funding/v1/networks",
+      "official_source": "https://docs.kraken.com/api-reference/funding-beta/list-funding-networks",
+      "title": "List Funding Networks"
+    },
+    {
+      "method": "GET",
+      "path": "/funding/v1/limits/withdrawal/{asset_class}/{asset}",
+      "official_source": "https://docs.kraken.com/api-reference/funding-beta/list-funding-withdrawal-limits",
+      "title": "List Funding Withdrawal Limits"
+    },
+    {
+      "method": "GET",
+      "path": "/funding/v1/withdrawals",
+      "official_source": "https://docs.kraken.com/api-reference/funding-beta/list-funding-withdrawals",
+      "title": "List Funding Withdrawals"
+    },
+    {
+      "method": "PUT",
+      "path": "/funding/v1/addresses/{id}",
+      "official_source": "https://docs.kraken.com/api-reference/funding-beta/update-funding-address",
+      "title": "Update Funding Address"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "POST",
+      "path": "/0/private/DepositMethods",
+      "official_source": "https://docs.kraken.com/api-reference/funding/get-deposit-methods"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "POST",
+      "path": "/0/private/DepositAddresses",
+      "official_source": "https://docs.kraken.com/api-reference/funding/get-deposit-addresses"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "POST",
+      "path": "/0/private/DepositStatus",
+      "official_source": "https://docs.kraken.com/api-reference/funding/get-status-of-recent-deposits"
+    },
+    {
+      "method": "POST",
+      "path": "/0/private/WithdrawMethods",
+      "official_source": "https://docs.kraken.com/api-reference/funding/get-withdrawal-methods",
+      "title": "Get Withdrawal Methods"
+    },
+    {
+      "method": "POST",
+      "path": "/0/private/WithdrawAddresses",
+      "official_source": "https://docs.kraken.com/api-reference/funding/get-withdrawal-addresses",
+      "title": "Get Withdrawal Addresses"
+    },
+    {
+      "method": "POST",
+      "path": "/0/private/WithdrawInfo",
+      "official_source": "https://docs.kraken.com/api-reference/funding/get-withdrawal-information",
+      "title": "Get Withdrawal Information"
+    },
+    {
+      "method": "POST",
+      "path": "/0/private/Withdraw",
+      "official_source": "https://docs.kraken.com/api-reference/funding/withdraw-funds",
+      "title": "Withdraw Funds"
+    },
+    {
+      "method": "POST",
+      "path": "/0/private/WithdrawStatus",
+      "official_source": "https://docs.kraken.com/api-reference/funding/get-status-of-recent-withdrawals",
+      "title": "Get Status of Recent Withdrawals"
+    },
+    {
+      "method": "POST",
+      "path": "/0/private/WithdrawCancel",
+      "official_source": "https://docs.kraken.com/api-reference/funding/request-withdrawal-cancellation",
+      "title": "Request Withdrawal Cancellation"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "POST",
+      "path": "/0/private/WalletTransfer",
+      "official_source": "https://docs.kraken.com/api-reference/funding/request-wallet-transfer"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "POST",
+      "path": "/0/private/CreateSubaccount",
+      "official_source": "https://docs.kraken.com/api-reference/subaccounts/create-subaccount"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "POST",
+      "path": "/0/private/AccountTransfer",
+      "official_source": "https://docs.kraken.com/api-reference/subaccounts/account-transfer"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "POST",
+      "path": "/0/private/Earn/Strategies",
+      "official_source": "https://docs.kraken.com/api-reference/earn/list-earn-strategies"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "POST",
+      "path": "/0/private/Earn/Allocations",
+      "official_source": "https://docs.kraken.com/api-reference/earn/list-earn-allocations"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "POST",
+      "path": "/0/private/Earn/Allocate",
+      "official_source": "https://docs.kraken.com/api-reference/earn/allocate-earn-funds"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "POST",
+      "path": "/0/private/Earn/Deallocate",
+      "official_source": "https://docs.kraken.com/api-reference/earn/deallocate-earn-funds"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "POST",
+      "path": "/0/private/Earn/AllocateStatus",
+      "official_source": "https://docs.kraken.com/api-reference/earn/get-allocation-status"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "POST",
+      "path": "/0/private/Earn/DeallocateStatus",
+      "official_source": "https://docs.kraken.com/api-reference/earn/get-deallocation-status"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "GET",
+      "path": "/0/public/PreTrade",
+      "official_source": "https://docs.kraken.com/api-reference/transparency/pre-trade-data"
+    },
+    {
+      "spec": "/openapi/spot-rest.yaml",
+      "method": "GET",
+      "path": "/0/public/PostTrade",
+      "official_source": "https://docs.kraken.com/api-reference/transparency/post-trade-data"
+    },
+    {
+      "method": "GET",
+      "path": "/affiliate/v1/daily-activity",
+      "official_source": "https://docs.kraken.com/api-reference/affiliate/get-daily-activity",
+      "title": "Get Daily Activity"
+    },
+    {
+      "spec": "/openapi/futures-rest.yaml",
+      "method": "GET",
+      "path": "/derivatives/api/v3/tickers",
+      "official_source": "https://docs.kraken.com/api-reference/market-data/get-tickers"
+    },
+    {
+      "spec": "/openapi/futures-rest.yaml",
+      "method": "GET",
+      "path": "/derivatives/api/v3/tickers/{symbol}",
+      "official_source": "https://docs.kraken.com/api-reference/market-data/get-ticker-by-symbol"
+    },
+    {
+      "spec": "/openapi/futures-rest.yaml",
+      "method": "GET",
+      "path": "/derivatives/api/v3/orderbook",
+      "official_source": "https://docs.kraken.com/api-reference/market-data/get-orderbook"
+    },
+    {
+      "spec": "/openapi/futures-rest.yaml",
+      "method": "GET",
+      "path": "/derivatives/api/v3/history",
+      "official_source": "https://docs.kraken.com/api-reference/market-data/get-trade-history"
+    },
+    {
+      "spec": "/openapi/futures-rest.yaml",
+      "method": "GET",
+      "path": "/derivatives/api/v3/instruments",
+      "official_source": "https://docs.kraken.com/api-reference/instrument-details/get-instruments"
+    },
+    {
+      "spec": "/openapi/futures-rest.yaml",
+      "method": "GET",
+      "path": "/derivatives/api/v3/trading/instruments",
+      "official_source": "https://docs.kraken.com/api-reference/instrument-details/get-trading-instruments"
+    },
+    {
+      "spec": "/openapi/futures-rest.yaml",
+      "method": "GET",
+      "path": "/derivatives/api/v3/instruments/status",
+      "official_source": "https://docs.kraken.com/api-reference/instrument-details/get-instrument-status-list"
+    },
+    {
+      "spec": "/openapi/futures-rest.yaml",
+      "method": "GET",
+      "path": "/derivatives/api/v3/instruments/{symbol}/status",
+      "official_source": "https://docs.kraken.com/api-reference/instrument-details/get-instrument-status"
+    },
+    {
+      "spec": "/openapi/futures-rest.yaml",
+      "method": "POST",
+      "path": "/derivatives/api/v3/sendorder",
+      "official_source": "https://docs.kraken.com/api-reference/order-management/send-order"
+    },
+    {
+      "spec": "/openapi/futures-rest.yaml",
+      "method": "POST",
+      "path": "/derivatives/api/v3/editorder",
+      "official_source": "https://docs.kraken.com/api-reference/order-management/edit-order"
+    },
+    {
+      "spec": "/openapi/futures-rest.yaml",
+      "method": "POST",
+      "path": "/derivatives/api/v3/cancelorder",
+      "official_source": "https://docs.kraken.com/api-reference/order-management/cancel-order"
+    },
+    {
+      "spec": "/openapi/futures-rest.yaml",
+      "method": "POST",
+      "path": "/derivatives/api/v3/cancelallorders",
+      "official_source": "https://docs.kraken.com/api-reference/order-management/cancel-all-orders"
+    },
+    {
+      "spec": "/openapi/futures-rest.yaml",
+      "method": "POST",
+      "path": "/derivatives/api/v3/cancelallordersafter",
+      "official_source": "https://docs.kraken.com/api-reference/order-management/dead-mans-switch"
+    },
+    {
+      "spec": "/openapi/futures-rest.yaml",
+      "method": "POST",
+      "path": "/derivatives/api/v3/batchorder",
+      "official_source": "https://docs.kraken.com/api-reference/order-management/batch-order-management"
+    },
+    {
+      "spec": "/openapi/futures-rest.yaml",
+      "method": "GET",
+      "path": "/derivatives/api/v3/openorders",
+      "official_source": "https://docs.kraken.com/api-reference/order-management/get-open-orders"
+    },
+    {
+      "spec": "/openapi/futures-rest.yaml",
+      "method": "POST",
+      "path": "/derivatives/api/v3/orders/status",
+      "official_source": "https://docs.kraken.com/api-reference/order-management/get-specific-orders-status"
+    },
+    {
+      "spec": "/openapi/futures-rest.yaml",
+      "method": "GET",
+      "path": "/derivatives/api/v3/accounts",
+      "official_source": "https://docs.kraken.com/api-reference/account-information/get-wallets"
+    },
+    {
+      "spec": "/openapi/futures-rest.yaml",
+      "method": "GET",
+      "path": "/derivatives/api/v3/openpositions",
+      "official_source": "https://docs.kraken.com/api-reference/account-information/get-open-positions"
+    },
+    {
+      "spec": "/openapi/futures-rest.yaml",
+      "method": "GET",
+      "path": "/derivatives/api/v3/unwindqueue",
+      "official_source": "https://docs.kraken.com/api-reference/account-information/get-position-percentile-of-unwind-queue"
+    },
+    {
+      "spec": "/openapi/futures-rest.yaml",
+      "method": "GET",
+      "path": "/derivatives/api/v3/portfolio-margining/parameters",
+      "official_source": "https://docs.kraken.com/api-reference/account-information/get-portfolio-margin-parameters"
+    },
+    {
+      "spec": "/openapi/futures-rest.yaml",
+      "method": "POST",
+      "path": "/derivatives/api/v3/portfolio-margining/simulate",
+      "official_source": "https://docs.kraken.com/api-reference/account-information/calculate-portfolio-margin-pnl-and-greeks"
+    },
+    {
+      "spec": "/openapi/futures-rest.yaml",
+      "method": "GET",
+      "path": "/derivatives/api/v3/pnlpreferences",
+      "official_source": "https://docs.kraken.com/api-reference/multi-collateral/get-pnl-currency-preferences"
+    },
+    {
+      "spec": "/openapi/futures-rest.yaml",
+      "method": "PUT",
+      "path": "/derivatives/api/v3/pnlpreferences",
+      "official_source": "https://docs.kraken.com/api-reference/multi-collateral/set-pnl-currency-preference"
+    },
+    {
+      "spec": "/openapi/futures-rest.yaml",
+      "method": "GET",
+      "path": "/derivatives/api/v3/leveragepreferences",
+      "official_source": "https://docs.kraken.com/api-reference/multi-collateral/get-leverage-settings"
+    },
+    {
+      "spec": "/openapi/futures-rest.yaml",
+      "method": "PUT",
+      "path": "/derivatives/api/v3/leveragepreferences",
+      "official_source": "https://docs.kraken.com/api-reference/multi-collateral/set-leverage-settings"
+    },
+    {
+      "spec": "/openapi/futures-rest.yaml",
+      "method": "GET",
+      "path": "/derivatives/api/v3/feeschedules",
+      "official_source": "https://docs.kraken.com/api-reference/fee-schedules/get-fee-schedules"
+    },
+    {
+      "spec": "/openapi/futures-rest.yaml",
+      "method": "GET",
+      "path": "/derivatives/api/v3/feeschedules/volumes",
+      "official_source": "https://docs.kraken.com/api-reference/fee-schedules/get-fee-schedule-volumes"
+    },
+    {
+      "spec": "/openapi/futures-rest.yaml",
+      "method": "GET",
+      "path": "/derivatives/api/v3/fills",
+      "official_source": "https://docs.kraken.com/api-reference/historical-data/get-your-fills"
+    },
+    {
+      "spec": "/openapi/futures-rest.yaml",
+      "method": "GET",
+      "path": "/derivatives/api/v3/historical-funding-rates",
+      "official_source": "https://docs.kraken.com/api-reference/historical-funding-rates/historical-funding-rates"
+    },
+    {
+      "spec": "/openapi/futures-rest.yaml",
+      "method": "GET",
+      "path": "/derivatives/api/v3/self-trade-strategy",
+      "official_source": "https://docs.kraken.com/api-reference/trading-settings/get-self-trade-strategy"
+    },
+    {
+      "spec": "/openapi/futures-rest.yaml",
+      "method": "PUT",
+      "path": "/derivatives/api/v3/self-trade-strategy",
+      "official_source": "https://docs.kraken.com/api-reference/trading-settings/update-self-trade-strategy"
+    },
+    {
+      "method": "GET",
+      "path": "/derivatives/api/v3/rfq-assignment/max-leverage",
+      "official_source": "https://docs.kraken.com/api-reference/trading-settings/get-the-off-book-max-leverage-cap",
+      "title": "Get the off-book max leverage cap"
+    },
+    {
+      "method": "PUT",
+      "path": "/derivatives/api/v3/rfq-assignment/max-leverage",
+      "official_source": "https://docs.kraken.com/api-reference/trading-settings/set-the-off-book-max-leverage-cap",
+      "title": "Set the off-book max leverage cap"
+    },
+    {
+      "method": "DELETE",
+      "path": "/derivatives/api/v3/rfq-assignment/max-leverage",
+      "official_source": "https://docs.kraken.com/api-reference/trading-settings/clear-the-off-book-max-leverage-cap",
+      "title": "Clear the off-book max leverage cap"
+    },
+    {
+      "spec": "/openapi/futures-rest.yaml",
+      "method": "GET",
+      "path": "/derivatives/api/v3/subaccounts",
+      "official_source": "https://docs.kraken.com/api-reference/subaccounts/get-subaccounts"
+    },
+    {
+      "spec": "/openapi/futures-rest.yaml",
+      "method": "GET",
+      "path": "/derivatives/api/v3/subaccount/{subaccountUid}/trading-enabled",
+      "official_source": "https://docs.kraken.com/api-reference/subaccounts/check-subaccount-trading-status"
+    },
+    {
+      "spec": "/openapi/futures-rest.yaml",
+      "method": "PUT",
+      "path": "/derivatives/api/v3/subaccount/{subaccountUid}/trading-enabled",
+      "official_source": "https://docs.kraken.com/api-reference/subaccounts/update-subaccount-trading-status"
+    },
+    {
+      "spec": "/openapi/futures-rest.yaml",
+      "method": "POST",
+      "path": "/derivatives/api/v3/transfer",
+      "official_source": "https://docs.kraken.com/api-reference/transfers/initiate-wallet-transfer"
+    },
+    {
+      "spec": "/openapi/futures-rest.yaml",
+      "method": "POST",
+      "path": "/derivatives/api/v3/transfer/subaccount",
+      "official_source": "https://docs.kraken.com/api-reference/transfers/initiate-sub-account-transfer"
+    },
+    {
+      "method": "POST",
+      "path": "/derivatives/api/v3/withdrawal",
+      "official_source": "https://docs.kraken.com/api-reference/transfers/initiate-withdrawal-to-spot-wallet",
+      "title": "Initiate withdrawal to Spot wallet"
+    },
+    {
+      "method": "GET",
+      "path": "/derivatives/api/v3/assignmentprogram/current",
+      "official_source": "https://docs.kraken.com/api-reference/assignment-program/list-assignment-programs",
+      "title": "List assignment programs"
+    },
+    {
+      "method": "POST",
+      "path": "/derivatives/api/v3/assignmentprogram/add",
+      "official_source": "https://docs.kraken.com/api-reference/assignment-program/add-assignment-preference",
+      "title": "Add assignment preference"
+    },
+    {
+      "method": "POST",
+      "path": "/derivatives/api/v3/assignmentprogram/delete",
+      "official_source": "https://docs.kraken.com/api-reference/assignment-program/deletes-assignment-preference",
+      "title": "Deletes assignment preference"
+    },
+    {
+      "method": "GET",
+      "path": "/derivatives/api/v3/assignmentprogram/history",
+      "official_source": "https://docs.kraken.com/api-reference/assignment-program/list-assignment-preferences-history",
+      "title": "List assignment preferences history"
+    },
+    {
+      "method": "GET",
+      "path": "/derivatives/api/v3/rfqs",
+      "official_source": "https://docs.kraken.com/api-reference/rfqs/list-all-open-rfqs",
+      "title": "List all open RFQs"
+    },
+    {
+      "method": "GET",
+      "path": "/derivatives/api/v3/rfqs/{rfqUid}",
+      "official_source": "https://docs.kraken.com/api-reference/rfqs/retrieve-a-single-rfq-open-or-recently-closed",
+      "title": "Retrieve a single RFQ (open or recently closed)"
+    },
+    {
+      "method": "GET",
+      "path": "/derivatives/api/v3/rfqs/open-offers",
+      "official_source": "https://docs.kraken.com/api-reference/rfqs/list-open-offers-on-open-rfqs",
+      "title": "List open offers on open RFQs"
+    },
+    {
+      "method": "GET",
+      "path": "/derivatives/api/v3/rfqs/closed-offers",
+      "official_source": "https://docs.kraken.com/api-reference/rfqs/list-offers-placed-by-the-account-on-closed-rfqs",
+      "title": "List offers placed by the account on closed RFQs"
+    },
+    {
+      "method": "POST",
+      "path": "/derivatives/api/v3/rfqs/place-offer/{rfqUid}",
+      "official_source": "https://docs.kraken.com/api-reference/rfqs/place-new-offer-on-an-open-rfq",
+      "title": "Place new offer on an open RFQ"
+    },
+    {
+      "method": "DELETE",
+      "path": "/derivatives/api/v3/rfqs/cancel-offer/{rfqUid}",
+      "official_source": "https://docs.kraken.com/api-reference/rfqs/cancel-open-offer-on-open-rfq",
+      "title": "Cancel open offer on open RFQ"
+    },
+    {
+      "method": "GET",
+      "path": "/derivatives/api/v3/rfqs/open-rfqs",
+      "official_source": "https://docs.kraken.com/api-reference/rfqs/list-open-rfqs-for-account",
+      "title": "List open RFQs for account"
+    },
+    {
+      "method": "POST",
+      "path": "/derivatives/api/v3/rfqs/open-rfqs",
+      "official_source": "https://docs.kraken.com/api-reference/rfqs/create-a-new-rfq",
+      "title": "Create a new RFQ"
+    },
+    {
+      "method": "DELETE",
+      "path": "/derivatives/api/v3/rfqs/open-rfqs/{rfqUid}",
+      "official_source": "https://docs.kraken.com/api-reference/rfqs/cancel-an-open-rfq",
+      "title": "Cancel an open RFQ"
+    },
+    {
+      "method": "POST",
+      "path": "/derivatives/api/v3/rfqs/open-rfqs/accept-offer/{rfqUid}",
+      "official_source": "https://docs.kraken.com/api-reference/rfqs/accept-an-offer-on-an-open-rfq",
+      "title": "Accept an offer on an open RFQ"
+    },
+    {
+      "spec": "/openapi/futures-rest.yaml",
+      "method": "GET",
+      "path": "/derivatives/api/v3/notifications",
+      "official_source": "https://docs.kraken.com/api-reference/general/get-notifications"
+    },
+    {
+      "method": "GET",
+      "path": "/api/history/v3/accountlogcsv",
+      "official_source": "https://docs.kraken.com/api-reference/account-history/account-log-csv"
+    },
+    {
+      "method": "GET",
+      "path": "/api/history/v3/account-log",
+      "official_source": "https://docs.kraken.com/api-reference/account-history/get-account-log"
+    },
+    {
+      "method": "GET",
+      "path": "/api/history/v3/executions",
+      "official_source": "https://docs.kraken.com/api-reference/account-history/get-execution-events"
+    },
+    {
+      "method": "GET",
+      "path": "/api/history/v3/orders",
+      "official_source": "https://docs.kraken.com/api-reference/account-history/get-order-events"
+    },
+    {
+      "method": "GET",
+      "path": "/api/history/v3/positions",
+      "official_source": "https://docs.kraken.com/api-reference/account-history/get-position-update-events"
+    },
+    {
+      "method": "GET",
+      "path": "/api/history/v3/triggers",
+      "official_source": "https://docs.kraken.com/api-reference/account-history/get-trigger-events"
+    },
+    {
+      "method": "GET",
+      "path": "/api/charts/v1/analytics/liquidity-pool",
+      "official_source": "https://docs.kraken.com/api-reference/analytics/get-liquidity-pool-statistic"
+    },
+    {
+      "method": "GET",
+      "path": "/api/charts/v1/analytics/{symbol}/{analytics_type}",
+      "official_source": "https://docs.kraken.com/api-reference/analytics/market-analytics"
+    },
+    {
+      "method": "GET",
+      "path": "/api/charts/v1/{tick_type}/{symbol}/{resolution}",
+      "official_source": "https://docs.kraken.com/api-reference/candles/market-candles"
+    },
+    {
+      "method": "GET",
+      "path": "/api/charts/v1/{tick_type}",
+      "official_source": "https://docs.kraken.com/api-reference/candles/markets"
+    },
+    {
+      "method": "GET",
+      "path": "/api/charts/v1/{tick_type}/{symbol}",
+      "official_source": "https://docs.kraken.com/api-reference/candles/resolutions"
+    },
+    {
+      "method": "GET",
+      "path": "/api/charts/v1/",
+      "official_source": "https://docs.kraken.com/api-reference/candles/tick-types"
+    },
+    {
+      "method": "GET",
+      "path": "/api/history/v3/market/{tradeable}/executions",
+      "official_source": "https://docs.kraken.com/api-reference/market-history/get-public-execution-events"
+    },
+    {
+      "method": "GET",
+      "path": "/api/history/v3/market/{tradeable}/price",
+      "official_source": "https://docs.kraken.com/api-reference/market-history/get-public-mark-price-events"
+    },
+    {
+      "method": "GET",
+      "path": "/api/history/v3/market/{tradeable}/orders",
+      "official_source": "https://docs.kraken.com/api-reference/market-history/get-public-order-events"
+    },
+    {
+      "method": "WS",
+      "path": "/ws/v1",
+      "host": "futures-websocket",
+      "channel": "account_log",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/futures-websocket/account_log"
+    },
+    {
+      "method": "WS",
+      "path": "/ws/v1",
+      "host": "futures-websocket",
+      "channel": "balances",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/futures-websocket/balances"
+    },
+    {
+      "method": "WS",
+      "path": "/ws/v1",
+      "host": "futures-websocket",
+      "channel": "book",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/futures-websocket/book"
+    },
+    {
+      "method": "WS",
+      "path": "/ws/v1",
+      "host": "futures-websocket",
+      "channel": "challenge",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/futures-websocket/challenge"
+    },
+    {
+      "method": "WS",
+      "path": "/ws/v1",
+      "host": "futures-websocket",
+      "channel": "fills",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/futures-websocket/fills"
+    },
+    {
+      "method": "WS",
+      "path": "/ws/v1",
+      "host": "futures-websocket",
+      "channel": "heartbeat",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/futures-websocket/heartbeat"
+    },
+    {
+      "method": "WS",
+      "path": "/ws/v1",
+      "host": "futures-websocket",
+      "channel": "notifications",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/futures-websocket/notifications"
+    },
+    {
+      "method": "WS",
+      "path": "/ws/v1",
+      "host": "futures-websocket",
+      "channel": "open_orders",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/futures-websocket/open_orders"
+    },
+    {
+      "method": "WS",
+      "path": "/ws/v1",
+      "host": "futures-websocket",
+      "channel": "open_orders_verbose",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/futures-websocket/open_orders_verbose"
+    },
+    {
+      "method": "WS",
+      "path": "/ws/v1",
+      "host": "futures-websocket",
+      "channel": "open_position",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/futures-websocket/open_position"
+    },
+    {
+      "method": "WS",
+      "path": "/ws/v1",
+      "host": "futures-websocket",
+      "channel": "ticker",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/futures-websocket/ticker"
+    },
+    {
+      "method": "WS",
+      "path": "/ws/v1",
+      "host": "futures-websocket",
+      "channel": "ticker_lite",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/futures-websocket/ticker_lite"
+    },
+    {
+      "method": "WS",
+      "path": "/ws/v1",
+      "host": "futures-websocket",
+      "channel": "trade",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/futures-websocket/trade"
+    },
+    {
+      "method": "WS",
+      "path": "/",
+      "host": "spot-websocket-v1",
+      "channel": "addorder",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/spot-websocket-v1/addorder"
+    },
+    {
+      "method": "WS",
+      "path": "/",
+      "host": "spot-websocket-v1",
+      "channel": "amendorder",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/spot-websocket-v1/amendorder"
+    },
+    {
+      "method": "WS",
+      "path": "/",
+      "host": "spot-websocket-v1",
+      "channel": "book",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/spot-websocket-v1/book"
+    },
+    {
+      "method": "WS",
+      "path": "/",
+      "host": "spot-websocket-v1",
+      "channel": "cancelall",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/spot-websocket-v1/cancelall"
+    },
+    {
+      "method": "WS",
+      "path": "/",
+      "host": "spot-websocket-v1",
+      "channel": "cancelallordersafter",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/spot-websocket-v1/cancelallordersafter"
+    },
+    {
+      "method": "WS",
+      "path": "/",
+      "host": "spot-websocket-v1",
+      "channel": "cancelorder",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/spot-websocket-v1/cancelorder"
+    },
+    {
+      "method": "WS",
+      "path": "/",
+      "host": "spot-websocket-v1",
+      "channel": "editorder",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/spot-websocket-v1/editorder"
+    },
+    {
+      "method": "WS",
+      "path": "/",
+      "host": "spot-websocket-v1",
+      "channel": "heartbeat",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/spot-websocket-v1/heartbeat"
+    },
+    {
+      "method": "WS",
+      "path": "/",
+      "host": "spot-websocket-v1",
+      "channel": "ohlc",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/spot-websocket-v1/ohlc"
+    },
+    {
+      "method": "WS",
+      "path": "/",
+      "host": "spot-websocket-v1",
+      "channel": "openorders",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/spot-websocket-v1/openorders"
+    },
+    {
+      "method": "WS",
+      "path": "/",
+      "host": "spot-websocket-v1",
+      "channel": "owntrades",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/spot-websocket-v1/owntrades"
+    },
+    {
+      "method": "WS",
+      "path": "/",
+      "host": "spot-websocket-v1",
+      "channel": "ping",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/spot-websocket-v1/ping"
+    },
+    {
+      "method": "WS",
+      "path": "/",
+      "host": "spot-websocket-v1",
+      "channel": "spread",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/spot-websocket-v1/spread"
+    },
+    {
+      "method": "WS",
+      "path": "/",
+      "host": "spot-websocket-v1",
+      "channel": "subscriptionstatus",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/spot-websocket-v1/subscriptionstatus"
+    },
+    {
+      "method": "WS",
+      "path": "/",
+      "host": "spot-websocket-v1",
+      "channel": "systemstatus",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/spot-websocket-v1/systemstatus"
+    },
+    {
+      "method": "WS",
+      "path": "/",
+      "host": "spot-websocket-v1",
+      "channel": "ticker",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/spot-websocket-v1/ticker"
+    },
+    {
+      "method": "WS",
+      "path": "/",
+      "host": "spot-websocket-v1",
+      "channel": "trade",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/spot-websocket-v1/trade"
+    },
+    {
+      "method": "WS",
+      "path": "/",
+      "host": "spot-websocket-v1",
+      "channel": "unsubscribe",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/spot-websocket-v1/unsubscribe"
+    },
+    {
+      "method": "WS",
+      "path": "/v2",
+      "host": "spot-websocket-v2",
+      "channel": "add_order",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/spot-websocket-v2/add_order"
+    },
+    {
+      "method": "WS",
+      "path": "/v2",
+      "host": "spot-websocket-v2",
+      "channel": "amend_order",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/spot-websocket-v2/amend_order"
+    },
+    {
+      "method": "WS",
+      "path": "/v2",
+      "host": "spot-websocket-v2",
+      "channel": "balances",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/spot-websocket-v2/balances"
+    },
+    {
+      "method": "WS",
+      "path": "/v2",
+      "host": "spot-websocket-v2",
+      "channel": "batch_add",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/spot-websocket-v2/batch_add"
+    },
+    {
+      "method": "WS",
+      "path": "/v2",
+      "host": "spot-websocket-v2",
+      "channel": "batch_cancel",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/spot-websocket-v2/batch_cancel"
+    },
+    {
+      "method": "WS",
+      "path": "/v2",
+      "host": "spot-websocket-v2",
+      "channel": "book",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/spot-websocket-v2/book"
+    },
+    {
+      "method": "WS",
+      "path": "/v2",
+      "host": "spot-websocket-v2",
+      "channel": "cancel_after",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/spot-websocket-v2/cancel_after"
+    },
+    {
+      "method": "WS",
+      "path": "/v2",
+      "host": "spot-websocket-v2",
+      "channel": "cancel_all",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/spot-websocket-v2/cancel_all"
+    },
+    {
+      "method": "WS",
+      "path": "/v2",
+      "host": "spot-websocket-v2",
+      "channel": "cancel_order",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/spot-websocket-v2/cancel_order"
+    },
+    {
+      "method": "WS",
+      "path": "/v2",
+      "host": "spot-websocket-v2",
+      "channel": "edit_order",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/spot-websocket-v2/edit_order"
+    },
+    {
+      "method": "WS",
+      "path": "/v2",
+      "host": "spot-websocket-v2",
+      "channel": "executions",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/spot-websocket-v2/executions"
+    },
+    {
+      "method": "WS",
+      "path": "/v2",
+      "host": "spot-websocket-v2",
+      "channel": "heartbeat",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/spot-websocket-v2/heartbeat"
+    },
+    {
+      "method": "WS",
+      "path": "/v2",
+      "host": "spot-websocket-v2",
+      "channel": "instrument",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/spot-websocket-v2/instrument"
+    },
+    {
+      "method": "WS",
+      "path": "/v2",
+      "host": "spot-websocket-v2",
+      "channel": "level3",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/spot-websocket-v2/level3"
+    },
+    {
+      "method": "WS",
+      "path": "/v2",
+      "host": "spot-websocket-v2",
+      "channel": "ohlc",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/spot-websocket-v2/ohlc"
+    },
+    {
+      "method": "WS",
+      "path": "/v2",
+      "host": "spot-websocket-v2",
+      "channel": "ping",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/spot-websocket-v2/ping"
+    },
+    {
+      "method": "WS",
+      "path": "/v2",
+      "host": "spot-websocket-v2",
+      "channel": "status",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/spot-websocket-v2/status"
+    },
+    {
+      "method": "WS",
+      "path": "/v2",
+      "host": "spot-websocket-v2",
+      "channel": "ticker",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/spot-websocket-v2/ticker"
+    },
+    {
+      "method": "WS",
+      "path": "/v2",
+      "host": "spot-websocket-v2",
+      "channel": "trade",
+      "official_source": "https://docs.kraken.com/exchange/api-reference/spot-websocket-v2/trade"
+    }
+  ],
+  "reviewed": "2026-09-28"
+}

@@ -32,7 +32,7 @@ const KEYS: &[&str] = &[
 ];
 pub(super) fn handles(name: &str, public: bool) -> bool {
     public
-        == !matches!(
+        != matches!(
             name,
             "upsert_user_preferences" | "delete_user_preference_signed"
         )

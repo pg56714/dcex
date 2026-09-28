@@ -18,27 +18,27 @@ impl OkxClient {
     ) -> Result<Option<ValidatedResponse>> {
         let result = match method_name {
             "get_easy_convert_currencies" => {
-                if let Some(source) = params.get("source") {
-                    if !matches!(source, "1" | "2") {
-                        return Err(DcexError::InvalidInput(
-                            "OKX easy convert source must be 1 or 2".to_string(),
-                        ));
-                    }
+                if let Some(source) = params.get("source")
+                    && !matches!(source, "1" | "2")
+                {
+                    return Err(DcexError::InvalidInput(
+                        "OKX easy convert source must be 1 or 2".to_string(),
+                    ));
                 }
                 self.get_request(TRADE_EASY_CONVERT_CURRENCIES, params.only(&["source"]))
                     .await
             }
             "get_easy_convert_history" => {
-                if let Some(limit) = params.get("limit") {
-                    if !(1..=100).contains(&limit.parse::<u16>().map_err(|_| {
+                if let Some(limit) = params.get("limit")
+                    && !(1..=100).contains(&limit.parse::<u16>().map_err(|_| {
                         DcexError::InvalidInput(
                             "OKX easy convert limit must be an integer".to_string(),
                         )
-                    })?) {
-                        return Err(DcexError::InvalidInput(
-                            "OKX easy convert limit must be between 1 and 100".to_string(),
-                        ));
-                    }
+                    })?)
+                {
+                    return Err(DcexError::InvalidInput(
+                        "OKX easy convert limit must be between 1 and 100".to_string(),
+                    ));
                 }
                 self.get_request(
                     TRADE_EASY_CONVERT_HISTORY,
@@ -68,12 +68,12 @@ impl OkxClient {
                         "OKX easy convert toCcy must differ from fromCcy".to_string(),
                     ));
                 }
-                if let Some(source) = params.get("source") {
-                    if !matches!(source, "1" | "2") {
-                        return Err(DcexError::InvalidInput(
-                            "OKX easy convert source must be 1 or 2".to_string(),
-                        ));
-                    }
+                if let Some(source) = params.get("source")
+                    && !matches!(source, "1" | "2")
+                {
+                    return Err(DcexError::InvalidInput(
+                        "OKX easy convert source must be 1 or 2".to_string(),
+                    ));
                 }
                 let mut body = params.required_body(&["toCcy"])?;
                 body.insert("fromCcy".to_string(), currencies);
