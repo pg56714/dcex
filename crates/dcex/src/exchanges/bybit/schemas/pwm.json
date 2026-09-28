@@ -174,7 +174,20 @@
     },
     "has_example": true,
     "source_file": "v5/finance/pwm/asset-manager/create-fund.mdx",
-    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "managementFeeRate": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "management_fee_rate": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "method": "POST",
@@ -370,7 +383,36 @@
     },
     "has_example": true,
     "source_file": "v5/finance/pwm/asset-manager/manage-investment-plan.mdx",
-    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "updateFunds": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "type": "string",
+                "format": "decimal"
+              }
+            }
+          }
+        },
+        "update_funds": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "type": "string",
+                "format": "decimal"
+              }
+            }
+          }
+        }
+      }
+    }
   },
   {
     "method": "POST",
@@ -552,7 +594,16 @@
     },
     "has_example": true,
     "source_file": "v5/finance/pwm/fund-transfer.mdx",
-    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "method": "GET",
@@ -793,7 +844,16 @@
     },
     "has_example": true,
     "source_file": "v5/finance/pwm/investment-plan/invest-more.mdx",
-    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "method": "GET",
@@ -965,7 +1025,16 @@
     },
     "has_example": true,
     "source_file": "v5/finance/pwm/investment-plan/redeem.mdx",
-    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "method": "POST",

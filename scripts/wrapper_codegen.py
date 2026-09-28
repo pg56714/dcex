@@ -9,6 +9,8 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
+from scripts.decimal_declarations import annotate
+
 ROOT = Path(__file__).resolve().parents[1]
 
 METHOD_ALIASES = {
@@ -63,6 +65,7 @@ def load_schemas(exchange: str) -> list[dict[str, Any]]:
 
 def write_schemas(exchange: str, endpoints: list[dict[str, Any]]) -> None:
     """Preserve each exchange's schema format while grouping by responsibility."""
+    annotate(exchange, endpoints)
     domains = endpoint_domains(exchange)
     groups: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for endpoint in endpoints:

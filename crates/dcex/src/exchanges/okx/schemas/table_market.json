@@ -38,7 +38,16 @@
       "instId"
     ],
     "bools": [],
-    "schema": null
+    "schema": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "sz": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_candles_history",
@@ -178,7 +187,16 @@
       "instId"
     ],
     "bools": [],
-    "schema": "{\"type\":\"object\",\"properties\":{\"instId\":{\"type\":\"string\"},\"sz\":{\"type\":\"string\"}},\"required\":[\"instId\"]}"
+    "schema": "{\"type\":\"object\",\"properties\":{\"instId\":{\"type\":\"string\"},\"sz\":{\"type\":\"string\"}},\"required\":[\"instId\"]}",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "sz": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_platform_24_volume",

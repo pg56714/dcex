@@ -213,7 +213,36 @@
     ],
     "json_body": false,
     "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/otc#create-otc-blocktrade",
-    "summary": "Create OTC Blocktrade (PREDICTION_TRADE)"
+    "summary": "Create OTC Blocktrade (PREDICTION_TRADE)",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "makerAmount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "maker_amount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pricePerShare": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "price_per_share": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "takerAmount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "taker_amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "prediction_fulfil_otc_blocktrade",
@@ -802,7 +831,44 @@
     ],
     "json_body": false,
     "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/trade#get-quote",
-    "summary": "Get Quote (PREDICTION_TRADE)"
+    "summary": "Get Quote (PREDICTION_TRADE)",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amountIn": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "amount_in": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "feeRateBps": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "fee_rate_bps": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "fundTransferAmount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "fund_transfer_amount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "priceLimit": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "price_limit": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "prediction_place_order",
@@ -883,7 +949,28 @@
     ],
     "json_body": false,
     "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/trade#place-order",
-    "summary": "Place Order (PREDICTION_TRADE)"
+    "summary": "Place Order (PREDICTION_TRADE)",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "fundTransferAmount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "fund_transfer_amount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "priceLimit": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "price_limit": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "prediction_query_active_orders",
@@ -1063,7 +1150,20 @@
     ],
     "json_body": false,
     "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/transfer#apply-mm-deposit",
-    "summary": "Apply MM Deposit (PREDICTION_TRADE)"
+    "summary": "Apply MM Deposit (PREDICTION_TRADE)",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "fromTokenAmount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "from_token_amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "prediction_apply_mm_withdraw",
@@ -1116,7 +1216,16 @@
     ],
     "json_body": false,
     "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/transfer#apply-mm-withdraw",
-    "summary": "Apply MM Withdraw (PREDICTION_TRADE)"
+    "summary": "Apply MM Withdraw (PREDICTION_TRADE)",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "prediction_create_inbound_transfer",
@@ -1176,7 +1285,20 @@
     ],
     "json_body": false,
     "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/transfer#create-inbound-transfer",
-    "summary": "Create Inbound Transfer (PREDICTION_TRADE)"
+    "summary": "Create Inbound Transfer (PREDICTION_TRADE)",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "fromTokenAmount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "from_token_amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "prediction_create_outbound_transfer",
@@ -1243,7 +1365,20 @@
     ],
     "json_body": false,
     "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/transfer#create-outbound-transfer",
-    "summary": "Create Outbound Transfer (PREDICTION_TRADE)"
+    "summary": "Create Outbound Transfer (PREDICTION_TRADE)",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "fromTokenAmount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "from_token_amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "prediction_query_transfer_list",

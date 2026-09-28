@@ -133,7 +133,28 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "fromAmount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "from_amount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "toAmount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "to_amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "wallet_dust_convert",
@@ -188,7 +209,20 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "dustQuotaAssetToTargetAssetPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "dust_quota_asset_to_target_asset_price": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "wallet_dust_convertible_assets",
@@ -222,7 +256,20 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "dustQuotaAssetToTargetAssetPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "dust_quota_asset_to_target_asset_price": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "wallet_dustlog",

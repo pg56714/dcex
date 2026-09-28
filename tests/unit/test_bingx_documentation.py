@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[2]
 
 @pytest.mark.parametrize("prefix", ["dcex", "dcex/async_support"])
 def test_bingx_public_docstrings_start_with_a_summary(prefix):
-    for path in (ROOT / prefix / "bingx").glob("*.py"):
+    for path in (ROOT / prefix / "bingx").rglob("*.py"):
         for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
             if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) or node.name.startswith("_"):
                 continue

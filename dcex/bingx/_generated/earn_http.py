@@ -11,8 +11,7 @@ class GeneratedEarnHTTP(MarketHTTP):
     def get_wealth_v1_product_dual_currency_order_records(
         self, *, page_id: int, page_size: int, order_no: str | None = None
     ) -> Any:  # noqa: ANN401
-        """
-        Dual-Currency Order Records.
+        """Dual-Currency Order Records.
 
         Use native BingX symbols. Decimal fields are strings to preserve precision.
         Source: https://bingx-api.github.io/docs-v3/#/en/Wealth/Dual-Currency/Dual-Currency%20Order%20Records
@@ -23,8 +22,7 @@ class GeneratedEarnHTTP(MarketHTTP):
         )
 
     def get_wealth_v1_product_dual_currency_position(self, *, order_no: str | None = None) -> Any:  # noqa: ANN401
-        """
-        Dual-Currency Position Query.
+        """Dual-Currency Position Query.
 
         Use native BingX symbols. Decimal fields are strings to preserve precision.
         Source: https://bingx-api.github.io/docs-v3/#/en/Wealth/Dual-Currency/Dual-Currency%20Position%20Query
@@ -46,8 +44,7 @@ class GeneratedEarnHTTP(MarketHTTP):
         exercise_asset: str | None = None,
         direction: str | None = None,
     ) -> Any:  # noqa: ANN401
-        """
-        Dual-Currency Product List.
+        """Dual-Currency Product List.
 
         Use native BingX symbols. Decimal fields are strings to preserve precision.
         Source: https://bingx-api.github.io/docs-v3/#/en/Wealth/Dual-Currency/Dual-Currency%20Product%20List
@@ -81,8 +78,7 @@ class GeneratedEarnHTTP(MarketHTTP):
         select_accounts: list[Any] | None = None,
         settle_target_account: str | None = None,
     ) -> Any:  # noqa: ANN401
-        """
-        Dual-Currency Place Order.
+        """Dual-Currency Place Order.
 
         Use native BingX symbols. Decimal fields are strings to preserve precision.
         Source: https://bingx-api.github.io/docs-v3/#/en/Wealth/Dual-Currency/Dual-Currency%20Place%20Order
@@ -107,8 +103,7 @@ class GeneratedEarnHTTP(MarketHTTP):
     def get_wealth_v1_product_dual_currency_pre_order(
         self, *, sku: str, strike_price: str, product_id: int
     ) -> Any:  # noqa: ANN401
-        """
-        Dual-Currency Pre-Order Quote.
+        """Dual-Currency Pre-Order Quote.
 
         Use native BingX symbols. Decimal fields are strings to preserve precision.
         Source: https://bingx-api.github.io/docs-v3/#/en/Wealth/Dual-Currency/Dual-Currency%20Pre-Order%20Quote

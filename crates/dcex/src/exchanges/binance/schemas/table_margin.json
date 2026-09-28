@@ -147,7 +147,16 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_margin_risk_coefficients",
@@ -329,7 +338,16 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "size": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "cancel_margin_order_list",
@@ -840,7 +858,68 @@
           "FOK"
         ]
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "pendingIcebergQty": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pendingPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pendingQuantity": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pendingStopPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pending_iceberg_qty": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pending_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pending_quantity": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pending_stop_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "workingIcebergQty": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "workingPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "workingQuantity": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "working_iceberg_qty": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "working_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "working_quantity": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_futures_position_margin_change_history",
@@ -1321,7 +1400,16 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "size": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "margin_margin_manual_liquidation",
@@ -1510,6 +1598,19 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "marginCallLevel": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "margin_call_level": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   }
 ]

@@ -51,7 +51,56 @@
       "subPosId"
     ],
     "bools": [],
-    "schema": "{\"type\":\"object\",\"properties\":{\"instType\":{\"type\":\"string\",\"description\":\"Instrument type SPOT SWAP , the default value\"},\"subPosId\":{\"type\":\"string\",\"description\":\"Lead position ID\"},\"tpTriggerPx\":{\"type\":\"string\",\"description\":\"Take-profit trigger price. Take-profit order price will be the market price after triggering. At least one of tpTriggerPx and slTriggerPx must be filled The take profit order will be deleted if it is 0\"},\"slTriggerPx\":{\"type\":\"string\",\"description\":\"Stop-loss trigger price. Stop-loss order price will be the market price after triggering. The stop loss order will be deleted if it is 0\"},\"tpOrdPx\":{\"type\":\"string\",\"description\":\"Take-profit order price If the price is -1, take-profit will be executed at the market price, the default is -1 Only applicable to SPOT lead trader\"},\"slOrdPx\":{\"type\":\"string\",\"description\":\"Stop-loss order price If the price is -1, stop-loss will be executed at the market price, the default is -1 Only applicable to SPOT lead trader\"},\"tpTriggerPxType\":{\"type\":\"string\",\"description\":\"Take-profit trigger price type last : last price index : index price mark : mark price Default is last\"},\"slTriggerPxType\":{\"type\":\"string\",\"description\":\"Stop-loss trigger price type last : last price index : index price mark : mark price Default is last\"},\"tag\":{\"type\":\"string\",\"description\":\"Order tag A combination of case-sensitive alphanumerics, all numbers, or all letters of up to 16 characters.\"}},\"required\":[\"subPosId\"]}"
+    "schema": "{\"type\":\"object\",\"properties\":{\"instType\":{\"type\":\"string\",\"description\":\"Instrument type SPOT SWAP , the default value\"},\"subPosId\":{\"type\":\"string\",\"description\":\"Lead position ID\"},\"tpTriggerPx\":{\"type\":\"string\",\"description\":\"Take-profit trigger price. Take-profit order price will be the market price after triggering. At least one of tpTriggerPx and slTriggerPx must be filled The take profit order will be deleted if it is 0\"},\"slTriggerPx\":{\"type\":\"string\",\"description\":\"Stop-loss trigger price. Stop-loss order price will be the market price after triggering. The stop loss order will be deleted if it is 0\"},\"tpOrdPx\":{\"type\":\"string\",\"description\":\"Take-profit order price If the price is -1, take-profit will be executed at the market price, the default is -1 Only applicable to SPOT lead trader\"},\"slOrdPx\":{\"type\":\"string\",\"description\":\"Stop-loss order price If the price is -1, stop-loss will be executed at the market price, the default is -1 Only applicable to SPOT lead trader\"},\"tpTriggerPxType\":{\"type\":\"string\",\"description\":\"Take-profit trigger price type last : last price index : index price mark : mark price Default is last\"},\"slTriggerPxType\":{\"type\":\"string\",\"description\":\"Stop-loss trigger price type last : last price index : index price mark : mark price Default is last\"},\"tag\":{\"type\":\"string\",\"description\":\"Order tag A combination of case-sensitive alphanumerics, all numbers, or all letters of up to 16 characters.\"}},\"required\":[\"subPosId\"]}",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "slOrdPx": {
+          "type": "string",
+          "format": "decimal",
+          "x-decimal-sentinels": [
+            "-1"
+          ]
+        },
+        "slTriggerPx": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "sl_ord_px": {
+          "type": "string",
+          "format": "decimal",
+          "x-decimal-sentinels": [
+            "-1"
+          ]
+        },
+        "sl_trigger_px": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "tpOrdPx": {
+          "type": "string",
+          "format": "decimal",
+          "x-decimal-sentinels": [
+            "-1"
+          ]
+        },
+        "tpTriggerPx": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "tp_ord_px": {
+          "type": "string",
+          "format": "decimal",
+          "x-decimal-sentinels": [
+            "-1"
+          ]
+        },
+        "tp_trigger_px": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "copytrading_close_subposition",
@@ -69,7 +118,16 @@
       "subPosId"
     ],
     "bools": [],
-    "schema": "{\"type\":\"object\",\"properties\":{\"instType\":{\"type\":\"string\",\"description\":\"Instrument type SPOT SWAP , the default value\"},\"subPosId\":{\"type\":\"string\",\"description\":\"Lead position ID\"},\"ordType\":{\"type\":\"string\",\"description\":\"Order type market \\uff1aMarket order, the default value limit \\uff1aLimit order\"},\"px\":{\"type\":\"string\",\"description\":\"Order price. Only applicable to limit order and SPOT lead trader If the price is 0, the pending order will be canceled. It is modifying order if you set px after placing limit order.\"},\"tag\":{\"type\":\"string\",\"description\":\"Order tag A combination of case-sensitive alphanumerics, all numbers, or all letters of up to 16 characters.\"}},\"required\":[\"subPosId\"]}"
+    "schema": "{\"type\":\"object\",\"properties\":{\"instType\":{\"type\":\"string\",\"description\":\"Instrument type SPOT SWAP , the default value\"},\"subPosId\":{\"type\":\"string\",\"description\":\"Lead position ID\"},\"ordType\":{\"type\":\"string\",\"description\":\"Order type market \\uff1aMarket order, the default value limit \\uff1aLimit order\"},\"px\":{\"type\":\"string\",\"description\":\"Order price. Only applicable to limit order and SPOT lead trader If the price is 0, the pending order will be canceled. It is modifying order if you set px after placing limit order.\"},\"tag\":{\"type\":\"string\",\"description\":\"Order tag A combination of case-sensitive alphanumerics, all numbers, or all letters of up to 16 characters.\"}},\"required\":[\"subPosId\"]}",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "px": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_copytrading_instruments",

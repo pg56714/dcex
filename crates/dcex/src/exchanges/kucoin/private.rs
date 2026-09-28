@@ -10,6 +10,7 @@ impl KucoinClient {
         method_name: &str,
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
+        crate::exchanges::input_contracts::pairs("kucoin", method_name, &params)?;
         let method_name = match method_name {
             "place_copy_futures_stop_order" => "post_v1_copy_trade_futures_st_orders",
             other => other,

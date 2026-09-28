@@ -11,6 +11,7 @@ impl OndoClient {
         method_name: &str,
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
+        crate::exchanges::input_contracts::pairs("ondo", method_name, &params)?;
         let params = OndoParams::from_pairs(params);
         let response = match method_name {
             "get_login_challenge" | "complete_login_challenge" => {

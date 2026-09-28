@@ -214,7 +214,20 @@
     "example": {},
     "has_example": false,
     "source_file": "v5/asset/fiat-convert/quote-apply.mdx",
-    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "requestAmount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "request_amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "method": "GET",

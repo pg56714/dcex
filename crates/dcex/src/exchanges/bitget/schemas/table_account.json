@@ -21,7 +21,28 @@
     ],
     "arrays": [],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "openAmount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "openPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "open_amount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "open_price": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_futures_liquidation_price",
@@ -47,7 +68,28 @@
     ],
     "arrays": [],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "openAmount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "openPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "open_amount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "open_price": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_futures_max_open_quantity",
@@ -71,7 +113,20 @@
     ],
     "arrays": [],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "openPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "open_price": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_futures_interest_history",
@@ -230,7 +285,20 @@
     ],
     "arrays": [],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "size": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_uta_eligible_discount_rates",

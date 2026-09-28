@@ -133,7 +133,88 @@
     ],
     "source": "https://bingx-api.github.io/docs-v3/#/en/Coin-M%20Futures/Trades%20Endpoints/Trade%20order",
     "summary": "Trade order",
-    "scoped": false
+    "scoped": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "quantity": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stopLoss": {
+          "type": "object",
+          "properties": {
+            "price": {
+              "type": "number",
+              "format": "decimal",
+              "x-positive": true
+            },
+            "stopPrice": {
+              "type": "number",
+              "format": "decimal",
+              "x-positive": true
+            }
+          }
+        },
+        "stopPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stop_loss": {
+          "type": "object",
+          "properties": {
+            "price": {
+              "type": "number",
+              "format": "decimal",
+              "x-positive": true
+            },
+            "stopPrice": {
+              "type": "number",
+              "format": "decimal",
+              "x-positive": true
+            }
+          }
+        },
+        "stop_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "takeProfit": {
+          "type": "object",
+          "properties": {
+            "price": {
+              "type": "number",
+              "format": "decimal",
+              "x-positive": true
+            },
+            "stopPrice": {
+              "type": "number",
+              "format": "decimal",
+              "x-positive": true
+            }
+          }
+        },
+        "take_profit": {
+          "type": "object",
+          "properties": {
+            "price": {
+              "type": "number",
+              "format": "decimal",
+              "x-positive": true
+            },
+            "stopPrice": {
+              "type": "number",
+              "format": "decimal",
+              "x-positive": true
+            }
+          }
+        }
+      }
+    }
   },
   {
     "name": "delete_cswap_v1_trade_all_open_orders",

@@ -3,9 +3,10 @@
 Ordinary REST endpoints use the shared request engine in
 `crates/dcex/src/exchanges/schema.rs`. It owns field types, decimal syntax,
 required and duplicate fields, recursive JSON constraints, arrays, and form
-encoding. Python's `dcex/_schema_codec.py` checks values before conversion to
-native string pairs: financial floats are rejected and `Decimal` values are
-rendered in fixed notation without rounding.
+encoding. `input_contracts.json` is the explicit input-schema source shared by
+Rust `input_contracts.rs` and Python `_input_codec.py` / `_input_validation.py`.
+The `_schema_codec.py` module retains compatible imports. Python validates
+declared endpoint inputs before conversion to native string pairs.
 
 Exchange adapters retain host selection, symbol conversion, authentication,
 conditional business rules, and the documented location and wire type of each
@@ -45,15 +46,26 @@ for every exchange registered in the native module.
 
 ## Numbers and wire format
 
-Prices, quantities and amounts use plain decimal strings. Reject Python floats,
-scientific strings, invalid negative values and non-numbers before transport. Integers,
-booleans and identifiers retain their own types; a signed identifier is not an
-amount. Signed margin deltas and OKX's `tpOrdPx`/`slOrdPx=-1` market selectors
-retain their existing contracts; ordinary schema amounts remain nonnegative.
-Existing documented zero values retain their endpoint-specific checks.
-Kraken EditOrder relative prices, signed RFQ/portfolio sizes, and Bitget's empty
-TPSL size selector retain their endpoint-specific meanings. Signed JSON numbers
-are declared with `x-signed`; callers supply exact strings or `Decimal` values.
+Numeric validation depends on an explicit `format: decimal` declaration for an
+exchange, endpoint and field, including nested properties/items and Python
+aliases. No field-name heuristic grants numeric semantics or exceptions.
+Hand-written adapters must declare their fields in the same input catalog.
+The per-endpoint `input_schema` metadata is regenerated from that catalog;
+wire schemas retain their existing types and structural constraints.
+
+Declared decimals reject Python float/bool, scientific strings and non-numbers.
+Callers use exact strings or `Decimal`; integer values retain their existing
+endpoint rules. Negatives are rejected unless the exact field has `x-signed`.
+`x-positive` excludes zero; other zero restrictions remain in endpoint checks.
+Kraken's declared REST place/edit/amend and V1 addOrder/editOrder price fields
+use `x-relative: kraken_relative_price`, with the shared grammar
+`[+\-#][0-9]+(\.[0-9]+)?%?`. Other exchanges do not inherit this exception.
+Explicit `x-decimal-sentinels` cover documented OKX market-price selectors and
+Bitget/Bybit empty no-change or unused investment selectors. Hyperliquid's
+builder fee rate explicitly permits the percent suffix through `x-percent`.
+Signed margin deltas, spread prices and RFQ/portfolio sizes opt in per field.
+Identifiers, tokens, booleans and undeclared values do not acquire financial
+validation from their names; their ordinary endpoint type checks still apply.
 An explicit JSON `number` schema can produce a JSON number from an exact plain
 string; Rust uses `serde_json` arbitrary precision, never an intermediate `f64`.
 Range comparisons remain separate from value serialization.
@@ -68,6 +80,7 @@ escaping values. The signer sends exactly the bytes it signs.
 Run each command from the repository root:
 
 ```powershell
+uv run --no-sync python -m scripts.build_input_contracts --write
 uv run --no-sync python -m scripts.build_binance_wrappers
 uv run --no-sync python -m scripts.build_bitget_wrappers
 uv run --no-sync python -m scripts.build_bybit_wrappers
@@ -79,10 +92,13 @@ uv run --no-sync ruff format dcex scripts
 uv run --no-sync ruff check dcex scripts --fix
 uv run --no-sync ruff format dcex scripts
 cargo fmt --all
+uv run --no-sync python -m scripts.build_input_contracts --check
 ```
 
 A second run must produce identical files. Run the existing endpoint wire and
 signature tests, shared sync/async wrapper tests and schema codec regressions.
+Decimal tests traverse every declared REST/WS field and verify the installed
+Python endpoint wrappers. Add declarations and wire regressions for new fields.
 When changing evidence paths, regenerate `scripts/build_endpoint_docs.py` and
 run its `--check`. Check for loaded `.pyd` modules and verify exclusive access
 before rebuilding native. Behaviour fixes and file-only moves use separate

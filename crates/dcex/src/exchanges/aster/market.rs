@@ -595,6 +595,7 @@ impl AsterClient {
         method_name: &str,
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
+        crate::exchanges::input_contracts::pairs("aster", method_name, &params)?;
         // These ordinary public routes are documented without complete parameter tables.
         // Preserve caller-supplied wire parameters rather than inventing a schema.
         let incomplete = match method_name {

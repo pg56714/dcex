@@ -18,8 +18,7 @@ class GeneratedAffiliateHTTP(MarketHTTP):
         page_size: int | None = None,
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
-        """
-        Query partner information.
+        """Query partner information.
 
         Use native BingX symbols. Decimal fields are strings to preserve precision.
         Source: https://bingx-api.github.io/docs-v3/#/en/Agent/Query%20partner%20information
@@ -51,8 +50,7 @@ class GeneratedAffiliateHTTP(MarketHTTP):
         business_type: str | None = None,
         distance_type: int | None = None,
     ) -> Any:  # noqa: ANN401
-        """
-        Daily commission details.
+        """Daily commission details.
 
         Use native BingX symbols. Decimal fields are strings to preserve precision.
         Source: https://bingx-api.github.io/docs-v3/#/en/Agent/Daily%20commission%20details
@@ -85,8 +83,7 @@ class GeneratedAffiliateHTTP(MarketHTTP):
         uid: int | None = None,
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
-        """
-        Query API transaction commission （non-invitation relationship）.
+        """Query API transaction commission （non-invitation relationship）.
 
         Use native BingX symbols. Decimal fields are strings to preserve precision.
         Source: https://bingx-api.github.io/docs-v3/#/en/Agent/Query%20API%20transaction%20commission%20%EF%BC%88non-invitation%20relationship%EF%BC%89
@@ -117,8 +114,7 @@ class GeneratedAffiliateHTTP(MarketHTTP):
         page_size: int | None = None,
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
-        """
-        Invitation code data.
+        """Invitation code data.
 
         Use native BingX symbols. Decimal fields are strings to preserve precision.
         Source: https://bingx-api.github.io/docs-v3/#/en/Agent/Invitation%20code%20data
@@ -147,8 +143,7 @@ class GeneratedAffiliateHTTP(MarketHTTP):
         end_time: int | None = None,
         last_uid: int | None = None,
     ) -> Any:  # noqa: ANN401
-        """
-        1. Query Invited Users.
+        """1. Query Invited Users.
 
         Use native BingX symbols. Decimal fields are strings to preserve precision.
         Source: https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/agent/api-reference.md#L14
@@ -167,8 +162,7 @@ class GeneratedAffiliateHTTP(MarketHTTP):
         )
 
     def get_agent_v1_account_invite_relation_check(self, *, uid: int) -> Any:  # noqa: ANN401
-        """
-        3. Query Agent User Information.
+        """3. Query Agent User Information.
 
         Use native BingX symbols. Decimal fields are strings to preserve precision.
         Source: https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/agent/api-reference.md#L115
@@ -187,8 +181,7 @@ class GeneratedAffiliateHTTP(MarketHTTP):
         page_index: int,
         page_size: int,
     ) -> Any:  # noqa: ANN401
-        """
-        6. Query Deposit Details of Invited Users.
+        """6. Query Deposit Details of Invited Users.
 
         Use native BingX symbols. Decimal fields are strings to preserve precision.
         Source: https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/agent/api-reference.md#L242
@@ -208,8 +201,7 @@ class GeneratedAffiliateHTTP(MarketHTTP):
         )
 
     def get_agent_v1_account_superior_check(self, *, uid: int) -> Any:  # noqa: ANN401
-        """
-        8. Superior Verification.
+        """8. Superior Verification.
 
         Use native BingX symbols. Decimal fields are strings to preserve precision.
         Source: https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/agent/api-reference.md#L333

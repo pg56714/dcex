@@ -67,7 +67,12 @@ impl HyperliquidClient {
         params.ensure_allowed(&allowed)?;
         let action = parse_ordered_json(params.required("action")?, "action")?;
         let value = action.to_json();
-        crate::exchanges::schema::validate_numbers(&value, "action")?;
+        crate::exchanges::input_contracts::validate(
+            &value,
+            &crate::exchanges::input_contracts::endpoint("hyperliquid", name, false)["properties"]
+                ["action"],
+            "action",
+        )?;
         let object = value
             .as_object()
             .ok_or_else(|| invalid("action must be an object"))?;

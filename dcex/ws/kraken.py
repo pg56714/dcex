@@ -3,6 +3,7 @@
 import json
 from typing import Any
 
+from dcex._input_validation import normalize_endpoint
 from dcex._schema_codec import encode_json
 
 from .._native_http import load_native
@@ -401,6 +402,9 @@ class V1Client(AsyncWebSocketMixin):
 
     async def send_message(self, message: dict[str, Any], *, all_symbols: bool = False) -> None:
         """Send a documented V1 event; cancelAll/countdown require all_symbols=True."""
+        message = normalize_endpoint(
+            "kraken", str(message.get("event", "")), message, websocket=True
+        )
         await self._native_client.send_message(encode_json(message), all_symbols)
 
     async def recv(self) -> dict[str, Any] | list[Any]:

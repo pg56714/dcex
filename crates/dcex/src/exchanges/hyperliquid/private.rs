@@ -6,6 +6,7 @@ impl HyperliquidClient {
         method_name: &str,
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
+        crate::exchanges::input_contracts::pairs("hyperliquid", method_name, &params)?;
         let params = HyperliquidParams::from_pairs(params);
         if let Some(response) = self.catalog_request(method_name, &params, false).await? {
             return Ok(response);

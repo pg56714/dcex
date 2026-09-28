@@ -9,6 +9,7 @@ impl BybitClient {
         method_name: &str,
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
+        crate::exchanges::input_contracts::pairs("bybit", method_name, &params)?;
         let params = super::super::operation_guards::validate("bybit", method_name, params)?;
         let params = BybitParams::from_pairs(params);
         if let Some(result) = self

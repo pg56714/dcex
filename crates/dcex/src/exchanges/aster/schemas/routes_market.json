@@ -18,7 +18,16 @@
       "page",
       "size"
     ],
-    "required": []
+    "required": [],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "size": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_direct_announcement",

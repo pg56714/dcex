@@ -133,7 +133,28 @@
         "kind": "int"
       }
     ],
-    "name": "create_options_block_order"
+    "name": "create_options_block_order",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "legs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "price": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "quantity": {
+                "type": "string",
+                "format": "decimal"
+              }
+            }
+          }
+        }
+      }
+    }
   },
   {
     "method": "GET",

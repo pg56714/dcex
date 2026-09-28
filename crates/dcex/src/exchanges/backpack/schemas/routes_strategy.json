@@ -25,7 +25,20 @@
       "autoLendRedeem",
       "autoBorrow",
       "autoBorrowRepay"
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "quantity": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_open_strategy",

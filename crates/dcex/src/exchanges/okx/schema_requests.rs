@@ -39,7 +39,7 @@ impl OkxClient {
         }
         let schema = e.schema.map(cached_schema).transpose()?;
         let pairs = p.without(&[]);
-        crate::exchanges::schema::validate_pairs(&pairs)?;
+        crate::exchanges::input_contracts::pairs("okx", name, &pairs)?;
         let mut seen = std::collections::HashSet::new();
         for (key, value) in &pairs {
             if !e.keys.contains(&key.as_str())

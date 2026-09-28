@@ -69,8 +69,10 @@ impl BinanceClient {
             let fields: serde_json::Map<String, serde_json::Value> =
                 serde_json::from_str(params.required("fields")?)
                     .map_err(|e| DcexError::InvalidInput(e.to_string()))?;
-            crate::exchanges::schema::validate_numbers(
+            crate::exchanges::input_contracts::validate(
                 &serde_json::Value::Object(fields.clone()),
+                &crate::exchanges::input_contracts::endpoint("binance", name, false)["properties"]
+                    ["fields"],
                 "fields",
             )?;
             if fields.is_empty()

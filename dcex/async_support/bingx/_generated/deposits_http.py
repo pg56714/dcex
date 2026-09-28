@@ -17,8 +17,7 @@ class GeneratedDepositsHTTP(MarketHTTP):
         wallet_type: int,
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
-        """
-        Query Sub-account Deposit Address.
+        """Query Sub-account Deposit Address.
 
         Use native BingX symbols. Decimal fields are strings to preserve precision.
         Source: https://bingx-api.github.io/docs-v3/#/en/Account%20and%20Wallet/Sub-account%20Management/Query%20Sub-account%20Deposit%20Address

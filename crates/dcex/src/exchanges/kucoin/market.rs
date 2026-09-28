@@ -17,6 +17,7 @@ impl KucoinClient {
         method_name: &str,
         mut params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
+        crate::exchanges::input_contracts::pairs("kucoin", method_name, &params)?;
         let method_name = match method_name {
             "get_uta_oes_currency" => "get_uta_oe_scurrency",
             "get_otc_loan_accounts" => "get_accounts",

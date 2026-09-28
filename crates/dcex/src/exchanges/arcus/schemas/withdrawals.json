@@ -65,7 +65,16 @@
       },
       "additionalProperties": false
     },
-    "official_source": "https://docs.arcus.xyz/api-reference/exchange/submit-withdrawal"
+    "official_source": "https://docs.arcus.xyz/api-reference/exchange/submit-withdrawal",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "create_withdrawal",
@@ -101,6 +110,15 @@
       },
       "additionalProperties": false
     },
-    "official_source": "https://docs.arcus.xyz/api-reference/exchange/submit-withdrawal"
+    "official_source": "https://docs.arcus.xyz/api-reference/exchange/submit-withdrawal",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   }
 ]

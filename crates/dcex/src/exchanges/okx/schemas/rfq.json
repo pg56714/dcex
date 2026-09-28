@@ -125,7 +125,16 @@
       ]
     },
     "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-create-quote",
-    "row": 1218
+    "row": 1218,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "sz": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "cancel_rfq_quote",

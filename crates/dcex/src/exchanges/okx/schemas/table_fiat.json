@@ -202,7 +202,16 @@
       "clientId"
     ],
     "bools": [],
-    "schema": "{\"type\":\"object\",\"properties\":{\"paymentAcctId\":{\"type\":\"string\"},\"ccy\":{\"type\":\"string\"},\"amt\":{\"type\":\"string\"},\"paymentMethod\":{\"type\":\"string\"},\"clientId\":{\"type\":\"string\"}},\"required\":[\"paymentAcctId\",\"ccy\",\"amt\",\"paymentMethod\",\"clientId\"]}"
+    "schema": "{\"type\":\"object\",\"properties\":{\"paymentAcctId\":{\"type\":\"string\"},\"ccy\":{\"type\":\"string\"},\"amt\":{\"type\":\"string\"},\"paymentMethod\":{\"type\":\"string\"},\"clientId\":{\"type\":\"string\"}},\"required\":[\"paymentAcctId\",\"ccy\",\"amt\",\"paymentMethod\",\"clientId\"]}",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amt": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "cancel_fiat_withdrawal",

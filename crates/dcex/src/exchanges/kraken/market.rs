@@ -12,6 +12,7 @@ impl KrakenClient {
         method_name: &str,
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
+        crate::exchanges::input_contracts::pairs("kraken", method_name, &params)?;
         if let Some(result) = self
             .table_request(method_name, &KrakenParams::from_pairs(params.clone()), true)
             .await?

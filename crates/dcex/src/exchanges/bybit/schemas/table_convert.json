@@ -21,7 +21,20 @@
       "requestCoin",
       "requestAmount"
     ],
-    "integers": []
+    "integers": [],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "requestAmount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "request_amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "execute_convert_quote",

@@ -69,7 +69,16 @@
       ]
     },
     "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-create-withdrawal-order",
-    "row": 1323
+    "row": 1323,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amt": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "cancel_fiat_withdrawal",

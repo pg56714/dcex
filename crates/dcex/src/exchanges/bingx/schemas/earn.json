@@ -188,7 +188,24 @@
     ],
     "source": "https://bingx-api.github.io/docs-v3/#/en/Wealth/Dual-Currency/Dual-Currency%20Place%20Order",
     "summary": "Dual-Currency Place Order",
-    "scoped": false
+    "scoped": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "strikePrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "strike_price": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_wealth_v1_product_dual_currency_pre_order",
@@ -220,6 +237,19 @@
     ],
     "source": "https://bingx-api.github.io/docs-v3/#/en/Wealth/Dual-Currency/Dual-Currency%20Pre-Order%20Quote",
     "summary": "Dual-Currency Pre-Order Quote",
-    "scoped": false
+    "scoped": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "strikePrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "strike_price": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   }
 ]

@@ -6,6 +6,7 @@ impl AsterClient {
         method_name: &str,
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
+        crate::exchanges::input_contracts::pairs("aster", method_name, &params)?;
         let incomplete = match method_name {
             "place_spot_batch_orders_raw" => Some(HttpMethod::Post),
             "cancel_spot_batch_orders_raw" => Some(HttpMethod::Delete),

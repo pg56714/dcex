@@ -10,6 +10,7 @@ impl KrakenClient {
         method_name: &str,
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
+        crate::exchanges::input_contracts::pairs("kraken", method_name, &params)?;
         let params = KrakenParams::from_pairs(params);
         if let Some(result) = self.field_schema_request(method_name, &params).await? {
             return Ok(result);

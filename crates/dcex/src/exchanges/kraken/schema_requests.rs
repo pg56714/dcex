@@ -42,17 +42,7 @@ impl KrakenClient {
             return Ok(None);
         };
         params.ensure_allowed(endpoint.allowed)?;
-        let checked: Vec<_> = params
-            .only(endpoint.allowed)
-            .into_iter()
-            .filter(|(key, value)| {
-                !(name == "simulate_futures_portfolio" && key == "json"
-                    || name == "edit_spot_order"
-                        && matches!(key.as_str(), "price" | "price2")
-                        && crate::exchanges::schema::relative_price(value))
-            })
-            .collect();
-        crate::exchanges::schema::validate_pairs(&checked)?;
+        crate::exchanges::input_contracts::pairs("kraken", name, &params.only(endpoint.allowed))?;
         let mut query = Vec::new();
         let mut path = endpoint.path.to_string();
         for field in endpoint.fields {

@@ -10,6 +10,7 @@ impl MexcClient {
         method_name: &str,
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
+        crate::exchanges::input_contracts::pairs("mexc", method_name, &params)?;
         let params = super::super::operation_guards::validate("mexc", method_name, params)?;
         let params = MexcParams::from_pairs(params);
         if let Some(result) = self.field_schema_request(method_name, &params).await? {

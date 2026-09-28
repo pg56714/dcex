@@ -14,6 +14,27 @@
     "decimals": [
       "bidPrice",
       "askPrice"
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "askPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "ask_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "bidPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "bid_price": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   }
 ]

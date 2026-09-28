@@ -26,6 +26,15 @@
         "required": true,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "quantity": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   }
 ]

@@ -372,7 +372,16 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/p2p/ad-management#get-ad-list",
-    "summary": "Get Ad List"
+    "summary": "Get Ad List",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "p2p_ad_management_get_exchange_rate",
@@ -452,7 +461,16 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/p2p/ad-management#fee-simulate",
-    "summary": "Fee Simulate"
+    "summary": "Fee Simulate",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "p2p_ad_management_get_ad_limit",
@@ -617,7 +635,36 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/p2p/ad-management#create-ad",
-    "summary": "Create Ad"
+    "summary": "Create Ad",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "maxAmount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "max_amount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "minAmount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "min_amount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "quantity": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "p2p_ad_management_update_ad",
@@ -730,7 +777,36 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/p2p/ad-management#update-ad",
-    "summary": "Update Ad"
+    "summary": "Update Ad",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "maxAmount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "max_amount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "minAmount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "min_amount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "quantity": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "p2p_ad_management_operate_ad",

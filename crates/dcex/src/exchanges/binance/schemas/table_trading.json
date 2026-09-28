@@ -500,7 +500,84 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "pendingIcebergQty": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pendingPegOffsetValue": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pendingPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pendingStopPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pending_iceberg_qty": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pending_peg_offset_value": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pending_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pending_stop_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "recvWindow": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "recv_window": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "workingIcebergQty": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "workingPegOffsetValue": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "workingPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "workingQuantity": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "working_iceberg_qty": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "working_peg_offset_value": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "working_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "working_quantity": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_futures_download_id_for_futures_order_history",
@@ -649,7 +726,11 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "futures_old_trades_lookup",
@@ -793,7 +874,20 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "recvWindow": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "recv_window": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "spot_historical_block_trades",
@@ -986,7 +1080,36 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "icebergQty": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "iceberg_qty": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "quantity": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "recvWindow": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "recv_window": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "spot_sor_order_test",
@@ -1118,7 +1241,36 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "icebergQty": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "iceberg_qty": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "quantity": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "recvWindow": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "recv_window": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "algo_cancel_algo_order_future_algo",
@@ -1361,7 +1513,24 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "limitPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "limit_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "quantity": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "algo_volume_participation_future_algo",
@@ -1448,7 +1617,24 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "limitPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "limit_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "quantity": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "algo_cancel_algo_order_spot_algo",
@@ -1666,7 +1852,24 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "limitPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "limit_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "quantity": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_dual_investment_positions",

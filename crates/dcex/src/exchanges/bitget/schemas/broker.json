@@ -540,7 +540,16 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/broker/broker#broker-sub-account-withdrawal",
-    "summary": "Broker Sub-Account Withdrawal"
+    "summary": "Broker Sub-Account Withdrawal",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "classic_affiliate_customer_info_get_commission_detail",
@@ -1778,7 +1787,16 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/classic-broker-subaccount/classic-broker-subaccount#subaccount-withdrawal",
-    "summary": "Subaccount Withdrawal"
+    "summary": "Subaccount Withdrawal",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "classic_broker_subaccount_subaccount_deposit_auto_transfer",

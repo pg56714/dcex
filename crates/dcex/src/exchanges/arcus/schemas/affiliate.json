@@ -48,7 +48,20 @@
       },
       "additionalProperties": false
     },
-    "official_source": "https://docs.arcus.xyz/api-reference/referral/claim-accrued-commission"
+    "official_source": "https://docs.arcus.xyz/api-reference/referral/claim-accrued-commission",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amountQuantums": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "amount_quantums": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "create_referral_code",

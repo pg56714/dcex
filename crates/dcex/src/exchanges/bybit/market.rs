@@ -11,6 +11,7 @@ impl BybitClient {
         method_name: &str,
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
+        crate::exchanges::input_contracts::pairs("bybit", method_name, &params)?;
         if let Some(result) = self
             .field_schema_request(method_name, &BybitParams::from_pairs(params.clone()), true)
             .await?

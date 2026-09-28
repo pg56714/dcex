@@ -588,6 +588,7 @@ impl BinanceClient {
         method_name: &str,
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
+        crate::exchanges::input_contracts::pairs("binance", method_name, &params)?;
         let params = PublicParams(params);
         if let Some(response) = self.catalog_request(method_name, &params, true).await? {
             return Ok(response);

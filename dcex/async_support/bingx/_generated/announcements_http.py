@@ -15,8 +15,7 @@ class GeneratedAnnouncementsHTTP(MarketHTTP):
         language: str | None = None,
         page: int | None = None,
     ) -> Any:  # noqa: ANN401
-        """
-        1. Get Announcements.
+        """1. Get Announcements.
 
         Use native BingX symbols. Decimal fields are strings to preserve precision.
         Source: https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/announcement/api-reference.md#L7

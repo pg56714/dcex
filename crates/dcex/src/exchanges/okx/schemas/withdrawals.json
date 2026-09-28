@@ -137,7 +137,16 @@
       ]
     },
     "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-withdrawal",
-    "row": 1309
+    "row": 1309,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amt": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "cancel_withdrawal",

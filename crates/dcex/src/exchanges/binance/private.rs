@@ -77,6 +77,7 @@ impl BinanceClient {
         method_name: &str,
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
+        crate::exchanges::input_contracts::pairs("binance", method_name, &params)?;
         let method_name = match method_name {
             "get_c2c_trade_history" => "get_c2_c_trade_history",
             other => other,

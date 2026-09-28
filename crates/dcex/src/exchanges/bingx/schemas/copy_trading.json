@@ -36,7 +36,28 @@
     ],
     "source": "https://bingx-api.github.io/docs-v3/#/en/Copy%20Trade/USDT-M%20Perpetual%20Contracts/Traders%20set%20take%20profit%20and%20stop%20loss%20based%20on%20order%20numbers",
     "summary": "Traders set take profit and stop loss based on order numbers",
-    "scoped": false
+    "scoped": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "stopLossMarkPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stop_loss_mark_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "takeProfitMarkPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "take_profit_mark_price": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_copy_trading_v1_p_futures_trading_pairs",

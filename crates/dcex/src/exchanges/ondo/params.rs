@@ -188,7 +188,8 @@ impl OndoParams {
                     )));
                 }
             }
-            crate::exchanges::schema::validate_numbers(&value, "body")?;
+            // Decimal fields in this body are checked by the endpoint contract
+            // before the private dispatcher constructs OndoParams.
             return Ok(value);
         }
         self.ensure_allowed(allowed)?;

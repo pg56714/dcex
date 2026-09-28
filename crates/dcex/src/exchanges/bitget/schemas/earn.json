@@ -206,7 +206,16 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/earn-classic-sharkfin/classic-earn-sharkfin#subscribe-sharkfin",
-    "summary": "Subscribe SharkFin"
+    "summary": "Subscribe SharkFin",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "classic_earn_sharkfin_get_subscribe_result",

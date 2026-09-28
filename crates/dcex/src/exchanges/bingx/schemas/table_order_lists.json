@@ -26,7 +26,40 @@
     ],
     "integers": [
       "recvWindow"
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "limitPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "limit_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "orderPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "order_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "quantity": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "triggerPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "trigger_price": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "cancel_spot_oco",

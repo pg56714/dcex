@@ -41,7 +41,16 @@
         "kind": "int"
       }
     ],
-    "name": "withdraw_managed_sub_account"
+    "name": "withdraw_managed_sub_account",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "method": "POST",
@@ -120,6 +129,15 @@
         "kind": "int"
       }
     ],
-    "name": "create_withdrawal"
+    "name": "create_withdrawal",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   }
 ]

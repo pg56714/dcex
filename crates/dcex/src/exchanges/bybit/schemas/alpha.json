@@ -308,7 +308,36 @@
     },
     "has_example": true,
     "source_file": "v5/alpha/lp/stake.mdx",
-    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "payTokenAmount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pay_token_amount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "priceLower": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "priceUpper": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "price_lower": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "price_upper": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "method": "POST",
@@ -371,7 +400,16 @@
     },
     "has_example": true,
     "source_file": "v5/alpha/prediction/buy.mdx",
-    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "method": "GET",
@@ -509,7 +547,16 @@
     },
     "has_example": true,
     "source_file": "v5/alpha/prediction/order-estimate.mdx",
-    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "method": "POST",
@@ -809,7 +856,16 @@
     },
     "has_example": true,
     "source_file": "v5/alpha/prediction/sell.mdx",
-    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "size": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "method": "POST",
@@ -1326,7 +1382,20 @@
     },
     "has_example": true,
     "source_file": "v5/alpha/trade/trade-purchase.mdx",
-    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "fromTokenAmount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "from_token_amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "method": "POST",
@@ -1381,7 +1450,20 @@
     },
     "has_example": true,
     "source_file": "v5/alpha/trade/trade-quote.mdx",
-    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "fromTokenAmount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "from_token_amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "method": "POST",
@@ -1467,6 +1549,19 @@
     },
     "has_example": true,
     "source_file": "v5/alpha/trade/trade-redeem.mdx",
-    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "fromTokenAmount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "from_token_amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   }
 ]

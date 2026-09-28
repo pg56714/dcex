@@ -48,7 +48,20 @@
       "ltCoin",
       "ltAmount"
     ],
-    "integers": []
+    "integers": [],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "ltAmount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "lt_amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "spot_lever_token_redeem",
@@ -64,6 +77,15 @@
       "ltCoin",
       "quantity"
     ],
-    "integers": []
+    "integers": [],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "quantity": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   }
 ]

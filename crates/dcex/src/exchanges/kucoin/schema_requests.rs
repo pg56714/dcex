@@ -45,7 +45,7 @@ impl KucoinClient {
         }
         params.ensure_allowed(&allowed)?;
         let supplied = params.only(&allowed);
-        crate::exchanges::schema::validate_pairs(&supplied)?;
+        crate::exchanges::input_contracts::pairs("kucoin", name, &supplied)?;
         if supplied
             .iter()
             .map(|(k, _)| k)

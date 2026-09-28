@@ -225,101 +225,6 @@ pub(crate) fn request_in_schema_order(
         .collect())
 }
 
-pub(crate) fn decimal_field(key: &str) -> bool {
-    matches!(
-        key.replace('_', "").to_ascii_lowercase().as_str(),
-        "price"
-            | "quantity"
-            | "qty"
-            | "amount"
-            | "size"
-            | "volume"
-            | "vol"
-            | "notional"
-            | "funds"
-            | "sz"
-            | "px"
-            | "amt"
-            | "submittedquantity"
-            | "submittedprice"
-            | "limitprice"
-            | "stopprice"
-            | "triggerprice"
-            | "activationprice"
-            | "callbackrate"
-            | "newqty"
-            | "newquantity"
-            | "origqty"
-            | "quoteorderqty"
-            | "baseqty"
-            | "quoteqty"
-            | "orderqty"
-            | "orderprice"
-            | "orderamount"
-            | "minprice"
-            | "maxprice"
-            | "lowerprice"
-            | "upperprice"
-            | "investment"
-            | "totalinvestment"
-            | "reservedmargin"
-            | "takeprofit"
-            | "stoploss"
-            | "tpprice"
-            | "slprice"
-            | "tptriggerpx"
-            | "sltriggerpx"
-            | "tpordpx"
-            | "slordpx"
-            | "execqty"
-            | "execprice"
-            | "baseamount"
-            | "quoteamount"
-            | "newprice"
-            | "entryprice"
-            | "bidprice"
-            | "askprice"
-            | "openprice"
-            | "openamount"
-            | "trailingamount"
-            | "monitorprice"
-            | "takeprofitprice"
-            | "stoplossprice"
-            | "investmentamount"
-            | "tokenizedassetamount"
-            | "underlyingassetamount"
-            | "price2"
-    )
-}
-
-pub(crate) fn input(key: &str, value: &impl ToString) -> Result<String> {
-    if decimal_field(key)
-        && matches!(
-            std::any::type_name_of_val(value).trim_start_matches('&'),
-            "f32" | "f64"
-        )
-    {
-        return Err(invalid(
-            key,
-            "requires an exact decimal string, not a float",
-        ));
-    }
-    let text = value.to_string();
-    if matches!(key, "price" | "price2") && relative_price(&text) {
-        return Ok(text);
-    }
-    if key == "amount" && text.starts_with('-') && plain(&text[1..], false) {
-        return Ok(text);
-    }
-    validate_pairs(&[(key.into(), text.clone())])?;
-    Ok(text)
-}
-
-pub(crate) fn relative_price(raw: &str) -> bool {
-    raw.strip_prefix(['+', '-'])
-        .is_some_and(|value| plain(value.strip_suffix('%').unwrap_or(value), false))
-}
-
 fn plain(value: &str, positive: bool) -> bool {
     if crate::common::is_positive_plain_decimal(value) {
         return true;
@@ -330,36 +235,6 @@ fn plain(value: &str, positive: bool) -> bool {
         && value.bytes().filter(|b| *b == b'.').count() <= 1
         && !value.starts_with('.')
         && !value.ends_with('.')
-}
-
-/// Check financial values recursively without converting them through f64.
-pub(crate) fn validate_numbers(value: &Value, key: &str) -> Result<()> {
-    match value {
-        Value::Object(items) => {
-            for (name, item) in items {
-                validate_numbers(item, name)?;
-            }
-        }
-        Value::Array(items) => {
-            for item in items {
-                validate_numbers(item, key)?;
-            }
-        }
-        _ if decimal_field(key) => {
-            let valid = match value {
-                Value::String(raw) => {
-                    plain(raw, false) || (matches!(key, "tpOrdPx" | "slOrdPx") && raw == "-1")
-                }
-                Value::Number(number) => number.is_u64(),
-                _ => false,
-            };
-            if !valid {
-                return Err(invalid(key, "requires a nonnegative plain decimal string"));
-            }
-        }
-        _ => {}
-    }
-    Ok(())
 }
 
 fn decode(key: &str, raw: &str, kind: &str) -> Result<Value> {
@@ -410,25 +285,7 @@ fn decode(key: &str, raw: &str, kind: &str) -> Result<Value> {
 }
 
 pub(crate) fn encode(key: &str, raw: &str, kind: &str) -> Result<Value> {
-    let value = decode(key, raw, kind)?;
-    if kind != "number" {
-        validate_numbers(&value, key)?;
-    }
-    Ok(value)
-}
-
-/// Validate native pairs before an adapter performs symbol or body conversion.
-pub(crate) fn validate_pairs(pairs: &[(String, String)]) -> Result<()> {
-    for (key, raw) in pairs {
-        if raw.starts_with('{') || raw.starts_with('[') {
-            if let Ok(value) = serde_json::from_str::<Value>(raw) {
-                validate_numbers(&value, key)?;
-            }
-        } else {
-            validate_numbers(&Value::String(raw.clone()), key)?;
-        }
-    }
-    Ok(())
+    decode(key, raw, kind)
 }
 
 /// Convert exact string decimals to documented JSON numbers without f64.
@@ -474,21 +331,7 @@ pub(crate) fn validate_with(
     closed: bool,
     nonempty: bool,
 ) -> Result<()> {
-    if !value.is_object() && !value.is_array() {
-        if schema["type"] == "number" && decimal_field(key) {
-            let raw = value.to_string();
-            let digits = if schema["x-signed"] == true {
-                raw.strip_prefix('-').unwrap_or(&raw)
-            } else {
-                &raw
-            };
-            if !plain(digits, false) {
-                return Err(invalid(key, "requires a plain decimal number"));
-            }
-        } else {
-            validate_numbers(value, key)?;
-        }
-    }
+    crate::exchanges::input_contracts::validate(value, schema, key)?;
     if let Some(branches) = schema["allOf"].as_array() {
         for branch in branches {
             validate_with(value, branch, key, closed, nonempty)?;
@@ -565,9 +408,6 @@ pub(crate) fn validate_with(
         }
     }
     if let Some(raw) = value.as_str() {
-        if schema["format"] == "decimal" && !plain(raw, true) {
-            return Err(invalid(key, "requires a positive plain decimal string"));
-        }
         if (nonempty && raw.trim().is_empty() && schema["x-allow-empty"] != true)
             || schema["minLength"]
                 .as_u64()
@@ -632,7 +472,7 @@ mod tests {
     fn decimal_syntax_preserves_arbitrary_precision() {
         for value in ["1e-7", "1E7", "-3", "abc", "NaN", "inf", ".1", "1.", " 1"] {
             assert!(
-                encode("submittedPrice", value, "string").is_err(),
+                encode("submittedPrice", value, "decimal").is_err(),
                 "{value}"
             );
             assert!(encode("investment", value, "decimal").is_err(), "{value}");
@@ -643,8 +483,9 @@ mod tests {
             encode("price", &exact, "number").unwrap().to_string(),
             exact
         );
-        assert!(validate_numbers(&json!({"orders": [{"price": 0.3}]}), "args").is_err());
-        assert!(validate_numbers(&json!({"orders": [{"price": "1e-3"}]}), "args").is_err());
+        let shape = json!({"properties":{"orders":{"items":{"properties":{"price":{"format":"decimal"}}}}}});
+        assert!(validate(&json!({"orders": [{"price": 0.3}]}), &shape, "args").is_err());
+        assert!(validate(&json!({"orders": [{"price": "1e-3"}]}), &shape, "args").is_err());
     }
 
     #[test]
@@ -687,7 +528,7 @@ mod tests {
 
     #[test]
     fn schema_decimal_format_does_not_depend_on_field_name() {
-        let shape = json!({"type": "string", "format": "decimal"});
+        let shape = json!({"type": "string", "format": "decimal", "x-positive": true});
         for raw in ["-1", "1e-5", "abc", "0"] {
             assert!(validate(&json!(raw), &shape, "bid").is_err());
         }

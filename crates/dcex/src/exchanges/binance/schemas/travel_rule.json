@@ -83,7 +83,16 @@
         "kind": "int"
       }
     ],
-    "name": "create_broker_withdrawal"
+    "name": "create_broker_withdrawal",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "method": "PUT",
@@ -155,7 +164,16 @@
         "kind": "str"
       }
     ],
-    "name": "submit_broker_deposit_questionnaire"
+    "name": "submit_broker_deposit_questionnaire",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "method": "POST",
@@ -241,6 +259,15 @@
         "kind": "int"
       }
     ],
-    "name": "create_travel_rule_withdrawal"
+    "name": "create_travel_rule_withdrawal",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   }
 ]

@@ -17,7 +17,20 @@
     ],
     "integers": [
       "recvWindow"
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "triggerPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "trigger_price": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "adjust_simulated_trading_balance",
@@ -33,6 +46,15 @@
     "integers": [
       "amount",
       "recvWindow"
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   }
 ]

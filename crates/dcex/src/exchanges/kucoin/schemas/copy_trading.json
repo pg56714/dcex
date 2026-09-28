@@ -298,7 +298,28 @@
     "source": "https://www.kucoin.com/docs-new/rest/copy-trading/add-order",
     "summary": "Add Order",
     "withdrawal": false,
-    "confirm": false
+    "confirm": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "size": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stopPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stop_price": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "post_v1_copy_trade_futures_orders_test",
@@ -599,7 +620,28 @@
     "source": "https://www.kucoin.com/docs-new/rest/copy-trading/add-order-test",
     "summary": "Add Order Test",
     "withdrawal": false,
-    "confirm": false
+    "confirm": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "size": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stopPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stop_price": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "post_v1_copy_trade_futures_st_orders",
@@ -885,7 +927,36 @@
     "source": "https://www.kucoin.com/docs-new/rest/copy-trading/add-take-profit-and-stop-loss-order",
     "summary": "Add Take Profit And Stop Loss Order",
     "withdrawal": false,
-    "confirm": false
+    "confirm": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "size": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "triggerStopDownPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "triggerStopUpPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "trigger_stop_down_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "trigger_stop_up_price": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "delete_v1_copy_trade_futures_orders",
@@ -977,7 +1048,16 @@
     "source": "https://www.kucoin.com/docs-new/rest/copy-trading/get-max-open-size",
     "summary": "Get Max Open Size",
     "withdrawal": false,
-    "confirm": false
+    "confirm": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "price": {
+          "type": "number",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_v1_copy_trade_futures_position_margin_max_withdraw_margin",
@@ -1162,7 +1242,20 @@
     "source": "https://www.kucoin.com/docs-new/rest/copy-trading/remove-isolated-margin",
     "summary": "Remove Isolated Margin",
     "withdrawal": false,
-    "confirm": false
+    "confirm": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "withdrawAmount": {
+          "type": "number",
+          "format": "decimal"
+        },
+        "withdraw_amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "post_v1_copy_trade_futures_position_risk_limit_level_change",
@@ -1377,7 +1470,20 @@
     "source": "https://www.kucoin.com/docs-new/rest/copy-trading/get-cross-margin-requirement",
     "summary": "Get Cross Margin Requirement",
     "withdrawal": false,
-    "confirm": false
+    "confirm": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "positionValue": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "position_value": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "post_v2_copy_trade_position_switch_position_mode",

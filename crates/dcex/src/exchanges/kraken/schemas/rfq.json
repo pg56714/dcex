@@ -33,7 +33,28 @@
         }
       }
     ],
-    "official_source": "https://docs.kraken.com/api-reference/rfqs/accept-an-offer-on-an-open-rfq"
+    "official_source": "https://docs.kraken.com/api-reference/rfqs/accept-an-offer-on-an-open-rfq",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "askAccepted": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "ask_accepted": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "bidAccepted": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "bid_accepted": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "cancel_user_rfq",
@@ -125,7 +146,52 @@
         }
       }
     ],
-    "official_source": "https://docs.kraken.com/api-reference/rfqs/create-a-new-rfq"
+    "official_source": "https://docs.kraken.com/api-reference/rfqs/create-a-new-rfq",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "json": {
+          "type": "object",
+          "properties": {
+            "legs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "size": {
+                    "type": "number",
+                    "format": "decimal",
+                    "x-signed": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "size": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "request": {
+          "type": "object",
+          "properties": {
+            "legs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "size": {
+                    "type": "number",
+                    "format": "decimal",
+                    "x-signed": true
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   },
   {
     "name": "get_open_rfqs",
@@ -209,7 +275,24 @@
         }
       }
     ],
-    "official_source": "https://docs.kraken.com/api-reference/rfqs/place-new-offer-on-an-open-rfq"
+    "official_source": "https://docs.kraken.com/api-reference/rfqs/place-new-offer-on-an-open-rfq",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "ask": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "bid": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "price": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_rfq",

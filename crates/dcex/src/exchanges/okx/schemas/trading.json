@@ -96,7 +96,20 @@
       ]
     },
     "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-set-mmp",
-    "row": 1067
+    "row": 1067,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "qtyLimit": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "qty_limit": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_mmp_config",

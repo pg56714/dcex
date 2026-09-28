@@ -96,7 +96,16 @@
     ],
     "json_body": false,
     "source": "https://developers.binance.com/en/docs/catalog/investment-and-services-vip-loan/api/rest-api/market-data#query-viploan-fixed-rate-market",
-    "summary": "Query VIP Loan Fixed Rate Market (USER_DATA)"
+    "summary": "Query VIP Loan Fixed Rate Market (USER_DATA)",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "size": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "vip_loan_borrow",
@@ -163,7 +172,20 @@
     ],
     "json_body": false,
     "source": "https://developers.binance.com/en/docs/catalog/investment-and-services-vip-loan/api/rest-api/trade#vip-loan-borrow",
-    "summary": "VIP Loan Borrow (TRADE)"
+    "summary": "VIP Loan Borrow (TRADE)",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "loanAmount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "loan_amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "vip_loan_fixed_rate_borrow",
@@ -294,7 +316,16 @@
     ],
     "json_body": false,
     "source": "https://developers.binance.com/en/docs/catalog/investment-and-services-vip-loan/api/rest-api/trade#vip-loan-repay",
-    "summary": "VIP Loan Repay (TRADE)"
+    "summary": "VIP Loan Repay (TRADE)",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "check_vip_loan_collateral_account",

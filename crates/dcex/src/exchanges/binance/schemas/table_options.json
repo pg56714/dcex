@@ -194,7 +194,28 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "deltaLimit": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "delta_limit": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "qtyLimit": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "qty_limit": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "tradfi_options_contract",

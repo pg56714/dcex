@@ -270,7 +270,11 @@ impl KucoinProWebSocket {
                 "Operation is unsupported on this KuCoin trade profile.".into(),
             ));
         }
-        crate::exchanges::schema::validate_numbers(&args, "args")?;
+        crate::exchanges::input_contracts::validate(
+            &args,
+            crate::exchanges::input_contracts::endpoint("kucoin", operation, true),
+            "args",
+        )?;
         let valid_args = if operation == "futures.multi_order" {
             args.as_array()
                 .is_some_and(|items| !items.is_empty() && items.iter().all(Value::is_object))

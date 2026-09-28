@@ -39,9 +39,15 @@ pub(super) fn validate(
                         .split_once('.')
                         .is_none_or(|(_, fraction)| fraction.len() <= 3)
             }
-            Kind::Decimal => value
-                .as_str()
-                .is_some_and(|v| v.parse::<f64>().is_ok_and(|v| v.is_finite() && v > 0.0)),
+            Kind::Decimal => {
+                value.is_string()
+                    && crate::exchanges::input_contracts::validate(
+                        value,
+                        &serde_json::json!({"format":"decimal", "x-positive":true}),
+                        key,
+                    )
+                    .is_ok()
+            }
             Kind::Bool => value.is_boolean(),
             Kind::Strings => value.as_array().is_some_and(|v| {
                 !v.is_empty() && v.iter().all(|v| v.as_str().is_some_and(|v| !v.is_empty()))

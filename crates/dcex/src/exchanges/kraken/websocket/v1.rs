@@ -76,6 +76,11 @@ impl KrakenV1WebSocket {
                 "Only account-wide cancellations require all_symbols=true.",
             ));
         }
+        crate::exchanges::input_contracts::validate(
+            &Value::Object(obj.clone()),
+            crate::exchanges::input_contracts::endpoint("kraken", &event, true),
+            "order",
+        )?;
         if trading {
             let token = self
                 .token
@@ -98,10 +103,6 @@ impl KrakenV1WebSocket {
                     }
                 }
                 "addOrder" => {
-                    crate::exchanges::schema::validate_numbers(
-                        &Value::Object(obj.clone()),
-                        "order",
-                    )?;
                     for key in ["ordertype", "type", "pair", "volume"] {
                         if obj
                             .get(key)

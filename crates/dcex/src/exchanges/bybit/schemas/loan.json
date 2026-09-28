@@ -195,6 +195,15 @@
     },
     "has_example": true,
     "source_file": "v5/otc/repay.mdx",
-    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "quantity": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   }
 ]

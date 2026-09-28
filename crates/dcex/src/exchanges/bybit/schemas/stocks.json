@@ -154,7 +154,20 @@
     },
     "has_example": true,
     "source_file": "v5/stocks/convert-submit.mdx",
-    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "inputAmount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "input_amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "method": "GET",
@@ -361,7 +374,36 @@
     },
     "has_example": true,
     "source_file": "v5/stocks/place-order.mdx",
-    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "limitPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "limit_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "notional": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "qty": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stopPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stop_price": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "method": "GET",

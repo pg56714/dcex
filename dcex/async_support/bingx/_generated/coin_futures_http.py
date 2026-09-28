@@ -27,8 +27,7 @@ class GeneratedCoinFuturesHTTP(MarketHTTP):
         recv_window: int | None = None,
         time_in_force: str | None = None,
     ) -> Any:  # noqa: ANN401
-        """
-        Trade order.
+        """Trade order.
 
         Use native BingX symbols. Decimal fields are strings to preserve precision.
         Source: https://bingx-api.github.io/docs-v3/#/en/Coin-M%20Futures/Trades%20Endpoints/Trade%20order
@@ -61,8 +60,7 @@ class GeneratedCoinFuturesHTTP(MarketHTTP):
         recv_window: int | None = None,
         all_symbols: bool = False,
     ) -> Any:  # noqa: ANN401
-        """
-        Cancel all orders.
+        """Cancel all orders.
 
         Use native BingX symbols. Decimal fields are strings to preserve precision.
         Source: https://bingx-api.github.io/docs-v3/#/en/Coin-M%20Futures/Trades%20Endpoints/Cancel%20all%20orders

@@ -9,6 +9,7 @@ impl OndoClient {
         method_name: &str,
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
+        crate::exchanges::input_contracts::pairs("ondo", method_name, &params)?;
         let params = super::super::operation_guards::validate("ondo", method_name, params)?;
         let params = OndoParams::from_pairs(params);
         if let Some(response) = self.account_private_request(method_name, &params).await? {

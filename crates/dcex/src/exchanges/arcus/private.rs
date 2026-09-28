@@ -8,6 +8,7 @@ impl ArcusClient {
         method_name: &str,
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
+        crate::exchanges::input_contracts::pairs("arcus", method_name, &params)?;
         if super::schema_requests::field_schemas::handles(method_name, false) {
             return self.field_schema_request(method_name, params).await;
         }
@@ -43,6 +44,7 @@ mod spot {
             method_name: &str,
             params: Vec<(String, String)>,
         ) -> Result<ValidatedResponse> {
+            crate::exchanges::input_contracts::pairs("arcus", method_name, &params)?;
             if method_name != "submit_signed_quote" {
                 return Err(DcexError::InvalidInput(format!(
                     "unknown Arcus spot private method: {method_name}"

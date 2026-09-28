@@ -57,7 +57,16 @@
       "toAddr"
     ],
     "bools": [],
-    "schema": "{\"type\":\"object\",\"properties\":{\"ccy\":{\"type\":\"string\"},\"amt\":{\"type\":\"string\"},\"dest\":{\"type\":\"string\"},\"toAddr\":{\"type\":\"string\"},\"toAddrType\":{\"type\":\"string\"},\"chain\":{\"type\":\"string\"},\"areaCode\":{\"type\":\"string\"},\"rcvrInfo\":{\"type\":\"object\",\"properties\":{\"walletType\":{\"type\":\"string\"},\"exchId\":{\"type\":\"string\"},\"rcvrFirstName\":{\"type\":\"string\"},\"rcvrLastName\":{\"type\":\"string\"},\"rcvrCountry\":{\"type\":\"string\"},\"rcvrCountrySubDivision\":{\"type\":\"string\"},\"rcvrTownName\":{\"type\":\"string\"},\"rcvrStreetName\":{\"type\":\"string\"}},\"required\":[\"walletType\"]},\"clientId\":{\"type\":\"string\"}},\"required\":[\"ccy\",\"amt\",\"dest\",\"toAddr\"]}"
+    "schema": "{\"type\":\"object\",\"properties\":{\"ccy\":{\"type\":\"string\"},\"amt\":{\"type\":\"string\"},\"dest\":{\"type\":\"string\"},\"toAddr\":{\"type\":\"string\"},\"toAddrType\":{\"type\":\"string\"},\"chain\":{\"type\":\"string\"},\"areaCode\":{\"type\":\"string\"},\"rcvrInfo\":{\"type\":\"object\",\"properties\":{\"walletType\":{\"type\":\"string\"},\"exchId\":{\"type\":\"string\"},\"rcvrFirstName\":{\"type\":\"string\"},\"rcvrLastName\":{\"type\":\"string\"},\"rcvrCountry\":{\"type\":\"string\"},\"rcvrCountrySubDivision\":{\"type\":\"string\"},\"rcvrTownName\":{\"type\":\"string\"},\"rcvrStreetName\":{\"type\":\"string\"}},\"required\":[\"walletType\"]},\"clientId\":{\"type\":\"string\"}},\"required\":[\"ccy\",\"amt\",\"dest\",\"toAddr\"]}",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amt": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "cancel_withdrawal",

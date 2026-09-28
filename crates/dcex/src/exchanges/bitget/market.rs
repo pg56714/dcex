@@ -11,6 +11,7 @@ impl BitgetClient {
         method_name: &str,
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
+        crate::exchanges::input_contracts::pairs("bitget", method_name, &params)?;
         let method_name = match method_name {
             "convert_classic_asset" => "classic_trade",
             "convert_uta_small_assets" => "uta_small_assets_trade",

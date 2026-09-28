@@ -768,7 +768,7 @@ def _sample_value(case: EndpointCase, parameter: inspect.Parameter) -> Any:
         return "BTCUSDT"
     if name in {"external_oid", "externalOid"}:
         return "test-external-id"
-    if name in {"chain", "addr", "dest", "fee", "toAddr"}:
+    if name in {"chain", "addr", "dest", "toAddr"}:
         return "test"
     if name in {"amt"}:
         return "1"
@@ -782,9 +782,9 @@ def _sample_value(case: EndpointCase, parameter: inspect.Parameter) -> Any:
         return {}
     if name in {"columns"}:
         return "symbol"
-    from dcex._schema_codec import _DECIMALS
+    from dcex._input_validation import endpoint_schema
 
-    if name.replace("_", "").lower() in _DECIMALS:
+    if endpoint_schema(case.exchange, case.method_name).get("properties", {}).get(name, {}).get("format") == "decimal":
         return "1"
     return "test"
 

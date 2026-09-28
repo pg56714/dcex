@@ -209,7 +209,16 @@
       "size"
     ],
     "required": [],
-    "integers": []
+    "integers": [],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "size": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "request_small_balance_quote",

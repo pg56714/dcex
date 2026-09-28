@@ -8,6 +8,15 @@ pub type ExchangeMethodFuture<'a> =
     Pin<Box<dyn Future<Output = Result<ValidatedResponse>> + Send + 'a>>;
 
 pub trait ExchangeMethodRequestClient {
+    /// Select explicit endpoint input declarations for this client.
+    fn input_exchange(&self) -> &'static str {
+        std::any::type_name::<Self>()
+            .split("::exchanges::")
+            .nth(1)
+            .and_then(|name| name.split("::").next())
+            .unwrap_or("")
+    }
+
     fn public_request_boxed<'a>(
         &'a self,
         method_name: &'static str,
@@ -81,7 +90,12 @@ impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
 
     pub fn param(mut self, key: impl Into<String>, value: impl ToString) -> Self {
         let key = key.into();
-        let value = match schema::input(&key, &value) {
+        let value = match input_contracts::input(
+            self.client.input_exchange(),
+            self.method_name,
+            &key,
+            &value,
+        ) {
             Ok(value) => value,
             Err(error) => {
                 self.invalid_input = Some(error);
@@ -102,7 +116,7 @@ impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
 
     pub fn push_param(mut self, key: impl Into<String>, value: impl ToString) -> Self {
         let key = key.into();
-        match schema::input(&key, &value) {
+        match input_contracts::input(self.client.input_exchange(), self.method_name, &key, &value) {
             Ok(value) => self.params.push((key, value)),
             Err(error) => self.invalid_input = Some(error),
         }
@@ -1697,19 +1711,28 @@ mod tests {
         private [];
     }
 
+    #[test]
+    fn undeclared_names_do_not_imply_financial_validation() {
+        let client = DummyClient;
+        let request = client.schema_amount(0.1_f64);
+        assert!(request.invalid_input.is_none());
+        assert_eq!(request.params, vec![("amount".into(), "0.1".into())]);
+    }
+
     #[tokio::test]
     async fn financial_floats_are_rejected_before_builder_dispatch() {
-        let client = DummyClient;
-        assert!(client.schema_amount(0.1_f64).send().await.is_err());
+        let client =
+            crate::exchanges::binance::BinanceClient::public(std::time::Duration::from_secs(1))
+                .expect("client");
         assert!(
-            ExchangeMethodRequest::public(&client, "example", Vec::new())
+            ExchangeMethodRequest::public(&client, "place_order", Vec::new())
                 .param("price", 0.1_f32)
                 .send()
                 .await
                 .is_err()
         );
         assert!(
-            ExchangeMethodRequest::public(&client, "example", Vec::new())
+            ExchangeMethodRequest::public(&client, "place_order", Vec::new())
                 .push_param("quantity", 1.0_f64)
                 .send()
                 .await
@@ -1876,5 +1899,6 @@ pub mod mexc;
 pub mod okx;
 pub mod ondo;
 
+pub(crate) mod input_contracts;
 mod operation_guards;
 pub(crate) mod schema;

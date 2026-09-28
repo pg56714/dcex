@@ -10,6 +10,7 @@ impl OkxClient {
         method_name: &str,
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
+        crate::exchanges::input_contracts::pairs("okx", method_name, &params)?;
         let params = OkxParams::from_pairs(params);
         if let Some(result) = self.table_request(method_name, &params, false).await? {
             return Ok(result);

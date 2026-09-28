@@ -1163,7 +1163,17 @@
     "source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/transfer",
     "summary": "Transfer",
     "withdrawal": false,
-    "confirm": false
+    "confirm": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal",
+          "x-apidog-mock": "1"
+        }
+      }
+    }
   },
   {
     "name": "get_v3_broker_nd_transfer_detail",

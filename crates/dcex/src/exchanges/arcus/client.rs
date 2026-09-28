@@ -260,6 +260,7 @@ pub(super) mod spot {
             method_name: &str,
             params: Vec<(String, String)>,
         ) -> Result<ValidatedResponse> {
+            crate::exchanges::input_contracts::pairs("arcus", method_name, &params)?;
             if matches!(
                 method_name,
                 "get_native_balance"

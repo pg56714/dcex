@@ -18,7 +18,20 @@
       "sz"
     ],
     "bools": [],
-    "schema": null
+    "schema": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "px": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "sz": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_convert_currency_pair",
@@ -59,7 +72,20 @@
       "rfqSzCcy"
     ],
     "bools": [],
-    "schema": null
+    "schema": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "rfqSz": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "rfq_sz": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "execute_convert_trade",
@@ -85,6 +111,23 @@
       "szCcy"
     ],
     "bools": [],
-    "schema": null
+    "schema": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "rfqSz": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "rfq_sz": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "sz": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   }
 ]

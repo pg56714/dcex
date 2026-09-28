@@ -33,7 +33,16 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/stock-plus/assets#transfer",
-    "summary": "Transfer"
+    "summary": "Transfer",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "stock_plus_assets_get_transfer_records",
@@ -165,7 +174,16 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/stock-plus/assets#check-cash-flow",
-    "summary": "Check Cash Flow"
+    "summary": "Check Cash Flow",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "size": {
+          "type": "number",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "stock_plus_assets_get_stock_position",
@@ -413,7 +431,52 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/stock-plus/orders#place-order",
-    "summary": "Place Order"
+    "summary": "Place Order",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "monitorPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "monitor_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "submittedPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "submittedQuantity": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "submitted_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "submitted_quantity": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "trailingAmount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "trailing_amount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "triggerPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "trigger_price": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "stock_plus_orders_modify_order",
@@ -513,7 +576,44 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/stock-plus/orders#modify-order",
-    "summary": "Modify Order"
+    "summary": "Modify Order",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "monitorPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "monitor_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "quantity": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "trailingAmount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "trailing_amount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "triggerPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "trigger_price": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "stock_plus_orders_cancel_order",

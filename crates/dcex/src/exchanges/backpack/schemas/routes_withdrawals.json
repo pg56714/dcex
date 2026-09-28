@@ -19,6 +19,15 @@
     ],
     "decimals": [
       "quantity"
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "quantity": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   }
 ]

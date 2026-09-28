@@ -377,7 +377,7 @@ INVALID_COIN_FUTURES_CASES = [
         "place_coin_futures_order",
         ("BTCUSD_PERP", "BUY", "MARKET", "-1"),
         {},
-        "quantity must be positive",
+        "quantity.*(?:positive|plain decimal)",
         id="negative-quantity",
     ),
     pytest.param(

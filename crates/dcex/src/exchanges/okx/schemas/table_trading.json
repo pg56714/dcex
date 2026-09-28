@@ -29,7 +29,30 @@
     ],
     "required": [],
     "bools": [],
-    "schema": null
+    "schema": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "newPx": {
+          "type": "string",
+          "format": "decimal",
+          "x-signed": true
+        },
+        "newSz": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "new_px": {
+          "type": "string",
+          "format": "decimal",
+          "x-signed": true
+        },
+        "new_sz": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_spread_order_history_archive",
@@ -70,7 +93,20 @@
     "bools": [
       "inclRealPosAndEq"
     ],
-    "schema": "{\"type\":\"object\",\"properties\":{\"acctLv\":{\"type\":\"string\"},\"inclRealPosAndEq\":{\"type\":\"boolean\"},\"lever\":{\"type\":\"string\"},\"simPos\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"instId\":{\"type\":\"string\"},\"pos\":{\"type\":\"string\"},\"avgPx\":{\"type\":\"string\"},\"lever\":{\"type\":\"string\"}},\"required\":[\"instId\",\"pos\",\"avgPx\"]}},\"simAsset\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"ccy\":{\"type\":\"string\"},\"amt\":{\"type\":\"string\"}},\"required\":[\"ccy\",\"amt\"]}},\"greeksType\":{\"type\":\"string\"},\"idxVol\":{\"type\":\"string\"}},\"required\":[]}"
+    "schema": "{\"type\":\"object\",\"properties\":{\"acctLv\":{\"type\":\"string\"},\"inclRealPosAndEq\":{\"type\":\"boolean\"},\"lever\":{\"type\":\"string\"},\"simPos\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"instId\":{\"type\":\"string\"},\"pos\":{\"type\":\"string\"},\"avgPx\":{\"type\":\"string\"},\"lever\":{\"type\":\"string\"}},\"required\":[\"instId\",\"pos\",\"avgPx\"]}},\"simAsset\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"ccy\":{\"type\":\"string\"},\"amt\":{\"type\":\"string\"}},\"required\":[\"ccy\",\"amt\"]}},\"greeksType\":{\"type\":\"string\"},\"idxVol\":{\"type\":\"string\"}},\"required\":[]}",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "idxVol": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "idx_vol": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "move_positions",
@@ -90,7 +126,48 @@
       "clientId"
     ],
     "bools": [],
-    "schema": "{\"type\":\"object\",\"properties\":{\"fromAcct\":{\"type\":\"string\"},\"toAcct\":{\"type\":\"string\"},\"legs\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"from\":{\"type\":\"object\",\"properties\":{\"posId\":{\"type\":\"string\"},\"sz\":{\"type\":\"string\"},\"side\":{\"type\":\"string\"}},\"required\":[\"posId\",\"sz\",\"side\"]},\"to\":{\"type\":\"object\",\"properties\":{\"tdMode\":{\"type\":\"string\"},\"posSide\":{\"type\":\"string\"},\"ccy\":{\"type\":\"string\"}},\"required\":[]}},\"required\":[\"from\",\"to\"]}},\"clientId\":{\"type\":\"string\"}},\"required\":[\"fromAcct\",\"toAcct\",\"legs\",\"clientId\"]}"
+    "schema": "{\"type\":\"object\",\"properties\":{\"fromAcct\":{\"type\":\"string\"},\"toAcct\":{\"type\":\"string\"},\"legs\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"from\":{\"type\":\"object\",\"properties\":{\"posId\":{\"type\":\"string\"},\"sz\":{\"type\":\"string\"},\"side\":{\"type\":\"string\"}},\"required\":[\"posId\",\"sz\",\"side\"]},\"to\":{\"type\":\"object\",\"properties\":{\"tdMode\":{\"type\":\"string\"},\"posSide\":{\"type\":\"string\"},\"ccy\":{\"type\":\"string\"}},\"required\":[]}},\"required\":[\"from\",\"to\"]}},\"clientId\":{\"type\":\"string\"}},\"required\":[\"fromAcct\",\"toAcct\",\"legs\",\"clientId\"]}",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "sz": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "legs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "px": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "pxUsd": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "pxVol": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "px_usd": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "px_vol": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "sz": {
+                "type": "string",
+                "format": "decimal"
+              }
+            }
+          }
+        }
+      }
+    }
   },
   {
     "name": "get_move_positions_history",
@@ -156,7 +233,20 @@
       "qtyLimit"
     ],
     "bools": [],
-    "schema": "{\"type\":\"object\",\"properties\":{\"instFamily\":{\"type\":\"string\"},\"timeInterval\":{\"type\":\"string\"},\"frozenInterval\":{\"type\":\"string\"},\"qtyLimit\":{\"type\":\"string\"}},\"required\":[\"instFamily\",\"timeInterval\",\"frozenInterval\",\"qtyLimit\"]}"
+    "schema": "{\"type\":\"object\",\"properties\":{\"instFamily\":{\"type\":\"string\"},\"timeInterval\":{\"type\":\"string\"},\"frozenInterval\":{\"type\":\"string\"},\"qtyLimit\":{\"type\":\"string\"}},\"required\":[\"instFamily\",\"timeInterval\",\"frozenInterval\",\"qtyLimit\"]}",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "qtyLimit": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "qty_limit": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_mmp_config",

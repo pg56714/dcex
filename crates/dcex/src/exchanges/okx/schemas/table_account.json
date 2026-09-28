@@ -218,7 +218,16 @@
       "adjustments"
     ],
     "bools": [],
-    "schema": "{\"type\":\"object\",\"properties\":{\"type\":{\"type\":\"string\"},\"adjustments\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"ccy\":{\"type\":\"string\"},\"amt\":{\"type\":\"string\"}},\"required\":[\"ccy\",\"amt\"]}}},\"required\":[\"type\",\"adjustments\"]}"
+    "schema": "{\"type\":\"object\",\"properties\":{\"type\":{\"type\":\"string\"},\"adjustments\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"ccy\":{\"type\":\"string\"},\"amt\":{\"type\":\"string\"}},\"required\":[\"ccy\",\"amt\"]}}},\"required\":[\"type\",\"adjustments\"]}",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amt": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_non_tradable_assets",

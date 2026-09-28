@@ -511,7 +511,16 @@
         "minimum": 1,
         "maximum": 1000
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "size": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_basic_fee",

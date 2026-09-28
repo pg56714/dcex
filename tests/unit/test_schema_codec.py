@@ -3,11 +3,12 @@
 import importlib
 import json
 from decimal import Decimal
-from pathlib import Path
 
 import pytest
 
 from dcex._schema_codec import encode_json, normalize
+from dcex._input_validation import normalize_endpoint
+from dcex._input_codec import CATALOG
 
 EXCHANGES = [
     "arcus",
@@ -44,8 +45,12 @@ def encoder(exchange, asynchronous):
 @pytest.mark.parametrize("asynchronous", [False, True])
 @pytest.mark.parametrize("value", [1e-7, 0.1 + 0.2, "1e-7", "-3", "abc", "NaN", True])
 def test_every_exchange_rejects_lossy_financial_inputs(exchange, asynchronous, value):
+    # Use a declared endpoint field; low-level serialization has no context.
+    method, key = next((method, key) for method, schema in CATALOG["exchanges"][exchange].items()
+                      for key, field in schema["properties"].items()
+                      if field.get("format") == "decimal" and not field.get("x-relative") and not field.get("x-signed"))
     with pytest.raises(ValueError, match="decimal"):
-        encoder(exchange, asynchronous)(quantity=value)
+        normalize_endpoint(exchange, method, {key: value})
 
 
 @pytest.mark.parametrize("exchange", EXCHANGES)
@@ -74,7 +79,7 @@ def test_every_exchange_preserves_decimal_precision(exchange, asynchronous):
 @pytest.mark.parametrize("value", [0.01, "1e-5", "abc"])
 def test_nested_rest_and_ws_inputs_reject_invalid_numbers(field, value):
     with pytest.raises(ValueError):
-        encode_json({"args": [{field: value}]})
+        normalize({"args": [{field: value}]}, schema={"properties": {"args": {"items": {"properties": {field: {"format": "decimal"}}}}}})
 
 
 def test_nested_decimal_and_type_encoding():
@@ -89,14 +94,8 @@ def test_nested_decimal_and_type_encoding():
     }
 
 
-def test_python_and_native_decimal_field_policy_agree():
-    import re
-
-    from dcex._schema_codec import _DECIMALS
-
-    source = (Path(__file__).parents[2] / "crates/dcex/src/exchanges/schema.rs").read_text()
-    section = source.split("pub(crate) fn decimal_field", 1)[1].split("\n}", 1)[0]
-    assert set(re.findall(r'"([a-z][a-z0-9]*)"', section)) == _DECIMALS
+def test_field_names_do_not_determine_validation_policy():
+    assert normalize({"price": "label", "amount": -3}) == {"price": "label", "amount": -3}
 
 
 @pytest.mark.asyncio
@@ -116,16 +115,15 @@ async def test_ws_numeric_errors_precede_native_send(exchange, class_name, metho
     client = object.__new__(cls)
     client._native_client = AsyncMock()
     with pytest.raises(ValueError, match="decimal"):
-        await getattr(client, method)(*args, {"price": price, "qty": "1"})
+        await getattr(client, method)(*args, {"event": "addOrder", "volume": price, "qty": price})
     getattr(client._native_client, method).assert_not_called()
 
 
 def test_documented_signed_delta_and_market_selector_survive_boundary():
-    assert normalize({"amount": "-5", "slOrdPx": "-1"}) == {"amount": "-5", "slOrdPx": "-1"}
-    # Native endpoint rules decide whether amount denotes a signed margin delta
-    # or an ordinary positive amount. This boundary must not erase its sign.
+    assert normalize_endpoint("arcus", "adjust_isolated_margin", {"amount": "-5"}) == {"amount": "-5"}
+    assert normalize_endpoint("okx", "place_algo_order", {"slOrdPx": "-1"}) == {"slOrdPx": "-1"}
     with pytest.raises(ValueError):
-        normalize({"slOrdPx": "-2"})
+        normalize_endpoint("okx", "place_algo_order", {"slOrdPx": "-2"})
 
 
 def test_signed_payloads_preserve_decimals_without_accepting_floats():
@@ -133,4 +131,4 @@ def test_signed_payloads_preserve_decimals_without_accepting_floats():
         "size": "-1.25"
     }
     with pytest.raises(ValueError, match="float"):
-        encode_json({"size": -1.25}, signed_fields=("size",))
+        normalize_endpoint("arcus", "adjust_isolated_margin", {"amount": -1.25})

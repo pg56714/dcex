@@ -161,7 +161,52 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "limitIcebergQty": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "limit_iceberg_qty": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "quantity": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stopIcebergQty": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stopLimitPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stopPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stop_iceberg_qty": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stop_limit_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stop_price": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "place_margin_otoco",
@@ -430,7 +475,92 @@
           "FOK"
         ]
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "pendingAboveIcebergQty": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pendingAbovePrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pendingAboveStopPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pendingBelowIcebergQty": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pendingBelowPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pendingBelowStopPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pendingQuantity": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pending_above_iceberg_qty": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pending_above_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pending_above_stop_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pending_below_iceberg_qty": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pending_below_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pending_below_stop_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pending_quantity": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "workingIcebergQty": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "workingPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "workingQuantity": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "working_iceberg_qty": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "working_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "working_quantity": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "place_spot_opoco",
@@ -796,6 +926,115 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "pendingAboveIcebergQty": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pendingAbovePegOffsetValue": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pendingAbovePrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pendingAboveStopPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pendingBelowIcebergQty": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pendingBelowPegOffsetValue": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pendingBelowPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pendingBelowStopPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pending_above_iceberg_qty": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pending_above_peg_offset_value": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pending_above_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pending_above_stop_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pending_below_iceberg_qty": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pending_below_peg_offset_value": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pending_below_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pending_below_stop_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "recvWindow": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "recv_window": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "workingIcebergQty": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "workingPegOffsetValue": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "workingPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "workingQuantity": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "working_iceberg_qty": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "working_peg_offset_value": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "working_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "working_quantity": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   }
 ]

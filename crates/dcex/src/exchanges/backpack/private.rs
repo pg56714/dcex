@@ -9,6 +9,7 @@ impl BackpackClient {
         method_name: &str,
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
+        crate::exchanges::input_contracts::pairs("backpack", method_name, &params)?;
         let params = super::super::operation_guards::validate("backpack", method_name, params)?;
         let params = BackpackParams::from_pairs(params);
         if let Some(response) = self.rfq_schema_request(method_name, &params).await? {

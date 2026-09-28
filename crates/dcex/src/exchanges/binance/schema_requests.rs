@@ -50,7 +50,7 @@ impl BinanceClient {
             return Ok(None);
         };
         params.ensure_allowed(endpoint.allowed)?;
-        crate::exchanges::schema::validate_pairs(&params.0)?;
+        crate::exchanges::input_contracts::pairs("binance", name, &params.0)?;
         let singleton_keys: Vec<_> = params
             .0
             .iter()

@@ -9,6 +9,7 @@ impl ExtendedClient {
         method_name: &str,
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
+        crate::exchanges::input_contracts::pairs("extended", method_name, &params)?;
         let params = ExtendedParams::from_pairs(params);
         if let Some(response) = self
             .portfolio_schema_request(method_name, &params, false)

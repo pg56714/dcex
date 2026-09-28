@@ -88,7 +88,16 @@
         "minimum": 0
       }
     ],
-    "symbol_key": null
+    "symbol_key": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_withdrawal_methods",

@@ -27,7 +27,16 @@
     ],
     "arrays": [],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_classic_earn_elite_subscribe_result",
@@ -82,7 +91,16 @@
     ],
     "arrays": [],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_classic_earn_elite_redeem_info",
@@ -161,7 +179,20 @@
     ],
     "arrays": [],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "pledgeAmount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pledge_amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "classic_earn_loan_borrow",
@@ -182,7 +213,28 @@
     ],
     "arrays": [],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "loanAmount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "loan_amount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pledgeAmount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pledge_amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_classic_earn_loan_ongoing_orders",
@@ -216,7 +268,16 @@
     ],
     "arrays": [],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_classic_earn_loan_repay_history",
@@ -259,7 +320,16 @@
     ],
     "arrays": [],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_classic_earn_loan_revise_history",

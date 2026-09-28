@@ -14,7 +14,16 @@
     ],
     "arrays": [],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_uta_convert_records",
@@ -107,7 +116,28 @@
     ],
     "arrays": [],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "fromCoinSize": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "from_coin_size": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "toCoinSize": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "to_coin_size": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "classic_trade",
@@ -132,7 +162,36 @@
     ],
     "arrays": [],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "cnvtPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "cnvt_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "fromCoinSize": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "from_coin_size": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "toCoinSize": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "to_coin_size": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_classic_convert_record",

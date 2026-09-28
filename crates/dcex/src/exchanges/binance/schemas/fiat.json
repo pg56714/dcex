@@ -43,7 +43,16 @@
     ],
     "json_body": true,
     "source": "https://developers.binance.com/en/docs/catalog/investment-and-services-fiat/api/rest-api/~#deposit",
-    "summary": "Deposit (TRADE)"
+    "summary": "Deposit (TRADE)",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "fiat_withdraw",
@@ -96,7 +105,16 @@
     ],
     "json_body": true,
     "source": "https://developers.binance.com/en/docs/catalog/investment-and-services-fiat/api/rest-api/~#fiat-withdraw",
-    "summary": "Fiat Withdraw (TRADE)"
+    "summary": "Fiat Withdraw (TRADE)",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_fiat_deposit_withdraw_history",

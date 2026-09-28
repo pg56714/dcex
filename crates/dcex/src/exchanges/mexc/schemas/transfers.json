@@ -48,6 +48,15 @@
       }
     ],
     "title": "Internal Transfer",
-    "official_source": "https://www.mexc.com/api-docs/spot-v3/wallet-endpoints/internal-transfer"
+    "official_source": "https://www.mexc.com/api-docs/spot-v3/wallet-endpoints/internal-transfer",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   }
 ]

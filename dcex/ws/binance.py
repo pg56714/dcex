@@ -3,7 +3,9 @@
 import json
 from typing import Any
 
+from .._input_validation import normalize_endpoint
 from .._native_http import load_native
+from .._schema_codec import encode_json
 from ._base import AsyncWebSocketMixin
 
 _native = load_native()
@@ -262,6 +264,7 @@ class ApiClient(AsyncWebSocketMixin):
             timeout=timeout,
             base_url=base_url,
         )
+        self._input_market = market
 
     async def connect(self) -> None:
         """Connect; authentication is applied to individual signed requests."""
@@ -273,9 +276,10 @@ class ApiClient(AsyncWebSocketMixin):
 
     async def request(self, method: str, params: dict[str, Any] | None = None) -> int:
         """Send a documented method and return its correlation ID after writing."""
-        return int(
-            await self._native_client.request(method, json.dumps(params or {}, allow_nan=False))
+        params = normalize_endpoint(
+            "binance", f"{self._input_market}:{method}", params or {}, websocket=True
         )
+        return int(await self._native_client.request(method, encode_json(params, allow_nan=False)))
 
     async def recv(self) -> dict[str, Any]:
         """Read a complete response or user event without suppressing API errors."""

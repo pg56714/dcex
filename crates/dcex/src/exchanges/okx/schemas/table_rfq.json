@@ -21,7 +21,44 @@
       "anonymous",
       "allowPartialExecution"
     ],
-    "schema": "{\"type\":\"object\",\"properties\":{\"counterparties\":{\"type\":\"array\",\"items\":{\"type\":\"string\",\"properties\":{},\"required\":[]}},\"anonymous\":{\"type\":\"boolean\"},\"clRfqId\":{\"type\":\"string\"},\"tag\":{\"type\":\"string\"},\"allowPartialExecution\":{\"type\":\"boolean\"},\"legs\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"instId\":{\"type\":\"string\"},\"tdMode\":{\"type\":\"string\"},\"ccy\":{\"type\":\"string\"},\"sz\":{\"type\":\"string\"},\"lmtPx\":{\"type\":\"string\"},\"side\":{\"type\":\"string\"},\"posSide\":{\"type\":\"string\"},\"tgtCcy\":{\"type\":\"string\"},\"tradeQuoteCcy\":{\"type\":\"string\"}},\"required\":[\"instId\",\"sz\",\"side\"]}},\"acctAlloc\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"acct\":{\"type\":\"string\"},\"legs\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"sz\":{\"type\":\"string\"},\"instId\":{\"type\":\"string\"},\"tdMode\":{\"type\":\"string\"},\"ccy\":{\"type\":\"string\"},\"posSide\":{\"type\":\"string\"}},\"required\":[\"sz\",\"instId\"]}}},\"required\":[\"acct\",\"legs\"]}}},\"required\":[\"counterparties\",\"legs\"]}"
+    "schema": "{\"type\":\"object\",\"properties\":{\"counterparties\":{\"type\":\"array\",\"items\":{\"type\":\"string\",\"properties\":{},\"required\":[]}},\"anonymous\":{\"type\":\"boolean\"},\"clRfqId\":{\"type\":\"string\"},\"tag\":{\"type\":\"string\"},\"allowPartialExecution\":{\"type\":\"boolean\"},\"legs\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"instId\":{\"type\":\"string\"},\"tdMode\":{\"type\":\"string\"},\"ccy\":{\"type\":\"string\"},\"sz\":{\"type\":\"string\"},\"lmtPx\":{\"type\":\"string\"},\"side\":{\"type\":\"string\"},\"posSide\":{\"type\":\"string\"},\"tgtCcy\":{\"type\":\"string\"},\"tradeQuoteCcy\":{\"type\":\"string\"}},\"required\":[\"instId\",\"sz\",\"side\"]}},\"acctAlloc\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"acct\":{\"type\":\"string\"},\"legs\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"sz\":{\"type\":\"string\"},\"instId\":{\"type\":\"string\"},\"tdMode\":{\"type\":\"string\"},\"ccy\":{\"type\":\"string\"},\"posSide\":{\"type\":\"string\"}},\"required\":[\"sz\",\"instId\"]}}},\"required\":[\"acct\",\"legs\"]}}},\"required\":[\"counterparties\",\"legs\"]}",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "legs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "px": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "pxUsd": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "pxVol": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "px_usd": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "px_vol": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "sz": {
+                "type": "string",
+                "format": "decimal"
+              }
+            }
+          }
+        }
+      }
+    }
   },
   {
     "name": "get_rfq_counterparties",
@@ -84,7 +121,48 @@
       "quoteId"
     ],
     "bools": [],
-    "schema": "{\"type\":\"object\",\"properties\":{\"rfqId\":{\"type\":\"string\"},\"quoteId\":{\"type\":\"string\"},\"legs\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"instId\":{\"type\":\"string\"},\"sz\":{\"type\":\"string\"}},\"required\":[\"instId\",\"sz\"]}}},\"required\":[\"rfqId\",\"quoteId\"]}"
+    "schema": "{\"type\":\"object\",\"properties\":{\"rfqId\":{\"type\":\"string\"},\"quoteId\":{\"type\":\"string\"},\"legs\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"instId\":{\"type\":\"string\"},\"sz\":{\"type\":\"string\"}},\"required\":[\"instId\",\"sz\"]}}},\"required\":[\"rfqId\",\"quoteId\"]}",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "sz": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "legs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "px": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "pxUsd": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "pxVol": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "px_usd": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "px_vol": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "sz": {
+                "type": "string",
+                "format": "decimal"
+              }
+            }
+          }
+        }
+      }
+    }
   },
   {
     "name": "get_rfq_rfqs",
@@ -182,7 +260,16 @@
     "bools": [
       "anonymous"
     ],
-    "schema": "{\"type\":\"object\",\"properties\":{\"rfqId\":{\"type\":\"string\"},\"clQuoteId\":{\"type\":\"string\"},\"tag\":{\"type\":\"string\"},\"anonymous\":{\"type\":\"boolean\"},\"quoteSide\":{\"type\":\"string\"},\"expiresIn\":{\"type\":\"string\"},\"legs\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"instId\":{\"type\":\"string\"},\"tdMode\":{\"type\":\"string\"},\"ccy\":{\"type\":\"string\"},\"sz\":{\"type\":\"string\"},\"px\":{\"type\":\"string\"},\"side\":{\"type\":\"string\"},\"posSide\":{\"type\":\"string\"},\"tgtCcy\":{\"type\":\"string\"},\"tradeQuoteCcy\":{\"type\":\"string\"}},\"required\":[\"instId\",\"sz\",\"px\",\"side\"]}}},\"required\":[\"rfqId\",\"quoteSide\",\"legs\"]}"
+    "schema": "{\"type\":\"object\",\"properties\":{\"rfqId\":{\"type\":\"string\"},\"clQuoteId\":{\"type\":\"string\"},\"tag\":{\"type\":\"string\"},\"anonymous\":{\"type\":\"boolean\"},\"quoteSide\":{\"type\":\"string\"},\"expiresIn\":{\"type\":\"string\"},\"legs\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"instId\":{\"type\":\"string\"},\"tdMode\":{\"type\":\"string\"},\"ccy\":{\"type\":\"string\"},\"sz\":{\"type\":\"string\"},\"px\":{\"type\":\"string\"},\"side\":{\"type\":\"string\"},\"posSide\":{\"type\":\"string\"},\"tgtCcy\":{\"type\":\"string\"},\"tradeQuoteCcy\":{\"type\":\"string\"}},\"required\":[\"instId\",\"sz\",\"px\",\"side\"]}}},\"required\":[\"rfqId\",\"quoteSide\",\"legs\"]}",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "sz": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "cancel_rfq_quote",

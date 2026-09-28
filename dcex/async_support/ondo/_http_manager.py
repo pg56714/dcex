@@ -67,9 +67,15 @@ class HTTPManager(BaseHTTPManager):
         return data
 
     async def _native_public(self, method_name: str, **kwargs: object) -> Any:
+        from ..._input_validation import normalize_endpoint
+
+        kwargs = normalize_endpoint("ondo", method_name, kwargs)
         return await self._call("public_request", method_name, _params(**kwargs))
 
     async def _native_private(self, method_name: str, **kwargs: object) -> Any:
+        from ..._input_validation import normalize_endpoint
+
+        kwargs = normalize_endpoint("ondo", method_name, kwargs)
         return await self._call("private_request", method_name, _params(**kwargs))
 
     async def public_request(self, method_name: str, **params: object) -> Any:

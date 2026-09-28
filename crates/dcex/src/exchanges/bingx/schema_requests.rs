@@ -41,7 +41,7 @@ impl BingxClient {
             })
             .cloned()
             .collect();
-        crate::exchanges::schema::validate_pairs(&scalar_fields)?;
+        crate::exchanges::input_contracts::pairs("bingx", name, &scalar_fields)?;
         if supplied
             .iter()
             .map(|(k, _)| k)

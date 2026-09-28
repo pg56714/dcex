@@ -99,7 +99,20 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/classic-copytrading-future-follower/classic-copytrading-future-copytrade-follower#copy-settings",
-    "summary": "Copy settings"
+    "summary": "Copy settings",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "copyAmount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "copy_amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "classic_copytrading_future_copytrade_follower_query_current_orders",
@@ -308,7 +321,28 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/classic-copytrading-future-follower/classic-copytrading-future-copytrade-follower#set-tpsl",
-    "summary": "Set TPSL"
+    "summary": "Set TPSL",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "stopLossPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stopSurplusPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stop_loss_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stop_surplus_price": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "classic_copytrading_future_copytrade_follower_close_positions",
@@ -503,7 +537,28 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/classic-copytrading-future-follower/classic-copytrading-future-copytrade-follower#set-copy-trade-settings",
-    "summary": "Set Copy Trade Settings"
+    "summary": "Set Copy Trade Settings",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "settings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "traceValue": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "maxHoldSize": {
+                "type": "string",
+                "format": "decimal"
+              }
+            }
+          }
+        }
+      }
+    }
   },
   {
     "name": "classic_copytrading_future_copytrade_follower_cancel_trader",
@@ -857,7 +912,28 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/classic-copytrading-future-trader/classic-copytrading-future-copytrade-trader#modify-tracking-order-tpsl",
-    "summary": "Modify Tracking Order TPSL"
+    "summary": "Modify Tracking Order TPSL",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "stopLossPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stopSurplusPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stop_loss_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stop_surplus_price": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "classic_copytrading_future_copytrade_trader_trader_order_total_detail",
@@ -1491,7 +1567,28 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/classic-copytrading-spot-follower/classic-copytrading-spot-copytrade-follower#set-take-profit-and-stop-loss",
-    "summary": "Set Take Profit And Stop Loss"
+    "summary": "Set Take Profit And Stop Loss",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "stopLossPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stopSurplusPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stop_loss_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stop_surplus_price": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "classic_copytrading_spot_copytrade_follower_settings",
@@ -1574,7 +1671,28 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/classic-copytrading-spot-follower/classic-copytrading-spot-copytrade-follower#add-or-modify-following-configurations",
-    "summary": "Add or Modify Following Configurations"
+    "summary": "Add or Modify Following Configurations",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "settings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "maxHoldSize": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "traceValue": {
+                "type": "string",
+                "format": "decimal"
+              }
+            }
+          }
+        }
+      }
+    }
   },
   {
     "name": "classic_copytrading_spot_copytrade_follower_stop_order",
@@ -1899,7 +2017,28 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/classic-copytrading-spot-trader/classic-copytrading-spot-copytrade-trader#modify-take-profit-and-stop-loss",
-    "summary": "Modify Take Profit and Stop Loss"
+    "summary": "Modify Take Profit and Stop Loss",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "stopLossPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stopSurplusPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stop_loss_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stop_surplus_price": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "classic_copytrading_spot_copytrade_trader_order_total_detail",
@@ -2117,7 +2256,40 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/copy-trading/follower#create-copy",
-    "summary": "Create Copy"
+    "summary": "Create Copy",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "marginPerOrder": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "margin_per_order": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "maxMarginRatio": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "maxPostionValue": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "max_margin_ratio": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "max_postion_value": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "copy_trading_follower_modify_settings",
@@ -2193,7 +2365,36 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/copy-trading/follower#modify-follower-settings",
-    "summary": "Modify Follower Settings"
+    "summary": "Modify Follower Settings",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "marginPerOrder": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "margin_per_order": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "maxMarginRatio": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "maxPostionValue": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "max_margin_ratio": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "max_postion_value": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "copy_trading_follower_unfollow",
@@ -2293,7 +2494,16 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/copy-trading/follower#copy-transfer",
-    "summary": "Copy Transfer"
+    "summary": "Copy Transfer",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "copy_trading_follower_get_copy_transfer_record",
@@ -2445,7 +2655,16 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/copy-trading/follower#close-positions",
-    "summary": "Close Positions"
+    "summary": "Close Positions",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "qty": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "copy_trading_follower_close_all",
@@ -2561,7 +2780,28 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/copy-trading/follower#place-tpsl",
-    "summary": "Place TPSL"
+    "summary": "Place TPSL",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "stopLoss": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stop_loss": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "takeProfit": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "take_profit": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "copy_trading_follower_modify_tpsl",
@@ -2621,7 +2861,28 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/copy-trading/follower#modify-tpsl",
-    "summary": "Modify TPSL"
+    "summary": "Modify TPSL",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "stopLoss": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stop_loss": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "takeProfit": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "take_profit": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "copy_trading_follower_cancel_tpsl",
@@ -2807,7 +3068,16 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/copy-trading/public-private#transfer",
-    "summary": "Transfer"
+    "summary": "Transfer",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "copy_trading_public_private_get_transfer_record",

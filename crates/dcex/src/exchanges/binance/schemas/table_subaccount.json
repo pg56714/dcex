@@ -449,7 +449,16 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "size": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_move_position_history_for_sub_account",
@@ -562,7 +571,16 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_sub_account_deposit_history",
@@ -696,7 +714,140 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "order_args": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "activationPrice": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "activation_price": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "callbackRate": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "callback_rate": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "icebergQty": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "iceberg_qty": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "pegOffsetValue": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "peg_offset_value": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "price": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "quantity": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "quoteOrderQty": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "quote_order_qty": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "stopPrice": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "stop_price": {
+                "type": "string",
+                "format": "decimal"
+              }
+            }
+          }
+        },
+        "orderArgs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "activationPrice": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "activation_price": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "callbackRate": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "callback_rate": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "icebergQty": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "iceberg_qty": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "pegOffsetValue": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "peg_offset_value": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "price": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "quantity": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "quoteOrderQty": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "quote_order_qty": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "stopPrice": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "stop_price": {
+                "type": "string",
+                "format": "decimal"
+              }
+            }
+          }
+        }
+      }
+    }
   },
   {
     "name": "deposit_assets_into_the_managed_sub_account",
@@ -737,7 +888,16 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_managed_sub_account_deposit_address",
@@ -785,7 +945,16 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "query_managed_sub_account_asset_details",

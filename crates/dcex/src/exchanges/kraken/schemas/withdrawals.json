@@ -223,7 +223,31 @@
         }
       }
     ],
-    "official_source": "https://docs.kraken.com/api-reference/funding-beta/create-funding-withdrawal"
+    "official_source": "https://docs.kraken.com/api-reference/funding-beta/create-funding-withdrawal",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "object",
+              "properties": {
+                "asset_amount": {
+                  "type": "object",
+                  "properties": {
+                    "amount": {
+                      "type": "string",
+                      "format": "decimal"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   },
   {
     "name": "get_funding_withdrawal_limits",
@@ -551,6 +575,19 @@
         }
       }
     ],
-    "official_source": "https://docs.kraken.com/api-reference/funding/withdraw-funds"
+    "official_source": "https://docs.kraken.com/api-reference/funding/withdraw-funds",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "max_fee": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   }
 ]

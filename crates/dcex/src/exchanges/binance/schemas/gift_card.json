@@ -36,7 +36,20 @@
     ],
     "json_body": false,
     "source": "https://developers.binance.com/en/docs/catalog/investment-and-services-gift-card/api/rest-api/market-data#create-adual-token-gift-card",
-    "summary": "Create a dual-token gift card (fixed value, discount feature) (TRADE)"
+    "summary": "Create a dual-token gift card (fixed value, discount feature) (TRADE)",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "baseTokenAmount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "base_token_amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "create_a_single_token_gift_card",
@@ -68,7 +81,16 @@
     ],
     "json_body": false,
     "source": "https://developers.binance.com/en/docs/catalog/investment-and-services-gift-card/api/rest-api/market-data#create-asingle-token-gift-card",
-    "summary": "Create a single-token gift card (USER_DATA)"
+    "summary": "Create a single-token gift card (USER_DATA)",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "fetch_rsa_public_key",

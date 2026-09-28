@@ -15,7 +15,20 @@
     ],
     "arrays": [],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "borrowAmount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "borrow_amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "repay_cross_margin_asset",
@@ -32,7 +45,20 @@
     ],
     "arrays": [],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "repayAmount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "repay_amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_cross_margin_max_borrowable",
@@ -137,7 +163,20 @@
     ],
     "arrays": [],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "borrowAmount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "borrow_amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "repay_isolated_margin_asset",
@@ -157,7 +196,20 @@
     ],
     "arrays": [],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "repayAmount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "repay_amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_isolated_margin_max_borrowable",
@@ -293,7 +345,16 @@
     ],
     "arrays": [],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_uta_max_borrowable",

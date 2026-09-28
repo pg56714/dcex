@@ -185,7 +185,16 @@
     },
     "has_example": true,
     "source_file": "v5/bot/futures-combo/create.mdx",
-    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "init_margin": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "method": "POST",
@@ -313,7 +322,16 @@
     },
     "has_example": true,
     "source_file": "v5/bot/futures-combo/get-limit.mdx",
-    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "init_margin": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "method": "POST",
@@ -483,7 +501,44 @@
     },
     "has_example": true,
     "source_file": "v5/bot/futures-grid/create.mdx",
-    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "entry_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "max_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "min_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "move_down_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "move_up_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stop_loss_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "take_profit_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "total_investment": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "method": "POST",
@@ -647,7 +702,44 @@
     },
     "has_example": true,
     "source_file": "v5/bot/futures-grid/validate-input.mdx",
-    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "entry_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "init_margin": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "max_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "min_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "move_down_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "move_up_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stop_loss_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "take_profit_price": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "method": "POST",
@@ -773,7 +865,24 @@
     },
     "has_example": true,
     "source_file": "v5/bot/futures-martingale/create.mdx",
-    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "entry_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "init_margin": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "price_float_percent": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "method": "POST",
@@ -905,7 +1014,24 @@
     },
     "has_example": true,
     "source_file": "v5/bot/futures-martingale/get-limit.mdx",
-    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "entry_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "init_margin": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "price_float_percent": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "method": "POST",
@@ -1049,7 +1175,50 @@
     },
     "has_example": true,
     "source_file": "v5/bot/spot-grid/create.mdx",
-    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "base_investment": {
+          "type": "string",
+          "format": "decimal",
+          "x-decimal-sentinels": [
+            ""
+          ]
+        },
+        "entry_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "limit_up_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "max_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "min_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "quote_investment": {
+          "type": "string",
+          "format": "decimal",
+          "x-decimal-sentinels": [
+            ""
+          ]
+        },
+        "stop_loss_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "take_profit_price": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "method": "POST",
@@ -1186,6 +1355,49 @@
     },
     "has_example": true,
     "source_file": "v5/bot/spot-grid/validate-input.mdx",
-    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "base_investment": {
+          "type": "string",
+          "format": "decimal",
+          "x-decimal-sentinels": [
+            ""
+          ]
+        },
+        "entry_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "limit_up_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "max_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "min_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "quote_investment": {
+          "type": "string",
+          "format": "decimal",
+          "x-decimal-sentinels": [
+            ""
+          ]
+        },
+        "stop_loss": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "take_profit": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   }
 ]

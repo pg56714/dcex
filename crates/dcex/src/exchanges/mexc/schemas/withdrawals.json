@@ -92,7 +92,16 @@
       }
     ],
     "title": "Withdraw(new)",
-    "official_source": "https://www.mexc.com/api-docs/spot-v3/wallet-endpoints/withdrawnew"
+    "official_source": "https://www.mexc.com/api-docs/spot-v3/wallet-endpoints/withdrawnew",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "create_spot_withdrawal_legacy",
@@ -157,6 +166,15 @@
       }
     ],
     "title": "Withdraw(previous,offline soon)",
-    "official_source": "https://www.mexc.com/api-docs/spot-v3/wallet-endpoints/withdrawpreviousoffline-soon"
+    "official_source": "https://www.mexc.com/api-docs/spot-v3/wallet-endpoints/withdrawpreviousoffline-soon",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   }
 ]

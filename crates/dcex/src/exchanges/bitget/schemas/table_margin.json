@@ -157,7 +157,32 @@
     ],
     "arrays": [],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "baseSize": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "base_size": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "quoteSize": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "quote_size": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "cancel_cross_margin_order",
@@ -389,7 +414,32 @@
     ],
     "arrays": [],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "baseSize": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "base_size": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "quoteSize": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "quote_size": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "cancel_isolated_margin_order",

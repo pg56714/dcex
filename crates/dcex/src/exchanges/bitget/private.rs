@@ -10,6 +10,7 @@ impl BitgetClient {
         method_name: &str,
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
+        crate::exchanges::input_contracts::pairs("bitget", method_name, &params)?;
         let method_name = match method_name {
             "close_copy_futures_follower_positions" => {
                 "classic_copytrading_future_copytrade_follower_close_positions"

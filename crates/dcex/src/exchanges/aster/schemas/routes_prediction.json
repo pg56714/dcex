@@ -205,7 +205,36 @@
       "price",
       "stopPrice"
     ],
-    "method": "HttpMethod::Post"
+    "method": "HttpMethod::Post",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "quantity": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "quoteOrderQty": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "quote_order_qty": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stopPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stop_price": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "cancel_prediction_order",
@@ -316,7 +345,16 @@
     "decimals": [
       "amount"
     ],
-    "method": "HttpMethod::Post"
+    "method": "HttpMethod::Post",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "create_prediction_mint",
@@ -335,7 +373,16 @@
     "decimals": [
       "quantity"
     ],
-    "method": "HttpMethod::Post"
+    "method": "HttpMethod::Post",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "quantity": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "create_prediction_burn",
@@ -354,7 +401,16 @@
     "decimals": [
       "quantity"
     ],
-    "method": "HttpMethod::Post"
+    "method": "HttpMethod::Post",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "quantity": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "create_prediction_split",
@@ -375,7 +431,16 @@
     "decimals": [
       "quantity"
     ],
-    "method": "HttpMethod::Post"
+    "method": "HttpMethod::Post",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "quantity": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "create_prediction_merge",
@@ -394,7 +459,16 @@
     "decimals": [
       "quantity"
     ],
-    "method": "HttpMethod::Post"
+    "method": "HttpMethod::Post",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "quantity": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_prediction_positions",

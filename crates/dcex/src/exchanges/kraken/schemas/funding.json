@@ -70,7 +70,16 @@
         }
       }
     ],
-    "official_source": "https://docs.kraken.com/api-reference/funding-beta/calculate-funding-fees"
+    "official_source": "https://docs.kraken.com/api-reference/funding-beta/calculate-funding-fees",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "create_funding_address",

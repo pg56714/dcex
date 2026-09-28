@@ -69,7 +69,16 @@
       "amount",
       "direction"
     ],
-    "integers": []
+    "integers": [],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_crypto_loan_collateral_data",
@@ -166,7 +175,16 @@
       "orderId",
       "amount"
     ],
-    "integers": []
+    "integers": [],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_crypto_loan_ongoing_orders",
@@ -200,7 +218,16 @@
       "amount",
       "direction"
     ],
-    "integers": []
+    "integers": [],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_crypto_loan_common_collateral_data",
@@ -312,7 +339,20 @@
       "annualRate",
       "term"
     ],
-    "integers": []
+    "integers": [],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "orderAmount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "order_amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "crypto_loan_fixed_borrow_order_cancel",
@@ -385,7 +425,16 @@
       "collateralCoin",
       "amount"
     ],
-    "integers": []
+    "integers": [],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_crypto_loan_fixed_repayment_history",
@@ -468,7 +517,20 @@
       "annualRate",
       "term"
     ],
-    "integers": []
+    "integers": [],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "orderAmount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "order_amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_crypto_loan_flexible_available_inventory",
@@ -497,7 +559,20 @@
       "loanCurrency",
       "loanAmount"
     ],
-    "integers": []
+    "integers": [],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "loanAmount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "loan_amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_crypto_loan_flexible_borrow_history",
@@ -528,7 +603,16 @@
       "collateralCoin",
       "amount"
     ],
-    "integers": []
+    "integers": [],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_crypto_loan_flexible_repayment_history",
@@ -557,7 +641,16 @@
       "loanCurrency",
       "amount"
     ],
-    "integers": []
+    "integers": [],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_crypto_loan_flexible_ongoing_coin",

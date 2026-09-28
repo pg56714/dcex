@@ -110,7 +110,50 @@
         "values": [],
         "minimum": 0
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "displayvol": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "price": {
+          "type": "string",
+          "format": "decimal",
+          "x-relative": "kraken_relative_price"
+        },
+        "price2": {
+          "type": "string",
+          "format": "decimal",
+          "x-relative": "kraken_relative_price"
+        },
+        "volume": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "close[price]": {
+          "type": "string",
+          "format": "decimal",
+          "x-relative": "kraken_relative_price"
+        },
+        "close[price2]": {
+          "type": "string",
+          "format": "decimal",
+          "x-relative": "kraken_relative_price"
+        },
+        "close_price": {
+          "type": "string",
+          "format": "decimal",
+          "x-relative": "kraken_relative_price"
+        },
+        "close_price2": {
+          "type": "string",
+          "format": "decimal",
+          "x-relative": "kraken_relative_price"
+        }
+      }
+    }
   },
   {
     "name": "get_spot_trades_info",

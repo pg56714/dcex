@@ -64,7 +64,28 @@
         "minimum": null,
         "maximum": null
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "fromCurrencySize": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "from_currency_size": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "toCurrencySize": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "to_currency_size": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "add_convert_order",
@@ -270,7 +291,28 @@
         "minimum": null,
         "maximum": null
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "fromCurrencySize": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "from_currency_size": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "toCurrencySize": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "to_currency_size": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_convert_order_detail",
@@ -400,7 +442,28 @@
         "minimum": null,
         "maximum": null
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "fromCurrencySize": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "from_currency_size": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "toCurrencySize": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "to_currency_size": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_convert_symbol",

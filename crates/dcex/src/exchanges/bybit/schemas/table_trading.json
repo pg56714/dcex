@@ -80,7 +80,124 @@
       "toUid",
       "list"
     ],
-    "integers": []
+    "integers": [],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "legs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "price": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "qty": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "slLimitPrice": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "sl_limit_price": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "stopLoss": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "stop_loss": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "takeProfit": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "take_profit": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "tpLimitPrice": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "tp_limit_price": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "triggerPrice": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "trigger_price": {
+                "type": "string",
+                "format": "decimal"
+              }
+            }
+          }
+        },
+        "list": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "price": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "qty": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "slLimitPrice": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "sl_limit_price": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "stopLoss": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "stop_loss": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "takeProfit": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "take_profit": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "tpLimitPrice": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "tp_limit_price": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "triggerPrice": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "trigger_price": {
+                "type": "string",
+                "format": "decimal"
+              }
+            }
+          }
+        }
+      }
+    }
   },
   {
     "name": "get_exchange_order_records",

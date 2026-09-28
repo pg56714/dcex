@@ -30,7 +30,7 @@ impl BybitClient {
             return Ok(None);
         }
         let pairs = params.without(&[]);
-        crate::exchanges::schema::validate_pairs(&pairs)?;
+        crate::exchanges::input_contracts::pairs("bybit", name, &pairs)?;
         let mut seen = std::collections::HashSet::new();
         for (key, value) in &pairs {
             if !endpoint.keys.contains(&key.as_str())

@@ -8,6 +8,7 @@ import os
 from dataclasses import dataclass, field
 from typing import Any
 
+from dcex._input_validation import normalize_endpoint
 from dcex._schema_codec import normalize_params
 
 from .._native_http import load_native, request_native_json
@@ -82,9 +83,11 @@ class HTTPManager(BaseHTTPManager):
         return data
 
     def _native_public(self, method_name: str, **kwargs: object) -> Any:
+        kwargs = normalize_endpoint("ondo", method_name, kwargs)
         return self._call("public_request", method_name, _params(**kwargs))
 
     def _native_private(self, method_name: str, **kwargs: object) -> Any:
+        kwargs = normalize_endpoint("ondo", method_name, kwargs)
         return self._call("private_request", method_name, _params(**kwargs))
 
     def public_request(self, method_name: str, **params: object) -> Any:

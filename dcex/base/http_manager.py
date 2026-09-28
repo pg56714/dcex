@@ -9,15 +9,16 @@ is pulled together here:
 - logger setup (previously copy-pasted into every ``__post_init__``)
 - an ``EXCHANGE`` marker so call sites stop hard-coding ``Common.BINANCE`` etc.
 - request/error logging helpers used on each manager's request path
+- explicit endpoint input validation before adapter serialization
 
-Mixing :class:`BaseHTTPManager` in does not change any request behaviour; it
-only removes duplicated boilerplate.
+Transport and signing stay in each exchange adapter.
 """
 
 import logging
 import re
 from typing import ClassVar
 
+from .._input_validation import bind_endpoint_validation
 from ..utils.common import Common
 from ..utils.errors import sanitize_message, sanitize_url
 
@@ -34,6 +35,11 @@ class BaseHTTPManager:
     #: The exchange this manager talks to. Overridden by each subclass.
     EXCHANGE: ClassVar[Common | None] = None
     last_response_headers: dict[str, str] | None = None
+
+    def __init_subclass__(cls, **kwargs: object) -> None:
+        """Validate declared endpoint inputs before any adapter serializes them."""
+        super().__init_subclass__(**kwargs)
+        bind_endpoint_validation(cls)
 
     def _setup_logger(self, logger: logging.Logger | None) -> logging.Logger:
         """

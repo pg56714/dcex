@@ -116,7 +116,28 @@
         }
       }
     ],
-    "official_source": "https://docs.kraken.com/api-reference/assignment-program/add-assignment-preference"
+    "official_source": "https://docs.kraken.com/api-reference/assignment-program/add-assignment-preference",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "cashAccountOpenPositionMaxNotional": {
+          "type": "number",
+          "format": "decimal"
+        },
+        "cash_account_open_position_max_notional": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "maxSize": {
+          "type": "number",
+          "format": "decimal"
+        },
+        "max_size": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "delete_assignment_program",

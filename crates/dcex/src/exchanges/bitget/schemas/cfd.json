@@ -68,7 +68,16 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/cfd-account/cfd-account#cfd-transfer",
-    "summary": "Transfer"
+    "summary": "Transfer",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "cfd_account_get_transfer_records",
@@ -417,7 +426,36 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/cfd-trade/cfd-trade#place-cfd-order",
-    "summary": "Place CFD Order"
+    "summary": "Place CFD Order",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "qty": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stopLoss": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stop_loss": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "takeProfit": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "take_profit": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "cfd_trade_modify_order",
@@ -468,7 +506,32 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/cfd-trade/cfd-trade#modify-cfd-order",
-    "summary": "Modify CFD Order"
+    "summary": "Modify CFD Order",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stopLoss": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stop_loss": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "takeProfit": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "take_profit": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "cfd_trade_cancel_order",
@@ -549,7 +612,16 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/cfd-trade/cfd-trade#close-cfd-positions",
-    "summary": "Close CFD Positions"
+    "summary": "Close CFD Positions",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "qty": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "cfd_trade_close_all_positions",

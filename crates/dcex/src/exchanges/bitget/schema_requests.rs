@@ -34,7 +34,7 @@ impl BitgetClient {
             return Ok(None);
         }
         params.ensure_allowed(endpoint.fields, endpoint.fields.contains(&"symbol"))?;
-        crate::exchanges::schema::validate_pairs(&params.only(endpoint.fields))?;
+        crate::exchanges::input_contracts::pairs("bitget", name, &params.only(endpoint.fields))?;
         if params.get("symbol").is_some() && params.get("product_symbol").is_some() {
             return Err(invalid("symbol and product_symbol are mutually exclusive"));
         }

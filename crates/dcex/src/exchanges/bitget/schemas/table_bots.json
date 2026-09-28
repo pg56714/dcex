@@ -37,7 +37,16 @@
       "fundsSource"
     ],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "size": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_uta_trade_grid_bot_detail",
@@ -123,7 +132,92 @@
       "terminationParams"
     ],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "investmentAmount": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "type": "string",
+                "format": "decimal"
+              }
+            }
+          }
+        },
+        "investment_amount": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "type": "string",
+                "format": "decimal"
+              }
+            }
+          }
+        },
+        "maxPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "max_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "minPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "min_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "reservedMargin": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "reserved_margin": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stopLoss": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stopUpwardPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stop_loss": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stop_upward_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "takeProfit": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "take_profit": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "triggerPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "trigger_price": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "uta_trade_grid_create_neutral_bot",
@@ -159,7 +253,60 @@
       "investmentAmount"
     ],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "investmentAmount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "investment_amount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "maxPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "max_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "minPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "min_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stopLoss": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stop_loss": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "takeProfit": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "take_profit": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "triggerPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "trigger_price": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_uta_trade_grid_list_details",
@@ -200,7 +347,28 @@
       "terminationParams"
     ],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "stopLoss": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stop_loss": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "takeProfit": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "take_profit": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "uta_trade_grid_modify_grid_interval",
@@ -223,7 +391,28 @@
     ],
     "arrays": [],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "maxPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "max_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "minPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "min_price": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "uta_trade_grid_modify_neutral_bot",
@@ -243,7 +432,28 @@
     ],
     "arrays": [],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "stopLoss": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stop_loss": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "takeProfit": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "take_profit": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "uta_trade_grid_modify_neutral_grid_interval",
@@ -266,7 +476,28 @@
     ],
     "arrays": [],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "maxPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "max_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "minPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "min_price": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_uta_trade_grid_neutral_bot_detail",
@@ -331,7 +562,60 @@
       "investmentAmount"
     ],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "investmentAmount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "investment_amount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "maxPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "max_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "minPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "min_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stopLoss": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stop_loss": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "takeProfit": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "take_profit": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "triggerPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "trigger_price": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "uta_trade_grid_validate",
@@ -380,6 +664,91 @@
       "terminationParams"
     ],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "investmentAmount": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "type": "string",
+                "format": "decimal"
+              }
+            }
+          }
+        },
+        "investment_amount": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "type": "string",
+                "format": "decimal"
+              }
+            }
+          }
+        },
+        "maxPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "max_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "minPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "min_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "reservedMargin": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "reserved_margin": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stopLoss": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stopUpwardPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stop_loss": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stop_upward_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "takeProfit": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "take_profit": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "triggerPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "trigger_price": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   }
 ]

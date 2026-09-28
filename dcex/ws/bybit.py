@@ -3,6 +3,7 @@
 import json
 from typing import Any
 
+from dcex._input_validation import normalize_endpoint
 from dcex._schema_codec import encode_json
 
 from .._native_http import load_native
@@ -132,6 +133,7 @@ class PrivateClient(AsyncWebSocketMixin):
 
     async def send_trade_order(self, op: str, args: dict[str, Any]) -> str:
         """Submit one order.create, order.amend, or order.cancel request on /v5/trade."""
+        args = normalize_endpoint("bybit", op, args, websocket=True)
         return str(await self._native_client.send_trade_order(op, encode_json(args)))
 
     def is_authenticated(self) -> bool:

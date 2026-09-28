@@ -11,6 +11,7 @@ impl BackpackClient {
         method_name: &str,
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
+        crate::exchanges::input_contracts::pairs("backpack", method_name, &params)?;
         let params = BackpackParams::from_pairs(params);
         if let Some(response) = self
             .borrow_lend_schema_request(method_name, &params, true)
