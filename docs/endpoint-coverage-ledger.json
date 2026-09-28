@@ -1474,7 +1474,8 @@
       "evidence": [],
       "official_source": "https://developers.binance.com/en/docs/catalog/core-trading-spot-trading/api/rest-api/trade#order-oco",
       "http_method": "POST",
-      "path": "/api/v3/order/oco"
+      "path": "/api/v3/order/oco",
+      "superseded_reason": "Legacy Spot OCO is replaced by /api/v3/orderList/oco; use place_spot_oco_order."
     },
     {
       "row": 48,
@@ -3837,7 +3838,8 @@
       "evidence": [],
       "official_source": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/rest-api/account#account-information-v2",
       "http_method": "GET",
-      "path": "/fapi/v2/account"
+      "path": "/fapi/v2/account",
+      "superseded_reason": "Use the implemented USD-M v3 account/balance/positionRisk routes."
     },
     {
       "row": 148,
@@ -3856,7 +3858,8 @@
       "evidence": [],
       "official_source": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/rest-api/account#futures-account-balance-v2",
       "http_method": "GET",
-      "path": "/fapi/v2/balance"
+      "path": "/fapi/v2/balance",
+      "superseded_reason": "Use the implemented USD-M v3 account/balance/positionRisk routes."
     },
     {
       "row": 149,
@@ -3875,7 +3878,8 @@
       "evidence": [],
       "official_source": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/rest-api/trade#position-information-v2",
       "http_method": "GET",
-      "path": "/fapi/v2/positionRisk"
+      "path": "/fapi/v2/positionRisk",
+      "superseded_reason": "Use the implemented USD-M v3 account/balance/positionRisk routes."
     },
     {
       "row": 150,
@@ -12933,7 +12937,8 @@
       "evidence": [],
       "official_source": "https://developers.binance.com/en/docs/catalog/vip-and-institutional-sub-account/api/rest-api/asset-management#get-detail-on-sub-accounts-futures-account",
       "http_method": "GET",
-      "path": "/sapi/v1/sub-account/futures/account"
+      "path": "/sapi/v1/sub-account/futures/account",
+      "superseded_reason": "Subaccount futures v1 query is replaced by the implemented v2 query."
     },
     {
       "row": 536,
@@ -12952,7 +12957,8 @@
       "evidence": [],
       "official_source": "https://developers.binance.com/en/docs/catalog/vip-and-institutional-sub-account/api/rest-api/asset-management#get-summary-of-sub-accounts-futures-account",
       "http_method": "GET",
-      "path": "/sapi/v1/sub-account/futures/accountSummary"
+      "path": "/sapi/v1/sub-account/futures/accountSummary",
+      "superseded_reason": "Subaccount futures v1 query is replaced by the implemented v2 query."
     },
     {
       "row": 537,
@@ -13043,7 +13049,8 @@
       "evidence": [],
       "official_source": "https://developers.binance.com/en/docs/catalog/vip-and-institutional-sub-account/api/rest-api/account-management#get-futures-position-risk-of-sub-account",
       "http_method": "GET",
-      "path": "/sapi/v1/sub-account/futures/positionRisk"
+      "path": "/sapi/v1/sub-account/futures/positionRisk",
+      "superseded_reason": "Subaccount futures v1 query is replaced by the implemented v2 query."
     },
     {
       "row": 541,
@@ -13254,7 +13261,8 @@
       "evidence": [],
       "official_source": "https://developers.binance.com/en/docs/catalog/vip-and-institutional-sub-account/api/rest-api/asset-management#query-sub-account-assets",
       "http_method": "GET",
-      "path": "/sapi/v3/sub-account/assets"
+      "path": "/sapi/v3/sub-account/assets",
+      "superseded_reason": "Subaccount assets v3 is replaced by the implemented v4 route."
     },
     {
       "row": 550,
@@ -17080,7 +17088,8 @@
       "evidence": [],
       "official_source": "https://bybit-exchange.github.io/docs/v5/abandon/contract-transaction-log",
       "http_method": "GET",
-      "path": "/v5/account/contract-transaction-log"
+      "path": "/v5/account/contract-transaction-log",
+      "superseded_reason": "Official Bybit documentation lists this legacy endpoint under abandon; current account/loan/risk endpoints are wrapped."
     },
     {
       "row": 711,
@@ -17122,7 +17131,8 @@
       "evidence": [],
       "official_source": "https://bybit-exchange.github.io/docs/v5/abandon/earning",
       "http_method": "GET",
-      "path": "/v5/broker/earning-record"
+      "path": "/v5/broker/earning-record",
+      "superseded_reason": "Official Bybit documentation lists this legacy endpoint under abandon; current account/loan/risk endpoints are wrapped."
     },
     {
       "row": 713,
@@ -17141,7 +17151,8 @@
       "evidence": [],
       "official_source": "https://bybit-exchange.github.io/docs/v5/abandon/margin-coin-info",
       "http_method": "GET",
-      "path": "/v5/ins-loan/ensure-tokens"
+      "path": "/v5/ins-loan/ensure-tokens",
+      "superseded_reason": "Official Bybit documentation lists this legacy endpoint under abandon; current account/loan/risk endpoints are wrapped."
     },
     {
       "row": 714,
@@ -17160,7 +17171,8 @@
       "evidence": [],
       "official_source": "https://bybit-exchange.github.io/docs/v5/abandon/ltv",
       "http_method": "GET",
-      "path": "/v5/ins-loan/ltv"
+      "path": "/v5/ins-loan/ltv",
+      "superseded_reason": "Official Bybit documentation lists this legacy endpoint under abandon; current account/loan/risk endpoints are wrapped."
     },
     {
       "row": 715,
@@ -17179,7 +17191,8 @@
       "evidence": [],
       "official_source": "https://bybit-exchange.github.io/docs/v5/abandon/account-info",
       "http_method": "GET",
-      "path": "/v5/lending/account"
+      "path": "/v5/lending/account",
+      "superseded_reason": "Official Bybit documentation lists this legacy endpoint under abandon; current account/loan/risk endpoints are wrapped."
     },
     {
       "row": 716,
@@ -17198,7 +17211,8 @@
       "evidence": [],
       "official_source": "https://bybit-exchange.github.io/docs/v5/abandon/order-record",
       "http_method": "GET",
-      "path": "/v5/lending/history-order"
+      "path": "/v5/lending/history-order",
+      "superseded_reason": "Official Bybit documentation lists this legacy endpoint under abandon; current account/loan/risk endpoints are wrapped."
     },
     {
       "row": 717,
@@ -17217,7 +17231,8 @@
       "evidence": [],
       "official_source": "https://bybit-exchange.github.io/docs/v5/abandon/coin-info",
       "http_method": "GET",
-      "path": "/v5/lending/info"
+      "path": "/v5/lending/info",
+      "superseded_reason": "Official Bybit documentation lists this legacy endpoint under abandon; current account/loan/risk endpoints are wrapped."
     },
     {
       "row": 718,
@@ -17236,7 +17251,8 @@
       "evidence": [],
       "official_source": "https://bybit-exchange.github.io/docs/v5/abandon/enable-unitransfer-subuid",
       "http_method": "POST",
-      "path": "/v5/asset/transfer/save-transfer-sub-member"
+      "path": "/v5/asset/transfer/save-transfer-sub-member",
+      "superseded_reason": "Official Bybit documentation lists this legacy endpoint under abandon; current account/loan/risk endpoints are wrapped."
     },
     {
       "row": 719,
@@ -17255,7 +17271,8 @@
       "evidence": [],
       "official_source": "https://bybit-exchange.github.io/docs/v5/abandon/borrow",
       "http_method": "POST",
-      "path": "/v5/crypto-loan/borrow"
+      "path": "/v5/crypto-loan/borrow",
+      "superseded_reason": "Official Bybit documentation lists this legacy endpoint under abandon; current account/loan/risk endpoints are wrapped."
     },
     {
       "row": 720,
@@ -17274,7 +17291,8 @@
       "evidence": [],
       "official_source": "https://bybit-exchange.github.io/docs/v5/abandon/deposit",
       "http_method": "POST",
-      "path": "/v5/lending/purchase"
+      "path": "/v5/lending/purchase",
+      "superseded_reason": "Official Bybit documentation lists this legacy endpoint under abandon; current account/loan/risk endpoints are wrapped."
     },
     {
       "row": 721,
@@ -17293,7 +17311,8 @@
       "evidence": [],
       "official_source": "https://bybit-exchange.github.io/docs/v5/abandon/redeem",
       "http_method": "POST",
-      "path": "/v5/lending/redeem"
+      "path": "/v5/lending/redeem",
+      "superseded_reason": "Official Bybit documentation lists this legacy endpoint under abandon; current account/loan/risk endpoints are wrapped."
     },
     {
       "row": 722,
@@ -17312,7 +17331,8 @@
       "evidence": [],
       "official_source": "https://bybit-exchange.github.io/docs/v5/abandon/cancel-redeem",
       "http_method": "POST",
-      "path": "/v5/lending/redeem-cancel"
+      "path": "/v5/lending/redeem-cancel",
+      "superseded_reason": "Official Bybit documentation lists this legacy endpoint under abandon; current account/loan/risk endpoints are wrapped."
     },
     {
       "row": 723,
@@ -17331,7 +17351,8 @@
       "evidence": [],
       "official_source": "https://bybit-exchange.github.io/docs/v5/abandon/set-risk-limit",
       "http_method": "POST",
-      "path": "/v5/position/set-risk-limit"
+      "path": "/v5/position/set-risk-limit",
+      "superseded_reason": "Official Bybit documentation lists this legacy endpoint under abandon; current account/loan/risk endpoints are wrapped."
     },
     {
       "row": 724,
@@ -17350,7 +17371,8 @@
       "evidence": [],
       "official_source": "https://bybit-exchange.github.io/docs/v5/abandon/tpsl-mode",
       "http_method": "POST",
-      "path": "/v5/position/set-tpsl-mode"
+      "path": "/v5/position/set-tpsl-mode",
+      "superseded_reason": "Official Bybit documentation lists this legacy endpoint under abandon; current account/loan/risk endpoints are wrapped."
     },
     {
       "row": 725,
@@ -17369,7 +17391,8 @@
       "evidence": [],
       "official_source": "https://bybit-exchange.github.io/docs/v5/abandon/cross-isolate",
       "http_method": "POST",
-      "path": "/v5/position/switch-isolated"
+      "path": "/v5/position/switch-isolated",
+      "superseded_reason": "Official Bybit documentation lists this legacy endpoint under abandon; current account/loan/risk endpoints are wrapped."
     },
     {
       "row": 726,
@@ -25902,7 +25925,8 @@
       "evidence": [],
       "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-trade-get-one-click-repay-currency-list",
       "http_method": "GET",
-      "path": "/api/v5/trade/one-click-repay-currency-list"
+      "path": "/api/v5/trade/one-click-repay-currency-list",
+      "superseded_reason": "One-click repayment v1 is replaced by the implemented v2 endpoints."
     },
     {
       "row": 1096,
@@ -25921,7 +25945,8 @@
       "evidence": [],
       "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-trade-post-trade-one-click-repay",
       "http_method": "POST",
-      "path": "/api/v5/trade/one-click-repay"
+      "path": "/api/v5/trade/one-click-repay",
+      "superseded_reason": "One-click repayment v1 is replaced by the implemented v2 endpoints."
     },
     {
       "row": 1097,
@@ -25940,7 +25965,8 @@
       "evidence": [],
       "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-trade-get-one-click-repay-history",
       "http_method": "GET",
-      "path": "/api/v5/trade/one-click-repay-history"
+      "path": "/api/v5/trade/one-click-repay-history",
+      "superseded_reason": "One-click repayment v1 is replaced by the implemented v2 endpoints."
     },
     {
       "row": 1098,
@@ -44769,7 +44795,8 @@
       "methods": [],
       "note": "Use the implemented Spot v2 kline endpoint.",
       "evidence": [],
-      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/spot-market/api-reference.md#L121"
+      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/spot-market/api-reference.md#L121",
+      "superseded_reason": "Use the implemented Spot v2 kline endpoint."
     },
     {
       "row": 1912,
@@ -45555,7 +45582,8 @@
       "evidence": [],
       "official_source": "https://bingx-api.github.io/docs-v3/#/en/Account%20and%20Wallet/Fund%20Account/Asset%20transfer%20records",
       "http_method": "GET",
-      "path": "/openApi/api/v3/asset/transfer"
+      "path": "/openApi/api/v3/asset/transfer",
+      "superseded_reason": "Transfer history uses the documented /openApi/api/v3/asset/transferRecord route."
     },
     {
       "row": 1946,
@@ -45963,7 +45991,8 @@
       "methods": [],
       "note": "get_api_key_info uses the documented /openApi/account/v1/apiKey/query route.",
       "evidence": [],
-      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Account%20and%20Wallet/Sub-account%20Management/%20Query%20API%20Key%20Information"
+      "official_source": "https://bingx-api.github.io/docs-v3/#/en/Account%20and%20Wallet/Sub-account%20Management/%20Query%20API%20Key%20Information",
+      "superseded_reason": "get_api_key_info uses the documented /openApi/account/v1/apiKey/query route."
     },
     {
       "row": 1964,
@@ -47263,13 +47292,14 @@
       "methods": [],
       "note": "Grouped row split into explicit verb/path/operation rows. See rows 3589.",
       "evidence": [
-        "dcex/async_support/kraken/_trade_http.py::get_spot_export_status",
-        "dcex/kraken/_trade_http.py::get_spot_export_status",
+        "dcex/async_support/kraken/_trade_http.py::TradeHTTP.get_spot_export_status",
+        "dcex/kraken/_trade_http.py::TradeHTTP.get_spot_export_status",
         "tests/unit/test_kraken_endpoint_coverage.py"
       ],
       "official_source": "https://docs.kraken.com/api-reference/account-data/request-export-report",
       "http_method": "POST",
-      "path": "/0/private/AddExport"
+      "path": "/0/private/AddExport",
+      "superseded_reason": "Grouped row split into explicit verb/path/operation rows. See rows 3589."
     },
     {
       "row": 2018,
@@ -47732,7 +47762,8 @@
       "methods": [],
       "note": "Grouped row split into individually sourced endpoint/transaction rows during the 2026-09-28 review.",
       "evidence": [],
-      "official_source": "https://docs.kraken.com/api-reference/funding-beta/claim-funding-deposit-address"
+      "official_source": "https://docs.kraken.com/api-reference/funding-beta/claim-funding-deposit-address",
+      "superseded_reason": "Grouped row split into individually sourced endpoint/transaction rows during the 2026-09-28 review."
     },
     {
       "row": 2038,
@@ -48186,12 +48217,13 @@
       "methods": [],
       "note": "Grouped row split into explicit verb/path/operation rows. See rows 3590, 3591.",
       "evidence": [
-        "dcex/async_support/kraken/_market_http.py::get_futures_market_analytics",
-        "dcex/async_support/kraken/_market_http.py::get_futures_liquidity_pool_statistics",
-        "dcex/kraken/_market_http.py::get_futures_market_analytics",
-        "dcex/kraken/_market_http.py::get_futures_liquidity_pool_statistics"
+        "dcex/async_support/kraken/_market_http.py::MarketHTTP.get_futures_market_analytics",
+        "dcex/async_support/kraken/_market_http.py::MarketHTTP.get_futures_liquidity_pool_statistics",
+        "dcex/kraken/_market_http.py::MarketHTTP.get_futures_market_analytics",
+        "dcex/kraken/_market_http.py::MarketHTTP.get_futures_liquidity_pool_statistics"
       ],
-      "official_source": "https://docs.kraken.com/api-reference/analytics/market-analytics"
+      "official_source": "https://docs.kraken.com/api-reference/analytics/market-analytics",
+      "superseded_reason": "Grouped row split into explicit verb/path/operation rows. See rows 3590, 3591."
     },
     {
       "row": 2058,
@@ -48208,14 +48240,15 @@
       "methods": [],
       "note": "Grouped row split into explicit verb/path/operation rows. See rows 3592, 3593, 3594.",
       "evidence": [
-        "dcex/async_support/kraken/_market_http.py::get_futures_market_executions",
-        "dcex/async_support/kraken/_market_http.py::get_futures_market_orders",
-        "dcex/async_support/kraken/_market_http.py::get_futures_market_price",
-        "dcex/kraken/_market_http.py::get_futures_market_executions",
-        "dcex/kraken/_market_http.py::get_futures_market_orders",
-        "dcex/kraken/_market_http.py::get_futures_market_price"
+        "dcex/async_support/kraken/_market_http.py::MarketHTTP.get_futures_market_executions",
+        "dcex/async_support/kraken/_market_http.py::MarketHTTP.get_futures_market_orders",
+        "dcex/async_support/kraken/_market_http.py::MarketHTTP.get_futures_market_price",
+        "dcex/kraken/_market_http.py::MarketHTTP.get_futures_market_executions",
+        "dcex/kraken/_market_http.py::MarketHTTP.get_futures_market_orders",
+        "dcex/kraken/_market_http.py::MarketHTTP.get_futures_market_price"
       ],
-      "official_source": "https://docs.kraken.com/api-reference/market-history/get-public-execution-events"
+      "official_source": "https://docs.kraken.com/api-reference/market-history/get-public-execution-events",
+      "superseded_reason": "Grouped row split into explicit verb/path/operation rows. See rows 3592, 3593, 3594."
     },
     {
       "row": 2059,
@@ -48854,16 +48887,17 @@
       "methods": [],
       "note": "Grouped row split into explicit verb/path/operation rows. See rows 3595, 3596.",
       "evidence": [
-        "dcex/async_support/kraken/_trade_http.py::get_futures_trading_instruments",
-        "dcex/async_support/kraken/_trade_http.py::get_futures_subaccount_trading_status",
-        "dcex/kraken/_trade_http.py::get_futures_trading_instruments",
-        "dcex/kraken/_trade_http.py::get_futures_subaccount_trading_status"
+        "dcex/async_support/kraken/_trade_http.py::TradeHTTP.get_futures_trading_instruments",
+        "dcex/async_support/kraken/_trade_http.py::TradeHTTP.get_futures_subaccount_trading_status",
+        "dcex/kraken/_trade_http.py::TradeHTTP.get_futures_trading_instruments",
+        "dcex/kraken/_trade_http.py::TradeHTTP.get_futures_subaccount_trading_status"
       ],
       "official_source": "https://docs.kraken.com/api-reference/subaccounts/check-subaccount-trading-status",
       "official_sources": [
         "https://docs.kraken.com/api-reference/subaccounts/check-subaccount-trading-status",
         "https://docs.kraken.com/api-reference/subaccounts/update-subaccount-trading-status"
-      ]
+      ],
+      "superseded_reason": "Grouped row split into explicit verb/path/operation rows. See rows 3595, 3596."
     },
     {
       "row": 2087,
@@ -48903,16 +48937,17 @@
       "methods": [],
       "note": "Grouped row split into explicit verb/path/operation rows. See rows 3597, 3598, 3599, 3600.",
       "evidence": [
-        "dcex/async_support/kraken/_trade_http.py::get_futures_account_log",
-        "dcex/async_support/kraken/_trade_http.py::get_futures_execution_events",
-        "dcex/async_support/kraken/_trade_http.py::get_futures_order_events",
-        "dcex/async_support/kraken/_trade_http.py::get_futures_position_events",
-        "dcex/kraken/_trade_http.py::get_futures_account_log",
-        "dcex/kraken/_trade_http.py::get_futures_execution_events",
-        "dcex/kraken/_trade_http.py::get_futures_order_events",
-        "dcex/kraken/_trade_http.py::get_futures_position_events"
+        "dcex/async_support/kraken/_trade_http.py::TradeHTTP.get_futures_account_log",
+        "dcex/async_support/kraken/_trade_http.py::TradeHTTP.get_futures_execution_events",
+        "dcex/async_support/kraken/_trade_http.py::TradeHTTP.get_futures_order_events",
+        "dcex/async_support/kraken/_trade_http.py::TradeHTTP.get_futures_position_events",
+        "dcex/kraken/_trade_http.py::TradeHTTP.get_futures_account_log",
+        "dcex/kraken/_trade_http.py::TradeHTTP.get_futures_execution_events",
+        "dcex/kraken/_trade_http.py::TradeHTTP.get_futures_order_events",
+        "dcex/kraken/_trade_http.py::TradeHTTP.get_futures_position_events"
       ],
-      "official_source": "https://docs.kraken.com/api-reference/account-history/get-execution-events"
+      "official_source": "https://docs.kraken.com/api-reference/account-history/get-execution-events",
+      "superseded_reason": "Grouped row split into explicit verb/path/operation rows. See rows 3597, 3598, 3599, 3600."
     },
     {
       "row": 2089,
@@ -48929,7 +48964,8 @@
       "methods": [],
       "note": "Implemented API key check route is /api/auth/v1/api-keys/v3/check.",
       "evidence": [],
-      "official_source": "https://docs.kraken.com/api-reference/api-keys/check-v3-api-key"
+      "official_source": "https://docs.kraken.com/api-reference/api-keys/check-v3-api-key",
+      "superseded_reason": "Implemented API key check route is /api/auth/v1/api-keys/v3/check."
     },
     {
       "row": 2090,
@@ -48946,7 +48982,8 @@
       "methods": [],
       "note": "Grouped row split into individually sourced endpoint/transaction rows during the 2026-09-28 review.",
       "evidence": [],
-      "official_source": "https://docs.kraken.com/api-reference/rfqs/list-open-offers-on-open-rfqs"
+      "official_source": "https://docs.kraken.com/api-reference/rfqs/list-open-offers-on-open-rfqs",
+      "superseded_reason": "Grouped row split into individually sourced endpoint/transaction rows during the 2026-09-28 review."
     },
     {
       "row": 2091,
@@ -60512,7 +60549,8 @@
       "evidence": [],
       "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-futures-open-interset",
       "http_method": "GET",
-      "path": "/api/ua/v1/market/open-interest"
+      "path": "/api/ua/v1/market/open-interest",
+      "superseded_reason": "Legacy UTA v1 route is replaced by the corresponding implemented UTA v2 or current DCP route."
     },
     {
       "row": 2585,
@@ -60531,7 +60569,8 @@
       "evidence": [],
       "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-position-tiers",
       "http_method": "GET",
-      "path": "/api/ua/v1/market/position-tiers"
+      "path": "/api/ua/v1/market/position-tiers",
+      "superseded_reason": "Legacy UTA v1 route is replaced by the corresponding implemented UTA v2 or current DCP route."
     },
     {
       "row": 2586,
@@ -60550,7 +60589,8 @@
       "evidence": [],
       "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-actual-fee",
       "http_method": "GET",
-      "path": "/api/ua/v1/user/fee-rate"
+      "path": "/api/ua/v1/user/fee-rate",
+      "superseded_reason": "Legacy UTA v1 route is replaced by the corresponding implemented UTA v2 or current DCP route."
     },
     {
       "row": 2587,
@@ -60569,7 +60609,8 @@
       "evidence": [],
       "official_source": "https://www.kucoin.com/docs-new/rest/ua/account/get-account-overview-uta",
       "http_method": "GET",
-      "path": "/api/ua/v1/unified/account/overview"
+      "path": "/api/ua/v1/unified/account/overview",
+      "superseded_reason": "Legacy UTA v1 route is replaced by the corresponding implemented UTA v2 or current DCP route."
     },
     {
       "row": 2588,
@@ -60588,7 +60629,8 @@
       "evidence": [],
       "official_source": "https://www.kucoin.com/docs-new/rest/ua/set-dcp-classic",
       "http_method": "POST",
-      "path": "/api/ua/v1/dcp/set"
+      "path": "/api/ua/v1/dcp/set",
+      "superseded_reason": "Legacy UTA v1 route is replaced by the corresponding implemented UTA v2 or current DCP route."
     },
     {
       "row": 2589,
@@ -60607,7 +60649,8 @@
       "evidence": [],
       "official_source": "https://www.kucoin.com/docs-new/rest/ua/get-dcp-classic",
       "http_method": "GET",
-      "path": "/api/ua/v1/dcp/query"
+      "path": "/api/ua/v1/dcp/query",
+      "superseded_reason": "Legacy UTA v1 route is replaced by the corresponding implemented UTA v2 or current DCP route."
     },
     {
       "row": 2590,
@@ -61627,7 +61670,8 @@
       "official_sources": [
         "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#check-builder-fee-approval",
         "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-approved-builders-for-user"
-      ]
+      ],
+      "superseded_reason": "Grouped row split into individually sourced endpoint/transaction rows during the 2026-09-28 review."
     },
     {
       "row": 2629,
@@ -64542,7 +64586,8 @@
       "methods": [],
       "note": "Grouped row split into individually sourced endpoint/transaction rows during the 2026-09-28 review.",
       "evidence": [],
-      "official_source": "https://apidocs.lighter.xyz/reference/referral_create"
+      "official_source": "https://apidocs.lighter.xyz/reference/referral_create",
+      "superseded_reason": "Grouped row split into individually sourced endpoint/transaction rows during the 2026-09-28 review."
     },
     {
       "row": 2746,
@@ -64721,32 +64766,32 @@
       "note": "Grouped row split into explicit verb/path/operation rows. See rows 3601, 3602, 3603, 3604, 3605, 3606, 3607, 3608, 3609, 3610, 3611, 3612, 3613.",
       "evidence": [
         "crates/dcex/src/exchanges/lighter/explorer.rs",
-        "dcex/async_support/lighter/_market_http.py::get_explorer_account_logs",
-        "dcex/async_support/lighter/_market_http.py::get_explorer_account_positions",
-        "dcex/async_support/lighter/_market_http.py::get_explorer_account_assets",
-        "dcex/async_support/lighter/_batch_http.py::get_explorer_batches",
-        "dcex/async_support/lighter/_batch_http.py::get_explorer_batch",
-        "dcex/async_support/lighter/_market_http.py::get_explorer_blocks",
-        "dcex/async_support/lighter/_market_http.py::get_explorer_block",
-        "dcex/async_support/lighter/_market_http.py::get_explorer_log",
-        "dcex/async_support/lighter/_market_http.py::get_explorer_markets",
-        "dcex/async_support/lighter/_market_http.py::get_explorer_market_logs",
-        "dcex/async_support/lighter/_market_http.py::search_explorer",
-        "dcex/async_support/lighter/_market_http.py::get_explorer_transaction_stats",
-        "dcex/async_support/lighter/_market_http.py::get_explorer_total",
-        "dcex/lighter/_market_http.py::get_explorer_account_logs",
-        "dcex/lighter/_market_http.py::get_explorer_account_positions",
-        "dcex/lighter/_market_http.py::get_explorer_account_assets",
-        "dcex/lighter/_batch_http.py::get_explorer_batches",
-        "dcex/lighter/_batch_http.py::get_explorer_batch",
-        "dcex/lighter/_market_http.py::get_explorer_blocks",
-        "dcex/lighter/_market_http.py::get_explorer_block",
-        "dcex/lighter/_market_http.py::get_explorer_log",
-        "dcex/lighter/_market_http.py::get_explorer_markets",
-        "dcex/lighter/_market_http.py::get_explorer_market_logs",
-        "dcex/lighter/_market_http.py::search_explorer",
-        "dcex/lighter/_market_http.py::get_explorer_transaction_stats",
-        "dcex/lighter/_market_http.py::get_explorer_total",
+        "dcex/async_support/lighter/_market_http.py::MarketHTTP.get_explorer_account_logs",
+        "dcex/async_support/lighter/_market_http.py::MarketHTTP.get_explorer_account_positions",
+        "dcex/async_support/lighter/_market_http.py::MarketHTTP.get_explorer_account_assets",
+        "dcex/async_support/lighter/_batch_http.py::MarketHTTPBatchHTTP.get_explorer_batches",
+        "dcex/async_support/lighter/_batch_http.py::MarketHTTPBatchHTTP.get_explorer_batch",
+        "dcex/async_support/lighter/_market_http.py::MarketHTTP.get_explorer_blocks",
+        "dcex/async_support/lighter/_market_http.py::MarketHTTP.get_explorer_block",
+        "dcex/async_support/lighter/_market_http.py::MarketHTTP.get_explorer_log",
+        "dcex/async_support/lighter/_market_http.py::MarketHTTP.get_explorer_markets",
+        "dcex/async_support/lighter/_market_http.py::MarketHTTP.get_explorer_market_logs",
+        "dcex/async_support/lighter/_market_http.py::MarketHTTP.search_explorer",
+        "dcex/async_support/lighter/_market_http.py::MarketHTTP.get_explorer_transaction_stats",
+        "dcex/async_support/lighter/_market_http.py::MarketHTTP.get_explorer_total",
+        "dcex/lighter/_market_http.py::MarketHTTP.get_explorer_account_logs",
+        "dcex/lighter/_market_http.py::MarketHTTP.get_explorer_account_positions",
+        "dcex/lighter/_market_http.py::MarketHTTP.get_explorer_account_assets",
+        "dcex/lighter/_batch_http.py::MarketHTTPBatchHTTP.get_explorer_batches",
+        "dcex/lighter/_batch_http.py::MarketHTTPBatchHTTP.get_explorer_batch",
+        "dcex/lighter/_market_http.py::MarketHTTP.get_explorer_blocks",
+        "dcex/lighter/_market_http.py::MarketHTTP.get_explorer_block",
+        "dcex/lighter/_market_http.py::MarketHTTP.get_explorer_log",
+        "dcex/lighter/_market_http.py::MarketHTTP.get_explorer_markets",
+        "dcex/lighter/_market_http.py::MarketHTTP.get_explorer_market_logs",
+        "dcex/lighter/_market_http.py::MarketHTTP.search_explorer",
+        "dcex/lighter/_market_http.py::MarketHTTP.get_explorer_transaction_stats",
+        "dcex/lighter/_market_http.py::MarketHTTP.get_explorer_total",
         "tests/unit/test_lighter_endpoint_coverage.py"
       ],
       "official_source": "https://apidocs.lighter.xyz/reference/get_accounts-param-assets",
@@ -64764,7 +64809,8 @@
         "https://apidocs.lighter.xyz/reference/get_search",
         "https://apidocs.lighter.xyz/reference/get_stats-tx",
         "https://apidocs.lighter.xyz/reference/get_total"
-      ]
+      ],
+      "superseded_reason": "Grouped row split into explicit verb/path/operation rows. See rows 3601, 3602, 3603, 3604, 3605, 3606, 3607, 3608, 3609, 3610, 3611, 3612, 3613."
     },
     {
       "row": 2754,
@@ -65068,16 +65114,17 @@
       "note": "Grouped row split into explicit verb/path/operation rows. See rows 3614, 3615.",
       "evidence": [
         "crates/dcex/src/exchanges/lighter/trade.rs",
-        "dcex/async_support/lighter/_trade_http.py::create_public_pool",
-        "dcex/async_support/lighter/_trade_http.py::update_public_pool",
-        "dcex/lighter/_trade_http.py::create_public_pool",
-        "dcex/lighter/_trade_http.py::update_public_pool",
+        "dcex/async_support/lighter/_trade_http.py::TradeHTTP.create_public_pool",
+        "dcex/async_support/lighter/_trade_http.py::TradeHTTP.update_public_pool",
+        "dcex/lighter/_trade_http.py::TradeHTTP.create_public_pool",
+        "dcex/lighter/_trade_http.py::TradeHTTP.update_public_pool",
         "tests/unit/test_lighter_endpoint_coverage.py"
       ],
       "official_source": "https://apidocs.lighter.xyz/reference/sendtx",
       "official_sources": [
         "https://apidocs.lighter.xyz/reference/sendtx"
-      ]
+      ],
+      "superseded_reason": "Grouped row split into explicit verb/path/operation rows. See rows 3614, 3615."
     },
     {
       "row": 2766,
@@ -65095,16 +65142,17 @@
       "note": "Grouped row split into explicit verb/path/operation rows. See rows 3616, 3617.",
       "evidence": [
         "crates/dcex/src/exchanges/lighter/trade.rs",
-        "dcex/async_support/lighter/_trade_http.py::mint_shares",
-        "dcex/async_support/lighter/_trade_http.py::burn_shares",
-        "dcex/lighter/_trade_http.py::mint_shares",
-        "dcex/lighter/_trade_http.py::burn_shares",
+        "dcex/async_support/lighter/_trade_http.py::TradeHTTP.mint_shares",
+        "dcex/async_support/lighter/_trade_http.py::TradeHTTP.burn_shares",
+        "dcex/lighter/_trade_http.py::TradeHTTP.mint_shares",
+        "dcex/lighter/_trade_http.py::TradeHTTP.burn_shares",
         "tests/unit/test_lighter_endpoint_coverage.py"
       ],
       "official_source": "https://apidocs.lighter.xyz/reference/sendtx",
       "official_sources": [
         "https://apidocs.lighter.xyz/reference/sendtx"
-      ]
+      ],
+      "superseded_reason": "Grouped row split into explicit verb/path/operation rows. See rows 3616, 3617."
     },
     {
       "row": 2767,
@@ -65122,12 +65170,13 @@
       "note": "Grouped row split into individually sourced endpoint/transaction rows during the 2026-09-28 review.",
       "evidence": [
         "crates/dcex/src/exchanges/lighter/trade/pools.rs",
-        "dcex/async_support/lighter/_trade_http.py::stake_assets",
-        "dcex/async_support/lighter/_trade_http.py::unstake_assets",
-        "dcex/lighter/_trade_http.py::stake_assets",
-        "dcex/lighter/_trade_http.py::unstake_assets"
+        "dcex/async_support/lighter/_trade_http.py::TradeHTTP.stake_assets",
+        "dcex/async_support/lighter/_trade_http.py::TradeHTTP.unstake_assets",
+        "dcex/lighter/_trade_http.py::TradeHTTP.stake_assets",
+        "dcex/lighter/_trade_http.py::TradeHTTP.unstake_assets"
       ],
-      "official_source": "https://apidocs.lighter.xyz/reference/sendtx"
+      "official_source": "https://apidocs.lighter.xyz/reference/sendtx",
+      "superseded_reason": "Grouped row split into individually sourced endpoint/transaction rows during the 2026-09-28 review."
     },
     {
       "row": 2768,
@@ -65145,16 +65194,17 @@
       "note": "Grouped row split into explicit verb/path/operation rows. See rows 3618, 3619.",
       "evidence": [
         "crates/dcex/src/exchanges/lighter/trade.rs",
-        "dcex/async_support/lighter/_trade_http.py::update_account_config",
-        "dcex/async_support/lighter/_trade_http.py::update_account_asset_config",
-        "dcex/lighter/_trade_http.py::update_account_config",
-        "dcex/lighter/_trade_http.py::update_account_asset_config",
+        "dcex/async_support/lighter/_trade_http.py::TradeHTTP.update_account_config",
+        "dcex/async_support/lighter/_trade_http.py::TradeHTTP.update_account_asset_config",
+        "dcex/lighter/_trade_http.py::TradeHTTP.update_account_config",
+        "dcex/lighter/_trade_http.py::TradeHTTP.update_account_asset_config",
         "tests/unit/test_lighter_endpoint_coverage.py"
       ],
       "official_source": "https://apidocs.lighter.xyz/reference/sendtx",
       "official_sources": [
         "https://apidocs.lighter.xyz/reference/sendtx"
-      ]
+      ],
+      "superseded_reason": "Grouped row split into explicit verb/path/operation rows. See rows 3618, 3619."
     },
     {
       "row": 2769,
@@ -65171,7 +65221,8 @@
       "methods": [],
       "note": "Grouped row split into individually sourced endpoint/transaction rows during the 2026-09-28 review.",
       "evidence": [],
-      "official_source": "https://apidocs.lighter.xyz/reference/sendtx"
+      "official_source": "https://apidocs.lighter.xyz/reference/sendtx",
+      "superseded_reason": "Grouped row split into individually sourced endpoint/transaction rows during the 2026-09-28 review."
     },
     {
       "row": 2770,
@@ -69416,7 +69467,8 @@
       "evidence": [],
       "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#account-information-v3-user_data",
       "http_method": "GET",
-      "path": "/fapi/v3/account"
+      "path": "/fapi/v3/account",
+      "superseded_reason": "Current futures account wrapper uses /fapi/v3/accountWithJoinMargin."
     },
     {
       "row": 2945,
@@ -70448,58 +70500,58 @@
       "note": "Grouped row split into explicit verb/path/operation rows. See rows 3620, 3621, 3622, 3623, 3624, 3625, 3626, 3627, 3628, 3629, 3630, 3631, 3632, 3633, 3634, 3635, 3636, 3637, 3638, 3639, 3640, 3641, 3642, 3643, 3644, 3645, 3646, 3647, 3648, 3649, 3650.",
       "evidence": [
         "crates/dcex/src/exchanges/aster/prediction.rs",
-        "dcex/aster/_market_http.py::get_prediction_ping",
-        "dcex/aster/_market_http.py::get_prediction_time",
-        "dcex/aster/_market_http.py::get_prediction_exchange_info",
-        "dcex/aster/_market_http.py::get_prediction_depth",
-        "dcex/aster/_market_http.py::get_prediction_trades",
-        "dcex/aster/_market_http.py::get_prediction_historical_trades",
-        "dcex/aster/_market_http.py::get_prediction_agg_trades",
-        "dcex/aster/_market_http.py::get_prediction_klines",
-        "dcex/aster/_market_http.py::get_prediction_ticker_24hr",
-        "dcex/aster/_market_http.py::get_prediction_ticker_price",
-        "dcex/aster/_market_http.py::get_prediction_ticker_book_ticker",
-        "dcex/aster/_trade_http.py::register_agent_signed",
-        "dcex/aster/_trade_http.py::create_prediction_order",
-        "dcex/aster/_trade_http.py::cancel_prediction_order",
-        "dcex/aster/_trade_http.py::get_prediction_order",
-        "dcex/aster/_trade_http.py::get_prediction_open_order",
-        "dcex/aster/_trade_http.py::get_prediction_all_orders",
+        "dcex/aster/_market_http.py::MarketHTTP.get_prediction_ping",
+        "dcex/aster/_market_http.py::MarketHTTP.get_prediction_time",
+        "dcex/aster/_market_http.py::MarketHTTP.get_prediction_exchange_info",
+        "dcex/aster/_market_http.py::MarketHTTP.get_prediction_depth",
+        "dcex/aster/_market_http.py::MarketHTTP.get_prediction_trades",
+        "dcex/aster/_market_http.py::MarketHTTP.get_prediction_historical_trades",
+        "dcex/aster/_market_http.py::MarketHTTP.get_prediction_agg_trades",
+        "dcex/aster/_market_http.py::MarketHTTP.get_prediction_klines",
+        "dcex/aster/_market_http.py::MarketHTTP.get_prediction_ticker_24hr",
+        "dcex/aster/_market_http.py::MarketHTTP.get_prediction_ticker_price",
+        "dcex/aster/_market_http.py::MarketHTTP.get_prediction_ticker_book_ticker",
+        "dcex/aster/_trade_http.py::TradeHTTP.register_agent_signed",
+        "dcex/aster/_trade_http.py::TradeHTTP.create_prediction_order",
+        "dcex/aster/_trade_http.py::TradeHTTP.cancel_prediction_order",
+        "dcex/aster/_trade_http.py::TradeHTTP.get_prediction_order",
+        "dcex/aster/_trade_http.py::TradeHTTP.get_prediction_open_order",
+        "dcex/aster/_trade_http.py::TradeHTTP.get_prediction_all_orders",
         "dcex/aster/_trade_http.py::TradeHTTP",
-        "dcex/aster/_transfers_http.py::create_prediction_asset_wallet_transfer",
-        "dcex/aster/_trade_http.py::create_prediction_mint",
-        "dcex/aster/_trade_http.py::create_prediction_burn",
-        "dcex/aster/_trade_http.py::create_prediction_split",
-        "dcex/aster/_trade_http.py::create_prediction_merge",
-        "dcex/aster/_trade_http.py::get_prediction_position_histories",
-        "dcex/aster/_trade_http.py::get_prediction_settlement_histories",
-        "dcex/aster/_trade_http.py::get_prediction_user_trades",
-        "dcex/async_support/aster/_market_http.py::get_prediction_ping",
-        "dcex/async_support/aster/_market_http.py::get_prediction_time",
-        "dcex/async_support/aster/_market_http.py::get_prediction_exchange_info",
-        "dcex/async_support/aster/_market_http.py::get_prediction_depth",
-        "dcex/async_support/aster/_market_http.py::get_prediction_trades",
-        "dcex/async_support/aster/_market_http.py::get_prediction_historical_trades",
-        "dcex/async_support/aster/_market_http.py::get_prediction_agg_trades",
-        "dcex/async_support/aster/_market_http.py::get_prediction_klines",
-        "dcex/async_support/aster/_market_http.py::get_prediction_ticker_24hr",
-        "dcex/async_support/aster/_market_http.py::get_prediction_ticker_price",
-        "dcex/async_support/aster/_market_http.py::get_prediction_ticker_book_ticker",
-        "dcex/async_support/aster/_trade_http.py::register_agent_signed",
-        "dcex/async_support/aster/_trade_http.py::create_prediction_order",
-        "dcex/async_support/aster/_trade_http.py::cancel_prediction_order",
-        "dcex/async_support/aster/_trade_http.py::get_prediction_order",
-        "dcex/async_support/aster/_trade_http.py::get_prediction_open_order",
-        "dcex/async_support/aster/_trade_http.py::get_prediction_all_orders",
+        "dcex/aster/_transfers_http.py::TradeHTTPTransfersHTTP.create_prediction_asset_wallet_transfer",
+        "dcex/aster/_trade_http.py::TradeHTTP.create_prediction_mint",
+        "dcex/aster/_trade_http.py::TradeHTTP.create_prediction_burn",
+        "dcex/aster/_trade_http.py::TradeHTTP.create_prediction_split",
+        "dcex/aster/_trade_http.py::TradeHTTP.create_prediction_merge",
+        "dcex/aster/_trade_http.py::TradeHTTP.get_prediction_position_histories",
+        "dcex/aster/_trade_http.py::TradeHTTP.get_prediction_settlement_histories",
+        "dcex/aster/_trade_http.py::TradeHTTP.get_prediction_user_trades",
+        "dcex/async_support/aster/_market_http.py::MarketHTTP.get_prediction_ping",
+        "dcex/async_support/aster/_market_http.py::MarketHTTP.get_prediction_time",
+        "dcex/async_support/aster/_market_http.py::MarketHTTP.get_prediction_exchange_info",
+        "dcex/async_support/aster/_market_http.py::MarketHTTP.get_prediction_depth",
+        "dcex/async_support/aster/_market_http.py::MarketHTTP.get_prediction_trades",
+        "dcex/async_support/aster/_market_http.py::MarketHTTP.get_prediction_historical_trades",
+        "dcex/async_support/aster/_market_http.py::MarketHTTP.get_prediction_agg_trades",
+        "dcex/async_support/aster/_market_http.py::MarketHTTP.get_prediction_klines",
+        "dcex/async_support/aster/_market_http.py::MarketHTTP.get_prediction_ticker_24hr",
+        "dcex/async_support/aster/_market_http.py::MarketHTTP.get_prediction_ticker_price",
+        "dcex/async_support/aster/_market_http.py::MarketHTTP.get_prediction_ticker_book_ticker",
+        "dcex/async_support/aster/_trade_http.py::TradeHTTP.register_agent_signed",
+        "dcex/async_support/aster/_trade_http.py::TradeHTTP.create_prediction_order",
+        "dcex/async_support/aster/_trade_http.py::TradeHTTP.cancel_prediction_order",
+        "dcex/async_support/aster/_trade_http.py::TradeHTTP.get_prediction_order",
+        "dcex/async_support/aster/_trade_http.py::TradeHTTP.get_prediction_open_order",
+        "dcex/async_support/aster/_trade_http.py::TradeHTTP.get_prediction_all_orders",
         "dcex/async_support/aster/_trade_http.py::TradeHTTP",
-        "dcex/async_support/aster/_transfers_http.py::create_prediction_asset_wallet_transfer",
-        "dcex/async_support/aster/_trade_http.py::create_prediction_mint",
-        "dcex/async_support/aster/_trade_http.py::create_prediction_burn",
-        "dcex/async_support/aster/_trade_http.py::create_prediction_split",
-        "dcex/async_support/aster/_trade_http.py::create_prediction_merge",
-        "dcex/async_support/aster/_trade_http.py::get_prediction_position_histories",
-        "dcex/async_support/aster/_trade_http.py::get_prediction_settlement_histories",
-        "dcex/async_support/aster/_trade_http.py::get_prediction_user_trades",
+        "dcex/async_support/aster/_transfers_http.py::TradeHTTPTransfersHTTP.create_prediction_asset_wallet_transfer",
+        "dcex/async_support/aster/_trade_http.py::TradeHTTP.create_prediction_mint",
+        "dcex/async_support/aster/_trade_http.py::TradeHTTP.create_prediction_burn",
+        "dcex/async_support/aster/_trade_http.py::TradeHTTP.create_prediction_split",
+        "dcex/async_support/aster/_trade_http.py::TradeHTTP.create_prediction_merge",
+        "dcex/async_support/aster/_trade_http.py::TradeHTTP.get_prediction_position_histories",
+        "dcex/async_support/aster/_trade_http.py::TradeHTTP.get_prediction_settlement_histories",
+        "dcex/async_support/aster/_trade_http.py::TradeHTTP.get_prediction_user_trades",
         "tests/unit/test_aster_endpoint_coverage.py"
       ],
       "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#24h-price-change",
@@ -70536,7 +70588,8 @@
         "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#recent-trades-list",
         "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#test-server-connectivity",
         "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#trading-specification-information"
-      ]
+      ],
+      "superseded_reason": "Grouped row split into explicit verb/path/operation rows. See rows 3620, 3621, 3622, 3623, 3624, 3625, 3626, 3627, 3628, 3629, 3630, 3631, 3632, 3633, 3634, 3635, 3636, 3637, 3638, 3639, 3640, 3641, 3642, 3643, 3644, 3645, 3646, 3647, 3648, 3649, 3650."
     },
     {
       "row": 2987,
@@ -70555,14 +70608,14 @@
       "evidence": [
         "crates/dcex/src/exchanges/aster/tests/endpoint_coverage.rs",
         "tests/unit/test_aster_endpoint_coverage.py",
-        "dcex/aster/_trade_http.py::create_prediction_mint",
-        "dcex/aster/_trade_http.py::create_prediction_burn",
-        "dcex/aster/_trade_http.py::create_prediction_split",
-        "dcex/aster/_trade_http.py::create_prediction_merge",
-        "dcex/async_support/aster/_trade_http.py::create_prediction_mint",
-        "dcex/async_support/aster/_trade_http.py::create_prediction_burn",
-        "dcex/async_support/aster/_trade_http.py::create_prediction_split",
-        "dcex/async_support/aster/_trade_http.py::create_prediction_merge"
+        "dcex/aster/_trade_http.py::TradeHTTP.create_prediction_mint",
+        "dcex/aster/_trade_http.py::TradeHTTP.create_prediction_burn",
+        "dcex/aster/_trade_http.py::TradeHTTP.create_prediction_split",
+        "dcex/aster/_trade_http.py::TradeHTTP.create_prediction_merge",
+        "dcex/async_support/aster/_trade_http.py::TradeHTTP.create_prediction_mint",
+        "dcex/async_support/aster/_trade_http.py::TradeHTTP.create_prediction_burn",
+        "dcex/async_support/aster/_trade_http.py::TradeHTTP.create_prediction_split",
+        "dcex/async_support/aster/_trade_http.py::TradeHTTP.create_prediction_merge"
       ],
       "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#prediction-market-burn-trade",
       "host": "papi",
@@ -70581,28 +70634,6 @@
         3625,
         3626,
         3628
-      ],
-      "replacement_routes": [
-        {
-          "http_method": "POST",
-          "path": "/api/v3/prediction/burn",
-          "host": "papi"
-        },
-        {
-          "http_method": "POST",
-          "path": "/api/v3/prediction/merge",
-          "host": "papi"
-        },
-        {
-          "http_method": "POST",
-          "path": "/api/v3/prediction/mint",
-          "host": "papi"
-        },
-        {
-          "http_method": "POST",
-          "path": "/api/v3/prediction/split",
-          "host": "papi"
-        }
       ]
     },
     {
@@ -70622,12 +70653,12 @@
       "evidence": [
         "crates/dcex/src/exchanges/aster/tests/endpoint_coverage.rs",
         "tests/unit/test_aster_endpoint_coverage.py",
-        "dcex/aster/_trade_http.py::get_prediction_positions",
-        "dcex/aster/_trade_http.py::get_prediction_position_histories",
-        "dcex/aster/_trade_http.py::get_prediction_settlement_histories",
-        "dcex/async_support/aster/_trade_http.py::get_prediction_positions",
-        "dcex/async_support/aster/_trade_http.py::get_prediction_position_histories",
-        "dcex/async_support/aster/_trade_http.py::get_prediction_settlement_histories"
+        "dcex/aster/_trade_http.py::TradeHTTP.get_prediction_positions",
+        "dcex/aster/_trade_http.py::TradeHTTP.get_prediction_position_histories",
+        "dcex/aster/_trade_http.py::TradeHTTP.get_prediction_settlement_histories",
+        "dcex/async_support/aster/_trade_http.py::TradeHTTP.get_prediction_positions",
+        "dcex/async_support/aster/_trade_http.py::TradeHTTP.get_prediction_position_histories",
+        "dcex/async_support/aster/_trade_http.py::TradeHTTP.get_prediction_settlement_histories"
       ],
       "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#prediction-market-burn-trade",
       "host": "papi",
@@ -70645,23 +70676,6 @@
         3641,
         3642,
         3643
-      ],
-      "replacement_routes": [
-        {
-          "http_method": "GET",
-          "path": "/api/v3/prediction/positionHistories",
-          "host": "papi"
-        },
-        {
-          "http_method": "GET",
-          "path": "/api/v3/prediction/positions",
-          "host": "papi"
-        },
-        {
-          "http_method": "GET",
-          "path": "/api/v3/prediction/settlementHistories",
-          "host": "papi"
-        }
       ]
     },
     {
@@ -71848,17 +71862,18 @@
       "note": "Grouped row split into explicit verb/path/operation rows. See rows 3667, 3668.",
       "evidence": [
         "crates/dcex/src/exchanges/extended/tests/endpoint_coverage.rs",
-        "dcex/async_support/extended/_account_http.py::get_account_performance",
-        "dcex/async_support/extended/_account_http.py::get_account_funding_stats",
-        "dcex/extended/_account_http.py::get_account_performance",
-        "dcex/extended/_account_http.py::get_account_funding_stats",
+        "dcex/async_support/extended/_account_http.py::AccountHTTP.get_account_performance",
+        "dcex/async_support/extended/_account_http.py::AccountHTTP.get_account_funding_stats",
+        "dcex/extended/_account_http.py::AccountHTTP.get_account_performance",
+        "dcex/extended/_account_http.py::AccountHTTP.get_account_funding_stats",
         "tests/unit/test_extended_endpoint_coverage.py"
       ],
       "official_source": "https://api.docs.extended.exchange/#get-account-funding-history",
       "official_sources": [
         "https://api.docs.extended.exchange/#get-account-funding-history",
         "https://api.docs.extended.exchange/#get-account-funding-stats"
-      ]
+      ],
+      "superseded_reason": "Grouped row split into explicit verb/path/operation rows. See rows 3667, 3668."
     },
     {
       "row": 3035,
@@ -71879,22 +71894,22 @@
         "crates/dcex/src/exchanges/extended/interest.rs",
         "crates/dcex/src/exchanges/extended/vault.rs",
         "crates/dcex/src/exchanges/extended/rewards.rs",
-        "dcex/async_support/extended/_account_http.py::get_bridge_quote",
-        "dcex/async_support/extended/_account_http.py::get_account_equity_history",
-        "dcex/async_support/extended/_account_http.py::get_account_pnl_history",
-        "dcex/async_support/extended/_account_http.py::get_account_pnl_percentage_history",
-        "dcex/async_support/extended/_account_http.py::get_cumulative_account_pnl_history",
-        "dcex/async_support/extended/_account_http.py::get_cumulative_account_pnl_percentage_history",
-        "dcex/async_support/extended/_account_http.py::get_account_vault_equity_history",
-        "dcex/async_support/extended/_account_http.py::get_account_max_drawdown_history",
-        "dcex/extended/_account_http.py::get_bridge_quote",
-        "dcex/extended/_account_http.py::get_account_equity_history",
-        "dcex/extended/_account_http.py::get_account_pnl_history",
-        "dcex/extended/_account_http.py::get_account_pnl_percentage_history",
-        "dcex/extended/_account_http.py::get_cumulative_account_pnl_history",
-        "dcex/extended/_account_http.py::get_cumulative_account_pnl_percentage_history",
-        "dcex/extended/_account_http.py::get_account_vault_equity_history",
-        "dcex/extended/_account_http.py::get_account_max_drawdown_history",
+        "dcex/async_support/extended/_account_http.py::AccountHTTP.get_bridge_quote",
+        "dcex/async_support/extended/_account_http.py::AccountHTTP.get_account_equity_history",
+        "dcex/async_support/extended/_account_http.py::AccountHTTP.get_account_pnl_history",
+        "dcex/async_support/extended/_account_http.py::AccountHTTP.get_account_pnl_percentage_history",
+        "dcex/async_support/extended/_account_http.py::AccountHTTP.get_cumulative_account_pnl_history",
+        "dcex/async_support/extended/_account_http.py::AccountHTTP.get_cumulative_account_pnl_percentage_history",
+        "dcex/async_support/extended/_account_http.py::AccountHTTP.get_account_vault_equity_history",
+        "dcex/async_support/extended/_account_http.py::AccountHTTP.get_account_max_drawdown_history",
+        "dcex/extended/_account_http.py::AccountHTTP.get_bridge_quote",
+        "dcex/extended/_account_http.py::AccountHTTP.get_account_equity_history",
+        "dcex/extended/_account_http.py::AccountHTTP.get_account_pnl_history",
+        "dcex/extended/_account_http.py::AccountHTTP.get_account_pnl_percentage_history",
+        "dcex/extended/_account_http.py::AccountHTTP.get_cumulative_account_pnl_history",
+        "dcex/extended/_account_http.py::AccountHTTP.get_cumulative_account_pnl_percentage_history",
+        "dcex/extended/_account_http.py::AccountHTTP.get_account_vault_equity_history",
+        "dcex/extended/_account_http.py::AccountHTTP.get_account_max_drawdown_history",
         "tests/unit/test_extended_endpoint_coverage.py"
       ],
       "official_source": "https://api.docs.extended.exchange/#get-account-equity-history",
@@ -71907,7 +71922,8 @@
         "https://api.docs.extended.exchange/#get-account-vault-equity-history",
         "https://api.docs.extended.exchange/#get-cumulative-account-pnl-history",
         "https://api.docs.extended.exchange/#get-cumulative-account-pnl-percentage-history"
-      ]
+      ],
+      "superseded_reason": "Grouped row split into explicit verb/path/operation rows. See rows 3669, 3670, 3671, 3672, 3673, 3674, 3675, 3676."
     },
     {
       "row": 3036,
@@ -71925,17 +71941,18 @@
       "note": "Grouped row split into explicit verb/path/operation rows. See rows 3677, 3678.",
       "evidence": [
         "crates/dcex/src/exchanges/extended/tests/endpoint_coverage.rs",
-        "dcex/async_support/extended/_market_http.py::get_vault_performance",
-        "dcex/async_support/extended/_market_http.py::get_vault_summary",
-        "dcex/extended/_market_http.py::get_vault_performance",
-        "dcex/extended/_market_http.py::get_vault_summary",
+        "dcex/async_support/extended/_market_http.py::MarketHTTP.get_vault_performance",
+        "dcex/async_support/extended/_market_http.py::MarketHTTP.get_vault_summary",
+        "dcex/extended/_market_http.py::MarketHTTP.get_vault_performance",
+        "dcex/extended/_market_http.py::MarketHTTP.get_vault_summary",
         "tests/unit/test_extended_endpoint_coverage.py"
       ],
       "official_source": "https://api.docs.extended.exchange/#get-vault-performance",
       "official_sources": [
         "https://api.docs.extended.exchange/#get-vault-performance",
         "https://api.docs.extended.exchange/#get-vault-summary"
-      ]
+      ],
+      "superseded_reason": "Grouped row split into explicit verb/path/operation rows. See rows 3677, 3678."
     },
     {
       "row": 3037,
@@ -71956,18 +71973,18 @@
         "crates/dcex/src/exchanges/extended/interest.rs",
         "crates/dcex/src/exchanges/extended/vault.rs",
         "crates/dcex/src/exchanges/extended/rewards.rs",
-        "dcex/async_support/extended/_account_http.py::get_account_funding_history",
-        "dcex/async_support/extended/_account_http.py::get_interest_key_metrics",
-        "dcex/async_support/extended/_account_http.py::get_interest_daily_metrics",
-        "dcex/async_support/extended/_account_http.py::get_interest_payment_chart",
-        "dcex/async_support/extended/_market_http.py::get_interest_rate_curves_history",
-        "dcex/async_support/extended/_market_http.py::get_latest_interest_rate_curve",
-        "dcex/extended/_account_http.py::get_account_funding_history",
-        "dcex/extended/_account_http.py::get_interest_key_metrics",
-        "dcex/extended/_account_http.py::get_interest_daily_metrics",
-        "dcex/extended/_account_http.py::get_interest_payment_chart",
-        "dcex/extended/_market_http.py::get_interest_rate_curves_history",
-        "dcex/extended/_market_http.py::get_latest_interest_rate_curve",
+        "dcex/async_support/extended/_account_http.py::AccountHTTP.get_account_funding_history",
+        "dcex/async_support/extended/_account_http.py::AccountHTTP.get_interest_key_metrics",
+        "dcex/async_support/extended/_account_http.py::AccountHTTP.get_interest_daily_metrics",
+        "dcex/async_support/extended/_account_http.py::AccountHTTP.get_interest_payment_chart",
+        "dcex/async_support/extended/_market_http.py::MarketHTTP.get_interest_rate_curves_history",
+        "dcex/async_support/extended/_market_http.py::MarketHTTP.get_latest_interest_rate_curve",
+        "dcex/extended/_account_http.py::AccountHTTP.get_account_funding_history",
+        "dcex/extended/_account_http.py::AccountHTTP.get_interest_key_metrics",
+        "dcex/extended/_account_http.py::AccountHTTP.get_interest_daily_metrics",
+        "dcex/extended/_account_http.py::AccountHTTP.get_interest_payment_chart",
+        "dcex/extended/_market_http.py::MarketHTTP.get_interest_rate_curves_history",
+        "dcex/extended/_market_http.py::MarketHTTP.get_latest_interest_rate_curve",
         "tests/unit/test_extended_endpoint_coverage.py"
       ],
       "official_source": "https://api.docs.extended.exchange/#get-interest-daily-metrics",
@@ -71978,7 +71995,8 @@
         "https://api.docs.extended.exchange/#get-interest-payments-history",
         "https://api.docs.extended.exchange/#get-interest-rate-curves-history",
         "https://api.docs.extended.exchange/#get-latest-interest-rate-curve"
-      ]
+      ],
+      "superseded_reason": "Grouped row split into explicit verb/path/operation rows. See rows 3679, 3680, 3681, 3682, 3683, 3684."
     },
     {
       "row": 3038,
@@ -72019,14 +72037,15 @@
       "note": "Grouped row split into explicit verb/path/operation rows. See rows 3685.",
       "evidence": [
         "crates/dcex/src/exchanges/extended/tests/endpoint_coverage.rs",
-        "dcex/async_support/extended/_account_http.py::get_interest_payments_history",
-        "dcex/extended/_account_http.py::get_interest_payments_history",
+        "dcex/async_support/extended/_account_http.py::AccountHTTP.get_interest_payments_history",
+        "dcex/extended/_account_http.py::AccountHTTP.get_interest_payments_history",
         "tests/unit/test_extended_endpoint_coverage.py"
       ],
       "official_source": "https://api.docs.extended.exchange/#get-earned-points",
       "official_sources": [
         "https://api.docs.extended.exchange/#get-earned-points"
-      ]
+      ],
+      "superseded_reason": "Grouped row split into explicit verb/path/operation rows. See rows 3685."
     },
     {
       "row": 3040,
@@ -75153,14 +75172,14 @@
       "methods": [],
       "note": "Grouped row split into explicit verb/path/operation rows. See rows 3686, 3687, 3688, 3689.",
       "evidence": [
-        "dcex/arcus/_market_http.py::get_market_metadata",
-        "dcex/arcus/_market_http.py::get_market_overview",
-        "dcex/arcus/_market_http.py::get_spot_market_overview",
-        "dcex/arcus/_market_http.py::get_metadata_candles",
-        "dcex/async_support/arcus/_market_http.py::get_market_metadata",
-        "dcex/async_support/arcus/_market_http.py::get_market_overview",
-        "dcex/async_support/arcus/_market_http.py::get_spot_market_overview",
-        "dcex/async_support/arcus/_market_http.py::get_metadata_candles"
+        "dcex/arcus/_market_http.py::MarketHTTP.get_market_metadata",
+        "dcex/arcus/_market_http.py::MarketHTTP.get_market_overview",
+        "dcex/arcus/_market_http.py::MarketHTTP.get_spot_market_overview",
+        "dcex/arcus/_market_http.py::MarketHTTP.get_metadata_candles",
+        "dcex/async_support/arcus/_market_http.py::MarketHTTP.get_market_metadata",
+        "dcex/async_support/arcus/_market_http.py::MarketHTTP.get_market_overview",
+        "dcex/async_support/arcus/_market_http.py::MarketHTTP.get_spot_market_overview",
+        "dcex/async_support/arcus/_market_http.py::MarketHTTP.get_metadata_candles"
       ],
       "official_source": "https://docs.arcus.xyz/api-reference/marketmetadata/get-market-metadata",
       "official_sources": [
@@ -75168,7 +75187,8 @@
         "https://docs.arcus.xyz/api-reference/marketmetadata/get-market-overview",
         "https://docs.arcus.xyz/api-reference/marketmetadata/get-spot-candles",
         "https://docs.arcus.xyz/api-reference/marketmetadata/get-spot-market-overview"
-      ]
+      ],
+      "superseded_reason": "Grouped row split into explicit verb/path/operation rows. See rows 3686, 3687, 3688, 3689."
     },
     {
       "row": 3169,
@@ -75185,19 +75205,20 @@
       "methods": [],
       "note": "Grouped row split into explicit verb/path/operation rows. See rows 3690, 3691, 3692.",
       "evidence": [
-        "dcex/arcus/_account_http.py::get_user_preferences",
-        "dcex/arcus/_account_http.py::upsert_user_preferences",
-        "dcex/arcus/_account_http.py::delete_user_preference_signed",
-        "dcex/async_support/arcus/_account_http.py::get_user_preferences",
-        "dcex/async_support/arcus/_account_http.py::upsert_user_preferences",
-        "dcex/async_support/arcus/_account_http.py::delete_user_preference_signed"
+        "dcex/arcus/_account_http.py::AccountHTTP.get_user_preferences",
+        "dcex/arcus/_account_http.py::AccountHTTP.upsert_user_preferences",
+        "dcex/arcus/_account_http.py::AccountHTTP.delete_user_preference_signed",
+        "dcex/async_support/arcus/_account_http.py::AccountHTTP.get_user_preferences",
+        "dcex/async_support/arcus/_account_http.py::AccountHTTP.upsert_user_preferences",
+        "dcex/async_support/arcus/_account_http.py::AccountHTTP.delete_user_preference_signed"
       ],
       "official_source": "https://docs.arcus.xyz/api-reference/userpreferences/delete-a-user-preference",
       "official_sources": [
         "https://docs.arcus.xyz/api-reference/userpreferences/delete-a-user-preference",
         "https://docs.arcus.xyz/api-reference/userpreferences/get-user-preferences",
         "https://docs.arcus.xyz/api-reference/userpreferences/upsert-user-preferences"
-      ]
+      ],
+      "superseded_reason": "Grouped row split into explicit verb/path/operation rows. See rows 3690, 3691, 3692."
     },
     {
       "row": 3170,
@@ -75214,7 +75235,8 @@
       "methods": [],
       "note": "Grouped row split into individually sourced endpoint/transaction rows during the 2026-09-28 review.",
       "evidence": [],
-      "official_source": "https://docs.arcus.xyz/api-reference/referral/create-referral-code"
+      "official_source": "https://docs.arcus.xyz/api-reference/referral/create-referral-code",
+      "superseded_reason": "Grouped row split into individually sourced endpoint/transaction rows during the 2026-09-28 review."
     },
     {
       "row": 3171,
@@ -81005,7 +81027,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/market/announcement"
+      "path": "/api/ua/v1/market/announcement",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3414,
@@ -81026,7 +81049,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/market/currency"
+      "path": "/api/ua/v1/market/currency",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3415,
@@ -81047,7 +81071,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/asset/currencies"
+      "path": "/api/ua/v1/asset/currencies",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3416,
@@ -81068,7 +81093,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/market/instrument"
+      "path": "/api/ua/v1/market/instrument",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3417,
@@ -81089,7 +81115,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/market/ticker"
+      "path": "/api/ua/v1/market/ticker",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3418,
@@ -81110,7 +81137,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/market/orderbook"
+      "path": "/api/ua/v1/market/orderbook",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3419,
@@ -81131,7 +81159,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/market/kline"
+      "path": "/api/ua/v1/market/kline",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3420,
@@ -81152,7 +81181,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/market/trade"
+      "path": "/api/ua/v1/market/trade",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3421,
@@ -81173,7 +81203,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/market/collateral-discount-ratio"
+      "path": "/api/ua/v1/market/collateral-discount-ratio",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3422,
@@ -81194,7 +81225,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/market/index-price"
+      "path": "/api/ua/v1/market/index-price",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3423,
@@ -81215,7 +81247,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/market/funding-rate"
+      "path": "/api/ua/v1/market/funding-rate",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3424,
@@ -81236,7 +81269,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/market/funding-rate-history"
+      "path": "/api/ua/v1/market/funding-rate-history",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3425,
@@ -81257,7 +81291,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/server/status"
+      "path": "/api/ua/v1/server/status",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3426,
@@ -81278,7 +81313,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/oes/currency"
+      "path": "/api/ua/v1/oes/currency",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3427,
@@ -81299,7 +81335,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/market/borrowable-currency"
+      "path": "/api/ua/v1/market/borrowable-currency",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3428,
@@ -81320,7 +81357,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/user/kyc-region"
+      "path": "/api/ua/v1/user/kyc-region",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3429,
@@ -81341,7 +81379,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/user/my-ip"
+      "path": "/api/ua/v1/user/my-ip",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3430,
@@ -81362,7 +81401,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/market/fiat-price"
+      "path": "/api/ua/v1/market/fiat-price",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3431,
@@ -81383,7 +81423,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/market/interest-rate-index"
+      "path": "/api/ua/v1/market/interest-rate-index",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3432,
@@ -81404,7 +81445,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/trade-statistics"
+      "path": "/api/ua/v1/trade-statistics",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3433,
@@ -81425,7 +81467,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/order/max-order-quantity"
+      "path": "/api/ua/v1/order/max-order-quantity",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3434,
@@ -81446,7 +81489,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/market/call-auction-info"
+      "path": "/api/ua/v1/market/call-auction-info",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3435,
@@ -81467,7 +81511,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/unified/account/balance"
+      "path": "/api/ua/v1/unified/account/balance",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3436,
@@ -81488,7 +81533,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/account/balance"
+      "path": "/api/ua/v1/account/balance",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3437,
@@ -81509,7 +81555,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/sub-account/balance"
+      "path": "/api/ua/v1/sub-account/balance",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3438,
@@ -81530,7 +81577,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/account/transfer-quota"
+      "path": "/api/ua/v1/account/transfer-quota",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3439,
@@ -81551,7 +81599,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "POST",
-      "path": "/api/ua/v1/account/transfer"
+      "path": "/api/ua/v1/account/transfer",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3440,
@@ -81572,7 +81621,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "POST",
-      "path": "/api/ua/v1/sub-account/canTransferOut"
+      "path": "/api/ua/v1/sub-account/canTransferOut",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3441,
@@ -81593,7 +81643,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/account/mode"
+      "path": "/api/ua/v1/account/mode",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3442,
@@ -81614,7 +81665,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "POST",
-      "path": "/api/ua/v1/account/mode"
+      "path": "/api/ua/v1/account/mode",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3443,
@@ -81635,7 +81687,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/account/ledger"
+      "path": "/api/ua/v1/account/ledger",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3444,
@@ -81656,7 +81709,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/account/interest-history"
+      "path": "/api/ua/v1/account/interest-history",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3445,
@@ -81677,7 +81731,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "POST",
-      "path": "/api/ua/v1/unified/account/modify-leverage"
+      "path": "/api/ua/v1/unified/account/modify-leverage",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3446,
@@ -81698,7 +81753,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/oes/custody-quota"
+      "path": "/api/ua/v1/oes/custody-quota",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3447,
@@ -81719,7 +81775,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "POST",
-      "path": "/api/ua/v1/unified/account/modify-leverage-margin-cross"
+      "path": "/api/ua/v1/unified/account/modify-leverage-margin-cross",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3448,
@@ -81740,7 +81797,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/unified/account/leverage"
+      "path": "/api/ua/v1/unified/account/leverage",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3449,
@@ -81761,7 +81819,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/account/interest-limits"
+      "path": "/api/ua/v1/account/interest-limits",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3450,
@@ -81782,7 +81841,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/user/api-key"
+      "path": "/api/ua/v1/user/api-key",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3451,
@@ -81803,7 +81863,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "POST",
-      "path": "/api/ua/v1/user/sub/create-sub-account"
+      "path": "/api/ua/v1/user/sub/create-sub-account",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3452,
@@ -81824,7 +81885,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/user/sub-account-list"
+      "path": "/api/ua/v1/user/sub-account-list",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3453,
@@ -81845,7 +81907,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/user/sub-api-key"
+      "path": "/api/ua/v1/user/sub-api-key",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3454,
@@ -81866,7 +81929,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "POST",
-      "path": "/api/ua/v1/user/create-sub-api-key"
+      "path": "/api/ua/v1/user/create-sub-api-key",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3455,
@@ -81887,7 +81951,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "POST",
-      "path": "/api/ua/v1/user/modify-sub-api-key"
+      "path": "/api/ua/v1/user/modify-sub-api-key",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3456,
@@ -81908,7 +81973,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "DELETE",
-      "path": "/api/ua/v1/user/sub-api-key"
+      "path": "/api/ua/v1/user/sub-api-key",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3457,
@@ -81929,7 +81995,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/asset/deposit/address"
+      "path": "/api/ua/v1/asset/deposit/address",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3458,
@@ -81950,7 +82017,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/asset/deposit/history"
+      "path": "/api/ua/v1/asset/deposit/history",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3459,
@@ -81971,7 +82039,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/withdrawals/quotas"
+      "path": "/api/ua/v1/withdrawals/quotas",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3460,
@@ -81992,7 +82061,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "POST",
-      "path": "/api/ua/v1/withdrawal"
+      "path": "/api/ua/v1/withdrawal",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3461,
@@ -82013,7 +82083,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "DELETE",
-      "path": "/api/ua/v1/withdrawal"
+      "path": "/api/ua/v1/withdrawal",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3462,
@@ -82034,7 +82105,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/asset/withdrawal/history"
+      "path": "/api/ua/v1/asset/withdrawal/history",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3463,
@@ -82055,7 +82127,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/account/fee/kcs-deduct"
+      "path": "/api/ua/v1/account/fee/kcs-deduct",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3464,
@@ -82076,7 +82149,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/rate-limit/query-cap"
+      "path": "/api/ua/v1/rate-limit/query-cap",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3465,
@@ -82097,7 +82171,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "POST",
-      "path": "/api/ua/v1/rate-limit/set"
+      "path": "/api/ua/v1/rate-limit/set",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3466,
@@ -82118,7 +82193,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/rate-limit/query"
+      "path": "/api/ua/v1/rate-limit/query",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3467,
@@ -82139,7 +82215,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/rate-limit/query-all"
+      "path": "/api/ua/v1/rate-limit/query-all",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3468,
@@ -82160,7 +82237,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "POST",
-      "path": "/api/ua/v1/unified/order/place"
+      "path": "/api/ua/v1/unified/order/place",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3469,
@@ -82181,7 +82259,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "POST",
-      "path": "/api/ua/v1/unified/order/amend"
+      "path": "/api/ua/v1/unified/order/amend",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3470,
@@ -82202,7 +82281,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "POST",
-      "path": "/api/ua/v1/unified/order/cancel"
+      "path": "/api/ua/v1/unified/order/cancel",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3471,
@@ -82223,7 +82303,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "POST",
-      "path": "/api/ua/v1/unified/order/cancel-batch"
+      "path": "/api/ua/v1/unified/order/cancel-batch",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3472,
@@ -82244,7 +82325,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "POST",
-      "path": "/api/ua/v1/unified/order/cancel-all"
+      "path": "/api/ua/v1/unified/order/cancel-all",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3473,
@@ -82265,7 +82347,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/unified/order/detail"
+      "path": "/api/ua/v1/unified/order/detail",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3474,
@@ -82286,7 +82369,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/unified/order/open-list"
+      "path": "/api/ua/v1/unified/order/open-list",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3475,
@@ -82307,7 +82391,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/unified/order/history"
+      "path": "/api/ua/v1/unified/order/history",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3476,
@@ -82328,7 +82413,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/unified/order/execution"
+      "path": "/api/ua/v1/unified/order/execution",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3477,
@@ -82349,7 +82435,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/unified/position/open-list"
+      "path": "/api/ua/v1/unified/position/open-list",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3478,
@@ -82370,7 +82457,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/position/history"
+      "path": "/api/ua/v1/position/history",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3479,
@@ -82391,7 +82479,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/position/funding-history"
+      "path": "/api/ua/v1/position/funding-history",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3480,
@@ -82412,7 +82501,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "POST",
-      "path": "/api/ua/v1/unified/position/margin-mode"
+      "path": "/api/ua/v1/unified/position/margin-mode",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3481,
@@ -82433,7 +82523,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "POST",
-      "path": "/api/ua/v1/unified/position/modify-margin"
+      "path": "/api/ua/v1/unified/position/modify-margin",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3482,
@@ -82454,7 +82545,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/unified/position/margin-mode"
+      "path": "/api/ua/v1/unified/position/margin-mode",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3483,
@@ -82475,7 +82567,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/otc-loan/discount-rate"
+      "path": "/api/ua/v1/otc-loan/discount-rate",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3484,
@@ -82496,7 +82589,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/otc-loan/loan"
+      "path": "/api/ua/v1/otc-loan/loan",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3485,
@@ -82517,7 +82611,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/otc-loan/account"
+      "path": "/api/ua/v1/otc-loan/account",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3486,
@@ -82538,7 +82633,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "POST",
-      "path": "/api/v2/bullet-private"
+      "path": "/api/v2/bullet-private",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3487,
@@ -82559,7 +82655,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/market/cross-config"
+      "path": "/api/ua/v1/market/cross-config",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3488,
@@ -82580,7 +82677,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "POST",
-      "path": "/api/ua/v1/{accountMode}/order/place-batch"
+      "path": "/api/ua/v1/{accountMode}/order/place-batch",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3489,
@@ -82601,7 +82699,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/ua/v1/{accountMode}/position/tiers"
+      "path": "/api/ua/v1/{accountMode}/position/tiers",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3490,
@@ -82622,7 +82721,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/v2/deposit-addresses"
+      "path": "/api/v2/deposit-addresses",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3491,
@@ -82643,7 +82743,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/v1/deposit-addresses"
+      "path": "/api/v1/deposit-addresses",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3492,
@@ -82664,7 +82765,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "POST",
-      "path": "/api/v1/deposit-addresses"
+      "path": "/api/v1/deposit-addresses",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3493,
@@ -82685,7 +82787,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/v1/sub/user"
+      "path": "/api/v1/sub/user",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3494,
@@ -82706,7 +82809,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/v1/sub-accounts"
+      "path": "/api/v1/sub-accounts",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3495,
@@ -82727,7 +82831,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "POST",
-      "path": "/api/v2/accounts/sub-transfer"
+      "path": "/api/v2/accounts/sub-transfer",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3496,
@@ -82748,7 +82853,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/v1/hist-deposits"
+      "path": "/api/v1/hist-deposits",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3497,
@@ -82769,7 +82875,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "POST",
-      "path": "/api/v2/accounts/inner-transfer"
+      "path": "/api/v2/accounts/inner-transfer",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3498,
@@ -82790,7 +82897,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/v1/transfer-list"
+      "path": "/api/v1/transfer-list",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3499,
@@ -82811,7 +82919,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/v1/hist-withdrawals"
+      "path": "/api/v1/hist-withdrawals",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3500,
@@ -82832,7 +82941,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "POST",
-      "path": "/api/v3/transfer-out"
+      "path": "/api/v3/transfer-out",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3501,
@@ -82853,7 +82963,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "POST",
-      "path": "/api/v1/transfer-in"
+      "path": "/api/v1/transfer-in",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3502,
@@ -82874,7 +82985,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "POST",
-      "path": "/api/v1/withdrawals"
+      "path": "/api/v1/withdrawals",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3503,
@@ -82895,7 +83007,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "DELETE",
-      "path": "/api/v1/order/client-order/{clientOid}"
+      "path": "/api/v1/order/client-order/{clientOid}",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3504,
@@ -82916,7 +83029,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "DELETE",
-      "path": "/api/v1/orders"
+      "path": "/api/v1/orders",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3505,
@@ -82937,7 +83051,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/v1/limit/orders"
+      "path": "/api/v1/limit/orders",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3506,
@@ -82958,7 +83073,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/v1/orders/{orderId}"
+      "path": "/api/v1/orders/{orderId}",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3507,
@@ -82979,7 +83095,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/v1/order/client-order/{clientOid}"
+      "path": "/api/v1/order/client-order/{clientOid}",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3508,
@@ -83000,7 +83117,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/v1/limit/fills"
+      "path": "/api/v1/limit/fills",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3509,
@@ -83021,7 +83139,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/v3/etf/info"
+      "path": "/api/v3/etf/info",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3510,
@@ -83042,7 +83161,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/v1/margin/account"
+      "path": "/api/v1/margin/account",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3511,
@@ -83063,7 +83183,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "POST",
-      "path": "/api/v1/margin/order"
+      "path": "/api/v1/margin/order",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3512,
@@ -83084,7 +83205,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "POST",
-      "path": "/api/v1/margin/order/test"
+      "path": "/api/v1/margin/order/test",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3513,
@@ -83105,7 +83227,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/v1/isolated/accounts"
+      "path": "/api/v1/isolated/accounts",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3514,
@@ -83126,7 +83249,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/v1/isolated/account/{symbol}"
+      "path": "/api/v1/isolated/account/{symbol}",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3515,
@@ -83147,7 +83271,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "POST",
-      "path": "/api/v1/position/margin/auto-deposit-status"
+      "path": "/api/v1/position/margin/auto-deposit-status",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3516,
@@ -83168,7 +83293,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/v1/position"
+      "path": "/api/v1/position",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3517,
@@ -83189,7 +83315,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/v2/affiliate/inviter/statistics"
+      "path": "/api/v2/affiliate/inviter/statistics",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3518,
@@ -83210,7 +83337,8 @@
       ],
       "note": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported.",
       "http_method": "GET",
-      "path": "/api/v1/broker/api/rebase/download"
+      "path": "/api/v1/broker/api/rebase/download",
+      "superseded_reason": "Listed by the exchange under Abandoned Endpoints; retained for migration inventory, not claimed as currently supported."
     },
     {
       "row": 3519,
@@ -88395,14 +88523,7 @@
       "http_method": "GET",
       "path": "/fapi/v3/leverageBracket",
       "host": "fapi",
-      "superseded_by": 2952,
-      "replacement_routes": [
-        {
-          "http_method": "GET",
-          "path": "/fapi/v3/leverageBrackets",
-          "host": "fapi"
-        }
-      ]
+      "superseded_by": 2952
     },
     {
       "row": 3737,
@@ -97536,16 +97657,7 @@
       "actions": [
         "hip3LiquidatorTransfer"
       ],
-      "superseded_by": 2659,
-      "replacement_routes": [
-        {
-          "http_method": "POST",
-          "path": "/exchange",
-          "actions": [
-            "hip3LiquidatorTransfer"
-          ]
-        }
-      ]
+      "superseded_by": 2659
     },
     {
       "row": 4115,
@@ -97991,18 +98103,7 @@
       "actions": [
         "outcomeMeta"
       ],
-      "superseded_by": 2610,
-      "replacement_routes": [
-        {
-          "http_method": "POST",
-          "path": "/info",
-          "actions": [
-            "outcomeDeployerLimits",
-            "outcomeMeta",
-            "settledOutcome"
-          ]
-        }
-      ]
+      "superseded_by": 2610
     },
     {
       "row": 4131,
@@ -100191,14 +100292,7 @@
       "path": "predictionEvents \\- Prediction Events",
       "host": "aster-finance-prediction-api-tesetnet",
       "channel": "predictionEvents \\- Prediction Events",
-      "superseded_by": 3634,
-      "replacement_routes": [
-        {
-          "http_method": "GET",
-          "path": "/api/v3/prediction/exchangeInfo",
-          "host": "papi"
-        }
-      ]
+      "superseded_by": 3634
     },
     {
       "row": 4220,
@@ -100531,14 +100625,7 @@
       "path": "predictionEvents \\- Prediction Events",
       "host": "aster-finance-prediction-api",
       "channel": "predictionEvents \\- Prediction Events",
-      "superseded_by": 3634,
-      "replacement_routes": [
-        {
-          "http_method": "GET",
-          "path": "/api/v3/prediction/exchangeInfo",
-          "host": "papi"
-        }
-      ]
+      "superseded_by": 3634
     },
     {
       "row": 4234,
@@ -102863,15 +102950,7 @@
       "path": "/account.status",
       "host": "derivatives_trading_usds_futures",
       "channel": "account_information",
-      "superseded_by": 4327,
-      "replacement_routes": [
-        {
-          "http_method": "WS",
-          "path": "/v2/account.status",
-          "host": "derivatives_trading_usds_futures",
-          "channel": "account_information_v2"
-        }
-      ]
+      "superseded_by": 4327
     },
     {
       "row": 4327,
@@ -102923,15 +103002,7 @@
       "path": "/account.balance",
       "host": "derivatives_trading_usds_futures",
       "channel": "futures_account_balance",
-      "superseded_by": 4329,
-      "replacement_routes": [
-        {
-          "http_method": "WS",
-          "path": "/v2/account.balance",
-          "host": "derivatives_trading_usds_futures",
-          "channel": "futures_account_balance_v2"
-        }
-      ]
+      "superseded_by": 4329
     },
     {
       "row": 4329,
@@ -103191,15 +103262,7 @@
       "path": "/account.position",
       "host": "derivatives_trading_usds_futures",
       "channel": "position_information",
-      "superseded_by": 4339,
-      "replacement_routes": [
-        {
-          "http_method": "WS",
-          "path": "/v2/account.position",
-          "host": "derivatives_trading_usds_futures",
-          "channel": "position_information_v2"
-        }
-      ]
+      "superseded_by": 4339
     },
     {
       "row": 4339,
@@ -104940,15 +105003,7 @@
       "path": "/orderList.place",
       "host": "spot",
       "channel": "order_list_place",
-      "superseded_by": 4406,
-      "replacement_routes": [
-        {
-          "http_method": "WS",
-          "path": "/orderList.place.oco",
-          "host": "spot",
-          "channel": "order_list_place_oco"
-        }
-      ]
+      "superseded_by": 4406
     },
     {
       "row": 4406,
@@ -110870,14 +110925,7 @@
       "http_method": "WS",
       "path": "Order V2",
       "channel": "3470256w0",
-      "superseded_by": 4640,
-      "replacement_routes": [
-        {
-          "http_method": "WS",
-          "path": "Order V2",
-          "channel": "3470073w0"
-        }
-      ]
+      "superseded_by": 4640
     },
     {
       "row": 4647,
@@ -110901,14 +110949,7 @@
       "http_method": "WS",
       "path": "Order V1",
       "channel": "3470257w0",
-      "superseded_by": 4641,
-      "replacement_routes": [
-        {
-          "http_method": "WS",
-          "path": "Order V1",
-          "channel": "3470074w0"
-        }
-      ]
+      "superseded_by": 4641
     },
     {
       "row": 4648,
@@ -110932,14 +110973,7 @@
       "http_method": "WS",
       "path": "Balance",
       "channel": "3470258w0",
-      "superseded_by": 4642,
-      "replacement_routes": [
-        {
-          "http_method": "WS",
-          "path": "Balance",
-          "channel": "3470075w0"
-        }
-      ]
+      "superseded_by": 4642
     },
     {
       "row": 4649,
@@ -110963,14 +110997,7 @@
       "http_method": "WS",
       "path": "Stop Order",
       "channel": "3470259w0",
-      "superseded_by": 4643,
-      "replacement_routes": [
-        {
-          "http_method": "WS",
-          "path": "Stop Order",
-          "channel": "3470139w0"
-        }
-      ]
+      "superseded_by": 4643
     },
     {
       "row": 4650,

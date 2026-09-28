@@ -1,0 +1,437 @@
+[
+  {
+    "source": {
+      "exchange": "aster",
+      "http_method": null,
+      "path": null,
+      "host": "papi",
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "aster",
+        "http_method": "POST",
+        "path": "/api/v3/prediction/burn",
+        "host": "papi",
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      },
+      {
+        "exchange": "aster",
+        "http_method": "POST",
+        "path": "/api/v3/prediction/merge",
+        "host": "papi",
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      },
+      {
+        "exchange": "aster",
+        "http_method": "POST",
+        "path": "/api/v3/prediction/mint",
+        "host": "papi",
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      },
+      {
+        "exchange": "aster",
+        "http_method": "POST",
+        "path": "/api/v3/prediction/split",
+        "host": "papi",
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#prediction-market-burn-trade"
+  },
+  {
+    "source": {
+      "exchange": "aster",
+      "http_method": null,
+      "path": null,
+      "host": "papi",
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "aster",
+        "http_method": "GET",
+        "path": "/api/v3/prediction/positionHistories",
+        "host": "papi",
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      },
+      {
+        "exchange": "aster",
+        "http_method": "GET",
+        "path": "/api/v3/prediction/positions",
+        "host": "papi",
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      },
+      {
+        "exchange": "aster",
+        "http_method": "GET",
+        "path": "/api/v3/prediction/settlementHistories",
+        "host": "papi",
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#prediction-market-burn-trade"
+  },
+  {
+    "source": {
+      "exchange": "aster",
+      "http_method": "GET",
+      "path": "/fapi/v3/leverageBracket",
+      "host": "fapi",
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "aster",
+        "http_method": "GET",
+        "path": "/fapi/v3/leverageBrackets",
+        "host": "fapi",
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#notional-and-leverage-brackets-user_data"
+  },
+  {
+    "source": {
+      "exchange": "hyperliquid",
+      "http_method": "POST",
+      "path": "/exchange",
+      "host": null,
+      "channel": null,
+      "actions": [
+        "hip3LiquidatorTransfer"
+      ],
+      "tx_types": null,
+      "operation": "dex"
+    },
+    "targets": [
+      {
+        "exchange": "hyperliquid",
+        "http_method": "POST",
+        "path": "/exchange",
+        "host": null,
+        "channel": null,
+        "actions": [
+          "hip3LiquidatorTransfer"
+        ],
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-3-deployer-actions"
+  },
+  {
+    "source": {
+      "exchange": "hyperliquid",
+      "http_method": "POST",
+      "path": "/info",
+      "host": null,
+      "channel": null,
+      "actions": [
+        "outcomeMeta"
+      ],
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "hyperliquid",
+        "http_method": "POST",
+        "path": "/info",
+        "host": null,
+        "channel": null,
+        "actions": [
+          "outcomeDeployerLimits",
+          "outcomeMeta",
+          "settledOutcome"
+        ],
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-4-deployer-actions#action-format"
+  },
+  {
+    "source": {
+      "exchange": "aster",
+      "http_method": "WS",
+      "path": "predictionEvents \\- Prediction Events",
+      "host": "aster-finance-prediction-api-tesetnet",
+      "channel": "predictionEvents \\- Prediction Events",
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "aster",
+        "http_method": "GET",
+        "path": "/api/v3/prediction/exchangeInfo",
+        "host": "papi",
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api-tesetnet.md#L455"
+  },
+  {
+    "source": {
+      "exchange": "aster",
+      "http_method": "WS",
+      "path": "predictionEvents \\- Prediction Events",
+      "host": "aster-finance-prediction-api",
+      "channel": "predictionEvents \\- Prediction Events",
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "aster",
+        "http_method": "GET",
+        "path": "/api/v3/prediction/exchangeInfo",
+        "host": "papi",
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api.md#L455"
+  },
+  {
+    "source": {
+      "exchange": "binance",
+      "http_method": "WS",
+      "path": "/account.status",
+      "host": "derivatives_trading_usds_futures",
+      "channel": "account_information",
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "binance",
+        "http_method": "WS",
+        "path": "/v2/account.status",
+        "host": "derivatives_trading_usds_futures",
+        "channel": "account_information_v2",
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/ws-api/account#account-information"
+  },
+  {
+    "source": {
+      "exchange": "binance",
+      "http_method": "WS",
+      "path": "/account.balance",
+      "host": "derivatives_trading_usds_futures",
+      "channel": "futures_account_balance",
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "binance",
+        "http_method": "WS",
+        "path": "/v2/account.balance",
+        "host": "derivatives_trading_usds_futures",
+        "channel": "futures_account_balance_v2",
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/ws-api/account#futures-account-balance"
+  },
+  {
+    "source": {
+      "exchange": "binance",
+      "http_method": "WS",
+      "path": "/account.position",
+      "host": "derivatives_trading_usds_futures",
+      "channel": "position_information",
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "binance",
+        "http_method": "WS",
+        "path": "/v2/account.position",
+        "host": "derivatives_trading_usds_futures",
+        "channel": "position_information_v2",
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/ws-api/trade#position-information"
+  },
+  {
+    "source": {
+      "exchange": "binance",
+      "http_method": "WS",
+      "path": "/orderList.place",
+      "host": "spot",
+      "channel": "order_list_place",
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "binance",
+        "http_method": "WS",
+        "path": "/orderList.place.oco",
+        "host": "spot",
+        "channel": "order_list_place_oco",
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://developers.binance.com/en/docs/catalog/core-trading-spot-trading/api/ws-api/trade#order-list-place"
+  },
+  {
+    "source": {
+      "exchange": "kucoin",
+      "http_method": "WS",
+      "path": "Order V2",
+      "host": null,
+      "channel": "3470256w0",
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "kucoin",
+        "http_method": "WS",
+        "path": "Order V2",
+        "host": null,
+        "channel": "3470073w0",
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.kucoin.com/docs-new/3470256w0"
+  },
+  {
+    "source": {
+      "exchange": "kucoin",
+      "http_method": "WS",
+      "path": "Order V1",
+      "host": null,
+      "channel": "3470257w0",
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "kucoin",
+        "http_method": "WS",
+        "path": "Order V1",
+        "host": null,
+        "channel": "3470074w0",
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.kucoin.com/docs-new/3470257w0"
+  },
+  {
+    "source": {
+      "exchange": "kucoin",
+      "http_method": "WS",
+      "path": "Balance",
+      "host": null,
+      "channel": "3470258w0",
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "kucoin",
+        "http_method": "WS",
+        "path": "Balance",
+        "host": null,
+        "channel": "3470075w0",
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.kucoin.com/docs-new/3470258w0"
+  },
+  {
+    "source": {
+      "exchange": "kucoin",
+      "http_method": "WS",
+      "path": "Stop Order",
+      "host": null,
+      "channel": "3470259w0",
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "kucoin",
+        "http_method": "WS",
+        "path": "Stop Order",
+        "host": null,
+        "channel": "3470139w0",
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.kucoin.com/docs-new/3470259w0"
+  }
+]

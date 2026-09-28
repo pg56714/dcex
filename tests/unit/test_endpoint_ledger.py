@@ -1,7 +1,6 @@
 """Every implemented ledger claim must have callable wrappers and wire-test evidence."""
 
 import importlib
-import ast
 import json
 import re
 from functools import cache
@@ -46,60 +45,18 @@ def test_implemented_routes_are_unique():
 
 
 def test_superseded_rows_target_same_route_or_declared_replacement():
-    rows = {r["row"]: r for r in LEDGER["rows"]}
-    failures = []
-    for row in rows.values():
-        if row["status"] != "superseded" or "superseded_by" not in row:
-            continue
-        targets = row["superseded_by"]
-        for number in targets if isinstance(targets, list) else [targets]:
-            target = rows[number]
-            assert target["exchange"] == row["exchange"]
-            same = all(
-                row.get(key) == target.get(key)
-                for key in (
-                    "http_method",
-                    "path",
-                    "host",
-                    "channel",
-                    "actions",
-                    "tx_types",
-                    "operation",
-                )
-            )
-            grouped = row.get("channel") is not None and row["channel"] in target.get(
-                "channels", []
-            )
-            declared = any(
-                all(target.get(k) == v for k, v in route.items())
-                for route in row.get("replacement_routes", [])
-            )
-            grouped = grouped or any(
-                all(row.get(k) == v for k, v in route.items())
-                for route in target.get("covered_routes", [])
-            )
-            if not (same or grouped or declared):
-                failures.append((row["row"], number, row.get("path"), row.get("channel")))
-    assert not failures, failures
+    from tests.unit.ledger_validation import validate_superseded
+
+    replacements = json.loads((ROOT / "docs/endpoint-replacements.json").read_text(encoding="utf-8"))
+    validate_superseded(LEDGER["rows"], replacements)
 
 
 def test_evidence_symbols_exist_and_numeric_anchors_are_forbidden():
+    from tests.unit.ledger_validation import validate_evidence
+
     for row in LEDGER["rows"]:
         for evidence in row.get("evidence", []):
-            assert not re.search(r":\d+$", evidence), (row["row"], evidence)
-            if "::" not in evidence:
-                continue
-            path, symbol = evidence.split("::", 1)
-            source = (ROOT / path).read_text(encoding="utf8")
-            if path.endswith(".py"):
-                names = {
-                    node.name
-                    for node in ast.walk(ast.parse(source))
-                    if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
-                }
-                assert symbol.split(".")[-1] in names, (row["row"], evidence)
-            else:
-                assert re.search(r"\b" + re.escape(symbol) + r"\b", source), (row["row"], evidence)
+            validate_evidence(ROOT, evidence)
 
 
 @cache
