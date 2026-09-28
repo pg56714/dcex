@@ -78,7 +78,11 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "futures_send_quote_request",

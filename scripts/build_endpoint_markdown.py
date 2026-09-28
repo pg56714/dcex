@@ -3,21 +3,16 @@
 # ruff: noqa: E501 - bilingual Markdown paragraphs and table templates.
 
 import argparse
-import ast
 import collections
 import importlib
 import inspect
 import json
-import shutil
-import subprocess
 from pathlib import Path
 
 from scripts.build_endpoint_docs import EXCHANGE_ORDER as EXCHANGES
 
 ROOT = Path(__file__).resolve().parents[1]
-GIT = shutil.which("git") or ""
-if not GIT:
-    raise RuntimeError("git is required to compare the documented baseline")
+BASELINE = ROOT / "docs/endpoint-method-baseline.json"
 
 
 def build_markdown() -> dict[Path, str]:
@@ -57,19 +52,7 @@ def build_markdown() -> dict[Path, str]:
                         inspect.getdoc(function) or "See the method signature and endpoint ledger."
                     )
                     names[name] = (file.as_posix(), doc.splitlines()[0].rstrip("."))
-        old = set()
-        files = subprocess.check_output(  # noqa: S603 - fixed revision and known exchange names.
-            [GIT, "ls-tree", "-r", "--name-only", "d0bbf8b0", f"dcex/{ex}"], text=True
-        ).splitlines()
-        for file in files:
-            if not file.endswith(".py"):
-                continue
-            source = subprocess.run(  # noqa: S603 - paths returned by git for the fixed revision.
-                [GIT, "show", f"d0bbf8b0:{file}"], capture_output=True, check=True
-            ).stdout.decode("utf-8")
-            for node in ast.walk(ast.parse(source)):
-                if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
-                    old.add(node.name)
+        old = set(json.loads(BASELINE.read_text(encoding="utf-8"))["methods"][ex])
         methods[ex] = len(names)
         additions[ex] = len(names.keys() - old)
         method_info[ex] = {name: info for name, info in sorted(names.items()) if name not in old}
@@ -154,16 +137,16 @@ def build_markdown() -> dict[Path, str]:
         verification = d["verification"]
         text += "<!-- VERIFICATION -->\n"
         labels = {
-            "rust_passed": "Rust passed",
-            "rust_live_ignored": "Rust live ignored",
-            "python_passed": "Python passed",
-            "python_deselected": "Python deselected",
-            "python_skipped": "Python skipped",
-            "python_xfailed": "Python xfailed",
-            "outstanding_test_failures": "Outstanding test failures",
-            "native_extension_rebuilt": "Native extension rebuilt",
-            "native_profile": "Native build profile",
-            "clippy_existing_warnings": "Existing Clippy warnings",
+            "rust_passed": ("Rust 通過" if zh else "Rust passed"),
+            "rust_live_ignored": ("Rust 線上測試略過" if zh else "Rust live ignored"),
+            "python_passed": ("Python 通過" if zh else "Python passed"),
+            "python_deselected": ("Python 未選取" if zh else "Python deselected"),
+            "python_skipped": ("Python 略過" if zh else "Python skipped"),
+            "python_xfailed": ("Python 預期失敗" if zh else "Python xfailed"),
+            "outstanding_test_failures": ("未解決測試失敗" if zh else "Outstanding test failures"),
+            "native_extension_rebuilt": ("原生擴充已重建" if zh else "Native extension rebuilt"),
+            "native_profile": ("原生建置模式" if zh else "Native build profile"),
+            "clippy_existing_warnings": ("既有 Clippy 警告" if zh else "Existing Clippy warnings"),
         }
         for key, label in labels.items():
             if key in verification:

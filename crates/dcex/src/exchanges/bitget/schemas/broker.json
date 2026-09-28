@@ -181,7 +181,11 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/broker/broker#get-all-broker-sub-account-deposit-withdrawal",
-    "summary": "Get All Broker Sub-Account Deposit Withdrawal"
+    "summary": "Get All Broker Sub-Account Deposit Withdrawal",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "broker_get_broker_commission",
@@ -1326,7 +1330,11 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/classic-broker-commission/classic-broker-commission#get-order-commission",
-    "summary": "Get Order Commission"
+    "summary": "Get Order Commission",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "classic_broker_commission_get_rebate_info",
@@ -1835,7 +1843,11 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/classic-broker-subaccount/classic-broker-subaccount#sub-deposit-auto-transfer",
-    "summary": "Sub Deposit Auto Transfer"
+    "summary": "Sub Deposit Auto Transfer",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "classic_broker_subaccount_subaccount_deposit_records",
@@ -1955,7 +1967,11 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/classic-broker-subaccount/classic-broker-subaccount#sub-withdrawal-records",
-    "summary": "Sub Withdrawal Records"
+    "summary": "Sub Withdrawal Records",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "classic_broker_subaccount_get_subaccount_all_deposit_withdrawal_records",
@@ -2007,7 +2023,11 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/classic-broker-subaccount/classic-broker-subaccount#get-sub-accounts-deposit-and-withdrawal-records",
-    "summary": "Get Sub-accounts Deposit and Withdrawal Records"
+    "summary": "Get Sub-accounts Deposit and Withdrawal Records",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "classic_broker_subaccount_get_broker_subaccounts",

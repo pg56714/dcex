@@ -110,6 +110,10 @@
         "copy_amount": {
           "type": "string",
           "format": "decimal"
+        },
+        "leverage": {
+          "type": "string",
+          "format": "decimal"
         }
       }
     }
@@ -188,7 +192,11 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/classic-copytrading-future-follower/classic-copytrading-future-copytrade-follower#get-current-tracking-orders",
-    "summary": "Get Current Tracking Orders"
+    "summary": "Get Current Tracking Orders",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "classic_copytrading_future_copytrade_follower_query_history_orders",
@@ -264,7 +272,11 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/classic-copytrading-future-follower/classic-copytrading-future-copytrade-follower#get-history-tracking-orders",
-    "summary": "Get History Tracking Orders"
+    "summary": "Get History Tracking Orders",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "classic_copytrading_future_copytrade_follower_setting_tpsl",
@@ -740,7 +752,11 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/classic-copytrading-future-trader/classic-copytrading-future-copytrade-trader#get-current-tracking-orders",
-    "summary": "Get Current Tracking Orders"
+    "summary": "Get Current Tracking Orders",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "classic_copytrading_future_copytrade_trader_trader_order_history_track",
@@ -816,7 +832,11 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/classic-copytrading-future-trader/classic-copytrading-future-copytrade-trader#get-history-tracking-orders",
-    "summary": "Get History Tracking Orders"
+    "summary": "Get History Tracking Orders",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "classic_copytrading_future_copytrade_trader_trader_order_close_positions",
@@ -855,7 +875,11 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/classic-copytrading-future-trader/classic-copytrading-future-copytrade-trader#close-tracking-order",
-    "summary": "Close Tracking Order"
+    "summary": "Close Tracking Order",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "classic_copytrading_future_copytrade_trader_trader_order_modify_tpsl",
@@ -944,7 +968,11 @@
     "scoped": false,
     "fields": [],
     "source": "https://www.bitget.com/docs/catalog/classic-copytrading-future-trader/classic-copytrading-future-copytrade-trader#get-tracking-order-summary",
-    "summary": "Get Tracking Order Summary"
+    "summary": "Get Tracking Order Summary",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "classic_copytrading_future_copytrade_trader_trader_profit_history_summarys",
@@ -1308,7 +1336,11 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/classic-copytrading-spot-follower/classic-copytrading-spot-copytrade-follower#sell-and-sell-in-batch",
-    "summary": "Sell And Sell in Batch"
+    "summary": "Sell And Sell in Batch",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "classic_copytrading_spot_copytrade_follower_query_current_orders",
@@ -1376,7 +1408,11 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/classic-copytrading-spot-follower/classic-copytrading-spot-copytrade-follower#get-current-copy-trade-orders",
-    "summary": "Get Current Copy Trade Orders"
+    "summary": "Get Current Copy Trade Orders",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "classic_copytrading_spot_copytrade_follower_query_history_orders",
@@ -1444,7 +1480,11 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/classic-copytrading-spot-follower/classic-copytrading-spot-copytrade-follower#get-history-tracking-orders",
-    "summary": "Get History Tracking Orders"
+    "summary": "Get History Tracking Orders",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "classic_copytrading_spot_copytrade_follower_query_settings",
@@ -1716,7 +1756,11 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/classic-copytrading-spot-follower/classic-copytrading-spot-copytrade-follower#stop-the-order",
-    "summary": "Stop The Order"
+    "summary": "Stop The Order",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "classic_copytrading_spot_copytrade_trader_config_query_followers",
@@ -1858,7 +1902,11 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/classic-copytrading-spot-trader/classic-copytrading-spot-copytrade-trader#sell-and-sell-in-batch",
-    "summary": "Sell And Sell in Batch"
+    "summary": "Sell And Sell in Batch",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "classic_copytrading_spot_copytrade_trader_order_current_track",
@@ -1918,7 +1966,11 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/classic-copytrading-spot-trader/classic-copytrading-spot-copytrade-trader#get-current-tracking-orders",
-    "summary": "Get Current Tracking Orders"
+    "summary": "Get Current Tracking Orders",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "classic_copytrading_spot_copytrade_trader_order_history_track",
@@ -1978,7 +2030,11 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/classic-copytrading-spot-trader/classic-copytrading-spot-copytrade-trader#get-history-tracking-orders",
-    "summary": "Get History Tracking Orders"
+    "summary": "Get History Tracking Orders",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "classic_copytrading_spot_copytrade_trader_order_modify_tpsl",
@@ -2049,7 +2105,11 @@
     "scoped": false,
     "fields": [],
     "source": "https://www.bitget.com/docs/catalog/classic-copytrading-spot-trader/classic-copytrading-spot-copytrade-trader#get-data-indicator-statistics",
-    "summary": "Get Data Indicator Statistics"
+    "summary": "Get Data Indicator Statistics",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "classic_copytrading_spot_copytrade_trader_profit_details",
@@ -2287,6 +2347,10 @@
         "max_postion_value": {
           "type": "string",
           "format": "decimal"
+        },
+        "leverage": {
+          "type": "string",
+          "format": "decimal"
         }
       }
     }
@@ -2390,6 +2454,10 @@
           "format": "decimal"
         },
         "max_postion_value": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "leverage": {
           "type": "string",
           "format": "decimal"
         }
@@ -2539,7 +2607,11 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/copy-trading/follower#get-copy-transfer-record",
-    "summary": "Get Copy Transfer Record"
+    "summary": "Get Copy Transfer Record",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "copy_trading_follower_get_current_copy",
@@ -2930,7 +3002,11 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/copy-trading/follower#get-current-tpsl-orders",
-    "summary": "Get Current TPSL Orders"
+    "summary": "Get Current TPSL Orders",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "copy_trading_follower_get_tpsl_order_history",
@@ -2982,7 +3058,11 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/copy-trading/follower#get-tpsl-order-history",
-    "summary": "Get TPSL Order History"
+    "summary": "Get TPSL Order History",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "copy_trading_public_private_get_position_summary",
@@ -3024,7 +3104,11 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/copy-trading/public-private#get-max-transferable",
-    "summary": "Get Max Transferable"
+    "summary": "Get Max Transferable",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "copy_trading_public_private_transfer",
@@ -3121,7 +3205,11 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/copy-trading/public-private#get-transfer-record",
-    "summary": "Get Transfer Record"
+    "summary": "Get Transfer Record",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "copy_trading_public_private_get_current_followers",

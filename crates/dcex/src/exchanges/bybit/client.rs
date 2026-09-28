@@ -28,6 +28,8 @@ pub struct BybitClient {
 }
 
 impl BybitClient {
+    pub(crate) const INPUT_EXCHANGE: &'static str = "bybit";
+
     pub fn new(
         api_key: Option<String>,
         api_secret: Option<String>,

@@ -106,6 +106,10 @@
       ]
     },
     "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-cancel-withdrawal-order",
-    "row": 1324
+    "row": 1324,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   }
 ]

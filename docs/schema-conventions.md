@@ -103,3 +103,30 @@ When changing evidence paths, regenerate `scripts/build_endpoint_docs.py` and
 run its `--check`. Check for loaded `.pyd` modules and verify exclusive access
 before rebuilding native. Behaviour fixes and file-only moves use separate
 commits; do not edit `CHANGELOG.md` manually.
+
+### Explicit boundaries and evidence granularity
+
+An undeclared field receives **no numeric validation**. The completeness guard
+independently inventories public signatures, wire aliases, variadic operations and
+list/dict parameters; non-financial exceptions are individually documented in
+`tests/fixtures/input_contract_exemptions.json`. Adding a numeric parameter without
+a declaration fails the guard. `format: decimal` permits zero by default;
+`x-positive: true` requires a value strictly greater than zero. Order quantities
+and transfer amounts without a zero control meaning opt into positive checks;
+zero-valued cancellation controls and documented sentinels retain their semantics.
+
+Kraken V1 `amendOrder` also permits relative limit/trigger prices. Conditional
+`close[price]`/`close[price2]` (Python `close_price`/`close_price2`) inherit the
+corresponding price rules, as specified by the [Kraken V1 addOrder documentation](https://docs-legacy.kraken.com/api/docs/websocket-v1/addorder/).
+[Kraken futures offsets](https://docs.kraken.com/api-reference/order-management/send-order)
+allow positive and negative decimal values, with their unit specified separately.
+[OKX simulation idxVol](https://www.okx.com/docs-v5/en/#trading-account-rest-api-position-builder)
+is a signed decimal in the -0.99 to 1 range. The checked [Backpack API documentation](https://docs.backpack.exchange/)
+describes triggerQuantity as a string quantity but does not establish percent-suffix
+support; no percent exception is inferred from that absence (checked 2026-09-29).
+
+Rust ledger evidence without `::symbol` is deliberately **file-level evidence**:
+it proves the cited source file exists, not that a particular function covers a
+route. Symbol-qualified references are validated when present; dedicated wire
+coverage tests remain the route-level evidence. Superseded reasons must contain
+at least four distinct words and cannot be padded single-token placeholders.

@@ -48,7 +48,7 @@ def validate_superseded(rows, replacements):
             continue
         if not row.get("superseded_by"):
             reason = row.get("superseded_reason", "")
-            assert isinstance(reason, str) and len(reason.strip()) >= 20, (row["row"], "missing reason")
+            assert isinstance(reason, str) and len(reason.strip()) >= 20 and len(set(re.findall(r"[A-Za-z]{2,}", reason.lower()))) >= 4, (row["row"], "missing reason")
         else:
             visit(row["row"], set())
 
@@ -72,7 +72,9 @@ def python_symbols(source):
 def rust_symbols(source):
     # Ignore comments and quoted content before recognizing actual declarations.
     tokens = re.compile(r'//[^\n]*|/\*[\s\S]*?\*/|r(?P<hash>\#*)"[\s\S]*?"(?P=hash)|"(?:\\[\s\S]|[^"\\])*"')
-    code = tokens.sub(" ", source)
+    # A char literal containing a double quote must not start a string token.
+    chars = re.compile(r"'(?:\\.|[^'\\\n])'")
+    code = tokens.sub(" ", chars.sub(" ", source))
     return set(re.findall(r"\b(?:fn|struct|enum|trait|type|const|static|mod)\s+(\w+)", code))
 
 

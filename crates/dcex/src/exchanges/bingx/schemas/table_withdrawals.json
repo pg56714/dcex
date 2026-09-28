@@ -24,6 +24,10 @@
       "offset",
       "limit",
       "recvWindow"
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   }
 ]

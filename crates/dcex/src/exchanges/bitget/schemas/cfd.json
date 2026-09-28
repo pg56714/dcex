@@ -154,7 +154,11 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/cfd-account/cfd-account#get-cfd-transfer-records",
-    "summary": "Get Transfer Records"
+    "summary": "Get Transfer Records",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "cfd_account_get_financial_records",
@@ -555,7 +559,11 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/cfd-trade/cfd-trade#cancel-cfd-order",
-    "summary": "Cancel CFD Order"
+    "summary": "Cancel CFD Order",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "cfd_trade_cancel_all_orders",
@@ -576,7 +584,11 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/cfd-trade/cfd-trade#cancel-all-cfd-orders",
-    "summary": "Cancel All CFD Orders"
+    "summary": "Cancel All CFD Orders",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "cfd_trade_close_positions",
@@ -673,7 +685,11 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/cfd-trade/cfd-trade#get-cfd-unfilled-orders",
-    "summary": "Get CFD Unfilled Orders"
+    "summary": "Get CFD Unfilled Orders",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "cfd_trade_get_order_history",
@@ -745,7 +761,11 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/cfd-trade/cfd-trade#get-cfd-order-history",
-    "summary": "Get CFD Order History"
+    "summary": "Get CFD Order History",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "cfd_trade_get_current_positions",

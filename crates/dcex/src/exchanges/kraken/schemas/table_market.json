@@ -169,7 +169,11 @@
         "values": [],
         "minimum": 1
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_futures_market_executions",
@@ -381,7 +385,11 @@
         "minimum": 0
       }
     ],
-    "symbol_key": "pair"
+    "symbol_key": "pair",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_spot_grouped_orderbook",
@@ -434,7 +442,11 @@
         "minimum": 0
       }
     ],
-    "symbol_key": "pair"
+    "symbol_key": "pair",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_spot_maintenance_schedule",

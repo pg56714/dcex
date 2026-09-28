@@ -29,7 +29,11 @@
     ],
     "source": "https://bingx-api.github.io/docs-v3/#/en/Wealth/Dual-Currency/Dual-Currency%20Order%20Records",
     "summary": "Dual-Currency Order Records",
-    "scoped": false
+    "scoped": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_wealth_v1_product_dual_currency_position",

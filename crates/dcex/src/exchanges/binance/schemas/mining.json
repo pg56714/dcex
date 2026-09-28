@@ -346,7 +346,16 @@
     ],
     "json_body": false,
     "source": "https://developers.binance.com/en/docs/catalog/investment-and-services-mining/api/rest-api/~#hashrate-resale-request",
-    "summary": "Hashrate Resale Request (USER_DATA)"
+    "summary": "Hashrate Resale Request (USER_DATA)",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "hash_rate": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "mining_account_earning",

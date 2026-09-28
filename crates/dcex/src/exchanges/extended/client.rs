@@ -24,6 +24,8 @@ pub struct ExtendedClient {
 }
 
 impl ExtendedClient {
+    pub(crate) const INPUT_EXCHANGE: &'static str = "extended";
+
     pub fn new(api_key: Option<String>, timeout: Duration) -> Result<Self> {
         Self::with_base_url(
             api_key,

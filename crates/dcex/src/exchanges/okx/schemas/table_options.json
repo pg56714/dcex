@@ -24,6 +24,10 @@
       "instFamily"
     ],
     "bools": [],
-    "schema": "{\"type\":\"object\",\"properties\":{\"instType\":{\"type\":\"string\"},\"instFamily\":{\"type\":\"string\"},\"lockInterval\":{\"type\":\"string\"}},\"required\":[\"instType\",\"instFamily\"]}"
+    "schema": "{\"type\":\"object\",\"properties\":{\"instType\":{\"type\":\"string\"},\"instFamily\":{\"type\":\"string\"},\"lockInterval\":{\"type\":\"string\"}},\"required\":[\"instType\",\"instFamily\"]}",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   }
 ]

@@ -220,7 +220,20 @@
       "profitSharingRatio"
     ],
     "bools": [],
-    "schema": "{\"type\":\"object\",\"properties\":{\"instType\":{\"type\":\"string\",\"description\":\"Instrument type SWAP\"},\"profitSharingRatio\":{\"type\":\"string\",\"description\":\"Profit sharing ratio. 0.1 represents 10%\"}},\"required\":[\"profitSharingRatio\"]}"
+    "schema": "{\"type\":\"object\",\"properties\":{\"instType\":{\"type\":\"string\",\"description\":\"Instrument type SWAP\"},\"profitSharingRatio\":{\"type\":\"string\",\"description\":\"Profit sharing ratio. 0.1 represents 10%\"}},\"required\":[\"profitSharingRatio\"]}",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "profit_sharing_ratio": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "profitSharingRatio": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_copytrading_config",
@@ -261,7 +274,60 @@
       "subPosCloseType"
     ],
     "bools": [],
-    "schema": "{\"type\":\"object\",\"properties\":{\"instType\":{\"type\":\"string\",\"description\":\"Instrument type SWAP , the default value\"},\"uniqueCode\":{\"type\":\"string\",\"description\":\"Lead trader unique code A combination of case-sensitive alphanumerics, all numbers and the length is 16 or 18 characters, e.g. 213E8C92DC61EFAC (16 characters) or 381749205163847291 (18 characters)\"},\"copyMgnMode\":{\"type\":\"string\",\"description\":\"Copy margin mode cross : cross isolated : isolated copy : Use the same margin mode as lead trader when opening positions\"},\"copyInstIdType\":{\"type\":\"string\",\"description\":\"Copy contract type setted custom : custom by instId which is required\\uff1b copy : Keep your contracts consistent with this trader by automatically adding or removing contracts when they do\"},\"instId\":{\"type\":\"string\",\"description\":\"Instrument ID. If there are multiple instruments, separate them with commas.\"},\"copyMode\":{\"type\":\"string\",\"description\":\"Copy mode fixed_amount : set the same fixed amount for each order, and copyAmt is required\\uff1b ratio_copy : set amount as a multiple of the lead trader\\u2019s order value, and copyRatio is required The default is fixed_amount\"},\"copyTotalAmt\":{\"type\":\"string\",\"description\":\"Maximum total amount in USDT. The maximum total amount you'll invest at any given time across all orders in this copy trade You won\\u2019t copy new orders if you exceed this amount\"},\"copyAmt\":{\"type\":\"string\",\"description\":\"Copy amount per order in USDT.\"},\"copyRatio\":{\"type\":\"string\",\"description\":\"Copy ratio per order.\"},\"tpRatio\":{\"type\":\"string\",\"description\":\"Take profit per order. 0.1 represents 10%\"},\"slRatio\":{\"type\":\"string\",\"description\":\"Stop loss per order. 0.1 represents 10%\"},\"slTotalAmt\":{\"type\":\"string\",\"description\":\"Total stop loss in USDT for trader. If your net loss (total profit - total loss) reaches this amount, you'll stop copying this trader\"},\"subPosCloseType\":{\"type\":\"string\",\"description\":\"Action type for open positions market_close : immediately close at market price copy_close \\uff1aclose when trader closes manual_close : close manually The default is copy_close\"},\"tag\":{\"type\":\"string\",\"description\":\"Order tag A combination of case-sensitive alphanumerics, all numbers, or all letters of up to 16 characters.\"}},\"required\":[\"uniqueCode\",\"copyMgnMode\",\"copyInstIdType\",\"copyTotalAmt\",\"subPosCloseType\"]}"
+    "schema": "{\"type\":\"object\",\"properties\":{\"instType\":{\"type\":\"string\",\"description\":\"Instrument type SWAP , the default value\"},\"uniqueCode\":{\"type\":\"string\",\"description\":\"Lead trader unique code A combination of case-sensitive alphanumerics, all numbers and the length is 16 or 18 characters, e.g. 213E8C92DC61EFAC (16 characters) or 381749205163847291 (18 characters)\"},\"copyMgnMode\":{\"type\":\"string\",\"description\":\"Copy margin mode cross : cross isolated : isolated copy : Use the same margin mode as lead trader when opening positions\"},\"copyInstIdType\":{\"type\":\"string\",\"description\":\"Copy contract type setted custom : custom by instId which is required\\uff1b copy : Keep your contracts consistent with this trader by automatically adding or removing contracts when they do\"},\"instId\":{\"type\":\"string\",\"description\":\"Instrument ID. If there are multiple instruments, separate them with commas.\"},\"copyMode\":{\"type\":\"string\",\"description\":\"Copy mode fixed_amount : set the same fixed amount for each order, and copyAmt is required\\uff1b ratio_copy : set amount as a multiple of the lead trader\\u2019s order value, and copyRatio is required The default is fixed_amount\"},\"copyTotalAmt\":{\"type\":\"string\",\"description\":\"Maximum total amount in USDT. The maximum total amount you'll invest at any given time across all orders in this copy trade You won\\u2019t copy new orders if you exceed this amount\"},\"copyAmt\":{\"type\":\"string\",\"description\":\"Copy amount per order in USDT.\"},\"copyRatio\":{\"type\":\"string\",\"description\":\"Copy ratio per order.\"},\"tpRatio\":{\"type\":\"string\",\"description\":\"Take profit per order. 0.1 represents 10%\"},\"slRatio\":{\"type\":\"string\",\"description\":\"Stop loss per order. 0.1 represents 10%\"},\"slTotalAmt\":{\"type\":\"string\",\"description\":\"Total stop loss in USDT for trader. If your net loss (total profit - total loss) reaches this amount, you'll stop copying this trader\"},\"subPosCloseType\":{\"type\":\"string\",\"description\":\"Action type for open positions market_close : immediately close at market price copy_close \\uff1aclose when trader closes manual_close : close manually The default is copy_close\"},\"tag\":{\"type\":\"string\",\"description\":\"Order tag A combination of case-sensitive alphanumerics, all numbers, or all letters of up to 16 characters.\"}},\"required\":[\"uniqueCode\",\"copyMgnMode\",\"copyInstIdType\",\"copyTotalAmt\",\"subPosCloseType\"]}",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "copy_total_amt": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "copy_amt": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "copy_ratio": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "tp_ratio": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "sl_ratio": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "sl_total_amt": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "copyTotalAmt": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "copyAmt": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "copyRatio": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "tpRatio": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "slRatio": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "slTotalAmt": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "copytrading_amend_copy_settings",
@@ -292,7 +358,60 @@
       "subPosCloseType"
     ],
     "bools": [],
-    "schema": "{\"type\":\"object\",\"properties\":{\"instType\":{\"type\":\"string\",\"description\":\"Instrument type SWAP\"},\"uniqueCode\":{\"type\":\"string\",\"description\":\"Lead trader unique code A combination of case-sensitive alphanumerics, all numbers and the length is 16 or 18 characters, e.g. 213E8C92DC61EFAC (16 characters) or 381749205163847291 (18 characters)\"},\"copyMgnMode\":{\"type\":\"string\",\"description\":\"Copy margin mode cross : cross isolated : isolated copy : Use the same margin mode as lead trader when opening positions\"},\"copyInstIdType\":{\"type\":\"string\",\"description\":\"Copy contract type setted custom : custom by instId which is required\\uff1b copy : Keep your contracts consistent with this trader by automatically adding or removing contracts when they do\"},\"instId\":{\"type\":\"string\",\"description\":\"Instrument ID. If there are multiple instruments, separate them with commas.\"},\"copyMode\":{\"type\":\"string\",\"description\":\"Copy mode fixed_amount : set the same fixed amount for each order, and copyAmt is required\\uff1b ratio_copy : set amount as a multiple of the lead trader\\u2019s order value, and copyRatio is required The default is fixed_amount\"},\"copyTotalAmt\":{\"type\":\"string\",\"description\":\"Maximum total amount in USDT. The maximum total amount you'll invest at any given time across all orders in this copy trade You won\\u2019t copy new orders if you exceed this amount\"},\"copyAmt\":{\"type\":\"string\",\"description\":\"Copy amount per order in USDT\"},\"copyRatio\":{\"type\":\"string\",\"description\":\"Copy ratio per order.\"},\"tpRatio\":{\"type\":\"string\",\"description\":\"Take profit per order. 0.1 represents 10%\"},\"slRatio\":{\"type\":\"string\",\"description\":\"Stop loss per order. 0.1 represents 10%\"},\"slTotalAmt\":{\"type\":\"string\",\"description\":\"Total stop loss in USDT for trader. If your net loss (total profit - total loss) reaches this amount, you'll stop copying this trader\"},\"subPosCloseType\":{\"type\":\"string\",\"description\":\"Action type for open positions market_close : immediately close at market price copy_close \\uff1aclose when trader closes manual_close : close manually The default is copy_close\"},\"tag\":{\"type\":\"string\",\"description\":\"Order tag A combination of case-sensitive alphanumerics, all numbers, or all letters of up to 16 characters.\"}},\"required\":[\"uniqueCode\",\"copyMgnMode\",\"copyInstIdType\",\"copyTotalAmt\",\"subPosCloseType\"]}"
+    "schema": "{\"type\":\"object\",\"properties\":{\"instType\":{\"type\":\"string\",\"description\":\"Instrument type SWAP\"},\"uniqueCode\":{\"type\":\"string\",\"description\":\"Lead trader unique code A combination of case-sensitive alphanumerics, all numbers and the length is 16 or 18 characters, e.g. 213E8C92DC61EFAC (16 characters) or 381749205163847291 (18 characters)\"},\"copyMgnMode\":{\"type\":\"string\",\"description\":\"Copy margin mode cross : cross isolated : isolated copy : Use the same margin mode as lead trader when opening positions\"},\"copyInstIdType\":{\"type\":\"string\",\"description\":\"Copy contract type setted custom : custom by instId which is required\\uff1b copy : Keep your contracts consistent with this trader by automatically adding or removing contracts when they do\"},\"instId\":{\"type\":\"string\",\"description\":\"Instrument ID. If there are multiple instruments, separate them with commas.\"},\"copyMode\":{\"type\":\"string\",\"description\":\"Copy mode fixed_amount : set the same fixed amount for each order, and copyAmt is required\\uff1b ratio_copy : set amount as a multiple of the lead trader\\u2019s order value, and copyRatio is required The default is fixed_amount\"},\"copyTotalAmt\":{\"type\":\"string\",\"description\":\"Maximum total amount in USDT. The maximum total amount you'll invest at any given time across all orders in this copy trade You won\\u2019t copy new orders if you exceed this amount\"},\"copyAmt\":{\"type\":\"string\",\"description\":\"Copy amount per order in USDT\"},\"copyRatio\":{\"type\":\"string\",\"description\":\"Copy ratio per order.\"},\"tpRatio\":{\"type\":\"string\",\"description\":\"Take profit per order. 0.1 represents 10%\"},\"slRatio\":{\"type\":\"string\",\"description\":\"Stop loss per order. 0.1 represents 10%\"},\"slTotalAmt\":{\"type\":\"string\",\"description\":\"Total stop loss in USDT for trader. If your net loss (total profit - total loss) reaches this amount, you'll stop copying this trader\"},\"subPosCloseType\":{\"type\":\"string\",\"description\":\"Action type for open positions market_close : immediately close at market price copy_close \\uff1aclose when trader closes manual_close : close manually The default is copy_close\"},\"tag\":{\"type\":\"string\",\"description\":\"Order tag A combination of case-sensitive alphanumerics, all numbers, or all letters of up to 16 characters.\"}},\"required\":[\"uniqueCode\",\"copyMgnMode\",\"copyInstIdType\",\"copyTotalAmt\",\"subPosCloseType\"]}",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "copy_total_amt": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "copy_amt": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "copy_ratio": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "tp_ratio": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "sl_ratio": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "sl_total_amt": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "copyTotalAmt": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "copyAmt": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "copyRatio": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "tpRatio": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "slRatio": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "slTotalAmt": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "copytrading_stop_copy_trading",

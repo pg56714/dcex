@@ -15,7 +15,11 @@
     ],
     "integers": [
       "recvWindow"
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_internal_transfer_records",
@@ -41,7 +45,11 @@
       "offset",
       "limit",
       "recvWindow"
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_sub_account_internal_transfer_records",
@@ -66,6 +74,10 @@
       "offset",
       "limit",
       "recvWindow"
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   }
 ]

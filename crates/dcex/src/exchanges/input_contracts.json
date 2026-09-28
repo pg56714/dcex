@@ -161,6 +161,51 @@
             }
           }
         }
+      },
+      "get_open_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_order_status": {
+        "type": "object",
+        "properties": {}
+      },
+      "set_leverage": {
+        "type": "object",
+        "properties": {
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "get_order_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "batch_cancel_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_l2_orderbook": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_all_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_transfer_updates": {
+        "type": "object",
+        "properties": {}
+      },
+      "submit_internal_transfer": {
+        "type": "object",
+        "properties": {}
       }
     },
     "aster": {
@@ -275,6 +320,22 @@
           "quantity": {
             "type": "string",
             "format": "decimal"
+          },
+          "chaseOffset": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "maxChaseOffset": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "chase_offset": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "max_chase_offset": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -312,6 +373,14 @@
           "stop_price": {
             "type": "string",
             "format": "decimal"
+          },
+          "pegOffset": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "peg_offset": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -325,6 +394,46 @@
           "fee_rate": {
             "type": "string",
             "format": "decimal"
+          },
+          "subOrderList": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "activationPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "activation_price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "callbackRate": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "callback_rate": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "quantity": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "stopPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "stop_price": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
           }
         }
       },
@@ -400,6 +509,14 @@
             "format": "decimal"
           },
           "value_limit": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "deltaLimit": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "delta_limit": {
             "type": "string",
             "format": "decimal"
           }
@@ -583,6 +700,189 @@
             }
           }
         }
+      },
+      "update_futures_strategy_order": {
+        "type": "object",
+        "properties": {
+          "subOrderList": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "activationPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "activation_price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "callbackRate": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "callback_rate": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "quantity": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "stopPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "stop_price": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get_futures_force_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_futures_batch_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "guarded_cancel_futures_batch_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_spot_batch_orders_raw": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_futures_remaining_openable_notional": {
+        "type": "object",
+        "properties": {
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "get_spot_orderbook": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_futures_orderbook": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_spot_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_open_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_open_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_all_spot_open_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_all_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_futures_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_futures_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_all_futures_open_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_futures_open_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_futures_open_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_futures_all_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "set_futures_leverage": {
+        "type": "object",
+        "properties": {
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "get_futures_strategy_open_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_futures_strategy_history_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "guarded_cancel_futures_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_prediction_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_prediction_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_prediction_open_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_prediction_open_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_prediction_all_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_builder_user_open_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_builder_user_all_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_withdraw_fee": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_chain_withdraw_fee": {
+        "type": "object",
+        "properties": {}
       }
     },
     "backpack": {
@@ -961,6 +1261,51 @@
             }
           }
         }
+      },
+      "update_account": {
+        "type": "object",
+        "properties": {
+          "leverageLimit": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "leverage_limit": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "get_order_book_depth": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_open_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_open_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_open_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_order_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_max_withdrawal_quantity": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_withdrawals": {
+        "type": "object",
+        "properties": {}
       }
     },
     "binance": {
@@ -1170,6 +1515,14 @@
           "stop_price": {
             "type": "string",
             "format": "decimal"
+          },
+          "trailing_delta": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "trailingDelta": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -1218,7 +1571,8 @@
         "properties": {
           "amount": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -1987,6 +2341,14 @@
           "working_quantity": {
             "type": "string",
             "format": "decimal"
+          },
+          "pending_trailing_delta": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingTrailingDelta": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -2070,6 +2432,22 @@
             "format": "decimal"
           },
           "working_quantity": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_above_trailing_delta": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_below_trailing_delta": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingAboveTrailingDelta": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingBelowTrailingDelta": {
             "type": "string",
             "format": "decimal"
           }
@@ -2165,7 +2543,8 @@
           },
           "icebergQty": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           },
           "iceberg_qty": {
             "type": "string",
@@ -2181,15 +2560,18 @@
           },
           "price": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           },
           "quantity": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           },
           "quoteOrderQty": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           },
           "quote_order_qty": {
             "type": "string",
@@ -2200,6 +2582,14 @@
             "format": "decimal"
           },
           "stop_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "trailingDelta": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "trailing_delta": {
             "type": "string",
             "format": "decimal"
           }
@@ -2500,6 +2890,14 @@
           "working_quantity": {
             "type": "string",
             "format": "decimal"
+          },
+          "pending_trailing_delta": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingTrailingDelta": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -2607,6 +3005,22 @@
             "format": "decimal"
           },
           "working_quantity": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_above_trailing_delta": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_below_trailing_delta": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingAboveTrailingDelta": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingBelowTrailingDelta": {
             "type": "string",
             "format": "decimal"
           }
@@ -3219,6 +3633,14 @@
             "format": "decimal"
           },
           "stop_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "trailingDelta": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "trailing_delta": {
             "type": "string",
             "format": "decimal"
           }
@@ -4137,6 +4559,142 @@
           "pendingBelowTrailingDelta": {
             "type": "string",
             "format": "decimal"
+          },
+          "stop_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "stop_limit_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "limit_iceberg_qty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "stop_iceberg_qty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "above_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "above_quantity": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "above_stop_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "above_iceberg_qty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "above_trailing_delta": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "below_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "below_quantity": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "below_stop_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "below_iceberg_qty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "below_trailing_delta": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "working_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "working_quantity": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "working_stop_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "working_iceberg_qty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "working_trailing_delta": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_quantity": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_stop_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_iceberg_qty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_trailing_delta": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_above_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_above_quantity": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_above_stop_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_above_iceberg_qty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_above_trailing_delta": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_below_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_below_quantity": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_below_stop_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_below_iceberg_qty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_below_trailing_delta": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -4284,6 +4842,142 @@
             "format": "decimal"
           },
           "pendingBelowTrailingDelta": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "stop_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "stop_limit_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "limit_iceberg_qty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "stop_iceberg_qty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "above_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "above_quantity": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "above_stop_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "above_iceberg_qty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "above_trailing_delta": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "below_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "below_quantity": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "below_stop_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "below_iceberg_qty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "below_trailing_delta": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "working_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "working_quantity": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "working_stop_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "working_iceberg_qty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "working_trailing_delta": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_quantity": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_stop_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_iceberg_qty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_trailing_delta": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_above_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_above_quantity": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_above_stop_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_above_iceberg_qty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_above_trailing_delta": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_below_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_below_quantity": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_below_stop_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_below_iceberg_qty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_below_trailing_delta": {
             "type": "string",
             "format": "decimal"
           }
@@ -4435,8 +5129,778 @@
           "pendingBelowTrailingDelta": {
             "type": "string",
             "format": "decimal"
+          },
+          "stop_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "stop_limit_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "limit_iceberg_qty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "stop_iceberg_qty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "above_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "above_quantity": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "above_stop_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "above_iceberg_qty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "above_trailing_delta": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "below_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "below_quantity": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "below_stop_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "below_iceberg_qty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "below_trailing_delta": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "working_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "working_quantity": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "working_stop_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "working_iceberg_qty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "working_trailing_delta": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_quantity": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_stop_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_iceberg_qty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_trailing_delta": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_above_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_above_quantity": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_above_stop_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_above_iceberg_qty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_above_trailing_delta": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_below_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_below_quantity": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_below_stop_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_below_iceberg_qty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pending_below_trailing_delta": {
+            "type": "string",
+            "format": "decimal"
           }
         }
+      },
+      "get_flexible_loan_ongoing_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_pm_um_force_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_pm_cm_force_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "set_pm_um_leverage": {
+        "type": "object",
+        "properties": {
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "set_pm_cm_leverage": {
+        "type": "object",
+        "properties": {
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "cancel_options_batch_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_futures_batch_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_coin_futures_batch_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_coin_futures_orderbook": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_coin_futures_open_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_coin_futures_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_coin_futures_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_all_coin_futures_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_convert_order_status": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_convert_limit_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_open_convert_limit_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_options_orderbook": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_orderbook": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_futures_orderbook": {
+        "type": "object",
+        "properties": {}
+      },
+      "futures_rpi_order_book": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_coin_futures_algo_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_coin_futures_algo_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_equity_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_all_equity_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_equity_order_detail": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_open_equity_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_equity_order_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_options_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_options_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_all_options_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_all_options_orders_by_underlying": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_open_options_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_options_order_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "set_leverage": {
+        "type": "object",
+        "properties": {
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "get_order_rate_limit": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_futures_algo_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_futures_algo_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_all_open_futures_algo_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_all_futures_algo_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_all_open_futures_algo_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_open_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_all_open_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_all_open_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_future_all_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_all_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_margin_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_margin_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_open_margin_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_all_open_margin_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_all_margin_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_pm_um_open_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_pm_um_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_pm_um_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_all_pm_um_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_pm_um_algo_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_pm_um_algo_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_all_pm_um_algo_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_pm_um_open_algo_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_pm_um_algo_order_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_pm_um_all_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_pm_cm_open_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_pm_cm_all_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_pm_margin_open_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_pm_margin_all_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_pm_cm_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_pm_cm_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_all_pm_cm_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_pm_margin_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_pm_margin_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_all_pm_margin_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_pm_cm_conditional_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_all_pm_cm_conditional_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_pm_cm_conditional_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_pm_cm_conditional_order_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_pm_cm_open_conditional_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_pm_cm_all_conditional_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_pm_um_order_amendments": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_pm_cm_order_amendments": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_order_list": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_all_order_lists": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_open_order_lists": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_spot_order_list": {
+        "type": "object",
+        "properties": {}
+      },
+      "set_coin_futures_leverage": {
+        "type": "object",
+        "properties": {
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "get_coin_futures_all_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_coin_futures_force_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_pm_order_rate_limits": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_futures_order_rate_limits": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_futures_force_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_margin_order_list": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_margin_order_rate_limits": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_margin_all_order_lists": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_margin_order_list": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_margin_open_order_lists": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_coin_futures_download_id_for_futures_order_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_coin_futures_futures_order_history_download_link_by_id": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_coin_futures_order_modify_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "query_coin_futures_current_open_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_pm_download_id_for_um_futures_order_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_pm_um_futures_order_download_link_by_id": {
+        "type": "object",
+        "properties": {}
+      },
+      "query_pm_current_cm_open_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "query_pm_current_um_open_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_futures_download_id_for_futures_order_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_futures_futures_order_history_download_link_by_id": {
+        "type": "object",
+        "properties": {}
+      },
+      "futures_order_status": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_futures_order_modify_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "adjust_margin_cross_margin_max_leverage": {
+        "type": "object",
+        "properties": {
+          "max_leverage": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "maxLeverage": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "algo_cancel_algo_order_future_algo": {
+        "type": "object",
+        "properties": {}
+      },
+      "query_algo_current_algo_open_orders_future_algo": {
+        "type": "object",
+        "properties": {}
+      },
+      "query_algo_historical_algo_orders_future_algo": {
+        "type": "object",
+        "properties": {}
+      },
+      "query_algo_sub_orders_future_algo": {
+        "type": "object",
+        "properties": {}
+      },
+      "algo_cancel_algo_order_spot_algo": {
+        "type": "object",
+        "properties": {}
+      },
+      "query_algo_current_algo_open_orders_spot_algo": {
+        "type": "object",
+        "properties": {}
+      },
+      "query_algo_historical_algo_orders_spot_algo": {
+        "type": "object",
+        "properties": {}
+      },
+      "query_algo_sub_orders_spot_algo": {
+        "type": "object",
+        "properties": {}
+      },
+      "accept_options_block_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_options_block_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "extend_options_block_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_options_block_order_details": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_options_block_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_margin_max_transferable": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_subaccount_futures_transfer_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_subaccount_spot_transfer_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_subaccount_universal_transfer_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_subaccount_transfer_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_pm_margin_transferable_amount": {
+        "type": "object",
+        "properties": {}
+      },
+      "wallet_dust_transfer": {
+        "type": "object",
+        "properties": {}
+      },
+      "query_managed_sub_account_transfer_log_master_account_investor": {
+        "type": "object",
+        "properties": {}
+      },
+      "query_managed_sub_account_transfer_log_master_account_trading": {
+        "type": "object",
+        "properties": {}
+      },
+      "query_managed_sub_account_transfer_log_sub_account_trading": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_transferable_earn_asset_balance_for_portfolio_margin": {
+        "type": "object",
+        "properties": {}
+      },
+      "fetch_withdraw_address_list": {
+        "type": "object",
+        "properties": {}
+      },
+      "fetch_withdraw_quota": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_withdrawal_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_travel_rule_withdrawal_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_travel_rule_withdrawal_history_v2": {
+        "type": "object",
+        "properties": {}
+      },
+      "disable_fast_withdraw_switch": {
+        "type": "object",
+        "properties": {}
+      },
+      "enable_fast_withdraw_switch": {
+        "type": "object",
+        "properties": {}
+      },
+      "prediction_batch_redeem": {
+        "type": "object",
+        "properties": {}
+      },
+      "prediction_batch_cancel_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_order_detail": {
+        "type": "object",
+        "properties": {}
+      },
+      "hashrate_resale_request": {
+        "type": "object",
+        "properties": {
+          "hash_rate": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "prediction_query_order_book": {
+        "type": "object",
+        "properties": {}
+      },
+      "prediction_query_active_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "prediction_query_order_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "prediction_query_transfer_list": {
+        "type": "object",
+        "properties": {}
+      },
+      "prediction_query_transfer_status": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_vip_loan_ongoing_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_fiat_deposit_withdraw_history": {
+        "type": "object",
+        "properties": {}
       }
     },
     "bingx": {
@@ -4691,15 +6155,18 @@
         "properties": {
           "price": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           },
           "quantity": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           },
           "quoteOrderQty": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           },
           "quote_order_qty": {
             "type": "string",
@@ -4833,7 +6300,8 @@
           },
           "price": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           },
           "priceRate": {
             "type": "string",
@@ -4845,7 +6313,8 @@
           },
           "quantity": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           },
           "quoteOrderQty": {
             "type": "string",
@@ -5899,6 +7368,196 @@
             }
           }
         }
+      },
+      "cancel_spot_batch_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_swap_batch_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_orderbook": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_orderbook": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_orderbook_v2": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_coin_swap_orderbook": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_spot_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_spot_open_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_open_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_order_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_swap_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_swap_all_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_order_detail": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_open_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_order_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "set_leverage": {
+        "type": "object",
+        "properties": {
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "get_swap_open_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_swap_force_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_swap_twap_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_swap_open_twap_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_swap_twap_order_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_swap_twap_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_swap_full_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_coin_swap_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_coin_swap_all_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_coin_swap_open_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_coin_swap_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_coin_swap_order_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_coin_swap_force_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "set_coin_swap_leverage": {
+        "type": "object",
+        "properties": {
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "get_standard_futures_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_transferable_coins": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_asset_transfer_records": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_subaccount_transfer_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_subaccount_transferable_amounts": {
+        "type": "object",
+        "properties": {}
+      },
+      "set_sub_account_transfer_authorization": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_internal_transfer_records": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_sub_account_internal_transfer_records": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_withdrawal_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "delete_cswap_v1_trade_all_open_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_copy_trading_v1_spot_history_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "post_copy_trading_v1_spot_trader_sell_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "post_copy_trading_v1_swap_trace_close_track_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_wealth_v1_product_dual_currency_order_records": {
+        "type": "object",
+        "properties": {}
       }
     },
     "bitget": {
@@ -6141,6 +7800,10 @@
             "format": "decimal"
           },
           "copy_amount": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "leverage": {
             "type": "string",
             "format": "decimal"
           }
@@ -6453,6 +8116,10 @@
           "max_postion_value": {
             "type": "string",
             "format": "decimal"
+          },
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -6480,6 +8147,10 @@
             "format": "decimal"
           },
           "max_postion_value": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "leverage": {
             "type": "string",
             "format": "decimal"
           }
@@ -6626,6 +8297,10 @@
             "format": "decimal"
           },
           "open_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "leverage": {
             "type": "string",
             "format": "decimal"
           }
@@ -6800,6 +8475,14 @@
           "new_trigger_price": {
             "type": "string",
             "format": "decimal"
+          },
+          "new_callback_ratio": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "newCallbackRatio": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -6826,6 +8509,14 @@
             "format": "decimal"
           },
           "trigger_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "range_rate": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "rangeRate": {
             "type": "string",
             "format": "decimal"
           }
@@ -7224,6 +8915,14 @@
           "trigger_price": {
             "type": "string",
             "format": "decimal"
+          },
+          "callback_ratio": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "callbackRatio": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -7342,6 +9041,14 @@
             "format": "decimal"
           },
           "trigger_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "range_rate": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "rangeRate": {
             "type": "string",
             "format": "decimal"
           }
@@ -7803,6 +9510,14 @@
           "trigger_price": {
             "type": "string",
             "format": "decimal"
+          },
+          "limit_offset": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "trailing_percent": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -7846,6 +9561,14 @@
             "format": "decimal"
           },
           "trigger_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "limit_offset": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "trailing_percent": {
             "type": "string",
             "format": "decimal"
           }
@@ -8014,6 +9737,10 @@
           "trigger_price": {
             "type": "string",
             "format": "decimal"
+          },
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -8081,6 +9808,10 @@
             "format": "decimal"
           },
           "trigger_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "leverage": {
             "type": "string",
             "format": "decimal"
           }
@@ -8252,6 +9983,10 @@
           "trigger_price": {
             "type": "string",
             "format": "decimal"
+          },
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -8319,6 +10054,10 @@
             "format": "decimal"
           },
           "trigger_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "leverage": {
             "type": "string",
             "format": "decimal"
           }
@@ -9106,6 +10845,542 @@
             }
           }
         }
+      },
+      "get_reality_orderbook": {
+        "type": "object",
+        "properties": {}
+      },
+      "set_uta_leverage": {
+        "type": "object",
+        "properties": {
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "long_leverage": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "short_leverage": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "longLeverage": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "shortLeverage": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "set_futures_leverage": {
+        "type": "object",
+        "properties": {
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "long_leverage": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "short_leverage": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "longLeverage": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "shortLeverage": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "get_uta_pre_set_leverage": {
+        "type": "object",
+        "properties": {
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "long_leverage": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "short_leverage": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "longLeverage": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "shortLeverage": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "cancel_spot_batch_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_uta_batch_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_futures_batch_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_cross_margin_batch_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_isolated_margin_batch_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "batch_create_classic_sub_accounts": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_orderbook": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_futures_orderbook": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_uta_orderbook": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_uta_rpi_orderbook": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_spot_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_open_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_history_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_uta_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_reality_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_uta_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_uta_open_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_uta_history_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_futures_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_futures_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_futures_open_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_futures_history_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_uta_strategy_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_uta_unfilled_strategy_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_uta_history_strategy_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_futures_plan_sub_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_futures_plan_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_pending_futures_plan_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_futures_plan_order_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_spot_plan_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_spot_plan_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_pending_spot_plan_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_plan_order_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_plan_sub_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_all_futures_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_spot_orders_by_symbol": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_uta_orders_by_symbol": {
+        "type": "object",
+        "properties": {}
+      },
+      "set_futures_all_leverage": {
+        "type": "object",
+        "properties": {
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "cancel_cross_margin_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_cross_margin_open_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_cross_margin_order_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_isolated_margin_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_isolated_margin_open_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_isolated_margin_order_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_uta_strategy_sub_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_cross_margin_liquidation_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_isolated_margin_liquidation_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_classic_earn_loan_ongoing_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_transfer_records": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_transferable_coins": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_futures_union_transfer_limits": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_sub_account_transfer_records": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_cross_margin_max_transferable": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_isolated_margin_max_transferable": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_uta_max_transferable": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_uta_transferable_coins": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_uta_position_transfer_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_uta_sub_account_transfer_records": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_uta_account_max_withdrawal": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_classic_spot_wallet_withdrawal_records": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_uta_account_withdrawal_records": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_uta_account_withdraw_address": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_spot_withdrawal": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_uta_withdrawal": {
+        "type": "object",
+        "properties": {}
+      },
+      "classic_broker_commission_get_order_commission": {
+        "type": "object",
+        "properties": {}
+      },
+      "cfd_trade_cancel_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cfd_trade_cancel_all_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "cfd_trade_get_unfilled_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "cfd_trade_get_order_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "classic_copytrading_future_copytrade_follower_query_current_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "classic_copytrading_future_copytrade_follower_query_history_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "classic_copytrading_future_copytrade_trader_trader_order_current_track": {
+        "type": "object",
+        "properties": {}
+      },
+      "classic_copytrading_future_copytrade_trader_trader_order_history_track": {
+        "type": "object",
+        "properties": {}
+      },
+      "classic_copytrading_future_copytrade_trader_trader_order_close_positions": {
+        "type": "object",
+        "properties": {}
+      },
+      "classic_copytrading_future_copytrade_trader_trader_order_total_detail": {
+        "type": "object",
+        "properties": {}
+      },
+      "classic_copytrading_spot_copytrade_follower_order_close_tracking": {
+        "type": "object",
+        "properties": {}
+      },
+      "classic_copytrading_spot_copytrade_follower_query_current_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "classic_copytrading_spot_copytrade_follower_query_history_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "classic_copytrading_spot_copytrade_follower_stop_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "classic_copytrading_spot_copytrade_trader_order_close_tracking": {
+        "type": "object",
+        "properties": {}
+      },
+      "classic_copytrading_spot_copytrade_trader_order_current_track": {
+        "type": "object",
+        "properties": {}
+      },
+      "classic_copytrading_spot_copytrade_trader_order_history_track": {
+        "type": "object",
+        "properties": {}
+      },
+      "classic_copytrading_spot_copytrade_trader_order_total_detail": {
+        "type": "object",
+        "properties": {}
+      },
+      "copy_trading_follower_get_current_tpsl_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "copy_trading_follower_get_tpsl_order_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "classic_instloan_orders_get_loan_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "classic_instloan_orders_get_repayment_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "institutional_loan_get_loan_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "institutional_loan_get_repayment_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "classic_p2p_get_p2_p_order_list": {
+        "type": "object",
+        "properties": {}
+      },
+      "p2p_order_management_get_pending_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "p2p_order_management_get_all_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "p2p_order_management_get_order_info": {
+        "type": "object",
+        "properties": {}
+      },
+      "p2p_order_management_confirm_payment": {
+        "type": "object",
+        "properties": {}
+      },
+      "p2p_order_management_release_asset": {
+        "type": "object",
+        "properties": {}
+      },
+      "stock_plus_orders_cancel_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "stock_plus_orders_get_today_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "stock_plus_orders_get_history_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "stock_plus_orders_get_order_detail": {
+        "type": "object",
+        "properties": {}
+      },
+      "stock_plus_orders_get_today_executions": {
+        "type": "object",
+        "properties": {}
+      },
+      "stock_plus_orders_get_history_executions": {
+        "type": "object",
+        "properties": {}
+      },
+      "cfd_account_get_transfer_records": {
+        "type": "object",
+        "properties": {}
+      },
+      "classic_broker_subaccount_subaccount_deposit_auto_transfer": {
+        "type": "object",
+        "properties": {}
+      },
+      "classic_instloan_account_get_transferred_amount_from_spot_account": {
+        "type": "object",
+        "properties": {}
+      },
+      "copy_trading_follower_get_copy_transfer_record": {
+        "type": "object",
+        "properties": {}
+      },
+      "copy_trading_public_private_get_max_transferable": {
+        "type": "object",
+        "properties": {}
+      },
+      "copy_trading_public_private_get_transfer_record": {
+        "type": "object",
+        "properties": {}
+      },
+      "institutional_loan_get_transferred_quantity": {
+        "type": "object",
+        "properties": {}
+      },
+      "stock_plus_assets_get_transfer_records": {
+        "type": "object",
+        "properties": {}
+      },
+      "broker_get_all_subaccount_deposit_withdrawal": {
+        "type": "object",
+        "properties": {}
+      },
+      "classic_broker_subaccount_subaccount_withdrawal_records": {
+        "type": "object",
+        "properties": {}
+      },
+      "classic_broker_subaccount_get_subaccount_all_deposit_withdrawal_records": {
+        "type": "object",
+        "properties": {}
       }
     },
     "bybit": {
@@ -9125,6 +11400,10 @@
             "format": "decimal"
           },
           "quote_amount": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "leverage": {
             "type": "string",
             "format": "decimal"
           }
@@ -9215,6 +11494,14 @@
           "order_amount": {
             "type": "string",
             "format": "decimal"
+          },
+          "annualRate": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "annual_rate": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -9231,6 +11518,26 @@
         "type": "object",
         "properties": {
           "init_margin": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "adjust_position_percent": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "sl_percent": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "tp_percent": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "trailing_stop_percent": {
             "type": "string",
             "format": "decimal"
           }
@@ -9270,6 +11577,10 @@
           "total_investment": {
             "type": "string",
             "format": "decimal"
+          },
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -9287,6 +11598,22 @@
           "price_float_percent": {
             "type": "string",
             "format": "decimal"
+          },
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "add_position_percent": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "round_tp_percent": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "sl_percent": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -9295,7 +11622,8 @@
         "properties": {
           "amount": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -9353,6 +11681,14 @@
           "trigger_price": {
             "type": "string",
             "format": "decimal"
+          },
+          "chase_percent_e4": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "chasePercentE4": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -9361,7 +11697,8 @@
         "properties": {
           "amount": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -9402,6 +11739,46 @@
           "order_amount": {
             "type": "string",
             "format": "decimal"
+          },
+          "collateral_list": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "amount": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "collateralAmount": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          },
+          "collateralList": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "amount": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "collateralAmount": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          },
+          "annual_rate": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "annualRate": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -9424,6 +11801,14 @@
           "order_amount": {
             "type": "string",
             "format": "decimal"
+          },
+          "annual_rate": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "annualRate": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -9437,6 +11822,38 @@
           "loan_amount": {
             "type": "string",
             "format": "decimal"
+          },
+          "collateral_list": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "amount": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "collateralAmount": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          },
+          "collateralList": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "amount": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "collateralAmount": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
           }
         }
       },
@@ -9520,6 +11937,26 @@
           "init_margin": {
             "type": "string",
             "format": "decimal"
+          },
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "adjust_position_percent": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "sl_percent": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "tp_percent": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "trailing_stop_percent": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -9535,6 +11972,22 @@
             "format": "decimal"
           },
           "price_float_percent": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "add_position_percent": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "round_tp_percent": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "sl_percent": {
             "type": "string",
             "format": "decimal"
           }
@@ -9604,6 +12057,156 @@
           "amount": {
             "type": "string",
             "format": "decimal"
+          },
+          "dualAssetsExtra": {
+            "type": "object",
+            "properties": {
+              "leverage": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "price": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "amount": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "quantity": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "strikePrice": {
+                "type": "string",
+                "format": "decimal"
+              }
+            }
+          },
+          "smartLeverageStakeExtra": {
+            "type": "object",
+            "properties": {
+              "leverage": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "price": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "amount": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "quantity": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "strikePrice": {
+                "type": "string",
+                "format": "decimal"
+              }
+            }
+          },
+          "smartLeverageRedeemExtra": {
+            "type": "object",
+            "properties": {
+              "leverage": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "price": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "amount": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "quantity": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "strikePrice": {
+                "type": "string",
+                "format": "decimal"
+              }
+            }
+          },
+          "doubleWinStakeExtra": {
+            "type": "object",
+            "properties": {
+              "leverage": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "price": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "amount": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "quantity": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "strikePrice": {
+                "type": "string",
+                "format": "decimal"
+              }
+            }
+          },
+          "doubleWinRedeemExtra": {
+            "type": "object",
+            "properties": {
+              "leverage": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "price": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "amount": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "quantity": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "strikePrice": {
+                "type": "string",
+                "format": "decimal"
+              }
+            }
+          },
+          "discountBuyExtra": {
+            "type": "object",
+            "properties": {
+              "leverage": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "price": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "amount": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "quantity": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "strikePrice": {
+                "type": "string",
+                "format": "decimal"
+              }
+            }
           }
         }
       },
@@ -9954,6 +12557,10 @@
           "management_fee_rate": {
             "type": "string",
             "format": "decimal"
+          },
+          "profit_share_rate": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -10038,6 +12645,10 @@
           "take_profit_price": {
             "type": "string",
             "format": "decimal"
+          },
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -10094,6 +12705,10 @@
           "take_profit_price": {
             "type": "string",
             "format": "decimal"
+          },
+          "ts_percent": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -10137,6 +12752,10 @@
           "take_profit": {
             "type": "string",
             "format": "decimal"
+          },
+          "ts_percent": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -10166,6 +12785,10 @@
             "format": "decimal"
           },
           "qty_limit": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "delta_limit": {
             "type": "string",
             "format": "decimal"
           }
@@ -10287,6 +12910,10 @@
         "type": "object",
         "properties": {
           "amount": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "gross_payout_ratio": {
             "type": "string",
             "format": "decimal"
           }
@@ -10660,6 +13287,400 @@
             }
           }
         }
+      },
+      "crypto_loan_fixed_renew": {
+        "type": "object",
+        "properties": {
+          "collateral_list": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "amount": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "collateralAmount": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          },
+          "collateralList": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "amount": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "collateralAmount": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          }
+        }
+      },
+      "crypto_loan_common_max_loan": {
+        "type": "object",
+        "properties": {
+          "collateral_list": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "amount": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "collateralAmount": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          },
+          "collateralList": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "amount": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "collateralAmount": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          }
+        }
+      },
+      "request_earn_pwm_asset_manager_create_investment_plan": {
+        "type": "object",
+        "properties": {
+          "investment_distribution": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "amount": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "ratio": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          }
+        }
+      },
+      "set_spot_margin_leverage": {
+        "type": "object",
+        "properties": {
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "get_exchange_order_records": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_pre_upgrade_order_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_crypto_loan_ongoing_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_crypto_loan_fixed_available_inventory": {
+        "type": "object",
+        "properties": {
+          "annual_rate": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "annualRate": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "get_crypto_loan_fixed_borrow_order_info": {
+        "type": "object",
+        "properties": {}
+      },
+      "crypto_loan_fixed_borrow_order_cancel": {
+        "type": "object",
+        "properties": {}
+      },
+      "crypto_loan_fixed_supply_order_cancel": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_crypto_loan_fixed_supply_order_info": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_lever_token_order_record": {
+        "type": "object",
+        "properties": {}
+      },
+      "batch_set_collateral_coins": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_batch_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_earn_order_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_advanced_earn_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_liquidity_mining_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "remove_liquidity_mining": {
+        "type": "object",
+        "properties": {
+          "removeRate": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "remove_rate": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "reinvest_liquidity_mining": {
+        "type": "object",
+        "properties": {
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "get_fixed_earn_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_byusdt_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_rwa_earn_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_orderbook": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_order_price_limit": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spread_orderbook": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_full_orderbook": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_rpi_orderbook": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_crypto_loan_fixed_borrow_order_quote": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_crypto_loan_fixed_supply_order_quote": {
+        "type": "object",
+        "properties": {}
+      },
+      "set_leverage": {
+        "type": "object",
+        "properties": {
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "cancel_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_open_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_all_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_order_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_fixed_borrow_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_fixed_borrow_inventory": {
+        "type": "object",
+        "properties": {
+          "annualRate": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "annual_rate": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "cancel_spread_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_all_spread_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spread_open_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spread_order_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_strategy_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_transferable_amount": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_internal_transfer_records": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_transferable_coin": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_universal_transfer_records": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_asset_withdraw_vasp_list": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_asset_withdraw_query_address": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_asset_withdraw_query_record": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_withdrawable_amount": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_alpha_lp_order_list": {
+        "type": "object",
+        "properties": {}
+      },
+      "redeem_alpha_lp": {
+        "type": "object",
+        "properties": {
+          "derc_ratio": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "request_alpha_prediction_order_book": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_alpha_prediction_order_list": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_alpha_trade_order_list": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_event_orderbook": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_event_order_realtime": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_event_order_list": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_ins_loan_loan_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_earn_pwm_asset_manager_all_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "request_earn_pwm_asset_manager_manage_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_earn_pwm_investment_plan_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_stock_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_rwa_stocks_order_detail": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_earn_pwm_query_fund_transfer_result": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_withdrawal": {
+        "type": "object",
+        "properties": {}
       }
     },
     "extended": {
@@ -10743,6 +13764,74 @@
             "format": "decimal"
           }
         }
+      },
+      "create_withdrawal_signed": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "settlement": {
+                "type": "object",
+                "properties": {
+                  "amount": {
+                    "type": "string",
+                    "format": "decimal"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "update_leverage": {
+        "type": "object",
+        "properties": {
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "get_order_book": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_open_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_orders_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_order_by_external_id": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_orders_by_external_id": {
+        "type": "object",
+        "properties": {}
+      },
+      "place_rfq_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_order_by_external_id": {
+        "type": "object",
+        "properties": {}
       }
     },
     "hyperliquid": {
@@ -11072,6 +14161,67 @@
             }
           }
         }
+      },
+      "open_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "order_status": {
+        "type": "object",
+        "properties": {}
+      },
+      "historical_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "frontend_open_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_batch_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_batch_orders_by_cloid": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_order_by_cloid": {
+        "type": "object",
+        "properties": {}
+      },
+      "update_leverage": {
+        "type": "object",
+        "properties": {
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "cancel_twap_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "transfer_vault_usd": {
+        "type": "object",
+        "properties": {}
+      },
+      "transfer_hip3_liquidator": {
+        "type": "object",
+        "properties": {}
+      },
+      "transfer_sub_account_usd": {
+        "type": "object",
+        "properties": {}
+      },
+      "withdraw_staking_signed": {
+        "type": "object",
+        "properties": {}
       }
     },
     "kraken": {
@@ -11423,7 +14573,8 @@
           },
           "limitPriceOffsetValue": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-signed": true
           },
           "limit_price": {
             "type": "string",
@@ -11431,7 +14582,8 @@
           },
           "limit_price_offset_value": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-signed": true
           },
           "size": {
             "type": "string",
@@ -11776,6 +14928,11 @@
           },
           "volume": {
             "type": "string",
+            "format": "decimal",
+            "x-positive": true
+          },
+          "leverage": {
+            "type": "string",
             "format": "decimal"
           }
         }
@@ -12079,7 +15236,8 @@
                 },
                 "limitPriceOffsetValue": {
                   "type": "string",
-                  "format": "decimal"
+                  "format": "decimal",
+                  "x-signed": true
                 },
                 "limit_price": {
                   "type": "string",
@@ -12087,7 +15245,8 @@
                 },
                 "limit_price_offset_value": {
                   "type": "string",
-                  "format": "decimal"
+                  "format": "decimal",
+                  "x-signed": true
                 },
                 "size": {
                   "type": "string",
@@ -12105,6 +15264,132 @@
             }
           }
         }
+      },
+      "cancel_spot_batch_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_orderbook": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_futures_orderbook": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_grouped_orderbook": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_futures_market_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_open_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_closed_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_spot_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_spot_all_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_spot_all_orders_after": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_futures_open_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_futures_order_status": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_futures_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_futures_all_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_futures_all_orders_after": {
+        "type": "object",
+        "properties": {}
+      },
+      "set_futures_leverage_preference": {
+        "type": "object",
+        "properties": {
+          "max_leverage": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "maxLeverage": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "get_futures_order_events": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_level3_orderbook": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_order_amends": {
+        "type": "object",
+        "properties": {}
+      },
+      "update_rfq_assignment_max_leverage": {
+        "type": "object",
+        "properties": {
+          "max_leverage": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "maxLeverage": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "get_withdrawal_addresses": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_withdrawal_methods": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_withdrawal_status": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_funding_withdrawal_limits": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_funding_withdrawals": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_spot_withdrawal": {
+        "type": "object",
+        "properties": {}
       }
     },
     "kucoin": {
@@ -12306,6 +15591,10 @@
           "position_value": {
             "type": "string",
             "format": "decimal"
+          },
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -12319,6 +15608,10 @@
           "total_margin": {
             "type": "string",
             "format": "decimal"
+          },
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -12326,6 +15619,10 @@
         "type": "object",
         "properties": {
           "price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "leverage": {
             "type": "string",
             "format": "decimal"
           }
@@ -12367,6 +15664,10 @@
         "properties": {
           "price": {
             "type": "number",
+            "format": "decimal"
+          },
+          "leverage": {
+            "type": "string",
             "format": "decimal"
           }
         }
@@ -12419,6 +15720,10 @@
           "size": {
             "type": "string",
             "format": "decimal"
+          },
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -12430,6 +15735,10 @@
             "format": "decimal"
           },
           "size": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "leverage": {
             "type": "string",
             "format": "decimal"
           }
@@ -12445,6 +15754,10 @@
           "size": {
             "type": "string",
             "format": "decimal"
+          },
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -12452,6 +15765,10 @@
         "type": "object",
         "properties": {
           "size": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "leverage": {
             "type": "string",
             "format": "decimal"
           }
@@ -12475,6 +15792,10 @@
           "value_qty": {
             "type": "string",
             "format": "decimal"
+          },
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -12482,6 +15803,10 @@
         "type": "object",
         "properties": {
           "size": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "leverage": {
             "type": "string",
             "format": "decimal"
           }
@@ -12525,6 +15850,10 @@
           "visible_size": {
             "type": "string",
             "format": "decimal"
+          },
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -12536,6 +15865,10 @@
             "format": "decimal"
           },
           "size": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "leverage": {
             "type": "string",
             "format": "decimal"
           }
@@ -12551,6 +15884,10 @@
           "size": {
             "type": "string",
             "format": "decimal"
+          },
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -12562,6 +15899,10 @@
             "format": "decimal"
           },
           "size": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "leverage": {
             "type": "string",
             "format": "decimal"
           }
@@ -12603,6 +15944,10 @@
             "format": "decimal"
           },
           "value_qty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "leverage": {
             "type": "string",
             "format": "decimal"
           }
@@ -12958,6 +16303,10 @@
           "trigger_price": {
             "type": "string",
             "format": "decimal"
+          },
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -12989,6 +16338,10 @@
           "stop_price": {
             "type": "string",
             "format": "decimal"
+          },
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -13008,6 +16361,10 @@
             "format": "decimal"
           },
           "stop_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "leverage": {
             "type": "string",
             "format": "decimal"
           }
@@ -13052,6 +16409,10 @@
           "trigger_stop_up_price": {
             "type": "string",
             "format": "decimal"
+          },
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -13063,6 +16424,10 @@
             "format": "decimal"
           },
           "position_value": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "leverage": {
             "type": "string",
             "format": "decimal"
           }
@@ -13081,6 +16446,14 @@
         "type": "object",
         "properties": {
           "size": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "interestRate": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "interest_rate": {
             "type": "string",
             "format": "decimal"
           }
@@ -13175,6 +16548,10 @@
             "format": "decimal"
           },
           "visible_size": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "leverage": {
             "type": "string",
             "format": "decimal"
           }
@@ -13411,6 +16788,454 @@
             }
           }
         }
+      },
+      "post_v2_broker_withdrawal": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "fee": {
+                "type": "string",
+                "format": "decimal"
+              }
+            }
+          }
+        }
+      },
+      "modify_futures_cross_margin_leverage": {
+        "type": "object",
+        "properties": {
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "batch_cancel_uta_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_futures_batch_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "set_futures_batch_margin_mode": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_structured_earn_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "modify_margin_leverage": {
+        "type": "object",
+        "properties": {
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "modify_margin_lending_purchase": {
+        "type": "object",
+        "properties": {
+          "interestRate": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "interest_rate": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "get_margin_lending_purchase_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_margin_lending_redeem_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_orderbook": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_futures_orderbook": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_spot_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_spot_all_orders_by_symbol": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_spot_all_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_open_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_futures_order_list": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_futures_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_futures_order_by_client_oid": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_futures_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_futures_order_by_client_oid": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_futures_all_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_futures_open_order_value": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_uta_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_uta_order_detail": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_uta_open_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_uta_order_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_uta_orders_by_symbol": {
+        "type": "object",
+        "properties": {}
+      },
+      "modify_uta_futures_leverage": {
+        "type": "object",
+        "properties": {
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "modify_uta_cross_margin_leverage": {
+        "type": "object",
+        "properties": {
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "cancel_spot_order_by_client_oid": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_order_by_client_oid": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_active_order_symbols": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_active_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_closed_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_spot_stop_order_by_client_oid": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_spot_stop_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_spot_stop_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_stop_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_stop_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_spot_oco_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_spot_oco_order_by_client_oid": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_spot_oco_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_oco_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_oco_order_by_client_oid": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_oco_order_details": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_oco_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_margin_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_margin_order_by_client_oid": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_margin_orders_by_symbol": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_margin_active_order_symbols": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_margin_open_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_margin_closed_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_margin_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_margin_order_by_client_oid": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_margin_stop_order_by_client_oid": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_margin_stop_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_margin_stop_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_margin_stop_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_margin_stop_order_by_client_oid": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_margin_oco_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_margin_oco_order_by_client_oid": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_margin_oco_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_margin_oco_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_margin_oco_order_by_client_oid": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_margin_oco_order_details": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_margin_oco_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_futures_stop_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_futures_recent_closed_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_futures_stop_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_stop_order_by_client_oid": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_full_orderbook": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_uta_orderbook": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_spot_order_sync": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_spot_order_by_client_oid_sync": {
+        "type": "object",
+        "properties": {}
+      },
+      "add_convert_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_convert_limit_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_convert_limit_order_detail": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_convert_limit_order_detail_list": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_convert_order_detail": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_convert_order_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_margin_stop_order_by_id_raw": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_transfer_quotas": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_uta_transfer_quota": {
+        "type": "object",
+        "properties": {}
+      },
+      "set_uta_sub_account_transfer_permission": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_futures_max_withdraw_margin": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_withdrawal_history_by_id": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_withdrawal_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_withdrawal_quotas": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_uta_withdrawal_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_uta_withdrawal_quotas": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_withdrawal": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_uta_withdrawal": {
+        "type": "object",
+        "properties": {}
+      },
+      "delete_v1_copy_trade_futures_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "delete_v1_copy_trade_futures_orders_client_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "post_v2_copy_trade_futures_change_cross_user_leverage": {
+        "type": "object",
+        "properties": {
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "get_v3_broker_nd_transfer_detail": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_v3_broker_nd_withdraw_detail": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_v1_copy_trade_futures_position_margin_max_withdraw_margin": {
+        "type": "object",
+        "properties": {}
       }
     },
     "lighter": {
@@ -13463,6 +17288,26 @@
           "integrator_taker_fee": {
             "type": "string",
             "format": "decimal"
+          },
+          "orders": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "base_amount": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "trigger_price": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
           }
         }
       },
@@ -13495,6 +17340,10 @@
         "type": "object",
         "properties": {
           "operator_fee": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "min_operator_share_rate": {
             "type": "string",
             "format": "decimal"
           }
@@ -13587,6 +17436,26 @@
           "integrator_taker_fee": {
             "type": "string",
             "format": "decimal"
+          },
+          "orders": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "base_amount": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "trigger_price": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
           }
         }
       },
@@ -13619,6 +17488,10 @@
         "type": "object",
         "properties": {
           "operator_fee": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "min_operator_share_rate": {
             "type": "string",
             "format": "decimal"
           }
@@ -13705,6 +17578,10 @@
           "operator_fee": {
             "type": "string",
             "format": "decimal"
+          },
+          "min_operator_share_rate": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -13773,6 +17650,10 @@
           "operator_fee": {
             "type": "string",
             "format": "decimal"
+          },
+          "min_operator_share_rate": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -13784,6 +17665,91 @@
             "format": "decimal"
           }
         }
+      },
+      "get_account_active_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_account_inactive_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_account_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_explorer_batches": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_explorer_batch": {
+        "type": "object",
+        "properties": {}
+      },
+      "send_tx_batch": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_order_book_details": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_order_books": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_order_book_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "sign_cancel_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "sign_cancel_all_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_all_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "update_referral_kickback": {
+        "type": "object",
+        "properties": {
+          "kickback_percentage": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "get_transfer_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_transfer_fee_info": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_fastwithdraw_info": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_withdraw_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_withdrawal_delay": {
+        "type": "object",
+        "properties": {}
+      },
+      "submit_fast_withdrawal": {
+        "type": "object",
+        "properties": {}
       }
     },
     "mexc": {
@@ -13951,6 +17917,10 @@
           "vol": {
             "type": "string",
             "format": "decimal"
+          },
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -13962,6 +17932,10 @@
             "format": "decimal"
           },
           "vol": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "leverage": {
             "type": "string",
             "format": "decimal"
           }
@@ -13977,6 +17951,10 @@
           "vol": {
             "type": "string",
             "format": "decimal"
+          },
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -13984,6 +17962,10 @@
         "type": "object",
         "properties": {
           "vol": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "leverage": {
             "type": "string",
             "format": "decimal"
           }
@@ -13995,6 +17977,10 @@
           "vol": {
             "type": "string",
             "format": "decimal"
+          },
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -14002,6 +17988,10 @@
         "type": "object",
         "properties": {
           "vol": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "leverage": {
             "type": "string",
             "format": "decimal"
           }
@@ -14031,6 +18021,10 @@
             "format": "decimal"
           },
           "vol": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "leverage": {
             "type": "string",
             "format": "decimal"
           }
@@ -14068,6 +18062,10 @@
             "format": "decimal"
           },
           "vol": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "leverage": {
             "type": "string",
             "format": "decimal"
           }
@@ -14108,6 +18106,10 @@
           "vol": {
             "type": "string",
             "format": "decimal"
+          },
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -14121,6 +18123,10 @@
           "vol": {
             "type": "string",
             "format": "decimal"
+          },
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -14132,6 +18138,10 @@
             "format": "decimal"
           },
           "vol": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "leverage": {
             "type": "string",
             "format": "decimal"
           }
@@ -14157,6 +18167,10 @@
             "format": "decimal"
           },
           "vol": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "leverage": {
             "type": "string",
             "format": "decimal"
           }
@@ -14422,6 +18436,175 @@
             }
           }
         }
+      },
+      "change_contract_leverage": {
+        "type": "object",
+        "properties": {
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "cancel_contract_batch_orders_by_external_id": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_contract_batch_orders_by_external_id": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_orderbook": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_spot_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_spot_open_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_open_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_all_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_contract_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_contract_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_contract_order_with_external_id": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_all_contract_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_contract_open_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_contract_history_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_contract_order_by_external_id": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_contract_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_contract_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_contract_order_deal_details": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_contract_order_deals": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_contract_plan_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_contract_plan_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_all_contract_plan_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_contract_stop_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "chase_contract_limit_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_contract_open_order_count": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_contract_trailing_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_contract_trailing_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_contract_tpsl_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_all_contract_tpsl_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_spot_all_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_contract_open_stop_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_contract_closed_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_subaccount_transfer_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_user_universal_transfer_by_id": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_internal_transfer_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_contract_transfer_records": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_withdraw_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_withdrawal_addresses": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_rebate_affiliate_withdraw": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_spot_withdrawal": {
+        "type": "object",
+        "properties": {}
       }
     },
     "okx": {
@@ -14599,6 +18782,38 @@
                   ]
                 },
                 "sz": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          },
+          "adv_chase_params": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "chaseVal": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "maxChaseVal": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          },
+          "advChaseParams": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "chaseVal": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "maxChaseVal": {
                   "type": "string",
                   "format": "decimal"
                 }
@@ -14934,6 +19149,10 @@
           "px": {
             "type": "string",
             "format": "decimal"
+          },
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -15197,6 +19416,78 @@
                 }
               }
             }
+          },
+          "adv_chase_params": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "chaseVal": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "maxChaseVal": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          },
+          "advChaseParams": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "chaseVal": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "maxChaseVal": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          },
+          "trigger_params": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "triggerPx": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          },
+          "triggerParams": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "triggerPx": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          },
+          "callback_ratio": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "callback_spread": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "callbackRatio": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "callbackSpread": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -15291,7 +19582,8 @@
           },
           "sz": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           },
           "attachAlgoOrds": {
             "type": "array",
@@ -15448,6 +19740,10 @@
           "amt": {
             "type": "string",
             "format": "decimal"
+          },
+          "rate": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -15568,11 +19864,13 @@
         "properties": {
           "idxVol": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-signed": true
           },
           "idx_vol": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-signed": true
           }
         }
       },
@@ -15604,6 +19902,62 @@
           "vol_mult": {
             "type": "string",
             "format": "decimal"
+          },
+          "trigger_params": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "triggerPx": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          },
+          "triggerParams": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "triggerPx": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          },
+          "px_steps": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "px_steps_mult": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "init_ord_amt": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "safety_ord_amt": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pxSteps": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pxStepsMult": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "initOrdAmt": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "safetyOrdAmt": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -15615,6 +19969,46 @@
             "format": "decimal"
           },
           "vol_mult": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "init_ord_amt": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "safety_ord_amt": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "px_steps": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "px_steps_mult": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "profit_sharing_ratio": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "initOrdAmt": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "safetyOrdAmt": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pxSteps": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pxStepsMult": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "profitSharingRatio": {
             "type": "string",
             "format": "decimal"
           }
@@ -15720,6 +20114,54 @@
           "tp_trigger_px": {
             "type": "string",
             "format": "decimal"
+          },
+          "trigger_params": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "triggerPx": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          },
+          "triggerParams": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "triggerPx": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          },
+          "tp_ratio": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "sl_ratio": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "top_up_amt": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "tpRatio": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "slRatio": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "topUpAmt": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -15784,6 +20226,10 @@
           "amt": {
             "type": "string",
             "format": "decimal"
+          },
+          "percent": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -15803,6 +20249,38 @@
             "format": "decimal"
           },
           "min_px": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "investment_data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "amt": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          },
+          "investmentData": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "amt": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          },
+          "top_up_amt": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "topUpAmt": {
             "type": "string",
             "format": "decimal"
           }
@@ -15862,6 +20340,54 @@
           "tp_trigger_px": {
             "type": "string",
             "format": "decimal"
+          },
+          "trigger_params": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "triggerPx": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          },
+          "triggerParams": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "triggerPx": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          },
+          "profit_sharing_ratio": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "tp_ratio": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "sl_ratio": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "profitSharingRatio": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "tpRatio": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "slRatio": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -15889,6 +20415,46 @@
           "amt": {
             "type": "string",
             "format": "decimal"
+          },
+          "recurring_list": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "ratio": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "minPx": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "maxPx": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          },
+          "recurringList": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "ratio": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "minPx": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "maxPx": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
           }
         }
       },
@@ -16218,6 +20784,584 @@
             }
           }
         }
+      },
+      "borrow_flexible_loan": {
+        "type": "object",
+        "properties": {
+          "collateralData": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "amt": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          }
+        }
+      },
+      "trading_bot_signal_order_algo": {
+        "type": "object",
+        "properties": {
+          "entry_setting_param": {
+            "type": "object",
+            "properties": {
+              "amt": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "ratio": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "lever": {
+                "type": "string",
+                "format": "decimal"
+              }
+            }
+          },
+          "entrySettingParam": {
+            "type": "object",
+            "properties": {
+              "amt": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "ratio": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "lever": {
+                "type": "string",
+                "format": "decimal"
+              }
+            }
+          },
+          "exit_setting_param": {
+            "type": "object",
+            "properties": {
+              "tpSlRatio": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "tpRatio": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "slRatio": {
+                "type": "string",
+                "format": "decimal"
+              }
+            }
+          },
+          "exitSettingParam": {
+            "type": "object",
+            "properties": {
+              "tpSlRatio": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "tpRatio": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "slRatio": {
+                "type": "string",
+                "format": "decimal"
+              }
+            }
+          },
+          "invest_amt": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "ratio": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "investAmt": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "trading_bot_signal_amend_tpsl": {
+        "type": "object",
+        "properties": {
+          "exit_setting_param": {
+            "type": "object",
+            "properties": {
+              "tpSlRatio": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "tpRatio": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "slRatio": {
+                "type": "string",
+                "format": "decimal"
+              }
+            }
+          },
+          "exitSettingParam": {
+            "type": "object",
+            "properties": {
+              "tpSlRatio": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "tpRatio": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "slRatio": {
+                "type": "string",
+                "format": "decimal"
+              }
+            }
+          }
+        }
+      },
+      "trading_bot_recurring_amend_price_range": {
+        "type": "object",
+        "properties": {
+          "recurring_list": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "ratio": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "minPx": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "maxPx": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          },
+          "recurringList": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "ratio": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "minPx": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "maxPx": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          }
+        }
+      },
+      "rfq_cancel_batch_rfqs": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_rfq_batch_quotes": {
+        "type": "object",
+        "properties": {}
+      },
+      "set_savings_lending_rate": {
+        "type": "object",
+        "properties": {
+          "rate": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "get_active_staking_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_staking_order_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_dual_investment_order_status": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_dual_investment_order_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_sbe_orderbook": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_spread_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_all_spread_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spread_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spread_orders_pending": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spread_orders_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_all_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_order_list": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_orders_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_orders_history_archive": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_algo_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_pending_algo_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_algo_order_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "set_risk_offset_amount": {
+        "type": "object",
+        "properties": {
+          "cl_spot_in_use_amt": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "clSpotInUseAmt": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "get_spread_order_history_archive": {
+        "type": "object",
+        "properties": {}
+      },
+      "trading_bot_grid_cancel_close_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "trading_bot_grid_order_instant_trigger": {
+        "type": "object",
+        "properties": {
+          "top_up_amt": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "topUpAmt": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "get_trading_bot_grid_orders_algo_pending": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_trading_bot_grid_orders_algo_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_trading_bot_grid_orders_algo_details": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_trading_bot_grid_sub_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_trading_bot_dca_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_trading_bot_signal_orders_algo_details": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_trading_bot_signal_orders_algo_pending": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_trading_bot_signal_orders_algo_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "trading_bot_signal_cancel_sub_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_trading_bot_signal_sub_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "trading_bot_recurring_amend_order_algo": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_trading_bot_recurring_orders_algo_pending": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_trading_bot_recurring_orders_algo_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_trading_bot_recurring_orders_algo_details": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_trading_bot_recurring_sub_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "trading_bot_recurring_amend_recurring_time": {
+        "type": "object",
+        "properties": {}
+      },
+      "copytrading_amend_profit_sharing_ratio": {
+        "type": "object",
+        "properties": {
+          "profit_sharing_ratio": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "profitSharingRatio": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "copytrading_first_copy_settings": {
+        "type": "object",
+        "properties": {
+          "copy_total_amt": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "copy_amt": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "copy_ratio": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "tp_ratio": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "sl_ratio": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "sl_total_amt": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "copyTotalAmt": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "copyAmt": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "copyRatio": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "tpRatio": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "slRatio": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "slTotalAmt": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "copytrading_amend_copy_settings": {
+        "type": "object",
+        "properties": {
+          "copy_total_amt": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "copy_amt": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "copy_ratio": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "tp_ratio": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "sl_ratio": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "sl_total_amt": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "copyTotalAmt": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "copyAmt": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "copyRatio": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "tpRatio": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "slRatio": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "slTotalAmt": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "get_fiat_deposit_order_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "fiat_buy_sell_quote": {
+        "type": "object",
+        "properties": {
+          "rfq_amt": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "rfqAmt": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "fiat_buy_sell_trade": {
+        "type": "object",
+        "properties": {
+          "rfq_amt": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "rfqAmt": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "mass_cancel_options_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_transfer_state": {
+        "type": "object",
+        "properties": {}
+      },
+      "set_sub_account_transfer_out": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_max_withdrawal": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_deposit_withdraw_status": {
+        "type": "object",
+        "properties": {}
+      },
+      "trading_bot_grid_withdraw_income": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_asset_withdrawal_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_fiat_withdrawal_payment_methods": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_fiat_withdrawal_order_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_fiat_withdrawal": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_account_subaccount_max_withdrawal": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_withdrawal": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_fiat_withdrawal": {
+        "type": "object",
+        "properties": {}
       }
     },
     "ondo": {
@@ -16458,6 +21602,10 @@
                 }
               }
             }
+          },
+          "quote_size": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -16578,6 +21726,111 @@
             }
           }
         }
+      },
+      "set_leverage": {
+        "type": "object",
+        "properties": {
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "get_max_order_size": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_open_order_counts": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_order_summaries": {
+        "type": "object",
+        "properties": {}
+      },
+      "batch_cancel_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_open_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_fills_by_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_open_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_twap_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_twap_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_twap_order_fills": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_running_twap_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_twap_order_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "export_orders_csv": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_stop_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "remove_stop_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_all_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_withdrawals": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_withdrawal": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_withdrawal_limits": {
+        "type": "object",
+        "properties": {}
+      },
+      "export_withdrawals_csv": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_withdrawal_status": {
+        "type": "object",
+        "properties": {}
       }
     }
   },
@@ -17190,6 +22443,20 @@
           "displayvol": {
             "type": "string",
             "format": "decimal"
+          },
+          "close[price]": {
+            "type": "string",
+            "format": "decimal",
+            "x-relative": "kraken_relative_price"
+          },
+          "close[price2]": {
+            "type": "string",
+            "format": "decimal",
+            "x-relative": "kraken_relative_price"
+          },
+          "leverage": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -17221,11 +22488,13 @@
         "properties": {
           "limit_price": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-relative": "kraken_relative_price"
           },
           "trigger_price": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-relative": "kraken_relative_price"
           },
           "order_qty": {
             "type": "string",

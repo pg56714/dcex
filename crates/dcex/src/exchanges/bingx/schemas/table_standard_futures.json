@@ -34,7 +34,11 @@
       "endTime",
       "limit",
       "recvWindow"
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_standard_futures_balance",

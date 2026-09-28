@@ -53,6 +53,8 @@ pub struct AsterClient {
 }
 
 impl AsterClient {
+    pub(crate) const INPUT_EXCHANGE: &'static str = "aster";
+
     pub fn new(
         user_address: Option<String>,
         signer_address: Option<String>,

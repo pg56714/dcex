@@ -260,7 +260,11 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/classic-p2p-p2p/classic-p2p#get-merchant-p2p-orders",
-    "summary": "Get Merchant P2P Orders"
+    "summary": "Get Merchant P2P Orders",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "classic_tax_get_p2_p_account_record",
@@ -1010,7 +1014,11 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/p2p/order-management#get-pending-orders",
-    "summary": "Get Pending Orders"
+    "summary": "Get Pending Orders",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "p2p_order_management_get_all_orders",
@@ -1078,7 +1086,11 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/p2p/order-management#get-all-orders",
-    "summary": "Get All Orders"
+    "summary": "Get All Orders",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "p2p_order_management_get_order_info",
@@ -1098,7 +1110,11 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/p2p/order-management#get-order-info",
-    "summary": "Get Order Info"
+    "summary": "Get Order Info",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "p2p_order_management_confirm_payment",
@@ -1118,7 +1134,11 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/p2p/order-management#confirm-payment",
-    "summary": "Confirm Payment"
+    "summary": "Confirm Payment",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "p2p_order_management_release_asset",
@@ -1138,7 +1158,11 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/p2p/order-management#release-asset",
-    "summary": "Release Asset"
+    "summary": "Release Asset",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "p2p_user_info_get_user_info",

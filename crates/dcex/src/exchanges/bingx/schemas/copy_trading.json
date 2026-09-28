@@ -252,7 +252,11 @@
     ],
     "source": "https://bingx-api.github.io/docs-v3/#/en/Copy%20Trade/Spot%20Trading/Query%20Historical%20Orders",
     "summary": "Query Historical Orders",
-    "scoped": false
+    "scoped": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "post_copy_trading_v1_spot_trader_sell_order",
@@ -270,7 +274,11 @@
     ],
     "source": "https://bingx-api.github.io/docs-v3/#/en/Copy%20Trade/Spot%20Trading/Trader%20sells%20spot%20assets%20based%20on%20buy%20order%20number",
     "summary": "Trader sells spot assets based on buy order number",
-    "scoped": false
+    "scoped": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "post_copy_trading_v1_p_futures_set_commission",
@@ -348,6 +356,10 @@
     ],
     "source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/copytrade-swap/api-reference.md#L91",
     "summary": "2. Close Position by Order Number",
-    "scoped": false
+    "scoped": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   }
 ]

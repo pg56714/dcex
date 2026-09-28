@@ -27,6 +27,8 @@ pub struct BackpackClient {
 }
 
 impl BackpackClient {
+    pub(crate) const INPUT_EXCHANGE: &'static str = "backpack";
+
     pub fn new(
         api_key: Option<String>,
         api_secret: Option<String>,

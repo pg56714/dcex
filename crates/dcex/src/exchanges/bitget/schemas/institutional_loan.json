@@ -95,7 +95,11 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/classic-instloan-account/classic-instloan-account#get-transferable-amount",
-    "summary": "Get transferable amount"
+    "summary": "Get transferable amount",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "classic_instloan_orders_get_loan_orders",
@@ -131,7 +135,11 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/classic-instloan-orders/classic-instloan-orders#get-loan-orders",
-    "summary": "Get Loan Orders"
+    "summary": "Get Loan Orders",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "classic_instloan_orders_get_repayment_orders",
@@ -167,7 +175,11 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/classic-instloan-orders/classic-instloan-orders#get-repayment-orders",
-    "summary": "Get Repayment Orders"
+    "summary": "Get Repayment Orders",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "classic_instloan_public_get_product_info",
@@ -342,7 +354,11 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/institutional-loan/loan#get-loan-orders",
-    "summary": "Get Loan Orders"
+    "summary": "Get Loan Orders",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "institutional_loan_get_product_info",
@@ -398,7 +414,11 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/institutional-loan/loan#get-repayment-orders",
-    "summary": "Get Repayment Orders"
+    "summary": "Get Repayment Orders",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "institutional_loan_get_risk_unit",
@@ -457,6 +477,10 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/institutional-loan/loan#get-transferred-quantity",
-    "summary": "Get Transferred Quantity"
+    "summary": "Get Transferred Quantity",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   }
 ]

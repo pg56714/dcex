@@ -20,7 +20,11 @@
         "kind": "int"
       }
     ],
-    "name": "accept_options_block_order"
+    "name": "accept_options_block_order",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "method": "GET",
@@ -80,7 +84,11 @@
         "kind": "int"
       }
     ],
-    "name": "cancel_options_block_order"
+    "name": "cancel_options_block_order",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "method": "PUT",
@@ -103,7 +111,11 @@
         "kind": "int"
       }
     ],
-    "name": "extend_options_block_order"
+    "name": "extend_options_block_order",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "method": "POST",
@@ -177,7 +189,11 @@
         "kind": "int"
       }
     ],
-    "name": "get_options_block_order_details"
+    "name": "get_options_block_order_details",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "method": "GET",
@@ -221,6 +237,10 @@
         "kind": "int"
       }
     ],
-    "name": "get_options_block_orders"
+    "name": "get_options_block_orders",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   }
 ]

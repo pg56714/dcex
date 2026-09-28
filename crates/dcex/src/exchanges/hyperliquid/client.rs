@@ -24,6 +24,8 @@ pub struct HyperliquidClient {
 }
 
 impl HyperliquidClient {
+    pub(crate) const INPUT_EXCHANGE: &'static str = "hyperliquid";
+
     pub fn new(
         testnet: bool,
         wallet_address: Option<String>,

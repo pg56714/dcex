@@ -249,7 +249,11 @@
     "required": [],
     "arrays": [],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "classic_earn_loan_repay",

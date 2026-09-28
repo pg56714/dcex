@@ -239,6 +239,10 @@
     ],
     "source": "https://bingx-api.github.io/docs-v3/#/en/Coin-M%20Futures/Trades%20Endpoints/Cancel%20all%20orders",
     "summary": "Cancel all orders",
-    "scoped": true
+    "scoped": true,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   }
 ]

@@ -199,7 +199,11 @@
     ],
     "arrays": [],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_cross_margin_open_orders",
@@ -221,7 +225,11 @@
     ],
     "arrays": [],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_cross_margin_order_history",
@@ -244,7 +252,11 @@
     ],
     "arrays": [],
     "limit": 500,
-    "days": 90
+    "days": 90,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_cross_margin_fills",
@@ -456,7 +468,11 @@
     ],
     "arrays": [],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_isolated_margin_open_orders",
@@ -477,7 +493,11 @@
     ],
     "arrays": [],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_isolated_margin_order_history",
@@ -500,7 +520,11 @@
     ],
     "arrays": [],
     "limit": 500,
-    "days": 90
+    "days": 90,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_isolated_margin_fills",
@@ -565,7 +589,11 @@
     "required": [],
     "arrays": [],
     "limit": 500,
-    "days": 90
+    "days": 90,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_isolated_margin_liquidation_orders",
@@ -585,7 +613,11 @@
     "required": [],
     "arrays": [],
     "limit": 500,
-    "days": 90
+    "days": 90,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_classic_interest_rate_record",

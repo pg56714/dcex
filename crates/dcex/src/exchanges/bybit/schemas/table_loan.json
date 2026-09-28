@@ -201,7 +201,11 @@
       "cursor"
     ],
     "required": [],
-    "integers": []
+    "integers": [],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "crypto_loan_common_adjust_ltv",
@@ -264,7 +268,20 @@
       "term",
       "annualRate"
     ],
-    "integers": []
+    "integers": [],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "annual_rate": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "annualRate": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_crypto_loan_fixed_borrow_contract_info",
@@ -301,7 +318,11 @@
     "integers": [
       "sort",
       "limit"
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_crypto_loan_fixed_borrow_order_info",
@@ -317,7 +338,11 @@
       "cursor"
     ],
     "required": [],
-    "integers": []
+    "integers": [],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "crypto_loan_fixed_borrow",
@@ -350,6 +375,46 @@
         "order_amount": {
           "type": "string",
           "format": "decimal"
+        },
+        "collateral_list": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "collateralAmount": {
+                "type": "string",
+                "format": "decimal"
+              }
+            }
+          }
+        },
+        "collateralList": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "collateralAmount": {
+                "type": "string",
+                "format": "decimal"
+              }
+            }
+          }
+        },
+        "annual_rate": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "annualRate": {
+          "type": "string",
+          "format": "decimal"
         }
       }
     }
@@ -365,7 +430,11 @@
     "required": [
       "orderId"
     ],
-    "integers": []
+    "integers": [],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "crypto_loan_fixed_supply_order_cancel",
@@ -379,7 +448,11 @@
     "required": [
       "orderId"
     ],
-    "integers": []
+    "integers": [],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_crypto_loan_fixed_renew_info",
@@ -407,7 +480,44 @@
     "required": [
       "loanId"
     ],
-    "integers": []
+    "integers": [],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "collateral_list": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "collateralAmount": {
+                "type": "string",
+                "format": "decimal"
+              }
+            }
+          }
+        },
+        "collateralList": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "collateralAmount": {
+                "type": "string",
+                "format": "decimal"
+              }
+            }
+          }
+        }
+      }
+    }
   },
   {
     "name": "crypto_loan_fixed_repay_collateral",
@@ -481,7 +591,11 @@
     "integers": [
       "sort",
       "limit"
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_crypto_loan_fixed_supply_order_info",
@@ -497,7 +611,11 @@
       "cursor"
     ],
     "required": [],
-    "integers": []
+    "integers": [],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "crypto_loan_fixed_supply",
@@ -526,6 +644,14 @@
           "format": "decimal"
         },
         "order_amount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "annual_rate": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "annualRate": {
           "type": "string",
           "format": "decimal"
         }
@@ -570,6 +696,38 @@
         "loan_amount": {
           "type": "string",
           "format": "decimal"
+        },
+        "collateral_list": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "collateralAmount": {
+                "type": "string",
+                "format": "decimal"
+              }
+            }
+          }
+        },
+        "collateralList": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "collateralAmount": {
+                "type": "string",
+                "format": "decimal"
+              }
+            }
+          }
         }
       }
     }
@@ -701,7 +859,44 @@
     "required": [
       "currency"
     ],
-    "integers": []
+    "integers": [],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "collateral_list": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "collateralAmount": {
+                "type": "string",
+                "format": "decimal"
+              }
+            }
+          }
+        },
+        "collateralList": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "collateralAmount": {
+                "type": "string",
+                "format": "decimal"
+              }
+            }
+          }
+        }
+      }
+    }
   },
   {
     "name": "get_crypto_loan_common_max_collateral_amount",

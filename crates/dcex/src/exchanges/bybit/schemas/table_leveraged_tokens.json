@@ -32,7 +32,11 @@
       "endTime",
       "limit",
       "ltOrderType"
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "spot_lever_token_purchase",

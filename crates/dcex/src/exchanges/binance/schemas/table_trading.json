@@ -17,7 +17,11 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_futures_aggregate_trades",
@@ -153,7 +157,11 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_spot_aggregate_trades",
@@ -575,6 +583,14 @@
         "working_quantity": {
           "type": "string",
           "format": "decimal"
+        },
+        "pending_trailing_delta": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pendingTrailingDelta": {
+          "type": "string",
+          "format": "decimal"
         }
       }
     }
@@ -611,7 +627,11 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_futures_download_id_for_futures_trade_history",
@@ -672,7 +692,11 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_futures_futures_trade_download_link_by_id",
@@ -826,7 +850,11 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "spot_order_amendments",
@@ -1304,7 +1332,11 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "query_algo_current_algo_open_orders_future_algo",
@@ -1324,7 +1356,11 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "query_algo_historical_algo_orders_future_algo",
@@ -1389,7 +1425,11 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "query_algo_sub_orders_future_algo",
@@ -1430,7 +1470,11 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "algo_time_weighted_average_price_future_algo",
@@ -1668,7 +1712,11 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "query_algo_current_algo_open_orders_spot_algo",
@@ -1688,7 +1736,11 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "query_algo_historical_algo_orders_spot_algo",
@@ -1753,7 +1805,11 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "query_algo_sub_orders_spot_algo",
@@ -1794,7 +1850,11 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "algo_time_weighted_average_price_spot_algo",

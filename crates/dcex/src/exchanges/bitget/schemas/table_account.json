@@ -40,6 +40,10 @@
         "open_price": {
           "type": "string",
           "format": "decimal"
+        },
+        "leverage": {
+          "type": "string",
+          "format": "decimal"
         }
       }
     }

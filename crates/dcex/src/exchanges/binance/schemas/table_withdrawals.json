@@ -24,7 +24,11 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "fetch_withdraw_address_list",
@@ -35,7 +39,11 @@
     "public": false,
     "api_key": false,
     "allowed": [],
-    "fields": []
+    "fields": [],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "fetch_withdraw_quota",
@@ -46,7 +54,11 @@
     "public": false,
     "api_key": false,
     "allowed": [],
-    "fields": []
+    "fields": [],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_withdrawal_history",
@@ -122,6 +134,10 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   }
 ]

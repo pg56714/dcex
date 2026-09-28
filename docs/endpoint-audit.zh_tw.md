@@ -50,16 +50,16 @@ API 提款沒有第二次確認，送出即執行。建議交易用 API 金鑰�
 ## 驗證與限制
 
 <!-- VERIFICATION -->
-- Rust passed: `685`
-- Rust live ignored: `53`
-- Python passed: `21985`
-- Python deselected: `944`
-- Python skipped: `0`
-- Python xfailed: `0`
-- Outstanding test failures: `0`
-- Native extension rebuilt: `True`
-- Native build profile: `release`
-- Existing Clippy warnings: `14`
+- Rust 通過: `685`
+- Rust 線上測試略過: `53`
+- Python 通過: `21985`
+- Python 未選取: `944`
+- Python 略過: `0`
+- Python 預期失敗: `0`
+- 未解決測試失敗: `0`
+- 原生擴充已重建: `True`
+- 原生建置模式: `release`
+- 既有 Clippy 警告: `14`
 <!-- /VERIFICATION -->
 
 離線測試驗證路由、HTTP 方法、參數、簽章、WebSocket 訊息與回應處理，不能證明真實帳戶權限或交易所線上可用性。沒有送出真實訂單、提款或帳戶管理操作。

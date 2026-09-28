@@ -252,7 +252,11 @@
       "orderId"
     ],
     "decimals": [],
-    "method": "HttpMethod::Delete"
+    "method": "HttpMethod::Delete",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_prediction_order",
@@ -270,7 +274,11 @@
       "orderId"
     ],
     "decimals": [],
-    "method": "HttpMethod::Get"
+    "method": "HttpMethod::Get",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_prediction_open_order",
@@ -288,7 +296,11 @@
       "orderId"
     ],
     "decimals": [],
-    "method": "HttpMethod::Get"
+    "method": "HttpMethod::Get",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_prediction_open_orders",
@@ -300,7 +312,11 @@
     "required": [],
     "integers": [],
     "decimals": [],
-    "method": "HttpMethod::Get"
+    "method": "HttpMethod::Get",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_prediction_all_orders",
@@ -323,7 +339,11 @@
       "limit"
     ],
     "decimals": [],
-    "method": "HttpMethod::Get"
+    "method": "HttpMethod::Get",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "create_prediction_asset_wallet_transfer",

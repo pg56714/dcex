@@ -1,4 +1,4 @@
-use serde_json::{Number, Value};
+use serde_json::Value;
 
 use crate::common::OrderSide;
 use crate::{DcexError, Result};
@@ -112,7 +112,7 @@ pub(super) fn bool_or_string(value: &str) -> String {
 }
 
 pub(super) fn batch_orders_query(value: &str) -> Result<String> {
-    let mut value = serde_json::from_str::<Value>(value).map_err(|error| {
+    let value = serde_json::from_str::<Value>(value).map_err(|error| {
         DcexError::InvalidInput(format!("invalid batch order JSON parameter: {error}"))
     })?;
     let Value::Array(orders) = &value else {
@@ -143,7 +143,7 @@ pub(super) fn batch_orders_query(value: &str) -> Result<String> {
             }
         }
     }
-    normalize_batch_value(&mut value);
+    let value = normalize_batch_value(value)?;
     serde_json::to_string(&value).map_err(|error| DcexError::Decode(error.to_string()))
 }
 
@@ -342,23 +342,15 @@ pub(super) fn validate_json_object(params: &BingxParams, key: &str) -> Result<()
     )))
 }
 
-fn normalize_batch_value(value: &mut Value) {
-    let Value::Array(orders) = value else {
-        return;
-    };
-    for order in orders {
-        let Value::Object(order) = order else {
-            continue;
-        };
-        for field in BATCH_NUMERIC_FIELDS {
-            if let Some(Value::String(raw)) = order.get(*field)
-                && let Ok(number) = raw.parse::<f64>()
-                && let Some(number) = Number::from_f64(number)
-            {
-                order.insert((*field).to_string(), Value::Number(number));
-            }
-        }
-    }
+fn normalize_batch_value(value: Value) -> Result<Value> {
+    let properties: serde_json::Map<String, Value> = BATCH_NUMERIC_FIELDS
+        .iter()
+        .map(|field| (field.to_string(), serde_json::json!({"type": "number"})))
+        .collect();
+    let shape = serde_json::json!({
+        "type": "array", "items": {"type": "object", "properties": properties}
+    });
+    crate::exchanges::schema::encode_shape(value, &shape, "batchOrders")
 }
 
 pub(super) fn comma_list(value: &str) -> String {

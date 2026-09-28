@@ -343,6 +343,19 @@
         }
       }
     ],
-    "official_source": "https://docs.kraken.com/api-reference/trading-settings/set-the-off-book-max-leverage-cap"
+    "official_source": "https://docs.kraken.com/api-reference/trading-settings/set-the-off-book-max-leverage-cap",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "max_leverage": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "maxLeverage": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   }
 ]

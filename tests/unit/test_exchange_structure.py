@@ -44,12 +44,18 @@ def test_exchange_core_files(exchange):
 def test_private_dispatch_has_one_home(exchange):
     native = NATIVE / exchange
     assert re.search(r"^mod private;$", (native / "mod.rs").read_text(encoding="utf-8"), re.M)
-    dispatch_files = {
-        path.relative_to(native).as_posix()
-        for path in native.rglob("*.rs")
-        if "tests" not in path.relative_to(native).parts
-        and re.search(r"\bfn\s+(?:legacy_)?private_request(?:_boxed)?\s*(?:<[^\n]+?>)?\s*\(", _rust_code(path.read_text(encoding="utf-8")))
-    }
+    # Existing product handlers are explicit, reviewed delegates of private.rs.
+    # New names (including suffix/prefix variants) must never silently escape.
+    domains = json.loads((ROOT / "tests/fixtures/private_domain_handlers.json").read_text(encoding="utf-8"))
+    dispatch_files = set()
+    for path in native.rglob("*.rs"):
+        relative = path.relative_to(native).as_posix()
+        if "tests" in path.relative_to(native).parts:
+            continue
+        names = re.findall(r"\bfn\s+(\w*private_request\w*)", _rust_code(path.read_text(encoding="utf-8")))
+        for name in names:
+            if name not in domains.get(exchange, {}).get(relative, []):
+                dispatch_files.add(relative)
     assert dispatch_files == {"private.rs"}
 
 
@@ -62,8 +68,40 @@ def test_native_test_entry_only_declares_existing_modules(exchange):
     assert len(modules) == len(set(modules))
     assert "endpoint_coverage" in modules
     assert all((native / "tests" / f"{name}.rs").is_file() for name in modules)
-    assert {path.stem for path in (native / "tests").glob("*.rs")} == set(modules)
+    assert_test_modules_declared(native)
     assert not (native / "tests/route_coverage.rs").exists()
+
+
+def assert_test_modules_declared(native):
+    for path in (native / "tests").rglob("*.rs"):
+        relative = path.relative_to(native / "tests")
+        if relative.name == "mod.rs":
+            module = relative.parent.name
+            parent = path.parent.parent
+        else:
+            module = relative.stem
+            parent = path.parent
+        declaration = parent.with_suffix(".rs")
+        if not declaration.is_file():
+            declaration = parent / "mod.rs"
+        assert declaration.is_file(), path
+        assert re.search(r"\bmod\s+" + re.escape(module) + r"\s*;", _rust_code(declaration.read_text(encoding="utf-8"))), path
+
+
+def test_nested_test_file_requires_parent_declaration(tmp_path):
+    (tmp_path / "tests/sub").mkdir(parents=True)
+    (tmp_path / "tests.rs").write_text("mod sub;", encoding="utf-8")
+    (tmp_path / "tests/sub.rs").write_text("", encoding="utf-8")
+    (tmp_path / "tests/sub/x.rs").write_text("fn sample() {}", encoding="utf-8")
+    with pytest.raises(AssertionError):
+        assert_test_modules_declared(tmp_path)
+    (tmp_path / "tests/sub.rs").write_text("mod x;", encoding="utf-8")
+    assert_test_modules_declared(tmp_path)
+
+
+@pytest.mark.parametrize("name", ["private_request_inner", "signed_private_request"])
+def test_private_dispatch_name_variants_are_detected(name):
+    assert re.search(r"\bfn\s+\w*private_request\w*", f"async fn {name}() {{}}")
 
 
 @pytest.mark.parametrize("exchange", EXCHANGES)

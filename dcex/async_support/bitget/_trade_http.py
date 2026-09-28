@@ -2823,7 +2823,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         Call ``POST /api/v3/account/adjust-account-mode``. Uses advanced mode with delta_switch;
         the deprecated delta mode is not accepted.
 
-
         Requires confirm=True. This changes the account margin mode.
         """
         require_confirmation(confirm)
@@ -3388,7 +3387,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         Requires a whitelisted master account. Bitget cancels pending orders for
         the moved symbols in both accounts. Only USDT/USDC futures are supported.
         Nested symbols use native exchange IDs. Execution uses the mark price.
-
 
         Requires confirm=True. This transfers positions and cancels related pending orders.
         """

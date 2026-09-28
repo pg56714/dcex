@@ -558,6 +558,22 @@
         "working_quantity": {
           "type": "string",
           "format": "decimal"
+        },
+        "pending_above_trailing_delta": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pending_below_trailing_delta": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pendingAboveTrailingDelta": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pendingBelowTrailingDelta": {
+          "type": "string",
+          "format": "decimal"
         }
       }
     }
@@ -1031,6 +1047,22 @@
           "format": "decimal"
         },
         "working_quantity": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pending_above_trailing_delta": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pending_below_trailing_delta": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pendingAboveTrailingDelta": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pendingBelowTrailingDelta": {
           "type": "string",
           "format": "decimal"
         }

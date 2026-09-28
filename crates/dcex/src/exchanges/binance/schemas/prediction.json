@@ -153,7 +153,11 @@
     ],
     "json_body": false,
     "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/market-data#query-order-book",
-    "summary": "Query Order Book"
+    "summary": "Query Order Book",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "prediction_create_otc_blocktrade",
@@ -679,7 +683,11 @@
     ],
     "json_body": false,
     "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/redeem#batch-redeem",
-    "summary": "Batch Redeem (PREDICTION_TRADE)"
+    "summary": "Batch Redeem (PREDICTION_TRADE)",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "prediction_get_redeem_status",
@@ -743,7 +751,11 @@
     ],
     "json_body": false,
     "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/trade#batch-cancel-orders",
-    "summary": "Batch Cancel Orders (PREDICTION_TRADE)"
+    "summary": "Batch Cancel Orders (PREDICTION_TRADE)",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "prediction_get_quote",
@@ -1030,7 +1042,11 @@
     ],
     "json_body": false,
     "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/trade#query-active-orders",
-    "summary": "Query Active Orders (PREDICTION_TRADE)"
+    "summary": "Query Active Orders (PREDICTION_TRADE)",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "prediction_query_order_history",
@@ -1104,7 +1120,11 @@
     ],
     "json_body": false,
     "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/trade#query-order-history",
-    "summary": "Query Order History (PREDICTION_TRADE)"
+    "summary": "Query Order History (PREDICTION_TRADE)",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "prediction_apply_mm_deposit",
@@ -1445,7 +1465,11 @@
     ],
     "json_body": false,
     "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/transfer#query-transfer-list",
-    "summary": "Query Transfer List (PREDICTION_TRADE)"
+    "summary": "Query Transfer List (PREDICTION_TRADE)",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "prediction_query_transfer_status",
@@ -1470,7 +1494,11 @@
     ],
     "json_body": false,
     "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/transfer#query-transfer-status",
-    "summary": "Query Transfer Status (PREDICTION_TRADE)"
+    "summary": "Query Transfer Status (PREDICTION_TRADE)",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "prediction_get_portfolio",

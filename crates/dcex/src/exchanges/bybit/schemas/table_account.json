@@ -45,7 +45,11 @@
     "required": [
       "request"
     ],
-    "integers": []
+    "integers": [],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_asset_overview",

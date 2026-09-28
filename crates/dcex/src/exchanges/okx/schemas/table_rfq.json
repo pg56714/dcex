@@ -94,7 +94,11 @@
     ],
     "required": [],
     "bools": [],
-    "schema": "{\"type\":\"object\",\"properties\":{\"rfqIds\":{\"type\":\"array\",\"items\":{\"type\":\"string\",\"properties\":{},\"required\":[]}},\"clRfqIds\":{\"type\":\"array\",\"items\":{\"type\":\"string\",\"properties\":{},\"required\":[]}}},\"required\":[]}"
+    "schema": "{\"type\":\"object\",\"properties\":{\"rfqIds\":{\"type\":\"array\",\"items\":{\"type\":\"string\",\"properties\":{},\"required\":[]}},\"clRfqIds\":{\"type\":\"array\",\"items\":{\"type\":\"string\",\"properties\":{},\"required\":[]}}},\"required\":[]}",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "rfq_cancel_all_rfqs",
@@ -363,7 +367,11 @@
     ],
     "required": [],
     "bools": [],
-    "schema": "{\"type\":\"object\",\"properties\":{\"quoteIds\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}},\"clQuoteIds\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}}},\"required\":[]}"
+    "schema": "{\"type\":\"object\",\"properties\":{\"quoteIds\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}},\"clQuoteIds\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}}},\"required\":[]}",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "cancel_all_rfq_quotes",

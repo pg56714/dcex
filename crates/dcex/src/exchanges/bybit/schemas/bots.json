@@ -192,6 +192,26 @@
         "init_margin": {
           "type": "string",
           "format": "decimal"
+        },
+        "leverage": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "adjust_position_percent": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "sl_percent": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "tp_percent": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "trailing_stop_percent": {
+          "type": "string",
+          "format": "decimal"
         }
       }
     }
@@ -327,6 +347,26 @@
       "type": "object",
       "properties": {
         "init_margin": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "leverage": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "adjust_position_percent": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "sl_percent": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "tp_percent": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "trailing_stop_percent": {
           "type": "string",
           "format": "decimal"
         }
@@ -536,6 +576,10 @@
         "total_investment": {
           "type": "string",
           "format": "decimal"
+        },
+        "leverage": {
+          "type": "string",
+          "format": "decimal"
         }
       }
     }
@@ -737,6 +781,10 @@
         "take_profit_price": {
           "type": "string",
           "format": "decimal"
+        },
+        "leverage": {
+          "type": "string",
+          "format": "decimal"
         }
       }
     }
@@ -878,6 +926,22 @@
           "format": "decimal"
         },
         "price_float_percent": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "leverage": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "add_position_percent": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "round_tp_percent": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "sl_percent": {
           "type": "string",
           "format": "decimal"
         }
@@ -1027,6 +1091,22 @@
           "format": "decimal"
         },
         "price_float_percent": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "leverage": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "add_position_percent": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "round_tp_percent": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "sl_percent": {
           "type": "string",
           "format": "decimal"
         }
@@ -1216,6 +1296,10 @@
         "take_profit_price": {
           "type": "string",
           "format": "decimal"
+        },
+        "ts_percent": {
+          "type": "string",
+          "format": "decimal"
         }
       }
     }
@@ -1394,6 +1478,10 @@
           "format": "decimal"
         },
         "take_profit": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "ts_percent": {
           "type": "string",
           "format": "decimal"
         }

@@ -22,6 +22,8 @@ pub struct ArcusClient {
 }
 
 impl ArcusClient {
+    pub(crate) const INPUT_EXCHANGE: &'static str = "arcus";
+
     pub fn new(
         api_key: Option<String>,
         api_secret: Option<String>,
@@ -136,6 +138,8 @@ pub(super) mod spot {
     }
 
     impl ArcusSpotClient {
+        pub(crate) const INPUT_EXCHANGE: &'static str = "arcus";
+
         pub fn new(api_key: Option<String>, testnet: bool, timeout: Duration) -> Result<Self> {
             Ok(Self {
                 transport: AsyncHttpClient::new(timeout)?,

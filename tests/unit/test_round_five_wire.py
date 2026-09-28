@@ -3,6 +3,7 @@
 import importlib
 import inspect
 import json
+from decimal import Decimal
 from urllib.parse import parse_qs, urlsplit
 
 import pytest
@@ -58,6 +59,31 @@ async def test_round_five_regression_wire(asynchronous, case, monkeypatch):
                     with pytest.raises(ValueError, match="decimal"):
                         await call("place_batch_order", request=[{**order, field: value}])
                     assert received.empty()
+        finally:
+            result = client.close()
+            if inspect.isawaitable(result):
+                await result
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("asynchronous", [False, True])
+async def test_bingx_batch_retains_exact_json_numbers(asynchronous):
+    prefix = "dcex.async_support" if asynchronous else "dcex"
+    cls = importlib.import_module(f"{prefix}.bingx.client").Client
+    with _http_server({"code": 0, "data": {}}) as (base, received):
+        client = cls(api_key="key", api_secret="secret", base_url=base, preload_product_table=False)
+        if asynchronous:
+            await client.async_init()
+        try:
+            order = dict(symbol="BTC-USDT", side="BUY", type="LIMIT", positionSide="LONG", quantity="0.123456789012345678901", price="61000.123456789012345678")
+            result = client.place_swap_batch_order(batch_orders=[order])
+            if inspect.isawaitable(result):
+                await result
+            request = received.get(timeout=2)
+            params = parse_qs(urlsplit(request["path"]).query or request["body"])
+            decoded = json.loads(params["batchOrders"][0], parse_float=Decimal)
+            assert decoded[0]["quantity"] == Decimal(order["quantity"])
+            assert decoded[0]["price"] == Decimal(order["price"])
         finally:
             result = client.close()
             if inspect.isawaitable(result):

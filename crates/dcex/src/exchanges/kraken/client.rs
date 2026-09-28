@@ -31,6 +31,8 @@ pub struct KrakenClient {
 }
 
 impl KrakenClient {
+    pub(crate) const INPUT_EXCHANGE: &'static str = "kraken";
+
     /// Header-nonce authentication documented by the Funding and Affiliate guides.
     /// The signed path includes the encoded query; the nonce is not in the body.
     pub(super) async fn request_header_nonce(

@@ -65,7 +65,11 @@
         "minimum": null,
         "maximum": null
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_spot_server_time",
@@ -406,7 +410,11 @@
         "minimum": null,
         "maximum": null
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_uta_service_status",

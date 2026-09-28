@@ -1,0 +1,217 @@
+{
+  "arcus": {
+    "trade.rs": [
+      "build_private_request"
+    ]
+  },
+  "aster": {
+    "account.rs": [
+      "account_private_request"
+    ],
+    "builder.rs": [
+      "builder_private_request"
+    ],
+    "trade.rs": [
+      "trade_private_request"
+    ],
+    "withdrawals.rs": [
+      "withdrawals_private_request"
+    ]
+  },
+  "backpack": {
+    "account.rs": [
+      "account_private_request"
+    ],
+    "rfq.rs": [
+      "rfq_private_request"
+    ],
+    "strategy.rs": [
+      "strategy_private_request"
+    ],
+    "trade.rs": [
+      "trade_private_request"
+    ]
+  },
+  "binance": {
+    "batch.rs": [
+      "batch_private_request"
+    ],
+    "coin_futures.rs": [
+      "coin_futures_private_request"
+    ],
+    "convert.rs": [
+      "convert_private_request"
+    ],
+    "earn.rs": [
+      "simple_earn_private_request"
+    ],
+    "equity.rs": [
+      "equity_private_request"
+    ],
+    "loan.rs": [
+      "loan_private_request"
+    ],
+    "margin.rs": [
+      "margin_private_request"
+    ],
+    "options.rs": [
+      "options_private_request"
+    ],
+    "portfolio_margin.rs": [
+      "portfolio_margin_private_request"
+    ],
+    "staking.rs": [
+      "staking_private_request"
+    ],
+    "subaccount.rs": [
+      "subaccount_private_request"
+    ],
+    "trading_controls.rs": [
+      "trading_controls_private_request"
+    ]
+  },
+  "bingx": {
+    "account.rs": [
+      "account_private_request"
+    ],
+    "trade.rs": [
+      "trade_private_request"
+    ]
+  },
+  "bitget": {
+    "account.rs": [
+      "account_private_request"
+    ],
+    "earn.rs": [
+      "earn_private_request"
+    ],
+    "loan.rs": [
+      "loan_private_request"
+    ],
+    "trade.rs": [
+      "trade_private_request"
+    ]
+  },
+  "bybit": {
+    "account.rs": [
+      "account_private_request"
+    ],
+    "advanced_earn.rs": [
+      "advanced_earn_private_request"
+    ],
+    "byusdt.rs": [
+      "byusdt_private_request"
+    ],
+    "earn.rs": [
+      "earn_private_request"
+    ],
+    "fixed_earn.rs": [
+      "fixed_earn_private_request"
+    ],
+    "funding.rs": [
+      "asset_private_request"
+    ],
+    "hold_to_earn.rs": [
+      "hold_to_earn_private_request"
+    ],
+    "launchpool.rs": [
+      "launchpool_private_request"
+    ],
+    "liquidity_mining.rs": [
+      "liquidity_mining_private_request"
+    ],
+    "position.rs": [
+      "position_private_request"
+    ],
+    "rfq.rs": [
+      "rfq_private_request"
+    ],
+    "rwa_earn.rs": [
+      "rwa_earn_private_request"
+    ],
+    "spread.rs": [
+      "spread_private_request"
+    ],
+    "strategy.rs": [
+      "strategy_private_request"
+    ],
+    "trade.rs": [
+      "trade_private_request"
+    ]
+  },
+  "extended": {
+    "account.rs": [
+      "account_private_request"
+    ],
+    "trade.rs": [
+      "trade_private_request"
+    ]
+  },
+  "kraken": {
+    "account.rs": [
+      "account_private_request"
+    ],
+    "earn.rs": [
+      "earn_private_request"
+    ],
+    "trade.rs": [
+      "trade_private_request"
+    ]
+  },
+  "kucoin": {
+    "account.rs": [
+      "account_private_request"
+    ],
+    "earn.rs": [
+      "earn_private_request"
+    ],
+    "margin.rs": [
+      "margin_private_request"
+    ],
+    "trade.rs": [
+      "trade_private_request"
+    ],
+    "uta.rs": [
+      "uta_private_request"
+    ]
+  },
+  "mexc": {
+    "account.rs": [
+      "account_private_request"
+    ],
+    "trade.rs": [
+      "trade_private_request"
+    ]
+  },
+  "okx": {
+    "account.rs": [
+      "account_private_request"
+    ],
+    "algo.rs": [
+      "algo_private_request"
+    ],
+    "finance.rs": [
+      "finance_private_request"
+    ],
+    "funding.rs": [
+      "asset_private_request"
+    ],
+    "spread.rs": [
+      "spread_private_request"
+    ],
+    "subaccount.rs": [
+      "subaccount_private_request"
+    ],
+    "trade.rs": [
+      "trade_private_request"
+    ]
+  },
+  "ondo": {
+    "account.rs": [
+      "account_private_request"
+    ],
+    "trade.rs": [
+      "trade_private_request"
+    ]
+  }
+}

@@ -21,8 +21,9 @@ python -m scripts.build_kucoin_wrappers
 ruff check --fix dcex
 ruff format dcex
 cargo fmt --all
-python -m scripts.build_endpoint_markdown
-python scripts/build_endpoint_docs.py
+python -m scripts.build_endpoint_markdown --write
+python -m scripts.build_endpoint_markdown --check
+python scripts/build_endpoint_docs.py --write
 ```
 
 The wrapper generators use committed schemas and require no network access.

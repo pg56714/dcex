@@ -6,7 +6,11 @@
     "public": false,
     "keys": [],
     "required": [],
-    "integers": []
+    "integers": [],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_asset_withdraw_query_address",
@@ -24,7 +28,11 @@
     "integers": [
       "addressType",
       "limit"
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_asset_withdraw_query_record",
@@ -47,6 +55,10 @@
       "startTime",
       "endTime",
       "limit"
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   }
 ]

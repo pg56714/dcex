@@ -20,7 +20,11 @@
     },
     "has_example": true,
     "source_file": "v5/stocks/cancel-order.mdx",
-    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "method": "GET",
@@ -258,7 +262,11 @@
     },
     "has_example": true,
     "source_file": "v5/stocks/order-detail.mdx",
-    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "method": "POST",

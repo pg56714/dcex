@@ -12,7 +12,11 @@
     ],
     "arrays": [],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_spot_sub_account_transfer_records",
@@ -32,7 +36,11 @@
     "required": [],
     "arrays": [],
     "limit": 100,
-    "days": 90
+    "days": 90,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "transfer_spot_sub_account",
@@ -83,7 +91,11 @@
     ],
     "arrays": [],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_isolated_margin_max_transferable",
@@ -98,7 +110,11 @@
     ],
     "arrays": [],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_uta_max_transferable",
@@ -113,7 +129,11 @@
     ],
     "arrays": [],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_uta_transferable_coins",
@@ -130,7 +150,11 @@
     ],
     "arrays": [],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_uta_position_transfer_history",
@@ -150,7 +174,11 @@
     ],
     "arrays": [],
     "limit": 100,
-    "days": 90
+    "days": 90,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "transfer_uta_account",
@@ -271,6 +299,10 @@
     "required": [],
     "arrays": [],
     "limit": 100,
-    "days": 90
+    "days": 90,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   }
 ]

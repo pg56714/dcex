@@ -24,6 +24,8 @@ pub struct OndoClient {
 }
 
 impl OndoClient {
+    pub(crate) const INPUT_EXCHANGE: &'static str = "ondo";
+
     pub fn new(
         api_key_id: Option<String>,
         api_secret: Option<String>,

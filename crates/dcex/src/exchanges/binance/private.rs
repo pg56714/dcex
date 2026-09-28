@@ -557,6 +557,9 @@ impl BinanceClient {
 }
 
 impl crate::exchanges::ExchangeMethodRequestClient for BinanceClient {
+    fn input_exchange(&self) -> &'static str {
+        Self::INPUT_EXCHANGE
+    }
     fn public_request_boxed<'a>(
         &'a self,
         method_name: &'static str,

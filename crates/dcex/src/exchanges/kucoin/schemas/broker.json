@@ -18,7 +18,25 @@
     "source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/apply-for-fast-withdrawal",
     "summary": "Apply for Fast Withdrawal",
     "withdrawal": true,
-    "confirm": false
+    "confirm": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "string",
+              "format": "decimal"
+            },
+            "fee": {
+              "type": "string",
+              "format": "decimal"
+            }
+          }
+        }
+      }
+    }
   },
   {
     "name": "get_v2_broker_api_rebate_download",
@@ -1194,7 +1212,11 @@
     "source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/get-transfer-history",
     "summary": "Get Transfer History",
     "withdrawal": false,
-    "confirm": false
+    "confirm": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_v1_asset_ndbroker_deposit_list",
@@ -1309,7 +1331,11 @@
     "source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/get-withdraw-detail",
     "summary": "Get Withdraw Detail",
     "withdrawal": false,
-    "confirm": false
+    "confirm": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "post_v1_broker_nd_mark_up",

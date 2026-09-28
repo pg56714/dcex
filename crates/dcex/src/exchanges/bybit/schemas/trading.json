@@ -114,6 +114,10 @@
         "qty_limit": {
           "type": "string",
           "format": "decimal"
+        },
+        "delta_limit": {
+          "type": "string",
+          "format": "decimal"
         }
       }
     }

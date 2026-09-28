@@ -1,7 +1,7 @@
 """
 Build docs/endpoint-coverage.html from docs/endpoint-coverage-ledger.json.
 
-Edit the ledger JSON, then run ``python scripts/build_endpoint_docs.py``.
+Edit the ledger JSON, then run ``python scripts/build_endpoint_docs.py --write``.
 ``--check`` exits non-zero when the committed HTML is out of date.
 """
 
@@ -93,7 +93,9 @@ def build_html(ledger: dict[str, Any]) -> str:
 def main() -> int:
     """Write the HTML, or verify it is current with ``--check``."""
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--check", action="store_true", help="fail if the HTML is stale")
+    mode = parser.add_mutually_exclusive_group(required=True)
+    mode.add_argument("--write", action="store_true", help="write the generated HTML")
+    mode.add_argument("--check", action="store_true", help="fail if the HTML is stale")
     args = parser.parse_args()
 
     ledger = json.loads(LEDGER.read_text(encoding="utf-8"))
@@ -101,7 +103,10 @@ def main() -> int:
     if args.check:
         current = OUTPUT.read_text(encoding="utf-8") if OUTPUT.exists() else ""
         if current != html:
-            print(f"{OUTPUT.relative_to(ROOT)} is out of date; run scripts/build_endpoint_docs.py")
+            print(
+                f"{OUTPUT.relative_to(ROOT)} is out of date; "
+                "run scripts/build_endpoint_docs.py --write"
+            )
             return 1
         return 0
     OUTPUT.write_text(html, encoding="utf-8", newline="\n")

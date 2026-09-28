@@ -13,7 +13,11 @@
         "kind": "int"
       }
     ],
-    "name": "disable_fast_withdraw_switch"
+    "name": "disable_fast_withdraw_switch",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "method": "POST",
@@ -29,6 +33,10 @@
         "kind": "int"
       }
     ],
-    "name": "enable_fast_withdraw_switch"
+    "name": "enable_fast_withdraw_switch",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   }
 ]

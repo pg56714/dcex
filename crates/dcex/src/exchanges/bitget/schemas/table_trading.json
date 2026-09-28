@@ -14,7 +14,16 @@
     ],
     "arrays": [],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "leverage": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_futures_position_history",
@@ -129,7 +138,11 @@
     ],
     "arrays": [],
     "limit": 100,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_all_trade_rates",

@@ -33,6 +33,8 @@ pub struct MexcClient {
 }
 
 impl MexcClient {
+    pub(crate) const INPUT_EXCHANGE: &'static str = "mexc";
+
     pub fn new(
         api_key: Option<String>,
         api_secret: Option<String>,

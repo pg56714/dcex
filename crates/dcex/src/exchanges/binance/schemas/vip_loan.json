@@ -477,7 +477,11 @@
     ],
     "json_body": false,
     "source": "https://developers.binance.com/en/docs/catalog/investment-and-services-vip-loan/api/rest-api/user-information#get-viploan-ongoing-orders",
-    "summary": "Get VIP Loan Ongoing Orders (USER_DATA)"
+    "summary": "Get VIP Loan Ongoing Orders (USER_DATA)",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_vip_loan_repayment_history",

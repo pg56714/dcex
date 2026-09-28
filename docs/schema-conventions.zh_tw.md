@@ -90,3 +90,24 @@ uv run --no-sync python -m scripts.build_input_contracts --check
 `scripts/build_endpoint_docs.py` 及其 `--check`。重建 native 前，檢查已載入的
 `.pyd` 模組並確認可以獨占開啟。行為修正與純搬檔必須分開提交；不得手動修改
 `CHANGELOG.md`。
+
+### 明確驗證邊界與證據粒度
+
+未宣告欄位**完全不進行數值驗證**。完整性守門獨立盤點公開簽章、wire 別名、
+可變參數操作及 list/dict 參數；非數值例外逐項記錄於
+`tests/fixtures/input_contract_exemptions.json`。新增數值參數而未補宣告會使測試失敗。
+`format: decimal` 預設允許零；`x-positive: true` 要求嚴格大於零。
+無零值控制語意的訂單數量及轉帳金額採正值限制，取消設定所用零值及官方哨兵值保留原語意。
+
+Kraken V1 `amendOrder` 的限價／觸發價也允許相對價格。
+條件平倉 `close[price]`／`close[price2]`（Python `close_price`／`close_price2`）
+繼承對應價格規則，依據 [Kraken V1 addOrder 官方文件](https://docs-legacy.kraken.com/api/docs/websocket-v1/addorder/)。
+[Kraken 期貨偏移值](https://docs.kraken.com/api-reference/order-management/send-order)允許正負十進位值，單位由另一欄位指定。
+[OKX 模擬 idxVol](https://www.okx.com/docs-v5/en/#trading-account-rest-api-position-builder)為 -0.99 至 1 的有號十進位值。
+[Backpack 官方文件](https://docs.backpack.exchange/)將 triggerQuantity 描述為字串數量，
+但未明確說明百分比後綴；目前不知道是否支援，因此不據此新增百分比例外（查核日期：2026-09-29）。
+
+Rust ledger 中沒有 `::symbol` 的引用刻意維持**檔案層級證據**：
+只證明來源檔存在，不代表特定函式已覆蓋該路由。有符號引用時仍驗證符號；
+路由層級的證據由專屬 wire 測試提供。superseded 理由須包含至少四個不同單字，
+不能用重複單一字串填滿長度門檻。

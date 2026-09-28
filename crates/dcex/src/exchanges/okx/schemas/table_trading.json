@@ -73,7 +73,11 @@
     ],
     "required": [],
     "bools": [],
-    "schema": null
+    "schema": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "simulate_positions",
@@ -99,11 +103,13 @@
       "properties": {
         "idxVol": {
           "type": "string",
-          "format": "decimal"
+          "format": "decimal",
+          "x-signed": true
         },
         "idx_vol": {
           "type": "string",
-          "format": "decimal"
+          "format": "decimal",
+          "x-signed": true
         }
       }
     }

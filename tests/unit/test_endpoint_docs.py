@@ -33,7 +33,7 @@ def test_endpoint_coverage_html_matches_ledger() -> None:
     ledger = json.loads(LEDGER.read_text(encoding="utf-8"))
 
     assert OUTPUT.read_text(encoding="utf-8") == build_html(ledger), (
-        "docs/endpoint-coverage.html is stale; run `python scripts/build_endpoint_docs.py`"
+        "docs/endpoint-coverage.html is stale; run `python scripts/build_endpoint_docs.py --write`"
     )
 
 
@@ -49,3 +49,19 @@ def test_endpoint_coverage_html_embeds_every_ledger_row() -> None:
     assert len(payload["rows"]) == len(ledger["rows"])
     assert set(payload["exchanges"]) == {row["exchange"] for row in ledger["rows"]}
     assert "</script" not in html[start : html.index("</script>", start)]
+
+
+def test_html_cli_requires_explicit_mode_without_writing():
+    before = OUTPUT.read_bytes(), OUTPUT.stat().st_mtime_ns
+    for args, code in [([], 2), (["--help"], 0), (["--write", "--check"], 2)]:
+        result = subprocess.run([sys.executable, "-m", "scripts.build_endpoint_docs", *args], cwd=ROOT, capture_output=True)
+        assert result.returncode == code, result.stderr
+    assert before == (OUTPUT.read_bytes(), OUTPUT.stat().st_mtime_ns)
+
+
+def test_markdown_generation_does_not_require_git(monkeypatch):
+    def unavailable(*args, **kwargs):
+        raise AssertionError("generation must not read Git history")
+    monkeypatch.setattr(subprocess, "run", unavailable)
+    documents = build_markdown()
+    assert "Rust 通過" in documents[ROOT / "docs/endpoint-audit.zh_tw.md"]

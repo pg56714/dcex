@@ -41,7 +41,11 @@
       "category",
       "symbol"
     ],
-    "integers": []
+    "integers": [],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_rpi_orderbook",
@@ -60,7 +64,11 @@
     ],
     "integers": [
       "limit"
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_position_symbol_info",

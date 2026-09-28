@@ -20,7 +20,11 @@
       }
     ],
     "title": "Cancel withdraw",
-    "official_source": "https://www.mexc.com/api-docs/spot-v3/wallet-endpoints/cancel-withdraw"
+    "official_source": "https://www.mexc.com/api-docs/spot-v3/wallet-endpoints/cancel-withdraw",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "create_spot_withdrawal",

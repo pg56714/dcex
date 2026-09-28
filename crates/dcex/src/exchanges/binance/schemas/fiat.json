@@ -167,7 +167,11 @@
     ],
     "json_body": false,
     "source": "https://developers.binance.com/en/docs/catalog/investment-and-services-fiat/api/rest-api/~#get-fiat-deposit-withdraw-history",
-    "summary": "Get Fiat Deposit/Withdraw History (USER_DATA)"
+    "summary": "Get Fiat Deposit/Withdraw History (USER_DATA)",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_fiat_payments_history",
@@ -245,6 +249,10 @@
     ],
     "json_body": false,
     "source": "https://developers.binance.com/en/docs/catalog/investment-and-services-fiat/api/rest-api/~#get-order-detail",
-    "summary": "Get Order Detail (USER_DATA)"
+    "summary": "Get Order Detail (USER_DATA)",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   }
 ]

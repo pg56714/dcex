@@ -112,7 +112,11 @@
     },
     "has_example": true,
     "source_file": "v5/finance/pwm/asset-manager/all-order.mdx",
-    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "method": "POST",
@@ -185,6 +189,10 @@
         "management_fee_rate": {
           "type": "string",
           "format": "decimal"
+        },
+        "profit_share_rate": {
+          "type": "string",
+          "format": "decimal"
         }
       }
     }
@@ -247,7 +255,28 @@
     },
     "has_example": true,
     "source_file": "v5/finance/pwm/asset-manager/create-investment-plan.mdx",
-    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "investment_distribution": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "type": "string",
+                "format": "decimal"
+              },
+              "ratio": {
+                "type": "string",
+                "format": "decimal"
+              }
+            }
+          }
+        }
+      }
+    }
   },
   {
     "method": "POST",
@@ -451,7 +480,11 @@
     },
     "has_example": true,
     "source_file": "v5/finance/pwm/asset-manager/manage-order.mdx",
-    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "method": "POST",
@@ -956,7 +989,11 @@
     },
     "has_example": true,
     "source_file": "v5/finance/pwm/investment-plan/order.mdx",
-    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "method": "POST",
@@ -1103,6 +1140,10 @@
     },
     "has_example": true,
     "source_file": "v5/finance/pwm/query-fund-transfer-result.mdx",
-    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   }
 ]

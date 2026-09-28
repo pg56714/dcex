@@ -406,7 +406,11 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_margin_order_rate_limits",
@@ -444,7 +448,11 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_margin_all_order_lists",
@@ -510,7 +518,11 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_margin_order_list",
@@ -562,7 +574,11 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_margin_open_order_lists",
@@ -600,7 +616,11 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "close_margin_listen_key",
@@ -917,6 +937,14 @@
         "working_quantity": {
           "type": "string",
           "format": "decimal"
+        },
+        "pending_trailing_delta": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "pendingTrailingDelta": {
+          "type": "string",
+          "format": "decimal"
         }
       }
     }
@@ -994,7 +1022,20 @@
         "required": true,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "max_leverage": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "maxLeverage": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_margin_bnb_burn_status",

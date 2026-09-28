@@ -113,7 +113,20 @@
       "clSpotInUseAmt"
     ],
     "bools": [],
-    "schema": null
+    "schema": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "cl_spot_in_use_amt": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "clSpotInUseAmt": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "preset_account_level_switch",

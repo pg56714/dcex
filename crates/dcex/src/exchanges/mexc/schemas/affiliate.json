@@ -266,7 +266,11 @@
       }
     ],
     "title": "Get Affiliate Withdraw Record (affiliate only)",
-    "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-affiliate-withdraw-record-affiliate-only"
+    "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-affiliate-withdraw-record-affiliate-only",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_rebate_affiliate_list",

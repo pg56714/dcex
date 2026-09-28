@@ -928,8 +928,6 @@ class AccountHTTP(
         Source:
         https://bybit-exchange.github.io/docs/v5/user/modify-master-apikey
 
-
-
         Requires confirm=True. This changes the API key permissions.
         """
         require_confirmation(confirm)
@@ -983,8 +981,6 @@ class AccountHTTP(
 
         Source:
         https://bybit-exchange.github.io/docs/v5/user/rm-master-apikey
-
-
 
         Requires confirm=True. This revokes the API key and its access.
         """

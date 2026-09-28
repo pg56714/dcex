@@ -29,7 +29,11 @@
     "integers": [
       "limit",
       "recvWindow"
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_coin_swap_kline",
@@ -224,7 +228,11 @@
     "integers": [
       "orderId",
       "recvWindow"
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "cancel_coin_swap_all_orders",
@@ -238,7 +246,11 @@
     "required": [],
     "integers": [
       "recvWindow"
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "close_coin_swap_all_positions",
@@ -266,7 +278,11 @@
     "required": [],
     "integers": [
       "recvWindow"
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_coin_swap_order",
@@ -285,7 +301,11 @@
     "integers": [
       "orderId",
       "recvWindow"
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_coin_swap_order_history",
@@ -309,7 +329,11 @@
       "startTime",
       "endTime",
       "recvWindow"
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_coin_swap_fills",
@@ -350,7 +374,11 @@
       "endTime",
       "limit",
       "recvWindow"
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_coin_swap_leverage",
@@ -386,7 +414,16 @@
     ],
     "integers": [
       "recvWindow"
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "leverage": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "get_coin_swap_margin_type",

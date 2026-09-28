@@ -94,7 +94,11 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/stock-plus/assets#check-transfer-records",
-    "summary": "Check Transfer Records"
+    "summary": "Check Transfer Records",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "stock_plus_assets_get_account",
@@ -474,6 +478,14 @@
         "trigger_price": {
           "type": "string",
           "format": "decimal"
+        },
+        "limit_offset": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "trailing_percent": {
+          "type": "string",
+          "format": "decimal"
         }
       }
     }
@@ -611,6 +623,14 @@
         "trigger_price": {
           "type": "string",
           "format": "decimal"
+        },
+        "limit_offset": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "trailing_percent": {
+          "type": "string",
+          "format": "decimal"
         }
       }
     }
@@ -649,7 +669,11 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/stock-plus/orders#cancel-order",
-    "summary": "Cancel Order"
+    "summary": "Cancel Order",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "stock_plus_orders_get_today_orders",
@@ -701,7 +725,11 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/stock-plus/orders#check-today-orders",
-    "summary": "Check Today Orders"
+    "summary": "Check Today Orders",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "stock_plus_orders_get_history_orders",
@@ -761,7 +789,11 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/stock-plus/orders#check-history-orders",
-    "summary": "Check History Orders"
+    "summary": "Check History Orders",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "stock_plus_orders_get_order_detail",
@@ -781,7 +813,11 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/stock-plus/orders#check-order-detail",
-    "summary": "Check Order Detail"
+    "summary": "Check Order Detail",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "stock_plus_orders_get_today_executions",
@@ -809,7 +845,11 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/stock-plus/orders#check-today-executions",
-    "summary": "Check Today Executions"
+    "summary": "Check Today Executions",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "stock_plus_orders_get_history_executions",
@@ -845,7 +885,11 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/stock-plus/orders#check-history-executions",
-    "summary": "Check History Executions"
+    "summary": "Check History Executions",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "stock_plus_stock_quotes_get_static_info",

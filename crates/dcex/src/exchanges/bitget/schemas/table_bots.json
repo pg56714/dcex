@@ -215,6 +215,10 @@
         "trigger_price": {
           "type": "string",
           "format": "decimal"
+        },
+        "leverage": {
+          "type": "string",
+          "format": "decimal"
         }
       }
     }
@@ -318,6 +322,10 @@
           "format": "decimal"
         },
         "trigger_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "leverage": {
           "type": "string",
           "format": "decimal"
         }
@@ -645,6 +653,10 @@
         "trigger_price": {
           "type": "string",
           "format": "decimal"
+        },
+        "leverage": {
+          "type": "string",
+          "format": "decimal"
         }
       }
     }
@@ -777,6 +789,10 @@
           "format": "decimal"
         },
         "trigger_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "leverage": {
           "type": "string",
           "format": "decimal"
         }

@@ -9,13 +9,7 @@ pub type ExchangeMethodFuture<'a> =
 
 pub trait ExchangeMethodRequestClient {
     /// Select explicit endpoint input declarations for this client.
-    fn input_exchange(&self) -> &'static str {
-        std::any::type_name::<Self>()
-            .split("::exchanges::")
-            .nth(1)
-            .and_then(|name| name.split("::").next())
-            .unwrap_or("")
-    }
+    fn input_exchange(&self) -> &'static str;
 
     fn public_request_boxed<'a>(
         &'a self,
@@ -34,6 +28,9 @@ impl<T> ExchangeMethodRequestClient for &T
 where
     T: ExchangeMethodRequestClient + Sync + ?Sized,
 {
+    fn input_exchange(&self) -> &'static str {
+        (*self).input_exchange()
+    }
     fn public_request_boxed<'a>(
         &'a self,
         method_name: &'static str,
@@ -1637,6 +1634,9 @@ macro_rules! impl_exchange_method_wrappers {
         private [$($(#[$private_meta:meta])* $private_method:ident($($private_param:ident => $private_key:literal),*)),* $(,)?] $(;)?
     ) => {
         impl crate::exchanges::ExchangeMethodRequestClient for $client {
+            fn input_exchange(&self) -> &'static str {
+                <$client>::INPUT_EXCHANGE
+            }
             fn public_request_boxed<'a>(
                 &'a self,
                 method_name: &'static str,
@@ -1741,6 +1741,9 @@ mod tests {
     }
 
     impl ExchangeMethodRequestClient for DummyClient {
+        fn input_exchange(&self) -> &'static str {
+            "binance"
+        }
         fn public_request_boxed<'a>(
             &'a self,
             _method_name: &'static str,
@@ -1902,3 +1905,32 @@ pub mod ondo;
 pub(crate) mod input_contracts;
 mod operation_guards;
 pub(crate) mod schema;
+
+#[cfg(test)]
+#[test]
+fn every_client_has_a_catalog_identity() {
+    let catalog: serde_json::Value =
+        serde_json::from_str(include_str!("input_contracts.json")).unwrap();
+    let identities = [
+        arcus::client::ArcusClient::INPUT_EXCHANGE,
+        arcus::client::ArcusSpotClient::INPUT_EXCHANGE,
+        aster::client::AsterClient::INPUT_EXCHANGE,
+        backpack::client::BackpackClient::INPUT_EXCHANGE,
+        binance::client::BinanceClient::INPUT_EXCHANGE,
+        bingx::client::BingxClient::INPUT_EXCHANGE,
+        bitget::client::BitgetClient::INPUT_EXCHANGE,
+        bybit::client::BybitClient::INPUT_EXCHANGE,
+        extended::client::ExtendedClient::INPUT_EXCHANGE,
+        hyperliquid::client::HyperliquidClient::INPUT_EXCHANGE,
+        kraken::client::KrakenClient::INPUT_EXCHANGE,
+        kucoin::client::KucoinClient::INPUT_EXCHANGE,
+        lighter::client::LighterClient::INPUT_EXCHANGE,
+        mexc::client::MexcClient::INPUT_EXCHANGE,
+        okx::client::OkxClient::INPUT_EXCHANGE,
+        ondo::client::OndoClient::INPUT_EXCHANGE,
+    ];
+    assert_eq!(identities.len(), 16);
+    for identity in identities {
+        assert!(catalog["exchanges"][identity].is_object(), "{identity}");
+    }
+}

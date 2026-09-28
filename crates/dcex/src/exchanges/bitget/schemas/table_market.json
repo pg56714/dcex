@@ -271,7 +271,11 @@
     ],
     "arrays": [],
     "limit": 1000,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_uta_rpi_symbols",

@@ -167,7 +167,11 @@
         "minimum": null,
         "maximum": null
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "set_uta_sub_account_transfer_permission",
@@ -194,6 +198,10 @@
         "minimum": null,
         "maximum": null
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   }
 ]

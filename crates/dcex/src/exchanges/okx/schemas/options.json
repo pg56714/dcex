@@ -46,6 +46,10 @@
       ]
     },
     "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-trade-post-mass-cancel-order",
-    "row": 1101
+    "row": 1101,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   }
 ]

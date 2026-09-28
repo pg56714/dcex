@@ -15,6 +15,10 @@
         "name": "to_address",
         "required": true
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   }
 ]

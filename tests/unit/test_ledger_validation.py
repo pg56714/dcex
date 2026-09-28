@@ -34,6 +34,9 @@ def test_superseded_without_target_requires_specific_reason():
     with pytest.raises(AssertionError, match="missing reason"):
         validate_superseded([row(1, "superseded")], [])
     validate_superseded([row(1, "superseded", superseded_reason="Historical grouped inventory without an independently callable endpoint.")], [])
+    for reason in ["a" * 20, "same " * 10]:
+        with pytest.raises(AssertionError, match="missing reason"):
+            validate_superseded([row(1, "superseded", superseded_reason=reason)], [])
 
 
 def test_evidence_resolves_full_class_and_ignores_rust_comments(tmp_path):
@@ -46,3 +49,8 @@ def test_evidence_resolves_full_class_and_ignores_rust_comments(tmp_path):
     for evidence in ["sample.rs::fake", "sample.rs::string_fake", "missing.py"]:
         with pytest.raises(AssertionError):
             validate_evidence(tmp_path, evidence)
+
+
+def test_rust_char_literal_does_not_hide_the_next_symbol(tmp_path):
+    (tmp_path / "sample.rs").write_text("const QUOTE: char = '\"';\nfn real() {}\n", encoding="utf-8")
+    validate_evidence(tmp_path, "sample.rs::real")

@@ -39,6 +39,8 @@ pub struct LighterClient {
 }
 
 impl LighterClient {
+    pub(crate) const INPUT_EXCHANGE: &'static str = "lighter";
+
     /// Override the separate public explorer API origin.
     pub fn with_explorer_base_url(mut self, base_url: String) -> Result<Self> {
         let url = url::Url::parse(&base_url).map_err(|e| DcexError::InvalidInput(e.to_string()))?;

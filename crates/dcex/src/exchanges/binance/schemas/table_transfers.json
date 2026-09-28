@@ -161,7 +161,11 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "pm_pro_bnb_transfer",
@@ -356,7 +360,11 @@
           "COIN_FUTURE"
         ]
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "query_managed_sub_account_transfer_log_master_account_trading",
@@ -424,7 +432,11 @@
           "COIN_FUTURE"
         ]
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "query_managed_sub_account_transfer_log_sub_account_trading",
@@ -492,7 +504,11 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_transferable_earn_asset_balance_for_portfolio_margin",
@@ -529,7 +545,11 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "transfer_ldusdt_rwusd_for_portfolio_margin",

@@ -125,7 +125,11 @@
         "minimum": null,
         "maximum": null
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "cancel_convert_limit_order",
@@ -152,7 +156,11 @@
         "minimum": null,
         "maximum": null
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_convert_currencies",
@@ -187,7 +195,11 @@
         "minimum": null,
         "maximum": null
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_convert_limit_order_detail_list",
@@ -246,7 +258,11 @@
         "minimum": null,
         "maximum": null
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_convert_limit_quote",
@@ -339,7 +355,11 @@
         "minimum": null,
         "maximum": null
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_convert_order_history",
@@ -397,7 +417,11 @@
         "minimum": null,
         "maximum": null
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_convert_quote",

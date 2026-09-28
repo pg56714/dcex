@@ -75,6 +75,8 @@ pub struct BinanceClient {
 }
 
 impl BinanceClient {
+    pub(crate) const INPUT_EXCHANGE: &'static str = "binance";
+
     pub fn new(
         api_key: Option<String>,
         api_secret: Option<String>,

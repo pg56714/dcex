@@ -43,13 +43,17 @@ async def test_relative_rest_wire(asynchronous, value, method, path, kwargs, fie
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("event", ["addOrder", "editOrder"])
+@pytest.mark.parametrize("event", ["addOrder", "editOrder", "amendOrder"])
 @pytest.mark.parametrize("value", ["+5", "-5", "#5", "+5.25%", "-5%", "#5.5%"])
 async def test_relative_ws_wire(event, value):
     from dcex.ws.kraken import V1Client
     payload = {"event":event, "pair":"XBT/USD", "type":"buy", "ordertype":"limit", "volume":"1", "price":value, "price2":value}
     if event == "editOrder":
         payload["orderid"] = "order-id"
+    if event == "addOrder":
+        payload.update({"close[price]": value, "close[price2]": value})
+    if event == "amendOrder":
+        payload = {"event": event, "order_id": "order-id", "limit_price": value, "trigger_price": value}
     async with echo_peer() as (url, received):
         client = V1Client("offline-token", base_url=url, timeout=2)
         try:

@@ -25,6 +25,8 @@ pub struct OkxClient {
 }
 
 impl OkxClient {
+    pub(crate) const INPUT_EXCHANGE: &'static str = "okx";
+
     pub fn new(
         api_key: Option<String>,
         api_secret: Option<String>,

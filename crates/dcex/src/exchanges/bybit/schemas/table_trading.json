@@ -213,7 +213,11 @@
     "required": [],
     "integers": [
       "limit"
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_pre_upgrade_closed_pnl",
@@ -263,6 +267,10 @@
       "startTime",
       "endTime",
       "limit"
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   }
 ]

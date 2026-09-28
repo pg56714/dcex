@@ -381,7 +381,11 @@
       "required": []
     },
     "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-cancel-multiple-quotes",
-    "row": 1227
+    "row": 1227,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "cancel_all_rfq_quotes",

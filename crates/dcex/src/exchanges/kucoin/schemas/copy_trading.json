@@ -317,6 +317,10 @@
         "stop_price": {
           "type": "string",
           "format": "decimal"
+        },
+        "leverage": {
+          "type": "string",
+          "format": "decimal"
         }
       }
     }
@@ -639,6 +643,10 @@
         "stop_price": {
           "type": "string",
           "format": "decimal"
+        },
+        "leverage": {
+          "type": "string",
+          "format": "decimal"
         }
       }
     }
@@ -954,6 +962,10 @@
         "trigger_stop_up_price": {
           "type": "string",
           "format": "decimal"
+        },
+        "leverage": {
+          "type": "string",
+          "format": "decimal"
         }
       }
     }
@@ -977,7 +989,11 @@
     "source": "https://www.kucoin.com/docs-new/rest/copy-trading/cancel-order-by-orderid",
     "summary": "Cancel Order By OrderId",
     "withdrawal": false,
-    "confirm": false
+    "confirm": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "delete_v1_copy_trade_futures_orders_client_order",
@@ -1006,7 +1022,11 @@
     "source": "https://www.kucoin.com/docs-new/rest/copy-trading/cancel-order-by-clientoid",
     "summary": "Cancel Order By ClientOid",
     "withdrawal": false,
-    "confirm": false
+    "confirm": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_v1_copy_trade_futures_get_max_open_size",
@@ -1054,6 +1074,10 @@
       "properties": {
         "price": {
           "type": "number",
+          "format": "decimal"
+        },
+        "leverage": {
+          "type": "string",
           "format": "decimal"
         }
       }
@@ -1109,7 +1133,11 @@
     "source": "https://www.kucoin.com/docs-new/rest/copy-trading/get-max-withdraw-margin",
     "summary": "Get Max Withdraw Margin",
     "withdrawal": false,
-    "confirm": false
+    "confirm": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "post_v1_copy_trade_futures_position_margin_deposit_margin",
@@ -1430,7 +1458,16 @@
     "source": "https://www.kucoin.com/docs-new/rest/copy-trading/modify-cross-margin-leverage",
     "summary": "Modify Cross Margin Leverage",
     "withdrawal": false,
-    "confirm": false
+    "confirm": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "leverage": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "post_v2_copy_trade_get_cross_mode_margin_requirement",
@@ -1479,6 +1516,10 @@
           "format": "decimal"
         },
         "position_value": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "leverage": {
           "type": "string",
           "format": "decimal"
         }

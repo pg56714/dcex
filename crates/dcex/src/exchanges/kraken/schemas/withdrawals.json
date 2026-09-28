@@ -320,7 +320,11 @@
         }
       }
     ],
-    "official_source": "https://docs.kraken.com/api-reference/funding-beta/list-funding-withdrawal-limits"
+    "official_source": "https://docs.kraken.com/api-reference/funding-beta/list-funding-withdrawal-limits",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_funding_withdrawals",
@@ -474,7 +478,11 @@
         }
       }
     ],
-    "official_source": "https://docs.kraken.com/api-reference/funding-beta/list-funding-withdrawals"
+    "official_source": "https://docs.kraken.com/api-reference/funding-beta/list-funding-withdrawals",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "cancel_spot_withdrawal",
@@ -499,7 +507,11 @@
         }
       }
     ],
-    "official_source": "https://docs.kraken.com/api-reference/funding/request-withdrawal-cancellation"
+    "official_source": "https://docs.kraken.com/api-reference/funding/request-withdrawal-cancellation",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "create_spot_withdrawal",

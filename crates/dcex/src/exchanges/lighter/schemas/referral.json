@@ -46,7 +46,16 @@
         "name": "kickback_percentage",
         "required": true
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "kickback_percentage": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "method": "GET",
