@@ -129,6 +129,8 @@ this change does not assert batch transport support.
 is a signed decimal in the -0.99 to 1 range. The checked [Backpack API documentation](https://docs.backpack.exchange/)
 describes triggerQuantity as a string quantity but does not establish percent-suffix
 support; no percent exception is inferred from that absence (checked 2026-09-29).
+[Aster futures pegOffset](https://asterdex.github.io/aster-api-website/futures-v3/account%26trades/)
+is explicitly signed: BUY offsets can be negative. Its declaration preserves this existing behavior.
 
 Rust ledger evidence without `::symbol` is deliberately **file-level evidence**:
 it proves the cited source file exists, not that a particular function covers a

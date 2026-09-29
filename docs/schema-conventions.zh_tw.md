@@ -110,6 +110,8 @@ Kraken V1 `amendOrder` 的限價／觸發價也允許相對價格。
 [OKX 模擬 idxVol](https://www.okx.com/docs-v5/en/#trading-account-rest-api-position-builder)為 -0.99 至 1 的有號十進位值。
 [Backpack 官方文件](https://docs.backpack.exchange/)將 triggerQuantity 描述為字串數量，
 但未明確說明百分比後綴；目前不知道是否支援，因此不據此新增百分比例外（查核日期：2026-09-29）。
+[Aster 期貨 pegOffset](https://asterdex.github.io/aster-api-website/futures-v3/account%26trades/)
+明確為有號偏移，BUY 偏移可為負數；契約保留此既有行為。
 
 Rust ledger 中沒有 `::symbol` 的引用刻意維持**檔案層級證據**：
 只證明來源檔存在，不代表特定函式已覆蓋該路由。有符號引用時仍驗證符號；

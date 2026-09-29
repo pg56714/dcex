@@ -131,3 +131,27 @@ async def test_documented_signed_values_reach_the_wire(asynchronous):
             result = client.close()
             if inspect.isawaitable(result):
                 await result
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("asynchronous", [False, True])
+async def test_aster_signed_bbo_offset_reaches_the_wire(asynchronous):
+    from tests.unit.test_aster_endpoint_coverage import _client_kwargs
+
+    prefix = "dcex.async_support" if asynchronous else "dcex"
+    cls = importlib.import_module(f"{prefix}.aster.client").Client
+    with _http_server({"orderId": 1}) as (base, received):
+        client = cls(**_client_kwargs(base))
+        if asynchronous:
+            await client.async_init()
+        try:
+            result = client.place_futures_order(product_symbol="BTC-USDT-SWAP", side="buy", type_="LIMIT", quantity="1", price="60000", timeInForce="GTC", pegPriceType="QUEUE_1", pegOffset="-0.5")
+            if inspect.isawaitable(result):
+                await result
+            request = received.get(timeout=2)
+            assert urlsplit(request["path"]).path == "/fapi/v3/order"
+            assert parse_qs(urlsplit(request["path"]).query or request["body"])["pegOffset"] == ["-0.5"]
+        finally:
+            result = client.close()
+            if inspect.isawaitable(result):
+                await result

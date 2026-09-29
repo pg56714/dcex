@@ -376,7 +376,8 @@
           },
           "pegOffset": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-signed": true
           },
           "peg_offset": {
             "type": "string",
@@ -15705,6 +15706,10 @@
             "format": "decimal"
           },
           "trigger_stop_up_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "leverage": {
             "type": "string",
             "format": "decimal"
           }

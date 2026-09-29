@@ -38,7 +38,7 @@ def test_neutral_grid_investment_is_an_array(method):
 
 
 def test_documented_signed_values_and_percent_scope():
-    for exchange, method, key in [("kraken", "place_futures_order", "limitPriceOffsetValue"), ("okx", "simulate_positions", "idxVol")]:
+    for exchange, method, key in [("kraken", "place_futures_order", "limitPriceOffsetValue"), ("okx", "simulate_positions", "idxVol"), ("aster", "place_futures_order", "pegOffset")]:
         schema = CATALOG["exchanges"][exchange][method]
         assert normalize({key: "-0.5"}, schema=schema) == {key: "-0.5"}
         with pytest.raises(ValueError):
