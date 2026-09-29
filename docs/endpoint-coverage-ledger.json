@@ -115617,10 +115617,10 @@
     }
   ],
   "verification": {
-    "rust_passed": 685,
+    "rust_passed": 686,
     "rust_live_ignored": 53,
-    "python_full_collection": 21985,
-    "python_passed": 21985,
+    "python_full_collection": 23401,
+    "python_passed": 23401,
     "python_skipped": 0,
     "python_xfailed": 0,
     "outstanding_test_failures": 0,
@@ -115628,7 +115628,7 @@
     "native_profile": "release",
     "live_authenticated_operations": false,
     "clippy_existing_warnings": 14,
-    "note": "Round 5 preparation: Rust workspace/all-features 685 passed, 53 live tests ignored; Python 21985 passed, 944 live/private/stateful/generated cases deselected. Release native rebuilt after loaded-module and exclusive-access checks. All 50 Kraken relative-price and BingX fractional TP/SL native wire regressions pass. Full pre-commit, Ruff, Pyright, rustfmt and HTML/Markdown/input-catalog checks pass. Clippy succeeds with 14 existing warnings; all-targets succeeds with 173 existing warnings. Six wrapper generators and the schema-table generator reproduce all 1,234 checked files. R4 behavior fixes and pure file moves/renames are in separate commits. No authenticated live operations were invoked. External Claude round 5 review remains pending.",
+    "note": "Round 6 preparation: Rust workspace/all-features 686 passed, 53 live tests ignored; Python 23401 passed, 944 live/private/stateful/generated cases deselected. Release native rebuilt after loaded-module and exclusive-access checks. R5-01 through R5-03 have failing-before/passing-after sync/async wire evidence; R5-04 mutations detect undeclared numeric and batch inputs. Signed offsets, Kraken relative prices and exact BingX batch numbers are covered by native wire tests. Full pre-commit, Ruff, Pyright, rustfmt and HTML/Markdown/input-catalog checks pass. Clippy succeeds with 14 existing warnings, or 173 with all targets. Six wrapper generators and the schema-table generator reproduce 1,237 files. R5 behavior fixes and R5-14 pure refactors are in separate commits. Kraken batch offsets and Backpack percent quantities remain unconfirmed and are explicitly documented; no authenticated live operations were invoked. External Claude round 6 review remains pending.",
     "python_deselected": 944,
     "clippy_all_targets_warnings": 173
   }
