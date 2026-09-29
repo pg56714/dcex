@@ -1,6 +1,6 @@
 //! Builder operations.
 use crate::exchanges::aster::{AsterClient, AsterMarket, params::AsterParams};
-use crate::{DcexError, Result, exchange::ValidatedResponse, http::HttpMethod};
+use crate::{Result, exchange::ValidatedResponse, http::HttpMethod};
 
 impl AsterClient {
     pub(in crate::exchanges::aster) async fn builder_private_request(
@@ -58,6 +58,4 @@ impl AsterClient {
     }
 }
 
-fn invalid(message: &str) -> DcexError {
-    DcexError::InvalidInput(format!("Aster: {message}"))
-}
+use crate::exchanges::aster::params::invalid;

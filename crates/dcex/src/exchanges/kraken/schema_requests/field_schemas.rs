@@ -4,10 +4,10 @@ use std::sync::OnceLock;
 use serde::Deserialize;
 use serde_json::{Map, Value};
 
+use crate::Result;
 use crate::exchange::ValidatedResponse;
 use crate::exchanges::kraken::{KrakenAuth, KrakenClient, params::KrakenParams};
 use crate::http::HttpMethod;
-use crate::{DcexError, Result};
 
 #[derive(Deserialize)]
 struct Field {
@@ -25,9 +25,7 @@ struct Endpoint {
     fields: Vec<Field>,
 }
 static ENDPOINTS: OnceLock<Vec<Endpoint>> = OnceLock::new();
-fn invalid(message: impl std::fmt::Display) -> DcexError {
-    DcexError::InvalidInput(format!("Kraken: {message}"))
-}
+use crate::exchanges::kraken::params::invalid;
 
 impl KrakenClient {
     pub(in crate::exchanges::kraken) async fn field_schema_request(

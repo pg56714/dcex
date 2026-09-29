@@ -3,9 +3,9 @@ use super::client::{KrakenAuth, KrakenClient};
 use super::params::KrakenParams;
 #[path = "generated/schema_tables.rs"]
 mod endpoints;
+use crate::Result;
 use crate::exchange::ValidatedResponse;
 use crate::http::HttpMethod;
-use crate::{DcexError, Result};
 use endpoints::ENDPOINTS;
 
 pub(super) struct Field {
@@ -25,9 +25,7 @@ pub(super) struct Endpoint {
     pub fields: &'static [Field],
     pub symbol_key: Option<&'static str>,
 }
-fn invalid(message: impl std::fmt::Display) -> DcexError {
-    DcexError::InvalidInput(format!("Kraken: {message}"))
-}
+use crate::exchanges::kraken::params::invalid;
 impl KrakenClient {
     pub(super) async fn table_request(
         &self,

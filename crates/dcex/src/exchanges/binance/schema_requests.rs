@@ -3,9 +3,9 @@ use super::client::{BinanceClient, BinanceMarket};
 use super::params::PublicParams;
 #[path = "generated/schema_tables.rs"]
 mod endpoints;
+use crate::Result;
 use crate::exchange::ValidatedResponse;
 use crate::http::HttpMethod;
-use crate::{DcexError, Result};
 use endpoints::ENDPOINTS;
 
 pub(super) struct Field {
@@ -25,9 +25,7 @@ pub(super) struct Endpoint {
     pub allowed: &'static [&'static str],
     pub fields: &'static [Field],
 }
-fn invalid(message: impl std::fmt::Display) -> DcexError {
-    DcexError::InvalidInput(format!("Binance: {message}"))
-}
+use crate::exchanges::binance::params::invalid;
 
 impl BinanceClient {
     pub(super) async fn table_request(

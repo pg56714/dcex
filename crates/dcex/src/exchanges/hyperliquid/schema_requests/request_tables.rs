@@ -20,9 +20,7 @@ struct Operation {
     required_fields: Vec<String>,
 }
 
-fn invalid(message: impl std::fmt::Display) -> DcexError {
-    DcexError::InvalidInput(format!("Hyperliquid: {message}"))
-}
+use crate::exchanges::hyperliquid::params::invalid;
 
 impl HyperliquidClient {
     pub(in crate::exchanges::hyperliquid) async fn catalog_request(

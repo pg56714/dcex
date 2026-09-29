@@ -12,12 +12,9 @@ impl ArcusClient {
     }
 }
 
-use crate::DcexError;
+use crate::exchanges::arcus::params::invalid;
 use serde_json::{Value, json};
 use std::collections::BTreeMap;
-fn invalid(message: impl std::fmt::Display) -> DcexError {
-    DcexError::InvalidInput(format!("Arcus: {message}"))
-}
 impl ArcusClient {
     pub(super) fn validate_withdrawal(&self, value: &Value, signed: bool) -> Result<()> {
         let amount = value["amount"].as_str().expect("validated string");

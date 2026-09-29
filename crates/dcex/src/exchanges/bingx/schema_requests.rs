@@ -1,7 +1,7 @@
 //! Schema-driven request validation, encoding and dispatch.
 use super::{client::BingxClient, params::*};
 use crate::{
-    DcexError, Result,
+    Result,
     exchange::{ValidatedResponse, unix_timestamp_ms},
 };
 use serde_json::Value;
@@ -369,8 +369,6 @@ impl BingxClient {
         }))
     }
 }
-fn invalid(message: &str) -> DcexError {
-    DcexError::InvalidInput(format!("BingX: {message}"))
-}
+use crate::exchanges::bingx::params::invalid;
 
 mod request_tables;

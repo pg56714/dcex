@@ -6,11 +6,11 @@ use ed25519_dalek::Signer;
 use serde::Deserialize;
 use serde_json::{Value, json};
 
+use crate::Result;
 use crate::exchange::ValidatedResponse;
 use crate::exchanges::arcus::ArcusClient;
 use crate::exchanges::arcus::signing::{legacy_signing_message, timestamp_ns};
 use crate::http::{HttpMethod, HttpRequest};
-use crate::{DcexError, Result};
 
 #[derive(Deserialize)]
 struct Endpoint {
@@ -30,9 +30,7 @@ fn endpoint(name: &str) -> Option<&'static Endpoint> {
 pub(in crate::exchanges::arcus) fn handles(name: &str, public: bool) -> bool {
     endpoint(name).is_some_and(|e| public == (e.method == "GET" && !e.signed))
 }
-fn invalid(message: impl std::fmt::Display) -> DcexError {
-    DcexError::InvalidInput(format!("Arcus: {message}"))
-}
+use crate::exchanges::arcus::params::invalid;
 
 impl ArcusClient {
     pub(in crate::exchanges::arcus) async fn field_schema_request(

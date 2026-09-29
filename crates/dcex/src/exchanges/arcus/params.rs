@@ -95,3 +95,7 @@ pub(super) fn decimal_product_below(price: &str, quantity: &str, minimum: &str) 
         .ok_or_else(|| DcexError::InvalidInput("Arcus notional overflow".into()))?;
     Ok(product < minimum)
 }
+
+pub(in crate::exchanges::arcus) fn invalid(message: impl std::fmt::Display) -> crate::DcexError {
+    crate::DcexError::InvalidInput(format!("Arcus: {message}"))
+}

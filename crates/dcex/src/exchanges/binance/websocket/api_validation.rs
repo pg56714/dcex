@@ -1,6 +1,6 @@
 use super::api::BinanceWebSocketApiMarket;
 use super::api_schema::{Field, Kind};
-use crate::{DcexError, Result};
+use crate::Result;
 use serde_json::{Map, Value};
 
 pub(super) fn validate(
@@ -286,6 +286,4 @@ fn enum_value(params: &Map<String, Value>, key: &str, values: &[&str]) -> Result
         Ok(())
     }
 }
-fn invalid(message: &str) -> DcexError {
-    DcexError::InvalidInput(format!("Binance WebSocket API: {message}"))
-}
+use crate::exchanges::binance::params::invalid_ws as invalid;

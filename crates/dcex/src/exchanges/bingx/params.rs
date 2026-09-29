@@ -375,3 +375,7 @@ pub(super) fn python_list_string(value: &str) -> String {
     }
     value.replace(['\'', ' '], "")
 }
+
+pub(in crate::exchanges::bingx) fn invalid(message: impl std::fmt::Display) -> crate::DcexError {
+    crate::DcexError::InvalidInput(format!("BingX: {message}"))
+}

@@ -1,14 +1,12 @@
 //! Additional batch trading, available balances and margin preferences.
 pub(in crate::exchanges::kraken) use super::client::{KrakenAuth, KrakenClient};
 pub(in crate::exchanges::kraken) use super::params::KrakenParams;
+pub(in crate::exchanges::kraken) use crate::Result;
 pub(in crate::exchanges::kraken) use crate::exchange::ValidatedResponse;
 pub(in crate::exchanges::kraken) use crate::http::HttpMethod;
-pub(in crate::exchanges::kraken) use crate::{DcexError, Result};
 pub(in crate::exchanges::kraken) use serde_json::Value;
 
-pub(in crate::exchanges::kraken) fn invalid(message: &str) -> DcexError {
-    DcexError::InvalidInput(format!("Kraken: {message}"))
-}
+pub(in crate::exchanges::kraken) use crate::exchanges::kraken::params::invalid;
 pub(in crate::exchanges::kraken) fn parse_bool(
     params: &KrakenParams,
     key: &str,

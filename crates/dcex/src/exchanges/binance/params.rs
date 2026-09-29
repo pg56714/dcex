@@ -358,3 +358,11 @@ pub(super) fn push_optional_display<T: ToString>(
         params.push((key.to_string(), value.to_string()));
     }
 }
+
+pub(in crate::exchanges::binance) fn invalid(message: impl std::fmt::Display) -> crate::DcexError {
+    crate::DcexError::InvalidInput(format!("Binance: {message}"))
+}
+
+pub(in crate::exchanges::binance) fn invalid_ws(message: &str) -> crate::DcexError {
+    crate::DcexError::InvalidInput(format!("Binance WebSocket API: {message}"))
+}

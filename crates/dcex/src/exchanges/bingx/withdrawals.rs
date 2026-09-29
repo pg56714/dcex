@@ -3,7 +3,7 @@
 mod wallet_requests {
     // Wallet writes from the official BingX documentation request tables.
     use crate::exchanges::bingx::{client::BingxClient, params::BingxParams};
-    use crate::{DcexError, Result, exchange::ValidatedResponse, http::HttpMethod};
+    use crate::{Result, exchange::ValidatedResponse, http::HttpMethod};
     use serde_json::{Map, Value};
 
     impl BingxClient {
@@ -116,9 +116,7 @@ mod wallet_requests {
             }
         }
     }
-    fn invalid(message: &str) -> DcexError {
-        DcexError::InvalidInput(format!("BingX: {message}"))
-    }
+    use crate::exchanges::bingx::params::invalid;
 }
 
 mod wrappers {

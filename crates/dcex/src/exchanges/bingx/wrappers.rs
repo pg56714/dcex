@@ -228,8 +228,9 @@ crate::exchanges::impl_exchange_method_wrappers! {
         place_swap_limit_buy_order(
             product_symbol => "product_symbol",
             quantity => "quantity",
-            price => "price"
-        , position_side => "positionSide"),
+            price => "price",
+            position_side => "positionSide"
+        ),
         place_swap_limit_order(
             product_symbol => "product_symbol",
             side => "side",
@@ -239,8 +240,9 @@ crate::exchanges::impl_exchange_method_wrappers! {
         place_swap_limit_sell_order(
             product_symbol => "product_symbol",
             quantity => "quantity",
-            price => "price"
-        , position_side => "positionSide"),
+            price => "price",
+            position_side => "positionSide"
+        ),
         place_swap_market_buy_order(product_symbol => "product_symbol", quantity => "quantity", position_side => "positionSide"),
         place_swap_market_order(
             product_symbol => "product_symbol",
@@ -252,8 +254,9 @@ crate::exchanges::impl_exchange_method_wrappers! {
         place_swap_post_only_buy_order(
             product_symbol => "product_symbol",
             quantity => "quantity",
-            price => "price"
-        , position_side => "positionSide"),
+            price => "price",
+            position_side => "positionSide"
+        ),
         place_swap_post_only_order(
             product_symbol => "product_symbol",
             side => "side",
@@ -263,8 +266,9 @@ crate::exchanges::impl_exchange_method_wrappers! {
         place_swap_post_only_sell_order(
             product_symbol => "product_symbol",
             quantity => "quantity",
-            price => "price"
-        , position_side => "positionSide"),
+            price => "price",
+            position_side => "positionSide"
+        ),
         replace_swap_order(
             product_symbol => "product_symbol",
             cancel_replace_mode => "cancelReplaceMode",

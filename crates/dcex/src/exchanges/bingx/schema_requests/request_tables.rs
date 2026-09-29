@@ -1,6 +1,6 @@
 //! Request tables from the official BingX documentation.
 use crate::exchanges::bingx::{BingxClient, params::BingxParams};
-use crate::{DcexError, Result, exchange::ValidatedResponse, http::HttpMethod};
+use crate::{Result, exchange::ValidatedResponse, http::HttpMethod};
 use serde::Deserialize;
 use serde_json::Value;
 use std::sync::OnceLock;
@@ -15,9 +15,7 @@ struct Endpoint {
     scoped: bool,
     fields: Vec<Field>,
 }
-fn invalid(message: impl std::fmt::Display) -> DcexError {
-    DcexError::InvalidInput(format!("BingX: {message}"))
-}
+use crate::exchanges::bingx::params::invalid;
 impl BingxClient {
     pub(in crate::exchanges::bingx) async fn catalog_request(
         &self,

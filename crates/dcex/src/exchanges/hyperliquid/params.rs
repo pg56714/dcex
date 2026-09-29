@@ -192,3 +192,9 @@ pub(super) fn fallback_coin(product_symbol: &str) -> String {
         .unwrap_or(product_symbol)
         .to_ascii_uppercase()
 }
+
+pub(in crate::exchanges::hyperliquid) fn invalid(
+    message: impl std::fmt::Display,
+) -> crate::DcexError {
+    crate::DcexError::InvalidInput(format!("Hyperliquid: {message}"))
+}

@@ -3,15 +3,13 @@ use super::{
     ArcusClient,
     signing::{legacy_signing_message, timestamp_ns},
 };
+use crate::Result;
 use crate::exchange::ValidatedResponse;
+use crate::exchanges::arcus::params::invalid;
 use crate::http::{HttpMethod, HttpRequest};
-use crate::{DcexError, Result};
 use ed25519_dalek::Signer;
 use serde_json::Value;
 use std::collections::BTreeMap;
-fn invalid(s: &str) -> DcexError {
-    DcexError::InvalidInput(format!("Arcus: {s}"))
-}
 const KEYS: &[&str] = &[
     "favoritedMarkets",
     "favoritePerpMarkets",

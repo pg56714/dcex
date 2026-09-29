@@ -1,5 +1,5 @@
 //! Shape validation for deployment actions and their named variants.
-use crate::{DcexError, Result};
+use crate::Result;
 use serde_json::{Map, Value};
 
 pub(super) fn validate_action_shape(
@@ -29,6 +29,4 @@ pub(super) fn validate_action_shape(
     Ok(())
 }
 
-fn invalid(message: impl std::fmt::Display) -> DcexError {
-    DcexError::InvalidInput(format!("Hyperliquid: {message}"))
-}
+use crate::exchanges::hyperliquid::params::invalid;

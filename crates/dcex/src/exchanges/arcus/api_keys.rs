@@ -1,13 +1,11 @@
 //! Wallet-authorized API key administration. Signatures are supplied by the caller.
 use super::ArcusClient;
+use crate::Result;
 use crate::exchange::ValidatedResponse;
 use crate::http::{HttpMethod, HttpRequest};
-use crate::{DcexError, Result};
 use serde_json::Value;
 
-fn invalid(message: &str) -> DcexError {
-    DcexError::InvalidInput(format!("Arcus: {message}"))
-}
+use crate::exchanges::arcus::params::invalid;
 fn address(value: &str) -> bool {
     value
         .strip_prefix("0x")

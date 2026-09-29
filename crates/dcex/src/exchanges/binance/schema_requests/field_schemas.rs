@@ -6,8 +6,7 @@ use serde_json::Value;
 
 use crate::exchanges::binance::{BinanceClient, BinanceMarket, params::PublicParams};
 use crate::{
-    DcexError, Result, common::is_positive_plain_decimal, exchange::ValidatedResponse,
-    http::HttpMethod,
+    Result, common::is_positive_plain_decimal, exchange::ValidatedResponse, http::HttpMethod,
 };
 
 use crate::exchanges::schema::Field;
@@ -19,9 +18,7 @@ struct Endpoint {
     parameters: Vec<Field>,
 }
 
-fn invalid(message: impl std::fmt::Display) -> DcexError {
-    DcexError::InvalidInput(format!("Binance: {message}"))
-}
+use crate::exchanges::binance::params::invalid;
 
 fn validate_pii(value: &Value) -> Result<()> {
     let obj = value

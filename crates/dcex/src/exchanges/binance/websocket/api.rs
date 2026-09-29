@@ -274,9 +274,7 @@ async fn run(
     let _ = connection.close().await;
 }
 
-fn invalid(message: &str) -> DcexError {
-    DcexError::InvalidInput(format!("Binance WebSocket API: {message}"))
-}
+use crate::exchanges::binance::params::invalid_ws as invalid;
 fn disconnected() -> DcexError {
     DcexError::Transport(
         "Binance WebSocket API disconnected; reconnect and reconcile orders before retrying".into(),

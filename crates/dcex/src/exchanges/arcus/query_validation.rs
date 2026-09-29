@@ -1,9 +1,7 @@
 //! Constraints from the official Arcus OpenAPI request tables.
-use crate::{DcexError, Result};
+use crate::Result;
+use crate::exchanges::arcus::params::invalid;
 use std::collections::BTreeMap;
-fn invalid(message: &str) -> DcexError {
-    DcexError::InvalidInput(format!("Arcus: {message}"))
-}
 struct Field {
     name: &'static str,
     required: bool,

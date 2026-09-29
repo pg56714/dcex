@@ -86,3 +86,7 @@ pub(super) fn require_one_identifier(params: &KrakenParams, keys: &[&str]) -> Re
         keys.join(", "),
     )))
 }
+
+pub(in crate::exchanges::kraken) fn invalid(message: impl std::fmt::Display) -> crate::DcexError {
+    crate::DcexError::InvalidInput(format!("Kraken: {message}"))
+}

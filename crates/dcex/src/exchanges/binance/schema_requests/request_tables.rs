@@ -1,7 +1,7 @@
 //! Additional documented SDK operations; Alpha has its own host and Fiat uses JSON.
 use crate::exchanges::binance::{BinanceClient, params::PublicParams};
 use crate::exchanges::schema::{self, Field};
-use crate::{DcexError, Result, exchange::ValidatedResponse, http::HttpMethod};
+use crate::{Result, exchange::ValidatedResponse, http::HttpMethod};
 use serde::Deserialize;
 use serde_json::Value;
 use std::sync::OnceLock;
@@ -14,9 +14,7 @@ struct Endpoint {
     json_body: bool,
     fields: Vec<Field>,
 }
-fn invalid(message: impl std::fmt::Display) -> DcexError {
-    DcexError::InvalidInput(format!("Binance: {message}"))
-}
+use crate::exchanges::binance::params::invalid;
 impl BinanceClient {
     pub(in crate::exchanges::binance) async fn catalog_request(
         &self,

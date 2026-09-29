@@ -303,3 +303,7 @@ fn json_value_string(value: &Value) -> String {
         Value::Array(_) | Value::Object(_) => value.to_string(),
     }
 }
+
+pub(in crate::exchanges::backpack) fn invalid(message: impl Into<String>) -> crate::DcexError {
+    crate::DcexError::InvalidInput(format!("Backpack: {}", message.into()))
+}

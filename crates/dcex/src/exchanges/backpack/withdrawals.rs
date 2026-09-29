@@ -1,6 +1,6 @@
 //! Withdrawals operations.
 use crate::exchanges::backpack::{BackpackClient, params::BackpackParams};
-use crate::{DcexError, Result, exchange::ValidatedResponse};
+use crate::{Result, exchange::ValidatedResponse};
 use serde_json::{Map, Value};
 
 impl BackpackClient {
@@ -117,9 +117,7 @@ impl BackpackClient {
             .map(Some)
     }
 }
-fn invalid(message: impl Into<String>) -> DcexError {
-    DcexError::InvalidInput(format!("Backpack: {}", message.into()))
-}
+use crate::exchanges::backpack::params::invalid;
 
 mod wrappers {
     use crate::exchanges::backpack::BackpackClient;

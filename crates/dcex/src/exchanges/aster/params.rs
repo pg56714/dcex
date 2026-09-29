@@ -349,3 +349,7 @@ pub(super) fn json_value_string(value: &Value) -> String {
         _ => value.to_string(),
     }
 }
+
+pub(in crate::exchanges::aster) fn invalid(message: &str) -> crate::DcexError {
+    crate::DcexError::InvalidInput(format!("Aster: {message}"))
+}
