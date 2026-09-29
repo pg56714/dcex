@@ -148,7 +148,11 @@
     ],
     "json_body": false,
     "source": "https://developers.binance.com/en/docs/catalog/investment-and-services-mining/api/rest-api/~#earnings-list",
-    "summary": "Earnings List (USER_DATA)"
+    "summary": "Earnings List (USER_DATA)",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "extra_bonus_list",
@@ -215,7 +219,11 @@
     ],
     "json_body": false,
     "source": "https://developers.binance.com/en/docs/catalog/investment-and-services-mining/api/rest-api/~#extra-bonus-list",
-    "summary": "Extra Bonus List (USER_DATA)"
+    "summary": "Extra Bonus List (USER_DATA)",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "hashrate_resale_detail",
@@ -254,7 +262,11 @@
     ],
     "json_body": false,
     "source": "https://developers.binance.com/en/docs/catalog/investment-and-services-mining/api/rest-api/~#hashrate-resale-detail",
-    "summary": "Hashrate Resale Detail (USER_DATA)"
+    "summary": "Hashrate Resale Detail (USER_DATA)",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "hashrate_resale_list",
@@ -286,7 +298,11 @@
     ],
     "json_body": false,
     "source": "https://developers.binance.com/en/docs/catalog/investment-and-services-mining/api/rest-api/~#hashrate-resale-list",
-    "summary": "Hashrate Resale List (USER_DATA)"
+    "summary": "Hashrate Resale List (USER_DATA)",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "hashrate_resale_request",
@@ -408,7 +424,11 @@
     ],
     "json_body": false,
     "source": "https://developers.binance.com/en/docs/catalog/investment-and-services-mining/api/rest-api/~#mining-account-earning",
-    "summary": "Mining Account Earning (USER_DATA)"
+    "summary": "Mining Account Earning (USER_DATA)",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "request_for_detail_miner_list",

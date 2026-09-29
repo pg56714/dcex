@@ -78,7 +78,11 @@
     ],
     "json_body": false,
     "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/market-data#list-prediction-markets",
-    "summary": "List Prediction Markets"
+    "summary": "List Prediction Markets",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "prediction_market_search",
@@ -545,7 +549,11 @@
     ],
     "json_body": false,
     "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/position#query-positions",
-    "summary": "Query Positions (PREDICTION_TRADE)"
+    "summary": "Query Positions (PREDICTION_TRADE)",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "prediction_query_positions_by_filter",
@@ -644,7 +652,11 @@
     ],
     "json_body": false,
     "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/position#query-settled-position-history",
-    "summary": "Query Settled Position History (PREDICTION_TRADE)"
+    "summary": "Query Settled Position History (PREDICTION_TRADE)",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "prediction_batch_redeem",
@@ -878,6 +890,10 @@
         "price_limit": {
           "type": "string",
           "format": "decimal"
+        },
+        "slippage_bps": {
+          "type": "string",
+          "format": "decimal"
         }
       }
     }
@@ -978,6 +994,10 @@
           "format": "decimal"
         },
         "price_limit": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "slippage_bps": {
           "type": "string",
           "format": "decimal"
         }

@@ -420,6 +420,10 @@
         "amount": {
           "type": "string",
           "format": "decimal"
+        },
+        "slippage": {
+          "type": "string",
+          "format": "decimal"
         }
       }
     }
@@ -882,6 +886,10 @@
       "type": "object",
       "properties": {
         "size": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "slippage": {
           "type": "string",
           "format": "decimal"
         }
@@ -1418,6 +1426,10 @@
         "from_token_amount": {
           "type": "string",
           "format": "decimal"
+        },
+        "slippage": {
+          "type": "string",
+          "format": "decimal"
         }
       }
     }
@@ -1583,6 +1595,10 @@
           "format": "decimal"
         },
         "from_token_amount": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "slippage": {
           "type": "string",
           "format": "decimal"
         }

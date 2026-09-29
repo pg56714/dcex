@@ -56,7 +56,16 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/classic-instloan-account/classic-instloan-account#bind-unbind-sub-account-uid-to-risk-unit",
-    "summary": "Bind/Unbind Sub-account UID to Risk Unit"
+    "summary": "Bind/Unbind Sub-account UID to Risk Unit",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "operate": {
+          "type": "string",
+          "description": "classic_instloan_account_bind_risk_unit/operate: selects the requested account operation as an enum string."
+        }
+      }
+    }
   },
   {
     "name": "classic_instloan_account_get_risk_unit",
@@ -278,7 +287,16 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/institutional-loan/loan#bind-unbind-uid-to-risk-unit",
-    "summary": "Bind/Unbind UID to Risk Unit"
+    "summary": "Bind/Unbind UID to Risk Unit",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "operate": {
+          "type": "string",
+          "description": "institutional_loan_bind_uid/operate: selects the requested account operation as an enum string."
+        }
+      }
+    }
   },
   {
     "name": "institutional_loan_get_margin_coin_info",

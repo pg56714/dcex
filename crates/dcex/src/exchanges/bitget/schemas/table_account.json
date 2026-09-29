@@ -44,6 +44,14 @@
         "leverage": {
           "type": "string",
           "format": "decimal"
+        },
+        "margin_coin": {
+          "type": "string",
+          "description": "get_futures_estimated_open_count/margin_coin: selects the settlement currency for the margin account."
+        },
+        "marginCoin": {
+          "type": "string",
+          "description": "get_futures_estimated_open_count/marginCoin: selects the settlement currency for the margin account."
         }
       }
     }
@@ -91,6 +99,14 @@
         "open_price": {
           "type": "string",
           "format": "decimal"
+        },
+        "margin_coin": {
+          "type": "string",
+          "description": "get_futures_liquidation_price/margin_coin: selects the settlement currency for the margin account."
+        },
+        "marginCoin": {
+          "type": "string",
+          "description": "get_futures_liquidation_price/marginCoin: selects the settlement currency for the margin account."
         }
       }
     }
@@ -128,6 +144,14 @@
         "open_price": {
           "type": "string",
           "format": "decimal"
+        },
+        "margin_coin": {
+          "type": "string",
+          "description": "get_futures_max_open_quantity/margin_coin: selects the settlement currency for the margin account."
+        },
+        "marginCoin": {
+          "type": "string",
+          "description": "get_futures_max_open_quantity/marginCoin: selects the settlement currency for the margin account."
         }
       }
     }
@@ -232,7 +256,28 @@
     ],
     "arrays": [],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "collateral_type": {
+          "type": "string",
+          "description": "set_uta_collateral_type/collateral_type: selects collateral currencies, account identifiers, or the collateral enable switch."
+        },
+        "collateral_coins": {
+          "type": "string",
+          "description": "set_uta_collateral_type/collateral_coins: selects collateral currencies, account identifiers, or the collateral enable switch."
+        },
+        "collateralType": {
+          "type": "string",
+          "description": "set_uta_collateral_type/collateralType: selects collateral currencies, account identifiers, or the collateral enable switch."
+        },
+        "collateralCoins": {
+          "type": "string",
+          "description": "set_uta_collateral_type/collateralCoins: selects collateral currencies, account identifiers, or the collateral enable switch."
+        }
+      }
+    }
   },
   {
     "name": "get_uta_settings",
@@ -332,7 +377,20 @@
     ],
     "arrays": [],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "delta_switch": {
+          "type": "string",
+          "description": "set_uta_account_mode/delta_switch: controls an integer or boolean option rather than a transferred balance."
+        },
+        "deltaSwitch": {
+          "type": "string",
+          "description": "set_uta_account_mode/deltaSwitch: controls an integer or boolean option rather than a transferred balance."
+        }
+      }
+    }
   },
   {
     "name": "set_uta_fee_deduction",
@@ -503,7 +561,16 @@
     ],
     "arrays": [],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "operation": {
+          "type": "string",
+          "description": "uta_freeze_sub/operation: selects the requested account operation as an enum string."
+        }
+      }
+    }
   },
   {
     "name": "uta_create_sub_api",

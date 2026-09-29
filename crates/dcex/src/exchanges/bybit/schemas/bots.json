@@ -369,6 +369,10 @@
         "trailing_stop_percent": {
           "type": "string",
           "format": "decimal"
+        },
+        "need_to_slippage": {
+          "type": "boolean",
+          "description": "get_fcombobot_getlimit/need_to_slippage: controls an integer or boolean option rather than a transferred balance."
         }
       }
     }
@@ -580,6 +584,22 @@
         "leverage": {
           "type": "string",
           "format": "decimal"
+        },
+        "take_profit_per": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "stop_loss_per": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "tp_sl_type": {
+          "type": "integer",
+          "description": "create_fgridbot/tp_sl_type: selects the documented mode, unit, or reference used by this operation."
+        },
+        "trailing_stop_per": {
+          "type": "string",
+          "format": "decimal"
         }
       }
     }
@@ -783,6 +803,22 @@
           "format": "decimal"
         },
         "leverage": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "tp_sl_type": {
+          "type": "integer",
+          "description": "request_fgridbot_validate/tp_sl_type: selects the documented mode, unit, or reference used by this operation."
+        },
+        "stop_loss_per": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "take_profit_per": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "trailing_stop_per": {
           "type": "string",
           "format": "decimal"
         }
@@ -1109,6 +1145,10 @@
         "sl_percent": {
           "type": "string",
           "format": "decimal"
+        },
+        "need_to_slippage": {
+          "type": "boolean",
+          "description": "get_fmartingalebot_getlimit/need_to_slippage: controls an integer or boolean option rather than a transferred balance."
         }
       }
     }
@@ -1300,6 +1340,10 @@
         "ts_percent": {
           "type": "string",
           "format": "decimal"
+        },
+        "enable_trailing": {
+          "type": "boolean",
+          "description": "request_grid_create_grid/enable_trailing: controls an integer or boolean option rather than a transferred balance."
         }
       }
     }
@@ -1484,6 +1528,10 @@
         "ts_percent": {
           "type": "string",
           "format": "decimal"
+        },
+        "enable_trailing": {
+          "type": "boolean",
+          "description": "request_grid_validate_input/enable_trailing: controls an integer or boolean option rather than a transferred balance."
         }
       }
     }

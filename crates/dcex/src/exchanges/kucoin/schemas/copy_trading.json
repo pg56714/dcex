@@ -321,6 +321,22 @@
         "leverage": {
           "type": "string",
           "format": "decimal"
+        },
+        "stop_price_type": {
+          "type": "string",
+          "description": "post_v1_copy_trade_futures_orders/stop_price_type: selects the documented mode, unit, or reference used by this operation."
+        },
+        "margin_mode": {
+          "type": "string",
+          "description": "post_v1_copy_trade_futures_orders/margin_mode: selects the account margin mode or its enabled state."
+        },
+        "stopPriceType": {
+          "type": "string",
+          "description": "post_v1_copy_trade_futures_orders/stopPriceType: selects the documented mode, unit, or reference used by this operation."
+        },
+        "marginMode": {
+          "type": "string",
+          "description": "post_v1_copy_trade_futures_orders/marginMode: selects the account margin mode or its enabled state."
         }
       }
     }
@@ -647,6 +663,22 @@
         "leverage": {
           "type": "string",
           "format": "decimal"
+        },
+        "stop_price_type": {
+          "type": "string",
+          "description": "post_v1_copy_trade_futures_orders_test/stop_price_type: selects the documented mode, unit, or reference used by this operation."
+        },
+        "margin_mode": {
+          "type": "string",
+          "description": "post_v1_copy_trade_futures_orders_test/margin_mode: selects the account margin mode or its enabled state."
+        },
+        "stopPriceType": {
+          "type": "string",
+          "description": "post_v1_copy_trade_futures_orders_test/stopPriceType: selects the documented mode, unit, or reference used by this operation."
+        },
+        "marginMode": {
+          "type": "string",
+          "description": "post_v1_copy_trade_futures_orders_test/marginMode: selects the account margin mode or its enabled state."
         }
       }
     }
@@ -966,6 +998,22 @@
         "leverage": {
           "type": "string",
           "format": "decimal"
+        },
+        "stop_price_type": {
+          "type": "string",
+          "description": "post_v1_copy_trade_futures_st_orders/stop_price_type: selects the documented mode, unit, or reference used by this operation."
+        },
+        "margin_mode": {
+          "type": "string",
+          "description": "post_v1_copy_trade_futures_st_orders/margin_mode: selects the account margin mode or its enabled state."
+        },
+        "stopPriceType": {
+          "type": "string",
+          "description": "post_v1_copy_trade_futures_st_orders/stopPriceType: selects the documented mode, unit, or reference used by this operation."
+        },
+        "marginMode": {
+          "type": "string",
+          "description": "post_v1_copy_trade_futures_st_orders/marginMode: selects the account margin mode or its enabled state."
         }
       }
     }
@@ -1208,7 +1256,16 @@
     "source": "https://www.kucoin.com/docs-new/rest/copy-trading/add-isolated-margin",
     "summary": "Add Isolated Margin",
     "withdrawal": false,
-    "confirm": false
+    "confirm": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "margin": {
+          "format": "decimal",
+          "x-positive": true
+        }
+      }
+    }
   },
   {
     "name": "post_v1_copy_trade_futures_position_margin_withdraw_margin",
@@ -1427,7 +1484,20 @@
     "source": "https://www.kucoin.com/docs-new/rest/copy-trading/switch-margin-mode",
     "summary": "Switch Margin Mode",
     "withdrawal": false,
-    "confirm": false
+    "confirm": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "margin_mode": {
+          "type": "string",
+          "description": "post_v1_copy_trade_futures_position_change_margin_mode/margin_mode: selects the account margin mode or its enabled state."
+        },
+        "marginMode": {
+          "type": "string",
+          "description": "post_v1_copy_trade_futures_position_change_margin_mode/marginMode: selects the account margin mode or its enabled state."
+        }
+      }
+    }
   },
   {
     "name": "post_v2_copy_trade_futures_change_cross_user_leverage",

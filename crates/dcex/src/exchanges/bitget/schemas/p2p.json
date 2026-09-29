@@ -666,6 +666,15 @@
         "quantity": {
           "type": "string",
           "format": "decimal"
+        },
+        "price_type": {
+          "type": "string",
+          "description": "p2p_ad_management_create_ad/price_type: selects the documented mode, unit, or reference used by this operation."
+        },
+        "premium": {
+          "type": "string",
+          "format": "decimal",
+          "x-signed": true
         }
       }
     }
@@ -808,6 +817,15 @@
         "quantity": {
           "type": "string",
           "format": "decimal"
+        },
+        "price_type": {
+          "type": "string",
+          "description": "p2p_ad_management_update_ad/price_type: selects the documented mode, unit, or reference used by this operation."
+        },
+        "premium": {
+          "type": "string",
+          "format": "decimal",
+          "x-signed": true
         }
       }
     }
@@ -838,7 +856,16 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/p2p/ad-management#operate-ad",
-    "summary": "Operate Ad"
+    "summary": "Operate Ad",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "operation": {
+          "type": "string",
+          "description": "p2p_ad_management_operate_ad/operation: selects the requested account operation as an enum string."
+        }
+      }
+    }
   },
   {
     "name": "p2p_ad_management_get_ad_info",

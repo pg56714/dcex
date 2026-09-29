@@ -18,7 +18,28 @@
     ],
     "arrays": [],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "auto_margin": {
+          "type": "string",
+          "description": "set_futures_auto_margin/auto_margin: enables automatic replenishment of isolated position margin."
+        },
+        "margin_coin": {
+          "type": "string",
+          "description": "set_futures_auto_margin/margin_coin: selects the settlement currency for the margin account."
+        },
+        "autoMargin": {
+          "type": "string",
+          "description": "set_futures_auto_margin/autoMargin: enables automatic replenishment of isolated position margin."
+        },
+        "marginCoin": {
+          "type": "string",
+          "description": "set_futures_auto_margin/marginCoin: selects the settlement currency for the margin account."
+        }
+      }
+    }
   },
   {
     "name": "get_cross_margin_assets",
@@ -129,7 +150,20 @@
     ],
     "arrays": [],
     "limit": 500,
-    "days": 90
+    "days": 90,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "margin_type": {
+          "type": "string",
+          "description": "get_cross_margin_financial_records/margin_type: selects the account margin mode or its enabled state."
+        },
+        "marginType": {
+          "type": "string",
+          "description": "get_cross_margin_financial_records/marginType: selects the account margin mode or its enabled state."
+        }
+      }
+    }
   },
   {
     "name": "place_cross_margin_order",
@@ -305,7 +339,11 @@
     "required": [],
     "arrays": [],
     "limit": 500,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_isolated_margin_interest_rate_limits",
@@ -398,7 +436,20 @@
     ],
     "arrays": [],
     "limit": 500,
-    "days": 90
+    "days": 90,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "margin_type": {
+          "type": "string",
+          "description": "get_isolated_margin_financial_records/margin_type: selects the account margin mode or its enabled state."
+        },
+        "marginType": {
+          "type": "string",
+          "description": "get_isolated_margin_financial_records/marginType: selects the account margin mode or its enabled state."
+        }
+      }
+    }
   },
   {
     "name": "place_isolated_margin_order",

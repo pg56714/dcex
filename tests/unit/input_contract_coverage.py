@@ -3,7 +3,7 @@
 import ast
 import re
 
-NUMERIC = re.compile(r"price|px|qty|quantity|amount|amt|size|sz|volume|vol|notional|funds|investment|collateral|margin|fee|lever|ratio|percent|pct|rate|offset|delta|spread", re.I)
+NUMERIC = re.compile(r"price|px|qty|quantity|amount|amt|size|sz|volume|vol|notional|funds|investment|collateral|margin|fee|lever|ratio|percent|pct|rate|offset|delta|spread|take_profit|stop_loss|(?:^|_)(?:tp|sl)(?:$|_)|trigger|trail|cost|budget|premium|slippage|value", re.I)
 OPERATIONS = re.compile(r"order|amend|transfer|withdraw|batch", re.I)
 
 
@@ -34,11 +34,30 @@ def missing_declarations(source, methods, exemptions):
         for name, annotation in args.items():
             identity = f"{method}/{name}"
             if identity in exemptions:
-                assert len(exemptions[identity].split()) >= 3, identity
+                reason = exemptions[identity]
+                assert identity in reason and len(set(reason.split())) >= 8, identity
+                assert not NUMERIC.search(name) or re.fullmatch(r"(?:bool|int)(?: \| None)?", annotation), (identity, annotation)
                 continue
             structured = OPERATIONS.search(method) and any(t in annotation for t in ["list", "dict"])
             if (NUMERIC.search(name) or structured) and name not in properties:
                 missing.append((method, name))
             if structured and name in properties:
                 assert properties[name].get("type") in {"array", "object"}, identity
+    return missing
+
+
+def missing_wire_declarations(value, schema, path=()):
+    """Compare a captured payload with declarations, including nested wire names."""
+    missing = []
+    if isinstance(value, dict):
+        for name, child in value.items():
+            declared = schema.get("properties", {}).get(name, {})
+            field = (*path, name)
+            if NUMERIC.search(name) and not isinstance(child, (dict, list, bool)):
+                if declared.get("format") != "decimal":
+                    missing.append(field)
+            missing.extend(missing_wire_declarations(child, declared, field))
+    elif isinstance(value, list):
+        for child in value:
+            missing.extend(missing_wire_declarations(child, schema.get("items", {}), (*path, "[]")))
     return missing

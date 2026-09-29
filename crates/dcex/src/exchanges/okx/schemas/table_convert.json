@@ -83,6 +83,14 @@
         "rfq_sz": {
           "type": "string",
           "format": "decimal"
+        },
+        "rfq_sz_ccy": {
+          "type": "string",
+          "description": "estimate_convert_quote/rfq_sz_ccy: selects currency identifiers or funding source categories for this operation."
+        },
+        "rfqSzCcy": {
+          "type": "string",
+          "description": "estimate_convert_quote/rfqSzCcy: selects currency identifiers or funding source categories for this operation."
         }
       }
     }
@@ -126,6 +134,14 @@
         "sz": {
           "type": "string",
           "format": "decimal"
+        },
+        "sz_ccy": {
+          "type": "string",
+          "description": "execute_convert_trade/sz_ccy: selects currency identifiers or funding source categories for this operation."
+        },
+        "szCcy": {
+          "type": "string",
+          "description": "execute_convert_trade/szCcy: selects currency identifiers or funding source categories for this operation."
         }
       }
     }

@@ -350,7 +350,31 @@ fn normalize_batch_value(value: Value) -> Result<Value> {
     let shape = serde_json::json!({
         "type": "array", "items": {"type": "object", "properties": properties}
     });
-    crate::exchanges::schema::encode_shape(value, &shape, "batchOrders")
+    let mut orders = crate::exchanges::schema::encode_shape(value, &shape, "batchOrders")?;
+    let attached_shape = serde_json::json!({
+        "type": "object", "properties": {
+            "stopPrice": {"type": "number"}, "price": {"type": "number"}
+        }
+    });
+    if let Some(orders) = orders.as_array_mut() {
+        for order in orders {
+            for key in ["takeProfit", "stopLoss"] {
+                if let Some(attached) = order.get_mut(key) {
+                    let value = if let Some(raw) = attached.as_str() {
+                        serde_json::from_str(raw).map_err(|e| invalid(e.to_string()))?
+                    } else {
+                        attached.clone()
+                    };
+                    let encoded =
+                        crate::exchanges::schema::encode_shape(value, &attached_shape, key)?;
+                    *attached = Value::String(
+                        serde_json::to_string(&encoded).map_err(|e| invalid(e.to_string()))?,
+                    );
+                }
+            }
+        }
+    }
+    Ok(orders)
 }
 
 pub(super) fn comma_list(value: &str) -> String {

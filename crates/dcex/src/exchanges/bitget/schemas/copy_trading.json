@@ -114,6 +114,10 @@
         "leverage": {
           "type": "string",
           "format": "decimal"
+        },
+        "margin_mode": {
+          "type": "string",
+          "description": "classic_copytrading_future_copytrade_follower_copy_settings/margin_mode: selects the account margin mode or its enabled state."
         }
       }
     }
@@ -420,7 +424,20 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/classic-copytrading-future-follower/classic-copytrading-future-copytrade-follower#close-positions",
-    "summary": "Close Positions"
+    "summary": "Close Positions",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "margin_coin": {
+          "type": "string",
+          "description": "classic_copytrading_future_copytrade_follower_close_positions/margin_coin: selects the settlement currency for the margin account."
+        },
+        "margin_mode": {
+          "type": "string",
+          "description": "classic_copytrading_future_copytrade_follower_close_positions/margin_mode: selects the account margin mode or its enabled state."
+        }
+      }
+    }
   },
   {
     "name": "classic_copytrading_future_copytrade_follower_query_settings",
@@ -635,7 +652,16 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/classic-copytrading-future-follower/classic-copytrading-future-copytrade-follower#get-my-traders",
-    "summary": "Get My Traders"
+    "summary": "Get My Traders",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "page_size": {
+          "type": "string",
+          "description": "classic_copytrading_future_copytrade_follower_query_traders/page_size: limits the number of result records returned by pagination."
+        }
+      }
+    }
   },
   {
     "name": "classic_copytrading_future_copytrade_follower_query_quantity_limit",
@@ -1079,7 +1105,16 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/classic-copytrading-future-trader/classic-copytrading-future-copytrade-trader#get-profit-share-detail",
-    "summary": "Get Profit Share Detail"
+    "summary": "Get Profit Share Detail",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "page_size": {
+          "type": "string",
+          "description": "classic_copytrading_future_copytrade_trader_trader_profit_details/page_size: limits the number of result records returned by pagination."
+        }
+      }
+    }
   },
   {
     "name": "classic_copytrading_future_copytrade_trader_trader_get_profits_group_coin_date",
@@ -1107,7 +1142,16 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/classic-copytrading-future-trader/classic-copytrading-future-copytrade-trader#get-profit-share-group-by-coin-date",
-    "summary": "Get Profit Share Group by Coin & Date"
+    "summary": "Get Profit Share Group by Coin & Date",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "page_size": {
+          "type": "string",
+          "description": "classic_copytrading_future_copytrade_trader_trader_get_profits_group_coin_date/page_size: limits the number of result records returned by pagination."
+        }
+      }
+    }
   },
   {
     "name": "classic_copytrading_future_copytrade_trader_trader_get_config_query_symbols",
@@ -1261,7 +1305,16 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/classic-copytrading-future-trader/classic-copytrading-future-copytrade-trader#get-my-followers",
-    "summary": "Get My Followers"
+    "summary": "Get My Followers",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "page_size": {
+          "type": "string",
+          "description": "classic_copytrading_future_copytrade_trader_config_query_followers/page_size: limits the number of result records returned by pagination."
+        }
+      }
+    }
   },
   {
     "name": "classic_copytrading_future_copytrade_trader_config_remove_follower",
@@ -1568,7 +1621,16 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/classic-copytrading-spot-follower/classic-copytrading-spot-copytrade-follower#my-trader-list",
-    "summary": "My Trader List"
+    "summary": "My Trader List",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "page_size": {
+          "type": "string",
+          "description": "classic_copytrading_spot_copytrade_follower_query_traders/page_size: limits the number of result records returned by pagination."
+        }
+      }
+    }
   },
   {
     "name": "classic_copytrading_spot_copytrade_follower_setting_tpsl",
@@ -1804,7 +1866,16 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/classic-copytrading-spot-trader/classic-copytrading-spot-copytrade-trader#my-follower-list",
-    "summary": "My Follower List"
+    "summary": "My Follower List",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "page_size": {
+          "type": "string",
+          "description": "classic_copytrading_spot_copytrade_trader_config_query_followers/page_size: limits the number of result records returned by pagination."
+        }
+      }
+    }
   },
   {
     "name": "classic_copytrading_spot_copytrade_trader_config_query_settings",
@@ -2145,7 +2216,16 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/classic-copytrading-spot-trader/classic-copytrading-spot-copytrade-trader#get-unrealized-profit-sharing-details",
-    "summary": "Get Unrealized Profit Sharing Details"
+    "summary": "Get Unrealized Profit Sharing Details",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "page_size": {
+          "type": "string",
+          "description": "classic_copytrading_spot_copytrade_trader_profit_details/page_size: limits the number of result records returned by pagination."
+        }
+      }
+    }
   },
   {
     "name": "classic_copytrading_spot_copytrade_trader_profit_history_details",
@@ -2351,6 +2431,10 @@
         "leverage": {
           "type": "string",
           "format": "decimal"
+        },
+        "max_entry_slippage": {
+          "type": "string",
+          "format": "decimal"
         }
       }
     }
@@ -2458,6 +2542,10 @@
           "format": "decimal"
         },
         "leverage": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "max_entry_slippage": {
           "type": "string",
           "format": "decimal"
         }
@@ -2568,7 +2656,8 @@
       "properties": {
         "amount": {
           "type": "string",
-          "format": "decimal"
+          "format": "decimal",
+          "x-positive": true
         }
       }
     }
@@ -2871,6 +2960,14 @@
         "take_profit": {
           "type": "string",
           "format": "decimal"
+        },
+        "tp_trigger_by": {
+          "type": "string",
+          "description": "copy_trading_follower_place_tpsl/tp_trigger_by: selects the documented mode, unit, or reference used by this operation."
+        },
+        "sl_trigger_by": {
+          "type": "string",
+          "description": "copy_trading_follower_place_tpsl/sl_trigger_by: selects the documented mode, unit, or reference used by this operation."
         }
       }
     }
@@ -2952,6 +3049,18 @@
         "take_profit": {
           "type": "string",
           "format": "decimal"
+        },
+        "strategy_id": {
+          "type": "string",
+          "description": "copy_trading_follower_modify_tpsl/strategy_id: identifies a strategy rather than specifying its investment."
+        },
+        "tp_trigger_by": {
+          "type": "string",
+          "description": "copy_trading_follower_modify_tpsl/tp_trigger_by: selects the documented mode, unit, or reference used by this operation."
+        },
+        "sl_trigger_by": {
+          "type": "string",
+          "description": "copy_trading_follower_modify_tpsl/sl_trigger_by: selects the documented mode, unit, or reference used by this operation."
         }
       }
     }
@@ -2982,7 +3091,16 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/copy-trading/follower#cancel-tpsl",
-    "summary": "Cancel TPSL"
+    "summary": "Cancel TPSL",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "strategy_id": {
+          "type": "string",
+          "description": "copy_trading_follower_cancel_tpsl/strategy_id: identifies a strategy rather than specifying its investment."
+        }
+      }
+    }
   },
   {
     "name": "copy_trading_follower_get_current_tpsl_orders",
@@ -3158,7 +3276,8 @@
       "properties": {
         "amount": {
           "type": "string",
-          "format": "decimal"
+          "format": "decimal",
+          "x-positive": true
         }
       }
     }

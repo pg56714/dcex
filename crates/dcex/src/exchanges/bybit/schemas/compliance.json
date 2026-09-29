@@ -117,6 +117,10 @@
     "has_example": true,
     "source_file": "v5/tm-onchain/appeal-list.mdx",
     "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75",
-    "verification_note": "Official spec incomplete; not verified live. appeal_types is passed through because array query encoding is unspecified."
+    "verification_note": "Official spec incomplete; not verified live. appeal_types is passed through because array query encoding is unspecified.",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   }
 ]

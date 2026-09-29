@@ -77,6 +77,10 @@
         "amount": {
           "type": "string",
           "format": "decimal"
+        },
+        "withdrawal_fee_token": {
+          "type": "string",
+          "description": "calculate_funding_fees/withdrawal_fee_token: selects currency identifiers or funding source categories for this operation."
         }
       }
     }

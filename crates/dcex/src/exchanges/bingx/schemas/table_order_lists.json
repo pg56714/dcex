@@ -109,7 +109,11 @@
       "pageIndex",
       "pageSize",
       "recvWindow"
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_spot_oco_history",
@@ -133,6 +137,10 @@
       "startTime",
       "endTime",
       "recvWindow"
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   }
 ]

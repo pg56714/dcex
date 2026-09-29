@@ -47,7 +47,16 @@
     ],
     "json_body": false,
     "source": "https://developers.binance.com/en/docs/catalog/investment-and-services-vip-loan/api/rest-api/market-data#get-collateral-asset-data",
-    "summary": "Get Collateral Asset Data (USER_DATA)"
+    "summary": "Get Collateral Asset Data (USER_DATA)",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "collateral_coin": {
+          "type": "string",
+          "description": "get_collateral_asset_data/collateral_coin: selects collateral currencies, account identifiers, or the collateral enable switch."
+        }
+      }
+    }
   },
   {
     "name": "get_loanable_assets_data",

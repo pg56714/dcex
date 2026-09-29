@@ -64,7 +64,11 @@
     "bools": [
       "collateralEnabled"
     ],
-    "schema": null
+    "schema": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_asset_bill_history",
@@ -97,7 +101,20 @@
       "feeType"
     ],
     "bools": [],
-    "schema": null
+    "schema": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "fee_type": {
+          "type": "string",
+          "description": "set_fee_type/fee_type: selects the documented mode, unit, or reference used by this operation."
+        },
+        "feeType": {
+          "type": "string",
+          "description": "set_fee_type/feeType: selects the documented mode, unit, or reference used by this operation."
+        }
+      }
+    }
   },
   {
     "name": "set_risk_offset_amount",
@@ -183,7 +200,11 @@
     "bools": [
       "collateralEnabled"
     ],
-    "schema": null
+    "schema": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "set_trading_config",

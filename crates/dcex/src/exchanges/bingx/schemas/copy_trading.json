@@ -124,7 +124,11 @@
     ],
     "source": "https://bingx-api.github.io/docs-v3/#/en/Copy%20Trade/USDT-M%20Perpetual%20Contracts/Profit%20Details",
     "summary": "Profit Details",
-    "scoped": false
+    "scoped": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_copy_trading_v1_p_futures_trader_detail",
@@ -142,7 +146,11 @@
     ],
     "source": "https://bingx-api.github.io/docs-v3/#/en/Copy%20Trade/USDT-M%20Perpetual%20Contracts/Personal%20Trading%20Overview",
     "summary": "Personal Trading Overview",
-    "scoped": false
+    "scoped": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_copy_trading_v1_spot_trader_detail",
@@ -199,7 +207,11 @@
     ],
     "source": "https://bingx-api.github.io/docs-v3/#/en/Copy%20Trade/Spot%20Trading/Profit%20Details",
     "summary": "Profit Details",
-    "scoped": false
+    "scoped": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_copy_trading_v1_spot_history_order",
@@ -338,7 +350,11 @@
     ],
     "source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/copytrade-swap/api-reference.md#L16",
     "summary": "1. Trader's Current Orders",
-    "scoped": false
+    "scoped": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "post_copy_trading_v1_swap_trace_close_track_order",

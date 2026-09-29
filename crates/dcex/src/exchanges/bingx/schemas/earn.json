@@ -118,7 +118,16 @@
     ],
     "source": "https://bingx-api.github.io/docs-v3/#/en/Wealth/Dual-Currency/Dual-Currency%20Product%20List",
     "summary": "Dual-Currency Product List",
-    "scoped": false
+    "scoped": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "investment_asset": {
+          "type": "string",
+          "description": "post_wealth_v1_product_dual_currency_invest_asset_list/investment_asset: selects currency identifiers or funding source categories for this operation."
+        }
+      }
+    }
   },
   {
     "name": "post_wealth_v1_product_dual_currency_order",
@@ -207,6 +216,10 @@
         "strike_price": {
           "type": "string",
           "format": "decimal"
+        },
+        "investment_asset": {
+          "type": "string",
+          "description": "post_wealth_v1_product_dual_currency_order/investment_asset: selects currency identifiers or funding source categories for this operation."
         }
       }
     }

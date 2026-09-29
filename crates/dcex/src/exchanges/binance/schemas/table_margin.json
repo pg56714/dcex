@@ -98,7 +98,20 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "multi_assets_margin": {
+          "type": "string",
+          "description": "set_futures_multi_assets_mode/multi_assets_margin: selects the settlement currency for the margin account."
+        },
+        "multiAssetsMargin": {
+          "type": "string",
+          "description": "set_futures_multi_assets_mode/multiAssetsMargin: selects the settlement currency for the margin account."
+        }
+      }
+    }
   },
   {
     "name": "adjust_futures_position_margin",

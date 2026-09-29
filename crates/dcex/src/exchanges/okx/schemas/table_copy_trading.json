@@ -98,6 +98,22 @@
         "tp_trigger_px": {
           "type": "string",
           "format": "decimal"
+        },
+        "tp_trigger_px_type": {
+          "type": "string",
+          "description": "copytrading_algo_order/tp_trigger_px_type: selects the documented mode, unit, or reference used by this operation."
+        },
+        "sl_trigger_px_type": {
+          "type": "string",
+          "description": "copytrading_algo_order/sl_trigger_px_type: selects the documented mode, unit, or reference used by this operation."
+        },
+        "tpTriggerPxType": {
+          "type": "string",
+          "description": "copytrading_algo_order/tpTriggerPxType: selects the documented mode, unit, or reference used by this operation."
+        },
+        "slTriggerPxType": {
+          "type": "string",
+          "description": "copytrading_algo_order/slTriggerPxType: selects the documented mode, unit, or reference used by this operation."
         }
       }
     }

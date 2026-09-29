@@ -826,7 +826,16 @@
     ],
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "fee_burn": {
+          "type": "string",
+          "description": "toggle_pm_bnb_burn_on_um_futures_trade/fee_burn: controls an integer or boolean option rather than a transferred balance."
+        },
+        "feeBurn": {
+          "type": "string",
+          "description": "toggle_pm_bnb_burn_on_um_futures_trade/feeBurn: controls an integer or boolean option rather than a transferred balance."
+        }
+      }
     }
   },
   {

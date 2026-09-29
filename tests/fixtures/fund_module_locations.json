@@ -1,6 +1,8 @@
 {
   "arcus": {
-    "withdrawals": [],
+    "withdrawals": [
+      "withdrawal_schema_request"
+    ],
     "transfers": [
       "submit_internal_transfer_request"
     ]
@@ -74,7 +76,8 @@
   },
   "extended": {
     "withdrawals": [
-      "create_withdrawal_signed_request"
+      "create_withdrawal_signed_request",
+      "commit_bridge_quote_request"
     ]
   },
   "hyperliquid": {

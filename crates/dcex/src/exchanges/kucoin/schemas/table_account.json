@@ -96,7 +96,11 @@
         "minimum": null,
         "maximum": null
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_spot_account_ledgers",
@@ -171,7 +175,11 @@
         "minimum": 10,
         "maximum": 500
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_spot_hf_account_ledgers",
@@ -362,7 +370,11 @@
         "minimum": null,
         "maximum": null
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_classic_account_balances_v2",

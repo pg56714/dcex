@@ -303,7 +303,20 @@
     ],
     "arrays": [],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "page_size": {
+          "type": "string",
+          "description": "get_classic_earn_loan_repay_history/page_size: limits the number of result records returned by pagination."
+        },
+        "pageSize": {
+          "type": "string",
+          "description": "get_classic_earn_loan_repay_history/pageSize: limits the number of result records returned by pagination."
+        }
+      }
+    }
   },
   {
     "name": "classic_earn_loan_revise_pledge",
@@ -355,7 +368,20 @@
     ],
     "arrays": [],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "page_size": {
+          "type": "string",
+          "description": "get_classic_earn_loan_revise_history/page_size: limits the number of result records returned by pagination."
+        },
+        "pageSize": {
+          "type": "string",
+          "description": "get_classic_earn_loan_revise_history/pageSize: limits the number of result records returned by pagination."
+        }
+      }
+    }
   },
   {
     "name": "get_classic_earn_loan_borrow_history",
@@ -378,7 +404,20 @@
     ],
     "arrays": [],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "page_size": {
+          "type": "string",
+          "description": "get_classic_earn_loan_borrow_history/page_size: limits the number of result records returned by pagination."
+        },
+        "pageSize": {
+          "type": "string",
+          "description": "get_classic_earn_loan_borrow_history/pageSize: limits the number of result records returned by pagination."
+        }
+      }
+    }
   },
   {
     "name": "get_classic_earn_loan_debts",
@@ -412,6 +451,19 @@
     ],
     "arrays": [],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "page_size": {
+          "type": "string",
+          "description": "get_classic_earn_loan_reduces/page_size: limits the number of result records returned by pagination."
+        },
+        "pageSize": {
+          "type": "string",
+          "description": "get_classic_earn_loan_reduces/pageSize: limits the number of result records returned by pagination."
+        }
+      }
+    }
   }
 ]

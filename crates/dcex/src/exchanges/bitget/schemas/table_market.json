@@ -364,7 +364,20 @@
     ],
     "arrays": [],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "margin_coin": {
+          "type": "string",
+          "description": "get_uta_risk_reserve/margin_coin: selects the settlement currency for the margin account."
+        },
+        "marginCoin": {
+          "type": "string",
+          "description": "get_uta_risk_reserve/marginCoin: selects the settlement currency for the margin account."
+        }
+      }
+    }
   },
   {
     "name": "get_uta_all_risk_reserves",
@@ -397,7 +410,20 @@
     ],
     "arrays": [],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "margin_coin": {
+          "type": "string",
+          "description": "get_uta_hourly_risk_reserve/margin_coin: selects the settlement currency for the margin account."
+        },
+        "marginCoin": {
+          "type": "string",
+          "description": "get_uta_hourly_risk_reserve/marginCoin: selects the settlement currency for the margin account."
+        }
+      }
+    }
   },
   {
     "name": "get_uta_split_records",

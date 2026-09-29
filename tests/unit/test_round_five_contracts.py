@@ -43,8 +43,9 @@ def test_documented_signed_values_and_percent_scope():
         assert normalize({key: "-0.5"}, schema=schema) == {key: "-0.5"}
         with pytest.raises(ValueError):
             normalize({key: "-5e-1"}, schema=schema)
+    assert normalize({"triggerQuantity": "50%"}, schema=CATALOG["exchanges"]["backpack"]["place_order"]) == {"triggerQuantity": "50%"}
     with pytest.raises(ValueError):
-        normalize({"triggerQuantity": "50%"}, schema=CATALOG["exchanges"]["backpack"]["place_order"])
+        normalize({"quantity": "50%"}, schema=CATALOG["exchanges"]["backpack"]["place_order"])
 
 
 def test_positive_amounts_and_zero_control_values():

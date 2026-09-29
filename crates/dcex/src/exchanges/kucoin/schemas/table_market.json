@@ -214,7 +214,20 @@
         "minimum": null,
         "maximum": null
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "page_size": {
+          "type": "string",
+          "description": "get_uta_index_prices/page_size: limits the number of result records returned by pagination."
+        },
+        "pageSize": {
+          "type": "string",
+          "description": "get_uta_index_prices/pageSize: limits the number of result records returned by pagination."
+        }
+      }
+    }
   },
   {
     "name": "get_uta_interest_rate_index",
@@ -268,7 +281,11 @@
         "minimum": 1,
         "maximum": null
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_uta_klines",
@@ -605,7 +622,11 @@
         "minimum": 1,
         "maximum": 100
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_futures_premium_index",
@@ -677,7 +698,11 @@
         "minimum": 1,
         "maximum": 100
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_call_auction_info",
@@ -981,7 +1006,11 @@
         "minimum": 1,
         "maximum": 100
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_futures_24h_statistics",

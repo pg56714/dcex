@@ -324,7 +324,11 @@
       ],
       "additionalProperties": false
     },
-    "official_source": "https://docs.arcus.xyz/api-reference/referral/list-the-callers-invite-codes"
+    "official_source": "https://docs.arcus.xyz/api-reference/referral/list-the-callers-invite-codes",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_affiliate_claim",

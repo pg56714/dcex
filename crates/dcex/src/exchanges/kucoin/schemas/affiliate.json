@@ -97,7 +97,11 @@
     "source": "https://www.kucoin.com/docs-new/rest/affiliate/invited",
     "summary": "Get Invited",
     "withdrawal": false,
-    "confirm": false
+    "confirm": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_ua_v2_affiliate_query_my_commission",
@@ -171,7 +175,11 @@
     "source": "https://www.kucoin.com/docs-new/rest/affiliate/commission",
     "summary": "Get Commission",
     "withdrawal": false,
-    "confirm": false
+    "confirm": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_ua_v2_affiliate_query_transaction_by_uid",
@@ -257,7 +265,11 @@
     "source": "https://www.kucoin.com/docs-new/rest/affiliate/trade-history",
     "summary": "Get Trade History",
     "withdrawal": false,
-    "confirm": false
+    "confirm": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_ua_v2_affiliate_query_transaction_by_time",
@@ -366,7 +378,11 @@
     "source": "https://www.kucoin.com/docs-new/rest/affiliate/transaction",
     "summary": "Get Transaction",
     "withdrawal": false,
-    "confirm": false
+    "confirm": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_ua_v2_affiliate_query_kumining",
@@ -448,7 +464,11 @@
     "source": "https://www.kucoin.com/docs-new/rest/affiliate/kumining",
     "summary": "Get Kumining",
     "withdrawal": false,
-    "confirm": false
+    "confirm": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_v2_affiliate_query_invitees",
@@ -546,7 +566,11 @@
     "source": "https://www.kucoin.com/docs-new/rest/affiliate/get-invited",
     "summary": "Get Invited",
     "withdrawal": false,
-    "confirm": false
+    "confirm": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_v2_affiliate_query_my_commission",
@@ -680,7 +704,11 @@
     "source": "https://www.kucoin.com/docs-new/rest/affiliate/get-commission",
     "summary": "Get Commission",
     "withdrawal": false,
-    "confirm": false
+    "confirm": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_v2_affiliate_query_transaction_by_uid",
@@ -764,7 +792,11 @@
     "source": "https://www.kucoin.com/docs-new/rest/affiliate/get-trade-history",
     "summary": "Get Trade History",
     "withdrawal": false,
-    "confirm": false
+    "confirm": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_v2_affiliate_query_transaction_by_time",
@@ -871,7 +903,11 @@
     "source": "https://www.kucoin.com/docs-new/rest/affiliate/get-transaction",
     "summary": "Get Transaction",
     "withdrawal": false,
-    "confirm": false
+    "confirm": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_v2_affiliate_query_kumining",
@@ -953,6 +989,10 @@
     "source": "https://www.kucoin.com/docs-new/rest/affiliate/get-kumining",
     "summary": "Get Kumining",
     "withdrawal": false,
-    "confirm": false
+    "confirm": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   }
 ]

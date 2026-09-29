@@ -32,7 +32,20 @@
       "coin",
       "collateralSwitch"
     ],
-    "integers": []
+    "integers": [],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "collateral_switch": {
+          "type": "string",
+          "description": "set_collateral_coin/collateral_switch: selects collateral currencies, account identifiers, or the collateral enable switch."
+        },
+        "collateralSwitch": {
+          "type": "string",
+          "description": "set_collateral_coin/collateralSwitch: selects collateral currencies, account identifiers, or the collateral enable switch."
+        }
+      }
+    }
   },
   {
     "name": "batch_set_collateral_coins",
@@ -156,7 +169,20 @@
     "required": [
       "deltaEnable"
     ],
-    "integers": []
+    "integers": [],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "delta_enable": {
+          "type": "string",
+          "description": "set_delta_mode/delta_enable: controls an integer or boolean option rather than a transferred balance."
+        },
+        "deltaEnable": {
+          "type": "string",
+          "description": "set_delta_mode/deltaEnable: controls an integer or boolean option rather than a transferred balance."
+        }
+      }
+    }
   },
   {
     "name": "set_spot_hedging",

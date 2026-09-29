@@ -108,10 +108,27 @@ Kraken V1 `amendOrder` 的限價／觸發價也允許相對價格。
 未如單筆請求宣告偏移欄位。契約允許有號偏移，但原生批次欄位清單仍明確拒絕這些欄位；
 本次修正不宣稱批次傳輸已支援偏移。
 [OKX 模擬 idxVol](https://www.okx.com/docs-v5/en/#trading-account-rest-api-position-builder)為 -0.99 至 1 的有號十進位值。
-[Backpack 官方文件](https://docs.backpack.exchange/)將 triggerQuantity 描述為字串數量，
-但未明確說明百分比後綴；目前不知道是否支援，因此不據此新增百分比例外（查核日期：2026-09-29）。
+[Backpack 官方 Rust client](https://github.com/backpack-exchange/bpx-api-client/blob/master/types/src/order.rs)
+將 `TriggerQuantity::Percent` 序列化為附百分比後綴的字串，因此 `triggerQuantity`
+以 `x-percent` 明確允許 `50%` 等精確值。
 [Aster 期貨 pegOffset](https://asterdex.github.io/aster-api-website/futures-v3/account%26trades/)
 明確為有號偏移，BUY 偏移可為負數；契約保留此既有行為。
+
+完整性檢查會將擷取的 OKX 批次／修改封包欄位名與巢狀宣告比較；只改宣告名稱、
+未改實際 wire 欄位時測試必須失敗。符合數值名稱模式的豁免須有 bool/int 型別註記，
+並提供包含方法／欄位識別的具體理由。幣別及模式選擇器改採明確的非 decimal 宣告。
+KuCoin 存入保證金要求正值；Bybit 增減保證金則明確允許有號差額。
+
+Bybit 下單數量要求正值，只有 `reduceOnly` 與 `closeOnTrigger` 同時為真時，
+才由 `x-zero-when` 同層條件允許零，保留
+[官方記載的永續／期貨零數量平倉](https://bybit-exchange.github.io/docs/v5/order/create-order)。
+Kraken 現貨 volume 保留零值保證金平倉用途。正值規則亦涵蓋已稽核的
+Bitget／MEXC／Kraken 訂單數量、轉帳金額及 OKX／Bybit 槓桿。
+
+[BingX 公開請求指引](https://github.com/BingX-API/api-ai-skills/blob/main/skills/swap-trade/SKILL.md)
+要求附帶 TP/SL 使用 JSON 字串，內部價格為 JSON 數字。批次的 dict 及 JSON 字串
+均轉為此格式，且不經二進位浮點捨入。市價 TP/SL 可省略 `price`，但有提供時必須
+大於零；`stopPrice` 亦要求正值，因此明確的零價格仍被拒絕（查核日期：2026-09-29）。
 
 Rust ledger 中沒有 `::symbol` 的引用刻意維持**檔案層級證據**：
 只證明來源檔存在，不代表特定函式已覆蓋該路由。有符號引用時仍驗證符號；

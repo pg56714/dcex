@@ -200,7 +200,11 @@
     "source": "https://www.kucoin.com/docs-new/rest/broker/api-broker/get-commission",
     "summary": "Get Commission",
     "withdrawal": false,
-    "confirm": false
+    "confirm": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_v2_broker_query_user",
@@ -303,7 +307,11 @@
     "source": "https://www.kucoin.com/docs-new/rest/broker/api-broker/get-user-list",
     "summary": "Get User List",
     "withdrawal": false,
-    "confirm": false
+    "confirm": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_v2_broker_query_detail_by_uid",
@@ -414,7 +422,11 @@
     "source": "https://www.kucoin.com/docs-new/rest/broker/api-broker/get-user-transactions",
     "summary": "Get User Transactions",
     "withdrawal": false,
-    "confirm": false
+    "confirm": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_v1_broker_nd_rebate_download",
@@ -731,7 +743,11 @@
     "source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/get-kyc-status-list",
     "summary": "Get KYC Status List",
     "withdrawal": false,
-    "confirm": false
+    "confirm": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_v1_broker_nd_info",
@@ -847,7 +863,11 @@
     "source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/get-subaccount",
     "summary": "Get sub-account",
     "withdrawal": false,
-    "confirm": false
+    "confirm": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "post_v1_broker_nd_account_apikey",
@@ -1188,7 +1208,8 @@
         "amount": {
           "type": "string",
           "format": "decimal",
-          "x-apidog-mock": "1"
+          "x-apidog-mock": "1",
+          "x-positive": true
         }
       }
     }

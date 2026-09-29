@@ -36,6 +36,30 @@
         "quantity": {
           "type": "string",
           "format": "decimal"
+        },
+        "strategy_type": {
+          "type": "string",
+          "description": "create_strategy/strategy_type: selects the strategy category used by the endpoint."
+        },
+        "slippage_tolerance": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "slippage_tolerance_type": {
+          "type": "string",
+          "description": "create_strategy/slippage_tolerance_type: selects the documented mode, unit, or reference used by this operation."
+        },
+        "strategyType": {
+          "type": "string",
+          "description": "create_strategy/strategyType: selects the strategy category used by the endpoint."
+        },
+        "slippageTolerance": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "slippageToleranceType": {
+          "type": "string",
+          "description": "create_strategy/slippageToleranceType: selects the documented mode, unit, or reference used by this operation."
         }
       }
     }
@@ -50,7 +74,20 @@
       "symbol",
       "strategyId",
       "clientStrategyId"
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "strategy_id": {
+          "type": "string",
+          "description": "get_open_strategy/strategy_id: identifies a strategy rather than specifying its investment."
+        },
+        "strategyId": {
+          "type": "string",
+          "description": "get_open_strategy/strategyId: identifies a strategy rather than specifying its investment."
+        }
+      }
+    }
   },
   {
     "name": "cancel_strategy",
@@ -62,7 +99,20 @@
       "symbol",
       "strategyId",
       "clientStrategyId"
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "strategy_id": {
+          "type": "string",
+          "description": "cancel_strategy/strategy_id: identifies a strategy rather than specifying its investment."
+        },
+        "strategyId": {
+          "type": "string",
+          "description": "cancel_strategy/strategyId: identifies a strategy rather than specifying its investment."
+        }
+      }
+    }
   },
   {
     "name": "get_open_strategies",
@@ -74,7 +124,20 @@
       "symbol",
       "marketType",
       "strategyType"
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "strategy_type": {
+          "type": "string",
+          "description": "get_open_strategies/strategy_type: selects the strategy category used by the endpoint."
+        },
+        "strategyType": {
+          "type": "string",
+          "description": "get_open_strategies/strategyType: selects the strategy category used by the endpoint."
+        }
+      }
+    }
   },
   {
     "name": "cancel_open_strategies",
@@ -85,7 +148,20 @@
       "product_symbol",
       "symbol",
       "strategyType"
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "strategy_type": {
+          "type": "string",
+          "description": "cancel_open_strategies/strategy_type: selects the strategy category used by the endpoint."
+        },
+        "strategyType": {
+          "type": "string",
+          "description": "cancel_open_strategies/strategyType: selects the strategy category used by the endpoint."
+        }
+      }
+    }
   },
   {
     "name": "get_strategy_history",
@@ -100,6 +176,19 @@
       "offset",
       "marketType",
       "sortDirection"
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "strategy_id": {
+          "type": "string",
+          "description": "get_strategy_history/strategy_id: identifies a strategy rather than specifying its investment."
+        },
+        "strategyId": {
+          "type": "string",
+          "description": "get_strategy_history/strategyId: identifies a strategy rather than specifying its investment."
+        }
+      }
+    }
   }
 ]

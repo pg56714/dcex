@@ -183,6 +183,14 @@
         "loan_amount": {
           "type": "string",
           "format": "decimal"
+        },
+        "collateral_account_id": {
+          "type": "string",
+          "description": "vip_loan_borrow/collateral_account_id: selects collateral currencies, account identifiers, or the collateral enable switch."
+        },
+        "collateral_coin": {
+          "type": "string",
+          "description": "vip_loan_borrow/collateral_coin: selects collateral currencies, account identifiers, or the collateral enable switch."
         }
       }
     }
@@ -252,7 +260,20 @@
     ],
     "json_body": false,
     "source": "https://developers.binance.com/en/docs/catalog/investment-and-services-vip-loan/api/rest-api/trade#vip-loan-fixed-rate-borrow",
-    "summary": "VIP Loan Fixed Rate Borrow (TRADE)"
+    "summary": "VIP Loan Fixed Rate Borrow (TRADE)",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "collateral_coin": {
+          "type": "string",
+          "description": "vip_loan_fixed_rate_borrow/collateral_coin: selects collateral currencies, account identifiers, or the collateral enable switch."
+        },
+        "collateral_account_id": {
+          "type": "string",
+          "description": "vip_loan_fixed_rate_borrow/collateral_account_id: selects collateral currencies, account identifiers, or the collateral enable switch."
+        }
+      }
+    }
   },
   {
     "name": "vip_loan_renew",
@@ -357,7 +378,11 @@
     ],
     "json_body": false,
     "source": "https://developers.binance.com/en/docs/catalog/investment-and-services-vip-loan/api/rest-api/user-information#check-viploan-collateral-account",
-    "summary": "Check VIP Loan Collateral Account (USER_DATA)"
+    "summary": "Check VIP Loan Collateral Account (USER_DATA)",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_vip_loan_accrued_interest",
@@ -480,7 +505,12 @@
     "summary": "Get VIP Loan Ongoing Orders (USER_DATA)",
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "collateral_coin": {
+          "type": "string",
+          "description": "get_vip_loan_ongoing_orders/collateral_coin: selects collateral currencies, account identifiers, or the collateral enable switch."
+        }
+      }
     }
   },
   {

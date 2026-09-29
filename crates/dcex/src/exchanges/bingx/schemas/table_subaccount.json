@@ -121,7 +121,11 @@
       "offset",
       "limit",
       "recvWindow"
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_sub_account_deposit_history",
@@ -148,7 +152,11 @@
       "offset",
       "limit",
       "recvWindow"
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "create_sub_account_deposit_address",

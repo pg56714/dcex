@@ -353,7 +353,11 @@
       "pageIndex",
       "pageSize",
       "recvWindow"
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_coin_swap_force_orders",
@@ -457,7 +461,20 @@
     ],
     "integers": [
       "recvWindow"
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "margin_type": {
+          "type": "string",
+          "description": "set_coin_swap_margin_type/margin_type: selects the account margin mode or its enabled state."
+        },
+        "marginType": {
+          "type": "string",
+          "description": "set_coin_swap_margin_type/marginType: selects the account margin mode or its enabled state."
+        }
+      }
+    }
   },
   {
     "name": "adjust_coin_swap_position_margin",

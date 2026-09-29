@@ -44,6 +44,20 @@
         "size": {
           "type": "string",
           "format": "decimal"
+        },
+        "funds_source": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "uta_trade_grid_add_investment/funds_source: selects currency identifiers or funding source categories for this operation."
+        },
+        "fundsSource": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "uta_trade_grid_add_investment/fundsSource: selects currency identifiers or funding source categories for this operation."
         }
       }
     }
@@ -219,6 +233,82 @@
         "leverage": {
           "type": "string",
           "format": "decimal"
+        },
+        "funds_source": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "uta_trade_grid_create_bot/funds_source: selects currency identifiers or funding source categories for this operation."
+        },
+        "slippage": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "auto_reserve_margin": {
+          "type": "string",
+          "description": "uta_trade_grid_create_bot/auto_reserve_margin: selects whether grid profits automatically replenish reserved margin."
+        },
+        "trigger_condition": {
+          "type": "string",
+          "description": "uta_trade_grid_create_bot/trigger_condition: selects the documented mode, unit, or reference used by this operation."
+        },
+        "trigger_params": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "triggerPx": {
+                "format": "decimal"
+              },
+              "price": {
+                "format": "decimal"
+              },
+              "triggerPrice": {
+                "format": "decimal"
+              }
+            }
+          }
+        },
+        "trailing_grid": {
+          "type": "string",
+          "description": "uta_trade_grid_create_bot/trailing_grid: selects trailing grid identifiers or response filters for this operation."
+        },
+        "fundsSource": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "uta_trade_grid_create_bot/fundsSource: selects currency identifiers or funding source categories for this operation."
+        },
+        "autoReserveMargin": {
+          "type": "string",
+          "description": "uta_trade_grid_create_bot/autoReserveMargin: selects whether grid profits automatically replenish reserved margin."
+        },
+        "triggerCondition": {
+          "type": "string",
+          "description": "uta_trade_grid_create_bot/triggerCondition: selects the documented mode, unit, or reference used by this operation."
+        },
+        "triggerParams": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "triggerPx": {
+                "format": "decimal"
+              },
+              "price": {
+                "format": "decimal"
+              },
+              "triggerPrice": {
+                "format": "decimal"
+              }
+            }
+          }
+        },
+        "trailingGrid": {
+          "type": "string",
+          "description": "uta_trade_grid_create_bot/trailingGrid: selects trailing Grid identifiers or response filters for this operation."
         }
       }
     }
@@ -328,6 +418,20 @@
         "leverage": {
           "type": "string",
           "format": "decimal"
+        },
+        "funds_source": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "uta_trade_grid_create_neutral_bot/funds_source: selects currency identifiers or funding source categories for this operation."
+        },
+        "fundsSource": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "uta_trade_grid_create_neutral_bot/fundsSource: selects currency identifiers or funding source categories for this operation."
         }
       }
     }
@@ -795,6 +899,56 @@
         "leverage": {
           "type": "string",
           "format": "decimal"
+        },
+        "trigger_condition": {
+          "type": "string",
+          "description": "uta_trade_grid_validate/trigger_condition: selects the documented mode, unit, or reference used by this operation."
+        },
+        "trigger_params": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "triggerPx": {
+                "format": "decimal"
+              },
+              "price": {
+                "format": "decimal"
+              },
+              "triggerPrice": {
+                "format": "decimal"
+              }
+            }
+          }
+        },
+        "trailing_grid": {
+          "type": "string",
+          "description": "uta_trade_grid_validate/trailing_grid: selects trailing grid identifiers or response filters for this operation."
+        },
+        "triggerCondition": {
+          "type": "string",
+          "description": "uta_trade_grid_validate/triggerCondition: selects the documented mode, unit, or reference used by this operation."
+        },
+        "triggerParams": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "triggerPx": {
+                "format": "decimal"
+              },
+              "price": {
+                "format": "decimal"
+              },
+              "triggerPrice": {
+                "format": "decimal"
+              }
+            }
+          }
+        },
+        "trailingGrid": {
+          "type": "string",
+          "description": "uta_trade_grid_validate/trailingGrid: selects trailing Grid identifiers or response filters for this operation."
         }
       }
     }

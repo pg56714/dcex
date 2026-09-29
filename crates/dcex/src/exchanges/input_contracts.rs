@@ -83,7 +83,20 @@ pub(crate) fn validate(value: &Value, schema: &Value, key: &str) -> Result<()> {
     }
     if let Some(object) = value.as_object() {
         for (name, child) in object {
-            validate(child, &schema["properties"][name], name)?;
+            let field = &schema["properties"][name];
+            if field["x-zero-when"].as_object().is_some_and(|conditions| {
+                conditions.iter().all(|(key, allowed)| {
+                    allowed
+                        .as_array()
+                        .is_some_and(|values| values.contains(&value[key]))
+                })
+            }) {
+                let mut relaxed = field.clone();
+                relaxed["x-positive"] = Value::Bool(false);
+                validate(child, &relaxed, name)?;
+            } else {
+                validate(child, field, name)?;
+            }
         }
     }
     if let Some(array) = value.as_array() {
@@ -96,8 +109,27 @@ pub(crate) fn validate(value: &Value, schema: &Value, key: &str) -> Result<()> {
 
 pub(crate) fn pairs(exchange: &str, method: &str, pairs: &[(String, String)]) -> Result<()> {
     let schema = endpoint(exchange, method, false);
+    let object: serde_json::Map<String, Value> = pairs
+        .iter()
+        .map(|(key, raw)| (key.clone(), Value::String(raw.clone())))
+        .collect();
+    let context = Value::Object(object);
     for (key, raw) in pairs {
-        validate(&Value::String(raw.clone()), &schema["properties"][key], key)?;
+        let field = &schema["properties"][key];
+        let value = Value::String(raw.clone());
+        if field["x-zero-when"].as_object().is_some_and(|conditions| {
+            conditions.iter().all(|(name, allowed)| {
+                allowed
+                    .as_array()
+                    .is_some_and(|values| values.contains(&context[name]))
+            })
+        }) {
+            let mut relaxed = field.clone();
+            relaxed["x-positive"] = Value::Bool(false);
+            validate(&value, &relaxed, key)?;
+        } else {
+            validate(&value, field, key)?;
+        }
     }
     Ok(())
 }
@@ -120,7 +152,14 @@ pub(crate) fn input(
         )));
     }
     let raw = value.to_string();
-    validate(&Value::String(raw.clone()), schema, key)?;
+    if schema["x-zero-when"].is_object() {
+        // Typed builders validate sibling-dependent zero controls at dispatch.
+        let mut deferred = schema.clone();
+        deferred["x-positive"] = Value::Bool(false);
+        validate(&Value::String(raw.clone()), &deferred, key)?;
+    } else {
+        validate(&Value::String(raw.clone()), schema, key)?;
+    }
     Ok(raw)
 }
 
@@ -188,5 +227,22 @@ mod tests {
         }
         assert!(relative_price("#5%"));
         assert!(!relative_price("+1e-7"));
+    }
+
+    #[test]
+    fn zero_quantity_requires_both_closing_flags_and_all_pairs_are_checked() {
+        let quantity = ("qty".into(), "0".into());
+        assert!(pairs("bybit", "place_order", std::slice::from_ref(&quantity)).is_err());
+        let closing = vec![
+            quantity,
+            ("reduceOnly".into(), "true".into()),
+            ("closeOnTrigger".into(), "true".into()),
+        ];
+        pairs("bybit", "place_order", &closing).unwrap();
+        let mut duplicate = closing;
+        duplicate.insert(0, ("qty".into(), "1e-7".into()));
+        assert!(pairs("bybit", "place_order", &duplicate).is_err());
+        assert!(input("bybit", "place_order", "qty", &"0").is_ok());
+        assert!(input("bybit", "place_order", "qty", &0.1_f64).is_err());
     }
 }

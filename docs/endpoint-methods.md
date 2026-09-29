@@ -2275,7 +2275,7 @@ Public Python sync/async methods added relative to `d0bbf8b0`. Counts include al
 
 ## Extended
 
-- [`commit_bridge_quote`](../dcex/extended/_account_http.py) — Commit an accepted bridge quote and return the bridge commitment.
+- [`commit_bridge_quote`](../dcex/extended/_withdrawals_http.py) — Commit an accepted bridge quote and return the bridge commitment.
 - [`create_referral_code`](../dcex/extended/_account_http.py) — Create a referral link code.
 - [`create_withdrawal_signed`](../dcex/extended/_withdrawals_http.py) — Submit a caller-signed withdrawal settlement.
 - [`get_account_equity_history`](../dcex/extended/_account_http.py) — Get account equity history.

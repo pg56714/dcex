@@ -58,7 +58,8 @@
       "properties": {
         "amount": {
           "type": "string",
-          "format": "decimal"
+          "format": "decimal",
+          "x-positive": true
         }
       }
     }
@@ -127,7 +128,8 @@
       "properties": {
         "amount": {
           "type": "string",
-          "format": "decimal"
+          "format": "decimal",
+          "x-positive": true
         }
       }
     }

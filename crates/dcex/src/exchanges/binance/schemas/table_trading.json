@@ -591,6 +591,38 @@
         "pendingTrailingDelta": {
           "type": "string",
           "format": "decimal"
+        },
+        "working_peg_price_type": {
+          "type": "string",
+          "description": "place_spot_opo/working_peg_price_type: selects the documented mode, unit, or reference used by this operation."
+        },
+        "working_peg_offset_type": {
+          "type": "string",
+          "description": "place_spot_opo/working_peg_offset_type: selects the documented mode, unit, or reference used by this operation."
+        },
+        "pending_peg_price_type": {
+          "type": "string",
+          "description": "place_spot_opo/pending_peg_price_type: selects the documented mode, unit, or reference used by this operation."
+        },
+        "pending_peg_offset_type": {
+          "type": "string",
+          "description": "place_spot_opo/pending_peg_offset_type: selects the documented mode, unit, or reference used by this operation."
+        },
+        "workingPegPriceType": {
+          "type": "string",
+          "description": "place_spot_opo/workingPegPriceType: selects the documented mode, unit, or reference used by this operation."
+        },
+        "workingPegOffsetType": {
+          "type": "string",
+          "description": "place_spot_opo/workingPegOffsetType: selects the documented mode, unit, or reference used by this operation."
+        },
+        "pendingPegPriceType": {
+          "type": "string",
+          "description": "place_spot_opo/pendingPegPriceType: selects the documented mode, unit, or reference used by this operation."
+        },
+        "pendingPegOffsetType": {
+          "type": "string",
+          "description": "place_spot_opo/pendingPegOffsetType: selects the documented mode, unit, or reference used by this operation."
         }
       }
     }
@@ -753,7 +785,16 @@
     ],
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "fee_burn": {
+          "type": "string",
+          "description": "toggle_futures_bnb_burn_on_futures_trade/fee_burn: controls an integer or boolean option rather than a transferred balance."
+        },
+        "feeBurn": {
+          "type": "string",
+          "description": "toggle_futures_bnb_burn_on_futures_trade/feeBurn: controls an integer or boolean option rather than a transferred balance."
+        }
+      }
     }
   },
   {
@@ -1978,6 +2019,10 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   }
 ]

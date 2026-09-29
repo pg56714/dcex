@@ -39,7 +39,8 @@
       "properties": {
         "amount": {
           "type": "string",
-          "format": "decimal"
+          "format": "decimal",
+          "x-positive": true
         }
       }
     }
@@ -486,6 +487,10 @@
         "trailing_percent": {
           "type": "string",
           "format": "decimal"
+        },
+        "trigger_count": {
+          "type": "integer",
+          "description": "stock_plus_orders_place_order/trigger_count: selects trigger count identifiers or response filters for this operation."
         }
       }
     }
@@ -631,6 +636,10 @@
         "trailing_percent": {
           "type": "string",
           "format": "decimal"
+        },
+        "trigger_count": {
+          "type": "integer",
+          "description": "stock_plus_orders_modify_order/trigger_count: selects trigger count identifiers or response filters for this operation."
         }
       }
     }

@@ -927,7 +927,20 @@
           "BREAK"
         ]
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "window_size": {
+          "type": "string",
+          "description": "spot_ticker/window_size: selects the historical aggregation interval as a duration label."
+        },
+        "windowSize": {
+          "type": "string",
+          "description": "spot_ticker/windowSize: selects the historical aggregation interval as a duration label."
+        }
+      }
+    }
   },
   {
     "name": "spot_ticker_trading_day",
@@ -1112,7 +1125,11 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_bfusd_rate_history",

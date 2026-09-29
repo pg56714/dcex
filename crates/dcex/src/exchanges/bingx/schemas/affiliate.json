@@ -50,7 +50,11 @@
     ],
     "source": "https://bingx-api.github.io/docs-v3/#/en/Agent/Query%20partner%20information",
     "summary": "Query partner information",
-    "scoped": false
+    "scoped": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_agent_v2_reward_commission_data_list",
@@ -124,7 +128,11 @@
     ],
     "source": "https://bingx-api.github.io/docs-v3/#/en/Agent/Daily%20commission%20details",
     "summary": "Daily commission details",
-    "scoped": false
+    "scoped": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_agent_v1_reward_third_commission_data_list",
@@ -184,7 +192,11 @@
     ],
     "source": "https://bingx-api.github.io/docs-v3/#/en/Agent/Query%20API%20transaction%20commission%20%EF%BC%88non-invitation%20relationship%EF%BC%89",
     "summary": "Query API transaction commission （non-invitation relationship）",
-    "scoped": false
+    "scoped": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_agent_v1_commission_data_list_referral_code",
@@ -244,7 +256,11 @@
     ],
     "source": "https://bingx-api.github.io/docs-v3/#/en/Agent/Invitation%20code%20data",
     "summary": "Invitation code data",
-    "scoped": false
+    "scoped": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_agent_v1_account_invite_account_list",
@@ -290,7 +306,11 @@
     ],
     "source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/agent/api-reference.md#L14",
     "summary": "1. Query Invited Users",
-    "scoped": false
+    "scoped": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_agent_v1_account_invite_relation_check",
@@ -361,7 +381,11 @@
     ],
     "source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/agent/api-reference.md#L242",
     "summary": "6. Query Deposit Details of Invited Users",
-    "scoped": false
+    "scoped": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_agent_v1_account_superior_check",

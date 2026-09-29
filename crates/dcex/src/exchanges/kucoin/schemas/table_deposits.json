@@ -66,7 +66,11 @@
         "minimum": 10,
         "maximum": 500
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "create_deposit_address_v3",
@@ -260,6 +264,10 @@
         "minimum": 1,
         "maximum": 50
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   }
 ]

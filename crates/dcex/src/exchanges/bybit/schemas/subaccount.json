@@ -27,6 +27,15 @@
     },
     "has_example": true,
     "source_file": "v5/user/fund-subuid-list.mdx",
-    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "page_size": {
+          "type": "string",
+          "description": "get_user_escrow_sub_members/page_size: limits the number of result records returned by pagination."
+        }
+      }
+    }
   }
 ]

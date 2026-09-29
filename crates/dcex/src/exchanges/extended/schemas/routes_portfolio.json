@@ -43,7 +43,20 @@
       "accountId",
       "interval",
       "pnlType"
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "price_market": {
+          "type": "string",
+          "description": "get_account_pnl_percentage_history/price_market: selects the documented mode, unit, or reference used by this operation."
+        },
+        "priceMarket": {
+          "type": "string",
+          "description": "get_account_pnl_percentage_history/priceMarket: selects the documented mode, unit, or reference used by this operation."
+        }
+      }
+    }
   },
   {
     "name": "get_cumulative_account_pnl_history",
@@ -76,7 +89,20 @@
       "accountId",
       "interval",
       "pnlType"
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "price_market": {
+          "type": "string",
+          "description": "get_cumulative_account_pnl_percentage_history/price_market: selects the documented mode, unit, or reference used by this operation."
+        },
+        "priceMarket": {
+          "type": "string",
+          "description": "get_cumulative_account_pnl_percentage_history/priceMarket: selects the documented mode, unit, or reference used by this operation."
+        }
+      }
+    }
   },
   {
     "name": "get_account_vault_equity_history",

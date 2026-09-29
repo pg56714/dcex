@@ -245,7 +245,16 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/broker/broker#get-broker-commission",
-    "summary": "Get Broker Commission"
+    "summary": "Get Broker Commission",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "page_size": {
+          "type": "string",
+          "description": "broker_get_broker_commission/page_size: limits the number of result records returned by pagination."
+        }
+      }
+    }
   },
   {
     "name": "broker_get_subaccount_apikey",
@@ -645,7 +654,16 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/classic-affiliate-customer-info/classic-affiliate-customerinfo#get-agent-customer-assets-list",
-    "summary": "Get Agent Customer Assets List"
+    "summary": "Get Agent Customer Assets List",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "page_size": {
+          "type": "string",
+          "description": "classic_affiliate_customer_info_get_customer_assets/page_size: limits the number of result records returned by pagination."
+        }
+      }
+    }
   },
   {
     "name": "classic_affiliate_customer_info_get_customer_deposit",
@@ -711,7 +729,16 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/classic-affiliate-customer-info/classic-affiliate-customerinfo#get-agent-customer-deposit-list",
-    "summary": "Get Agent Customer Deposit List"
+    "summary": "Get Agent Customer Deposit List",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "page_size": {
+          "type": "string",
+          "description": "classic_affiliate_customer_info_get_customer_deposit/page_size: limits the number of result records returned by pagination."
+        }
+      }
+    }
   },
   {
     "name": "classic_affiliate_customer_info_get_customer_kyc_result",
@@ -837,7 +864,16 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/classic-affiliate-customer-info/classic-affiliate-customerinfo#get-agent-customer-list",
-    "summary": "Get Agent Customer List"
+    "summary": "Get Agent Customer List",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "page_size": {
+          "type": "string",
+          "description": "classic_affiliate_customer_info_get_customer_list/page_size: limits the number of result records returned by pagination."
+        }
+      }
+    }
   },
   {
     "name": "classic_affiliate_customer_info_get_customer_trade_volume",
@@ -903,7 +939,16 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/classic-affiliate-customer-info/classic-affiliate-customerinfo#get-agent-customer-trade-volume-list",
-    "summary": "Get Agent Customer Trade Volume List"
+    "summary": "Get Agent Customer Trade Volume List",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "page_size": {
+          "type": "string",
+          "description": "classic_affiliate_customer_info_get_customer_trade_volume/page_size: limits the number of result records returned by pagination."
+        }
+      }
+    }
   },
   {
     "name": "classic_affiliate_customer_info_get_direct_commissions",
@@ -2071,7 +2116,16 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/classic-broker-subaccount/classic-broker-subaccount#get-broker-subaccounts",
-    "summary": "Get Broker Subaccounts"
+    "summary": "Get Broker Subaccounts",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "page_size": {
+          "type": "string",
+          "description": "classic_broker_subaccount_get_broker_subaccounts/page_size: limits the number of result records returned by pagination."
+        }
+      }
+    }
   },
   {
     "name": "classic_broker_subaccount_get_broker_subaccounts_commissions",
@@ -2131,7 +2185,16 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/classic-broker-subaccount/classic-broker-subaccount#get-broker-subaccounts-commissions",
-    "summary": "Get Broker Subaccounts Commissions"
+    "summary": "Get Broker Subaccounts Commissions",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "page_size": {
+          "type": "string",
+          "description": "classic_broker_subaccount_get_broker_subaccounts_commissions/page_size: limits the number of result records returned by pagination."
+        }
+      }
+    }
   },
   {
     "name": "classic_broker_subaccount_get_broker_trade_volume",
@@ -2175,6 +2238,15 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/classic-broker-subaccount/classic-broker-subaccount#get-broker-trade-volume",
-    "summary": "Get Broker Trade Volume"
+    "summary": "Get Broker Trade Volume",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "page_size": {
+          "type": "string",
+          "description": "classic_broker_subaccount_get_broker_trade_volume/page_size: limits the number of result records returned by pagination."
+        }
+      }
+    }
   }
 ]

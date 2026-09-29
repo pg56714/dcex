@@ -87,6 +87,14 @@
         "size": {
           "type": "string",
           "format": "decimal"
+        },
+        "margin_coin": {
+          "type": "string",
+          "description": "reverse_futures_position/margin_coin: selects the settlement currency for the margin account."
+        },
+        "marginCoin": {
+          "type": "string",
+          "description": "reverse_futures_position/marginCoin: selects the settlement currency for the margin account."
         }
       }
     }

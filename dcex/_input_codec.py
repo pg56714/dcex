@@ -18,6 +18,14 @@ def resolve_schema(schema: dict[str, Any]) -> dict[str, Any]:
     return schema
 
 
+def contextual_schema(schema: dict[str, Any], values: dict[str, Any]) -> dict[str, Any]:
+    """Allow a declared zero control only when all sibling conditions match."""
+    conditions = schema.get("x-zero-when")
+    if conditions and all(values.get(key) in allowed for key, allowed in conditions.items()):
+        return {**schema, "x-positive": False}
+    return schema
+
+
 def normalize(
     value: Any,  # noqa: ANN401
     key: str = "",
@@ -62,7 +70,9 @@ def normalize(
     if isinstance(value, dict):
         properties = schema.get("properties", {})
         return {
-            name: normalize(child, str(name), schema=properties.get(name, {}))
+            name: normalize(
+                child, str(name), schema=contextual_schema(properties.get(name, {}), value)
+            )
             for name, child in value.items()
         }
     if isinstance(value, list | tuple):

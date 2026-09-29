@@ -52,7 +52,20 @@
       "loanCurrency",
       "collateralCurrency"
     ],
-    "integers": []
+    "integers": [],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "collateral_currency": {
+          "type": "string",
+          "description": "get_crypto_loan_borrowable_collateralisable_number/collateral_currency: selects collateral currencies, account identifiers, or the collateral enable switch."
+        },
+        "collateralCurrency": {
+          "type": "string",
+          "description": "get_crypto_loan_borrowable_collateralisable_number/collateralCurrency: selects collateral currencies, account identifiers, or the collateral enable switch."
+        }
+      }
+    }
   },
   {
     "name": "crypto_loan_adjust_ltv",
@@ -105,7 +118,20 @@
       "cursor"
     ],
     "required": [],
-    "integers": []
+    "integers": [],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "collateral_currency": {
+          "type": "string",
+          "description": "get_crypto_loan_borrow_history/collateral_currency: selects collateral currencies, account identifiers, or the collateral enable switch."
+        },
+        "collateralCurrency": {
+          "type": "string",
+          "description": "get_crypto_loan_borrow_history/collateralCurrency: selects collateral currencies, account identifiers, or the collateral enable switch."
+        }
+      }
+    }
   },
   {
     "name": "get_crypto_loan_loanable_data",
@@ -132,7 +158,20 @@
       "cursor"
     ],
     "required": [],
-    "integers": []
+    "integers": [],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "collateral_currency": {
+          "type": "string",
+          "description": "get_crypto_loan_adjustment_history/collateral_currency: selects collateral currencies, account identifiers, or the collateral enable switch."
+        },
+        "collateralCurrency": {
+          "type": "string",
+          "description": "get_crypto_loan_adjustment_history/collateralCurrency: selects collateral currencies, account identifiers, or the collateral enable switch."
+        }
+      }
+    }
   },
   {
     "name": "get_crypto_loan_max_collateral_amount",
@@ -204,7 +243,16 @@
     "integers": [],
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "collateral_currency": {
+          "type": "string",
+          "description": "get_crypto_loan_ongoing_orders/collateral_currency: selects collateral currencies, account identifiers, or the collateral enable switch."
+        },
+        "collateralCurrency": {
+          "type": "string",
+          "description": "get_crypto_loan_ongoing_orders/collateralCurrency: selects collateral currencies, account identifiers, or the collateral enable switch."
+        }
+      }
     }
   },
   {
@@ -415,6 +463,14 @@
         "annualRate": {
           "type": "string",
           "format": "decimal"
+        },
+        "strategy_type": {
+          "type": "string",
+          "description": "crypto_loan_fixed_borrow/strategy_type: selects the strategy category used by the endpoint."
+        },
+        "strategyType": {
+          "type": "string",
+          "description": "crypto_loan_fixed_borrow/strategyType: selects the strategy category used by the endpoint."
         }
       }
     }
@@ -542,6 +598,14 @@
         "amount": {
           "type": "string",
           "format": "decimal"
+        },
+        "collateral_coin": {
+          "type": "string",
+          "description": "crypto_loan_fixed_repay_collateral/collateral_coin: selects collateral currencies, account identifiers, or the collateral enable switch."
+        },
+        "collateralCoin": {
+          "type": "string",
+          "description": "crypto_loan_fixed_repay_collateral/collateralCoin: selects collateral currencies, account identifiers, or the collateral enable switch."
         }
       }
     }
@@ -768,6 +832,14 @@
         "amount": {
           "type": "string",
           "format": "decimal"
+        },
+        "collateral_coin": {
+          "type": "string",
+          "description": "crypto_loan_flexible_repay_collateral/collateral_coin: selects collateral currencies, account identifiers, or the collateral enable switch."
+        },
+        "collateralCoin": {
+          "type": "string",
+          "description": "crypto_loan_flexible_repay_collateral/collateralCoin: selects collateral currencies, account identifiers, or the collateral enable switch."
         }
       }
     }
@@ -845,7 +917,20 @@
       "cursor"
     ],
     "required": [],
-    "integers": []
+    "integers": [],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "collateral_currency": {
+          "type": "string",
+          "description": "get_crypto_loan_common_adjustment_history/collateral_currency: selects collateral currencies, account identifiers, or the collateral enable switch."
+        },
+        "collateralCurrency": {
+          "type": "string",
+          "description": "get_crypto_loan_common_adjustment_history/collateralCurrency: selects collateral currencies, account identifiers, or the collateral enable switch."
+        }
+      }
+    }
   },
   {
     "name": "crypto_loan_common_max_loan",

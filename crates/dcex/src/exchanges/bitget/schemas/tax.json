@@ -109,7 +109,16 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/classic-tax-tax-records/classic-tax#futures-transaction-records",
-    "summary": "Futures Transaction Records"
+    "summary": "Futures Transaction Records",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "margin_coin": {
+          "type": "string",
+          "description": "classic_tax_get_future_account_record/margin_coin: selects the settlement currency for the margin account."
+        }
+      }
+    }
   },
   {
     "name": "classic_tax_get_margin_account_record",
@@ -169,7 +178,16 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/classic-tax-tax-records/classic-tax#margin-transaction-history",
-    "summary": "Margin Transaction History"
+    "summary": "Margin Transaction History",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "margin_type": {
+          "type": "string",
+          "description": "classic_tax_get_margin_account_record/margin_type: selects the account margin mode or its enabled state."
+        }
+      }
+    }
   },
   {
     "name": "tax_get_tax_records",
@@ -237,6 +255,15 @@
       }
     ],
     "source": "https://www.bitget.com/docs/catalog/tax/tax-records#get-tax-records",
-    "summary": "Get Unified Account Tax Records"
+    "summary": "Get Unified Account Tax Records",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "margin_type": {
+          "type": "string",
+          "description": "tax_get_tax_records/margin_type: selects the account margin mode or its enabled state."
+        }
+      }
+    }
   }
 ]

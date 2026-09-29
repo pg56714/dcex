@@ -405,7 +405,20 @@
         "required": false,
         "choices": []
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "delta_enabled": {
+          "type": "string",
+          "description": "pm_pro_switch_delta_mode/delta_enabled: controls an integer or boolean option rather than a transferred balance."
+        },
+        "deltaEnabled": {
+          "type": "string",
+          "description": "pm_pro_switch_delta_mode/deltaEnabled: controls an integer or boolean option rather than a transferred balance."
+        }
+      }
+    }
   },
   {
     "name": "fetch_address_verification_list",

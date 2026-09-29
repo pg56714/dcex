@@ -9,18 +9,32 @@ import pytest
 ROOT = Path(__file__).resolve().parents[2]
 
 
+def assert_docstring_summaries(source, require_functions=False):
+    for node in ast.walk(ast.parse(source)):
+        function = isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+        if not isinstance(node, (ast.Module, ast.ClassDef)) and not (function and not node.name.startswith("_")):
+            continue
+        doc = ast.get_docstring(node, clean=False)
+        if doc is None and not (function and require_functions):
+            continue  # Missing-doc policy is separate from existing summaries.
+        name = getattr(node, "name", "module")
+        assert doc and doc.strip(), name
+        assert not doc.lstrip().startswith(("Args:", "Returns:", "Raises:")), name
+
+
 def test_all_public_docstrings_start_with_a_summary():
     for path in (ROOT / "dcex").rglob("*.py"):
-        tree = ast.parse(path.read_text(encoding="utf-8"))
-        containers = [tree, *(node for node in ast.walk(tree) if isinstance(node, ast.ClassDef))]
-        for node in (node for container in containers for node in container.body):
-            if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) or node.name.startswith("_"):
-                continue
-            doc = ast.get_docstring(node, clean=False)
-            if doc is None and "bingx" not in path.parts:
-                continue  # Check existing docstrings; missing-doc policy is separate.
-            assert doc and doc.strip(), (path, node.name)
-            assert not doc.lstrip().startswith(("Args:", "Returns:", "Raises:")), (path, node.name)
+        assert_docstring_summaries(path.read_text(encoding="utf-8"), "bingx" in path.parts)
+
+
+@pytest.mark.parametrize("source", [
+    '"""Returns: missing module summary."""',
+    'class Client:\n """Args: missing class summary."""',
+    'if TYPE_CHECKING:\n def public():\n  """Raises: missing conditional function summary."""',
+])
+def test_summary_guard_covers_modules_classes_and_conditional_functions(source):
+    with pytest.raises(AssertionError):
+        assert_docstring_summaries(source)
 
 
 @pytest.mark.parametrize("prefix", ["dcex", "dcex/async_support"])

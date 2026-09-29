@@ -1847,7 +1847,7 @@ CASES: tuple[Case, ...] = (
     ),
     Case(
         "add_futures_isolated_margin",
-        {"product_symbol": "BTC-USDT-SWAP", "margin": 1.25, "biz_no": "test-order-1"},
+        {"product_symbol": "BTC-USDT-SWAP", "margin": "1.25", "biz_no": "test-order-1"},
         "POST /api/v1/position/margin/deposit-margin",
         host="futures",
         query={},

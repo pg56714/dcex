@@ -120,7 +120,20 @@
       "nextCursor"
     ],
     "required": [],
-    "integers": []
+    "integers": [],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "page_size": {
+          "type": "string",
+          "description": "get_sub_accounts_paginated/page_size: limits the number of result records returned by pagination."
+        },
+        "pageSize": {
+          "type": "string",
+          "description": "get_sub_accounts_paginated/pageSize: limits the number of result records returned by pagination."
+        }
+      }
+    }
   },
   {
     "name": "delete_sub_account_api_key",

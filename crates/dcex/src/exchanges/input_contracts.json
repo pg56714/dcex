@@ -91,6 +91,10 @@
           "sell_amount": {
             "type": "string",
             "format": "decimal"
+          },
+          "slippage_bps": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -206,6 +210,10 @@
       "submit_internal_transfer": {
         "type": "object",
         "properties": {}
+      },
+      "get_invite_codes": {
+        "type": "object",
+        "properties": {}
       }
     },
     "aster": {
@@ -214,7 +222,8 @@
         "properties": {
           "amount": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -336,6 +345,22 @@
           "max_chase_offset": {
             "type": "string",
             "format": "decimal"
+          },
+          "quantityUnit": {
+            "type": "string",
+            "description": "place_futures_chase_order/quantityUnit: selects the documented mode, unit, or reference used by this operation."
+          },
+          "chaseOffsetType": {
+            "type": "string",
+            "description": "place_futures_chase_order/chaseOffsetType: selects the documented mode, unit, or reference used by this operation."
+          },
+          "maxChaseOffsetType": {
+            "type": "string",
+            "description": "place_futures_chase_order/maxChaseOffsetType: selects the documented mode, unit, or reference used by this operation."
+          },
+          "clientStrategyId": {
+            "type": "string",
+            "description": "place_futures_chase_order/clientStrategyId: identifies a strategy rather than specifying its investment."
           }
         }
       },
@@ -381,7 +406,12 @@
           },
           "peg_offset": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-signed": true
+          },
+          "pegPriceType": {
+            "type": "string",
+            "description": "place_futures_order/pegPriceType: selects the documented mode, unit, or reference used by this operation."
           }
         }
       },
@@ -435,6 +465,14 @@
                 }
               }
             }
+          },
+          "strategyType": {
+            "type": "string",
+            "description": "place_futures_strategy_order/strategyType: selects the strategy category used by the endpoint."
+          },
+          "clientStrategyId": {
+            "type": "string",
+            "description": "place_futures_strategy_order/clientStrategyId: identifies a strategy rather than specifying its investment."
           }
         }
       },
@@ -481,7 +519,8 @@
         "properties": {
           "amount": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -490,7 +529,8 @@
         "properties": {
           "amount": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -744,6 +784,10 @@
                 }
               }
             }
+          },
+          "strategyType": {
+            "type": "string",
+            "description": "update_futures_strategy_order/strategyType: selects the strategy category used by the endpoint."
           }
         }
       },
@@ -839,11 +883,29 @@
       },
       "get_futures_strategy_open_order": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "strategyType": {
+            "type": "string",
+            "description": "get_futures_strategy_open_order/strategyType: selects the strategy category used by the endpoint."
+          },
+          "clientStrategyId": {
+            "type": "string",
+            "description": "get_futures_strategy_open_order/clientStrategyId: identifies a strategy rather than specifying its investment."
+          }
+        }
       },
       "get_futures_strategy_history_order": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "strategyType": {
+            "type": "string",
+            "description": "get_futures_strategy_history_order/strategyType: selects the strategy category used by the endpoint."
+          },
+          "clientStrategyId": {
+            "type": "string",
+            "description": "get_futures_strategy_history_order/clientStrategyId: identifies a strategy rather than specifying its investment."
+          }
+        }
       },
       "guarded_cancel_futures_order": {
         "type": "object",
@@ -884,6 +946,19 @@
       "get_chain_withdraw_fee": {
         "type": "object",
         "properties": {}
+      },
+      "set_futures_multi_assets_mode": {
+        "type": "object",
+        "properties": {}
+      },
+      "set_futures_margin_type": {
+        "type": "object",
+        "properties": {
+          "marginType": {
+            "type": "string",
+            "description": "set_futures_margin_type/marginType: selects the account margin mode or its enabled state."
+          }
+        }
       }
     },
     "backpack": {
@@ -897,6 +972,30 @@
           "quantity": {
             "type": "string",
             "format": "decimal"
+          },
+          "strategy_type": {
+            "type": "string",
+            "description": "create_strategy/strategy_type: selects the strategy category used by the endpoint."
+          },
+          "slippage_tolerance": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "slippage_tolerance_type": {
+            "type": "string",
+            "description": "create_strategy/slippage_tolerance_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "strategyType": {
+            "type": "string",
+            "description": "create_strategy/strategyType: selects the strategy category used by the endpoint."
+          },
+          "slippageTolerance": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "slippageToleranceType": {
+            "type": "string",
+            "description": "create_strategy/slippageToleranceType: selects the documented mode, unit, or reference used by this operation."
           }
         }
       },
@@ -976,7 +1075,8 @@
           },
           "triggerQuantity": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-percent": true
           },
           "trigger_price": {
             "type": "string",
@@ -984,7 +1084,28 @@
           },
           "trigger_quantity": {
             "type": "string",
+            "format": "decimal",
+            "x-percent": true
+          },
+          "stopLossTriggerBy": {
+            "type": "string",
+            "description": "place_limit_order/stopLossTriggerBy: selects the documented mode, unit, or reference used by this operation."
+          },
+          "takeProfitTriggerBy": {
+            "type": "string",
+            "description": "place_limit_order/takeProfitTriggerBy: selects the documented mode, unit, or reference used by this operation."
+          },
+          "triggerBy": {
+            "type": "string",
+            "description": "place_limit_order/triggerBy: selects the documented mode, unit, or reference used by this operation."
+          },
+          "slippageTolerance": {
+            "type": "string",
             "format": "decimal"
+          },
+          "slippageToleranceType": {
+            "type": "string",
+            "description": "place_limit_order/slippageToleranceType: selects the documented mode, unit, or reference used by this operation."
           }
         }
       },
@@ -1041,7 +1162,8 @@
           },
           "triggerQuantity": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-percent": true
           },
           "trigger_price": {
             "type": "string",
@@ -1049,7 +1171,28 @@
           },
           "trigger_quantity": {
             "type": "string",
+            "format": "decimal",
+            "x-percent": true
+          },
+          "stopLossTriggerBy": {
+            "type": "string",
+            "description": "place_market_order/stopLossTriggerBy: selects the documented mode, unit, or reference used by this operation."
+          },
+          "takeProfitTriggerBy": {
+            "type": "string",
+            "description": "place_market_order/takeProfitTriggerBy: selects the documented mode, unit, or reference used by this operation."
+          },
+          "triggerBy": {
+            "type": "string",
+            "description": "place_market_order/triggerBy: selects the documented mode, unit, or reference used by this operation."
+          },
+          "slippageTolerance": {
+            "type": "string",
             "format": "decimal"
+          },
+          "slippageToleranceType": {
+            "type": "string",
+            "description": "place_market_order/slippageToleranceType: selects the documented mode, unit, or reference used by this operation."
           }
         }
       },
@@ -1110,7 +1253,8 @@
           },
           "triggerQuantity": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-percent": true
           },
           "trigger_price": {
             "type": "string",
@@ -1118,7 +1262,28 @@
           },
           "trigger_quantity": {
             "type": "string",
+            "format": "decimal",
+            "x-percent": true
+          },
+          "stopLossTriggerBy": {
+            "type": "string",
+            "description": "place_order/stopLossTriggerBy: selects the documented mode, unit, or reference used by this operation."
+          },
+          "takeProfitTriggerBy": {
+            "type": "string",
+            "description": "place_order/takeProfitTriggerBy: selects the documented mode, unit, or reference used by this operation."
+          },
+          "triggerBy": {
+            "type": "string",
+            "description": "place_order/triggerBy: selects the documented mode, unit, or reference used by this operation."
+          },
+          "slippageTolerance": {
+            "type": "string",
             "format": "decimal"
+          },
+          "slippageToleranceType": {
+            "type": "string",
+            "description": "place_order/slippageToleranceType: selects the documented mode, unit, or reference used by this operation."
           }
         }
       },
@@ -1248,7 +1413,8 @@
                 },
                 "triggerQuantity": {
                   "type": "string",
-                  "format": "decimal"
+                  "format": "decimal",
+                  "x-percent": true
                 },
                 "trigger_price": {
                   "type": "string",
@@ -1256,7 +1422,8 @@
                 },
                 "trigger_quantity": {
                   "type": "string",
-                  "format": "decimal"
+                  "format": "decimal",
+                  "x-percent": true
                 }
               }
             }
@@ -1298,7 +1465,12 @@
       },
       "get_order_history": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "strategyId": {
+            "type": "string",
+            "description": "get_order_history/strategyId: identifies a strategy rather than specifying its investment."
+          }
+        }
       },
       "get_max_withdrawal_quantity": {
         "type": "object",
@@ -1307,6 +1479,149 @@
       "get_withdrawals": {
         "type": "object",
         "properties": {}
+      },
+      "get_borrow_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_interest_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_borrow_position_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_deposits": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_dust_conversion_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_settlement_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_funding_rates": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_klines": {
+        "type": "object",
+        "properties": {
+          "priceType": {
+            "type": "string",
+            "description": "get_klines/priceType: selects the documented mode, unit, or reference used by this operation."
+          }
+        }
+      },
+      "get_historical_trades": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_prediction_events": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_rfq_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_quote_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_rfq_fill_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_quote_fill_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_fill_history": {
+        "type": "object",
+        "properties": {
+          "strategyId": {
+            "type": "string",
+            "description": "get_fill_history/strategyId: identifies a strategy rather than specifying its investment."
+          }
+        }
+      },
+      "get_funding_payments": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_position_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_open_strategy": {
+        "type": "object",
+        "properties": {
+          "strategy_id": {
+            "type": "string",
+            "description": "get_open_strategy/strategy_id: identifies a strategy rather than specifying its investment."
+          },
+          "strategyId": {
+            "type": "string",
+            "description": "get_open_strategy/strategyId: identifies a strategy rather than specifying its investment."
+          }
+        }
+      },
+      "cancel_strategy": {
+        "type": "object",
+        "properties": {
+          "strategy_id": {
+            "type": "string",
+            "description": "cancel_strategy/strategy_id: identifies a strategy rather than specifying its investment."
+          },
+          "strategyId": {
+            "type": "string",
+            "description": "cancel_strategy/strategyId: identifies a strategy rather than specifying its investment."
+          }
+        }
+      },
+      "get_open_strategies": {
+        "type": "object",
+        "properties": {
+          "strategy_type": {
+            "type": "string",
+            "description": "get_open_strategies/strategy_type: selects the strategy category used by the endpoint."
+          },
+          "strategyType": {
+            "type": "string",
+            "description": "get_open_strategies/strategyType: selects the strategy category used by the endpoint."
+          }
+        }
+      },
+      "cancel_open_strategies": {
+        "type": "object",
+        "properties": {
+          "strategy_type": {
+            "type": "string",
+            "description": "cancel_open_strategies/strategy_type: selects the strategy category used by the endpoint."
+          },
+          "strategyType": {
+            "type": "string",
+            "description": "cancel_open_strategies/strategyType: selects the strategy category used by the endpoint."
+          }
+        }
+      },
+      "get_strategy_history": {
+        "type": "object",
+        "properties": {
+          "strategy_id": {
+            "type": "string",
+            "description": "get_strategy_history/strategy_id: identifies a strategy rather than specifying its investment."
+          },
+          "strategyId": {
+            "type": "string",
+            "description": "get_strategy_history/strategyId: identifies a strategy rather than specifying its investment."
+          }
+        }
       }
     },
     "binance": {
@@ -1329,6 +1644,10 @@
           "adjustment_amount": {
             "type": "string",
             "format": "decimal"
+          },
+          "collateralCoin": {
+            "type": "string",
+            "description": "adjust_flexible_loan_ltv/collateralCoin: selects collateral currencies, account identifiers, or the collateral enable switch."
           }
         }
       },
@@ -1402,6 +1721,14 @@
           "quantity": {
             "type": "string",
             "format": "decimal"
+          },
+          "price_match": {
+            "type": "string",
+            "description": "amend_coin_futures_order/price_match: selects the documented mode, unit, or reference used by this operation."
+          },
+          "priceMatch": {
+            "type": "string",
+            "description": "amend_coin_futures_order/priceMatch: selects the documented mode, unit, or reference used by this operation."
           }
         }
       },
@@ -1415,6 +1742,14 @@
           "quantity": {
             "type": "string",
             "format": "decimal"
+          },
+          "price_match": {
+            "type": "string",
+            "description": "amend_futures_order/price_match: selects the documented mode, unit, or reference used by this operation."
+          },
+          "priceMatch": {
+            "type": "string",
+            "description": "amend_futures_order/priceMatch: selects the documented mode, unit, or reference used by this operation."
           }
         }
       },
@@ -1453,6 +1788,10 @@
           "loan_amount": {
             "type": "string",
             "format": "decimal"
+          },
+          "collateralCoin": {
+            "type": "string",
+            "description": "borrow_flexible_loan/collateralCoin: selects collateral currencies, account identifiers, or the collateral enable switch."
           }
         }
       },
@@ -1524,6 +1863,30 @@
           "trailingDelta": {
             "type": "string",
             "format": "decimal"
+          },
+          "order_rate_limit_exceeded_mode": {
+            "type": "string",
+            "description": "cancel_replace_spot_order/order_rate_limit_exceeded_mode: selects the documented mode, unit, or reference used by this operation."
+          },
+          "peg_price_type": {
+            "type": "string",
+            "description": "cancel_replace_spot_order/peg_price_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "peg_offset_type": {
+            "type": "string",
+            "description": "cancel_replace_spot_order/peg_offset_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "orderRateLimitExceededMode": {
+            "type": "string",
+            "description": "cancel_replace_spot_order/orderRateLimitExceededMode: selects the documented mode, unit, or reference used by this operation."
+          },
+          "pegPriceType": {
+            "type": "string",
+            "description": "cancel_replace_spot_order/pegPriceType: selects the documented mode, unit, or reference used by this operation."
+          },
+          "pegOffsetType": {
+            "type": "string",
+            "description": "cancel_replace_spot_order/pegOffsetType: selects the documented mode, unit, or reference used by this operation."
           }
         }
       },
@@ -2160,6 +2523,14 @@
           "trigger_price": {
             "type": "string",
             "format": "decimal"
+          },
+          "priceProtect": {
+            "type": "string",
+            "description": "place_futures_algo_order/priceProtect: controls an integer or boolean option rather than a transferred balance."
+          },
+          "priceMatch": {
+            "type": "string",
+            "description": "place_futures_algo_order/priceMatch: selects the documented mode, unit, or reference used by this operation."
           }
         }
       },
@@ -2593,6 +2964,22 @@
           "trailing_delta": {
             "type": "string",
             "format": "decimal"
+          },
+          "priceProtect": {
+            "type": "string",
+            "description": "place_order/priceProtect: controls an integer or boolean option rather than a transferred balance."
+          },
+          "pegPriceType": {
+            "type": "string",
+            "description": "place_order/pegPriceType: selects the documented mode, unit, or reference used by this operation."
+          },
+          "pegOffsetType": {
+            "type": "string",
+            "description": "place_order/pegOffsetType: selects the documented mode, unit, or reference used by this operation."
+          },
+          "priceMatch": {
+            "type": "string",
+            "description": "place_order/priceMatch: selects the documented mode, unit, or reference used by this operation."
           }
         }
       },
@@ -2630,6 +3017,22 @@
           "stop_price": {
             "type": "string",
             "format": "decimal"
+          },
+          "strategy_type": {
+            "type": "string",
+            "description": "place_pm_cm_conditional_order/strategy_type: selects the strategy category used by the endpoint."
+          },
+          "client_strategy_id": {
+            "type": "string",
+            "description": "place_pm_cm_conditional_order/client_strategy_id: identifies a strategy rather than specifying its investment."
+          },
+          "strategyType": {
+            "type": "string",
+            "description": "place_pm_cm_conditional_order/strategyType: selects the strategy category used by the endpoint."
+          },
+          "newClientStrategyId": {
+            "type": "string",
+            "description": "place_pm_cm_conditional_order/newClientStrategyId: identifies a strategy rather than specifying its investment."
           }
         }
       },
@@ -2899,6 +3302,38 @@
           "pendingTrailingDelta": {
             "type": "string",
             "format": "decimal"
+          },
+          "working_peg_price_type": {
+            "type": "string",
+            "description": "place_spot_opo/working_peg_price_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "working_peg_offset_type": {
+            "type": "string",
+            "description": "place_spot_opo/working_peg_offset_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "pending_peg_price_type": {
+            "type": "string",
+            "description": "place_spot_opo/pending_peg_price_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "pending_peg_offset_type": {
+            "type": "string",
+            "description": "place_spot_opo/pending_peg_offset_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "workingPegPriceType": {
+            "type": "string",
+            "description": "place_spot_opo/workingPegPriceType: selects the documented mode, unit, or reference used by this operation."
+          },
+          "workingPegOffsetType": {
+            "type": "string",
+            "description": "place_spot_opo/workingPegOffsetType: selects the documented mode, unit, or reference used by this operation."
+          },
+          "pendingPegPriceType": {
+            "type": "string",
+            "description": "place_spot_opo/pendingPegPriceType: selects the documented mode, unit, or reference used by this operation."
+          },
+          "pendingPegOffsetType": {
+            "type": "string",
+            "description": "place_spot_opo/pendingPegOffsetType: selects the documented mode, unit, or reference used by this operation."
           }
         }
       },
@@ -3024,6 +3459,54 @@
           "pendingBelowTrailingDelta": {
             "type": "string",
             "format": "decimal"
+          },
+          "working_peg_price_type": {
+            "type": "string",
+            "description": "place_spot_opoco/working_peg_price_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "working_peg_offset_type": {
+            "type": "string",
+            "description": "place_spot_opoco/working_peg_offset_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "pending_above_peg_price_type": {
+            "type": "string",
+            "description": "place_spot_opoco/pending_above_peg_price_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "pending_above_peg_offset_type": {
+            "type": "string",
+            "description": "place_spot_opoco/pending_above_peg_offset_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "pending_below_peg_price_type": {
+            "type": "string",
+            "description": "place_spot_opoco/pending_below_peg_price_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "pending_below_peg_offset_type": {
+            "type": "string",
+            "description": "place_spot_opoco/pending_below_peg_offset_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "workingPegPriceType": {
+            "type": "string",
+            "description": "place_spot_opoco/workingPegPriceType: selects the documented mode, unit, or reference used by this operation."
+          },
+          "workingPegOffsetType": {
+            "type": "string",
+            "description": "place_spot_opoco/workingPegOffsetType: selects the documented mode, unit, or reference used by this operation."
+          },
+          "pendingAbovePegPriceType": {
+            "type": "string",
+            "description": "place_spot_opoco/pendingAbovePegPriceType: selects the documented mode, unit, or reference used by this operation."
+          },
+          "pendingAbovePegOffsetType": {
+            "type": "string",
+            "description": "place_spot_opoco/pendingAbovePegOffsetType: selects the documented mode, unit, or reference used by this operation."
+          },
+          "pendingBelowPegPriceType": {
+            "type": "string",
+            "description": "place_spot_opoco/pendingBelowPegPriceType: selects the documented mode, unit, or reference used by this operation."
+          },
+          "pendingBelowPegOffsetType": {
+            "type": "string",
+            "description": "place_spot_opoco/pendingBelowPegOffsetType: selects the documented mode, unit, or reference used by this operation."
           }
         }
       },
@@ -3053,7 +3536,8 @@
         "properties": {
           "amount": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -3062,7 +3546,8 @@
         "properties": {
           "amount": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -3177,6 +3662,10 @@
           "price_limit": {
             "type": "string",
             "format": "decimal"
+          },
+          "slippage_bps": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -3196,6 +3685,10 @@
             "format": "decimal"
           },
           "price_limit": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "slippage_bps": {
             "type": "string",
             "format": "decimal"
           }
@@ -3345,6 +3838,10 @@
           "repay_amount": {
             "type": "string",
             "format": "decimal"
+          },
+          "collateralCoin": {
+            "type": "string",
+            "description": "repay_flexible_loan/collateralCoin: selects collateral currencies, account identifiers, or the collateral enable switch."
           }
         }
       },
@@ -3644,6 +4141,22 @@
           "trailing_delta": {
             "type": "string",
             "format": "decimal"
+          },
+          "priceProtect": {
+            "type": "string",
+            "description": "test_order/priceProtect: controls an integer or boolean option rather than a transferred balance."
+          },
+          "pegPriceType": {
+            "type": "string",
+            "description": "test_order/pegPriceType: selects the documented mode, unit, or reference used by this operation."
+          },
+          "pegOffsetType": {
+            "type": "string",
+            "description": "test_order/pegOffsetType: selects the documented mode, unit, or reference used by this operation."
+          },
+          "priceMatch": {
+            "type": "string",
+            "description": "test_order/priceMatch: selects the documented mode, unit, or reference used by this operation."
           }
         }
       },
@@ -3670,18 +4183,37 @@
       },
       "toggle_futures_bnb_burn_on_futures_trade": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "fee_burn": {
+            "type": "string",
+            "description": "toggle_futures_bnb_burn_on_futures_trade/fee_burn: controls an integer or boolean option rather than a transferred balance."
+          },
+          "feeBurn": {
+            "type": "string",
+            "description": "toggle_futures_bnb_burn_on_futures_trade/feeBurn: controls an integer or boolean option rather than a transferred balance."
+          }
+        }
       },
       "toggle_pm_bnb_burn_on_um_futures_trade": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "fee_burn": {
+            "type": "string",
+            "description": "toggle_pm_bnb_burn_on_um_futures_trade/fee_burn: controls an integer or boolean option rather than a transferred balance."
+          },
+          "feeBurn": {
+            "type": "string",
+            "description": "toggle_pm_bnb_burn_on_um_futures_trade/feeBurn: controls an integer or boolean option rather than a transferred balance."
+          }
+        }
       },
       "transfer_between_subaccount_futures": {
         "type": "object",
         "properties": {
           "amount": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -3690,7 +4222,8 @@
         "properties": {
           "amount": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -3699,7 +4232,8 @@
         "properties": {
           "amount": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -3708,7 +4242,8 @@
         "properties": {
           "amount": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -3717,7 +4252,8 @@
         "properties": {
           "amount": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -3726,7 +4262,8 @@
         "properties": {
           "amount": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -3735,7 +4272,8 @@
         "properties": {
           "amount": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -3749,6 +4287,14 @@
           "loan_amount": {
             "type": "string",
             "format": "decimal"
+          },
+          "collateral_account_id": {
+            "type": "string",
+            "description": "vip_loan_borrow/collateral_account_id: selects collateral currencies, account identifiers, or the collateral enable switch."
+          },
+          "collateral_coin": {
+            "type": "string",
+            "description": "vip_loan_borrow/collateral_coin: selects collateral currencies, account identifiers, or the collateral enable switch."
           }
         }
       },
@@ -5271,7 +5817,12 @@
       },
       "get_flexible_loan_ongoing_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "collateralCoin": {
+            "type": "string",
+            "description": "get_flexible_loan_ongoing_orders/collateralCoin: selects collateral currencies, account identifiers, or the collateral enable switch."
+          }
+        }
       },
       "get_pm_um_force_orders": {
         "type": "object",
@@ -5574,7 +6125,16 @@
       },
       "cancel_pm_cm_conditional_order": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "client_strategy_id": {
+            "type": "string",
+            "description": "cancel_pm_cm_conditional_order/client_strategy_id: identifies a strategy rather than specifying its investment."
+          },
+          "newClientStrategyId": {
+            "type": "string",
+            "description": "cancel_pm_cm_conditional_order/newClientStrategyId: identifies a strategy rather than specifying its investment."
+          }
+        }
       },
       "cancel_all_pm_cm_conditional_orders": {
         "type": "object",
@@ -5582,11 +6142,29 @@
       },
       "get_pm_cm_conditional_order": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "client_strategy_id": {
+            "type": "string",
+            "description": "get_pm_cm_conditional_order/client_strategy_id: identifies a strategy rather than specifying its investment."
+          },
+          "newClientStrategyId": {
+            "type": "string",
+            "description": "get_pm_cm_conditional_order/newClientStrategyId: identifies a strategy rather than specifying its investment."
+          }
+        }
       },
       "get_pm_cm_conditional_order_history": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "client_strategy_id": {
+            "type": "string",
+            "description": "get_pm_cm_conditional_order_history/client_strategy_id: identifies a strategy rather than specifying its investment."
+          },
+          "newClientStrategyId": {
+            "type": "string",
+            "description": "get_pm_cm_conditional_order_history/newClientStrategyId: identifies a strategy rather than specifying its investment."
+          }
+        }
       },
       "get_pm_cm_open_conditional_orders": {
         "type": "object",
@@ -5897,9 +6475,281 @@
       },
       "get_vip_loan_ongoing_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "collateral_coin": {
+            "type": "string",
+            "description": "get_vip_loan_ongoing_orders/collateral_coin: selects collateral currencies, account identifiers, or the collateral enable switch."
+          }
+        }
       },
       "get_fiat_deposit_withdraw_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "check_flexible_loan_collateral_repay_rate": {
+        "type": "object",
+        "properties": {
+          "collateralCoin": {
+            "type": "string",
+            "description": "check_flexible_loan_collateral_repay_rate/collateralCoin: selects collateral currencies, account identifiers, or the collateral enable switch."
+          }
+        }
+      },
+      "get_flexible_loan_collateral_assets": {
+        "type": "object",
+        "properties": {
+          "collateralCoin": {
+            "type": "string",
+            "description": "get_flexible_loan_collateral_assets/collateralCoin: selects collateral currencies, account identifiers, or the collateral enable switch."
+          }
+        }
+      },
+      "get_flexible_loan_borrow_history": {
+        "type": "object",
+        "properties": {
+          "collateralCoin": {
+            "type": "string",
+            "description": "get_flexible_loan_borrow_history/collateralCoin: selects collateral currencies, account identifiers, or the collateral enable switch."
+          }
+        }
+      },
+      "get_flexible_loan_repayment_history": {
+        "type": "object",
+        "properties": {
+          "collateralCoin": {
+            "type": "string",
+            "description": "get_flexible_loan_repayment_history/collateralCoin: selects collateral currencies, account identifiers, or the collateral enable switch."
+          }
+        }
+      },
+      "get_flexible_loan_ltv_adjustment_history": {
+        "type": "object",
+        "properties": {
+          "collateralCoin": {
+            "type": "string",
+            "description": "get_flexible_loan_ltv_adjustment_history/collateralCoin: selects collateral currencies, account identifiers, or the collateral enable switch."
+          }
+        }
+      },
+      "get_flexible_loan_liquidation_history": {
+        "type": "object",
+        "properties": {
+          "collateralCoin": {
+            "type": "string",
+            "description": "get_flexible_loan_liquidation_history/collateralCoin: selects collateral currencies, account identifiers, or the collateral enable switch."
+          }
+        }
+      },
+      "get_stable_loan_borrow_history": {
+        "type": "object",
+        "properties": {
+          "collateralCoin": {
+            "type": "string",
+            "description": "get_stable_loan_borrow_history/collateralCoin: selects collateral currencies, account identifiers, or the collateral enable switch."
+          }
+        }
+      },
+      "get_stable_loan_repayment_history": {
+        "type": "object",
+        "properties": {
+          "collateralCoin": {
+            "type": "string",
+            "description": "get_stable_loan_repayment_history/collateralCoin: selects collateral currencies, account identifiers, or the collateral enable switch."
+          }
+        }
+      },
+      "get_stable_loan_ltv_adjustment_history": {
+        "type": "object",
+        "properties": {
+          "collateralCoin": {
+            "type": "string",
+            "description": "get_stable_loan_ltv_adjustment_history/collateralCoin: selects collateral currencies, account identifiers, or the collateral enable switch."
+          }
+        }
+      },
+      "get_pm_cm_position_risk": {
+        "type": "object",
+        "properties": {
+          "margin_asset": {
+            "type": "string",
+            "description": "get_pm_cm_position_risk/margin_asset: selects the settlement currency for the margin account."
+          },
+          "marginAsset": {
+            "type": "string",
+            "description": "get_pm_cm_position_risk/marginAsset: selects the settlement currency for the margin account."
+          }
+        }
+      },
+      "get_coin_futures_positions": {
+        "type": "object",
+        "properties": {
+          "marginAsset": {
+            "type": "string",
+            "description": "get_coin_futures_positions/marginAsset: selects the settlement currency for the margin account."
+          }
+        }
+      },
+      "get_options_open_interest": {
+        "type": "object",
+        "properties": {
+          "expiration": {
+            "type": "string",
+            "description": "get_options_open_interest/expiration: specifies a scheduling duration or timestamp in the endpoint time unit."
+          }
+        }
+      },
+      "spot_ticker": {
+        "type": "object",
+        "properties": {
+          "window_size": {
+            "type": "string",
+            "description": "spot_ticker/window_size: selects the historical aggregation interval as a duration label."
+          },
+          "windowSize": {
+            "type": "string",
+            "description": "spot_ticker/windowSize: selects the historical aggregation interval as a duration label."
+          }
+        }
+      },
+      "get_dual_investment_product_list": {
+        "type": "object",
+        "properties": {}
+      },
+      "set_futures_margin_type": {
+        "type": "object",
+        "properties": {
+          "margin_type": {
+            "type": "string",
+            "description": "set_futures_margin_type/margin_type: selects the account margin mode or its enabled state."
+          },
+          "marginType": {
+            "type": "string",
+            "description": "set_futures_margin_type/marginType: selects the account margin mode or its enabled state."
+          }
+        }
+      },
+      "set_coin_futures_margin_type": {
+        "type": "object",
+        "properties": {
+          "margin_type": {
+            "type": "string",
+            "description": "set_coin_futures_margin_type/margin_type: selects the account margin mode or its enabled state."
+          },
+          "marginType": {
+            "type": "string",
+            "description": "set_coin_futures_margin_type/marginType: selects the account margin mode or its enabled state."
+          }
+        }
+      },
+      "set_futures_multi_assets_mode": {
+        "type": "object",
+        "properties": {
+          "multi_assets_margin": {
+            "type": "string",
+            "description": "set_futures_multi_assets_mode/multi_assets_margin: selects the settlement currency for the margin account."
+          },
+          "multiAssetsMargin": {
+            "type": "string",
+            "description": "set_futures_multi_assets_mode/multiAssetsMargin: selects the settlement currency for the margin account."
+          }
+        }
+      },
+      "get_deposit_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "pm_pro_switch_delta_mode": {
+        "type": "object",
+        "properties": {
+          "delta_enabled": {
+            "type": "string",
+            "description": "pm_pro_switch_delta_mode/delta_enabled: controls an integer or boolean option rather than a transferred balance."
+          },
+          "deltaEnabled": {
+            "type": "string",
+            "description": "pm_pro_switch_delta_mode/deltaEnabled: controls an integer or boolean option rather than a transferred balance."
+          }
+        }
+      },
+      "get_travel_rule_deposit_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_travel_rule_deposit_history_v2": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_dual_investment_positions": {
+        "type": "object",
+        "properties": {}
+      },
+      "create_sub_account_api_key": {
+        "type": "object",
+        "properties": {}
+      },
+      "modify_sub_account_api_key_permission": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_sub_account_deposit_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_collateral_asset_data": {
+        "type": "object",
+        "properties": {
+          "collateral_coin": {
+            "type": "string",
+            "description": "get_collateral_asset_data/collateral_coin: selects collateral currencies, account identifiers, or the collateral enable switch."
+          }
+        }
+      },
+      "earnings_list": {
+        "type": "object",
+        "properties": {}
+      },
+      "extra_bonus_list": {
+        "type": "object",
+        "properties": {}
+      },
+      "hashrate_resale_detail": {
+        "type": "object",
+        "properties": {}
+      },
+      "hashrate_resale_list": {
+        "type": "object",
+        "properties": {}
+      },
+      "mining_account_earning": {
+        "type": "object",
+        "properties": {}
+      },
+      "prediction_list_prediction_markets": {
+        "type": "object",
+        "properties": {}
+      },
+      "prediction_query_positions": {
+        "type": "object",
+        "properties": {}
+      },
+      "prediction_query_settled_position_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "vip_loan_fixed_rate_borrow": {
+        "type": "object",
+        "properties": {
+          "collateral_coin": {
+            "type": "string",
+            "description": "vip_loan_fixed_rate_borrow/collateral_coin: selects collateral currencies, account identifiers, or the collateral enable switch."
+          },
+          "collateral_account_id": {
+            "type": "string",
+            "description": "vip_loan_fixed_rate_borrow/collateral_account_id: selects collateral currencies, account identifiers, or the collateral enable switch."
+          }
+        }
+      },
+      "check_vip_loan_collateral_account": {
         "type": "object",
         "properties": {}
       }
@@ -5946,7 +6796,8 @@
         "properties": {
           "amount": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -6468,6 +7319,10 @@
           "trigger_price": {
             "type": "string",
             "format": "decimal"
+          },
+          "price_type": {
+            "type": "string",
+            "description": "place_swap_twap_order/price_type: selects the documented mode, unit, or reference used by this operation."
           }
         }
       },
@@ -6477,6 +7332,10 @@
           "size": {
             "type": "string",
             "format": "decimal"
+          },
+          "offset": {
+            "type": "string",
+            "description": "post_api_lindorm_v1_ai_kline_query/offset: identifies the pagination cursor or result offset for this query."
           }
         }
       },
@@ -6596,6 +7455,10 @@
           "strike_price": {
             "type": "string",
             "format": "decimal"
+          },
+          "investment_asset": {
+            "type": "string",
+            "description": "post_wealth_v1_product_dual_currency_order/investment_asset: selects currency identifiers or funding source categories for this operation."
           }
         }
       },
@@ -6865,7 +7728,8 @@
         "properties": {
           "amount": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -6874,7 +7738,8 @@
         "properties": {
           "amount": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -6883,11 +7748,13 @@
         "properties": {
           "transferAmount": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           },
           "transfer_amount": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -7559,6 +8426,121 @@
       "get_wealth_v1_product_dual_currency_order_records": {
         "type": "object",
         "properties": {}
+      },
+      "get_subaccount_all_account_balance": {
+        "type": "object",
+        "properties": {}
+      },
+      "change_margin_type": {
+        "type": "object",
+        "properties": {
+          "margin_type": {
+            "type": "string",
+            "description": "change_margin_type/margin_type: selects the account margin mode or its enabled state."
+          }
+        }
+      },
+      "get_swap_fill_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_swap_position_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_swap_margin_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_coin_swap_fills": {
+        "type": "object",
+        "properties": {}
+      },
+      "set_coin_swap_margin_type": {
+        "type": "object",
+        "properties": {
+          "margin_type": {
+            "type": "string",
+            "description": "set_coin_swap_margin_type/margin_type: selects the account margin mode or its enabled state."
+          },
+          "marginType": {
+            "type": "string",
+            "description": "set_coin_swap_margin_type/marginType: selects the account margin mode or its enabled state."
+          }
+        }
+      },
+      "get_spot_open_oco": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_oco_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_deposit_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_deposit_addresses": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_sub_account_deposit_addresses": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_sub_account_deposit_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_agent_v1_asset_partner_data": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_agent_v2_reward_commission_data_list": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_agent_v1_reward_third_commission_data_list": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_agent_v1_commission_data_list_referral_code": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_agent_v1_account_invite_account_list": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_agent_v1_asset_deposit_detail_list": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_copy_trading_v1_p_futures_profit_detail": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_copy_trading_v1_p_futures_trader_detail": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_copy_trading_v1_spot_profit_detail": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_copy_trading_v1_swap_trace_current_track": {
+        "type": "object",
+        "properties": {}
+      },
+      "post_wealth_v1_product_dual_currency_invest_asset_list": {
+        "type": "object",
+        "properties": {
+          "investment_asset": {
+            "type": "string",
+            "description": "post_wealth_v1_product_dual_currency_invest_asset_list/investment_asset: selects currency identifiers or funding source categories for this operation."
+          }
+        }
       }
     },
     "bitget": {
@@ -7569,6 +8551,14 @@
             "type": "string",
             "format": "decimal",
             "x-signed": true
+          },
+          "margin_coin": {
+            "type": "string",
+            "description": "adjust_futures_position_margin/margin_coin: selects the settlement currency for the margin account."
+          },
+          "marginCoin": {
+            "type": "string",
+            "description": "adjust_futures_position_margin/marginCoin: selects the settlement currency for the margin account."
           }
         }
       },
@@ -7578,6 +8568,10 @@
           "amount": {
             "type": "string",
             "format": "decimal"
+          },
+          "operation": {
+            "type": "string",
+            "description": "adjust_uta_position_margin/operation: selects the requested account operation as an enum string."
           }
         }
       },
@@ -7717,7 +8711,8 @@
         "properties": {
           "amount": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -7807,6 +8802,10 @@
           "leverage": {
             "type": "string",
             "format": "decimal"
+          },
+          "margin_mode": {
+            "type": "string",
+            "description": "classic_copytrading_future_copytrade_follower_copy_settings/margin_mode: selects the account margin mode or its enabled state."
           }
         }
       },
@@ -8083,7 +9082,8 @@
         "properties": {
           "amount": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -8121,6 +9121,10 @@
           "leverage": {
             "type": "string",
             "format": "decimal"
+          },
+          "max_entry_slippage": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -8154,6 +9158,10 @@
           "leverage": {
             "type": "string",
             "format": "decimal"
+          },
+          "max_entry_slippage": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -8175,6 +9183,18 @@
           "take_profit": {
             "type": "string",
             "format": "decimal"
+          },
+          "strategy_id": {
+            "type": "string",
+            "description": "copy_trading_follower_modify_tpsl/strategy_id: identifies a strategy rather than specifying its investment."
+          },
+          "tp_trigger_by": {
+            "type": "string",
+            "description": "copy_trading_follower_modify_tpsl/tp_trigger_by: selects the documented mode, unit, or reference used by this operation."
+          },
+          "sl_trigger_by": {
+            "type": "string",
+            "description": "copy_trading_follower_modify_tpsl/sl_trigger_by: selects the documented mode, unit, or reference used by this operation."
           }
         }
       },
@@ -8196,6 +9216,14 @@
           "take_profit": {
             "type": "string",
             "format": "decimal"
+          },
+          "tp_trigger_by": {
+            "type": "string",
+            "description": "copy_trading_follower_place_tpsl/tp_trigger_by: selects the documented mode, unit, or reference used by this operation."
+          },
+          "sl_trigger_by": {
+            "type": "string",
+            "description": "copy_trading_follower_place_tpsl/sl_trigger_by: selects the documented mode, unit, or reference used by this operation."
           }
         }
       },
@@ -8204,7 +9232,8 @@
         "properties": {
           "amount": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -8304,6 +9333,14 @@
           "leverage": {
             "type": "string",
             "format": "decimal"
+          },
+          "margin_coin": {
+            "type": "string",
+            "description": "get_futures_estimated_open_count/margin_coin: selects the settlement currency for the margin account."
+          },
+          "marginCoin": {
+            "type": "string",
+            "description": "get_futures_estimated_open_count/marginCoin: selects the settlement currency for the margin account."
           }
         }
       },
@@ -8325,6 +9362,14 @@
           "open_price": {
             "type": "string",
             "format": "decimal"
+          },
+          "margin_coin": {
+            "type": "string",
+            "description": "get_futures_liquidation_price/margin_coin: selects the settlement currency for the margin account."
+          },
+          "marginCoin": {
+            "type": "string",
+            "description": "get_futures_liquidation_price/marginCoin: selects the settlement currency for the margin account."
           }
         }
       },
@@ -8338,6 +9383,14 @@
           "open_price": {
             "type": "string",
             "format": "decimal"
+          },
+          "margin_coin": {
+            "type": "string",
+            "description": "get_futures_max_open_quantity/margin_coin: selects the settlement currency for the margin account."
+          },
+          "marginCoin": {
+            "type": "string",
+            "description": "get_futures_max_open_quantity/marginCoin: selects the settlement currency for the margin account."
           }
         }
       },
@@ -8484,6 +9537,30 @@
           "newCallbackRatio": {
             "type": "string",
             "format": "decimal"
+          },
+          "new_trigger_type": {
+            "type": "string",
+            "description": "modify_futures_plan_order/new_trigger_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "new_stop_surplus_trigger_type": {
+            "type": "string",
+            "description": "modify_futures_plan_order/new_stop_surplus_trigger_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "new_stop_loss_trigger_type": {
+            "type": "string",
+            "description": "modify_futures_plan_order/new_stop_loss_trigger_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "newTriggerType": {
+            "type": "string",
+            "description": "modify_futures_plan_order/newTriggerType: selects the documented mode, unit, or reference used by this operation."
+          },
+          "newStopSurplusTriggerType": {
+            "type": "string",
+            "description": "modify_futures_plan_order/newStopSurplusTriggerType: selects the documented mode, unit, or reference used by this operation."
+          },
+          "newStopLossTriggerType": {
+            "type": "string",
+            "description": "modify_futures_plan_order/newStopLossTriggerType: selects the documented mode, unit, or reference used by this operation."
           }
         }
       },
@@ -8520,6 +9597,22 @@
           "rangeRate": {
             "type": "string",
             "format": "decimal"
+          },
+          "margin_coin": {
+            "type": "string",
+            "description": "modify_futures_tpsl_order/margin_coin: selects the settlement currency for the margin account."
+          },
+          "trigger_type": {
+            "type": "string",
+            "description": "modify_futures_tpsl_order/trigger_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "marginCoin": {
+            "type": "string",
+            "description": "modify_futures_tpsl_order/marginCoin: selects the settlement currency for the margin account."
+          },
+          "triggerType": {
+            "type": "string",
+            "description": "modify_futures_tpsl_order/triggerType: selects the documented mode, unit, or reference used by this operation."
           }
         }
       },
@@ -8594,6 +9687,38 @@
           "tp_limit_price": {
             "type": "string",
             "format": "decimal"
+          },
+          "tp_trigger_by": {
+            "type": "string",
+            "description": "modify_uta_order/tp_trigger_by: selects the documented mode, unit, or reference used by this operation."
+          },
+          "sl_trigger_by": {
+            "type": "string",
+            "description": "modify_uta_order/sl_trigger_by: selects the documented mode, unit, or reference used by this operation."
+          },
+          "tp_order_type": {
+            "type": "string",
+            "description": "modify_uta_order/tp_order_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "sl_order_type": {
+            "type": "string",
+            "description": "modify_uta_order/sl_order_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "px_amend_type": {
+            "type": "string",
+            "description": "modify_uta_order/px_amend_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "tpTriggerBy": {
+            "type": "string",
+            "description": "modify_uta_order/tpTriggerBy: selects the documented mode, unit, or reference used by this operation."
+          },
+          "slTriggerBy": {
+            "type": "string",
+            "description": "modify_uta_order/slTriggerBy: selects the documented mode, unit, or reference used by this operation."
+          },
+          "pxAmendType": {
+            "type": "string",
+            "description": "modify_uta_order/pxAmendType: selects the documented mode, unit, or reference used by this operation."
           }
         }
       },
@@ -8672,6 +9797,15 @@
           "quantity": {
             "type": "string",
             "format": "decimal"
+          },
+          "price_type": {
+            "type": "string",
+            "description": "p2p_ad_management_create_ad/price_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "premium": {
+            "type": "string",
+            "format": "decimal",
+            "x-signed": true
           }
         }
       },
@@ -8719,6 +9853,15 @@
           "quantity": {
             "type": "string",
             "format": "decimal"
+          },
+          "price_type": {
+            "type": "string",
+            "description": "p2p_ad_management_update_ad/price_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "premium": {
+            "type": "string",
+            "format": "decimal",
+            "x-signed": true
           }
         }
       },
@@ -8801,6 +9944,22 @@
           "size": {
             "type": "string",
             "format": "decimal"
+          },
+          "margin_mode": {
+            "type": "string",
+            "description": "place_futures_market_order/margin_mode: selects the account margin mode or its enabled state."
+          },
+          "margin_coin": {
+            "type": "string",
+            "description": "place_futures_market_order/margin_coin: selects the settlement currency for the margin account."
+          },
+          "marginMode": {
+            "type": "string",
+            "description": "place_futures_market_order/marginMode: selects the account margin mode or its enabled state."
+          },
+          "marginCoin": {
+            "type": "string",
+            "description": "place_futures_market_order/marginCoin: selects the settlement currency for the margin account."
           }
         }
       },
@@ -8854,7 +10013,24 @@
           },
           "size": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
+          },
+          "margin_mode": {
+            "type": "string",
+            "description": "place_futures_order/margin_mode: selects the account margin mode or its enabled state."
+          },
+          "margin_coin": {
+            "type": "string",
+            "description": "place_futures_order/margin_coin: selects the settlement currency for the margin account."
+          },
+          "marginMode": {
+            "type": "string",
+            "description": "place_futures_order/marginMode: selects the account margin mode or its enabled state."
+          },
+          "marginCoin": {
+            "type": "string",
+            "description": "place_futures_order/marginCoin: selects the settlement currency for the margin account."
           }
         }
       },
@@ -8924,6 +10100,46 @@
           "callbackRatio": {
             "type": "string",
             "format": "decimal"
+          },
+          "margin_mode": {
+            "type": "string",
+            "description": "place_futures_plan_order/margin_mode: selects the account margin mode or its enabled state."
+          },
+          "margin_coin": {
+            "type": "string",
+            "description": "place_futures_plan_order/margin_coin: selects the settlement currency for the margin account."
+          },
+          "trigger_type": {
+            "type": "string",
+            "description": "place_futures_plan_order/trigger_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "stop_surplus_trigger_type": {
+            "type": "string",
+            "description": "place_futures_plan_order/stop_surplus_trigger_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "stop_loss_trigger_type": {
+            "type": "string",
+            "description": "place_futures_plan_order/stop_loss_trigger_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "marginMode": {
+            "type": "string",
+            "description": "place_futures_plan_order/marginMode: selects the account margin mode or its enabled state."
+          },
+          "marginCoin": {
+            "type": "string",
+            "description": "place_futures_plan_order/marginCoin: selects the settlement currency for the margin account."
+          },
+          "triggerType": {
+            "type": "string",
+            "description": "place_futures_plan_order/triggerType: selects the documented mode, unit, or reference used by this operation."
+          },
+          "stopSurplusTriggerType": {
+            "type": "string",
+            "description": "place_futures_plan_order/stopSurplusTriggerType: selects the documented mode, unit, or reference used by this operation."
+          },
+          "stopLossTriggerType": {
+            "type": "string",
+            "description": "place_futures_plan_order/stopLossTriggerType: selects the documented mode, unit, or reference used by this operation."
           }
         }
       },
@@ -8977,6 +10193,34 @@
           "stop_surplus_trigger_price": {
             "type": "string",
             "format": "decimal"
+          },
+          "margin_coin": {
+            "type": "string",
+            "description": "place_futures_position_tpsl/margin_coin: selects the settlement currency for the margin account."
+          },
+          "stop_surplus_trigger_type": {
+            "type": "string",
+            "description": "place_futures_position_tpsl/stop_surplus_trigger_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "stop_loss_trigger_type": {
+            "type": "string",
+            "description": "place_futures_position_tpsl/stop_loss_trigger_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "stop_loss_client_oid": {
+            "type": "string",
+            "description": "place_futures_position_tpsl/stop_loss_client_oid: selects stop loss client oid identifiers or response filters for this operation."
+          },
+          "marginCoin": {
+            "type": "string",
+            "description": "place_futures_position_tpsl/marginCoin: selects the settlement currency for the margin account."
+          },
+          "stopSurplusTriggerType": {
+            "type": "string",
+            "description": "place_futures_position_tpsl/stopSurplusTriggerType: selects the documented mode, unit, or reference used by this operation."
+          },
+          "stopLossTriggerType": {
+            "type": "string",
+            "description": "place_futures_position_tpsl/stopLossTriggerType: selects the documented mode, unit, or reference used by this operation."
           }
         }
       },
@@ -9052,6 +10296,22 @@
           "rangeRate": {
             "type": "string",
             "format": "decimal"
+          },
+          "margin_coin": {
+            "type": "string",
+            "description": "place_futures_tpsl_order/margin_coin: selects the settlement currency for the margin account."
+          },
+          "trigger_type": {
+            "type": "string",
+            "description": "place_futures_tpsl_order/trigger_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "marginCoin": {
+            "type": "string",
+            "description": "place_futures_tpsl_order/marginCoin: selects the settlement currency for the margin account."
+          },
+          "triggerType": {
+            "type": "string",
+            "description": "place_futures_tpsl_order/triggerType: selects the documented mode, unit, or reference used by this operation."
           }
         }
       },
@@ -9234,6 +10494,14 @@
           "trigger_price": {
             "type": "string",
             "format": "decimal"
+          },
+          "trigger_type": {
+            "type": "string",
+            "description": "place_spot_plan_order/trigger_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "triggerType": {
+            "type": "string",
+            "description": "place_spot_plan_order/triggerType: selects the documented mode, unit, or reference used by this operation."
           }
         }
       },
@@ -9318,6 +10586,38 @@
           "tp_limit_price": {
             "type": "string",
             "format": "decimal"
+          },
+          "margin_mode": {
+            "type": "string",
+            "description": "place_uta_order/margin_mode: selects the account margin mode or its enabled state."
+          },
+          "tp_trigger_by": {
+            "type": "string",
+            "description": "place_uta_order/tp_trigger_by: selects the documented mode, unit, or reference used by this operation."
+          },
+          "sl_trigger_by": {
+            "type": "string",
+            "description": "place_uta_order/sl_trigger_by: selects the documented mode, unit, or reference used by this operation."
+          },
+          "tp_order_type": {
+            "type": "string",
+            "description": "place_uta_order/tp_order_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "sl_order_type": {
+            "type": "string",
+            "description": "place_uta_order/sl_order_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "marginMode": {
+            "type": "string",
+            "description": "place_uta_order/marginMode: selects the account margin mode or its enabled state."
+          },
+          "tpTriggerBy": {
+            "type": "string",
+            "description": "place_uta_order/tpTriggerBy: selects the documented mode, unit, or reference used by this operation."
+          },
+          "slTriggerBy": {
+            "type": "string",
+            "description": "place_uta_order/slTriggerBy: selects the documented mode, unit, or reference used by this operation."
           }
         }
       },
@@ -9447,6 +10747,14 @@
           "size": {
             "type": "string",
             "format": "decimal"
+          },
+          "margin_coin": {
+            "type": "string",
+            "description": "reverse_futures_position/margin_coin: selects the settlement currency for the margin account."
+          },
+          "marginCoin": {
+            "type": "string",
+            "description": "reverse_futures_position/marginCoin: selects the settlement currency for the margin account."
           }
         }
       },
@@ -9473,7 +10781,8 @@
         "properties": {
           "amount": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -9519,6 +10828,10 @@
           "trailing_percent": {
             "type": "string",
             "format": "decimal"
+          },
+          "trigger_count": {
+            "type": "integer",
+            "description": "stock_plus_orders_modify_order/trigger_count: selects trigger count identifiers or response filters for this operation."
           }
         }
       },
@@ -9572,6 +10885,10 @@
           "trailing_percent": {
             "type": "string",
             "format": "decimal"
+          },
+          "trigger_count": {
+            "type": "integer",
+            "description": "stock_plus_orders_place_order/trigger_count: selects trigger count identifiers or response filters for this operation."
           }
         }
       },
@@ -9607,7 +10924,8 @@
         "properties": {
           "amount": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -9616,7 +10934,8 @@
         "properties": {
           "amount": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -9625,7 +10944,8 @@
         "properties": {
           "amount": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -9634,7 +10954,8 @@
         "properties": {
           "amount": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -9643,7 +10964,8 @@
         "properties": {
           "amount": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -9653,6 +10975,20 @@
           "size": {
             "type": "string",
             "format": "decimal"
+          },
+          "funds_source": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "uta_trade_grid_add_investment/funds_source: selects currency identifiers or funding source categories for this operation."
+          },
+          "fundsSource": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "uta_trade_grid_add_investment/fundsSource: selects currency identifiers or funding source categories for this operation."
           }
         }
       },
@@ -9742,6 +11078,82 @@
           "leverage": {
             "type": "string",
             "format": "decimal"
+          },
+          "funds_source": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "uta_trade_grid_create_bot/funds_source: selects currency identifiers or funding source categories for this operation."
+          },
+          "slippage": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "auto_reserve_margin": {
+            "type": "string",
+            "description": "uta_trade_grid_create_bot/auto_reserve_margin: selects whether grid profits automatically replenish reserved margin."
+          },
+          "trigger_condition": {
+            "type": "string",
+            "description": "uta_trade_grid_create_bot/trigger_condition: selects the documented mode, unit, or reference used by this operation."
+          },
+          "trigger_params": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "triggerPx": {
+                  "format": "decimal"
+                },
+                "price": {
+                  "format": "decimal"
+                },
+                "triggerPrice": {
+                  "format": "decimal"
+                }
+              }
+            }
+          },
+          "trailing_grid": {
+            "type": "string",
+            "description": "uta_trade_grid_create_bot/trailing_grid: selects trailing grid identifiers or response filters for this operation."
+          },
+          "fundsSource": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "uta_trade_grid_create_bot/fundsSource: selects currency identifiers or funding source categories for this operation."
+          },
+          "autoReserveMargin": {
+            "type": "string",
+            "description": "uta_trade_grid_create_bot/autoReserveMargin: selects whether grid profits automatically replenish reserved margin."
+          },
+          "triggerCondition": {
+            "type": "string",
+            "description": "uta_trade_grid_create_bot/triggerCondition: selects the documented mode, unit, or reference used by this operation."
+          },
+          "triggerParams": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "triggerPx": {
+                  "format": "decimal"
+                },
+                "price": {
+                  "format": "decimal"
+                },
+                "triggerPrice": {
+                  "format": "decimal"
+                }
+              }
+            }
+          },
+          "trailingGrid": {
+            "type": "string",
+            "description": "uta_trade_grid_create_bot/trailingGrid: selects trailing Grid identifiers or response filters for this operation."
           }
         }
       },
@@ -9815,6 +11227,20 @@
           "leverage": {
             "type": "string",
             "format": "decimal"
+          },
+          "funds_source": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "uta_trade_grid_create_neutral_bot/funds_source: selects currency identifiers or funding source categories for this operation."
+          },
+          "fundsSource": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "uta_trade_grid_create_neutral_bot/fundsSource: selects currency identifiers or funding source categories for this operation."
           }
         }
       },
@@ -9988,6 +11414,56 @@
           "leverage": {
             "type": "string",
             "format": "decimal"
+          },
+          "trigger_condition": {
+            "type": "string",
+            "description": "uta_trade_grid_validate/trigger_condition: selects the documented mode, unit, or reference used by this operation."
+          },
+          "trigger_params": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "triggerPx": {
+                  "format": "decimal"
+                },
+                "price": {
+                  "format": "decimal"
+                },
+                "triggerPrice": {
+                  "format": "decimal"
+                }
+              }
+            }
+          },
+          "trailing_grid": {
+            "type": "string",
+            "description": "uta_trade_grid_validate/trailing_grid: selects trailing grid identifiers or response filters for this operation."
+          },
+          "triggerCondition": {
+            "type": "string",
+            "description": "uta_trade_grid_validate/triggerCondition: selects the documented mode, unit, or reference used by this operation."
+          },
+          "triggerParams": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "triggerPx": {
+                  "format": "decimal"
+                },
+                "price": {
+                  "format": "decimal"
+                },
+                "triggerPrice": {
+                  "format": "decimal"
+                }
+              }
+            }
+          },
+          "trailingGrid": {
+            "type": "string",
+            "description": "uta_trade_grid_validate/trailingGrid: selects trailing Grid identifiers or response filters for this operation."
           }
         }
       },
@@ -10533,6 +12009,22 @@
                 }
               }
             }
+          },
+          "margin_mode": {
+            "type": "string",
+            "description": "place_futures_batch_orders/margin_mode: selects the account margin mode or its enabled state."
+          },
+          "margin_coin": {
+            "type": "string",
+            "description": "place_futures_batch_orders/margin_coin: selects the settlement currency for the margin account."
+          },
+          "marginMode": {
+            "type": "string",
+            "description": "place_futures_batch_orders/marginMode: selects the account margin mode or its enabled state."
+          },
+          "marginCoin": {
+            "type": "string",
+            "description": "place_futures_batch_orders/marginCoin: selects the settlement currency for the margin account."
           }
         }
       },
@@ -10873,6 +12365,14 @@
           "shortLeverage": {
             "type": "string",
             "format": "decimal"
+          },
+          "margin_mode": {
+            "type": "string",
+            "description": "set_uta_leverage/margin_mode: selects the account margin mode or its enabled state."
+          },
+          "marginMode": {
+            "type": "string",
+            "description": "set_uta_leverage/marginMode: selects the account margin mode or its enabled state."
           }
         }
       },
@@ -10898,6 +12398,14 @@
           "shortLeverage": {
             "type": "string",
             "format": "decimal"
+          },
+          "margin_coin": {
+            "type": "string",
+            "description": "set_futures_leverage/margin_coin: selects the settlement currency for the margin account."
+          },
+          "marginCoin": {
+            "type": "string",
+            "description": "set_futures_leverage/marginCoin: selects the settlement currency for the margin account."
           }
         }
       },
@@ -10923,6 +12431,14 @@
           "shortLeverage": {
             "type": "string",
             "format": "decimal"
+          },
+          "margin_mode": {
+            "type": "string",
+            "description": "get_uta_pre_set_leverage/margin_mode: selects the account margin mode or its enabled state."
+          },
+          "marginMode": {
+            "type": "string",
+            "description": "get_uta_pre_set_leverage/marginMode: selects the account margin mode or its enabled state."
           }
         }
       },
@@ -10936,7 +12452,16 @@
       },
       "cancel_futures_batch_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "margin_coin": {
+            "type": "string",
+            "description": "cancel_futures_batch_orders/margin_coin: selects the settlement currency for the margin account."
+          },
+          "marginCoin": {
+            "type": "string",
+            "description": "cancel_futures_batch_orders/marginCoin: selects the settlement currency for the margin account."
+          }
+        }
       },
       "cancel_cross_margin_batch_orders": {
         "type": "object",
@@ -11004,7 +12529,16 @@
       },
       "cancel_futures_order": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "margin_coin": {
+            "type": "string",
+            "description": "cancel_futures_order/margin_coin: selects the settlement currency for the margin account."
+          },
+          "marginCoin": {
+            "type": "string",
+            "description": "cancel_futures_order/marginCoin: selects the settlement currency for the margin account."
+          }
+        }
       },
       "get_futures_order": {
         "type": "object",
@@ -11036,7 +12570,16 @@
       },
       "cancel_futures_plan_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "margin_coin": {
+            "type": "string",
+            "description": "cancel_futures_plan_orders/margin_coin: selects the settlement currency for the margin account."
+          },
+          "marginCoin": {
+            "type": "string",
+            "description": "cancel_futures_plan_orders/marginCoin: selects the settlement currency for the margin account."
+          }
+        }
       },
       "get_pending_futures_plan_orders": {
         "type": "object",
@@ -11068,7 +12611,16 @@
       },
       "cancel_all_futures_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "margin_coin": {
+            "type": "string",
+            "description": "cancel_all_futures_orders/margin_coin: selects the settlement currency for the margin account."
+          },
+          "marginCoin": {
+            "type": "string",
+            "description": "cancel_all_futures_orders/marginCoin: selects the settlement currency for the margin account."
+          }
+        }
       },
       "cancel_spot_orders_by_symbol": {
         "type": "object",
@@ -11382,6 +12934,522 @@
       "classic_broker_subaccount_get_subaccount_all_deposit_withdrawal_records": {
         "type": "object",
         "properties": {}
+      },
+      "get_futures_account": {
+        "type": "object",
+        "properties": {
+          "margin_coin": {
+            "type": "string",
+            "description": "get_futures_account/margin_coin: selects the settlement currency for the margin account."
+          },
+          "marginCoin": {
+            "type": "string",
+            "description": "get_futures_account/marginCoin: selects the settlement currency for the margin account."
+          }
+        }
+      },
+      "set_futures_margin_mode": {
+        "type": "object",
+        "properties": {
+          "margin_mode": {
+            "type": "string",
+            "description": "set_futures_margin_mode/margin_mode: selects the account margin mode or its enabled state."
+          },
+          "margin_coin": {
+            "type": "string",
+            "description": "set_futures_margin_mode/margin_coin: selects the settlement currency for the margin account."
+          },
+          "marginCoin": {
+            "type": "string",
+            "description": "set_futures_margin_mode/marginCoin: selects the settlement currency for the margin account."
+          },
+          "marginMode": {
+            "type": "string",
+            "description": "set_futures_margin_mode/marginMode: selects the account margin mode or its enabled state."
+          }
+        }
+      },
+      "get_futures_positions": {
+        "type": "object",
+        "properties": {
+          "margin_coin": {
+            "type": "string",
+            "description": "get_futures_positions/margin_coin: selects the settlement currency for the margin account."
+          },
+          "marginCoin": {
+            "type": "string",
+            "description": "get_futures_positions/marginCoin: selects the settlement currency for the margin account."
+          }
+        }
+      },
+      "get_futures_position": {
+        "type": "object",
+        "properties": {
+          "margin_coin": {
+            "type": "string",
+            "description": "get_futures_position/margin_coin: selects the settlement currency for the margin account."
+          },
+          "marginCoin": {
+            "type": "string",
+            "description": "get_futures_position/marginCoin: selects the settlement currency for the margin account."
+          }
+        }
+      },
+      "get_crypto_loan_borrow_history": {
+        "type": "object",
+        "properties": {
+          "page_size": {
+            "type": "string",
+            "description": "get_crypto_loan_borrow_history/page_size: limits the number of result records returned by pagination."
+          },
+          "pageSize": {
+            "type": "string",
+            "description": "get_crypto_loan_borrow_history/pageSize: limits the number of result records returned by pagination."
+          }
+        }
+      },
+      "get_crypto_loan_repay_history": {
+        "type": "object",
+        "properties": {
+          "page_size": {
+            "type": "string",
+            "description": "get_crypto_loan_repay_history/page_size: limits the number of result records returned by pagination."
+          },
+          "pageSize": {
+            "type": "string",
+            "description": "get_crypto_loan_repay_history/pageSize: limits the number of result records returned by pagination."
+          }
+        }
+      },
+      "get_crypto_loan_pledge_history": {
+        "type": "object",
+        "properties": {
+          "page_size": {
+            "type": "string",
+            "description": "get_crypto_loan_pledge_history/page_size: limits the number of result records returned by pagination."
+          },
+          "pageSize": {
+            "type": "string",
+            "description": "get_crypto_loan_pledge_history/pageSize: limits the number of result records returned by pagination."
+          }
+        }
+      },
+      "get_crypto_loan_liquidations": {
+        "type": "object",
+        "properties": {
+          "page_size": {
+            "type": "string",
+            "description": "get_crypto_loan_liquidations/page_size: limits the number of result records returned by pagination."
+          },
+          "pageSize": {
+            "type": "string",
+            "description": "get_crypto_loan_liquidations/pageSize: limits the number of result records returned by pagination."
+          }
+        }
+      },
+      "get_futures_history_funding_rate": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_uta_risk_reserve": {
+        "type": "object",
+        "properties": {
+          "margin_coin": {
+            "type": "string",
+            "description": "get_uta_risk_reserve/margin_coin: selects the settlement currency for the margin account."
+          },
+          "marginCoin": {
+            "type": "string",
+            "description": "get_uta_risk_reserve/marginCoin: selects the settlement currency for the margin account."
+          }
+        }
+      },
+      "get_uta_hourly_risk_reserve": {
+        "type": "object",
+        "properties": {
+          "margin_coin": {
+            "type": "string",
+            "description": "get_uta_hourly_risk_reserve/margin_coin: selects the settlement currency for the margin account."
+          },
+          "marginCoin": {
+            "type": "string",
+            "description": "get_uta_hourly_risk_reserve/marginCoin: selects the settlement currency for the margin account."
+          }
+        }
+      },
+      "set_futures_auto_margin": {
+        "type": "object",
+        "properties": {
+          "auto_margin": {
+            "type": "string",
+            "description": "set_futures_auto_margin/auto_margin: enables automatic replenishment of isolated position margin."
+          },
+          "margin_coin": {
+            "type": "string",
+            "description": "set_futures_auto_margin/margin_coin: selects the settlement currency for the margin account."
+          },
+          "autoMargin": {
+            "type": "string",
+            "description": "set_futures_auto_margin/autoMargin: enables automatic replenishment of isolated position margin."
+          },
+          "marginCoin": {
+            "type": "string",
+            "description": "set_futures_auto_margin/marginCoin: selects the settlement currency for the margin account."
+          }
+        }
+      },
+      "get_cross_margin_financial_records": {
+        "type": "object",
+        "properties": {
+          "margin_type": {
+            "type": "string",
+            "description": "get_cross_margin_financial_records/margin_type: selects the account margin mode or its enabled state."
+          },
+          "marginType": {
+            "type": "string",
+            "description": "get_cross_margin_financial_records/marginType: selects the account margin mode or its enabled state."
+          }
+        }
+      },
+      "get_isolated_margin_risk_rate": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_isolated_margin_financial_records": {
+        "type": "object",
+        "properties": {
+          "margin_type": {
+            "type": "string",
+            "description": "get_isolated_margin_financial_records/margin_type: selects the account margin mode or its enabled state."
+          },
+          "marginType": {
+            "type": "string",
+            "description": "get_isolated_margin_financial_records/marginType: selects the account margin mode or its enabled state."
+          }
+        }
+      },
+      "set_uta_collateral_type": {
+        "type": "object",
+        "properties": {
+          "collateral_type": {
+            "type": "string",
+            "description": "set_uta_collateral_type/collateral_type: selects collateral currencies, account identifiers, or the collateral enable switch."
+          },
+          "collateral_coins": {
+            "type": "string",
+            "description": "set_uta_collateral_type/collateral_coins: selects collateral currencies, account identifiers, or the collateral enable switch."
+          },
+          "collateralType": {
+            "type": "string",
+            "description": "set_uta_collateral_type/collateralType: selects collateral currencies, account identifiers, or the collateral enable switch."
+          },
+          "collateralCoins": {
+            "type": "string",
+            "description": "set_uta_collateral_type/collateralCoins: selects collateral currencies, account identifiers, or the collateral enable switch."
+          }
+        }
+      },
+      "set_uta_account_mode": {
+        "type": "object",
+        "properties": {
+          "delta_switch": {
+            "type": "string",
+            "description": "set_uta_account_mode/delta_switch: controls an integer or boolean option rather than a transferred balance."
+          },
+          "deltaSwitch": {
+            "type": "string",
+            "description": "set_uta_account_mode/deltaSwitch: controls an integer or boolean option rather than a transferred balance."
+          }
+        }
+      },
+      "uta_freeze_sub": {
+        "type": "object",
+        "properties": {
+          "operation": {
+            "type": "string",
+            "description": "uta_freeze_sub/operation: selects the requested account operation as an enum string."
+          }
+        }
+      },
+      "get_classic_earn_loan_repay_history": {
+        "type": "object",
+        "properties": {
+          "page_size": {
+            "type": "string",
+            "description": "get_classic_earn_loan_repay_history/page_size: limits the number of result records returned by pagination."
+          },
+          "pageSize": {
+            "type": "string",
+            "description": "get_classic_earn_loan_repay_history/pageSize: limits the number of result records returned by pagination."
+          }
+        }
+      },
+      "get_classic_earn_loan_revise_history": {
+        "type": "object",
+        "properties": {
+          "page_size": {
+            "type": "string",
+            "description": "get_classic_earn_loan_revise_history/page_size: limits the number of result records returned by pagination."
+          },
+          "pageSize": {
+            "type": "string",
+            "description": "get_classic_earn_loan_revise_history/pageSize: limits the number of result records returned by pagination."
+          }
+        }
+      },
+      "get_classic_earn_loan_borrow_history": {
+        "type": "object",
+        "properties": {
+          "page_size": {
+            "type": "string",
+            "description": "get_classic_earn_loan_borrow_history/page_size: limits the number of result records returned by pagination."
+          },
+          "pageSize": {
+            "type": "string",
+            "description": "get_classic_earn_loan_borrow_history/pageSize: limits the number of result records returned by pagination."
+          }
+        }
+      },
+      "get_classic_earn_loan_reduces": {
+        "type": "object",
+        "properties": {
+          "page_size": {
+            "type": "string",
+            "description": "get_classic_earn_loan_reduces/page_size: limits the number of result records returned by pagination."
+          },
+          "pageSize": {
+            "type": "string",
+            "description": "get_classic_earn_loan_reduces/pageSize: limits the number of result records returned by pagination."
+          }
+        }
+      },
+      "broker_get_broker_commission": {
+        "type": "object",
+        "properties": {
+          "page_size": {
+            "type": "string",
+            "description": "broker_get_broker_commission/page_size: limits the number of result records returned by pagination."
+          }
+        }
+      },
+      "classic_affiliate_customer_info_get_customer_assets": {
+        "type": "object",
+        "properties": {
+          "page_size": {
+            "type": "string",
+            "description": "classic_affiliate_customer_info_get_customer_assets/page_size: limits the number of result records returned by pagination."
+          }
+        }
+      },
+      "classic_affiliate_customer_info_get_customer_deposit": {
+        "type": "object",
+        "properties": {
+          "page_size": {
+            "type": "string",
+            "description": "classic_affiliate_customer_info_get_customer_deposit/page_size: limits the number of result records returned by pagination."
+          }
+        }
+      },
+      "classic_affiliate_customer_info_get_customer_list": {
+        "type": "object",
+        "properties": {
+          "page_size": {
+            "type": "string",
+            "description": "classic_affiliate_customer_info_get_customer_list/page_size: limits the number of result records returned by pagination."
+          }
+        }
+      },
+      "classic_affiliate_customer_info_get_customer_trade_volume": {
+        "type": "object",
+        "properties": {
+          "page_size": {
+            "type": "string",
+            "description": "classic_affiliate_customer_info_get_customer_trade_volume/page_size: limits the number of result records returned by pagination."
+          }
+        }
+      },
+      "classic_broker_subaccount_get_broker_subaccounts": {
+        "type": "object",
+        "properties": {
+          "page_size": {
+            "type": "string",
+            "description": "classic_broker_subaccount_get_broker_subaccounts/page_size: limits the number of result records returned by pagination."
+          }
+        }
+      },
+      "classic_broker_subaccount_get_broker_subaccounts_commissions": {
+        "type": "object",
+        "properties": {
+          "page_size": {
+            "type": "string",
+            "description": "classic_broker_subaccount_get_broker_subaccounts_commissions/page_size: limits the number of result records returned by pagination."
+          }
+        }
+      },
+      "classic_broker_subaccount_get_broker_trade_volume": {
+        "type": "object",
+        "properties": {
+          "page_size": {
+            "type": "string",
+            "description": "classic_broker_subaccount_get_broker_trade_volume/page_size: limits the number of result records returned by pagination."
+          }
+        }
+      },
+      "classic_copytrading_future_copytrade_follower_close_positions": {
+        "type": "object",
+        "properties": {
+          "margin_coin": {
+            "type": "string",
+            "description": "classic_copytrading_future_copytrade_follower_close_positions/margin_coin: selects the settlement currency for the margin account."
+          },
+          "margin_mode": {
+            "type": "string",
+            "description": "classic_copytrading_future_copytrade_follower_close_positions/margin_mode: selects the account margin mode or its enabled state."
+          }
+        }
+      },
+      "classic_copytrading_future_copytrade_follower_query_traders": {
+        "type": "object",
+        "properties": {
+          "page_size": {
+            "type": "string",
+            "description": "classic_copytrading_future_copytrade_follower_query_traders/page_size: limits the number of result records returned by pagination."
+          }
+        }
+      },
+      "classic_copytrading_future_copytrade_trader_trader_profit_details": {
+        "type": "object",
+        "properties": {
+          "page_size": {
+            "type": "string",
+            "description": "classic_copytrading_future_copytrade_trader_trader_profit_details/page_size: limits the number of result records returned by pagination."
+          }
+        }
+      },
+      "classic_copytrading_future_copytrade_trader_trader_get_profits_group_coin_date": {
+        "type": "object",
+        "properties": {
+          "page_size": {
+            "type": "string",
+            "description": "classic_copytrading_future_copytrade_trader_trader_get_profits_group_coin_date/page_size: limits the number of result records returned by pagination."
+          }
+        }
+      },
+      "classic_copytrading_future_copytrade_trader_config_query_followers": {
+        "type": "object",
+        "properties": {
+          "page_size": {
+            "type": "string",
+            "description": "classic_copytrading_future_copytrade_trader_config_query_followers/page_size: limits the number of result records returned by pagination."
+          }
+        }
+      },
+      "classic_copytrading_spot_copytrade_follower_query_traders": {
+        "type": "object",
+        "properties": {
+          "page_size": {
+            "type": "string",
+            "description": "classic_copytrading_spot_copytrade_follower_query_traders/page_size: limits the number of result records returned by pagination."
+          }
+        }
+      },
+      "classic_copytrading_spot_copytrade_trader_config_query_followers": {
+        "type": "object",
+        "properties": {
+          "page_size": {
+            "type": "string",
+            "description": "classic_copytrading_spot_copytrade_trader_config_query_followers/page_size: limits the number of result records returned by pagination."
+          }
+        }
+      },
+      "classic_copytrading_spot_copytrade_trader_profit_details": {
+        "type": "object",
+        "properties": {
+          "page_size": {
+            "type": "string",
+            "description": "classic_copytrading_spot_copytrade_trader_profit_details/page_size: limits the number of result records returned by pagination."
+          }
+        }
+      },
+      "copy_trading_follower_cancel_tpsl": {
+        "type": "object",
+        "properties": {
+          "strategy_id": {
+            "type": "string",
+            "description": "copy_trading_follower_cancel_tpsl/strategy_id: identifies a strategy rather than specifying its investment."
+          }
+        }
+      },
+      "classic_instloan_account_bind_risk_unit": {
+        "type": "object",
+        "properties": {
+          "operate": {
+            "type": "string",
+            "description": "classic_instloan_account_bind_risk_unit/operate: selects the requested account operation as an enum string."
+          }
+        }
+      },
+      "institutional_loan_bind_uid": {
+        "type": "object",
+        "properties": {
+          "operate": {
+            "type": "string",
+            "description": "institutional_loan_bind_uid/operate: selects the requested account operation as an enum string."
+          }
+        }
+      },
+      "p2p_ad_management_operate_ad": {
+        "type": "object",
+        "properties": {
+          "operation": {
+            "type": "string",
+            "description": "p2p_ad_management_operate_ad/operation: selects the requested account operation as an enum string."
+          }
+        }
+      },
+      "classic_tax_get_future_account_record": {
+        "type": "object",
+        "properties": {
+          "margin_coin": {
+            "type": "string",
+            "description": "classic_tax_get_future_account_record/margin_coin: selects the settlement currency for the margin account."
+          }
+        }
+      },
+      "classic_tax_get_margin_account_record": {
+        "type": "object",
+        "properties": {
+          "margin_type": {
+            "type": "string",
+            "description": "classic_tax_get_margin_account_record/margin_type: selects the account margin mode or its enabled state."
+          }
+        }
+      },
+      "tax_get_tax_records": {
+        "type": "object",
+        "properties": {
+          "margin_type": {
+            "type": "string",
+            "description": "tax_get_tax_records/margin_type: selects the account margin mode or its enabled state."
+          }
+        }
+      },
+      "close_copy_futures_follower_positions": {
+        "type": "object",
+        "properties": {
+          "margin_coin": {
+            "type": "string",
+            "description": "classic_copytrading_future_copytrade_follower_close_positions/margin_coin: selects the settlement currency for the margin account."
+          },
+          "margin_mode": {
+            "type": "string",
+            "description": "classic_copytrading_future_copytrade_follower_close_positions/margin_mode: selects the account margin mode or its enabled state."
+          }
+        }
+      },
+      "close_copy_futures_trader_positions": {
+        "type": "object",
+        "properties": {}
       }
     },
     "bybit": {
@@ -11469,6 +13537,18 @@
           "trigger_price": {
             "type": "string",
             "format": "decimal"
+          },
+          "tpTriggerBy": {
+            "type": "string",
+            "description": "amend_order/tpTriggerBy: selects the documented mode, unit, or reference used by this operation."
+          },
+          "slTriggerBy": {
+            "type": "string",
+            "description": "amend_order/slTriggerBy: selects the documented mode, unit, or reference used by this operation."
+          },
+          "triggerBy": {
+            "type": "string",
+            "description": "amend_order/triggerBy: selects the documented mode, unit, or reference used by this operation."
           }
         }
       },
@@ -11503,6 +13583,10 @@
           "annual_rate": {
             "type": "string",
             "format": "decimal"
+          },
+          "strategyType": {
+            "type": "string",
+            "description": "borrow_fixed_rate/strategyType: selects the strategy category used by the endpoint."
           }
         }
       },
@@ -11510,6 +13594,10 @@
         "type": "object",
         "properties": {
           "amount": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "slippage": {
             "type": "string",
             "format": "decimal"
           }
@@ -11580,6 +13668,22 @@
             "format": "decimal"
           },
           "leverage": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "take_profit_per": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "stop_loss_per": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "tp_sl_type": {
+            "type": "integer",
+            "description": "create_fgridbot/tp_sl_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "trailing_stop_per": {
             "type": "string",
             "format": "decimal"
           }
@@ -11690,6 +13794,14 @@
           "chasePercentE4": {
             "type": "string",
             "format": "decimal"
+          },
+          "strategy_type": {
+            "type": "string",
+            "description": "create_strategy/strategy_type: selects the strategy category used by the endpoint."
+          },
+          "strategyType": {
+            "type": "string",
+            "description": "create_strategy/strategyType: selects the strategy category used by the endpoint."
           }
         }
       },
@@ -11780,6 +13892,14 @@
           "annualRate": {
             "type": "string",
             "format": "decimal"
+          },
+          "strategy_type": {
+            "type": "string",
+            "description": "crypto_loan_fixed_borrow/strategy_type: selects the strategy category used by the endpoint."
+          },
+          "strategyType": {
+            "type": "string",
+            "description": "crypto_loan_fixed_borrow/strategyType: selects the strategy category used by the endpoint."
           }
         }
       },
@@ -11789,6 +13909,14 @@
           "amount": {
             "type": "string",
             "format": "decimal"
+          },
+          "collateral_coin": {
+            "type": "string",
+            "description": "crypto_loan_fixed_repay_collateral/collateral_coin: selects collateral currencies, account identifiers, or the collateral enable switch."
+          },
+          "collateralCoin": {
+            "type": "string",
+            "description": "crypto_loan_fixed_repay_collateral/collateralCoin: selects collateral currencies, account identifiers, or the collateral enable switch."
           }
         }
       },
@@ -11873,6 +14001,14 @@
           "amount": {
             "type": "string",
             "format": "decimal"
+          },
+          "collateral_coin": {
+            "type": "string",
+            "description": "crypto_loan_flexible_repay_collateral/collateral_coin: selects collateral currencies, account identifiers, or the collateral enable switch."
+          },
+          "collateralCoin": {
+            "type": "string",
+            "description": "crypto_loan_flexible_repay_collateral/collateralCoin: selects collateral currencies, account identifiers, or the collateral enable switch."
           }
         }
       },
@@ -11958,6 +14094,10 @@
           "trailing_stop_percent": {
             "type": "string",
             "format": "decimal"
+          },
+          "need_to_slippage": {
+            "type": "boolean",
+            "description": "get_fcombobot_getlimit/need_to_slippage: controls an integer or boolean option rather than a transferred balance."
           }
         }
       },
@@ -11991,6 +14131,10 @@
           "sl_percent": {
             "type": "string",
             "format": "decimal"
+          },
+          "need_to_slippage": {
+            "type": "boolean",
+            "description": "get_fmartingalebot_getlimit/need_to_slippage: controls an integer or boolean option rather than a transferred balance."
           }
         }
       },
@@ -12313,7 +14457,20 @@
           },
           "qty": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true,
+            "x-zero-when": {
+              "reduceOnly": [
+                true,
+                "true",
+                "True"
+              ],
+              "closeOnTrigger": [
+                true,
+                "true",
+                "True"
+              ]
+            }
           },
           "slLimitPrice": {
             "type": "string",
@@ -12354,6 +14511,34 @@
           "trigger_price": {
             "type": "string",
             "format": "decimal"
+          },
+          "slippageToleranceType": {
+            "type": "string",
+            "description": "place_order/slippageToleranceType: selects the documented mode, unit, or reference used by this operation."
+          },
+          "slippageTolerance": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "triggerDirection": {
+            "type": "integer",
+            "description": "place_order/triggerDirection: selects the documented mode, unit, or reference used by this operation."
+          },
+          "triggerBy": {
+            "type": "string",
+            "description": "place_order/triggerBy: selects the documented mode, unit, or reference used by this operation."
+          },
+          "tpTriggerBy": {
+            "type": "string",
+            "description": "place_order/tpTriggerBy: selects the documented mode, unit, or reference used by this operation."
+          },
+          "slTriggerBy": {
+            "type": "string",
+            "description": "place_order/slTriggerBy: selects the documented mode, unit, or reference used by this operation."
+          },
+          "closeOnTrigger": {
+            "type": "boolean",
+            "description": "place_order/closeOnTrigger: selects close On Trigger identifiers or response filters for this operation."
           }
         }
       },
@@ -12470,6 +14655,10 @@
           "from_token_amount": {
             "type": "string",
             "format": "decimal"
+          },
+          "slippage": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -12481,6 +14670,10 @@
             "format": "decimal"
           },
           "from_token_amount": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "slippage": {
             "type": "string",
             "format": "decimal"
           }
@@ -12599,7 +14792,8 @@
         "properties": {
           "amount": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -12648,6 +14842,22 @@
             "format": "decimal"
           },
           "leverage": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "tp_sl_type": {
+            "type": "integer",
+            "description": "request_fgridbot_validate/tp_sl_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "stop_loss_per": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "take_profit_per": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "trailing_stop_per": {
             "type": "string",
             "format": "decimal"
           }
@@ -12710,6 +14920,10 @@
           "ts_percent": {
             "type": "string",
             "format": "decimal"
+          },
+          "enable_trailing": {
+            "type": "boolean",
+            "description": "request_grid_create_grid/enable_trailing: controls an integer or boolean option rather than a transferred balance."
           }
         }
       },
@@ -12757,6 +14971,10 @@
           "ts_percent": {
             "type": "string",
             "format": "decimal"
+          },
+          "enable_trailing": {
+            "type": "boolean",
+            "description": "request_grid_validate_input/enable_trailing: controls an integer or boolean option rather than a transferred balance."
           }
         }
       },
@@ -12773,6 +14991,10 @@
         "type": "object",
         "properties": {
           "size": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "slippage": {
             "type": "string",
             "format": "decimal"
           }
@@ -12853,6 +15075,38 @@
           "tp_size": {
             "type": "string",
             "format": "decimal"
+          },
+          "trailing_stop": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "tp_trigger_by": {
+            "type": "string",
+            "description": "set_trading_stop/tp_trigger_by: selects the documented mode, unit, or reference used by this operation."
+          },
+          "sl_trigger_by": {
+            "type": "string",
+            "description": "set_trading_stop/sl_trigger_by: selects the documented mode, unit, or reference used by this operation."
+          },
+          "tp_order_type": {
+            "type": "string",
+            "description": "set_trading_stop/tp_order_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "sl_order_type": {
+            "type": "string",
+            "description": "set_trading_stop/sl_order_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "trailingStop": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "tpTriggerBy": {
+            "type": "string",
+            "description": "set_trading_stop/tpTriggerBy: selects the documented mode, unit, or reference used by this operation."
+          },
+          "slTriggerBy": {
+            "type": "string",
+            "description": "set_trading_stop/slTriggerBy: selects the documented mode, unit, or reference used by this operation."
           }
         }
       },
@@ -13164,6 +15418,10 @@
                 }
               }
             }
+          },
+          "strategyType": {
+            "type": "string",
+            "description": "create_rfq/strategyType: selects the strategy category used by the endpoint."
           }
         }
       },
@@ -13403,7 +15661,16 @@
       },
       "get_crypto_loan_ongoing_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "collateral_currency": {
+            "type": "string",
+            "description": "get_crypto_loan_ongoing_orders/collateral_currency: selects collateral currencies, account identifiers, or the collateral enable switch."
+          },
+          "collateralCurrency": {
+            "type": "string",
+            "description": "get_crypto_loan_ongoing_orders/collateralCurrency: selects collateral currencies, account identifiers, or the collateral enable switch."
+          }
+        }
       },
       "get_crypto_loan_fixed_available_inventory": {
         "type": "object",
@@ -13525,7 +15792,8 @@
         "properties": {
           "leverage": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -13580,7 +15848,24 @@
       },
       "get_strategy_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "strategy_id": {
+            "type": "string",
+            "description": "get_strategy_orders/strategy_id: identifies a strategy rather than specifying its investment."
+          },
+          "strategy_type": {
+            "type": "string",
+            "description": "get_strategy_orders/strategy_type: selects the strategy category used by the endpoint."
+          },
+          "strategyId": {
+            "type": "string",
+            "description": "get_strategy_orders/strategyId: identifies a strategy rather than specifying its investment."
+          },
+          "strategyType": {
+            "type": "string",
+            "description": "get_strategy_orders/strategyType: selects the strategy category used by the endpoint."
+          }
+        }
       },
       "get_transferable_amount": {
         "type": "object",
@@ -13682,6 +15967,230 @@
       "cancel_withdrawal": {
         "type": "object",
         "properties": {}
+      },
+      "add_position_margin": {
+        "type": "object",
+        "properties": {
+          "margin": {
+            "format": "decimal",
+            "x-signed": true
+          }
+        }
+      },
+      "set_margin_mode": {
+        "type": "object",
+        "properties": {
+          "margin_mode": {
+            "type": "string",
+            "description": "set_margin_mode/margin_mode: selects the account margin mode or its enabled state."
+          }
+        }
+      },
+      "set_spot_margin_mode": {
+        "type": "object",
+        "properties": {
+          "spot_margin_mode": {
+            "type": "string",
+            "description": "set_spot_margin_mode/spot_margin_mode: selects the account margin mode or its enabled state."
+          },
+          "spotMarginMode": {
+            "type": "string",
+            "description": "set_spot_margin_mode/spotMarginMode: selects the account margin mode or its enabled state."
+          }
+        }
+      },
+      "set_collateral_coin": {
+        "type": "object",
+        "properties": {
+          "collateral_switch": {
+            "type": "string",
+            "description": "set_collateral_coin/collateral_switch: selects collateral currencies, account identifiers, or the collateral enable switch."
+          },
+          "collateralSwitch": {
+            "type": "string",
+            "description": "set_collateral_coin/collateralSwitch: selects collateral currencies, account identifiers, or the collateral enable switch."
+          }
+        }
+      },
+      "set_delta_mode": {
+        "type": "object",
+        "properties": {
+          "delta_enable": {
+            "type": "string",
+            "description": "set_delta_mode/delta_enable: controls an integer or boolean option rather than a transferred balance."
+          },
+          "deltaEnable": {
+            "type": "string",
+            "description": "set_delta_mode/deltaEnable: controls an integer or boolean option rather than a transferred balance."
+          }
+        }
+      },
+      "get_sub_accounts_paginated": {
+        "type": "object",
+        "properties": {
+          "page_size": {
+            "type": "string",
+            "description": "get_sub_accounts_paginated/page_size: limits the number of result records returned by pagination."
+          },
+          "pageSize": {
+            "type": "string",
+            "description": "get_sub_accounts_paginated/pageSize: limits the number of result records returned by pagination."
+          }
+        }
+      },
+      "get_crypto_loan_borrowable_collateralisable_number": {
+        "type": "object",
+        "properties": {
+          "collateral_currency": {
+            "type": "string",
+            "description": "get_crypto_loan_borrowable_collateralisable_number/collateral_currency: selects collateral currencies, account identifiers, or the collateral enable switch."
+          },
+          "collateralCurrency": {
+            "type": "string",
+            "description": "get_crypto_loan_borrowable_collateralisable_number/collateralCurrency: selects collateral currencies, account identifiers, or the collateral enable switch."
+          }
+        }
+      },
+      "get_crypto_loan_borrow_history": {
+        "type": "object",
+        "properties": {
+          "collateral_currency": {
+            "type": "string",
+            "description": "get_crypto_loan_borrow_history/collateral_currency: selects collateral currencies, account identifiers, or the collateral enable switch."
+          },
+          "collateralCurrency": {
+            "type": "string",
+            "description": "get_crypto_loan_borrow_history/collateralCurrency: selects collateral currencies, account identifiers, or the collateral enable switch."
+          }
+        }
+      },
+      "get_crypto_loan_adjustment_history": {
+        "type": "object",
+        "properties": {
+          "collateral_currency": {
+            "type": "string",
+            "description": "get_crypto_loan_adjustment_history/collateral_currency: selects collateral currencies, account identifiers, or the collateral enable switch."
+          },
+          "collateralCurrency": {
+            "type": "string",
+            "description": "get_crypto_loan_adjustment_history/collateralCurrency: selects collateral currencies, account identifiers, or the collateral enable switch."
+          }
+        }
+      },
+      "get_crypto_loan_common_adjustment_history": {
+        "type": "object",
+        "properties": {
+          "collateral_currency": {
+            "type": "string",
+            "description": "get_crypto_loan_common_adjustment_history/collateral_currency: selects collateral currencies, account identifiers, or the collateral enable switch."
+          },
+          "collateralCurrency": {
+            "type": "string",
+            "description": "get_crypto_loan_common_adjustment_history/collateralCurrency: selects collateral currencies, account identifiers, or the collateral enable switch."
+          }
+        }
+      },
+      "get_coin_balance": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_advanced_earn_products": {
+        "type": "object",
+        "properties": {
+          "duration": {
+            "type": "string",
+            "description": "get_advanced_earn_products/duration: specifies a scheduling duration or timestamp in the endpoint time unit."
+          }
+        }
+      },
+      "set_auto_add_margin": {
+        "type": "object",
+        "properties": {
+          "autoAddMargin": {
+            "type": "integer",
+            "description": "set_auto_add_margin/autoAddMargin: enables automatic replenishment of isolated position margin."
+          }
+        }
+      },
+      "get_launchpool_activity_log": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_launchpool_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "stop_strategy": {
+        "type": "object",
+        "properties": {
+          "strategy_id": {
+            "type": "string",
+            "description": "stop_strategy/strategy_id: identifies a strategy rather than specifying its investment."
+          },
+          "strategyId": {
+            "type": "string",
+            "description": "stop_strategy/strategyId: identifies a strategy rather than specifying its investment."
+          }
+        }
+      },
+      "get_strategy_list": {
+        "type": "object",
+        "properties": {
+          "strategy_id": {
+            "type": "string",
+            "description": "get_strategy_list/strategy_id: identifies a strategy rather than specifying its investment."
+          },
+          "strategy_type": {
+            "type": "string",
+            "description": "get_strategy_list/strategy_type: selects the strategy category used by the endpoint."
+          },
+          "strategyId": {
+            "type": "string",
+            "description": "get_strategy_list/strategyId: identifies a strategy rather than specifying its investment."
+          },
+          "strategyType": {
+            "type": "string",
+            "description": "get_strategy_list/strategyType: selects the strategy category used by the endpoint."
+          }
+        }
+      },
+      "request_broker_award_distribution_record": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_card_reward_mall_item_list": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_card_reward_points_records": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_compliance_appeal_list": {
+        "type": "object",
+        "properties": {}
+      },
+      "request_ins_loan_association_uid": {
+        "type": "object",
+        "properties": {
+          "operate": {
+            "type": "string",
+            "description": "request_ins_loan_association_uid/operate: selects the requested account operation as an enum string."
+          }
+        }
+      },
+      "get_rwa_stocks_market_get_multiplier_list": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_user_escrow_sub_members": {
+        "type": "object",
+        "properties": {
+          "page_size": {
+            "type": "string",
+            "description": "get_user_escrow_sub_members/page_size: limits the number of result records returned by pagination."
+          }
+        }
       }
     },
     "extended": {
@@ -13762,7 +16271,8 @@
         "properties": {
           "amount": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -13831,6 +16341,36 @@
         "properties": {}
       },
       "cancel_order_by_external_id": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_account_pnl_percentage_history": {
+        "type": "object",
+        "properties": {
+          "price_market": {
+            "type": "string",
+            "description": "get_account_pnl_percentage_history/price_market: selects the documented mode, unit, or reference used by this operation."
+          },
+          "priceMarket": {
+            "type": "string",
+            "description": "get_account_pnl_percentage_history/priceMarket: selects the documented mode, unit, or reference used by this operation."
+          }
+        }
+      },
+      "get_cumulative_account_pnl_percentage_history": {
+        "type": "object",
+        "properties": {
+          "price_market": {
+            "type": "string",
+            "description": "get_cumulative_account_pnl_percentage_history/price_market: selects the documented mode, unit, or reference used by this operation."
+          },
+          "priceMarket": {
+            "type": "string",
+            "description": "get_cumulative_account_pnl_percentage_history/priceMarket: selects the documented mode, unit, or reference used by this operation."
+          }
+        }
+      },
+      "get_assets": {
         "type": "object",
         "properties": {}
       }
@@ -13978,6 +16518,10 @@
           "trigger_px": {
             "type": "string",
             "format": "decimal"
+          },
+          "slippage": {
+            "type": "number",
+            "description": "Local price tolerance fraction consumed by the market-order price calculation; not an exchange wire amount."
           }
         }
       },
@@ -13999,6 +16543,10 @@
           "trigger_px": {
             "type": "string",
             "format": "decimal"
+          },
+          "slippage": {
+            "type": "number",
+            "description": "Local price tolerance fraction consumed by the market-order price calculation; not an exchange wire amount."
           }
         }
       },
@@ -14020,6 +16568,10 @@
           "trigger_px": {
             "type": "string",
             "format": "decimal"
+          },
+          "slippage": {
+            "type": "number",
+            "description": "Local price tolerance fraction consumed by the market-order price calculation; not an exchange wire amount."
           }
         }
       },
@@ -14089,7 +16641,8 @@
         "properties": {
           "amount": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -14098,7 +16651,8 @@
         "properties": {
           "amount": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -14107,7 +16661,8 @@
         "properties": {
           "amount": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -14274,6 +16829,10 @@
           "amount": {
             "type": "string",
             "format": "decimal"
+          },
+          "strategy_id": {
+            "type": "string",
+            "description": "allocate_earn_funds/strategy_id: identifies a strategy rather than specifying its investment."
           }
         }
       },
@@ -14306,6 +16865,10 @@
           "amount": {
             "type": "string",
             "format": "decimal"
+          },
+          "withdrawal_fee_token": {
+            "type": "string",
+            "description": "calculate_funding_fees/withdrawal_fee_token: selects currency identifiers or funding source categories for this operation."
           }
         }
       },
@@ -14397,6 +16960,10 @@
           "amount": {
             "type": "string",
             "format": "decimal"
+          },
+          "strategy_id": {
+            "type": "string",
+            "description": "deallocate_earn_funds/strategy_id: identifies a strategy rather than specifying its investment."
           }
         }
       },
@@ -14413,7 +16980,8 @@
           },
           "size": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           },
           "stopPrice": {
             "type": "string",
@@ -14422,6 +16990,18 @@
           "stop_price": {
             "type": "string",
             "format": "decimal"
+          },
+          "trailingStopMaxDeviation": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "trailingStopDeviationUnit": {
+            "type": "string",
+            "description": "edit_futures_order/trailingStopDeviationUnit: selects the documented mode, unit, or reference used by this operation."
+          },
+          "qtyMode": {
+            "type": "string",
+            "description": "edit_futures_order/qtyMode: selects the documented mode, unit, or reference used by this operation."
           }
         }
       },
@@ -14473,7 +17053,8 @@
         "properties": {
           "amount": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -14588,7 +17169,8 @@
           },
           "size": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           },
           "stopPrice": {
             "type": "string",
@@ -14597,6 +17179,22 @@
           "stop_price": {
             "type": "string",
             "format": "decimal"
+          },
+          "triggerSignal": {
+            "type": "string",
+            "description": "place_futures_order/triggerSignal: selects the documented mode, unit, or reference used by this operation."
+          },
+          "trailingStopMaxDeviation": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "trailingStopDeviationUnit": {
+            "type": "string",
+            "description": "place_futures_order/trailingStopDeviationUnit: selects the documented mode, unit, or reference used by this operation."
+          },
+          "limitPriceOffsetUnit": {
+            "type": "string",
+            "description": "place_futures_order/limitPriceOffsetUnit: selects the documented mode, unit, or reference used by this operation."
           }
         }
       },
@@ -14929,12 +17527,15 @@
           },
           "volume": {
             "type": "string",
-            "format": "decimal",
-            "x-positive": true
+            "format": "decimal"
           },
           "leverage": {
             "type": "string",
             "format": "decimal"
+          },
+          "trigger": {
+            "type": "string",
+            "description": "place_spot_order/trigger: selects trigger identifiers or response filters for this operation."
           }
         }
       },
@@ -15060,7 +17661,8 @@
         "properties": {
           "amount": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -15069,7 +17671,8 @@
         "properties": {
           "amount": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -15078,7 +17681,8 @@
         "properties": {
           "amount": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -15340,6 +17944,10 @@
           "maxLeverage": {
             "type": "string",
             "format": "decimal"
+          },
+          "margin_mode": {
+            "type": "string",
+            "description": "set_futures_leverage_preference/margin_mode: selects the account margin mode or its enabled state."
           }
         }
       },
@@ -15391,6 +17999,33 @@
       "cancel_spot_withdrawal": {
         "type": "object",
         "properties": {}
+      },
+      "get_earn_allocation_status": {
+        "type": "object",
+        "properties": {
+          "strategy_id": {
+            "type": "string",
+            "description": "get_earn_allocation_status/strategy_id: identifies a strategy rather than specifying its investment."
+          }
+        }
+      },
+      "get_earn_deallocation_status": {
+        "type": "object",
+        "properties": {
+          "strategy_id": {
+            "type": "string",
+            "description": "get_earn_deallocation_status/strategy_id: identifies a strategy rather than specifying its investment."
+          }
+        }
+      },
+      "set_futures_self_trade_strategy": {
+        "type": "object",
+        "properties": {
+          "strategy": {
+            "type": "string",
+            "description": "set_futures_self_trade_strategy/strategy: selects the strategy category used by the endpoint."
+          }
+        }
       }
     },
     "kucoin": {
@@ -15470,6 +18105,30 @@
           "tp_trigger_price": {
             "type": "string",
             "format": "decimal"
+          },
+          "size_unit": {
+            "type": "string",
+            "description": "amend_uta_order/size_unit: selects the documented mode, unit, or reference used by this operation."
+          },
+          "tp_trigger_price_type": {
+            "type": "string",
+            "description": "amend_uta_order/tp_trigger_price_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "sl_trigger_price_type": {
+            "type": "string",
+            "description": "amend_uta_order/sl_trigger_price_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "sizeUnit": {
+            "type": "string",
+            "description": "amend_uta_order/sizeUnit: selects the documented mode, unit, or reference used by this operation."
+          },
+          "tpTriggerPriceType": {
+            "type": "string",
+            "description": "amend_uta_order/tpTriggerPriceType: selects the documented mode, unit, or reference used by this operation."
+          },
+          "slTriggerPriceType": {
+            "type": "string",
+            "description": "amend_uta_order/slTriggerPriceType: selects the documented mode, unit, or reference used by this operation."
           }
         }
       },
@@ -15510,6 +18169,14 @@
           "amount": {
             "type": "string",
             "format": "decimal"
+          },
+          "fee_deduct_type": {
+            "type": "string",
+            "description": "create_uta_withdrawal/fee_deduct_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "feeDeductType": {
+            "type": "string",
+            "description": "create_uta_withdrawal/feeDeductType: selects the documented mode, unit, or reference used by this operation."
           }
         }
       },
@@ -15519,6 +18186,14 @@
           "amount": {
             "type": "string",
             "format": "decimal"
+          },
+          "fee_deduct_type": {
+            "type": "string",
+            "description": "create_withdrawal/fee_deduct_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "feeDeductType": {
+            "type": "string",
+            "description": "create_withdrawal/feeDeductType: selects the documented mode, unit, or reference used by this operation."
           }
         }
       },
@@ -15527,7 +18202,8 @@
         "properties": {
           "amount": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -15712,6 +18388,22 @@
           "leverage": {
             "type": "string",
             "format": "decimal"
+          },
+          "stop_price_type": {
+            "type": "string",
+            "description": "post_v1_copy_trade_futures_st_orders/stop_price_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "margin_mode": {
+            "type": "string",
+            "description": "post_v1_copy_trade_futures_st_orders/margin_mode: selects the account margin mode or its enabled state."
+          },
+          "stopPriceType": {
+            "type": "string",
+            "description": "post_v1_copy_trade_futures_st_orders/stopPriceType: selects the documented mode, unit, or reference used by this operation."
+          },
+          "marginMode": {
+            "type": "string",
+            "description": "post_v1_copy_trade_futures_st_orders/marginMode: selects the account margin mode or its enabled state."
           }
         }
       },
@@ -15729,6 +18421,10 @@
           "leverage": {
             "type": "string",
             "format": "decimal"
+          },
+          "marginMode": {
+            "type": "string",
+            "description": "place_futures_limit_buy_order/marginMode: selects the account margin mode or its enabled state."
           }
         }
       },
@@ -15746,6 +18442,10 @@
           "leverage": {
             "type": "string",
             "format": "decimal"
+          },
+          "marginMode": {
+            "type": "string",
+            "description": "place_futures_limit_order/marginMode: selects the account margin mode or its enabled state."
           }
         }
       },
@@ -15763,6 +18463,10 @@
           "leverage": {
             "type": "string",
             "format": "decimal"
+          },
+          "marginMode": {
+            "type": "string",
+            "description": "place_futures_limit_sell_order/marginMode: selects the account margin mode or its enabled state."
           }
         }
       },
@@ -15776,6 +18480,10 @@
           "leverage": {
             "type": "string",
             "format": "decimal"
+          },
+          "marginMode": {
+            "type": "string",
+            "description": "place_futures_market_buy_order/marginMode: selects the account margin mode or its enabled state."
           }
         }
       },
@@ -15801,6 +18509,10 @@
           "leverage": {
             "type": "string",
             "format": "decimal"
+          },
+          "marginMode": {
+            "type": "string",
+            "description": "place_futures_market_order/marginMode: selects the account margin mode or its enabled state."
           }
         }
       },
@@ -15814,6 +18526,10 @@
           "leverage": {
             "type": "string",
             "format": "decimal"
+          },
+          "marginMode": {
+            "type": "string",
+            "description": "place_futures_market_sell_order/marginMode: selects the account margin mode or its enabled state."
           }
         }
       },
@@ -15859,6 +18575,14 @@
           "leverage": {
             "type": "string",
             "format": "decimal"
+          },
+          "marginMode": {
+            "type": "string",
+            "description": "place_futures_order/marginMode: selects the account margin mode or its enabled state."
+          },
+          "stopPriceType": {
+            "type": "string",
+            "description": "place_futures_order/stopPriceType: selects the documented mode, unit, or reference used by this operation."
           }
         }
       },
@@ -15876,6 +18600,10 @@
           "leverage": {
             "type": "string",
             "format": "decimal"
+          },
+          "marginMode": {
+            "type": "string",
+            "description": "place_futures_post_only_limit_buy_order/marginMode: selects the account margin mode or its enabled state."
           }
         }
       },
@@ -15893,6 +18621,10 @@
           "leverage": {
             "type": "string",
             "format": "decimal"
+          },
+          "marginMode": {
+            "type": "string",
+            "description": "place_futures_post_only_limit_order/marginMode: selects the account margin mode or its enabled state."
           }
         }
       },
@@ -15910,6 +18642,10 @@
           "leverage": {
             "type": "string",
             "format": "decimal"
+          },
+          "marginMode": {
+            "type": "string",
+            "description": "place_futures_post_only_limit_sell_order/marginMode: selects the account margin mode or its enabled state."
           }
         }
       },
@@ -15955,6 +18691,22 @@
           "leverage": {
             "type": "string",
             "format": "decimal"
+          },
+          "stop_price_type": {
+            "type": "string",
+            "description": "place_futures_tpsl_order/stop_price_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "margin_mode": {
+            "type": "string",
+            "description": "place_futures_tpsl_order/margin_mode: selects the account margin mode or its enabled state."
+          },
+          "stopPriceType": {
+            "type": "string",
+            "description": "place_futures_tpsl_order/stopPriceType: selects the documented mode, unit, or reference used by this operation."
+          },
+          "marginMode": {
+            "type": "string",
+            "description": "place_futures_tpsl_order/marginMode: selects the account margin mode or its enabled state."
           }
         }
       },
@@ -16312,6 +19064,38 @@
           "leverage": {
             "type": "string",
             "format": "decimal"
+          },
+          "size_unit": {
+            "type": "string",
+            "description": "place_uta_order/size_unit: selects the documented mode, unit, or reference used by this operation."
+          },
+          "margin_mode": {
+            "type": "string",
+            "description": "place_uta_order/margin_mode: selects the account margin mode or its enabled state."
+          },
+          "trigger_direction": {
+            "type": "string",
+            "description": "place_uta_order/trigger_direction: selects the documented mode, unit, or reference used by this operation."
+          },
+          "trigger_price_type": {
+            "type": "string",
+            "description": "place_uta_order/trigger_price_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "sizeUnit": {
+            "type": "string",
+            "description": "place_uta_order/sizeUnit: selects the documented mode, unit, or reference used by this operation."
+          },
+          "marginMode": {
+            "type": "string",
+            "description": "place_uta_order/marginMode: selects the account margin mode or its enabled state."
+          },
+          "triggerDirection": {
+            "type": "string",
+            "description": "place_uta_order/triggerDirection: selects the documented mode, unit, or reference used by this operation."
+          },
+          "triggerPriceType": {
+            "type": "string",
+            "description": "place_uta_order/triggerPriceType: selects the documented mode, unit, or reference used by this operation."
           }
         }
       },
@@ -16321,7 +19105,8 @@
           "amount": {
             "type": "string",
             "format": "decimal",
-            "x-apidog-mock": "1"
+            "x-apidog-mock": "1",
+            "x-positive": true
           }
         }
       },
@@ -16347,6 +19132,22 @@
           "leverage": {
             "type": "string",
             "format": "decimal"
+          },
+          "stop_price_type": {
+            "type": "string",
+            "description": "post_v1_copy_trade_futures_orders/stop_price_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "margin_mode": {
+            "type": "string",
+            "description": "post_v1_copy_trade_futures_orders/margin_mode: selects the account margin mode or its enabled state."
+          },
+          "stopPriceType": {
+            "type": "string",
+            "description": "post_v1_copy_trade_futures_orders/stopPriceType: selects the documented mode, unit, or reference used by this operation."
+          },
+          "marginMode": {
+            "type": "string",
+            "description": "post_v1_copy_trade_futures_orders/marginMode: selects the account margin mode or its enabled state."
           }
         }
       },
@@ -16372,6 +19173,22 @@
           "leverage": {
             "type": "string",
             "format": "decimal"
+          },
+          "stop_price_type": {
+            "type": "string",
+            "description": "post_v1_copy_trade_futures_orders_test/stop_price_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "margin_mode": {
+            "type": "string",
+            "description": "post_v1_copy_trade_futures_orders_test/margin_mode: selects the account margin mode or its enabled state."
+          },
+          "stopPriceType": {
+            "type": "string",
+            "description": "post_v1_copy_trade_futures_orders_test/stopPriceType: selects the documented mode, unit, or reference used by this operation."
+          },
+          "marginMode": {
+            "type": "string",
+            "description": "post_v1_copy_trade_futures_orders_test/marginMode: selects the account margin mode or its enabled state."
           }
         }
       },
@@ -16418,6 +19235,22 @@
           "leverage": {
             "type": "string",
             "format": "decimal"
+          },
+          "stop_price_type": {
+            "type": "string",
+            "description": "post_v1_copy_trade_futures_st_orders/stop_price_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "margin_mode": {
+            "type": "string",
+            "description": "post_v1_copy_trade_futures_st_orders/margin_mode: selects the account margin mode or its enabled state."
+          },
+          "stopPriceType": {
+            "type": "string",
+            "description": "post_v1_copy_trade_futures_st_orders/stopPriceType: selects the documented mode, unit, or reference used by this operation."
+          },
+          "marginMode": {
+            "type": "string",
+            "description": "post_v1_copy_trade_futures_st_orders/marginMode: selects the account margin mode or its enabled state."
           }
         }
       },
@@ -16559,6 +19392,14 @@
           "leverage": {
             "type": "string",
             "format": "decimal"
+          },
+          "marginMode": {
+            "type": "string",
+            "description": "test_futures_order/marginMode: selects the account margin mode or its enabled state."
+          },
+          "stopPriceType": {
+            "type": "string",
+            "description": "test_futures_order/stopPriceType: selects the documented mode, unit, or reference used by this operation."
           }
         }
       },
@@ -16609,7 +19450,8 @@
         "properties": {
           "amount": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -16831,7 +19673,16 @@
       },
       "set_futures_batch_margin_mode": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "margin_mode": {
+            "type": "string",
+            "description": "set_futures_batch_margin_mode/margin_mode: selects the account margin mode or its enabled state."
+          },
+          "marginMode": {
+            "type": "string",
+            "description": "set_futures_batch_margin_mode/marginMode: selects the account margin mode or its enabled state."
+          }
+        }
       },
       "get_structured_earn_orders": {
         "type": "object",
@@ -16937,7 +19788,16 @@
       },
       "cancel_uta_orders_by_symbol": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "margin_mode": {
+            "type": "string",
+            "description": "cancel_uta_orders_by_symbol/margin_mode: selects the account margin mode or its enabled state."
+          },
+          "marginMode": {
+            "type": "string",
+            "description": "cancel_uta_orders_by_symbol/marginMode: selects the account margin mode or its enabled state."
+          }
+        }
       },
       "modify_uta_futures_leverage": {
         "type": "object",
@@ -17241,6 +20101,262 @@
       "get_v1_copy_trade_futures_position_margin_max_withdraw_margin": {
         "type": "object",
         "properties": {}
+      },
+      "add_futures_isolated_margin": {
+        "type": "object",
+        "properties": {
+          "margin": {
+            "format": "decimal",
+            "x-positive": true
+          }
+        }
+      },
+      "post_v1_copy_trade_futures_position_margin_deposit_margin": {
+        "type": "object",
+        "properties": {
+          "margin": {
+            "format": "decimal",
+            "x-positive": true
+          }
+        }
+      },
+      "get_subaccounts": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_subaccount_balances": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_uta_subaccounts": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_uta_subaccount_currency_assets": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_uta_positions": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_earn_account_holdings": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_margin_borrow_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_margin_repay_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_margin_interest_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_futures_open_interest": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_uta_position_tiers": {
+        "type": "object",
+        "properties": {
+          "marginMode": {
+            "type": "string",
+            "description": "get_uta_position_tiers/marginMode: selects the account margin mode or its enabled state."
+          }
+        }
+      },
+      "get_uta_index_prices": {
+        "type": "object",
+        "properties": {
+          "page_size": {
+            "type": "string",
+            "description": "get_uta_index_prices/page_size: limits the number of result records returned by pagination."
+          },
+          "pageSize": {
+            "type": "string",
+            "description": "get_uta_index_prices/pageSize: limits the number of result records returned by pagination."
+          }
+        }
+      },
+      "get_uta_interest_rate_index": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_futures_interest_rate_index": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_futures_premium_index": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_announcements": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_uta_announcements": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_index_price": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_futures_trade_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_uta_trade_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "set_uta_margin_mode": {
+        "type": "object",
+        "properties": {
+          "margin_mode": {
+            "type": "string",
+            "description": "set_uta_margin_mode/margin_mode: selects the account margin mode or its enabled state."
+          },
+          "marginMode": {
+            "type": "string",
+            "description": "set_uta_margin_mode/marginMode: selects the account margin mode or its enabled state."
+          }
+        }
+      },
+      "get_uta_leverage": {
+        "type": "object",
+        "properties": {
+          "margin_mode": {
+            "type": "string",
+            "description": "get_uta_leverage/margin_mode: selects the account margin mode or its enabled state."
+          },
+          "marginMode": {
+            "type": "string",
+            "description": "get_uta_leverage/marginMode: selects the account margin mode or its enabled state."
+          }
+        }
+      },
+      "get_uta_position_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_uta_funding_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "set_futures_margin_mode": {
+        "type": "object",
+        "properties": {
+          "margin_mode": {
+            "type": "string",
+            "description": "set_futures_margin_mode/margin_mode: selects the account margin mode or its enabled state."
+          },
+          "marginMode": {
+            "type": "string",
+            "description": "set_futures_margin_mode/marginMode: selects the account margin mode or its enabled state."
+          }
+        }
+      },
+      "get_futures_funding_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_futures_account_ledgers": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_account_ledgers": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_deposit_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_uta_account_ledgers": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_uta_deposit_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_ua_v2_affiliate_query_invitees": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_ua_v2_affiliate_query_my_commission": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_ua_v2_affiliate_query_transaction_by_uid": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_ua_v2_affiliate_query_transaction_by_time": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_ua_v2_affiliate_query_kumining": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_v2_affiliate_query_invitees": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_v2_affiliate_query_my_commission": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_v2_affiliate_query_transaction_by_uid": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_v2_affiliate_query_transaction_by_time": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_v2_affiliate_query_kumining": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_v2_broker_query_my_commission": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_v2_broker_query_user": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_v2_broker_query_detail_by_uid": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_kyc_nd_broker_proxy_client_status_page": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_v1_broker_nd_account": {
+        "type": "object",
+        "properties": {}
+      },
+      "post_v1_copy_trade_futures_position_change_margin_mode": {
+        "type": "object",
+        "properties": {
+          "margin_mode": {
+            "type": "string",
+            "description": "post_v1_copy_trade_futures_position_change_margin_mode/margin_mode: selects the account margin mode or its enabled state."
+          },
+          "marginMode": {
+            "type": "string",
+            "description": "post_v1_copy_trade_futures_position_change_margin_mode/marginMode: selects the account margin mode or its enabled state."
+          }
+        }
       }
     },
     "lighter": {
@@ -17550,7 +20666,8 @@
         "properties": {
           "amount": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           },
           "usdc_fee": {
             "type": "string",
@@ -17622,7 +20739,8 @@
         "properties": {
           "amount": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           },
           "usdc_fee": {
             "type": "string",
@@ -17755,6 +20873,97 @@
       "submit_fast_withdrawal": {
         "type": "object",
         "properties": {}
+      },
+      "get_exchange_metrics": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "description": "get_exchange_metrics/value: selects value identifiers or response filters for this operation."
+          }
+        }
+      },
+      "get_account": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "description": "get_account/value: selects value identifiers or response filters for this operation."
+          }
+        }
+      },
+      "get_account_metadata": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "description": "get_account_metadata/value: selects value identifiers or response filters for this operation."
+          }
+        }
+      },
+      "get_pnl": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "description": "get_pnl/value: selects value identifiers or response filters for this operation."
+          }
+        }
+      },
+      "get_transaction": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "description": "get_transaction/value: selects value identifiers or response filters for this operation."
+          }
+        }
+      },
+      "get_pnl_leaderboard": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_explorer_account_logs": {
+        "type": "object",
+        "properties": {
+          "offset": {
+            "type": "string",
+            "description": "get_explorer_account_logs/offset: identifies the pagination cursor or result offset for this query."
+          }
+        }
+      },
+      "get_explorer_market_logs": {
+        "type": "object",
+        "properties": {
+          "offset": {
+            "type": "string",
+            "description": "get_explorer_market_logs/offset: identifies the pagination cursor or result offset for this query."
+          }
+        }
+      },
+      "send_tx": {
+        "type": "object",
+        "properties": {}
+      },
+      "sign_update_leverage": {
+        "type": "object",
+        "properties": {}
+      },
+      "update_leverage": {
+        "type": "object",
+        "properties": {}
+      },
+      "update_account_config": {
+        "type": "object",
+        "properties": {}
+      },
+      "update_account_asset_config": {
+        "type": "object",
+        "properties": {}
+      },
+      "sign_update_account_asset_config": {
+        "type": "object",
+        "properties": {}
       }
     },
     "mexc": {
@@ -17806,6 +21015,10 @@
           "trigger_price": {
             "type": "string",
             "format": "decimal"
+          },
+          "triggerType": {
+            "type": "integer",
+            "description": "amend_contract_plan_order/triggerType: selects the documented mode, unit, or reference used by this operation."
           }
         }
       },
@@ -18027,7 +21240,8 @@
           },
           "vol": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           },
           "leverage": {
             "type": "string",
@@ -18073,6 +21287,10 @@
           "leverage": {
             "type": "string",
             "format": "decimal"
+          },
+          "triggerType": {
+            "type": "string",
+            "description": "place_contract_plan_order/triggerType: selects the documented mode, unit, or reference used by this operation."
           }
         }
       },
@@ -18272,11 +21490,13 @@
           },
           "quoteOrderQty": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           },
           "quote_order_qty": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -18354,7 +21574,8 @@
         "properties": {
           "amount": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -18363,7 +21584,8 @@
         "properties": {
           "amount": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -18372,7 +21594,8 @@
         "properties": {
           "amount": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -18610,6 +21833,46 @@
       "cancel_spot_withdrawal": {
         "type": "object",
         "properties": {}
+      },
+      "get_contract_history_positions": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_contract_funding_records": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_contract_risk_reverse_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_contract_funding_rate_history": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_contract_fee_details": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_rebate_affiliate_campaign": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_rebate_affiliate_commission_detail": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_rebate_affiliate_commission": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_rebate_affiliate_referral": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_rebate_affiliate_subaffiliates": {
+        "type": "object",
+        "properties": {}
       }
     },
     "okx": {
@@ -18632,6 +21895,10 @@
           "collateral_amt": {
             "type": "string",
             "format": "decimal"
+          },
+          "collateralCcy": {
+            "type": "string",
+            "description": "adjust_flexible_loan_collateral/collateralCcy: selects collateral currencies, account identifiers, or the collateral enable switch."
           }
         }
       },
@@ -18671,7 +21938,8 @@
           },
           "newSz": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           },
           "newTpOrdPx": {
             "type": "string",
@@ -18708,7 +21976,8 @@
           },
           "new_sz": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           },
           "new_tp_ord_px": {
             "type": "string",
@@ -18730,29 +21999,29 @@
             "items": {
               "type": "object",
               "properties": {
-                "tpTriggerPx": {
+                "newTpTriggerPx": {
                   "type": "string",
                   "format": "decimal"
                 },
-                "tpOrdPx": {
+                "newTpOrdPx": {
                   "type": "string",
                   "format": "decimal",
                   "x-decimal-sentinels": [
                     "-1"
                   ]
                 },
-                "slTriggerPx": {
+                "newSlTriggerPx": {
                   "type": "string",
                   "format": "decimal"
                 },
-                "slOrdPx": {
+                "newSlOrdPx": {
                   "type": "string",
                   "format": "decimal",
                   "x-decimal-sentinels": [
                     "-1"
                   ]
                 },
-                "sz": {
+                "newSz": {
                   "type": "string",
                   "format": "decimal"
                 }
@@ -18764,29 +22033,29 @@
             "items": {
               "type": "object",
               "properties": {
-                "tpTriggerPx": {
+                "newTpTriggerPx": {
                   "type": "string",
                   "format": "decimal"
                 },
-                "tpOrdPx": {
+                "newTpOrdPx": {
                   "type": "string",
                   "format": "decimal",
                   "x-decimal-sentinels": [
                     "-1"
                   ]
                 },
-                "slTriggerPx": {
+                "newSlTriggerPx": {
                   "type": "string",
                   "format": "decimal"
                 },
-                "slOrdPx": {
+                "newSlOrdPx": {
                   "type": "string",
                   "format": "decimal",
                   "x-decimal-sentinels": [
                     "-1"
                   ]
                 },
-                "sz": {
+                "newSz": {
                   "type": "string",
                   "format": "decimal"
                 }
@@ -18824,6 +22093,30 @@
                 }
               }
             }
+          },
+          "new_tp_trigger_px_type": {
+            "type": "string",
+            "description": "amend_algo_order/new_tp_trigger_px_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "new_sl_trigger_px_type": {
+            "type": "string",
+            "description": "amend_algo_order/new_sl_trigger_px_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "new_trigger_px_type": {
+            "type": "string",
+            "description": "amend_algo_order/new_trigger_px_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "newTpTriggerPxType": {
+            "type": "string",
+            "description": "amend_algo_order/newTpTriggerPxType: selects the documented mode, unit, or reference used by this operation."
+          },
+          "newSlTriggerPxType": {
+            "type": "string",
+            "description": "amend_algo_order/newSlTriggerPxType: selects the documented mode, unit, or reference used by this operation."
+          },
+          "newTriggerPxType": {
+            "type": "string",
+            "description": "amend_algo_order/newTriggerPxType: selects the documented mode, unit, or reference used by this operation."
           }
         }
       },
@@ -18844,7 +22137,8 @@
           },
           "newSz": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           },
           "new_px": {
             "type": "string",
@@ -18860,36 +22154,37 @@
           },
           "new_sz": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           },
           "attachAlgoOrds": {
             "type": "array",
             "items": {
               "type": "object",
               "properties": {
-                "tpTriggerPx": {
+                "newTpTriggerPx": {
                   "type": "string",
                   "format": "decimal"
                 },
-                "tpOrdPx": {
+                "newTpOrdPx": {
                   "type": "string",
                   "format": "decimal",
                   "x-decimal-sentinels": [
                     "-1"
                   ]
                 },
-                "slTriggerPx": {
+                "newSlTriggerPx": {
                   "type": "string",
                   "format": "decimal"
                 },
-                "slOrdPx": {
+                "newSlOrdPx": {
                   "type": "string",
                   "format": "decimal",
                   "x-decimal-sentinels": [
                     "-1"
                   ]
                 },
-                "sz": {
+                "newSz": {
                   "type": "string",
                   "format": "decimal"
                 }
@@ -18901,34 +22196,42 @@
             "items": {
               "type": "object",
               "properties": {
-                "tpTriggerPx": {
+                "newTpTriggerPx": {
                   "type": "string",
                   "format": "decimal"
                 },
-                "tpOrdPx": {
+                "newTpOrdPx": {
                   "type": "string",
                   "format": "decimal",
                   "x-decimal-sentinels": [
                     "-1"
                   ]
                 },
-                "slTriggerPx": {
+                "newSlTriggerPx": {
                   "type": "string",
                   "format": "decimal"
                 },
-                "slOrdPx": {
+                "newSlOrdPx": {
                   "type": "string",
                   "format": "decimal",
                   "x-decimal-sentinels": [
                     "-1"
                   ]
                 },
-                "sz": {
+                "newSz": {
                   "type": "string",
                   "format": "decimal"
                 }
               }
             }
+          },
+          "rpiPxRound": {
+            "type": "string",
+            "description": "amend_order/rpiPxRound: controls an integer or boolean option rather than a transferred balance."
+          },
+          "pxAmendType": {
+            "type": "string",
+            "description": "amend_order/pxAmendType: selects the documented mode, unit, or reference used by this operation."
           }
         }
       },
@@ -19014,6 +22317,22 @@
           "tp_trigger_px": {
             "type": "string",
             "format": "decimal"
+          },
+          "tp_trigger_px_type": {
+            "type": "string",
+            "description": "copytrading_algo_order/tp_trigger_px_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "sl_trigger_px_type": {
+            "type": "string",
+            "description": "copytrading_algo_order/sl_trigger_px_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "tpTriggerPxType": {
+            "type": "string",
+            "description": "copytrading_algo_order/tpTriggerPxType: selects the documented mode, unit, or reference used by this operation."
+          },
+          "slTriggerPxType": {
+            "type": "string",
+            "description": "copytrading_algo_order/slTriggerPxType: selects the documented mode, unit, or reference used by this operation."
           }
         }
       },
@@ -19063,6 +22382,14 @@
           "rfq_sz": {
             "type": "string",
             "format": "decimal"
+          },
+          "rfq_sz_ccy": {
+            "type": "string",
+            "description": "estimate_convert_quote/rfq_sz_ccy: selects currency identifiers or funding source categories for this operation."
+          },
+          "rfqSzCcy": {
+            "type": "string",
+            "description": "estimate_convert_quote/rfqSzCcy: selects currency identifiers or funding source categories for this operation."
           }
         }
       },
@@ -19080,6 +22407,14 @@
           "sz": {
             "type": "string",
             "format": "decimal"
+          },
+          "sz_ccy": {
+            "type": "string",
+            "description": "execute_convert_trade/sz_ccy: selects currency identifiers or funding source categories for this operation."
+          },
+          "szCcy": {
+            "type": "string",
+            "description": "execute_convert_trade/szCcy: selects currency identifiers or funding source categories for this operation."
           }
         }
       },
@@ -19088,7 +22423,8 @@
         "properties": {
           "amt": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -19497,6 +22833,34 @@
           "callbackSpread": {
             "type": "string",
             "format": "decimal"
+          },
+          "tp_trigger_px_type": {
+            "type": "string",
+            "description": "place_algo_order/tp_trigger_px_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "tp_ord_kind": {
+            "type": "string",
+            "description": "place_algo_order/tp_ord_kind: selects tp ord kind identifiers or response filters for this operation."
+          },
+          "sl_trigger_px_type": {
+            "type": "string",
+            "description": "place_algo_order/sl_trigger_px_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "trigger_px_type": {
+            "type": "string",
+            "description": "place_algo_order/trigger_px_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "tpTriggerPxType": {
+            "type": "string",
+            "description": "place_algo_order/tpTriggerPxType: selects the documented mode, unit, or reference used by this operation."
+          },
+          "slTriggerPxType": {
+            "type": "string",
+            "description": "place_algo_order/slTriggerPxType: selects the documented mode, unit, or reference used by this operation."
+          },
+          "triggerPxType": {
+            "type": "string",
+            "description": "place_algo_order/triggerPxType: selects the documented mode, unit, or reference used by this operation."
           }
         }
       },
@@ -19665,6 +23029,14 @@
           "slippagePct": {
             "type": "string",
             "format": "decimal"
+          },
+          "pxAmendType": {
+            "type": "string",
+            "description": "place_order/pxAmendType: selects the documented mode, unit, or reference used by this operation."
+          },
+          "rpiPxRound": {
+            "type": "string",
+            "description": "place_order/rpiPxRound: controls an integer or boolean option rather than a transferred balance."
           }
         }
       },
@@ -19815,6 +23187,10 @@
           "notional_sz": {
             "type": "string",
             "format": "decimal"
+          },
+          "notionalCcy": {
+            "type": "string",
+            "description": "request_dual_investment_quote/notionalCcy: selects currency identifiers or funding source categories for this operation."
           }
         }
       },
@@ -20064,6 +23440,44 @@
           "slPct": {
             "type": "string",
             "format": "decimal"
+          },
+          "trigger_params": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "triggerPx": {
+                  "format": "decimal"
+                },
+                "price": {
+                  "format": "decimal"
+                },
+                "triggerPrice": {
+                  "format": "decimal"
+                }
+              }
+            }
+          },
+          "sl_mode": {
+            "type": "string",
+            "description": "trading_bot_dca_create/sl_mode: selects the documented mode, unit, or reference used by this operation."
+          },
+          "triggerParams": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "triggerPx": {
+                  "format": "decimal"
+                },
+                "price": {
+                  "format": "decimal"
+                },
+                "triggerPrice": {
+                  "format": "decimal"
+                }
+              }
+            }
           }
         }
       },
@@ -20344,6 +23758,22 @@
           "lever": {
             "type": "string",
             "format": "decimal"
+          },
+          "investment_type": {
+            "type": "string",
+            "description": "trading_bot_grid_min_investment/investment_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "trigger_strategy": {
+            "type": "string",
+            "description": "trading_bot_grid_min_investment/trigger_strategy: selects trigger strategy identifiers or response filters for this operation."
+          },
+          "investmentType": {
+            "type": "string",
+            "description": "trading_bot_grid_min_investment/investmentType: selects the documented mode, unit, or reference used by this operation."
+          },
+          "triggerStrategy": {
+            "type": "string",
+            "description": "trading_bot_grid_min_investment/triggerStrategy: selects trigger Strategy identifiers or response filters for this operation."
           }
         }
       },
@@ -20520,6 +23950,14 @@
                 }
               }
             }
+          },
+          "investment_ccy": {
+            "type": "string",
+            "description": "trading_bot_recurring_order_algo/investment_ccy: selects currency identifiers or funding source categories for this operation."
+          },
+          "investmentCcy": {
+            "type": "string",
+            "description": "trading_bot_recurring_order_algo/investmentCcy: selects currency identifiers or funding source categories for this operation."
           }
         }
       },
@@ -20550,7 +23988,8 @@
         "properties": {
           "amt": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -20585,6 +24024,40 @@
                 "sz": {
                   "type": "string",
                   "format": "decimal"
+                },
+                "attachAlgoOrds": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "tpTriggerPx": {
+                        "type": "string",
+                        "format": "decimal"
+                      },
+                      "tpOrdPx": {
+                        "type": "string",
+                        "format": "decimal",
+                        "x-decimal-sentinels": [
+                          "-1"
+                        ]
+                      },
+                      "slTriggerPx": {
+                        "type": "string",
+                        "format": "decimal"
+                      },
+                      "slOrdPx": {
+                        "type": "string",
+                        "format": "decimal",
+                        "x-decimal-sentinels": [
+                          "-1"
+                        ]
+                      },
+                      "sz": {
+                        "type": "string",
+                        "format": "decimal"
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -20636,29 +24109,55 @@
             "items": {
               "type": "object",
               "properties": {
-                "px": {
-                  "type": "string",
-                  "format": "decimal"
+                "newPx": {
+                  "format": "decimal",
+                  "x-positive": true
                 },
-                "pxUsd": {
-                  "type": "string",
-                  "format": "decimal"
+                "newSz": {
+                  "format": "decimal",
+                  "x-positive": true
                 },
-                "pxVol": {
-                  "type": "string",
-                  "format": "decimal"
+                "newPxUsd": {
+                  "format": "decimal",
+                  "x-positive": true
                 },
-                "px_usd": {
-                  "type": "string",
-                  "format": "decimal"
+                "newPxVol": {
+                  "format": "decimal",
+                  "x-positive": true
                 },
-                "px_vol": {
-                  "type": "string",
-                  "format": "decimal"
-                },
-                "sz": {
-                  "type": "string",
-                  "format": "decimal"
+                "attachAlgoOrds": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "newTpTriggerPx": {
+                        "type": "string",
+                        "format": "decimal"
+                      },
+                      "newTpOrdPx": {
+                        "type": "string",
+                        "format": "decimal",
+                        "x-decimal-sentinels": [
+                          "-1"
+                        ]
+                      },
+                      "newSlTriggerPx": {
+                        "type": "string",
+                        "format": "decimal"
+                      },
+                      "newSlOrdPx": {
+                        "type": "string",
+                        "format": "decimal",
+                        "x-decimal-sentinels": [
+                          "-1"
+                        ]
+                      },
+                      "newSz": {
+                        "type": "string",
+                        "format": "decimal"
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -21437,7 +24936,8 @@
         "properties": {
           "lever": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -21458,6 +24958,53 @@
             "format": "decimal"
           }
         }
+      },
+      "get_trading_bot_grid_ai_param": {
+        "type": "object",
+        "properties": {
+          "duration": {
+            "type": "string",
+            "description": "get_trading_bot_grid_ai_param/duration: specifies a scheduling duration or timestamp in the endpoint time unit."
+          }
+        }
+      },
+      "get_trading_bot_public_rsi_back_testing": {
+        "type": "object",
+        "properties": {
+          "trigger_cond": {
+            "type": "string",
+            "description": "get_trading_bot_public_rsi_back_testing/trigger_cond: selects the documented mode, unit, or reference used by this operation."
+          },
+          "duration": {
+            "type": "string",
+            "description": "get_trading_bot_public_rsi_back_testing/duration: specifies a scheduling duration or timestamp in the endpoint time unit."
+          },
+          "triggerCond": {
+            "type": "string",
+            "description": "get_trading_bot_public_rsi_back_testing/triggerCond: selects the documented mode, unit, or reference used by this operation."
+          }
+        }
+      },
+      "get_collateral_assets": {
+        "type": "object",
+        "properties": {}
+      },
+      "set_fee_type": {
+        "type": "object",
+        "properties": {
+          "fee_type": {
+            "type": "string",
+            "description": "set_fee_type/fee_type: selects the documented mode, unit, or reference used by this operation."
+          },
+          "feeType": {
+            "type": "string",
+            "description": "set_fee_type/feeType: selects the documented mode, unit, or reference used by this operation."
+          }
+        }
+      },
+      "set_collateral_assets": {
+        "type": "object",
+        "properties": {}
       }
     },
     "ondo": {

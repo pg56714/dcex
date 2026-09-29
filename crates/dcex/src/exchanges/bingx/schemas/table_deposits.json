@@ -22,7 +22,11 @@
       "offset",
       "limit",
       "recvWindow"
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_deposit_addresses",
@@ -42,7 +46,11 @@
       "offset",
       "limit",
       "recvWindow"
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_deposit_risk_records",

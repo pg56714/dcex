@@ -126,11 +126,30 @@ does not declare offset fields, unlike its single-order request. The catalog per
 signed offsets, but the existing native batch field allowlist still rejects them;
 this change does not assert batch transport support.
 [OKX simulation idxVol](https://www.okx.com/docs-v5/en/#trading-account-rest-api-position-builder)
-is a signed decimal in the -0.99 to 1 range. The checked [Backpack API documentation](https://docs.backpack.exchange/)
-describes triggerQuantity as a string quantity but does not establish percent-suffix
-support; no percent exception is inferred from that absence (checked 2026-09-29).
+is a signed decimal in the -0.99 to 1 range.
+The [official Backpack Rust client](https://github.com/backpack-exchange/bpx-api-client/blob/master/types/src/order.rs)
+serializes `TriggerQuantity::Percent` with a percent suffix. The `triggerQuantity`
+declaration therefore permits exact values such as `50%` through `x-percent`.
 [Aster futures pegOffset](https://asterdex.github.io/aster-api-website/futures-v3/account%26trades/)
 is explicitly signed: BUY offsets can be negative. Its declaration preserves this existing behavior.
+
+The completeness guard compares captured OKX batch/amend payload names with nested
+declarations; renaming a declaration while leaving the actual wire field unchanged
+fails the test. Numeric-name exemptions require a bool/int annotation and a
+field-qualified explanation. Currency and mode selectors have explicit nondecimal
+declarations. KuCoin deposited margin is positive; Bybit added margin is a signed delta.
+
+Bybit order quantity is positive except when both `reduceOnly` and `closeOnTrigger`
+are true, using the declared `x-zero-when` sibling conditions. This preserves the
+[documented perpetual/futures zero-quantity close](https://bybit-exchange.github.io/docs/v5/order/create-order).
+Kraken spot volume retains its zero-valued margin-close control. Positive rules also
+cover the audited Bitget/MEXC/Kraken order sizes, transfer amounts and OKX/Bybit leverage.
+
+[BingX's published request guidance](https://github.com/BingX-API/api-ai-skills/blob/main/skills/swap-trade/SKILL.md)
+requires attached TP/SL to be JSON strings with numeric prices. Batch dictionaries
+and JSON strings are normalized to that representation without binary floating-point
+rounding. Market TP/SL may omit `price`; when present it must be positive, as must
+`stopPrice`. Explicit zero prices remain invalid (checked 2026-09-29).
 
 Rust ledger evidence without `::symbol` is deliberately **file-level evidence**:
 it proves the cited source file exists, not that a particular function covers a

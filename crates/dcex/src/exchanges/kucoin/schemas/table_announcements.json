@@ -94,7 +94,11 @@
         "minimum": 0,
         "maximum": null
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_uta_announcements",
@@ -191,6 +195,10 @@
         "minimum": 0,
         "maximum": null
       }
-    ]
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   }
 ]

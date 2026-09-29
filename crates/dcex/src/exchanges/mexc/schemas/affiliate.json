@@ -41,7 +41,11 @@
       }
     ],
     "title": "Get Affiliate Campaign Data (affiliate only)",
-    "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-affiliate-campaign-data-affiliate-only"
+    "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-affiliate-campaign-data-affiliate-only",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_rebate_affiliate_commission_detail",
@@ -106,7 +110,11 @@
       }
     ],
     "title": "Get Affiliate Commission Detail Record (affiliate only)",
-    "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-affiliate-commission-detail-record-affiliate-only"
+    "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-affiliate-commission-detail-record-affiliate-only",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_rebate_affiliate_commission",
@@ -164,7 +172,11 @@
       }
     ],
     "title": "Get Affiliate Commission Record (affiliate only)",
-    "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-affiliate-commission-record-affiliate-only"
+    "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-affiliate-commission-record-affiliate-only",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_rebate_affiliate_referral",
@@ -222,7 +234,11 @@
       }
     ],
     "title": "Get Affiliate Referral Data（affiliate only）",
-    "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-affiliate-referral-dataaffiliate-only"
+    "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-affiliate-referral-dataaffiliate-only",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   },
   {
     "name": "get_rebate_affiliate_withdraw",
@@ -351,6 +367,10 @@
       }
     ],
     "title": "Get Subaffiliates Data (affiliate only)",
-    "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-subaffiliates-data-affiliate-only"
+    "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-subaffiliates-data-affiliate-only",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   }
 ]

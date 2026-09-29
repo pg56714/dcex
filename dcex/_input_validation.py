@@ -4,7 +4,7 @@ import inspect
 from functools import wraps
 from typing import Any
 
-from ._input_codec import CATALOG, normalize
+from ._input_codec import CATALOG, contextual_schema, normalize
 
 
 def endpoint_schema(exchange: str, method: str, *, websocket: bool = False) -> dict[str, Any]:
@@ -53,15 +53,24 @@ def _validated(function: Any, schema: dict[str, Any]) -> Any:  # noqa: ANN401
     def arguments(
         args: tuple[Any, ...], kwargs: dict[str, Any]
     ) -> tuple[tuple[Any, ...], dict[str, Any]]:
+        context = {**dict(zip(positional, args, strict=False)), **kwargs}
         normalized_args = tuple(
-            normalize(value, key=positional[index], schema=properties.get(positional[index], {}))
+            normalize(
+                value,
+                key=positional[index],
+                schema=contextual_schema(properties.get(positional[index], {}), context),
+            )
             if index < len(positional) and positional[index] != "self"
             else value
             for index, value in enumerate(args)
         )
         normalized_kwargs = {
             key: normalize(
-                value, key=key, schema=properties.get(key, properties.get(aliases.get(key), {}))
+                value,
+                key=key,
+                schema=contextual_schema(
+                    properties.get(key, properties.get(aliases.get(key), {})), context
+                ),
             )
             for key, value in kwargs.items()
         }

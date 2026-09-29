@@ -291,6 +291,10 @@
         "size": {
           "type": "string",
           "format": "decimal"
+        },
+        "offset": {
+          "type": "string",
+          "description": "post_api_lindorm_v1_ai_kline_query/offset: identifies the pagination cursor or result offset for this query."
         }
       }
     }

@@ -17,5 +17,12 @@
     "get_withdrawals": "Read-only history, availability or limits lookup; no movement of funds.",
     "get_withdrawal_limits": "Read-only history, availability or limits lookup; no movement of funds.",
     "export_withdrawals_csv": "Read-only history, availability or limits lookup; no movement of funds."
+  },
+  "extended": {
+    "get_bridge_config": "Reads supported bridge chains; does not accept or commit a transfer.",
+    "get_bridge_quote": "Requests a non-binding bridge estimate; committing the quote is a separate withdrawal operation."
+  },
+  "lighter": {
+    "get_fastbridge_info": "Reads public fast-bridge configuration; does not create or commit a withdrawal."
   }
 }

@@ -1065,6 +1065,54 @@
         "pendingBelowTrailingDelta": {
           "type": "string",
           "format": "decimal"
+        },
+        "working_peg_price_type": {
+          "type": "string",
+          "description": "place_spot_opoco/working_peg_price_type: selects the documented mode, unit, or reference used by this operation."
+        },
+        "working_peg_offset_type": {
+          "type": "string",
+          "description": "place_spot_opoco/working_peg_offset_type: selects the documented mode, unit, or reference used by this operation."
+        },
+        "pending_above_peg_price_type": {
+          "type": "string",
+          "description": "place_spot_opoco/pending_above_peg_price_type: selects the documented mode, unit, or reference used by this operation."
+        },
+        "pending_above_peg_offset_type": {
+          "type": "string",
+          "description": "place_spot_opoco/pending_above_peg_offset_type: selects the documented mode, unit, or reference used by this operation."
+        },
+        "pending_below_peg_price_type": {
+          "type": "string",
+          "description": "place_spot_opoco/pending_below_peg_price_type: selects the documented mode, unit, or reference used by this operation."
+        },
+        "pending_below_peg_offset_type": {
+          "type": "string",
+          "description": "place_spot_opoco/pending_below_peg_offset_type: selects the documented mode, unit, or reference used by this operation."
+        },
+        "workingPegPriceType": {
+          "type": "string",
+          "description": "place_spot_opoco/workingPegPriceType: selects the documented mode, unit, or reference used by this operation."
+        },
+        "workingPegOffsetType": {
+          "type": "string",
+          "description": "place_spot_opoco/workingPegOffsetType: selects the documented mode, unit, or reference used by this operation."
+        },
+        "pendingAbovePegPriceType": {
+          "type": "string",
+          "description": "place_spot_opoco/pendingAbovePegPriceType: selects the documented mode, unit, or reference used by this operation."
+        },
+        "pendingAbovePegOffsetType": {
+          "type": "string",
+          "description": "place_spot_opoco/pendingAbovePegOffsetType: selects the documented mode, unit, or reference used by this operation."
+        },
+        "pendingBelowPegPriceType": {
+          "type": "string",
+          "description": "place_spot_opoco/pendingBelowPegPriceType: selects the documented mode, unit, or reference used by this operation."
+        },
+        "pendingBelowPegOffsetType": {
+          "type": "string",
+          "description": "place_spot_opoco/pendingBelowPegOffsetType: selects the documented mode, unit, or reference used by this operation."
         }
       }
     }
