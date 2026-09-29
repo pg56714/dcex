@@ -75,50 +75,38 @@ impl BinanceClient {
             "get_subaccount_margin_summary" => (HttpMethod::Get, SUBACCOUNT_MARGIN_SUMMARY, &[]),
             "get_subaccount_assets" => (HttpMethod::Get, SUBACCOUNT_ASSETS, &["email"]),
             "get_subaccount_spot_summary" => (HttpMethod::Get, SUBACCOUNT_SPOT_SUMMARY, &[]),
-            "transfer_subaccount_futures" => (
-                HttpMethod::Post,
-                SUBACCOUNT_FUTURES_TRANSFER,
-                &["email", "asset", "amount", "type"],
-            ),
-            "transfer_subaccount_margin" => (
-                HttpMethod::Post,
-                SUBACCOUNT_MARGIN_TRANSFER,
-                &["email", "asset", "amount", "type"],
-            ),
+            "transfer_subaccount_futures" => {
+                super::transfers::subaccount_transfer_route(method_name)
+            }
+            "transfer_subaccount_margin" => {
+                super::transfers::subaccount_transfer_route(method_name)
+            }
             "get_subaccount_futures_transfer_history" => (
                 HttpMethod::Get,
                 SUBACCOUNT_FUTURES_TRANSFER_HISTORY,
                 &["email", "futuresType"],
             ),
-            "transfer_between_subaccount_futures" => (
-                HttpMethod::Post,
-                SUBACCOUNT_FUTURES_INTERNAL_TRANSFER,
-                &["fromEmail", "toEmail", "futuresType", "asset", "amount"],
-            ),
+            "transfer_between_subaccount_futures" => {
+                super::transfers::subaccount_transfer_route(method_name)
+            }
             "get_subaccount_spot_transfer_history" => {
                 (HttpMethod::Get, SUBACCOUNT_SPOT_TRANSFER_HISTORY, &[])
             }
             "get_subaccount_universal_transfer_history" => {
                 (HttpMethod::Get, SUBACCOUNT_UNIVERSAL_TRANSFER, &[])
             }
-            "transfer_between_subaccounts" => (
-                HttpMethod::Post,
-                SUBACCOUNT_UNIVERSAL_TRANSFER,
-                &["fromAccountType", "toAccountType", "asset", "amount"],
-            ),
+            "transfer_between_subaccounts" => {
+                super::transfers::subaccount_transfer_route(method_name)
+            }
             "get_subaccount_transfer_history" => {
                 (HttpMethod::Get, SUBACCOUNT_TRANSFER_HISTORY, &[])
             }
-            "transfer_subaccount_to_master" => (
-                HttpMethod::Post,
-                SUBACCOUNT_TO_MASTER_TRANSFER,
-                &["asset", "amount"],
-            ),
-            "transfer_subaccount_to_subaccount" => (
-                HttpMethod::Post,
-                SUBACCOUNT_TO_SUBACCOUNT_TRANSFER,
-                &["toEmail", "asset", "amount"],
-            ),
+            "transfer_subaccount_to_master" => {
+                super::transfers::subaccount_transfer_route(method_name)
+            }
+            "transfer_subaccount_to_subaccount" => {
+                super::transfers::subaccount_transfer_route(method_name)
+            }
             _ => return Ok(None),
         };
 

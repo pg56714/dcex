@@ -1,0 +1,21 @@
+{
+  "aster": {
+    "get_chain_withdraw_fee": "Read-only history, availability or limits lookup; no movement of funds.",
+    "get_spot_withdraw_fee": "Read-only history, availability or limits lookup; no movement of funds."
+  },
+  "binance": {
+    "get_margin_max_transferable": "Read-only history, availability or limits lookup; no movement of funds.",
+    "get_subaccount_futures_transfer_history": "Read-only history, availability or limits lookup; no movement of funds.",
+    "get_subaccount_spot_transfer_history": "Read-only history, availability or limits lookup; no movement of funds.",
+    "get_subaccount_universal_transfer_history": "Read-only history, availability or limits lookup; no movement of funds.",
+    "get_subaccount_transfer_history": "Read-only history, availability or limits lookup; no movement of funds."
+  },
+  "kucoin": {
+    "get_futures_max_withdraw_margin": "Read-only history, availability or limits lookup; no movement of funds."
+  },
+  "ondo": {
+    "get_withdrawals": "Read-only history, availability or limits lookup; no movement of funds.",
+    "get_withdrawal_limits": "Read-only history, availability or limits lookup; no movement of funds.",
+    "export_withdrawals_csv": "Read-only history, availability or limits lookup; no movement of funds."
+  }
+}

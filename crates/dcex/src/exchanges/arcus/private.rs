@@ -9,6 +9,12 @@ impl ArcusClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         crate::exchanges::input_contracts::pairs("arcus", method_name, &params)?;
+        if matches!(
+            method_name,
+            "create_withdrawal" | "create_withdrawal_signed"
+        ) {
+            return self.withdrawal_schema_request(method_name, params).await;
+        }
         if super::schema_requests::field_schemas::handles(method_name, false) {
             return self.field_schema_request(method_name, params).await;
         }

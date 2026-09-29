@@ -4,10 +4,11 @@ from collections.abc import Sequence
 from typing import Any
 
 from ._http_manager import HTTPManager
+from ._transfers_http import AccountHTTPTransfersHTTP
 from ._withdrawals_http import AccountHTTPWithdrawalsHTTP
 
 
-class AccountHTTP(AccountHTTPWithdrawalsHTTP, HTTPManager):
+class AccountHTTP(AccountHTTPTransfersHTTP, AccountHTTPWithdrawalsHTTP, HTTPManager):
     """Async HTTP client for Extended account endpoints."""
 
     async def get_account_details(self) -> Any:  # noqa: ANN401

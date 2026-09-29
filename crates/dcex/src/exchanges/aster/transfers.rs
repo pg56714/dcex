@@ -77,3 +77,34 @@ mod wrappers {
      ];
     }
 }
+
+mod fund_dispatch {
+    use crate::Result;
+    use crate::exchange::ValidatedResponse;
+    use crate::http::HttpMethod;
+
+    use super::super::client::{AsterClient, AsterMarket};
+    use super::super::endpoints::*;
+    use super::super::params::AsterParams;
+
+    impl AsterClient {
+        pub(in crate::exchanges::aster) async fn dispatch_transfer_spot_futures(
+            &self,
+            params: &AsterParams,
+        ) -> Result<ValidatedResponse> {
+            let market = params.get("market").unwrap_or("spot").to_ascii_lowercase();
+            let (market, path) = match market.as_str() {
+                "spot" => (AsterMarket::Spot, SPOT_TRANSFER),
+                "futures" => (AsterMarket::Futures, FUTURES_TRANSFER),
+                _ => unreachable!("validated Aster transfer market"),
+            };
+            self.signed(
+                HttpMethod::Post,
+                market,
+                path,
+                params.only(&["amount", "asset", "clientTranId", "kindType"]),
+            )
+            .await
+        }
+    }
+}

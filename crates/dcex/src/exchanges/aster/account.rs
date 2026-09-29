@@ -26,21 +26,7 @@ impl AsterClient {
                 )
                 .await
             }
-            "transfer_spot_futures" => {
-                let market = params.get("market").unwrap_or("spot").to_ascii_lowercase();
-                let (market, path) = match market.as_str() {
-                    "spot" => (AsterMarket::Spot, SPOT_TRANSFER),
-                    "futures" => (AsterMarket::Futures, FUTURES_TRANSFER),
-                    _ => unreachable!("validated Aster transfer market"),
-                };
-                self.signed(
-                    HttpMethod::Post,
-                    market,
-                    path,
-                    params.only(&["amount", "asset", "clientTranId", "kindType"]),
-                )
-                .await
-            }
+            "transfer_spot_futures" => self.dispatch_transfer_spot_futures(params).await,
             "get_futures_position_mode" => {
                 self.signed(
                     HttpMethod::Get,
