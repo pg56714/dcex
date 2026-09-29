@@ -22,7 +22,7 @@ pub(in crate::exchanges::kraken) fn parse_bool(
 }
 pub(in crate::exchanges::kraken) fn array(params: &KrakenParams, key: &str) -> Result<Vec<Value>> {
     let value: Value =
-        serde_json::from_str(params.required(key)?).map_err(|e| invalid(&e.to_string()))?;
+        serde_json::from_str(params.required(key)?).map_err(|e| invalid(e.to_string()))?;
     value
         .as_array()
         .cloned()

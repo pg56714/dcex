@@ -580,25 +580,25 @@ pub(super) fn validate(name: &str, params: &BTreeMap<String, String>) -> Result<
     };
     for key in params.keys() {
         if !fields.iter().any(|f| f.name == key) {
-            return Err(invalid(&format!("unsupported {name} field: {key}")));
+            return Err(invalid(format!("unsupported {name} field: {key}")));
         }
     }
     for field in fields {
         let Some(value) = params.get(field.name) else {
             if field.required {
-                return Err(invalid(&format!("{} is required", field.name)));
+                return Err(invalid(format!("{} is required", field.name)));
             }
             continue;
         };
         if value.trim().is_empty() {
-            return Err(invalid(&format!("{} must not be empty", field.name)));
+            return Err(invalid(format!("{} must not be empty", field.name)));
         }
         if field.integer {
             let n = value
                 .parse::<u64>()
-                .map_err(|_| invalid(&format!("{} must be an unsigned integer", field.name)))?;
+                .map_err(|_| invalid(format!("{} must be an unsigned integer", field.name)))?;
             if !(field.minimum..=field.maximum).contains(&n) {
-                return Err(invalid(&format!(
+                return Err(invalid(format!(
                     "{} is outside the documented range",
                     field.name
                 )));
@@ -619,7 +619,7 @@ pub(super) fn validate(name: &str, params: &BTreeMap<String, String>) -> Result<
                     }
                 })
             }) {
-                return Err(invalid(&format!("invalid {}", field.name)));
+                return Err(invalid(format!("invalid {}", field.name)));
             }
         }
     }
