@@ -3,11 +3,29 @@
 mod account_requests {
     use crate::exchanges::extended::{
         client::ExtendedClient,
+        endpoints::BRIDGE_QUOTE,
         params::{ExtendedParams, body_object, json_string, json_u64, object_required},
     };
     use crate::{DcexError, Result, exchange::ValidatedResponse};
     use serde_json::Value;
     impl ExtendedClient {
+        pub(in crate::exchanges::extended) async fn commit_bridge_quote_request(
+            &self,
+            params: &ExtendedParams,
+        ) -> Result<ValidatedResponse> {
+            params.ensure_allowed(&["id"], &[])?;
+            let id = params.required("id")?;
+            self.request(
+                crate::http::HttpMethod::Post,
+                BRIDGE_QUOTE,
+                vec![("id".into(), id.into())],
+                None,
+                true,
+                Default::default(),
+            )
+            .await
+        }
+
         pub(in crate::exchanges::extended) async fn create_withdrawal_signed_request(
             &self,
             params: &ExtendedParams,

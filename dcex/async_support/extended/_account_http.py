@@ -170,14 +170,6 @@ class AccountHTTP(AccountHTTPTransfersHTTP, AccountHTTPWithdrawalsHTTP, HTTPMana
         """Get chains supported by the Extended bridge."""
         return await self._native_private("get_bridge_config", [])
 
-    async def commit_bridge_quote(self, quote_id: str) -> Any:  # noqa: ANN401
-        """
-        Commit an accepted bridge quote and return the bridge commitment.
-
-        Source: https://api.docs.extended.exchange/#commit-quote
-        """
-        return await self._native_private("commit_bridge_quote", self._native_params(id=quote_id))
-
     async def get_bridge_quote(
         self,
         chainIn: str,  # noqa: N803

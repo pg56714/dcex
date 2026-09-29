@@ -222,19 +222,7 @@ impl ExtendedClient {
                 params.ensure_allowed(&[], &[])?;
                 self.private_get(BRIDGE_CONFIG, Vec::new()).await
             }
-            "commit_bridge_quote" => {
-                params.ensure_allowed(&["id"], &[])?;
-                let id = params.required("id")?;
-                self.request(
-                    crate::http::HttpMethod::Post,
-                    BRIDGE_QUOTE,
-                    vec![("id".into(), id.into())],
-                    None,
-                    true,
-                    Default::default(),
-                )
-                .await
-            }
+            "commit_bridge_quote" => self.commit_bridge_quote_request(params).await,
             "get_bridge_quote" => {
                 params.ensure_allowed(&["chainIn", "chainOut", "amount", "asset"], &[])?;
                 params.required_positive_decimal("amount")?;

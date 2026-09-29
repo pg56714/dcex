@@ -20,3 +20,11 @@ class AccountHTTPWithdrawalsHTTP(HTTPManager):
         return self._native_private(
             "create_withdrawal_signed", self._native_params(**{"body": body})
         )
+
+    def commit_bridge_quote(self, quote_id: str) -> Any:  # noqa: ANN401
+        """
+        Commit an accepted bridge quote and return the bridge commitment.
+
+        Source: https://api.docs.extended.exchange/#commit-quote
+        """
+        return self._native_private("commit_bridge_quote", self._native_params(id=quote_id))
