@@ -268,10 +268,10 @@ fn validate_passphrase(value: &str) -> Result<()> {
 fn validate_string_list(value: &Value, key: &str, max: usize, choices: &[&str]) -> Result<()> {
     let items = value
         .as_array()
-        .ok_or_else(|| invalid(&format!("{key} must be an array")))?;
+        .ok_or_else(|| invalid(format!("{key} must be an array")))?;
     let mut seen = std::collections::HashSet::new();
     if items.is_empty() || items.len() > max {
-        return Err(invalid(&format!("invalid {key} list length")));
+        return Err(invalid(format!("invalid {key} list length")));
     }
     for item in items {
         let text = item
@@ -279,7 +279,7 @@ fn validate_string_list(value: &Value, key: &str, max: usize, choices: &[&str]) 
             .filter(|s| !s.trim().is_empty())
             .ok_or_else(|| invalid("list entries must be nonempty strings"))?;
         if !seen.insert(text) || (!choices.is_empty() && !choices.contains(&text)) {
-            return Err(invalid(&format!("duplicate or unsupported {key}")));
+            return Err(invalid(format!("duplicate or unsupported {key}")));
         }
     }
     Ok(())
@@ -297,7 +297,7 @@ fn choices(params: &BitgetParams, key: &str, choices: &[&str]) -> Result<()> {
         .get(key)
         .is_some_and(|value| !choices.contains(&value))
     {
-        return Err(invalid(&format!("unsupported {key}")));
+        return Err(invalid(format!("unsupported {key}")));
     }
     Ok(())
 }
@@ -307,7 +307,7 @@ fn integer(params: &BitgetParams, key: &str) -> Result<Option<u64>> {
         .map(|value| {
             value
                 .parse()
-                .map_err(|_| invalid(&format!("{key} must be an unsigned integer")))
+                .map_err(|_| invalid(format!("{key} must be an unsigned integer")))
         })
         .transpose()
 }
@@ -512,7 +512,7 @@ fn validate(name: &str, params: &BitgetParams, endpoint: &Endpoint) -> Result<()
             && (value == 0
                 || (key != "pageNum" && endpoint.limit.is_some_and(|maximum| value > maximum)))
         {
-            return Err(invalid(&format!("{key} is outside the documented range")));
+            return Err(invalid(format!("{key} is outside the documented range")));
         }
     }
     let start = integer(params, "startTime")?;

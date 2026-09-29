@@ -126,5 +126,5 @@ pub(super) fn schema_required<'a>(params: &'a BitgetParams, key: &str) -> Result
     params
         .get(key)
         .filter(|value| !value.trim().is_empty())
-        .ok_or_else(|| schema_invalid(&format!("{key} is required")))
+        .ok_or_else(|| schema_invalid(format!("{key} is required")))
 }
