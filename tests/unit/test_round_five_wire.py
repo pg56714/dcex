@@ -88,3 +88,46 @@ async def test_bingx_batch_retains_exact_json_numbers(asynchronous):
             result = client.close()
             if inspect.isawaitable(result):
                 await result
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("asynchronous", [False, True])
+async def test_documented_signed_values_reach_the_wire(asynchronous):
+    from tests.unit.test_kraken_endpoint_coverage import _client_kwargs, _route_server
+
+    prefix = "dcex.async_support" if asynchronous else "dcex"
+    cls = importlib.import_module(f"{prefix}.kraken.client").Client
+    with _route_server() as (base, received):
+        client = cls(**_client_kwargs(base))
+        if asynchronous:
+            await client.async_init()
+        try:
+            result = client.place_futures_order(product_symbol="BTC-USD-SWAP", side="sell", orderType="take_profit", size="1", stopPrice="60000", limitPriceOffsetValue="-0.5", limitPriceOffsetUnit="PERCENT")
+            if inspect.isawaitable(result):
+                await result
+            request = received.get(timeout=2)
+            assert parse_qs(request["body"])["limitPriceOffsetValue"] == ["-0.5"]
+            # Official batch support is unconfirmed; retain the explicit native error.
+            with pytest.raises(ValueError, match="unsupported batch instruction field"):
+                result = client.manage_futures_batch_orders(orders=[dict(order="send", order_tag="offset", symbol="PF_XBTUSD", side="sell", orderType="take_profit", size="1", stopPrice="60000", limitPriceOffsetValue="-0.5", limitPriceOffsetUnit="PERCENT")])
+                if inspect.isawaitable(result):
+                    await result
+            assert received.empty()
+        finally:
+            result = client.close()
+            if inspect.isawaitable(result):
+                await result
+    cls = importlib.import_module(f"{prefix}.okx.client").Client
+    with _http_server({"code": "0", "data": []}) as (base, received):
+        client = cls(api_key="key", api_secret="secret", passphrase="pass", base_api=base, preload_product_table=False)
+        if asynchronous:
+            await client.async_init()
+        try:
+            result = client.simulate_positions(idx_vol="-0.5")
+            if inspect.isawaitable(result):
+                await result
+            assert json.loads(received.get(timeout=2)["body"])["idxVol"] == "-0.5"
+        finally:
+            result = client.close()
+            if inspect.isawaitable(result):
+                await result

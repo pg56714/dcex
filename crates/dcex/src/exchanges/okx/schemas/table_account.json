@@ -141,7 +141,16 @@
       "acctLv"
     ],
     "bools": [],
-    "schema": null
+    "schema": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "lever": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
   },
   {
     "name": "precheck_account_level_switch",

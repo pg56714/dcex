@@ -3,7 +3,7 @@
 import ast
 import re
 
-NUMERIC = re.compile(r"price|px|qty|quantity|amount|amt|size|sz|volume|vol|notional|funds|investment|collateral|margin|fee|leverage|ratio|percent|rate|offset|delta|spread", re.I)
+NUMERIC = re.compile(r"price|px|qty|quantity|amount|amt|size|sz|volume|vol|notional|funds|investment|collateral|margin|fee|lever|ratio|percent|pct|rate|offset|delta|spread", re.I)
 OPERATIONS = re.compile(r"order|amend|transfer|withdraw|batch", re.I)
 
 

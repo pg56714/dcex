@@ -140,6 +140,10 @@
         "slRatio": {
           "type": "string",
           "format": "decimal"
+        },
+        "lever": {
+          "type": "string",
+          "format": "decimal"
         }
       }
     }
@@ -728,6 +732,10 @@
         "topUpAmt": {
           "type": "string",
           "format": "decimal"
+        },
+        "lever": {
+          "type": "string",
+          "format": "decimal"
         }
       }
     }
@@ -794,6 +802,10 @@
         "min_px": {
           "type": "string",
           "format": "decimal"
+        },
+        "lever": {
+          "type": "string",
+          "format": "decimal"
         }
       }
     }
@@ -853,6 +865,10 @@
           "format": "decimal"
         },
         "sz": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "lever": {
           "type": "string",
           "format": "decimal"
         }
@@ -945,6 +961,26 @@
           "format": "decimal"
         },
         "profitSharingRatio": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "lever": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "tp_pct": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "sl_pct": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "tpPct": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "slPct": {
           "type": "string",
           "format": "decimal"
         }
@@ -1050,6 +1086,22 @@
           "format": "decimal"
         },
         "safetyOrdAmt": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "tp_pct": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "sl_pct": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "tpPct": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "slPct": {
           "type": "string",
           "format": "decimal"
         }
@@ -1445,6 +1497,10 @@
           "format": "decimal"
         },
         "investAmt": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "lever": {
           "type": "string",
           "format": "decimal"
         }

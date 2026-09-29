@@ -1912,22 +1912,22 @@ fn every_client_has_a_catalog_identity() {
     let catalog: serde_json::Value =
         serde_json::from_str(include_str!("input_contracts.json")).unwrap();
     let identities = [
-        arcus::client::ArcusClient::INPUT_EXCHANGE,
-        arcus::client::ArcusSpotClient::INPUT_EXCHANGE,
-        aster::client::AsterClient::INPUT_EXCHANGE,
-        backpack::client::BackpackClient::INPUT_EXCHANGE,
-        binance::client::BinanceClient::INPUT_EXCHANGE,
-        bingx::client::BingxClient::INPUT_EXCHANGE,
-        bitget::client::BitgetClient::INPUT_EXCHANGE,
-        bybit::client::BybitClient::INPUT_EXCHANGE,
-        extended::client::ExtendedClient::INPUT_EXCHANGE,
-        hyperliquid::client::HyperliquidClient::INPUT_EXCHANGE,
-        kraken::client::KrakenClient::INPUT_EXCHANGE,
-        kucoin::client::KucoinClient::INPUT_EXCHANGE,
-        lighter::client::LighterClient::INPUT_EXCHANGE,
-        mexc::client::MexcClient::INPUT_EXCHANGE,
-        okx::client::OkxClient::INPUT_EXCHANGE,
-        ondo::client::OndoClient::INPUT_EXCHANGE,
+        arcus::ArcusClient::INPUT_EXCHANGE,
+        arcus::ArcusSpotClient::INPUT_EXCHANGE,
+        aster::AsterClient::INPUT_EXCHANGE,
+        backpack::BackpackClient::INPUT_EXCHANGE,
+        binance::BinanceClient::INPUT_EXCHANGE,
+        bingx::BingxClient::INPUT_EXCHANGE,
+        bitget::BitgetClient::INPUT_EXCHANGE,
+        bybit::BybitClient::INPUT_EXCHANGE,
+        extended::ExtendedClient::INPUT_EXCHANGE,
+        hyperliquid::HyperliquidClient::INPUT_EXCHANGE,
+        kraken::KrakenClient::INPUT_EXCHANGE,
+        kucoin::KucoinClient::INPUT_EXCHANGE,
+        lighter::LighterClient::INPUT_EXCHANGE,
+        mexc::MexcClient::INPUT_EXCHANGE,
+        okx::OkxClient::INPUT_EXCHANGE,
+        ondo::OndoClient::INPUT_EXCHANGE,
     ];
     assert_eq!(identities.len(), 16);
     for identity in identities {

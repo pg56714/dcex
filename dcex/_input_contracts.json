@@ -19192,6 +19192,10 @@
           "min_px": {
             "type": "string",
             "format": "decimal"
+          },
+          "lever": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -19652,6 +19656,10 @@
                 }
               }
             }
+          },
+          "slippagePct": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -19871,6 +19879,10 @@
             "type": "string",
             "format": "decimal",
             "x-signed": true
+          },
+          "lever": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -19958,6 +19970,22 @@
           "safetyOrdAmt": {
             "type": "string",
             "format": "decimal"
+          },
+          "tp_pct": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "sl_pct": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "tpPct": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "slPct": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -20009,6 +20037,26 @@
             "format": "decimal"
           },
           "profitSharingRatio": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "lever": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "tp_pct": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "sl_pct": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "tpPct": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "slPct": {
             "type": "string",
             "format": "decimal"
           }
@@ -20217,6 +20265,10 @@
           "sz": {
             "type": "string",
             "format": "decimal"
+          },
+          "lever": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -20281,6 +20333,10 @@
             "format": "decimal"
           },
           "topUpAmt": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "lever": {
             "type": "string",
             "format": "decimal"
           }
@@ -20386,6 +20442,10 @@
             "format": "decimal"
           },
           "slRatio": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "lever": {
             "type": "string",
             "format": "decimal"
           }
@@ -20884,6 +20944,10 @@
           "investAmt": {
             "type": "string",
             "format": "decimal"
+          },
+          "lever": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -21362,6 +21426,33 @@
       "cancel_fiat_withdrawal": {
         "type": "object",
         "properties": {}
+      },
+      "set_leverage": {
+        "type": "object",
+        "properties": {
+          "lever": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "get_adjust_leverage": {
+        "type": "object",
+        "properties": {
+          "lever": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "preset_account_level_switch": {
+        "type": "object",
+        "properties": {
+          "lever": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
       }
     },
     "ondo": {

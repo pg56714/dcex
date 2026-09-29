@@ -110,6 +110,10 @@
           "type": "string",
           "format": "decimal",
           "x-signed": true
+        },
+        "lever": {
+          "type": "string",
+          "format": "decimal"
         }
       }
     }

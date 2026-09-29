@@ -120,6 +120,11 @@ Kraken V1 `amendOrder` also permits relative limit/trigger prices. Conditional
 corresponding price rules, as specified by the [Kraken V1 addOrder documentation](https://docs-legacy.kraken.com/api/docs/websocket-v1/addorder/).
 [Kraken futures offsets](https://docs.kraken.com/api-reference/order-management/send-order)
 allow positive and negative decimal values, with their unit specified separately.
+This is verified for `place_futures_order`. Batch offset support is unknown:
+the [official Kraken Go SDK batch instruction](https://github.com/krakenfx/api-go/blob/main/pkg/derivatives/entities.go)
+does not declare offset fields, unlike its single-order request. The catalog permits
+signed offsets, but the existing native batch field allowlist still rejects them;
+this change does not assert batch transport support.
 [OKX simulation idxVol](https://www.okx.com/docs-v5/en/#trading-account-rest-api-position-builder)
 is a signed decimal in the -0.99 to 1 range. The checked [Backpack API documentation](https://docs.backpack.exchange/)
 describes triggerQuantity as a string quantity but does not establish percent-suffix

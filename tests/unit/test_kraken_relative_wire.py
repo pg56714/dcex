@@ -53,7 +53,7 @@ async def test_relative_ws_wire(event, value):
     if event == "addOrder":
         payload.update({"close[price]": value, "close[price2]": value})
     if event == "amendOrder":
-        payload = {"event": event, "order_id": "order-id", "limit_price": value, "trigger_price": value}
+        payload = {"event": event, "txid": "order-id", "limit_price": value, "trigger_price": value}
     async with echo_peer() as (url, received):
         client = V1Client("offline-token", base_url=url, timeout=2)
         try:

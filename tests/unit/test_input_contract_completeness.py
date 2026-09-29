@@ -22,7 +22,7 @@ def test_all_public_numeric_and_structured_inputs_are_declared(prefix):
     assert not missing, missing
 
 
-@pytest.mark.parametrize("parameter", ["new_amount: str", "trailing_ratio: str", "orders: list[dict]"])
+@pytest.mark.parametrize("parameter", ["new_amount: str", "trailing_ratio: str", "lever: str", "slippagePct: str", "orders: list[dict]"])
 def test_adding_an_undeclared_numeric_or_batch_parameter_fails(parameter):
     source = f"class Trade:\n def place_order(self, {parameter}, **params): pass\n"
     assert missing_declarations(source, {"place_order": {"type": "object", "properties": {}}}, {}) == [("place_order", parameter.split(":")[0])]

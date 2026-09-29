@@ -103,6 +103,10 @@ Kraken V1 `amendOrder` 的限價／觸發價也允許相對價格。
 條件平倉 `close[price]`／`close[price2]`（Python `close_price`／`close_price2`）
 繼承對應價格規則，依據 [Kraken V1 addOrder 官方文件](https://docs-legacy.kraken.com/api/docs/websocket-v1/addorder/)。
 [Kraken 期貨偏移值](https://docs.kraken.com/api-reference/order-management/send-order)允許正負十進位值，單位由另一欄位指定。
+此行為已驗證於 `place_futures_order`。批次是否支援偏移欄位，目前不知道：
+[Kraken 官方 Go SDK 批次指令](https://github.com/krakenfx/api-go/blob/main/pkg/derivatives/entities.go)
+未如單筆請求宣告偏移欄位。契約允許有號偏移，但原生批次欄位清單仍明確拒絕這些欄位；
+本次修正不宣稱批次傳輸已支援偏移。
 [OKX 模擬 idxVol](https://www.okx.com/docs-v5/en/#trading-account-rest-api-position-builder)為 -0.99 至 1 的有號十進位值。
 [Backpack 官方文件](https://docs.backpack.exchange/)將 triggerQuantity 描述為字串數量，
 但未明確說明百分比後綴；目前不知道是否支援，因此不據此新增百分比例外（查核日期：2026-09-29）。
