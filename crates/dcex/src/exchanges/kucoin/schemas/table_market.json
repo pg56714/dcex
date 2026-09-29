@@ -284,7 +284,16 @@
     ],
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of uta interest rate index records per response page; this integer counts records."
+        },
+        "pageSize": {
+          "type": "integer",
+          "description": "limits the number of uta interest rate index records per response page; this integer counts records."
+        }
+      }
     }
   },
   {
@@ -625,7 +634,12 @@
     ],
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "offset": {
+          "type": "integer",
+          "description": "skips an integer number of futures interest rate index records before returning the next page."
+        }
+      }
     }
   },
   {
@@ -701,7 +715,12 @@
     ],
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "offset": {
+          "type": "integer",
+          "description": "skips an integer number of futures premium index records before returning the next page."
+        }
+      }
     }
   },
   {
@@ -1009,7 +1028,12 @@
     ],
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "offset": {
+          "type": "integer",
+          "description": "skips an integer number of spot index price records before returning the next page."
+        }
+      }
     }
   },
   {

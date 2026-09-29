@@ -44,7 +44,12 @@
     "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-affiliate-campaign-data-affiliate-only",
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of rebate affiliate campaign records per response page; this integer counts records."
+        }
+      }
     }
   },
   {
@@ -113,7 +118,12 @@
     "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-affiliate-commission-detail-record-affiliate-only",
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of rebate affiliate commission detail records per response page; this integer counts records."
+        }
+      }
     }
   },
   {
@@ -175,7 +185,12 @@
     "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-affiliate-commission-record-affiliate-only",
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of rebate affiliate commission records per response page; this integer counts records."
+        }
+      }
     }
   },
   {
@@ -237,7 +252,12 @@
     "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-affiliate-referral-dataaffiliate-only",
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of rebate affiliate referral records per response page; this integer counts records."
+        }
+      }
     }
   },
   {
@@ -285,7 +305,12 @@
     "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-affiliate-withdraw-record-affiliate-only",
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of rebate affiliate withdraw records per response page; this integer counts records."
+        }
+      }
     }
   },
   {
@@ -370,7 +395,12 @@
     "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-subaffiliates-data-affiliate-only",
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of rebate affiliate subaffiliates records per response page; this integer counts records."
+        }
+      }
     }
   }
 ]

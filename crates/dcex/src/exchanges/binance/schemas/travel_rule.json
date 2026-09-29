@@ -90,6 +90,22 @@
         "amount": {
           "type": "string",
           "format": "decimal"
+        },
+        "questionnaire": {
+          "type": "object",
+          "description": "For create broker withdrawal, carries identity, signing, permission, or travel-rule metadata for this operation."
+        },
+        "originator_pii": {
+          "type": "object",
+          "description": "For create broker withdrawal, carries identity, signing, permission, or travel-rule metadata for this operation."
+        },
+        "transaction_fee_flag": {
+          "type": "boolean",
+          "description": "For create broker withdrawal, controls an integer or boolean option rather than a transferred balance."
+        },
+        "transactionFeeFlag": {
+          "type": "boolean",
+          "description": "For create broker withdrawal, controls an integer or boolean option rather than a transferred balance."
         }
       }
     }
@@ -266,6 +282,18 @@
         "amount": {
           "type": "string",
           "format": "decimal"
+        },
+        "questionnaire": {
+          "type": "object",
+          "description": "For create travel rule withdrawal, carries identity, signing, permission, or travel-rule metadata for this operation."
+        },
+        "transaction_fee_flag": {
+          "type": "boolean",
+          "description": "For create travel rule withdrawal, controls an integer or boolean option rather than a transferred balance."
+        },
+        "transactionFeeFlag": {
+          "type": "boolean",
+          "description": "For create travel rule withdrawal, controls an integer or boolean option rather than a transferred balance."
         }
       }
     }

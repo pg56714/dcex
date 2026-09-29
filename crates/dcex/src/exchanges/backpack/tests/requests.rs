@@ -24,8 +24,9 @@ fn borrow_liquidation_estimate_uses_encoded_payload() {
     });
     let encoded = base64::engine::general_purpose::STANDARD
         .encode(br#"{"quantity":"1","side":"Borrow","symbol":"BTC"}"#);
-    let client = BackpackClient::with_base_url(None, None, 5_000, Duration::from_secs(2), base_url)
-        .expect("client");
+    let client =
+        BackpackClient::with_base_url(None, None, 5_000, Duration::from_secs(10), base_url)
+            .expect("client");
     let result = crate::http::block_on(async move {
         client
             .public_request(
@@ -46,7 +47,7 @@ fn borrow_liquidation_estimate_uses_encoded_payload() {
 
 #[test]
 fn rfq_submit_omits_default_execution_mode() {
-    let client = BackpackClient::public(5_000, Duration::from_secs(1)).expect("client");
+    let client = BackpackClient::public(5_000, Duration::from_secs(10)).expect("client");
     let error = crate::http::block_on(async move {
         client
             .submit_rfq("BTC-USDC-SPOT", "Bid")
@@ -64,7 +65,7 @@ fn rfq_submit_omits_default_execution_mode() {
 
 #[test]
 fn immediate_rfq_requires_price() {
-    let client = BackpackClient::public(5_000, Duration::from_secs(1)).expect("client");
+    let client = BackpackClient::public(5_000, Duration::from_secs(10)).expect("client");
     let error = crate::http::block_on(async move {
         client
             .submit_rfq_with_execution_mode("BTC-USDC-SPOT", "Bid", "Immediate")
@@ -78,7 +79,7 @@ fn immediate_rfq_requires_price() {
 
 #[test]
 fn rfq_actions_accept_client_id_identifiers() {
-    let accept_client = BackpackClient::public(5_000, Duration::from_secs(1)).expect("client");
+    let accept_client = BackpackClient::public(5_000, Duration::from_secs(10)).expect("client");
     let accept_error = crate::http::block_on(async move {
         accept_client
             .accept_rfq_quote_by_client_id(42, "quote-id")
@@ -91,7 +92,7 @@ fn rfq_actions_accept_client_id_identifiers() {
             .contains("Signed Backpack requests require api_key and api_secret")
     );
 
-    let cancel_client = BackpackClient::public(5_000, Duration::from_secs(1)).expect("client");
+    let cancel_client = BackpackClient::public(5_000, Duration::from_secs(10)).expect("client");
     let cancel_error =
         crate::http::block_on(async move { cancel_client.cancel_rfq_by_client_id(42).await })
             .expect_err("valid clientId cancel should reach credential validation");

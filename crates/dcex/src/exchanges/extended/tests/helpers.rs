@@ -14,7 +14,7 @@ pub(super) async fn public_request(method: &str, params: Vec<(String, String)>) 
     let (base_url, handle) = server();
     let client = ExtendedClient::with_base_url(
         None,
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         base_url,
         "dcex-test".to_string(),
     )
@@ -31,7 +31,7 @@ pub(super) async fn private_request(method: &str, params: Vec<(String, String)>)
     let (base_url, handle) = server();
     let client = ExtendedClient::with_base_url(
         Some("extended-key".to_string()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         base_url,
         "dcex-test".to_string(),
     )

@@ -2312,6 +2312,10 @@
 - [`complete_login_challenge`](../dcex/ondo/_market_http.py) — Exchange a caller-signed SIWE challenge for a JWT.
 - [`create_withdrawal`](../dcex/ondo/_withdrawals_http.py) — Submit a withdrawal to the specified address.
 - [`get_login_challenge`](../dcex/ondo/_market_http.py) — Request a SIWE challenge for Ethereum (1) or Avalanche (43114).
+- [`get_spot_depth`](../dcex/ondo/_market_http.py) — Read spot depth using BASE-QUOTE or BASE-QUOTE-SPOT.
+- [`get_spot_price_history`](../dcex/ondo/_market_http.py) — Read spot history with a TradingView symbol and Unix-second bounds.
+- [`get_spot_symbol_info`](../dcex/ondo/_market_http.py) — List spot TradingView symbols such as SPYUSDC.
+- [`get_spot_trades`](../dcex/ondo/_market_http.py) — Read public spot trades without account authentication.
 - [`hello`](../dcex/ondo/_market_http.py) — Get the public service greeting and health response.
 - [`invalidate_jwt`](../dcex/ondo/_account_http.py) — Invalidate all JWT sessions for this account using API key authentication.
 - [`ping`](../dcex/ondo/_market_http.py) — Alias for the public /hello service check.

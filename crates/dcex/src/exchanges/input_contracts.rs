@@ -52,18 +52,43 @@ pub(crate) fn validate(value: &Value, schema: &Value, key: &str) -> Result<()> {
     if value.is_null() || schema.is_null() {
         return Ok(());
     }
-    if schema["x-empty-as-absent"] == true && value.as_str() == Some("") {
+    if schema["x-empty-as-absent"] == true
+        && value.as_str().is_some_and(|raw| raw.trim().is_empty())
+    {
+        return Ok(());
+    }
+    if schema["x-delimited-string"] == true
+        && let Some(raw) = value.as_str()
+        && !raw.trim_start().starts_with('[')
+    {
+        if raw.split(',').any(|part| part.trim().is_empty()) {
+            return Err(DcexError::InvalidInput(format!(
+                "{key} requires nonempty comma-separated identifiers"
+            )));
+        }
         return Ok(());
     }
     if matches!(schema["type"].as_str(), Some("object" | "array"))
         && let Some(raw) = value.as_str()
     {
-        let parsed: Value = serde_json::from_str(raw).map_err(|_| invalid())?;
+        let parsed: Value = serde_json::from_str(raw.trim()).map_err(|_| {
+            DcexError::InvalidInput(format!(
+                "{key} must be a JSON {}",
+                schema["type"].as_str().unwrap_or("object")
+            ))
+        })?;
         return validate(&parsed, schema, key);
     }
     if schema["type"] == "object" && !value.is_object() {
         return Err(DcexError::InvalidInput(format!(
             "{key} must be a JSON object"
+        )));
+    }
+    if schema["x-nonempty-object"] == true
+        && value.as_object().is_some_and(|object| object.is_empty())
+    {
+        return Err(DcexError::InvalidInput(format!(
+            "{key} must be a nonempty JSON object"
         )));
     }
     if schema["format"] == "decimal" {
@@ -122,8 +147,28 @@ pub(crate) fn validate(value: &Value, schema: &Value, key: &str) -> Result<()> {
         if !(positive || zero && schema["x-positive"] != true) {
             return Err(invalid());
         }
+        if let Some(minimum) = schema["x-minimum"].as_str() {
+            let order = decimal_order(&raw, minimum);
+            if order.is_lt()
+                || order.is_eq() && schema["x-exclusive-minimum"] == true
+                || zero && schema["x-nonzero"] == true
+            {
+                return Err(DcexError::InvalidInput(format!(
+                    "{key} requires a decimal within its declared range"
+                )));
+            }
+        }
     }
     if let Some(object) = value.as_object() {
+        if schema["x-forbidden-keys"].as_array().is_some_and(|keys| {
+            keys.iter()
+                .filter_map(Value::as_str)
+                .any(|name| object.contains_key(name))
+        }) {
+            return Err(DcexError::InvalidInput(format!(
+                "{key} contains unsupported fields"
+            )));
+        }
         for (name, child) in object {
             let field = &schema["properties"][name];
             if allows_zero(field, value) {
@@ -141,6 +186,49 @@ pub(crate) fn validate(value: &Value, schema: &Value, key: &str) -> Result<()> {
         }
     }
     Ok(())
+}
+
+fn decimal_order(left: &str, right: &str) -> std::cmp::Ordering {
+    fn parts(raw: &str) -> (bool, &str, &str) {
+        let (whole, fraction) = raw
+            .trim_start_matches('-')
+            .split_once('.')
+            .unwrap_or((raw.trim_start_matches('-'), ""));
+        let whole = whole.trim_start_matches('0');
+        let fraction = fraction.trim_end_matches('0');
+        (
+            raw.starts_with('-') && !(whole.is_empty() && fraction.is_empty()),
+            whole,
+            fraction,
+        )
+    }
+    let (left_negative, left_whole, left_fraction) = parts(left);
+    let (right_negative, right_whole, right_fraction) = parts(right);
+    if left_negative != right_negative {
+        return right_negative.cmp(&left_negative);
+    }
+    let order = left_whole
+        .len()
+        .cmp(&right_whole.len())
+        .then_with(|| left_whole.cmp(right_whole))
+        .then_with(|| {
+            let length = left_fraction.len().max(right_fraction.len());
+            left_fraction
+                .bytes()
+                .chain(std::iter::repeat(b'0'))
+                .take(length)
+                .cmp(
+                    right_fraction
+                        .bytes()
+                        .chain(std::iter::repeat(b'0'))
+                        .take(length),
+                )
+        });
+    if left_negative {
+        order.reverse()
+    } else {
+        order
+    }
 }
 
 pub(crate) fn pairs(exchange: &str, method: &str, pairs: &[(String, String)]) -> Result<()> {
@@ -197,6 +285,53 @@ pub(crate) fn input(
 mod tests {
     use super::*;
     use serde_json::json;
+
+    #[test]
+    fn attached_trigger_ratios_use_exact_signed_bounds_and_delete_controls() {
+        for method in [
+            "place_order",
+            "place_batch_orders",
+            "amend_order",
+            "amend_algo_order",
+            "amend_multiple_orders",
+        ] {
+            let parent = endpoint("okx", method, false);
+            let parent = if method == "place_batch_orders" || method == "amend_multiple_orders" {
+                &parent["properties"]["orders"]["items"]
+            } else {
+                parent
+            };
+            let attached = &parent["properties"]["attachAlgoOrds"]["items"];
+            let amendment = method.starts_with("amend");
+            for field in if amendment {
+                ["newTpTriggerRatio", "newSlTriggerRatio"]
+            } else {
+                ["tpTriggerRatio", "slTriggerRatio"]
+            } {
+                let rule = &attached["properties"][field];
+                let tp = field.contains("Tp") || field.starts_with("tp");
+                assert_eq!(validate(&json!("-0.1"), rule, field).is_ok(), tp);
+                assert_eq!(validate(&json!("0"), rule, field).is_ok(), amendment);
+                assert!(validate(&json!("-1"), rule, field).is_err());
+                assert!(validate(&json!("-1.000000000000000001"), rule, field).is_err());
+                assert!(validate(&json!("0.125000000000000001"), rule, field).is_ok());
+            }
+            if amendment {
+                assert!(validate(&json!({"newSz":"1e-7"}), attached, "attached").is_err());
+            }
+        }
+        assert!(decimal_order("-0.999999999999999999999", "-1").is_gt());
+        assert!(decimal_order("-1.000000000000000000001", "-1").is_lt());
+        assert!(decimal_order("-0.000", "0").is_eq());
+    }
+
+    #[test]
+    fn algo_attached_size_is_not_a_documented_field() {
+        for alias in ["attachAlgoOrds", "attach_algo_ords"] {
+            let schema = endpoint("okx", "place_algo_order", false);
+            assert!(validate(&json!({alias:[{"sz":"1"}]}), schema, "algo").is_err());
+        }
+    }
 
     fn walk(schema: &Value, count: &mut usize) {
         let schema = resolve(schema);

@@ -203,7 +203,16 @@
     "confirm": false,
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of v2 broker query my commission records per response page; this integer counts records."
+        },
+        "pageSize": {
+          "type": "integer",
+          "description": "limits the number of v2 broker query my commission records per response page; this integer counts records."
+        }
+      }
     }
   },
   {
@@ -310,7 +319,16 @@
     "confirm": false,
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of v2 broker query user records per response page; this integer counts records."
+        },
+        "pageSize": {
+          "type": "integer",
+          "description": "limits the number of v2 broker query user records per response page; this integer counts records."
+        }
+      }
     }
   },
   {
@@ -425,7 +443,16 @@
     "confirm": false,
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of v2 broker query detail by uid records per response page; this integer counts records."
+        },
+        "pageSize": {
+          "type": "integer",
+          "description": "limits the number of v2 broker query detail by uid records per response page; this integer counts records."
+        }
+      }
     }
   },
   {
@@ -746,7 +773,16 @@
     "confirm": false,
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of kyc nd broker proxy client status page records per response page; this integer counts records."
+        },
+        "pageSize": {
+          "type": "integer",
+          "description": "limits the number of kyc nd broker proxy client status page records per response page; this integer counts records."
+        }
+      }
     }
   },
   {
@@ -866,7 +902,16 @@
     "confirm": false,
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of v1 broker nd account records per response page; this integer counts records."
+        },
+        "pageSize": {
+          "type": "integer",
+          "description": "limits the number of v1 broker nd account records per response page; this integer counts records."
+        }
+      }
     }
   },
   {

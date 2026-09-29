@@ -290,6 +290,30 @@ fn public_market_data_routes_match_official_paths() {
         public("ping", &[], "GET", "/hello"),
         public("get_markets", &[], "GET", "/v1/markets"),
         public(
+            "get_spot_depth",
+            &[("market", "SPY-USDC-SPOT")],
+            "GET",
+            "/v1/spot/depth?market=SPY-USDC",
+        ),
+        public(
+            "get_spot_trades",
+            &[("market", "SPY-USDC")],
+            "GET",
+            "/v1/spot/trades?market=SPY-USDC",
+        ),
+        public("get_spot_symbol_info", &[], "GET", "/v1/spot/symbol_info"),
+        public(
+            "get_spot_price_history",
+            &[
+                ("symbol", "SPYUSDC"),
+                ("resolution", "60"),
+                ("from", "1"),
+                ("to", "2"),
+            ],
+            "GET",
+            "/v1/spot/history?symbol=SPYUSDC&resolution=60&from=1&to=2",
+        ),
+        public(
             "get_trades",
             &[("market", MARKET), ("limit", "10")],
             "GET",

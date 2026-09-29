@@ -135,6 +135,11 @@ CASES = [
         from_time=1,
         to_time=2,
     ),
+    # Public spot endpoints observed on the service; private spot remains blocked.
+    case("get_spot_depth", "/v1/spot/depth?market=SPY-USDC", market="SPY-USDC-SPOT"),
+    case("get_spot_trades", "/v1/spot/trades?market=SPY-USDC", market="SPY-USDC"),
+    case("get_spot_symbol_info", "/v1/spot/symbol_info"),
+    case("get_spot_price_history", "/v1/spot/history?symbol=SPYUSDC&resolution=60&from=1&to=2", symbol="SPYUSDC", resolution="60", from_time=1, to_time=2),
     # Orders
     case(
         "get_orders",
@@ -372,6 +377,9 @@ def _drain(received: queue.Queue[dict[str, Any]]) -> list[dict[str, Any]]:
 def _assert_request(wire: WireCase, requests: list[dict[str, Any]]) -> None:
     assert len(requests) == 1, requests
     request = requests[0]
+    if wire.method.startswith("get_spot_"):
+        assert not any(key.lower().startswith("ondo-") for key in request)
+        assert request["authorization"] is None
     from tests.unit.wire_contracts import assert_wire_contract
     assert_wire_contract("ondo", wire.method, request)
     assert request["method"] == EXPECTED_VERBS[wire.method]
@@ -461,3 +469,22 @@ def test_unsafe_requests_are_rejected_before_the_wire(
     finally:
         client.close()
     assert _drain(received) == []
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("asynchronous", [False, True])
+async def test_spot_symbols_cannot_reach_perpetual_order_transport(asynchronous, server):
+    base_url, received = server
+    _drain(received)
+    client = (AsyncClient if asynchronous else Client)(**_client_kwargs(base_url))
+    try:
+        with pytest.raises(ValueError, match="spot private trading is blocked"):
+            result = client.place_order(market="SPY-USDC-SPOT", side="buy", type="limit", price="1", size="1")
+            if asynchronous:
+                await result
+        assert received.empty()
+    finally:
+        if asynchronous:
+            await client.close()
+        else:
+            client.close()

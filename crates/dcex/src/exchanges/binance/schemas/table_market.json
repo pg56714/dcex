@@ -1128,7 +1128,16 @@
     ],
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of dual investment product list records per response page; this integer counts records."
+        },
+        "pageSize": {
+          "type": "integer",
+          "description": "limits the number of dual investment product list records per response page; this integer counts records."
+        }
+      }
     }
   },
   {

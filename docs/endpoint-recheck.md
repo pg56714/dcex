@@ -2,7 +2,7 @@
 
 **English** | [繁體中文](endpoint-recheck.zh_tw.md)
 
-Reviewed: 2026-09-29. The original report contained 3,180 rows; the reconciled ledger contains 4,846 rows, with official documentation inventories for all 15 exchanges.
+Reviewed: 2026-09-30. The original report contained 3,180 rows; the reconciled ledger contains 4,857 rows, with official documentation inventories for all 15 exchanges.
 
 All documented endpoints are in scope, including withdrawals, address management, market making, RFQ, broker, referral and partner operations. All 111 originally excluded rows have been addressed; there are no scope exclusions. This does not mean every newly discovered endpoint is implemented.
 
@@ -75,6 +75,13 @@ API withdrawals have no second confirmation; they execute on submit. Trading API
 | 4712 | mexc | WS /ws (channel=incremental-order-book-maintenance-mechanism) | `unavailable` | [Docs](https://www.mexc.com/api-docs/futures/websocket-api/incremental-order-book-maintenance-mechanism) |
 | 4718 | mexc | WS /ws (channel=how-to-properly-maintain-a-local-copy-of-the-order-book) | `unavailable` | [Docs](https://www.mexc.com/api-docs/spot-v3/websocket-market-streams/how-to-properly-maintain-a-local-copy-of-the-order-book) |
 | 4736 | mexc | WS /ws (channel=deduction-info) | `unverified` | [Docs](https://www.mexc.com/api-docs/futures/websocket-api/deduction-info) |
+| 4851 | ondo | POST /v1/spot/orders | `blocked` | [Docs](https://docs.ondoperps.xyz/spot-trading) |
+| 4852 | ondo | DELETE /v1/spot/orders | `blocked` | [Docs](https://docs.ondoperps.xyz/spot-trading) |
+| 4853 | ondo | GET /v1/spot/orders | `blocked` | [Docs](https://docs.ondoperps.xyz/spot-trading) |
+| 4854 | ondo | POST /v1/spot/orders/batch | `blocked` | [Docs](https://docs.ondoperps.xyz/spot-trading) |
+| 4855 | ondo | DELETE /v1/spot/orders/batch | `blocked` | [Docs](https://docs.ondoperps.xyz/spot-trading) |
+| 4856 | ondo | GET /v1/spot/fills | `blocked` | [Docs](https://docs.ondoperps.xyz/spot-trading) |
+| 4857 | ondo | GET /v1/spot/candles | `blocked` | [Docs](https://docs.ondoperps.xyz/spot-trading) |
 
 ## Pending inventory rows
 

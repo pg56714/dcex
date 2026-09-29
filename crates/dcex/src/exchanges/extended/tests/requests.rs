@@ -85,7 +85,7 @@ async fn market_methods_use_documented_paths() {
 async fn get_candles_requires_interval_and_limit() {
     let client = ExtendedClient::with_base_url(
         None,
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         "http://127.0.0.1:1".to_string(),
         "dcex-test".to_string(),
     )

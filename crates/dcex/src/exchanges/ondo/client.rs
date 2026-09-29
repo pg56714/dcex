@@ -285,6 +285,12 @@ impl OndoClient {
     }
 
     pub(super) fn exchange_symbol(&self, product_symbol: &str) -> Result<String> {
+        if product_symbol.ends_with("-SPOT") {
+            return Err(DcexError::InvalidInput(
+                "Ondo spot private trading is blocked pending the official API specification"
+                    .into(),
+            ));
+        }
         if product_symbol.ends_with(".P") {
             return Ok(product_symbol.to_string());
         }

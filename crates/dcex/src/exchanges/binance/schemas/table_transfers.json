@@ -165,7 +165,16 @@
     ],
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "asset": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "For wallet dust transfer, selects currency identifiers or funding source categories for this operation.",
+          "x-delimited-string": true
+        }
+      }
     }
   },
   {

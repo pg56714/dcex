@@ -1113,6 +1113,54 @@
         "pendingBelowPegOffsetType": {
           "type": "string",
           "description": "place_spot_opoco/pendingBelowPegOffsetType: selects the documented mode, unit, or reference used by this operation."
+        },
+        "working_strategy_id": {
+          "type": "integer",
+          "description": "For place spot opoco, identifies the strategy of the working leg rather than specifying its price or quantity."
+        },
+        "working_strategy_type": {
+          "type": "integer",
+          "description": "For place spot opoco, selects the strategy category of the working leg rather than specifying its price or quantity."
+        },
+        "pending_above_strategy_id": {
+          "type": "integer",
+          "description": "For place spot opoco, identifies the strategy of the pending above leg rather than specifying its price or quantity."
+        },
+        "pending_above_strategy_type": {
+          "type": "integer",
+          "description": "For place spot opoco, selects the strategy category of the pending above leg rather than specifying its price or quantity."
+        },
+        "pending_below_strategy_id": {
+          "type": "integer",
+          "description": "For place spot opoco, identifies the strategy of the pending below leg rather than specifying its price or quantity."
+        },
+        "pending_below_strategy_type": {
+          "type": "integer",
+          "description": "For place spot opoco, selects the strategy category of the pending below leg rather than specifying its price or quantity."
+        },
+        "workingStrategyId": {
+          "type": "integer",
+          "description": "For place spot opoco, identifies the strategy of the working leg rather than specifying its price or quantity."
+        },
+        "workingStrategyType": {
+          "type": "integer",
+          "description": "For place spot opoco, selects the strategy category of the working leg rather than specifying its price or quantity."
+        },
+        "pendingAboveStrategyId": {
+          "type": "integer",
+          "description": "For place spot opoco, identifies the strategy of the pending above leg rather than specifying its price or quantity."
+        },
+        "pendingAboveStrategyType": {
+          "type": "integer",
+          "description": "For place spot opoco, selects the strategy category of the pending above leg rather than specifying its price or quantity."
+        },
+        "pendingBelowStrategyId": {
+          "type": "integer",
+          "description": "For place spot opoco, identifies the strategy of the pending below leg rather than specifying its price or quantity."
+        },
+        "pendingBelowStrategyType": {
+          "type": "integer",
+          "description": "For place spot opoco, selects the strategy category of the pending below leg rather than specifying its price or quantity."
         }
       }
     }

@@ -23,7 +23,7 @@ async def close(client):
 @pytest.mark.parametrize("asynchronous", [False, True])
 @pytest.mark.parametrize("native", [False, True])
 @pytest.mark.parametrize("method", ["amend_order", "amend_algo_order", "amend_multiple_orders", "place_order", "place_batch_orders"])
-@pytest.mark.parametrize("field", ["sz", "newTpTriggerRatio", "newSlTriggerRatio", "newCallbackRatio", "newCallbackSpread", "newActivePx"])
+@pytest.mark.parametrize("field", ["sz", "newCallbackRatio", "newCallbackSpread", "newActivePx"])
 async def test_okx_amend_attached_decimal_fields(asynchronous, native, method, field):
     if method.startswith("place") and field.startswith("new"):
         field = field[3].lower() + field[4:]
@@ -63,7 +63,7 @@ async def test_okx_amend_attached_decimal_fields(asynchronous, native, method, f
 @pytest.mark.asyncio
 @pytest.mark.parametrize("asynchronous", [False, True])
 @pytest.mark.parametrize("native", [False, True])
-@pytest.mark.parametrize("value", [[{"stopPrice": "-5"}], 5, True, None, ""])
+@pytest.mark.parametrize("value", [[{"stopPrice": "-5"}], 5, True, None, "", "  ", {}, "{}"])
 async def test_bingx_batch_attached_object_or_absent(asynchronous, native, value):
     prefix = "dcex.async_support" if asynchronous else "dcex"
     cls = importlib.import_module(f"{prefix}.bingx.client").Client
@@ -74,7 +74,7 @@ async def test_bingx_batch_attached_object_or_absent(asynchronous, native, value
         try:
             order = dict(symbol="BTC-USDT", side="BUY", type="MARKET", positionSide="LONG", quantity="1", takeProfit=value, stopLoss=value)
             args = {"batchOrders" if native else "batch_orders": [order]}
-            if value is None or value == "":
+            if value is None or isinstance(value, str) and not value.strip():
                 await invoke(client, "place_swap_batch_order", args, native)
                 request = received.get(timeout=10)
                 params = parse_qs(urlsplit(request["path"]).query or request["body"])

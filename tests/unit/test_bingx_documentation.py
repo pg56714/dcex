@@ -19,7 +19,7 @@ def assert_docstring_summaries(source, require_functions=False):
             continue  # Missing-doc policy is separate from existing summaries.
         name = getattr(node, "name", "module")
         assert doc and doc.strip(), name
-        assert not doc.lstrip().startswith(("Args:", "Returns:", "Raises:", "Yields:", "Attributes:", "Example:", "Examples:", "Note:")), name
+        assert not doc.lstrip().startswith(("Args:", "Returns:", "Raises:", "Yields:", "Attributes:", "Example:", "Examples:", "Note:", "Notes:", "Warning:", "Warnings:", "See Also:", "Todo:")), name
 
 
 def test_all_public_docstrings_start_with_a_summary():
@@ -53,7 +53,7 @@ def test_all_docstrings_have_at_most_one_consecutive_blank_line():
                 assert not doc or not re.search(r"\n[ \t]*\n[ \t]*\n", doc), (path, getattr(node, "name", "module"))
 
 
-@pytest.mark.parametrize("prefix", ["Yields", "Attributes", "Example", "Examples", "Note"])
+@pytest.mark.parametrize("prefix", ["Yields", "Attributes", "Example", "Examples", "Note", "Notes", "Warning", "Warnings", "See Also", "Todo"])
 def test_additional_section_prefixes_are_not_summaries(prefix):
     with pytest.raises(AssertionError):
         assert_docstring_summaries(f'def public():\n """{prefix}: missing summary."""\n ...')

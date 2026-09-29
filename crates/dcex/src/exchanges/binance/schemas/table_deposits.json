@@ -133,7 +133,12 @@
     ],
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "offset": {
+          "type": "integer",
+          "description": "skips an integer number of deposit history records before returning the next page."
+        }
+      }
     }
   },
   {

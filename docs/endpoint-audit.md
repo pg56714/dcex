@@ -2,7 +2,7 @@
 
 **English** | [繁體中文](endpoint-audit.zh_tw.md)
 
-Reviewed: 2026-09-29. The original report contained 3,180 rows; the reconciled ledger contains 4,846 rows, with official documentation inventories for all 15 exchanges.
+Reviewed: 2026-09-30. The original report contained 3,180 rows; the reconciled ledger contains 4,857 rows, with official documentation inventories for all 15 exchanges.
 
 All documented endpoints are in scope, including withdrawals, address management, market making, RFQ, broker, referral and partner operations. All 111 originally excluded rows have been addressed; there are no scope exclusions. This does not mean every newly discovered endpoint is implemented.
 
@@ -16,12 +16,12 @@ Historical, grouped and overlapping rows prevent converting these counts into an
 
 | Status | Rows | Definition |
 | --- | ---: | --- |
-| `implemented` | 3,696 | Exact offline HTTP route and public Rust/Python wrappers |
+| `implemented` | 3,700 | Exact offline HTTP route and public Rust/Python wrappers |
 | `protocol` | 403 | Asynchronous WebSocket protocol support with cited offline evidence; no live certification |
 | `superseded` | 686 | Historical or grouped row replaced by explicit current rows |
 | `unavailable` | 19 | Retired/unavailable operation, or documentation-only section with no endpoint |
 | `unverified` | 11 | Wrapper exists, but part of the official specification is incomplete |
-| `blocked` | 30 | Required signing or authorization specification is missing |
+| `blocked` | 37 | Required signing or authorization specification is missing |
 | `partial` | 1 | Grouped capability still has a documented gap |
 | `pending` | 0 | Documented operation awaiting implementation or dedicated verification |
 
@@ -44,15 +44,15 @@ Method counts include aliases and signing helpers, not endpoints. Additions are 
 | [backpack](official-endpoint-inventory/backpack.json) | 82 | 18 | 79 | 0 |
 | [aster](official-endpoint-inventory/aster.json) | 157 | 69 | 152 | 0 |
 | [extended](official-endpoint-inventory/extended.json) | 72 | 31 | 72 | 0 |
-| [ondo](official-endpoint-inventory/ondo.json) | 78 | 7 | 72 | 0 |
+| [ondo](official-endpoint-inventory/ondo.json) | 82 | 11 | 76 | 0 |
 | [arcus](official-endpoint-inventory/arcus.json) | 90 | 50 | 77 | 0 |
 
 ## Verification and limits
 
 <!-- VERIFICATION -->
-- Rust passed: `690`
+- Rust passed: `693`
 - Rust live ignored: `53`
-- Python passed: `23984`
+- Python passed: `24134`
 - Python deselected: `944`
 - Python skipped: `0`
 - Python xfailed: `0`
@@ -67,3 +67,5 @@ Offline tests verify routes, HTTP methods, parameters, signatures, WebSocket mes
 - OKX/Bitget SBE returns raw bytes without a built-in decoder.
 - Lighter explorer uses a separate base URL; historical exports never automatically pay a fee.
 - The ledger records the exact gaps and resolution requirements for `unverified` and `blocked` rows.
+
+Ondo supports perpetual futures and public spot market data with product-table entries. Private spot trading remains blocked; spot balance queries and WebSocket specifications are unverified. See [Ondo spot support](ondo-spot.md).

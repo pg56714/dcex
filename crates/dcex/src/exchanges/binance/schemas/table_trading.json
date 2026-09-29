@@ -623,6 +623,38 @@
         "pendingPegOffsetType": {
           "type": "string",
           "description": "place_spot_opo/pendingPegOffsetType: selects the documented mode, unit, or reference used by this operation."
+        },
+        "working_strategy_id": {
+          "type": "integer",
+          "description": "For place spot opo, identifies the strategy of the working leg rather than specifying its price or quantity."
+        },
+        "working_strategy_type": {
+          "type": "integer",
+          "description": "For place spot opo, selects the strategy category of the working leg rather than specifying its price or quantity."
+        },
+        "pending_strategy_id": {
+          "type": "integer",
+          "description": "For place spot opo, identifies the strategy of the pending leg rather than specifying its price or quantity."
+        },
+        "pending_strategy_type": {
+          "type": "integer",
+          "description": "For place spot opo, selects the strategy category of the pending leg rather than specifying its price or quantity."
+        },
+        "workingStrategyId": {
+          "type": "integer",
+          "description": "For place spot opo, identifies the strategy of the working leg rather than specifying its price or quantity."
+        },
+        "workingStrategyType": {
+          "type": "integer",
+          "description": "For place spot opo, selects the strategy category of the working leg rather than specifying its price or quantity."
+        },
+        "pendingStrategyId": {
+          "type": "integer",
+          "description": "For place spot opo, identifies the strategy of the pending leg rather than specifying its price or quantity."
+        },
+        "pendingStrategyType": {
+          "type": "integer",
+          "description": "For place spot opo, selects the strategy category of the pending leg rather than specifying its price or quantity."
         }
       }
     }
@@ -1469,7 +1501,16 @@
     ],
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of algo historical algo orders future algo records per response page; this integer counts records."
+        },
+        "pageSize": {
+          "type": "integer",
+          "description": "limits the number of algo historical algo orders future algo records per response page; this integer counts records."
+        }
+      }
     }
   },
   {
@@ -1514,7 +1555,16 @@
     ],
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of algo sub orders future algo records per response page; this integer counts records."
+        },
+        "pageSize": {
+          "type": "integer",
+          "description": "limits the number of algo sub orders future algo records per response page; this integer counts records."
+        }
+      }
     }
   },
   {
@@ -1613,6 +1663,10 @@
         "quantity": {
           "type": "string",
           "format": "decimal"
+        },
+        "duration": {
+          "type": "integer",
+          "description": "For algo time weighted average price future algo, specifies a scheduling duration or timestamp in the endpoint time unit."
         }
       }
     }
@@ -1849,7 +1903,16 @@
     ],
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of algo historical algo orders spot algo records per response page; this integer counts records."
+        },
+        "pageSize": {
+          "type": "integer",
+          "description": "limits the number of algo historical algo orders spot algo records per response page; this integer counts records."
+        }
+      }
     }
   },
   {
@@ -1894,7 +1957,16 @@
     ],
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of algo sub orders spot algo records per response page; this integer counts records."
+        },
+        "pageSize": {
+          "type": "integer",
+          "description": "limits the number of algo sub orders spot algo records per response page; this integer counts records."
+        }
+      }
     }
   },
   {
@@ -1968,6 +2040,10 @@
         "quantity": {
           "type": "string",
           "format": "decimal"
+        },
+        "duration": {
+          "type": "integer",
+          "description": "For algo time weighted average price spot algo, specifies a scheduling duration or timestamp in the endpoint time unit."
         }
       }
     }
@@ -2022,7 +2098,16 @@
     ],
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of dual investment positions records per response page; this integer counts records."
+        },
+        "pageSize": {
+          "type": "integer",
+          "description": "limits the number of dual investment positions records per response page; this integer counts records."
+        }
+      }
     }
   }
 ]

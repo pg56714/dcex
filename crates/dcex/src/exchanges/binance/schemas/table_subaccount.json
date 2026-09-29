@@ -226,7 +226,16 @@
     ],
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "can_margin_loan_repay": {
+          "type": "boolean",
+          "description": "For create sub account api key, controls the API key permission for margin loan repayment using a boolean flag."
+        },
+        "canMarginLoanRepay": {
+          "type": "boolean",
+          "description": "For create sub account api key, controls the API key permission for margin loan repayment using a boolean flag."
+        }
+      }
     }
   },
   {
@@ -408,7 +417,16 @@
     ],
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "can_margin_loan_repay": {
+          "type": "boolean",
+          "description": "For modify sub account api key permission, controls the API key permission for margin loan repayment using a boolean flag."
+        },
+        "canMarginLoanRepay": {
+          "type": "boolean",
+          "description": "For modify sub account api key permission, controls the API key permission for margin loan repayment using a boolean flag."
+        }
+      }
     }
   },
   {
@@ -674,7 +692,12 @@
     ],
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "offset": {
+          "type": "integer",
+          "description": "skips an integer number of sub account deposit history records before returning the next page."
+        }
+      }
     }
   },
   {

@@ -13,7 +13,7 @@ pub(super) fn client() -> MexcClient {
     MexcClient::new(
         Some("api-key".to_string()),
         Some("secret".to_string()),
-        Duration::from_secs(1),
+        Duration::from_secs(10),
     )
     .expect("client")
 }

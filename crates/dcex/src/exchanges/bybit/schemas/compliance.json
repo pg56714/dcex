@@ -120,7 +120,12 @@
     "verification_note": "Official spec incomplete; not verified live. appeal_types is passed through because array query encoding is unspecified.",
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of compliance appeal list records per response page; this integer counts records."
+        }
+      }
     }
   }
 ]

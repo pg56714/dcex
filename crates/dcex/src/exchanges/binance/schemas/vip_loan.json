@@ -103,6 +103,10 @@
         "size": {
           "type": "string",
           "format": "decimal"
+        },
+        "duration": {
+          "type": "integer",
+          "description": "For query vip loan fixed rate market, specifies a scheduling duration or timestamp in the endpoint time unit."
         }
       }
     }
@@ -191,6 +195,10 @@
         "collateral_coin": {
           "type": "string",
           "description": "vip_loan_borrow/collateral_coin: selects collateral currencies, account identifiers, or the collateral enable switch."
+        },
+        "is_flexible_rate": {
+          "type": "boolean",
+          "description": "For vip loan borrow, selects flexible rather than fixed loan-rate mode using a boolean flag."
         }
       }
     }
@@ -381,7 +389,12 @@
     "summary": "Check VIP Loan Collateral Account (USER_DATA)",
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "collateral_account_id": {
+          "type": "integer",
+          "description": "For check vip loan collateral account, selects collateral currencies, account identifiers, or the collateral enable switch."
+        }
+      }
     }
   },
   {
@@ -509,6 +522,10 @@
         "collateral_coin": {
           "type": "string",
           "description": "get_vip_loan_ongoing_orders/collateral_coin: selects collateral currencies, account identifiers, or the collateral enable switch."
+        },
+        "collateral_account_id": {
+          "type": "integer",
+          "description": "For get vip loan ongoing orders, selects collateral currencies, account identifiers, or the collateral enable switch."
         }
       }
     }

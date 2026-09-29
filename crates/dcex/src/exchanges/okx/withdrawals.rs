@@ -70,10 +70,13 @@ impl super::client::OkxClient {
         p: &super::params::OkxParams,
         public: bool,
     ) -> crate::Result<Option<crate::exchange::ValidatedResponse>> {
-        debug_assert!(
-            crate::exchanges::schema::fund_domain(name)
-                == Some(crate::exchanges::schema::FundDomain::Withdrawals)
-        );
+        if crate::exchanges::schema::fund_domain(name)
+            != Some(crate::exchanges::schema::FundDomain::Withdrawals)
+        {
+            return Err(crate::DcexError::InvalidInput(
+                "fund operation routed to the wrong owner".into(),
+            ));
+        }
         self.table_request_transport(name, p, public).await
     }
 }

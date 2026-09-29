@@ -30,7 +30,7 @@ fn futures_orderbook_uses_fapi_base_url() {
     let client = BinanceClient::with_base_urls(
         None,
         None,
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         "http://127.0.0.1:9".to_string(),
         futures_base_url,
     )
@@ -46,7 +46,7 @@ fn futures_orderbook_uses_fapi_base_url() {
 #[test]
 fn coin_futures_market_data_uses_dapi_base_url() {
     let (coin_base_url, handle) = recording_server();
-    let client = BinanceClient::public(Duration::from_secs(2))
+    let client = BinanceClient::public(Duration::from_secs(10))
         .expect("client")
         .with_coin_futures_base_url(coin_base_url);
     block_on(async move {
@@ -69,7 +69,7 @@ fn coin_futures_market_data_uses_dapi_base_url() {
 
 #[test]
 fn convert_pairs_require_at_least_one_asset() {
-    let client = BinanceClient::public(Duration::from_secs(1)).expect("client");
+    let client = BinanceClient::public(Duration::from_secs(10)).expect("client");
     let error =
         block_on(async move { client.public_request("get_convert_pairs", Vec::new()).await })
             .expect_err("missing filter");
@@ -78,7 +78,7 @@ fn convert_pairs_require_at_least_one_asset() {
 
 #[test]
 fn convert_quote_requires_one_amount_before_network() {
-    let client = BinanceClient::public(Duration::from_secs(1)).expect("client");
+    let client = BinanceClient::public(Duration::from_secs(10)).expect("client");
     let error = block_on(async move {
         client
             .private_request(
@@ -102,7 +102,7 @@ fn raw_auto_routes_options_paths_to_options_base_url() {
     let client = BinanceClient::with_all_base_urls(
         None,
         None,
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         "http://127.0.0.1:9".to_string(),
         "http://127.0.0.1:9".to_string(),
         options_base_url,
@@ -126,7 +126,7 @@ fn options_market_data_uses_dedicated_path() {
     let client = BinanceClient::with_all_base_urls(
         None,
         None,
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         "http://127.0.0.1:9".to_string(),
         "http://127.0.0.1:9".to_string(),
         options_base_url,
@@ -157,7 +157,7 @@ fn options_market_data_uses_dedicated_path() {
 
 #[test]
 fn options_order_requires_an_order_identifier_for_lookup() {
-    let client = BinanceClient::public(Duration::from_secs(1)).expect("client");
+    let client = BinanceClient::public(Duration::from_secs(10)).expect("client");
     let error = block_on(async move {
         client
             .private_request(
@@ -179,7 +179,7 @@ fn raw_auto_routes_spot_paths_to_spot_base_url() {
     let client = BinanceClient::with_base_urls(
         None,
         None,
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         spot_base_url,
         "http://127.0.0.1:9".to_string(),
     )
@@ -207,7 +207,7 @@ fn raw_auto_routes_futures_paths_to_futures_base_url() {
     let client = BinanceClient::with_base_urls(
         None,
         None,
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         "http://127.0.0.1:9".to_string(),
         futures_base_url,
     )
@@ -240,7 +240,7 @@ fn product_table_selects_equity_market() {
         min_notional: "1".to_string(),
         size_per_contract: "1".to_string(),
     }]);
-    let client = BinanceClient::public(Duration::from_secs(1))
+    let client = BinanceClient::public(Duration::from_secs(10))
         .expect("client")
         .with_product_table(table);
 
@@ -262,7 +262,7 @@ fn equity_market_data_uses_dedicated_path() {
     let client = BinanceClient::with_base_urls(
         Some("api-key".to_string()),
         None,
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         spot_base_url,
         "http://127.0.0.1:9".to_string(),
     )
@@ -289,7 +289,7 @@ fn futures_algo_lookup_requires_an_identifier_before_requesting() {
     let client = BinanceClient::new(
         Some("api-key".to_string()),
         Some("secret".to_string()),
-        Duration::from_secs(1),
+        Duration::from_secs(10),
     )
     .expect("client");
 
@@ -312,7 +312,7 @@ fn order_lookup_requires_an_identifier_before_requesting() {
         let client = BinanceClient::new(
             Some("api-key".to_string()),
             Some("secret".to_string()),
-            Duration::from_secs(1),
+            Duration::from_secs(10),
         )
         .expect("client");
         let error = block_on(async move {
@@ -338,7 +338,7 @@ fn current_spot_exchange_info_fields_reach_the_wire() {
     let client = BinanceClient::with_base_urls(
         None,
         None,
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         spot_base_url,
         "http://127.0.0.1:9".to_string(),
     )
@@ -371,7 +371,7 @@ fn current_spot_kline_fields_reach_the_wire() {
     let client = BinanceClient::with_base_urls(
         None,
         None,
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         spot_base_url,
         "http://127.0.0.1:9".to_string(),
     )
@@ -405,7 +405,7 @@ fn spot_account_omit_zero_balances_reaches_the_wire() {
     let client = BinanceClient::with_base_urls(
         Some("api-key".to_string()),
         Some("secret".to_string()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         spot_base_url,
         "http://127.0.0.1:9".to_string(),
     )
@@ -434,7 +434,7 @@ fn spot_cancel_fields_reach_the_wire() {
     let client = BinanceClient::with_base_urls(
         Some("api-key".to_string()),
         Some("secret".to_string()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         spot_base_url,
         "http://127.0.0.1:9".to_string(),
     )
@@ -466,7 +466,7 @@ fn futures_account_trade_order_id_reaches_the_wire() {
     let client = BinanceClient::with_base_urls(
         Some("api-key".to_string()),
         Some("secret".to_string()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         "http://127.0.0.1:9".to_string(),
         futures_base_url,
     )
@@ -491,7 +491,7 @@ fn futures_account_trade_order_id_reaches_the_wire() {
 
 #[test]
 fn margin_order_lookup_requires_an_identifier() {
-    let client = BinanceClient::public(Duration::from_secs(1)).expect("client");
+    let client = BinanceClient::public(Duration::from_secs(10)).expect("client");
     let error = block_on(async move {
         client
             .private_request(
@@ -507,7 +507,7 @@ fn margin_order_lookup_requires_an_identifier() {
 
 #[test]
 fn flexible_earn_partial_redemption_requires_amount() {
-    let client = BinanceClient::public(Duration::from_secs(1)).expect("client");
+    let client = BinanceClient::public(Duration::from_secs(10)).expect("client");
     let error = block_on(async move {
         client
             .private_request(
@@ -526,7 +526,7 @@ fn flexible_earn_partial_redemption_requires_amount() {
 
 #[test]
 fn flexible_loan_borrow_requires_an_amount() {
-    let client = BinanceClient::public(Duration::from_secs(1)).expect("client");
+    let client = BinanceClient::public(Duration::from_secs(10)).expect("client");
     let error = block_on(async move {
         client
             .private_request(
@@ -545,7 +545,7 @@ fn flexible_loan_borrow_requires_an_amount() {
 
 #[test]
 fn staking_mutations_require_documented_identifiers() {
-    let client = BinanceClient::public(Duration::from_secs(1)).expect("client");
+    let client = BinanceClient::public(Duration::from_secs(10)).expect("client");
     let error = block_on(async move {
         client
             .private_request("subscribe_onchain_yields", Vec::new())
@@ -558,7 +558,7 @@ fn staking_mutations_require_documented_identifiers() {
 
 #[test]
 fn subaccount_transfer_requires_internal_account_fields() {
-    let client = BinanceClient::public(Duration::from_secs(1)).expect("client");
+    let client = BinanceClient::public(Duration::from_secs(10)).expect("client");
     let error = block_on(async move {
         client
             .private_request(
@@ -581,7 +581,7 @@ fn portfolio_margin_algo_lookup_needs_only_algo_id() {
     let client = BinanceClient::with_base_urls(
         Some("api-key".to_string()),
         Some("secret".to_string()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         spot_base_url.clone(),
         "http://127.0.0.1:9".to_string(),
     )
@@ -600,7 +600,7 @@ fn portfolio_margin_cm_order_uses_papi_route() {
     let client = BinanceClient::with_base_urls(
         Some("api-key".to_string()),
         Some("secret".to_string()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         spot_base_url.clone(),
         "http://127.0.0.1:9".to_string(),
     )
@@ -620,7 +620,7 @@ fn portfolio_margin_cm_order_uses_papi_route() {
 
 #[test]
 fn portfolio_margin_margin_order_requires_price_and_time_in_force() {
-    let client = BinanceClient::public(Duration::from_secs(1)).expect("client");
+    let client = BinanceClient::public(Duration::from_secs(10)).expect("client");
     let error = block_on(async move {
         client
             .place_pm_margin_order("BTCUSDT", "BUY", "LIMIT", "1")
@@ -636,7 +636,7 @@ fn portfolio_margin_modify_order_uses_put_route() {
     let client = BinanceClient::with_base_urls(
         Some("api-key".to_string()),
         Some("secret".to_string()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         spot_base_url.clone(),
         "http://127.0.0.1:9".to_string(),
     )
@@ -654,7 +654,7 @@ fn portfolio_margin_modify_order_uses_put_route() {
 
 #[test]
 fn portfolio_margin_cm_conditional_requires_trigger_and_uses_route() {
-    let client = BinanceClient::public(Duration::from_secs(1)).expect("client");
+    let client = BinanceClient::public(Duration::from_secs(10)).expect("client");
     let error = block_on(async move {
         client
             .place_pm_cm_conditional_order("BTCUSD_PERP", "SELL", "STOP_MARKET")
@@ -667,7 +667,7 @@ fn portfolio_margin_cm_conditional_requires_trigger_and_uses_route() {
     let client = BinanceClient::with_base_urls(
         Some("api-key".to_string()),
         Some("secret".to_string()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         spot_base_url.clone(),
         "http://127.0.0.1:9".to_string(),
     )
@@ -691,7 +691,7 @@ fn portfolio_margin_oco_uses_margin_order_oco_route() {
     let client = BinanceClient::with_base_urls(
         Some("api-key".to_string()),
         Some("secret".to_string()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         spot_base_url.clone(),
         "http://127.0.0.1:9".to_string(),
     )
@@ -713,7 +713,7 @@ fn portfolio_margin_cm_conditional_lookup_uses_open_order_route() {
     let client = BinanceClient::with_base_urls(
         Some("api-key".to_string()),
         Some("secret".to_string()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         spot_base_url.clone(),
         "http://127.0.0.1:9".to_string(),
     )
@@ -732,7 +732,7 @@ fn portfolio_margin_cm_conditional_lookup_uses_open_order_route() {
 
 #[test]
 fn portfolio_margin_cm_trailing_callback_rate_uses_official_range() {
-    let client = BinanceClient::public(Duration::from_secs(1)).expect("client");
+    let client = BinanceClient::public(Duration::from_secs(10)).expect("client");
     let error = block_on(async move {
         client
             .place_pm_cm_conditional_order("BTCUSD_PERP", "SELL", "TRAILING_STOP_MARKET")

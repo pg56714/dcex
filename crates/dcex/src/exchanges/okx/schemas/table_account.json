@@ -67,7 +67,16 @@
     "schema": null,
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "collateral_enabled": {
+          "type": "boolean",
+          "description": "For get collateral assets, selects whether an asset serves as collateral using a boolean flag."
+        },
+        "collateralEnabled": {
+          "type": "boolean",
+          "description": "For get collateral assets, selects whether an asset serves as collateral using a boolean flag."
+        }
+      }
     }
   },
   {
@@ -203,7 +212,16 @@
     "schema": null,
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "collateral_enabled": {
+          "type": "boolean",
+          "description": "For set collateral assets, selects whether an asset serves as collateral using a boolean flag."
+        },
+        "collateralEnabled": {
+          "type": "boolean",
+          "description": "For set collateral assets, selects whether an asset serves as collateral using a boolean flag."
+        }
+      }
     }
   },
   {

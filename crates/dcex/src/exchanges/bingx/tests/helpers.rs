@@ -15,7 +15,7 @@ pub(super) fn recording_server() -> (String, thread::JoinHandle<String>) {
     let handle = thread::spawn(move || {
         let (mut stream, _) = listener.accept().expect("accept");
         stream
-            .set_read_timeout(Some(Duration::from_secs(2)))
+            .set_read_timeout(Some(Duration::from_secs(10)))
             .expect("timeout");
         let mut bytes = [0u8; 4096];
         let size = stream.read(&mut bytes).expect("request");

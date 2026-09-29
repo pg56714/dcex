@@ -69,7 +69,16 @@
     ],
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of deposit history records per response page; this integer counts records."
+        },
+        "pageSize": {
+          "type": "integer",
+          "description": "limits the number of deposit history records per response page; this integer counts records."
+        }
+      }
     }
   },
   {
@@ -267,7 +276,16 @@
     ],
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of uta deposit history records per response page; this integer counts records."
+        },
+        "pageSize": {
+          "type": "integer",
+          "description": "limits the number of uta deposit history records per response page; this integer counts records."
+        }
+      }
     }
   }
 ]

@@ -375,7 +375,11 @@
     "sandbox_withdrawal": "POST",
     "set_api_key_ip_whitelist": "POST",
     "set_leverage": "POST",
-    "set_stop_order": "POST"
+    "set_stop_order": "POST",
+    "get_spot_depth": "GET",
+    "get_spot_trades": "GET",
+    "get_spot_symbol_info": "GET",
+    "get_spot_price_history": "GET"
   },
   "lighter": {
     "acknowledge_notification": "POST",

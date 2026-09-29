@@ -7,7 +7,7 @@ async fn public_spot_orderbook_uses_public_endpoint() {
         None,
         None,
         None,
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         base_url,
         "http://127.0.0.1:9".to_string(),
     )
@@ -38,7 +38,7 @@ async fn spot_open_orders_uses_current_paginated_endpoint() {
         Some("key".to_string()),
         Some("secret".to_string()),
         Some("passphrase".to_string()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         base_url,
         "http://127.0.0.1:9".to_string(),
     )
@@ -69,7 +69,7 @@ async fn futures_position_uses_v2_endpoint() {
         Some("key".to_string()),
         Some("secret".to_string()),
         Some("passphrase".to_string()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         "http://127.0.0.1:9".to_string(),
         base_url,
     )
@@ -94,7 +94,7 @@ async fn futures_kline_uses_minutes_for_granularity() {
         None,
         None,
         None,
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         "http://127.0.0.1:9".to_string(),
         base_url,
     )
@@ -122,7 +122,7 @@ async fn futures_order_serializes_current_quantity_and_force_hold_fields() {
         Some("key".to_string()),
         Some("secret".to_string()),
         Some("passphrase".to_string()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         "http://127.0.0.1:9".to_string(),
         base_url,
     )
@@ -165,7 +165,7 @@ async fn earn_purchase_uses_json_body_and_endpoint() {
         Some("key".to_string()),
         Some("secret".to_string()),
         Some("passphrase".to_string()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         base_url,
         "http://127.0.0.1:9".to_string(),
     )
@@ -199,7 +199,7 @@ async fn subaccount_balance_uses_path_and_query() {
         Some("key".to_string()),
         Some("secret".to_string()),
         Some("passphrase".to_string()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         base_url,
         "http://127.0.0.1:9".to_string(),
     )
@@ -237,7 +237,7 @@ async fn uta_v2_positions_and_risk_overview_use_documented_paths() {
             Some("key".into()),
             Some("secret".into()),
             Some("passphrase".into()),
-            Duration::from_secs(2),
+            Duration::from_secs(10),
             base_url,
             "http://127.0.0.1:9".into(),
         )

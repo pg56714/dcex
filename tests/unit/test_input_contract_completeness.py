@@ -43,7 +43,7 @@ def test_boilerplate_exemption_reason_is_rejected():
         missing_declarations("class Trade:\n def get_orders(self, page_size: int): pass\n", {}, {"get_orders/page_size": "Integer pagination control; not a financial decimal"})
 
 
-@pytest.mark.parametrize("field", ["price", "base_amount", "usdc_amount"])
+@pytest.mark.parametrize("field", ["price", "base_amount", "usdc_amount", "trigger_price", "integrator_taker_fee", "integrator_maker_fee", "amount", "share_amount", "operator_fee"])
 def test_lighter_scaled_financial_integers_cannot_be_exempted(field):
     source = f"class Client:\n def create_order(self, {field}: int): pass\n"
     identity = f"create_order/{field}"
@@ -55,3 +55,17 @@ def test_repeated_reasons_are_rejected_after_removing_identity():
     from tests.unit.input_contract_coverage import validate_exemptions
     with pytest.raises(AssertionError):
         validate_exemptions({f"m{i}/page_size": f"m{i}/page_size: limits the number of result records returned by this endpoint" for i in range(5)})
+
+
+def test_method_prefixes_and_field_tokens_cannot_hide_repeated_reasons():
+    from tests.unit.input_contract_coverage import validate_exemptions
+    with pytest.raises(AssertionError):
+        validate_exemptions({f"m{i}/field{i}": f"m{i}/field{i}: For m{i}, field{i} identifies existing requests without order quantities" for i in range(5)})
+
+
+@pytest.mark.parametrize("method,field", [("mint_shares", "share_amount"), ("create_public_pool", "operator_fee")])
+def test_lighter_pool_financial_fields_cannot_be_exempted(method, field):
+    identity = f"{method}/{field}"
+    source = f"class Client:\n def {method}(self, {field}: int): pass\n"
+    with pytest.raises(AssertionError):
+        missing_declarations(source, {method: {"properties": {}}}, {identity: f"{identity}: integer control described with several distinct words to conceal missing financial coverage"}, "lighter")

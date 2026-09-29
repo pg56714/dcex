@@ -898,6 +898,17 @@ def _case_kwargs(case: EndpointCase, method: Any) -> dict[str, Any]:
         # This test checks forwarding to the fake transport. Business-valid
         # contents are covered by the real localhost endpoint tests.
         kwargs[field] = {}
+    for name, value in list(kwargs.items()):
+        if name not in signature.parameters:
+            continue
+        annotation = str(signature.parameters[name].annotation)
+        if isinstance(value, str) and "dict[" in annotation:
+            kwargs[name] = [{}] if "list[" in annotation else {}
+        elif isinstance(value, str) and annotation.startswith("list["):
+            kwargs[name] = ["fixture"] if annotation.startswith("list[str]") else [{}]
+    if case.exchange == "bingx" and case.method_name in {"place_spot_batch_order", "place_swap_batch_order"}:
+        field = "batch_orders" if "batch_orders" in signature.parameters else "data"
+        kwargs[field] = [{"symbol": "BTC-USDT", "side": "BUY", "positionSide": "LONG", "type": "MARKET", "quantity": "1"}]
     return kwargs
 
 

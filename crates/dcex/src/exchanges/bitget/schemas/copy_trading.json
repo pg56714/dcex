@@ -1392,7 +1392,15 @@
     "summary": "Sell And Sell in Batch",
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "tracking_no_list": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "For classic copytrading spot copytrade follower order close tracking, identifies existing orders or requests to query or cancel; contains no order quantities."
+        }
+      }
     }
   },
   {
@@ -1821,7 +1829,15 @@
     "summary": "Stop The Order",
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "tracking_no_list": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "For classic copytrading spot copytrade follower stop order, identifies existing orders or requests to query or cancel; contains no order quantities."
+        }
+      }
     }
   },
   {
@@ -1976,7 +1992,15 @@
     "summary": "Sell And Sell in Batch",
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "tracking_no_list": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "For classic copytrading spot copytrade trader order close tracking, identifies existing orders or requests to query or cancel; contains no order quantities."
+        }
+      }
     }
   },
   {

@@ -261,7 +261,16 @@
     ],
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of convert limit order detail list records per response page; this integer counts records."
+        },
+        "pageSize": {
+          "type": "integer",
+          "description": "limits the number of convert limit order detail list records per response page; this integer counts records."
+        }
+      }
     }
   },
   {
@@ -420,7 +429,16 @@
     ],
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of convert order history records per response page; this integer counts records."
+        },
+        "pageSize": {
+          "type": "integer",
+          "description": "limits the number of convert order history records per response page; this integer counts records."
+        }
+      }
     }
   },
   {

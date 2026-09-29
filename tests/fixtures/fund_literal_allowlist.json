@@ -1,0 +1,654 @@
+[
+  {
+    "source": "arcus/client.rs",
+    "names": [
+      "PermitWitnessTransferFrom"
+    ],
+    "sha256": "a99bfa6001dae57164e71fb89ecd789524b00037e5c3ad2151202ff3a709a7f6",
+    "reason": "Reviewed signing, read-only metadata or owner delegation; every recognized fund dispatch arm is independently checked."
+  },
+  {
+    "source": "arcus/endpoints.rs",
+    "names": [
+      "get_transfer_updates"
+    ],
+    "sha256": "d6a52028e6bc9f94a62e5be6d6cf012f6207607e262565452774c4a87ced0186",
+    "reason": "Reviewed static endpoint or account metadata; fund dispatch remains subject to independent owner checks."
+  },
+  {
+    "source": "arcus/private.rs",
+    "names": [
+      "create_withdrawal",
+      "create_withdrawal_signed",
+      "submit_internal_transfer"
+    ],
+    "sha256": "c041bb141d3856aeb4f0101bfa57941882e6ee9e49610ee3137224f06b324e19",
+    "reason": "Reviewed static endpoint or account metadata; fund dispatch remains subject to independent owner checks."
+  },
+  {
+    "source": "aster/account.rs",
+    "names": [
+      "transfer_spot_futures"
+    ],
+    "sha256": "9f85e8e964f7a1dbee1ebd7fda2aeb015571c95f978278667deef5b823b88c9e",
+    "reason": "Reviewed signing, read-only metadata or owner delegation; every recognized fund dispatch arm is independently checked."
+  },
+  {
+    "source": "aster/agents.rs",
+    "names": [
+      "canWithdraw"
+    ],
+    "sha256": "09985f500f5bd1827b3742e859fcd0594a1fc3904eaa37f5a1fb510a881497b9",
+    "reason": "Reviewed static endpoint or account metadata; fund dispatch remains subject to independent owner checks."
+  },
+  {
+    "source": "aster/client.rs",
+    "names": [
+      "get_chain_withdraw_fee"
+    ],
+    "sha256": "17101423de566d15a12f9ef9237e18cb121b1c34117b9370239d8daa92e0ba73",
+    "reason": "Reviewed signing, read-only metadata or owner delegation; every recognized fund dispatch arm is independently checked."
+  },
+  {
+    "source": "aster/market.rs",
+    "names": [
+      "get_spot_withdraw_fee"
+    ],
+    "sha256": "9a2897a02ba1a055de1958048c5bed402341bedb7d62d23febfdf0d3309121ce",
+    "reason": "Reviewed static endpoint or account metadata; fund dispatch remains subject to independent owner checks."
+  },
+  {
+    "source": "aster/prediction.rs",
+    "names": [
+      "create_prediction_asset_wallet_transfer"
+    ],
+    "sha256": "d1b4ce23b93c87b778defe5ac6a025b044ada55bc052bc52db2996f9d30e9b65",
+    "reason": "Schema metadata, parameter validation and domain router; transport caller provenance is checked independently."
+  },
+  {
+    "source": "aster/subaccount.rs",
+    "names": [
+      "canWithdraw"
+    ],
+    "sha256": "06b762ff043b9bd2a78ca50ae71c4159730fcd86cbc46ac24b8b12a8c19579d6",
+    "reason": "Reviewed signing, read-only metadata or owner delegation; every recognized fund dispatch arm is independently checked."
+  },
+  {
+    "source": "aster/trade.rs",
+    "names": [
+      "INTERNAL_TRANSFER",
+      "STAKING_WITHDRAW",
+      "TRANSFER",
+      "TRANSFER_FUTURE_TO_SPOT",
+      "TRANSFER_REFUND",
+      "TRANSFER_SPOT_TO_FUTURE",
+      "TRANSFER_SPOT_TO_SPOT",
+      "transfer_spot_futures",
+      "transfer_sub_account"
+    ],
+    "sha256": "e71c3f33da21ee5cb7beb39015d6f7a2433303d82fa8ec602ecac6654508a1a9",
+    "reason": "Reviewed signing, read-only metadata or owner delegation; every recognized fund dispatch arm is independently checked."
+  },
+  {
+    "source": "aster/wrappers.rs",
+    "names": [
+      "canWithdraw"
+    ],
+    "sha256": "09b6888ab78469f046f715a9ed0d5d231923e3c137653733b022578850237641",
+    "reason": "Public method declarations delegate to dispatch; generated wrappers have no independent HTTP submission."
+  },
+  {
+    "source": "backpack/account.rs",
+    "names": [
+      "get_max_withdrawal_quantity",
+      "get_withdrawals"
+    ],
+    "sha256": "e30b09b120835ca229cb684332c5d37b7e495c32121282804bb1d0ef6b39fc37",
+    "reason": "Reviewed signing, read-only metadata or owner delegation; every recognized fund dispatch arm is independently checked."
+  },
+  {
+    "source": "backpack/client.rs",
+    "names": [
+      "withdraw"
+    ],
+    "sha256": "a5c4bc0f7d149ce5489da6d46c5db51accd96d94f2344c8e8085e54c3788fd85",
+    "reason": "Reviewed signing, read-only metadata or owner delegation; every recognized fund dispatch arm is independently checked."
+  },
+  {
+    "source": "binance/margin.rs",
+    "names": [
+      "get_margin_max_transferable"
+    ],
+    "sha256": "bf7324f7e897dfc78f0e4737f62f6fa99c4d94b262bf4478316a8f10d998cc03",
+    "reason": "Reviewed static endpoint or account metadata; fund dispatch remains subject to independent owner checks."
+  },
+  {
+    "source": "binance/private.rs",
+    "names": [
+      "create_universal_transfer",
+      "get_universal_transfer_history"
+    ],
+    "sha256": "36333f8b71ac8ca4495d090aba2ff72da824081f081bfa616dfbefaceacb56d4",
+    "reason": "Reviewed static endpoint or account metadata; fund dispatch remains subject to independent owner checks."
+  },
+  {
+    "source": "binance/schema_requests.rs",
+    "names": [
+      "wallet_dust_transfer"
+    ],
+    "sha256": "60cdd4d3b3f4dc0975b944a44d7319071387f37378909c5e412fad73c5268697",
+    "reason": "Schema metadata, parameter validation and domain router; transport caller provenance is checked independently."
+  },
+  {
+    "source": "binance/subaccount.rs",
+    "names": [
+      "get_subaccount_futures_transfer_history",
+      "get_subaccount_spot_transfer_history",
+      "get_subaccount_transfer_history",
+      "get_subaccount_universal_transfer_history",
+      "transfer_between_subaccount_futures",
+      "transfer_between_subaccounts",
+      "transfer_subaccount_futures",
+      "transfer_subaccount_margin",
+      "transfer_subaccount_to_master",
+      "transfer_subaccount_to_subaccount"
+    ],
+    "sha256": "8d12491bc6cfa9da1ca1ba928c7952bfee8a384d209b1923fce726d89bda6130",
+    "reason": "Reviewed signing, read-only metadata or owner delegation; every recognized fund dispatch arm is independently checked."
+  },
+  {
+    "source": "binance/wrappers.rs",
+    "names": [
+      "transferSide",
+      "transferType",
+      "withdrawOrderId"
+    ],
+    "sha256": "ae86416aa8beccd4f7dd600ac0461edee5a2e4f17ab81bacd0cf068e07252f43",
+    "reason": "Public method declarations delegate to dispatch; generated wrappers have no independent HTTP submission."
+  },
+  {
+    "source": "bingx/account.rs",
+    "names": [
+      "TRANSFER",
+      "asset_transfer",
+      "get_asset_transfer_records",
+      "get_subaccount_transfer_history",
+      "get_subaccount_transferable_amounts",
+      "get_transferable_coins",
+      "transfer_subaccount_assets"
+    ],
+    "sha256": "36104a534dd4661c05064fe4307061fdbfad46b54b244c738dceec01d4f216c1",
+    "reason": "Reviewed signing, read-only metadata or owner delegation; every recognized fund dispatch arm is independently checked."
+  },
+  {
+    "source": "bingx/generated/schema_tables.rs",
+    "names": [
+      "get_internal_transfer_records",
+      "get_sub_account_internal_transfer_records",
+      "get_withdrawal_history",
+      "set_sub_account_transfer_authorization"
+    ],
+    "sha256": "2a94921eef386c750e2d57cd681a5a540a7b16dac762f8df30afea5dbbd2efc4",
+    "reason": "Public method declarations delegate to dispatch; generated wrappers have no independent HTTP submission."
+  },
+  {
+    "source": "bingx/schema_requests.rs",
+    "names": [
+      "transferable"
+    ],
+    "sha256": "81c945c605d6a5bd13813e82d536ef66aaffaa2df1acdb15863e63f755a38a9e",
+    "reason": "Schema metadata, parameter validation and domain router; transport caller provenance is checked independently."
+  },
+  {
+    "source": "bingx/withdrawals.rs",
+    "names": [
+      "transferClientId"
+    ],
+    "sha256": "b1f3e728a94e5784a5d0d59ba01234233229a6c56f79827921ad12363478045f",
+    "reason": "Reviewed static endpoint or account metadata; fund dispatch remains subject to independent owner checks."
+  },
+  {
+    "source": "bitget/account.rs",
+    "names": [
+      "get_transfer_records",
+      "get_transferable_coins",
+      "transfer"
+    ],
+    "sha256": "7bea50cfd2b20bd571e167299023758beae344ddef8fa700046ace8fa5383e32",
+    "reason": "Reviewed signing, read-only metadata or owner delegation; every recognized fund dispatch arm is independently checked."
+  },
+  {
+    "source": "bitget/generated/schema_tables.rs",
+    "names": [
+      "get_classic_spot_wallet_withdrawal_records",
+      "get_cross_margin_max_transferable",
+      "get_futures_union_transfer_limits",
+      "get_isolated_margin_max_transferable",
+      "get_spot_sub_account_transfer_records",
+      "get_uta_account_max_withdrawal",
+      "get_uta_account_withdraw_address",
+      "get_uta_account_withdrawal_records",
+      "get_uta_max_transferable",
+      "get_uta_position_transfer_history",
+      "get_uta_sub_account_transfer_records",
+      "get_uta_transferable_coins",
+      "transfer_spot_sub_account",
+      "transfer_uta_account",
+      "transfer_uta_sub_account",
+      "transfer_uta_sub_to_master"
+    ],
+    "sha256": "b4f71e98eb5f42feac784811b3caeec2ff31633c4058840afbee381c8b96126d",
+    "reason": "Public method declarations delegate to dispatch; generated wrappers have no independent HTTP submission."
+  },
+  {
+    "source": "bitget/schema_requests.rs",
+    "names": [
+      "get_uta_transferable_coins",
+      "transfer_spot_sub_account",
+      "transfer_uta_",
+      "transfer_uta_account",
+      "transfer_uta_sub_account",
+      "transfer_uta_sub_to_master"
+    ],
+    "sha256": "73257953b4f5050d1e6757d9958fee8c3efed2fb737f52842e3358ee5406d9f6",
+    "reason": "Schema metadata, parameter validation and domain router; transport caller provenance is checked independently."
+  },
+  {
+    "source": "bitget/withdrawals.rs",
+    "names": [
+      "internal_transfer",
+      "transferType"
+    ],
+    "sha256": "a71f1c21bb85a85abae1ba4f19f2815f331a60e0642fd57fc57bd168e37a0d6d",
+    "reason": "Reviewed static endpoint or account metadata; fund dispatch remains subject to independent owner checks."
+  },
+  {
+    "source": "bitget/wrappers.rs",
+    "names": [
+      "autoTransferProfits",
+      "transferType"
+    ],
+    "sha256": "b7361de855aa79cfc5cc92345fcccf142274309ab1a8adabe4fff6036caba6d8",
+    "reason": "Public method declarations delegate to dispatch; generated wrappers have no independent HTTP submission."
+  },
+  {
+    "source": "bybit/account.rs",
+    "names": [
+      "get_transferable_amount"
+    ],
+    "sha256": "e327fbcd36004b0a8aaecdd1d461af1eb2dfa4a158d7666b5593571395fe8a35",
+    "reason": "Reviewed signing, read-only metadata or owner delegation; every recognized fund dispatch arm is independently checked."
+  },
+  {
+    "source": "bybit/funding.rs",
+    "names": [
+      "create_internal_transfer",
+      "create_universal_transfer",
+      "get_internal_transfer_records",
+      "get_transferable_coin",
+      "get_universal_transfer_records",
+      "get_withdrawable_amount",
+      "withLtvTransferSafeAmount",
+      "withTransferSafeAmount"
+    ],
+    "sha256": "e8f15046e5b92daff8f7743ab0e5802fb7c99118c32d930081032fc70fcb0069",
+    "reason": "Reviewed static endpoint or account metadata; fund dispatch remains subject to independent owner checks."
+  },
+  {
+    "source": "bybit/generated/schema_tables.rs",
+    "names": [
+      "get_asset_withdraw_query_address",
+      "get_asset_withdraw_query_record",
+      "get_asset_withdraw_vasp_list"
+    ],
+    "sha256": "9ff3b778612856619deeeab0dcb3a860d2827c8915b892f6244cd12d9843b2fd",
+    "reason": "Public method declarations delegate to dispatch; generated wrappers have no independent HTTP submission."
+  },
+  {
+    "source": "bybit/schema_requests.rs",
+    "names": [
+      "get_asset_withdraw_query_address",
+      "get_asset_withdraw_query_record"
+    ],
+    "sha256": "a139939f52d993013d031c72e0597533a58c59f4ccfbe7f1fd14b93ee2db0407",
+    "reason": "Schema metadata, parameter validation and domain router; transport caller provenance is checked independently."
+  },
+  {
+    "source": "extended/account.rs",
+    "names": [
+      "TRANSFER",
+      "WITHDRAWAL",
+      "commit_bridge_quote",
+      "create_withdrawal_signed",
+      "get_bridge_config",
+      "get_bridge_quote",
+      "submit_internal_transfer"
+    ],
+    "sha256": "e332a54a77be9f3e44b66fb5f950016f52ab1392966e64f01ef8329542804e95",
+    "reason": "Reviewed signing, read-only metadata or owner delegation; every recognized fund dispatch arm is independently checked."
+  },
+  {
+    "source": "hyperliquid/private.rs",
+    "names": [
+      "transfer_between_dexes",
+      "transfer_hip3_liquidator",
+      "transfer_sub_account_spot",
+      "transfer_sub_account_usd",
+      "transfer_usdc_spot_perp",
+      "transfer_vault_usd",
+      "withdraw_staking_signed"
+    ],
+    "sha256": "dc6dfbd012f83c0b66e6dae125eedc91c6782093cd3ce9ceaa3a08f8a9a3c25b",
+    "reason": "Reviewed static endpoint or account metadata; fund dispatch remains subject to independent owner checks."
+  },
+  {
+    "source": "hyperliquid/trade.rs",
+    "names": [
+      "transfer_between_dexes",
+      "transfer_hip3_liquidator",
+      "transfer_sub_account_spot",
+      "transfer_sub_account_usd",
+      "transfer_usdc_spot_perp",
+      "transfer_vault_usd",
+      "withdraw_staking_signed"
+    ],
+    "sha256": "5e1d22a4e2d69d43cfedca72ab3da15b9bdf5161c859d84c6711c36c94616e8c",
+    "reason": "Reviewed signing, read-only metadata or owner delegation; every recognized fund dispatch arm is independently checked."
+  },
+  {
+    "source": "hyperliquid/websocket/post.rs",
+    "names": [
+      "usdClassTransfer"
+    ],
+    "sha256": "0d7b27bf100458fd23009cfe4af30ac0a37322fa9614b77ccb593188302a3bb5",
+    "reason": "WebSocket channel or action metadata and authentication logic; fund dispatch remains checked by the ownership guard."
+  },
+  {
+    "source": "kraken/account.rs",
+    "names": [
+      "futures_wallet_transfer",
+      "wallet_transfer_to_futures",
+      "withdraw_futures_to_spot_wallet"
+    ],
+    "sha256": "58a7c709a8b5d38ed09b558a858bf8483fa176c4e3d2d909b05ac550683df51d",
+    "reason": "Reviewed signing, read-only metadata or owner delegation; every recognized fund dispatch arm is independently checked."
+  },
+  {
+    "source": "kraken/schema_requests/field_schemas.rs",
+    "names": [
+      "create_spot_withdrawal"
+    ],
+    "sha256": "8574ffd69eb201da70338f7fbfde87b870c0c90d6a9323406f960cba8c8bcd86",
+    "reason": "Schema metadata, parameter validation and domain router; transport caller provenance is checked independently."
+  },
+  {
+    "source": "kucoin/account.rs",
+    "names": [
+      "flex_transfer",
+      "get_transfer_quotas"
+    ],
+    "sha256": "f89f37bec501be9a0ac60c2f1864a5abcfea5f784ee7b35f9d2dc830debdb154",
+    "reason": "Reviewed signing, read-only metadata or owner delegation; every recognized fund dispatch arm is independently checked."
+  },
+  {
+    "source": "kucoin/classic_trading.rs",
+    "names": [
+      "get_futures_max_withdraw_margin",
+      "withdrawAmount"
+    ],
+    "sha256": "7662d628f1289ebd35d376eb81f832434c12e746cca62345fbb2666ff8cd59fe",
+    "reason": "Reviewed static endpoint or account metadata; fund dispatch remains subject to independent owner checks."
+  },
+  {
+    "source": "kucoin/generated/schema_tables.rs",
+    "names": [
+      "get_uta_transfer_quota",
+      "get_uta_withdrawal_history",
+      "get_uta_withdrawal_quotas",
+      "get_withdrawal_history",
+      "get_withdrawal_history_by_id",
+      "get_withdrawal_quotas",
+      "set_uta_sub_account_transfer_permission",
+      "transfer_uta_accounts"
+    ],
+    "sha256": "28d9e453a9f3ba77a9681815515fa3a3fae3ab901c43c62f026303c3758bbbcf",
+    "reason": "Public method declarations delegate to dispatch; generated wrappers have no independent HTTP submission."
+  },
+  {
+    "source": "kucoin/schema_requests.rs",
+    "names": [
+      "get_uta_transfer_quota",
+      "transferType",
+      "transfer_uta_accounts"
+    ],
+    "sha256": "9081e9dc01aa1848441452b63df5e9ae7591209fab1e6b6875674e5f33b95022",
+    "reason": "Schema metadata, parameter validation and domain router; transport caller provenance is checked independently."
+  },
+  {
+    "source": "kucoin/uta.rs",
+    "names": [
+      "WITHDRAW"
+    ],
+    "sha256": "cba2c3a9554f080f04ed1702ef20dafc906d2316845376bc2f00b22d51cfc70e",
+    "reason": "Reviewed static endpoint or account metadata; fund dispatch remains subject to independent owner checks."
+  },
+  {
+    "source": "kucoin/wrappers.rs",
+    "names": [
+      "withdrawAmount",
+      "withdrawId",
+      "withdrawType",
+      "withdrawalId"
+    ],
+    "sha256": "594df76e33bd4dbe2fbc51a01b5fafb2fc6658485382fe6493f7a8fde34ca213",
+    "reason": "Public method declarations delegate to dispatch; generated wrappers have no independent HTTP submission."
+  },
+  {
+    "source": "lighter/account.rs",
+    "names": [
+      "L2Transfer",
+      "get_fastwithdraw_info",
+      "get_transfer_fee_info",
+      "get_transfer_history",
+      "get_withdraw_history"
+    ],
+    "sha256": "b789238f846b373193e2a22a232dc6194a70a0170c54d4708557c71f926ffd70",
+    "reason": "Reviewed signing, read-only metadata or owner delegation; every recognized fund dispatch arm is independently checked."
+  },
+  {
+    "source": "lighter/explorer.rs",
+    "names": [
+      "L2Transfer",
+      "L2TransferV2",
+      "Withdraw",
+      "WithdrawV2"
+    ],
+    "sha256": "ddace00016e6f2a0874615a1c434ef60b27e65534c924ad4d121279e2ae44155",
+    "reason": "Reviewed static endpoint or account metadata; fund dispatch remains subject to independent owner checks."
+  },
+  {
+    "source": "lighter/market.rs",
+    "names": [
+      "get_fastbridge_info",
+      "get_withdrawal_delay",
+      "ignore_transfers",
+      "transfer_fee",
+      "withdraw_fee"
+    ],
+    "sha256": "e322d464597e079a10677110d931153ee92bcabdb5a3367b06fb2e9c56cda642",
+    "reason": "Reviewed static endpoint or account metadata; fund dispatch remains subject to independent owner checks."
+  },
+  {
+    "source": "lighter/private.rs",
+    "names": [
+      "get_fastwithdraw_info",
+      "get_transfer_fee_info",
+      "get_transfer_history",
+      "get_withdraw_history"
+    ],
+    "sha256": "c19ca7a856f438f8f33c7005f3627b4df89995f8ab89fe775d8d3be93e85a690",
+    "reason": "Reviewed static endpoint or account metadata; fund dispatch remains subject to independent owner checks."
+  },
+  {
+    "source": "lighter/schema_requests/field_schemas.rs",
+    "names": [
+      "submit_fast_withdrawal"
+    ],
+    "sha256": "8c716cfc15e42ee7d1a1035ba090eea5848ce108fe84f1bbc26f1961481e9849",
+    "reason": "Schema metadata, parameter validation and domain router; transport caller provenance is checked independently."
+  },
+  {
+    "source": "lighter/trade.rs",
+    "names": [
+      "sign_transfer_l2_account",
+      "sign_transfer_same_master_account",
+      "sign_withdraw_l2",
+      "transfer_l2_account",
+      "transfer_same_master_account",
+      "withdraw_l2"
+    ],
+    "sha256": "fb2fffa771405e95ce42e665295cc94c976929d142b600a03127fec0d6c2c0a8",
+    "reason": "Reviewed signing, read-only metadata or owner delegation; every recognized fund dispatch arm is independently checked."
+  },
+  {
+    "source": "lighter/wrappers.rs",
+    "names": [
+      "sign_transfer_l2_account",
+      "sign_transfer_same_master_account",
+      "sign_withdraw_l2"
+    ],
+    "sha256": "b33a8ae62884f1eefd983d822f3f399d17f382faffc0ef583f56c4ead2ce059e",
+    "reason": "Public method declarations delegate to dispatch; generated wrappers have no independent HTTP submission."
+  },
+  {
+    "source": "mexc/account.rs",
+    "names": [
+      "get_contract_transfer_records",
+      "get_internal_transfer_history",
+      "get_subaccount_transfer_history",
+      "get_user_universal_transfer_by_id",
+      "get_user_universal_transfer_history",
+      "get_withdraw_history",
+      "transfer_subaccount_assets",
+      "user_universal_transfer"
+    ],
+    "sha256": "097c426571d46acf4e9722ead0643a70d21e883c00093b714b5dc947737813fd",
+    "reason": "Reviewed signing, read-only metadata or owner delegation; every recognized fund dispatch arm is independently checked."
+  },
+  {
+    "source": "mod.rs",
+    "names": [
+      "ignore_transfers",
+      "transfer_type"
+    ],
+    "sha256": "d32f579c2b35cbffb4e608d7a91a86fce2ad84ffe4eafbc2badbd1d6da989d00",
+    "reason": "Reviewed static endpoint or account metadata; fund dispatch remains subject to independent owner checks."
+  },
+  {
+    "source": "okx/account.rs",
+    "names": [
+      "get_max_withdrawal"
+    ],
+    "sha256": "08e193acaa437dde377827ce8953d2b04d6a93d17e25040aeb145b1654cf1443",
+    "reason": "Reviewed signing, read-only metadata or owner delegation; every recognized fund dispatch arm is independently checked."
+  },
+  {
+    "source": "okx/funding.rs",
+    "names": [
+      "funds_transfer",
+      "get_deposit_withdraw_status",
+      "get_transfer_state"
+    ],
+    "sha256": "dcfe437a1399d01b00a67e835c3cc55be529a90a905e2740d2f185e236256236",
+    "reason": "Reviewed static endpoint or account metadata; fund dispatch remains subject to independent owner checks."
+  },
+  {
+    "source": "okx/generated/schema_tables.rs",
+    "names": [
+      "cancel_fiat_withdrawal",
+      "cancel_withdrawal",
+      "create_fiat_withdrawal",
+      "create_withdrawal",
+      "get_account_subaccount_max_withdrawal",
+      "get_asset_withdrawal_history",
+      "get_fiat_withdrawal",
+      "get_fiat_withdrawal_order_history",
+      "get_fiat_withdrawal_payment_methods",
+      "set_sub_account_transfer_out",
+      "trading_bot_grid_withdraw_income"
+    ],
+    "sha256": "4884acfe0297b824d3e770e6149e3cac53dd005025f195c5de01d0ae2a30ca44",
+    "reason": "Public method declarations delegate to dispatch; generated wrappers have no independent HTTP submission."
+  },
+  {
+    "source": "okx/schema_requests/validation.rs",
+    "names": [
+      "auto_transfers_ccy",
+      "create_fiat_withdrawal",
+      "create_withdrawal",
+      "set_sub_account_transfer_out"
+    ],
+    "sha256": "b7617c944030080805ce1915813aff81e4e7aa35fe7cb45c04db3b40ffb355ce",
+    "reason": "Schema metadata, parameter validation and domain router; transport caller provenance is checked independently."
+  },
+  {
+    "source": "okx/subaccount.rs",
+    "names": [
+      "transfer_between_subaccounts"
+    ],
+    "sha256": "2954c5277675e5aa6b05736a6898fd272193d98319636353ecf9544aaad7f7c5",
+    "reason": "Reviewed signing, read-only metadata or owner delegation; every recognized fund dispatch arm is independently checked."
+  },
+  {
+    "source": "ondo/account.rs",
+    "names": [
+      "create_withdrawal",
+      "export_withdrawals_csv",
+      "get_withdrawal",
+      "get_withdrawal_limits",
+      "get_withdrawal_status",
+      "get_withdrawals",
+      "sandbox_withdrawal",
+      "transfer",
+      "withdrawalAddress"
+    ],
+    "sha256": "035dd7a9507465f370890cb97f18d9cafe94e5bf320d9875b708e42246304b7d",
+    "reason": "Reviewed signing, read-only metadata or owner delegation; every recognized fund dispatch arm is independently checked."
+  },
+  {
+    "source": "ondo/websocket/private.rs",
+    "names": [
+      "marginTransfersPerps",
+      "withdrawals"
+    ],
+    "sha256": "46e786a8e65df5f1b019be91f8502fc6974b615dc06fe787015b28ff1e0b3d34",
+    "reason": "WebSocket channel or action metadata and authentication logic; fund dispatch remains checked by the ownership guard."
+  },
+  {
+    "source": "ondo/wrappers.rs",
+    "names": [
+      "withdrawalAddress",
+      "withdrawalID"
+    ],
+    "sha256": "e8007caa2df102b5f8b4d9bc5df05e3a024336d5cf8634870a7adb3e3474cf52",
+    "reason": "Public method declarations delegate to dispatch; generated wrappers have no independent HTTP submission."
+  },
+  {
+    "source": "schema.rs",
+    "names": [
+      "bridge",
+      "send_asset",
+      "send_spot",
+      "send_to_evm",
+      "send_usd",
+      "transfer",
+      "transfer_l2_account",
+      "transfer_master_internal",
+      "transfer_same_master_account",
+      "transfer_sub_account_internal",
+      "withdraw"
+    ],
+    "sha256": "6700b854a359784b57d0cb85c6094336b4e7d2af2ab96d568fcc750d327e4219",
+    "reason": "Reviewed static endpoint or account metadata; fund dispatch remains subject to independent owner checks."
+  }
+]

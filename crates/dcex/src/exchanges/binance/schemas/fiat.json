@@ -112,6 +112,14 @@
         "amount": {
           "type": "string",
           "format": "decimal"
+        },
+        "account_info": {
+          "type": "object",
+          "description": "For fiat withdraw, carries identity, signing, permission, or travel-rule metadata for this operation."
+        },
+        "ext": {
+          "type": "object",
+          "description": "For fiat withdraw, carries identity, signing, permission, or travel-rule metadata for this operation."
         }
       }
     }

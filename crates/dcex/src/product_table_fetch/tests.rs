@@ -10,6 +10,30 @@ use super::*;
 use crate::product_table::MarketInfo;
 
 #[test]
+fn ondo_spot_and_perpetual_products_preserve_precision_and_skip_disabled_pairs() {
+    let market = |symbol: &str, disabled| {
+        serde_json::json!({
+            "market": symbol, "pair": {"base": "SPY", "quote": "USDC"},
+            "baseIncrement": "0.00000001", "quoteIncrement": "0.001", "disabled": disabled,
+        })
+    };
+    let data = serde_json::json!({"result": {
+        "perps": {"tradingPairs": [market("SPY-USDC.P", false)]},
+        "spot": {"tradingPairs": [market("SPY-USDC", false), market("SPYon-USDC", true)]},
+        "tokenConfig": {"SPY": {"ledgerUnit": "shares", "sharesMultiplier": "100000000"}}
+    }});
+    let rows = super::exchanges::ondo_market_rows(&data).unwrap();
+    assert_eq!(rows.len(), 2);
+    assert_eq!(rows[0].product_symbol, "SPY-USDC-SWAP");
+    assert_eq!(rows[1].product_symbol, "SPY-USDC-SPOT");
+    assert_eq!(rows[1].exchange_symbol, "SPY-USDC");
+    assert_eq!(rows[1].product_type, "spot");
+    assert_eq!(rows[1].size_precision, "0.00000001");
+    assert_eq!(rows[1].price_precision, "0.001");
+    assert_eq!(rows[1].size_per_contract, "1");
+}
+
+#[test]
 fn normalizes_listed_option_symbols_across_exchanges() {
     let binance = serde_json::json!({
         "symbol": "BTC-260925-145000-C", "quoteAsset": "USDT", "unit": 1,

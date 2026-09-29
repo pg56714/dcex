@@ -154,7 +154,8 @@
               "x-positive": true
             }
           },
-          "x-empty-as-absent": true
+          "x-empty-as-absent": true,
+          "x-nonempty-object": true
         },
         "stopPrice": {
           "type": "string",
@@ -174,7 +175,8 @@
               "x-positive": true
             }
           },
-          "x-empty-as-absent": true
+          "x-empty-as-absent": true,
+          "x-nonempty-object": true
         },
         "stop_price": {
           "type": "string",
@@ -194,7 +196,8 @@
               "x-positive": true
             }
           },
-          "x-empty-as-absent": true
+          "x-empty-as-absent": true,
+          "x-nonempty-object": true
         },
         "take_profit": {
           "type": "object",
@@ -210,7 +213,8 @@
               "x-positive": true
             }
           },
-          "x-empty-as-absent": true
+          "x-empty-as-absent": true,
+          "x-nonempty-object": true
         }
       }
     }
@@ -360,7 +364,16 @@
     ],
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of coin swap fills records per response page; this integer counts records."
+        },
+        "pageSize": {
+          "type": "integer",
+          "description": "limits the number of coin swap fills records per response page; this integer counts records."
+        }
+      }
     }
   },
   {

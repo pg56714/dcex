@@ -151,7 +151,12 @@
     "summary": "Earnings List (USER_DATA)",
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of earnings list records per response page; this integer counts records."
+        }
+      }
     }
   },
   {
@@ -222,7 +227,12 @@
     "summary": "Extra Bonus List (USER_DATA)",
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of extra bonus list records per response page; this integer counts records."
+        }
+      }
     }
   },
   {
@@ -265,7 +275,12 @@
     "summary": "Hashrate Resale Detail (USER_DATA)",
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of hashrate resale detail records per response page; this integer counts records."
+        }
+      }
     }
   },
   {
@@ -301,7 +316,12 @@
     "summary": "Hashrate Resale List (USER_DATA)",
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of hashrate resale list records per response page; this integer counts records."
+        }
+      }
     }
   },
   {
@@ -427,7 +447,12 @@
     "summary": "Mining Account Earning (USER_DATA)",
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of mining account earning records per response page; this integer counts records."
+        }
+      }
     }
   },
   {

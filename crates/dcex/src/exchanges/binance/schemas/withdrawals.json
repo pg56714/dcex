@@ -136,6 +136,14 @@
         "amount": {
           "type": "string",
           "format": "decimal"
+        },
+        "transaction_fee_flag": {
+          "type": "boolean",
+          "description": "For create withdrawal, controls an integer or boolean option rather than a transferred balance."
+        },
+        "transactionFeeFlag": {
+          "type": "boolean",
+          "description": "For create withdrawal, controls an integer or boolean option rather than a transferred balance."
         }
       }
     }

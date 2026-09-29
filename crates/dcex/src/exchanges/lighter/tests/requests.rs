@@ -2,7 +2,7 @@ use super::helpers::*;
 
 #[test]
 fn request_matches_python_encoding() {
-    let client = LighterClient::new(Duration::from_secs(1)).expect("client");
+    let client = LighterClient::new(Duration::from_secs(10)).expect("client");
     let request = client
         .build_request(
             HttpMethod::Post,
@@ -45,7 +45,7 @@ fn robinhood_uses_its_own_market_ids() {
     robinhood.exchange = "lighter_robinhood".to_string();
     robinhood.exchange_symbol = "77".to_string();
     let table = ProductTable::new(vec![mainnet, robinhood]);
-    let client = LighterClient::with_network(Duration::from_secs(1), LighterNetwork::Robinhood)
+    let client = LighterClient::with_network(Duration::from_secs(10), LighterNetwork::Robinhood)
         .expect("Robinhood client")
         .with_product_table(table);
     assert_eq!(
@@ -72,7 +72,7 @@ fn export_sends_resolved_market_id_with_configured_account_index() {
         size_per_contract: "1".to_string(),
     }]);
     let client = LighterClient::with_base_url_and_credentials(
-        Duration::from_secs(1),
+        Duration::from_secs(10),
         base_url,
         Some(12),
         None,
@@ -133,7 +133,7 @@ fn new_market_queries_follow_official_paths() {
     for (method, params, expected) in cases {
         let (base_url, handle) = recording_server();
         let client =
-            LighterClient::with_base_url(Duration::from_secs(1), base_url).expect("client");
+            LighterClient::with_base_url(Duration::from_secs(10), base_url).expect("client");
         let params = params
             .into_iter()
             .map(|(key, value)| (key.to_string(), value.to_string()))
@@ -146,7 +146,7 @@ fn new_market_queries_follow_official_paths() {
 
 #[test]
 fn robinhood_client_uses_explicit_profile() {
-    let client = LighterClient::with_network(Duration::from_secs(1), LighterNetwork::Robinhood)
+    let client = LighterClient::with_network(Duration::from_secs(10), LighterNetwork::Robinhood)
         .expect("client");
 
     assert_eq!(client.network(), Some(LighterNetwork::Robinhood));

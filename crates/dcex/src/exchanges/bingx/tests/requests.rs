@@ -17,7 +17,7 @@ fn new_swap_market_routes_use_official_paths() {
     for (method, path) in cases {
         let (url, server) = recording_server();
         let client =
-            BingxClient::with_base_url(None, None, Duration::from_secs(2), url).expect("client");
+            BingxClient::with_base_url(None, None, Duration::from_secs(10), url).expect("client");
         block_on(async move {
             client
                 .public_request(

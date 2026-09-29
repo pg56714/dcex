@@ -127,7 +127,12 @@
     "scoped": false,
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of copy trading v1 p futures profit detail records per response page; this integer counts records."
+        }
+      }
     }
   },
   {
@@ -149,7 +154,12 @@
     "scoped": false,
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "day_size": {
+          "type": "integer",
+          "description": "For get copy trading v1 p futures trader detail, limits the number of result records returned by pagination."
+        }
+      }
     }
   },
   {
@@ -210,7 +220,12 @@
     "scoped": false,
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of copy trading v1 spot profit detail records per response page; this integer counts records."
+        }
+      }
     }
   },
   {
@@ -267,7 +282,12 @@
     "scoped": false,
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of copy trading v1 spot history order records per response page; this integer counts records."
+        }
+      }
     }
   },
   {
@@ -353,7 +373,12 @@
     "scoped": false,
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "offset": {
+          "type": "integer",
+          "description": "skips an integer number of copy trading v1 swap trace current track records before returning the next page."
+        }
+      }
     }
   },
   {

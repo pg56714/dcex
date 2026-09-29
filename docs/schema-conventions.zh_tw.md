@@ -138,7 +138,7 @@ Rust ledger 中沒有 `::symbol` 的引用刻意維持**檔案層級證據**：
 所有 11 支 `scripts/build_*.py` 都必須明確指定 `--write` 或 `--check`。`--check` 在記憶體渲染；Rust 使用 rustfmt 標準輸入／輸出，Python 使用 Ruff 標準輸入／輸出，檔案有差異時回傳非零但不寫入。執行 `python -B -m scripts.build_schema_tables --check` 也會檢查格式化後的 Rust 表格；CI 逐一執行全部產生器。簽章向量使用隔離的 `uv run --no-sync --with hyperliquid-python-sdk==0.24.0 python -B -m scripts.build_hyperliquid_action_vectors --check`。
 
 
-第七輪補充：wire 名稱完整性已涵蓋全部 15 個交易所的既有端點封包測試；
+wire 名稱完整性已涵蓋全部 15 個交易所的既有端點封包測試；
 控制欄位以端點、完整路徑及已核對值限定，一般 description 不會免除 decimal 檢查。
 Backpack 百分比必須大於 0 且不超過 100，以精確十進位方式比較。
 Kraken 現貨數量 0 僅允許 reduce_only 或 ordertype=settle-position；
@@ -151,5 +151,19 @@ x-zero-when 的陣列表示條件群組之間 OR，各群組內仍為 AND。
 資金 catalog 入口先將提款／轉帳名稱交由各自 owner，再使用共用 transport 實作。
 所有權測試核對路由、owner 及 schema 載入來源，不依賴 schema 例外清單。
 單純 await nonce 或簽章不構成送出證據；純驗證允許清單限定完整原始程式內容，加入送出即失效。
-各交易所不可免除清單中的金融欄位不會因 int 註記而放行；移除識別前綴後，
-同一免除理由重複超過 4 次即使完整性檢查失敗。
+金融名稱片段（包括 price、amount、size、qty、fee、margin、collateral、share）
+不會因 int 註記而獲得豁免。原先 454 筆輸入豁免均已改為明確的控制或結構宣告。
+未來理由會先去掉 method／field 名稱與 `For ...,` 前綴再比較；同一理由重複超過
+4 次即使完整性檢查失敗，純驗證允許清單亦適用。
+
+OKX 附帶 TP 比例接受大於 -1 的精確有號 decimal；下單時排除零，修改 TP／SL
+比例時允許以零刪除附帶委託。SL 比例除改單刪除外均為正值。這些界限保留官方
+允許的數值，不在修改委託時猜測既有訂單方向。回調、啟動價格及分批數量維持
+正值規則；巢狀改單的 `newSz` 明確拒絕。algo-order 官方請求表未列出附帶 `sz`，
+故該 schema 亦拒絕它。下單的絕對價格與 Kraken 便利方法數量要求正值，已記載
+的 Kraken 相對價格控制仍保留。
+
+BingX 選填附帶字串先 trim 再檢查形狀；空白視為未提供，空物件則拒絕。
+資金 owner 以外的資金字串由來源雜湊固定，schema transport 只允許已稽核的
+router 與 owner 呼叫；owner 的領域驗證在 release 建置也會執行。產生器檢查
+同時拒絕所屬生成目錄中的孤兒檔案，檢查時不寫入或刪除。

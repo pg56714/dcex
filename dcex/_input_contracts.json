@@ -49,6 +49,10 @@
           "amount": {
             "type": "string",
             "format": "decimal"
+          },
+          "signature": {
+            "type": "object",
+            "description": "For create withdrawal signed, carries identity, signing, permission, or travel-rule metadata for this operation."
           }
         }
       },
@@ -189,7 +193,15 @@
       },
       "batch_cancel_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "cancels": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "For batch cancel orders, identifies existing orders or requests to query or cancel; contains no order quantities."
+          }
+        }
       },
       "get_l2_orderbook": {
         "type": "object",
@@ -213,7 +225,12 @@
       },
       "get_invite_codes": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "description": "skips an integer number of invite codes records before returning the next page."
+          }
+        }
       }
     },
     "aster": {
@@ -412,6 +429,10 @@
           "pegPriceType": {
             "type": "string",
             "description": "place_futures_order/pegPriceType: selects the documented mode, unit, or reference used by this operation."
+          },
+          "priceProtect": {
+            "type": "boolean",
+            "description": "For place futures order, enables trigger-price protection with a boolean flag rather than specifying a price."
           }
         }
       },
@@ -788,6 +809,10 @@
           "strategyType": {
             "type": "string",
             "description": "update_futures_strategy_order/strategyType: selects the strategy category used by the endpoint."
+          },
+          "strategyId": {
+            "type": "integer",
+            "description": "For update futures strategy order, identifies a strategy rather than specifying its investment."
           }
         }
       },
@@ -797,11 +822,41 @@
       },
       "cancel_futures_batch_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "orderIdList": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For cancel futures batch orders, identifies existing orders or requests to query or cancel; contains no order quantities."
+          },
+          "origClientOrderIdList": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For cancel futures batch orders, identifies existing orders or requests to query or cancel; contains no order quantities."
+          }
+        }
       },
       "guarded_cancel_futures_batch_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "orderIdList": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For guarded cancel futures batch orders, identifies existing orders or requests to query or cancel; contains no order quantities."
+          },
+          "origClientOrderIdList": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For guarded cancel futures batch orders, identifies existing orders or requests to query or cancel; contains no order quantities."
+          }
+        }
       },
       "cancel_spot_batch_orders_raw": {
         "type": "object",
@@ -842,7 +897,22 @@
       },
       "cancel_all_spot_open_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "orderIdList": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For cancel all spot open orders, identifies existing orders or requests to query or cancel; contains no order quantities."
+          },
+          "origClientOrderIdList": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For cancel all spot open orders, identifies existing orders or requests to query or cancel; contains no order quantities."
+          }
+        }
       },
       "get_spot_all_orders": {
         "type": "object",
@@ -891,6 +961,10 @@
           "clientStrategyId": {
             "type": "string",
             "description": "get_futures_strategy_open_order/clientStrategyId: identifies a strategy rather than specifying its investment."
+          },
+          "strategyId": {
+            "type": "integer",
+            "description": "For get futures strategy open order, identifies a strategy rather than specifying its investment."
           }
         }
       },
@@ -904,6 +978,10 @@
           "clientStrategyId": {
             "type": "string",
             "description": "get_futures_strategy_history_order/clientStrategyId: identifies a strategy rather than specifying its investment."
+          },
+          "strategyId": {
+            "type": "integer",
+            "description": "For get futures strategy history order, identifies a strategy rather than specifying its investment."
           }
         }
       },
@@ -949,7 +1027,12 @@
       },
       "set_futures_multi_assets_mode": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "multiAssetsMargin": {
+            "type": "boolean",
+            "description": "For set futures multi assets mode, enables or disables multi-assets margin mode using a boolean flag."
+          }
+        }
       },
       "set_futures_margin_type": {
         "type": "object",
@@ -996,6 +1079,26 @@
           "slippageToleranceType": {
             "type": "string",
             "description": "create_strategy/slippageToleranceType: selects the documented mode, unit, or reference used by this operation."
+          },
+          "duration": {
+            "type": "integer",
+            "description": "For create strategy, specifies a scheduling duration or timestamp in the endpoint time unit."
+          },
+          "client_strategy_id": {
+            "type": "integer",
+            "description": "For create strategy, identifies a strategy rather than specifying its investment."
+          },
+          "randomized_interval_quantity": {
+            "type": "boolean",
+            "description": "For create strategy, enables randomized interval quantities with a boolean flag rather than specifying a quantity."
+          },
+          "clientStrategyId": {
+            "type": "integer",
+            "description": "For create strategy, identifies a strategy rather than specifying its investment."
+          },
+          "randomizedIntervalQuantity": {
+            "type": "boolean",
+            "description": "For create strategy, enables randomized interval quantities with a boolean flag rather than specifying a quantity."
           }
         }
       },
@@ -1005,6 +1108,10 @@
           "quantity": {
             "type": "string",
             "format": "decimal"
+          },
+          "recipient_information": {
+            "type": "object",
+            "description": "For create withdrawal, carries identity, signing, permission, or travel-rule metadata for this operation."
           }
         }
       },
@@ -1501,6 +1608,17 @@
           "strategyId": {
             "type": "string",
             "description": "get_order_history/strategyId: identifies a strategy rather than specifying its investment."
+          },
+          "offset": {
+            "type": "integer",
+            "description": "skips an integer number of order history records before returning the next page."
+          },
+          "marketType": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For get order history, selects the documented mode, unit, or reference used by this operation."
           }
         }
       },
@@ -1510,35 +1628,75 @@
       },
       "get_withdrawals": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "description": "skips an integer number of withdrawals records before returning the next page."
+          }
+        }
       },
       "get_borrow_history": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "description": "skips an integer number of borrow history records before returning the next page."
+          }
+        }
       },
       "get_interest_history": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "description": "skips an integer number of interest history records before returning the next page."
+          }
+        }
       },
       "get_borrow_position_history": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "description": "skips an integer number of borrow position history records before returning the next page."
+          }
+        }
       },
       "get_deposits": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "description": "skips an integer number of deposits records before returning the next page."
+          }
+        }
       },
       "get_dust_conversion_history": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "description": "skips an integer number of dust conversion history records before returning the next page."
+          }
+        }
       },
       "get_settlement_history": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "description": "skips an integer number of settlement history records before returning the next page."
+          }
+        }
       },
       "get_funding_rates": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "description": "skips an integer number of funding rates records before returning the next page."
+          }
+        }
       },
       "get_klines": {
         "type": "object",
@@ -1551,27 +1709,57 @@
       },
       "get_historical_trades": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "description": "skips an integer number of historical trades records before returning the next page."
+          }
+        }
       },
       "get_prediction_events": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "description": "skips an integer number of prediction events records before returning the next page."
+          }
+        }
       },
       "get_rfq_history": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "description": "skips an integer number of rfq history records before returning the next page."
+          }
+        }
       },
       "get_quote_history": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "description": "skips an integer number of quote history records before returning the next page."
+          }
+        }
       },
       "get_rfq_fill_history": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "description": "skips an integer number of rfq fill history records before returning the next page."
+          }
+        }
       },
       "get_quote_fill_history": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "description": "skips an integer number of quote fill history records before returning the next page."
+          }
+        }
       },
       "get_fill_history": {
         "type": "object",
@@ -1579,16 +1767,30 @@
           "strategyId": {
             "type": "string",
             "description": "get_fill_history/strategyId: identifies a strategy rather than specifying its investment."
+          },
+          "offset": {
+            "type": "integer",
+            "description": "skips an integer number of fill history records before returning the next page."
           }
         }
       },
       "get_funding_payments": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "description": "skips an integer number of funding payments records before returning the next page."
+          }
+        }
       },
       "get_position_history": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "description": "skips an integer number of position history records before returning the next page."
+          }
+        }
       },
       "get_open_strategy": {
         "type": "object",
@@ -1600,6 +1802,14 @@
           "strategyId": {
             "type": "string",
             "description": "get_open_strategy/strategyId: identifies a strategy rather than specifying its investment."
+          },
+          "client_strategy_id": {
+            "type": "integer",
+            "description": "For get open strategy, identifies a strategy rather than specifying its investment."
+          },
+          "clientStrategyId": {
+            "type": "integer",
+            "description": "For get open strategy, identifies a strategy rather than specifying its investment."
           }
         }
       },
@@ -1613,6 +1823,14 @@
           "strategyId": {
             "type": "string",
             "description": "cancel_strategy/strategyId: identifies a strategy rather than specifying its investment."
+          },
+          "client_strategy_id": {
+            "type": "integer",
+            "description": "For cancel strategy, identifies a strategy rather than specifying its investment."
+          },
+          "clientStrategyId": {
+            "type": "integer",
+            "description": "For cancel strategy, identifies a strategy rather than specifying its investment."
           }
         }
       },
@@ -1652,6 +1870,10 @@
           "strategyId": {
             "type": "string",
             "description": "get_strategy_history/strategyId: identifies a strategy rather than specifying its investment."
+          },
+          "offset": {
+            "type": "integer",
+            "description": "skips an integer number of strategy history records before returning the next page."
           }
         }
       }
@@ -1706,6 +1928,10 @@
           "quantity": {
             "type": "string",
             "format": "decimal"
+          },
+          "duration": {
+            "type": "integer",
+            "description": "For algo time weighted average price future algo, specifies a scheduling duration or timestamp in the endpoint time unit."
           }
         }
       },
@@ -1723,6 +1949,10 @@
           "quantity": {
             "type": "string",
             "format": "decimal"
+          },
+          "duration": {
+            "type": "integer",
+            "description": "For algo time weighted average price spot algo, specifies a scheduling duration or timestamp in the endpoint time unit."
           }
         }
       },
@@ -1919,6 +2149,22 @@
           "pegOffsetType": {
             "type": "string",
             "description": "cancel_replace_spot_order/pegOffsetType: selects the documented mode, unit, or reference used by this operation."
+          },
+          "strategy_id": {
+            "type": "integer",
+            "description": "For cancel replace spot order, identifies a strategy rather than specifying its investment."
+          },
+          "strategy_type": {
+            "type": "integer",
+            "description": "For cancel replace spot order, selects the strategy category used by the endpoint."
+          },
+          "strategyId": {
+            "type": "integer",
+            "description": "For cancel replace spot order, identifies a strategy rather than specifying its investment."
+          },
+          "strategyType": {
+            "type": "integer",
+            "description": "For cancel replace spot order, selects the strategy category used by the endpoint."
           }
         }
       },
@@ -1950,6 +2196,22 @@
           "amount": {
             "type": "string",
             "format": "decimal"
+          },
+          "questionnaire": {
+            "type": "object",
+            "description": "For create broker withdrawal, carries identity, signing, permission, or travel-rule metadata for this operation."
+          },
+          "originator_pii": {
+            "type": "object",
+            "description": "For create broker withdrawal, carries identity, signing, permission, or travel-rule metadata for this operation."
+          },
+          "transaction_fee_flag": {
+            "type": "boolean",
+            "description": "For create broker withdrawal, controls an integer or boolean option rather than a transferred balance."
+          },
+          "transactionFeeFlag": {
+            "type": "boolean",
+            "description": "For create broker withdrawal, controls an integer or boolean option rather than a transferred balance."
           }
         }
       },
@@ -1959,6 +2221,18 @@
           "amount": {
             "type": "string",
             "format": "decimal"
+          },
+          "questionnaire": {
+            "type": "object",
+            "description": "For create travel rule withdrawal, carries identity, signing, permission, or travel-rule metadata for this operation."
+          },
+          "transaction_fee_flag": {
+            "type": "boolean",
+            "description": "For create travel rule withdrawal, controls an integer or boolean option rather than a transferred balance."
+          },
+          "transactionFeeFlag": {
+            "type": "boolean",
+            "description": "For create travel rule withdrawal, controls an integer or boolean option rather than a transferred balance."
           }
         }
       },
@@ -1978,6 +2252,14 @@
           "amount": {
             "type": "string",
             "format": "decimal"
+          },
+          "transaction_fee_flag": {
+            "type": "boolean",
+            "description": "For create withdrawal, controls an integer or boolean option rather than a transferred balance."
+          },
+          "transactionFeeFlag": {
+            "type": "boolean",
+            "description": "For create withdrawal, controls an integer or boolean option rather than a transferred balance."
           }
         }
       },
@@ -2005,6 +2287,14 @@
           "amount": {
             "type": "string",
             "format": "decimal"
+          },
+          "account_info": {
+            "type": "object",
+            "description": "For fiat withdraw, carries identity, signing, permission, or travel-rule metadata for this operation."
+          },
+          "ext": {
+            "type": "object",
+            "description": "For fiat withdraw, carries identity, signing, permission, or travel-rule metadata for this operation."
           }
         }
       },
@@ -3012,6 +3302,14 @@
           "priceMatch": {
             "type": "string",
             "description": "place_order/priceMatch: selects the documented mode, unit, or reference used by this operation."
+          },
+          "strategyId": {
+            "type": "integer",
+            "description": "For place order, identifies a strategy rather than specifying its investment."
+          },
+          "strategyType": {
+            "type": "integer",
+            "description": "For place order, selects the strategy category used by the endpoint."
           }
         }
       },
@@ -3197,6 +3495,14 @@
           "trigger_price": {
             "type": "string",
             "format": "decimal"
+          },
+          "price_protect": {
+            "type": "boolean",
+            "description": "For place pm um algo order, enables trigger-price protection with a boolean flag rather than specifying a price."
+          },
+          "priceProtect": {
+            "type": "boolean",
+            "description": "For place pm um algo order, enables trigger-price protection with a boolean flag rather than specifying a price."
           }
         }
       },
@@ -3366,6 +3672,38 @@
           "pendingPegOffsetType": {
             "type": "string",
             "description": "place_spot_opo/pendingPegOffsetType: selects the documented mode, unit, or reference used by this operation."
+          },
+          "working_strategy_id": {
+            "type": "integer",
+            "description": "For place spot opo, identifies the strategy of the working leg rather than specifying its price or quantity."
+          },
+          "working_strategy_type": {
+            "type": "integer",
+            "description": "For place spot opo, selects the strategy category of the working leg rather than specifying its price or quantity."
+          },
+          "pending_strategy_id": {
+            "type": "integer",
+            "description": "For place spot opo, identifies the strategy of the pending leg rather than specifying its price or quantity."
+          },
+          "pending_strategy_type": {
+            "type": "integer",
+            "description": "For place spot opo, selects the strategy category of the pending leg rather than specifying its price or quantity."
+          },
+          "workingStrategyId": {
+            "type": "integer",
+            "description": "For place spot opo, identifies the strategy of the working leg rather than specifying its price or quantity."
+          },
+          "workingStrategyType": {
+            "type": "integer",
+            "description": "For place spot opo, selects the strategy category of the working leg rather than specifying its price or quantity."
+          },
+          "pendingStrategyId": {
+            "type": "integer",
+            "description": "For place spot opo, identifies the strategy of the pending leg rather than specifying its price or quantity."
+          },
+          "pendingStrategyType": {
+            "type": "integer",
+            "description": "For place spot opo, selects the strategy category of the pending leg rather than specifying its price or quantity."
           }
         }
       },
@@ -3539,6 +3877,54 @@
           "pendingBelowPegOffsetType": {
             "type": "string",
             "description": "place_spot_opoco/pendingBelowPegOffsetType: selects the documented mode, unit, or reference used by this operation."
+          },
+          "working_strategy_id": {
+            "type": "integer",
+            "description": "For place spot opoco, identifies the strategy of the working leg rather than specifying its price or quantity."
+          },
+          "working_strategy_type": {
+            "type": "integer",
+            "description": "For place spot opoco, selects the strategy category of the working leg rather than specifying its price or quantity."
+          },
+          "pending_above_strategy_id": {
+            "type": "integer",
+            "description": "For place spot opoco, identifies the strategy of the pending above leg rather than specifying its price or quantity."
+          },
+          "pending_above_strategy_type": {
+            "type": "integer",
+            "description": "For place spot opoco, selects the strategy category of the pending above leg rather than specifying its price or quantity."
+          },
+          "pending_below_strategy_id": {
+            "type": "integer",
+            "description": "For place spot opoco, identifies the strategy of the pending below leg rather than specifying its price or quantity."
+          },
+          "pending_below_strategy_type": {
+            "type": "integer",
+            "description": "For place spot opoco, selects the strategy category of the pending below leg rather than specifying its price or quantity."
+          },
+          "workingStrategyId": {
+            "type": "integer",
+            "description": "For place spot opoco, identifies the strategy of the working leg rather than specifying its price or quantity."
+          },
+          "workingStrategyType": {
+            "type": "integer",
+            "description": "For place spot opoco, selects the strategy category of the working leg rather than specifying its price or quantity."
+          },
+          "pendingAboveStrategyId": {
+            "type": "integer",
+            "description": "For place spot opoco, identifies the strategy of the pending above leg rather than specifying its price or quantity."
+          },
+          "pendingAboveStrategyType": {
+            "type": "integer",
+            "description": "For place spot opoco, selects the strategy category of the pending above leg rather than specifying its price or quantity."
+          },
+          "pendingBelowStrategyId": {
+            "type": "integer",
+            "description": "For place spot opoco, identifies the strategy of the pending below leg rather than specifying its price or quantity."
+          },
+          "pendingBelowStrategyType": {
+            "type": "integer",
+            "description": "For place spot opoco, selects the strategy category of the pending below leg rather than specifying its price or quantity."
           }
         }
       },
@@ -3560,6 +3946,22 @@
           "quantity": {
             "type": "string",
             "format": "decimal"
+          },
+          "strategy_id": {
+            "type": "integer",
+            "description": "For place spot sor order, identifies a strategy rather than specifying its investment."
+          },
+          "strategy_type": {
+            "type": "integer",
+            "description": "For place spot sor order, selects the strategy category used by the endpoint."
+          },
+          "strategyId": {
+            "type": "integer",
+            "description": "For place spot sor order, identifies a strategy rather than specifying its investment."
+          },
+          "strategyType": {
+            "type": "integer",
+            "description": "For place spot sor order, selects the strategy category used by the endpoint."
           }
         }
       },
@@ -3644,6 +4046,10 @@
           "taker_amount": {
             "type": "string",
             "format": "decimal"
+          },
+          "expiration": {
+            "type": "integer",
+            "description": "For prediction create otc blocktrade, specifies a scheduling duration or timestamp in the endpoint time unit."
           }
         }
       },
@@ -3795,6 +4201,10 @@
           "size": {
             "type": "string",
             "format": "decimal"
+          },
+          "duration": {
+            "type": "integer",
+            "description": "For query vip loan fixed rate market, specifies a scheduling duration or timestamp in the endpoint time unit."
           }
         }
       },
@@ -3874,6 +4284,10 @@
           "collateralCoin": {
             "type": "string",
             "description": "repay_flexible_loan/collateralCoin: selects collateral currencies, account identifiers, or the collateral enable switch."
+          },
+          "collateralReturn": {
+            "type": "boolean",
+            "description": "For repay flexible loan, selects whether to return excess collateral after repayment using a boolean flag."
           }
         }
       },
@@ -4189,6 +4603,18 @@
           "priceMatch": {
             "type": "string",
             "description": "test_order/priceMatch: selects the documented mode, unit, or reference used by this operation."
+          },
+          "strategyId": {
+            "type": "integer",
+            "description": "For test order, identifies a strategy rather than specifying its investment."
+          },
+          "strategyType": {
+            "type": "integer",
+            "description": "For test order, selects the strategy category used by the endpoint."
+          },
+          "computeCommissionRates": {
+            "type": "boolean",
+            "description": "For test order, requests commission-rate estimates in the test-order response using a boolean flag."
           }
         }
       },
@@ -4210,6 +4636,30 @@
           "quantity": {
             "type": "string",
             "format": "decimal"
+          },
+          "compute_commission_rates": {
+            "type": "boolean",
+            "description": "For test spot sor order, requests commission-rate estimates in the test-order response using a boolean flag."
+          },
+          "strategy_id": {
+            "type": "integer",
+            "description": "For test spot sor order, identifies a strategy rather than specifying its investment."
+          },
+          "strategy_type": {
+            "type": "integer",
+            "description": "For test spot sor order, selects the strategy category used by the endpoint."
+          },
+          "computeCommissionRates": {
+            "type": "boolean",
+            "description": "For test spot sor order, requests commission-rate estimates in the test-order response using a boolean flag."
+          },
+          "strategyId": {
+            "type": "integer",
+            "description": "For test spot sor order, identifies a strategy rather than specifying its investment."
+          },
+          "strategyType": {
+            "type": "integer",
+            "description": "For test spot sor order, selects the strategy category used by the endpoint."
           }
         }
       },
@@ -4327,6 +4777,10 @@
           "collateral_coin": {
             "type": "string",
             "description": "vip_loan_borrow/collateral_coin: selects collateral currencies, account identifiers, or the collateral enable switch."
+          },
+          "is_flexible_rate": {
+            "type": "boolean",
+            "description": "For vip loan borrow, selects flexible rather than fixed loan-rate mode using a boolean flag."
           }
         }
       },
@@ -5884,15 +6338,60 @@
       },
       "cancel_options_batch_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "orderIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For cancel options batch orders, identifies existing orders or requests to query or cancel; contains no order quantities."
+          },
+          "clientOrderIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For cancel options batch orders, identifies existing orders or requests to query or cancel; contains no order quantities."
+          }
+        }
       },
       "cancel_futures_batch_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "order_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For cancel futures batch orders, identifies existing orders or requests to query or cancel; contains no order quantities."
+          },
+          "client_order_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For cancel futures batch orders, identifies existing orders or requests to query or cancel; contains no order quantities."
+          }
+        }
       },
       "cancel_coin_futures_batch_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "order_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For cancel coin futures batch orders, identifies existing orders or requests to query or cancel; contains no order quantities."
+          },
+          "client_order_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For cancel coin futures batch orders, identifies existing orders or requests to query or cancel; contains no order quantities."
+          }
+        }
       },
       "get_coin_futures_orderbook": {
         "type": "object",
@@ -5944,11 +6443,21 @@
       },
       "cancel_coin_futures_algo_order": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "fields": {
+            "type": "object",
+            "description": "For cancel coin futures algo order, contains optional cancellation or lookup identifiers for the coin futures algo order."
+          }
+        }
       },
       "get_coin_futures_algo_order": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "fields": {
+            "type": "object",
+            "description": "For get coin futures algo order, contains optional cancellation or lookup identifiers for the coin futures algo order."
+          }
+        }
       },
       "cancel_equity_order": {
         "type": "object",
@@ -6165,6 +6674,14 @@
           "newClientStrategyId": {
             "type": "string",
             "description": "cancel_pm_cm_conditional_order/newClientStrategyId: identifies a strategy rather than specifying its investment."
+          },
+          "strategy_id": {
+            "type": "integer",
+            "description": "For cancel pm cm conditional order, identifies a strategy rather than specifying its investment."
+          },
+          "strategyId": {
+            "type": "integer",
+            "description": "For cancel pm cm conditional order, identifies a strategy rather than specifying its investment."
           }
         }
       },
@@ -6182,6 +6699,14 @@
           "newClientStrategyId": {
             "type": "string",
             "description": "get_pm_cm_conditional_order/newClientStrategyId: identifies a strategy rather than specifying its investment."
+          },
+          "strategy_id": {
+            "type": "integer",
+            "description": "For get pm cm conditional order, identifies a strategy rather than specifying its investment."
+          },
+          "strategyId": {
+            "type": "integer",
+            "description": "For get pm cm conditional order, identifies a strategy rather than specifying its investment."
           }
         }
       },
@@ -6195,6 +6720,14 @@
           "newClientStrategyId": {
             "type": "string",
             "description": "get_pm_cm_conditional_order_history/newClientStrategyId: identifies a strategy rather than specifying its investment."
+          },
+          "strategy_id": {
+            "type": "integer",
+            "description": "For get pm cm conditional order history, identifies a strategy rather than specifying its investment."
+          },
+          "strategyId": {
+            "type": "integer",
+            "description": "For get pm cm conditional order history, identifies a strategy rather than specifying its investment."
           }
         }
       },
@@ -6350,11 +6883,29 @@
       },
       "query_algo_historical_algo_orders_future_algo": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of algo historical algo orders future algo records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of algo historical algo orders future algo records per response page; this integer counts records."
+          }
+        }
       },
       "query_algo_sub_orders_future_algo": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of algo sub orders future algo records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of algo sub orders future algo records per response page; this integer counts records."
+          }
+        }
       },
       "algo_cancel_algo_order_spot_algo": {
         "type": "object",
@@ -6366,11 +6917,29 @@
       },
       "query_algo_historical_algo_orders_spot_algo": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of algo historical algo orders spot algo records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of algo historical algo orders spot algo records per response page; this integer counts records."
+          }
+        }
       },
       "query_algo_sub_orders_spot_algo": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of algo sub orders spot algo records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of algo sub orders spot algo records per response page; this integer counts records."
+          }
+        }
       },
       "accept_options_block_order": {
         "type": "object",
@@ -6418,7 +6987,16 @@
       },
       "wallet_dust_transfer": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "asset": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For wallet dust transfer, selects currency identifiers or funding source categories for this operation.",
+            "x-delimited-string": true
+          }
+        }
       },
       "query_managed_sub_account_transfer_log_master_account_investor": {
         "type": "object",
@@ -6446,15 +7024,30 @@
       },
       "get_withdrawal_history": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "description": "skips an integer number of withdrawal history records before returning the next page."
+          }
+        }
       },
       "get_travel_rule_withdrawal_history": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "description": "skips an integer number of travel rule withdrawal history records before returning the next page."
+          }
+        }
       },
       "get_travel_rule_withdrawal_history_v2": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "description": "skips an integer number of travel rule withdrawal history v2 records before returning the next page."
+          }
+        }
       },
       "disable_fast_withdraw_switch": {
         "type": "object",
@@ -6466,11 +7059,27 @@
       },
       "prediction_batch_redeem": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "token_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For prediction batch redeem, selects currency identifiers or funding source categories for this operation."
+          }
+        }
       },
       "prediction_batch_cancel_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "cancel_info_list": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For prediction batch cancel orders, identifies existing orders or requests to query or cancel; contains no order quantities."
+          }
+        }
       },
       "get_order_detail": {
         "type": "object",
@@ -6491,15 +7100,30 @@
       },
       "prediction_query_active_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "description": "skips an integer number of prediction query active orders records before returning the next page."
+          }
+        }
       },
       "prediction_query_order_history": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "description": "skips an integer number of prediction query order history records before returning the next page."
+          }
+        }
       },
       "prediction_query_transfer_list": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "description": "skips an integer number of prediction query transfer list records before returning the next page."
+          }
+        }
       },
       "prediction_query_transfer_status": {
         "type": "object",
@@ -6511,6 +7135,10 @@
           "collateral_coin": {
             "type": "string",
             "description": "get_vip_loan_ongoing_orders/collateral_coin: selects collateral currencies, account identifiers, or the collateral enable switch."
+          },
+          "collateral_account_id": {
+            "type": "integer",
+            "description": "For get vip loan ongoing orders, selects collateral currencies, account identifiers, or the collateral enable switch."
           }
         }
       },
@@ -6645,7 +7273,16 @@
       },
       "get_dual_investment_product_list": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of dual investment product list records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of dual investment product list records per response page; this integer counts records."
+          }
+        }
       },
       "set_futures_margin_type": {
         "type": "object",
@@ -6688,7 +7325,12 @@
       },
       "get_deposit_history": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "description": "skips an integer number of deposit history records before returning the next page."
+          }
+        }
       },
       "pm_pro_switch_delta_mode": {
         "type": "object",
@@ -6705,27 +7347,69 @@
       },
       "get_travel_rule_deposit_history": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "description": "skips an integer number of travel rule deposit history records before returning the next page."
+          }
+        }
       },
       "get_travel_rule_deposit_history_v2": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "description": "skips an integer number of travel rule deposit history v2 records before returning the next page."
+          }
+        }
       },
       "get_dual_investment_positions": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of dual investment positions records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of dual investment positions records per response page; this integer counts records."
+          }
+        }
       },
       "create_sub_account_api_key": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "can_margin_loan_repay": {
+            "type": "boolean",
+            "description": "For create sub account api key, controls the API key permission for margin loan repayment using a boolean flag."
+          },
+          "canMarginLoanRepay": {
+            "type": "boolean",
+            "description": "For create sub account api key, controls the API key permission for margin loan repayment using a boolean flag."
+          }
+        }
       },
       "modify_sub_account_api_key_permission": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "can_margin_loan_repay": {
+            "type": "boolean",
+            "description": "For modify sub account api key permission, controls the API key permission for margin loan repayment using a boolean flag."
+          },
+          "canMarginLoanRepay": {
+            "type": "boolean",
+            "description": "For modify sub account api key permission, controls the API key permission for margin loan repayment using a boolean flag."
+          }
+        }
       },
       "get_sub_account_deposit_history": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "description": "skips an integer number of sub account deposit history records before returning the next page."
+          }
+        }
       },
       "get_collateral_asset_data": {
         "type": "object",
@@ -6738,35 +7422,75 @@
       },
       "earnings_list": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of earnings list records per response page; this integer counts records."
+          }
+        }
       },
       "extra_bonus_list": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of extra bonus list records per response page; this integer counts records."
+          }
+        }
       },
       "hashrate_resale_detail": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of hashrate resale detail records per response page; this integer counts records."
+          }
+        }
       },
       "hashrate_resale_list": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of hashrate resale list records per response page; this integer counts records."
+          }
+        }
       },
       "mining_account_earning": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of mining account earning records per response page; this integer counts records."
+          }
+        }
       },
       "prediction_list_prediction_markets": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "description": "skips an integer number of prediction list prediction markets records before returning the next page."
+          }
+        }
       },
       "prediction_query_positions": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "description": "skips an integer number of prediction query positions records before returning the next page."
+          }
+        }
       },
       "prediction_query_settled_position_history": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "description": "skips an integer number of prediction query settled position history records before returning the next page."
+          }
+        }
       },
       "vip_loan_fixed_rate_borrow": {
         "type": "object",
@@ -6783,7 +7507,12 @@
       },
       "check_vip_loan_collateral_account": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "collateral_account_id": {
+            "type": "integer",
+            "description": "For check vip loan collateral account, selects collateral currencies, account identifiers, or the collateral enable switch."
+          }
+        }
       }
     },
     "bingx": {
@@ -6844,7 +7573,16 @@
       },
       "get_subaccounts": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "is_feeze": {
+            "type": "boolean",
+            "description": "For get subaccounts, filters subaccounts by the frozen-state boolean flag rather than a financial value."
+          },
+          "isFeeze": {
+            "type": "boolean",
+            "description": "For get subaccounts, filters subaccounts by the frozen-state boolean flag rather than a financial value."
+          }
+        }
       },
       "get_wealth_v1_product_dual_currency_pre_order": {
         "type": "object",
@@ -6884,7 +7622,8 @@
                 "x-positive": true
               }
             },
-            "x-empty-as-absent": true
+            "x-empty-as-absent": true,
+            "x-nonempty-object": true
           },
           "stopPrice": {
             "type": "string",
@@ -6904,7 +7643,8 @@
                 "x-positive": true
               }
             },
-            "x-empty-as-absent": true
+            "x-empty-as-absent": true,
+            "x-nonempty-object": true
           },
           "stop_price": {
             "type": "string",
@@ -6924,7 +7664,8 @@
                 "x-positive": true
               }
             },
-            "x-empty-as-absent": true
+            "x-empty-as-absent": true,
+            "x-nonempty-object": true
           },
           "take_profit": {
             "type": "object",
@@ -6940,7 +7681,8 @@
                 "x-positive": true
               }
             },
-            "x-empty-as-absent": true
+            "x-empty-as-absent": true,
+            "x-nonempty-object": true
           }
         }
       },
@@ -7226,7 +7968,8 @@
                 "x-positive": true
               }
             },
-            "x-empty-as-absent": true
+            "x-empty-as-absent": true,
+            "x-nonempty-object": true
           },
           "stopPrice": {
             "type": "string",
@@ -7246,7 +7989,8 @@
                 "x-positive": true
               }
             },
-            "x-empty-as-absent": true
+            "x-empty-as-absent": true,
+            "x-nonempty-object": true
           },
           "stop_price": {
             "type": "string",
@@ -7266,7 +8010,8 @@
                 "x-positive": true
               }
             },
-            "x-empty-as-absent": true
+            "x-empty-as-absent": true,
+            "x-nonempty-object": true
           },
           "take_profit": {
             "type": "object",
@@ -7282,7 +8027,8 @@
                 "x-positive": true
               }
             },
-            "x-empty-as-absent": true
+            "x-empty-as-absent": true,
+            "x-nonempty-object": true
           }
         }
       },
@@ -7425,7 +8171,8 @@
                 "x-positive": true
               }
             },
-            "x-empty-as-absent": true
+            "x-empty-as-absent": true,
+            "x-nonempty-object": true
           },
           "stopPrice": {
             "type": "string",
@@ -7445,7 +8192,8 @@
                 "x-positive": true
               }
             },
-            "x-empty-as-absent": true
+            "x-empty-as-absent": true,
+            "x-nonempty-object": true
           },
           "stop_price": {
             "type": "string",
@@ -7465,7 +8213,8 @@
                 "x-positive": true
               }
             },
-            "x-empty-as-absent": true
+            "x-empty-as-absent": true,
+            "x-nonempty-object": true
           },
           "take_profit": {
             "type": "object",
@@ -7481,7 +8230,8 @@
                 "x-positive": true
               }
             },
-            "x-empty-as-absent": true
+            "x-empty-as-absent": true,
+            "x-nonempty-object": true
           }
         }
       },
@@ -7503,6 +8253,13 @@
           "investment_asset": {
             "type": "string",
             "description": "post_wealth_v1_product_dual_currency_order/investment_asset: selects currency identifiers or funding source categories for this operation."
+          },
+          "select_accounts": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For post wealth v1 product dual currency order, carries identity, signing, permission, or travel-rule metadata for this operation."
           }
         }
       },
@@ -7584,7 +8341,8 @@
                 "x-positive": true
               }
             },
-            "x-empty-as-absent": true
+            "x-empty-as-absent": true,
+            "x-nonempty-object": true
           },
           "stopPrice": {
             "type": "string",
@@ -7604,7 +8362,8 @@
                 "x-positive": true
               }
             },
-            "x-empty-as-absent": true
+            "x-empty-as-absent": true,
+            "x-nonempty-object": true
           },
           "stop_price": {
             "type": "string",
@@ -7624,7 +8383,8 @@
                 "x-positive": true
               }
             },
-            "x-empty-as-absent": true
+            "x-empty-as-absent": true,
+            "x-nonempty-object": true
           },
           "take_profit": {
             "type": "object",
@@ -7640,7 +8400,8 @@
                 "x-positive": true
               }
             },
-            "x-empty-as-absent": true
+            "x-empty-as-absent": true,
+            "x-nonempty-object": true
           }
         }
       },
@@ -7715,7 +8476,8 @@
                 "x-positive": true
               }
             },
-            "x-empty-as-absent": true
+            "x-empty-as-absent": true,
+            "x-nonempty-object": true
           },
           "stopPrice": {
             "type": "string",
@@ -7735,7 +8497,8 @@
                 "x-positive": true
               }
             },
-            "x-empty-as-absent": true
+            "x-empty-as-absent": true,
+            "x-nonempty-object": true
           },
           "stop_price": {
             "type": "string",
@@ -7755,7 +8518,8 @@
                 "x-positive": true
               }
             },
-            "x-empty-as-absent": true
+            "x-empty-as-absent": true,
+            "x-nonempty-object": true
           },
           "take_profit": {
             "type": "object",
@@ -7771,7 +8535,8 @@
                 "x-positive": true
               }
             },
-            "x-empty-as-absent": true
+            "x-empty-as-absent": true,
+            "x-nonempty-object": true
           }
         }
       },
@@ -7864,7 +8629,8 @@
                       "x-positive": true
                     }
                   },
-                  "x-empty-as-absent": true
+                  "x-empty-as-absent": true,
+                  "x-nonempty-object": true
                 },
                 "stopPrice": {
                   "type": "string",
@@ -7884,7 +8650,8 @@
                       "x-positive": true
                     }
                   },
-                  "x-empty-as-absent": true
+                  "x-empty-as-absent": true,
+                  "x-nonempty-object": true
                 },
                 "stop_price": {
                   "type": "string",
@@ -7904,7 +8671,8 @@
                       "x-positive": true
                     }
                   },
-                  "x-empty-as-absent": true
+                  "x-empty-as-absent": true,
+                  "x-nonempty-object": true
                 },
                 "take_profit": {
                   "type": "object",
@@ -7920,7 +8688,8 @@
                       "x-positive": true
                     }
                   },
-                  "x-empty-as-absent": true
+                  "x-empty-as-absent": true,
+                  "x-nonempty-object": true
                 }
               }
             }
@@ -7976,7 +8745,8 @@
                       "x-positive": true
                     }
                   },
-                  "x-empty-as-absent": true
+                  "x-empty-as-absent": true,
+                  "x-nonempty-object": true
                 },
                 "stopPrice": {
                   "type": "string",
@@ -7996,7 +8766,8 @@
                       "x-positive": true
                     }
                   },
-                  "x-empty-as-absent": true
+                  "x-empty-as-absent": true,
+                  "x-nonempty-object": true
                 },
                 "stop_price": {
                   "type": "string",
@@ -8016,7 +8787,8 @@
                       "x-positive": true
                     }
                   },
-                  "x-empty-as-absent": true
+                  "x-empty-as-absent": true,
+                  "x-nonempty-object": true
                 },
                 "take_profit": {
                   "type": "object",
@@ -8032,7 +8804,8 @@
                       "x-positive": true
                     }
                   },
-                  "x-empty-as-absent": true
+                  "x-empty-as-absent": true,
+                  "x-nonempty-object": true
                 }
               }
             }
@@ -8131,7 +8904,8 @@
                       "x-positive": true
                     }
                   },
-                  "x-empty-as-absent": true
+                  "x-empty-as-absent": true,
+                  "x-nonempty-object": true
                 },
                 "stopPrice": {
                   "type": "string",
@@ -8151,7 +8925,8 @@
                       "x-positive": true
                     }
                   },
-                  "x-empty-as-absent": true
+                  "x-empty-as-absent": true,
+                  "x-nonempty-object": true
                 },
                 "stop_price": {
                   "type": "string",
@@ -8171,7 +8946,8 @@
                       "x-positive": true
                     }
                   },
-                  "x-empty-as-absent": true
+                  "x-empty-as-absent": true,
+                  "x-nonempty-object": true
                 },
                 "take_profit": {
                   "type": "object",
@@ -8187,7 +8963,8 @@
                       "x-positive": true
                     }
                   },
-                  "x-empty-as-absent": true
+                  "x-empty-as-absent": true,
+                  "x-nonempty-object": true
                 }
               }
             }
@@ -8244,7 +9021,8 @@
                       "x-positive": true
                     }
                   },
-                  "x-empty-as-absent": true
+                  "x-empty-as-absent": true,
+                  "x-nonempty-object": true
                 },
                 "stopPrice": {
                   "type": "string",
@@ -8264,7 +9042,8 @@
                       "x-positive": true
                     }
                   },
-                  "x-empty-as-absent": true
+                  "x-empty-as-absent": true,
+                  "x-nonempty-object": true
                 },
                 "stop_price": {
                   "type": "string",
@@ -8284,7 +9063,8 @@
                       "x-positive": true
                     }
                   },
-                  "x-empty-as-absent": true
+                  "x-empty-as-absent": true,
+                  "x-nonempty-object": true
                 },
                 "take_profit": {
                   "type": "object",
@@ -8300,7 +9080,8 @@
                       "x-positive": true
                     }
                   },
-                  "x-empty-as-absent": true
+                  "x-empty-as-absent": true,
+                  "x-nonempty-object": true
                 }
               }
             }
@@ -8309,11 +9090,43 @@
       },
       "cancel_spot_batch_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "order_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For cancel spot batch orders, identifies existing orders or requests to query or cancel; contains no order quantities.",
+            "x-delimited-string": true
+          },
+          "client_order_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For cancel spot batch orders, identifies existing orders or requests to query or cancel; contains no order quantities.",
+            "x-delimited-string": true
+          }
+        }
       },
       "cancel_swap_batch_order": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "order_id_list": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For cancel swap batch order, identifies existing orders or requests to query or cancel; contains no order quantities."
+          },
+          "client_order_id_list": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For cancel swap batch order, identifies existing orders or requests to query or cancel; contains no order quantities."
+          }
+        }
       },
       "get_orderbook": {
         "type": "object",
@@ -8349,7 +9162,12 @@
       },
       "get_spot_order_history": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of spot order history records per response page; this integer counts records."
+          }
+        }
       },
       "cancel_swap_order": {
         "type": "object",
@@ -8398,7 +9216,12 @@
       },
       "get_swap_twap_order_history": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of swap twap order history records per response page; this integer counts records."
+          }
+        }
       },
       "get_swap_twap_order": {
         "type": "object",
@@ -8451,11 +9274,29 @@
       },
       "get_asset_transfer_records": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of asset transfer records records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of asset transfer records records per response page; this integer counts records."
+          }
+        }
       },
       "get_subaccount_transfer_history": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "paging_size": {
+            "type": "integer",
+            "description": "limits the number of subaccount transfer history records per response page; this integer counts records."
+          },
+          "pagingSize": {
+            "type": "integer",
+            "description": "limits the number of subaccount transfer history records per response page; this integer counts records."
+          }
+        }
       },
       "get_subaccount_transferable_amounts": {
         "type": "object",
@@ -8467,15 +9308,30 @@
       },
       "get_internal_transfer_records": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "description": "skips an integer number of internal transfer records records before returning the next page."
+          }
+        }
       },
       "get_sub_account_internal_transfer_records": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "description": "skips an integer number of sub account internal transfer records records before returning the next page."
+          }
+        }
       },
       "get_withdrawal_history": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "description": "skips an integer number of withdrawal history records before returning the next page."
+          }
+        }
       },
       "delete_cswap_v1_trade_all_open_orders": {
         "type": "object",
@@ -8483,7 +9339,12 @@
       },
       "get_copy_trading_v1_spot_history_order": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of copy trading v1 spot history order records per response page; this integer counts records."
+          }
+        }
       },
       "post_copy_trading_v1_spot_trader_sell_order": {
         "type": "object",
@@ -8495,11 +9356,25 @@
       },
       "get_wealth_v1_product_dual_currency_order_records": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of wealth v1 product dual currency order records records per response page; this integer counts records."
+          }
+        }
       },
       "get_subaccount_all_account_balance": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of subaccount all account balance records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of subaccount all account balance records per response page; this integer counts records."
+          }
+        }
       },
       "change_margin_type": {
         "type": "object",
@@ -8512,19 +9387,43 @@
       },
       "get_swap_fill_history": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of swap fill history records per response page; this integer counts records."
+          }
+        }
       },
       "get_swap_position_history": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of swap position history records per response page; this integer counts records."
+          }
+        }
       },
       "get_swap_margin_history": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of swap margin history records per response page; this integer counts records."
+          }
+        }
       },
       "get_coin_swap_fills": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of coin swap fills records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of coin swap fills records per response page; this integer counts records."
+          }
+        }
       },
       "set_coin_swap_margin_type": {
         "type": "object",
@@ -8541,67 +9440,155 @@
       },
       "get_spot_open_oco": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of spot open oco records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of spot open oco records per response page; this integer counts records."
+          }
+        }
       },
       "get_spot_oco_history": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of spot oco history records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of spot oco history records per response page; this integer counts records."
+          }
+        }
       },
       "get_deposit_history": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "description": "skips an integer number of deposit history records before returning the next page."
+          }
+        }
       },
       "get_deposit_addresses": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "description": "skips an integer number of deposit addresses records before returning the next page."
+          }
+        }
       },
       "get_sub_account_deposit_addresses": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "description": "skips an integer number of sub account deposit addresses records before returning the next page."
+          }
+        }
       },
       "get_sub_account_deposit_history": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "description": "skips an integer number of sub account deposit history records before returning the next page."
+          }
+        }
       },
       "get_agent_v1_asset_partner_data": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of agent v1 asset partner data records per response page; this integer counts records."
+          }
+        }
       },
       "get_agent_v2_reward_commission_data_list": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of agent v2 reward commission data list records per response page; this integer counts records."
+          }
+        }
       },
       "get_agent_v1_reward_third_commission_data_list": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of agent v1 reward third commission data list records per response page; this integer counts records."
+          }
+        }
       },
       "get_agent_v1_commission_data_list_referral_code": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of agent v1 commission data list referral code records per response page; this integer counts records."
+          }
+        }
       },
       "get_agent_v1_account_invite_account_list": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of agent v1 account invite account list records per response page; this integer counts records."
+          }
+        }
       },
       "get_agent_v1_asset_deposit_detail_list": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of agent v1 asset deposit detail list records per response page; this integer counts records."
+          }
+        }
       },
       "get_copy_trading_v1_p_futures_profit_detail": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of copy trading v1 p futures profit detail records per response page; this integer counts records."
+          }
+        }
       },
       "get_copy_trading_v1_p_futures_trader_detail": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "day_size": {
+            "type": "integer",
+            "description": "For get copy trading v1 p futures trader detail, limits the number of result records returned by pagination."
+          }
+        }
       },
       "get_copy_trading_v1_spot_profit_detail": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of copy trading v1 spot profit detail records per response page; this integer counts records."
+          }
+        }
       },
       "get_copy_trading_v1_swap_trace_current_track": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "description": "skips an integer number of copy trading v1 swap trace current track records before returning the next page."
+          }
+        }
       },
       "post_wealth_v1_product_dual_currency_invest_asset_list": {
         "type": "object",
@@ -8609,6 +9596,22 @@
           "investment_asset": {
             "type": "string",
             "description": "post_wealth_v1_product_dual_currency_invest_asset_list/investment_asset: selects currency identifiers or funding source categories for this operation."
+          },
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of post wealth v1 product dual currency invest asset list records per response page; this integer counts records."
+          },
+          "begin_duration": {
+            "type": "integer",
+            "description": "For post wealth v1 product dual currency invest asset list, specifies a scheduling duration or timestamp in the endpoint time unit."
+          },
+          "end_duration": {
+            "type": "integer",
+            "description": "For post wealth v1 product dual currency invest asset list, specifies a scheduling duration or timestamp in the endpoint time unit."
+          },
+          "duration": {
+            "type": "integer",
+            "description": "For post wealth v1 product dual currency invest asset list, specifies a scheduling duration or timestamp in the endpoint time unit."
           }
         }
       }
@@ -12551,6 +13554,13 @@
                 }
               }
             }
+          },
+          "order_list": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "For cancel spot batch orders, identifies existing orders or requests to query or cancel; contains no order quantities."
           }
         }
       },
@@ -12563,6 +13573,13 @@
               "type": "object",
               "properties": {}
             }
+          },
+          "order_list": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "For cancel uta batch orders, identifies existing orders or requests to query or cancel; contains no order quantities."
           }
         }
       },
@@ -12576,16 +13593,60 @@
           "marginCoin": {
             "type": "string",
             "description": "cancel_futures_batch_orders/marginCoin: selects the settlement currency for the margin account."
+          },
+          "order_id_list": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "For cancel futures batch orders, identifies existing orders or requests to query or cancel; contains no order quantities."
+          },
+          "orderIdList": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "For cancel futures batch orders, identifies existing orders or requests to query or cancel; contains no order quantities."
           }
         }
       },
       "cancel_cross_margin_batch_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "orders": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "For cancel cross margin batch orders, identifies existing orders or requests to query or cancel; contains no order quantities."
+          },
+          "orderIdList": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "For cancel cross margin batch orders, identifies existing orders or requests to query or cancel; contains no order quantities."
+          }
+        }
       },
       "cancel_isolated_margin_batch_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "orders": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "For cancel isolated margin batch orders, identifies existing orders or requests to query or cancel; contains no order quantities."
+          },
+          "orderIdList": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "For cancel isolated margin batch orders, identifies existing orders or requests to query or cancel; contains no order quantities."
+          }
+        }
       },
       "batch_create_classic_sub_accounts": {
         "type": "object",
@@ -12702,6 +13763,13 @@
           "marginCoin": {
             "type": "string",
             "description": "cancel_futures_plan_orders/marginCoin: selects the settlement currency for the margin account."
+          },
+          "order_id_list": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "For cancel futures plan orders, identifies existing orders or requests to query or cancel; contains no order quantities."
           }
         }
       },
@@ -12719,7 +13787,15 @@
       },
       "cancel_spot_plan_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "symbol_list": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For cancel spot plan orders, identifies the trading pairs whose existing plan orders should be cancelled."
+          }
+        }
       },
       "get_pending_spot_plan_orders": {
         "type": "object",
@@ -12913,7 +13989,15 @@
       },
       "classic_copytrading_spot_copytrade_follower_order_close_tracking": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "tracking_no_list": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For classic copytrading spot copytrade follower order close tracking, identifies existing orders or requests to query or cancel; contains no order quantities."
+          }
+        }
       },
       "classic_copytrading_spot_copytrade_follower_query_current_orders": {
         "type": "object",
@@ -12925,11 +14009,27 @@
       },
       "classic_copytrading_spot_copytrade_follower_stop_order": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "tracking_no_list": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For classic copytrading spot copytrade follower stop order, identifies existing orders or requests to query or cancel; contains no order quantities."
+          }
+        }
       },
       "classic_copytrading_spot_copytrade_trader_order_close_tracking": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "tracking_no_list": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For classic copytrading spot copytrade trader order close tracking, identifies existing orders or requests to query or cancel; contains no order quantities."
+          }
+        }
       },
       "classic_copytrading_spot_copytrade_trader_order_current_track": {
         "type": "object",
@@ -13173,7 +14273,16 @@
       },
       "get_futures_history_funding_rate": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of futures history funding rate records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of futures history funding rate records per response page; this integer counts records."
+          }
+        }
       },
       "get_uta_risk_reserve": {
         "type": "object",
@@ -13237,7 +14346,16 @@
       },
       "get_isolated_margin_risk_rate": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of isolated margin risk rate records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of isolated margin risk rate records per response page; this integer counts records."
+          }
+        }
       },
       "get_isolated_margin_financial_records": {
         "type": "object",
@@ -13942,6 +15060,18 @@
           "strategyType": {
             "type": "string",
             "description": "create_strategy/strategyType: selects the strategy category used by the endpoint."
+          },
+          "duration": {
+            "type": "integer",
+            "description": "For create strategy, specifies a scheduling duration or timestamp in the endpoint time unit."
+          },
+          "leverage_type": {
+            "type": "integer",
+            "description": "For create strategy, selects the strategy leverage mode using the documented integer enumeration."
+          },
+          "leverageType": {
+            "type": "integer",
+            "description": "For create strategy, selects the strategy leverage mode using the documented integer enumeration."
           }
         }
       },
@@ -13961,6 +15091,14 @@
           "amount": {
             "type": "string",
             "format": "decimal"
+          },
+          "fee_type": {
+            "type": "integer",
+            "description": "For create withdrawal, selects the withdrawal fee treatment using the documented integer enumeration."
+          },
+          "beneficiary": {
+            "type": "object",
+            "description": "For create withdrawal, carries identity, signing, permission, or travel-rule metadata for this operation."
           }
         }
       },
@@ -14495,6 +15633,10 @@
                 "format": "decimal"
               }
             }
+          },
+          "interestCard": {
+            "type": "object",
+            "description": "For place advanced earn order, identifies the selected earn interest promotion card for this order."
           }
         }
       },
@@ -14513,6 +15655,10 @@
           "amount": {
             "type": "string",
             "format": "decimal"
+          },
+          "interestCard": {
+            "type": "object",
+            "description": "For place earn order, identifies the selected earn interest promotion card for this order."
           }
         }
       },
@@ -14535,6 +15681,10 @@
           "qty": {
             "type": "string",
             "format": "decimal"
+          },
+          "isLeverage": {
+            "type": "integer",
+            "description": "For place limit buy order, selects whether spot orders borrow funds through an integer flag rather than a leverage multiplier."
           }
         }
       },
@@ -14548,6 +15698,10 @@
           "qty": {
             "type": "string",
             "format": "decimal"
+          },
+          "isLeverage": {
+            "type": "integer",
+            "description": "For place limit order, selects whether spot orders borrow funds through an integer flag rather than a leverage multiplier."
           }
         }
       },
@@ -14561,6 +15715,10 @@
           "qty": {
             "type": "string",
             "format": "decimal"
+          },
+          "isLeverage": {
+            "type": "integer",
+            "description": "For place limit sell order, selects whether spot orders borrow funds through an integer flag rather than a leverage multiplier."
           }
         }
       },
@@ -14570,6 +15728,10 @@
           "qty": {
             "type": "string",
             "format": "decimal"
+          },
+          "isLeverage": {
+            "type": "integer",
+            "description": "For place market buy order, selects whether spot orders borrow funds through an integer flag rather than a leverage multiplier."
           }
         }
       },
@@ -14579,6 +15741,10 @@
           "qty": {
             "type": "string",
             "format": "decimal"
+          },
+          "isLeverage": {
+            "type": "integer",
+            "description": "For place market order, selects whether spot orders borrow funds through an integer flag rather than a leverage multiplier."
           }
         }
       },
@@ -14588,6 +15754,10 @@
           "qty": {
             "type": "string",
             "format": "decimal"
+          },
+          "isLeverage": {
+            "type": "integer",
+            "description": "For place market sell order, selects whether spot orders borrow funds through an integer flag rather than a leverage multiplier."
           }
         }
       },
@@ -14682,6 +15852,10 @@
           "closeOnTrigger": {
             "type": "boolean",
             "description": "place_order/closeOnTrigger: selects close On Trigger identifiers or response filters for this operation."
+          },
+          "isLeverage": {
+            "type": "integer",
+            "description": "For place order, selects whether spot orders borrow funds through an integer flag rather than a leverage multiplier."
           }
         }
       },
@@ -14695,6 +15869,10 @@
           "qty": {
             "type": "string",
             "format": "decimal"
+          },
+          "isLeverage": {
+            "type": "integer",
+            "description": "For place post only limit buy order, selects whether spot orders borrow funds through an integer flag rather than a leverage multiplier."
           }
         }
       },
@@ -14708,6 +15886,10 @@
           "qty": {
             "type": "string",
             "format": "decimal"
+          },
+          "isLeverage": {
+            "type": "integer",
+            "description": "For place post only limit order, selects whether spot orders borrow funds through an integer flag rather than a leverage multiplier."
           }
         }
       },
@@ -14721,6 +15903,10 @@
           "qty": {
             "type": "string",
             "format": "decimal"
+          },
+          "isLeverage": {
+            "type": "integer",
+            "description": "For place post only limit sell order, selects whether spot orders borrow funds through an integer flag rather than a leverage multiplier."
           }
         }
       },
@@ -15866,7 +17052,15 @@
       },
       "batch_set_collateral_coins": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "request": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "For batch set collateral coins, lists coin identifiers and collateral switches or existing order identifiers."
+          }
+        }
       },
       "cancel_batch_orders": {
         "type": "object",
@@ -16044,12 +17238,29 @@
           "strategyType": {
             "type": "string",
             "description": "get_strategy_orders/strategyType: selects the strategy category used by the endpoint."
+          },
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of strategy orders records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of strategy orders records per response page; this integer counts records."
           }
         }
       },
       "get_transferable_amount": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "coins": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For get transferable amount, selects currency identifiers or funding source categories for this operation.",
+            "x-delimited-string": true
+          }
+        }
       },
       "get_internal_transfer_records": {
         "type": "object",
@@ -16081,7 +17292,15 @@
       },
       "get_alpha_lp_order_list": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "order_status": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For get alpha lp order list, identifies existing orders or requests to query or cancel; contains no order quantities."
+          }
+        }
       },
       "redeem_alpha_lp": {
         "type": "object",
@@ -16094,7 +17313,15 @@
       },
       "request_alpha_prediction_order_book": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "token_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For request alpha prediction order book, selects currency identifiers or funding source categories for this operation."
+          }
+        }
       },
       "get_alpha_prediction_order_list": {
         "type": "object",
@@ -16102,7 +17329,15 @@
       },
       "get_alpha_trade_order_list": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "order_status": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For get alpha trade order list, identifies existing orders or requests to query or cancel; contains no order quantities."
+          }
+        }
       },
       "get_event_orderbook": {
         "type": "object",
@@ -16272,7 +17507,16 @@
       },
       "get_coin_balance": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "withTransferSafeAmount": {
+            "type": "boolean",
+            "description": "For get coin balance, controls an integer or boolean option rather than a transferred balance."
+          },
+          "withLtvTransferSafeAmount": {
+            "type": "boolean",
+            "description": "For get coin balance, controls an integer or boolean option rather than a transferred balance."
+          }
+        }
       },
       "get_advanced_earn_products": {
         "type": "object",
@@ -16294,11 +17538,21 @@
       },
       "get_launchpool_activity_log": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of launchpool activity log records per response page; this integer counts records."
+          }
+        }
       },
       "get_launchpool_history": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of launchpool history records per response page; this integer counts records."
+          }
+        }
       },
       "stop_strategy": {
         "type": "object",
@@ -16331,24 +17585,52 @@
           "strategyType": {
             "type": "string",
             "description": "get_strategy_list/strategyType: selects the strategy category used by the endpoint."
+          },
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of strategy list records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of strategy list records per response page; this integer counts records."
           }
         }
       },
       "request_broker_award_distribution_record": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "with_used_amount": {
+            "type": "boolean",
+            "description": "For request broker award distribution record, controls an integer or boolean option rather than a transferred balance."
+          }
+        }
       },
       "get_card_reward_mall_item_list": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of card reward mall item list records per response page; this integer counts records."
+          }
+        }
       },
       "get_card_reward_points_records": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of card reward points records records per response page; this integer counts records."
+          }
+        }
       },
       "get_compliance_appeal_list": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of compliance appeal list records per response page; this integer counts records."
+          }
+        }
       },
       "request_ins_loan_association_uid": {
         "type": "object",
@@ -16361,7 +17643,12 @@
       },
       "get_rwa_stocks_market_get_multiplier_list": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of rwa stocks market get multiplier list records per response page; this integer counts records."
+          }
+        }
       },
       "get_user_escrow_sub_members": {
         "type": "object",
@@ -17004,6 +18291,10 @@
                 "format": "decimal"
               }
             }
+          },
+          "signature": {
+            "type": "object",
+            "description": "For transfer usdc spot perp, carries identity, signing, permission, or travel-rule metadata for this operation."
           }
         }
       },
@@ -17021,6 +18312,10 @@
                 "format": "decimal"
               }
             }
+          },
+          "signature": {
+            "type": "object",
+            "description": "For withdraw from bridge signed, carries identity, signing, permission, or travel-rule metadata for this operation."
           }
         }
       },
@@ -17085,11 +18380,27 @@
       },
       "cancel_batch_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "cancels": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "For cancel batch orders, identifies existing orders or requests to query or cancel; contains no order quantities."
+          }
+        }
       },
       "cancel_batch_orders_by_cloid": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "cancels": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "For cancel batch orders by cloid, identifies existing orders or requests to query or cancel; contains no order quantities."
+          }
+        }
       },
       "cancel_order": {
         "type": "object",
@@ -17134,7 +18445,12 @@
       },
       "withdraw_staking_signed": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "signature": {
+            "type": "object",
+            "description": "For withdraw staking signed, carries identity, signing, permission, or travel-rule metadata for this operation."
+          }
+        }
       },
       "borrow_lend_signed": {
         "type": "object",
@@ -17252,6 +18568,10 @@
           "withdrawal_fee_token": {
             "type": "string",
             "description": "calculate_funding_fees/withdrawal_fee_token: selects currency identifiers or funding source categories for this operation."
+          },
+          "fee_included": {
+            "type": "boolean",
+            "description": "For calculate funding fees, selects whether the amount includes fees using a boolean flag."
           }
         }
       },
@@ -17420,7 +18740,8 @@
           },
           "volume": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           },
           "close[price]": {
             "type": "string",
@@ -17465,7 +18786,16 @@
       },
       "get_spot_trade_volume": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "fee_info": {
+            "type": "boolean",
+            "description": "For get spot trade volume, controls an integer or boolean option rather than a transferred balance."
+          },
+          "fee_schedule": {
+            "type": "boolean",
+            "description": "For get spot trade volume, controls an integer or boolean option rather than a transferred balance."
+          }
+        }
       },
       "get_withdrawal_information": {
         "type": "object",
@@ -17678,7 +19008,8 @@
           },
           "volume": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           },
           "price2": {
             "type": "string",
@@ -17717,7 +19048,8 @@
           },
           "volume": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           },
           "price2": {
             "type": "string",
@@ -17756,7 +19088,8 @@
           },
           "volume": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           },
           "price2": {
             "type": "string",
@@ -17790,7 +19123,8 @@
         "properties": {
           "volume": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           },
           "price": {
             "type": "string",
@@ -17829,7 +19163,8 @@
         "properties": {
           "volume": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           },
           "price": {
             "type": "string",
@@ -17868,7 +19203,8 @@
         "properties": {
           "volume": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           },
           "price": {
             "type": "string",
@@ -17932,7 +19268,8 @@
           "price": {
             "type": "string",
             "format": "decimal",
-            "x-relative": "kraken_relative_price"
+            "x-relative": "kraken_relative_price",
+            "x-positive": true
           },
           "price2": {
             "type": "string",
@@ -17978,7 +19315,8 @@
           },
           "volume": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           },
           "price2": {
             "type": "string",
@@ -18017,7 +19355,8 @@
           },
           "volume": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           },
           "price2": {
             "type": "string",
@@ -18056,7 +19395,8 @@
           },
           "volume": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           },
           "price2": {
             "type": "string",
@@ -18320,7 +19660,22 @@
       },
       "cancel_spot_batch_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "orders": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For cancel spot batch orders, identifies existing orders or requests to query or cancel; contains no order quantities."
+          },
+          "cl_ord_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For cancel spot batch orders, identifies existing orders by their client-assigned identifiers for batch cancellation."
+          }
+        }
       },
       "get_spot_orderbook": {
         "type": "object",
@@ -18368,7 +19723,24 @@
       },
       "get_futures_order_status": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "orderIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For get futures order status, identifies existing orders or requests to query or cancel; contains no order quantities.",
+            "x-delimited-string": true
+          },
+          "cliOrdIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For get futures order status, identifies existing futures orders by their client-assigned identifiers for status queries.",
+            "x-delimited-string": true
+          }
+        }
       },
       "cancel_futures_order": {
         "type": "object",
@@ -18438,11 +19810,25 @@
       },
       "get_funding_withdrawal_limits": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "preferred_asset": {
+            "type": "object",
+            "description": "For get funding withdrawal limits, selects currency identifiers or funding source categories for this operation."
+          }
+        }
       },
       "get_funding_withdrawals": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "asset": {
+            "type": "object",
+            "description": "For get funding withdrawals, selects currency identifiers or funding source categories for this operation."
+          },
+          "scope": {
+            "type": "object",
+            "description": "For get funding withdrawals, carries identity, signing, permission, or travel-rule metadata for this operation."
+          }
+        }
       },
       "cancel_spot_withdrawal": {
         "type": "object",
@@ -18763,6 +20149,10 @@
           "base_amount": {
             "type": "string",
             "format": "decimal"
+          },
+          "includeBaseAmount": {
+            "type": "boolean",
+            "description": "For get subaccount balance, controls an integer or boolean option rather than a transferred balance."
           }
         }
       },
@@ -20166,11 +21556,34 @@
       },
       "batch_cancel_uta_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "cancel_order_list": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "For batch cancel uta orders, identifies existing orders or requests to query or cancel; contains no order quantities."
+          }
+        }
       },
       "cancel_futures_batch_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "order_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For cancel futures batch orders, identifies existing orders or requests to query or cancel; contains no order quantities."
+          },
+          "client_orders": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "For cancel futures batch orders, identifies existing orders or requests to query or cancel; contains no order quantities."
+          }
+        }
       },
       "set_futures_batch_margin_mode": {
         "type": "object",
@@ -20182,12 +21595,24 @@
           "marginMode": {
             "type": "string",
             "description": "selects cross or isolated margin using the documented integer enumeration."
+          },
+          "symbols": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For set futures batch margin mode, identifies the futures contracts whose margin mode should be updated."
           }
         }
       },
       "get_structured_earn_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of structured earn orders records per response page; this integer counts records."
+          }
+        }
       },
       "modify_margin_leverage": {
         "type": "object",
@@ -20213,11 +21638,21 @@
       },
       "get_margin_lending_purchase_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of margin lending purchase orders records per response page; this integer counts records."
+          }
+        }
       },
       "get_margin_lending_redeem_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of margin lending redeem orders records per response page; this integer counts records."
+          }
+        }
       },
       "get_spot_orderbook": {
         "type": "object",
@@ -20241,11 +21676,21 @@
       },
       "get_spot_open_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of spot open orders records per response page; this integer counts records."
+          }
+        }
       },
       "get_futures_order_list": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of futures order list records per response page; this integer counts records."
+          }
+        }
       },
       "get_futures_order": {
         "type": "object",
@@ -20281,11 +21726,29 @@
       },
       "get_uta_open_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of uta open orders records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of uta open orders records per response page; this integer counts records."
+          }
+        }
       },
       "get_uta_order_history": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of uta order history records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of uta order history records per response page; this integer counts records."
+          }
+        }
       },
       "cancel_uta_orders_by_symbol": {
         "type": "object",
@@ -20356,7 +21819,16 @@
       },
       "get_spot_stop_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of spot stop orders records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of spot stop orders records per response page; this integer counts records."
+          }
+        }
       },
       "get_spot_stop_order": {
         "type": "object",
@@ -20388,7 +21860,16 @@
       },
       "get_spot_oco_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of spot oco orders records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of spot oco orders records per response page; this integer counts records."
+          }
+        }
       },
       "cancel_margin_order": {
         "type": "object",
@@ -20432,7 +21913,16 @@
       },
       "get_margin_stop_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of margin stop orders records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of margin stop orders records per response page; this integer counts records."
+          }
+        }
       },
       "get_margin_stop_order": {
         "type": "object",
@@ -20468,7 +21958,16 @@
       },
       "get_margin_oco_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of margin oco orders records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of margin oco orders records per response page; this integer counts records."
+          }
+        }
       },
       "cancel_futures_stop_orders": {
         "type": "object",
@@ -20480,7 +21979,16 @@
       },
       "get_futures_stop_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of futures stop orders records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of futures stop orders records per response page; this integer counts records."
+          }
+        }
       },
       "get_spot_stop_order_by_client_oid": {
         "type": "object",
@@ -20516,7 +22024,16 @@
       },
       "get_convert_limit_order_detail_list": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of convert limit order detail list records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of convert limit order detail list records per response page; this integer counts records."
+          }
+        }
       },
       "get_convert_order_detail": {
         "type": "object",
@@ -20524,7 +22041,16 @@
       },
       "get_convert_order_history": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of convert order history records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of convert order history records per response page; this integer counts records."
+          }
+        }
       },
       "cancel_margin_stop_order_by_id_raw": {
         "type": "object",
@@ -20552,7 +22078,16 @@
       },
       "get_withdrawal_history": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of withdrawal history records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of withdrawal history records per response page; this integer counts records."
+          }
+        }
       },
       "get_withdrawal_quotas": {
         "type": "object",
@@ -20560,7 +22095,16 @@
       },
       "get_uta_withdrawal_history": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of uta withdrawal history records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of uta withdrawal history records per response page; this integer counts records."
+          }
+        }
       },
       "get_uta_withdrawal_quotas": {
         "type": "object",
@@ -20623,43 +22167,97 @@
       },
       "get_subaccounts": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of subaccounts records per response page; this integer counts records."
+          }
+        }
       },
       "get_spot_subaccount_balances": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of spot subaccount balances records per response page; this integer counts records."
+          }
+        }
       },
       "get_uta_subaccounts": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of uta subaccounts records per response page; this integer counts records."
+          }
+        }
       },
       "get_uta_subaccount_currency_assets": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of uta subaccount currency assets records per response page; this integer counts records."
+          }
+        }
       },
       "get_uta_positions": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of uta positions records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of uta positions records per response page; this integer counts records."
+          }
+        }
       },
       "get_earn_account_holdings": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of earn account holdings records per response page; this integer counts records."
+          }
+        }
       },
       "get_margin_borrow_history": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of margin borrow history records per response page; this integer counts records."
+          }
+        }
       },
       "get_margin_repay_history": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of margin repay history records per response page; this integer counts records."
+          }
+        }
       },
       "get_margin_interest_history": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of margin interest history records per response page; this integer counts records."
+          }
+        }
       },
       "get_futures_open_interest": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of futures open interest records per response page; this integer counts records."
+          }
+        }
       },
       "get_uta_position_tiers": {
         "type": "object",
@@ -20685,35 +22283,91 @@
       },
       "get_uta_interest_rate_index": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of uta interest rate index records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of uta interest rate index records per response page; this integer counts records."
+          }
+        }
       },
       "get_futures_interest_rate_index": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "description": "skips an integer number of futures interest rate index records before returning the next page."
+          }
+        }
       },
       "get_futures_premium_index": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "description": "skips an integer number of futures premium index records before returning the next page."
+          }
+        }
       },
       "get_announcements": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of announcements records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of announcements records per response page; this integer counts records."
+          }
+        }
       },
       "get_uta_announcements": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of uta announcements records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of uta announcements records per response page; this integer counts records."
+          }
+        }
       },
       "get_spot_index_price": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "description": "skips an integer number of spot index price records before returning the next page."
+          }
+        }
       },
       "get_futures_trade_history": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of futures trade history records per response page; this integer counts records."
+          }
+        }
       },
       "get_uta_trade_history": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of uta trade history records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of uta trade history records per response page; this integer counts records."
+          }
+        }
       },
       "set_uta_margin_mode": {
         "type": "object",
@@ -20743,11 +22397,29 @@
       },
       "get_uta_position_history": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of uta position history records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of uta position history records per response page; this integer counts records."
+          }
+        }
       },
       "get_uta_funding_history": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of uta funding history records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of uta funding history records per response page; this integer counts records."
+          }
+        }
       },
       "set_futures_margin_mode": {
         "type": "object",
@@ -20764,87 +22436,300 @@
       },
       "get_futures_funding_history": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "description": "skips an integer number of futures funding history records before returning the next page."
+          }
+        }
       },
       "get_futures_account_ledgers": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "description": "skips an integer number of futures account ledgers records before returning the next page."
+          }
+        }
       },
       "get_spot_account_ledgers": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of spot account ledgers records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of spot account ledgers records per response page; this integer counts records."
+          }
+        }
       },
       "get_deposit_history": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of deposit history records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of deposit history records per response page; this integer counts records."
+          }
+        }
       },
       "get_uta_account_ledgers": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of uta account ledgers records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of uta account ledgers records per response page; this integer counts records."
+          }
+        }
       },
       "get_uta_deposit_history": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of uta deposit history records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of uta deposit history records per response page; this integer counts records."
+          }
+        }
       },
       "get_ua_v2_affiliate_query_invitees": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "registration_end_at": {
+            "type": "integer",
+            "description": "For get ua v2 affiliate query invitees, specifies a scheduling duration or timestamp in the endpoint time unit."
+          },
+          "registration_start_at": {
+            "type": "integer",
+            "description": "For get ua v2 affiliate query invitees, specifies a scheduling duration or timestamp in the endpoint time unit."
+          },
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of ua v2 affiliate query invitees records per response page; this integer counts records."
+          },
+          "registrationEndAt": {
+            "type": "integer",
+            "description": "For get ua v2 affiliate query invitees, specifies a scheduling duration or timestamp in the endpoint time unit."
+          },
+          "registrationStartAt": {
+            "type": "integer",
+            "description": "For get ua v2 affiliate query invitees, specifies a scheduling duration or timestamp in the endpoint time unit."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of ua v2 affiliate query invitees records per response page; this integer counts records."
+          }
+        }
       },
       "get_ua_v2_affiliate_query_my_commission": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of ua v2 affiliate query my commission records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of ua v2 affiliate query my commission records per response page; this integer counts records."
+          }
+        }
       },
       "get_ua_v2_affiliate_query_transaction_by_uid": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of ua v2 affiliate query transaction by uid records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of ua v2 affiliate query transaction by uid records per response page; this integer counts records."
+          }
+        }
       },
       "get_ua_v2_affiliate_query_transaction_by_time": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of ua v2 affiliate query transaction by time records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of ua v2 affiliate query transaction by time records per response page; this integer counts records."
+          }
+        }
       },
       "get_ua_v2_affiliate_query_kumining": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of ua v2 affiliate query kumining records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of ua v2 affiliate query kumining records per response page; this integer counts records."
+          }
+        }
       },
       "get_v2_affiliate_query_invitees": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "registration_start_at": {
+            "type": "integer",
+            "description": "For get v2 affiliate query invitees, specifies a scheduling duration or timestamp in the endpoint time unit."
+          },
+          "registration_end_at": {
+            "type": "integer",
+            "description": "For get v2 affiliate query invitees, specifies a scheduling duration or timestamp in the endpoint time unit."
+          },
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of v2 affiliate query invitees records per response page; this integer counts records."
+          },
+          "registrationStartAt": {
+            "type": "integer",
+            "description": "For get v2 affiliate query invitees, specifies a scheduling duration or timestamp in the endpoint time unit."
+          },
+          "registrationEndAt": {
+            "type": "integer",
+            "description": "For get v2 affiliate query invitees, specifies a scheduling duration or timestamp in the endpoint time unit."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of v2 affiliate query invitees records per response page; this integer counts records."
+          }
+        }
       },
       "get_v2_affiliate_query_my_commission": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of v2 affiliate query my commission records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of v2 affiliate query my commission records per response page; this integer counts records."
+          }
+        }
       },
       "get_v2_affiliate_query_transaction_by_uid": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of v2 affiliate query transaction by uid records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of v2 affiliate query transaction by uid records per response page; this integer counts records."
+          }
+        }
       },
       "get_v2_affiliate_query_transaction_by_time": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of v2 affiliate query transaction by time records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of v2 affiliate query transaction by time records per response page; this integer counts records."
+          }
+        }
       },
       "get_v2_affiliate_query_kumining": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of v2 affiliate query kumining records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of v2 affiliate query kumining records per response page; this integer counts records."
+          }
+        }
       },
       "get_v2_broker_query_my_commission": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of v2 broker query my commission records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of v2 broker query my commission records per response page; this integer counts records."
+          }
+        }
       },
       "get_v2_broker_query_user": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of v2 broker query user records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of v2 broker query user records per response page; this integer counts records."
+          }
+        }
       },
       "get_v2_broker_query_detail_by_uid": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of v2 broker query detail by uid records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of v2 broker query detail by uid records per response page; this integer counts records."
+          }
+        }
       },
       "get_kyc_nd_broker_proxy_client_status_page": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of kyc nd broker proxy client status page records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of kyc nd broker proxy client status page records per response page; this integer counts records."
+          }
+        }
       },
       "get_v1_broker_nd_account": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of v1 broker nd account records per response page; this integer counts records."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of v1 broker nd account records per response page; this integer counts records."
+          }
+        }
       },
       "post_v1_copy_trade_futures_position_change_margin_mode": {
         "type": "object",
@@ -20913,6 +22798,10 @@
                 "format": "decimal"
               }
             }
+          },
+          "price_protection": {
+            "type": "boolean",
+            "description": "For burn shares, enables transaction price protection through a boolean flag rather than specifying a price."
           }
         }
       },
@@ -20977,6 +22866,10 @@
                 }
               }
             }
+          },
+          "price_protection": {
+            "type": "boolean",
+            "description": "For create grouped orders, enables transaction price protection through a boolean flag rather than specifying a price."
           }
         }
       },
@@ -21016,6 +22909,10 @@
                 "format": "decimal"
               }
             }
+          },
+          "price_protection": {
+            "type": "boolean",
+            "description": "For create order, enables transaction price protection through a boolean flag rather than specifying a price."
           }
         }
       },
@@ -21040,6 +22937,10 @@
                 "format": "decimal"
               }
             }
+          },
+          "price_protection": {
+            "type": "boolean",
+            "description": "For create public pool, enables transaction price protection through a boolean flag rather than specifying a price."
           }
         }
       },
@@ -21070,6 +22971,10 @@
                 "format": "decimal"
               }
             }
+          },
+          "price_protection": {
+            "type": "boolean",
+            "description": "For mint shares, enables transaction price protection through a boolean flag rather than specifying a price."
           }
         }
       },
@@ -21109,6 +23014,10 @@
                 "format": "decimal"
               }
             }
+          },
+          "price_protection": {
+            "type": "boolean",
+            "description": "For modify order, enables transaction price protection through a boolean flag rather than specifying a price."
           }
         }
       },
@@ -21325,6 +23234,10 @@
                 "format": "decimal"
               }
             }
+          },
+          "price_protection": {
+            "type": "boolean",
+            "description": "For stake assets, enables transaction price protection through a boolean flag rather than specifying a price."
           }
         }
       },
@@ -21334,6 +23247,10 @@
           "lease_amount": {
             "type": "string",
             "format": "decimal"
+          },
+          "duration_days": {
+            "type": "integer",
+            "description": "For submit lit lease, specifies a scheduling duration or timestamp in the endpoint time unit."
           }
         }
       },
@@ -21359,6 +23276,10 @@
                 "format": "decimal"
               }
             }
+          },
+          "price_protection": {
+            "type": "boolean",
+            "description": "For transfer l2 account, enables transaction price protection through a boolean flag rather than specifying a price."
           }
         }
       },
@@ -21376,6 +23297,10 @@
                 "format": "decimal"
               }
             }
+          },
+          "price_protection": {
+            "type": "boolean",
+            "description": "For unstake assets, enables transaction price protection through a boolean flag rather than specifying a price."
           }
         }
       },
@@ -21394,6 +23319,10 @@
                 "format": "decimal"
               }
             }
+          },
+          "price_protection": {
+            "type": "boolean",
+            "description": "For update margin, enables transaction price protection through a boolean flag rather than specifying a price."
           }
         }
       },
@@ -21418,6 +23347,10 @@
                 "format": "decimal"
               }
             }
+          },
+          "price_protection": {
+            "type": "boolean",
+            "description": "For update public pool, enables transaction price protection through a boolean flag rather than specifying a price."
           }
         }
       },
@@ -21480,7 +23413,12 @@
       },
       "cancel_order": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "price_protection": {
+            "type": "boolean",
+            "description": "For cancel order, enables transaction price protection through a boolean flag rather than specifying a price."
+          }
+        }
       },
       "sign_cancel_all_orders": {
         "type": "object",
@@ -21488,7 +23426,12 @@
       },
       "cancel_all_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "price_protection": {
+            "type": "boolean",
+            "description": "For cancel all orders, enables transaction price protection through a boolean flag rather than specifying a price."
+          }
+        }
       },
       "update_referral_kickback": {
         "type": "object",
@@ -21501,7 +23444,16 @@
       },
       "get_transfer_history": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "type_": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For get transfer history, selects the documented mode, unit, or reference used by this operation.",
+            "x-delimited-string": true
+          }
+        }
       },
       "get_transfer_fee_info": {
         "type": "object",
@@ -21579,7 +23531,12 @@
       },
       "get_pnl_leaderboard": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "description": "skips an integer number of pnl leaderboard records before returning the next page."
+          }
+        }
       },
       "get_explorer_account_logs": {
         "type": "object",
@@ -21601,11 +23558,21 @@
       },
       "send_tx": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "price_protection": {
+            "type": "boolean",
+            "description": "For send tx, enables transaction price protection through a boolean flag rather than specifying a price."
+          }
+        }
       },
       "sign_update_leverage": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "margin_mode": {
+            "type": "integer",
+            "description": "For sign update leverage, selects cross or isolated margin using the documented integer enumeration."
+          }
+        }
       },
       "update_leverage": {
         "type": "object",
@@ -21617,20 +23584,47 @@
                 "format": "decimal"
               }
             }
+          },
+          "margin_mode": {
+            "type": "integer",
+            "description": "For update leverage, selects cross or isolated margin using the documented integer enumeration."
+          },
+          "price_protection": {
+            "type": "boolean",
+            "description": "For update leverage, enables transaction price protection through a boolean flag rather than specifying a price."
           }
         }
       },
       "update_account_config": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "price_protection": {
+            "type": "boolean",
+            "description": "For update account config, enables transaction price protection through a boolean flag rather than specifying a price."
+          }
+        }
       },
       "update_account_asset_config": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "asset_margin_mode": {
+            "type": "integer",
+            "description": "For update account asset config, selects the asset margin mode using the documented integer enumeration."
+          },
+          "price_protection": {
+            "type": "boolean",
+            "description": "For update account asset config, enables transaction price protection through a boolean flag rather than specifying a price."
+          }
+        }
       },
       "sign_update_account_asset_config": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "asset_margin_mode": {
+            "type": "integer",
+            "description": "For sign update account asset config, selects the asset margin mode using the documented integer enumeration."
+          }
+        }
       },
       "transfer_same_master_account": {
         "type": "object",
@@ -21957,6 +23951,10 @@
           "leverage": {
             "type": "string",
             "format": "decimal"
+          },
+          "priceProtect": {
+            "type": "integer",
+            "description": "For place contract order, enables trigger-price protection with a boolean flag rather than specifying a price."
           }
         }
       },
@@ -22002,6 +24000,10 @@
           "triggerType": {
             "type": "string",
             "description": "place_contract_plan_order/triggerType: selects the documented mode, unit, or reference used by this operation."
+          },
+          "priceProtect": {
+            "type": "integer",
+            "description": "For place contract plan order, enables trigger-price protection with a boolean flag rather than specifying a price."
           }
         }
       },
@@ -22385,16 +24387,44 @@
           "leverage": {
             "type": "string",
             "format": "decimal"
+          },
+          "leverageMode": {
+            "type": "integer",
+            "description": "For change contract leverage, selects the leverage configuration mode using the documented integer enumeration."
+          },
+          "marginSelected": {
+            "type": "boolean",
+            "description": "For change contract leverage, selects whether margin configuration is included in this update through a boolean flag."
+          },
+          "leverageSelected": {
+            "type": "boolean",
+            "description": "For change contract leverage, selects whether leverage configuration is included in this update through a boolean flag."
           }
         }
       },
       "cancel_contract_batch_orders_by_external_id": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "orders": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "For cancel contract batch orders by external id, identifies existing orders or requests to query or cancel; contains no order quantities."
+          }
+        }
       },
       "get_contract_batch_orders_by_external_id": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "orders": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "For get contract batch orders by external id, identifies existing orders or requests to query or cancel; contains no order quantities."
+          }
+        }
       },
       "get_spot_orderbook": {
         "type": "object",
@@ -22422,7 +24452,13 @@
       },
       "cancel_contract_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "orders": {
+            "type": "array",
+            "items": {},
+            "description": "For cancel contract orders, identifies existing orders or requests to query or cancel; contains no order quantities."
+          }
+        }
       },
       "cancel_contract_order": {
         "type": "object",
@@ -22438,11 +24474,21 @@
       },
       "get_contract_open_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of contract open orders records per response page; this integer counts records."
+          }
+        }
       },
       "get_contract_history_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of contract history orders records per response page; this integer counts records."
+          }
+        }
       },
       "get_contract_order_by_external_id": {
         "type": "object",
@@ -22454,7 +24500,16 @@
       },
       "get_contract_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "order_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For get contract orders, identifies existing orders or requests to query or cancel; contains no order quantities.",
+            "x-delimited-string": true
+          }
+        }
       },
       "get_contract_order_deal_details": {
         "type": "object",
@@ -22462,15 +24517,33 @@
       },
       "get_contract_order_deals": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of contract order deals records per response page; this integer counts records."
+          }
+        }
       },
       "get_contract_plan_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of contract plan orders records per response page; this integer counts records."
+          }
+        }
       },
       "cancel_contract_plan_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "orders": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "For cancel contract plan orders, identifies existing orders or requests to query or cancel; contains no order quantities."
+          }
+        }
       },
       "cancel_all_contract_plan_orders": {
         "type": "object",
@@ -22478,7 +24551,12 @@
       },
       "get_contract_stop_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of contract stop orders records per response page; this integer counts records."
+          }
+        }
       },
       "chase_contract_limit_order": {
         "type": "object",
@@ -22494,11 +24572,32 @@
       },
       "get_contract_trailing_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "states": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For get contract trailing orders, filters trailing orders by their integer status codes rather than financial values.",
+            "x-delimited-string": true
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "limits the number of contract trailing orders records per response page; this integer counts records."
+          }
+        }
       },
       "cancel_contract_tpsl_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "orders": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "For cancel contract tpsl orders, identifies existing orders or requests to query or cancel; contains no order quantities."
+          }
+        }
       },
       "cancel_all_contract_tpsl_orders": {
         "type": "object",
@@ -22514,7 +24613,12 @@
       },
       "get_contract_closed_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of contract closed orders records per response page; this integer counts records."
+          }
+        }
       },
       "get_subaccount_transfer_history": {
         "type": "object",
@@ -22530,7 +24634,12 @@
       },
       "get_contract_transfer_records": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of contract transfer records records per response page; this integer counts records."
+          }
+        }
       },
       "get_withdraw_history": {
         "type": "object",
@@ -22542,7 +24651,12 @@
       },
       "get_rebate_affiliate_withdraw": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of rebate affiliate withdraw records per response page; this integer counts records."
+          }
+        }
       },
       "cancel_spot_withdrawal": {
         "type": "object",
@@ -22550,43 +24664,93 @@
       },
       "get_contract_history_positions": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of contract history positions records per response page; this integer counts records."
+          }
+        }
       },
       "get_contract_funding_records": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of contract funding records records per response page; this integer counts records."
+          }
+        }
       },
       "get_contract_risk_reverse_history": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of contract risk reverse history records per response page; this integer counts records."
+          }
+        }
       },
       "get_contract_funding_rate_history": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of contract funding rate history records per response page; this integer counts records."
+          }
+        }
       },
       "get_contract_fee_details": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of contract fee details records per response page; this integer counts records."
+          }
+        }
       },
       "get_rebate_affiliate_campaign": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of rebate affiliate campaign records per response page; this integer counts records."
+          }
+        }
       },
       "get_rebate_affiliate_commission_detail": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of rebate affiliate commission detail records per response page; this integer counts records."
+          }
+        }
       },
       "get_rebate_affiliate_commission": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of rebate affiliate commission records per response page; this integer counts records."
+          }
+        }
       },
       "get_rebate_affiliate_referral": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of rebate affiliate referral records per response page; this integer counts records."
+          }
+        }
       },
       "get_rebate_affiliate_subaffiliates": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "description": "limits the number of rebate affiliate subaffiliates records per response page; this integer counts records."
+          }
+        }
       }
     },
     "okx": {
@@ -22754,12 +24918,16 @@
                 "newTpTriggerRatio": {
                   "type": "string",
                   "format": "decimal",
-                  "x-positive": true
+                  "x-minimum": "-1",
+                  "x-exclusive-minimum": true,
+                  "x-signed": true,
+                  "x-nonzero": false
                 },
                 "newSlTriggerRatio": {
                   "type": "string",
                   "format": "decimal",
-                  "x-positive": true
+                  "x-minimum": "0",
+                  "x-exclusive-minimum": false
                 },
                 "newCallbackRatio": {
                   "type": "string",
@@ -22776,7 +24944,10 @@
                   "format": "decimal",
                   "x-positive": true
                 }
-              }
+              },
+              "x-forbidden-keys": [
+                "newSz"
+              ]
             }
           },
           "attach_algo_ords": {
@@ -22814,12 +24985,16 @@
                 "newTpTriggerRatio": {
                   "type": "string",
                   "format": "decimal",
-                  "x-positive": true
+                  "x-minimum": "-1",
+                  "x-exclusive-minimum": true,
+                  "x-signed": true,
+                  "x-nonzero": false
                 },
                 "newSlTriggerRatio": {
                   "type": "string",
                   "format": "decimal",
-                  "x-positive": true
+                  "x-minimum": "0",
+                  "x-exclusive-minimum": false
                 },
                 "newCallbackRatio": {
                   "type": "string",
@@ -22836,7 +25011,10 @@
                   "format": "decimal",
                   "x-positive": true
                 }
-              }
+              },
+              "x-forbidden-keys": [
+                "newSz"
+              ]
             }
           },
           "adv_chase_params": {
@@ -22975,12 +25153,16 @@
                 "newTpTriggerRatio": {
                   "type": "string",
                   "format": "decimal",
-                  "x-positive": true
+                  "x-minimum": "-1",
+                  "x-exclusive-minimum": true,
+                  "x-signed": true,
+                  "x-nonzero": false
                 },
                 "newSlTriggerRatio": {
                   "type": "string",
                   "format": "decimal",
-                  "x-positive": true
+                  "x-minimum": "0",
+                  "x-exclusive-minimum": false
                 },
                 "newCallbackRatio": {
                   "type": "string",
@@ -22997,7 +25179,10 @@
                   "format": "decimal",
                   "x-positive": true
                 }
-              }
+              },
+              "x-forbidden-keys": [
+                "newSz"
+              ]
             }
           },
           "attach_algo_ords": {
@@ -23035,12 +25220,16 @@
                 "newTpTriggerRatio": {
                   "type": "string",
                   "format": "decimal",
-                  "x-positive": true
+                  "x-minimum": "-1",
+                  "x-exclusive-minimum": true,
+                  "x-signed": true,
+                  "x-nonzero": false
                 },
                 "newSlTriggerRatio": {
                   "type": "string",
                   "format": "decimal",
-                  "x-positive": true
+                  "x-minimum": "0",
+                  "x-exclusive-minimum": false
                 },
                 "newCallbackRatio": {
                   "type": "string",
@@ -23057,7 +25246,10 @@
                   "format": "decimal",
                   "x-positive": true
                 }
-              }
+              },
+              "x-forbidden-keys": [
+                "newSz"
+              ]
             }
           },
           "rpiPxRound": {
@@ -23218,6 +25410,10 @@
           "amt": {
             "type": "string",
             "format": "decimal"
+          },
+          "rcvr_info": {
+            "type": "object",
+            "description": "For create withdrawal, carries identity, signing, permission, or travel-rule metadata for this operation."
           }
         }
       },
@@ -23577,12 +25773,12 @@
                   "x-decimal-sentinels": [
                     "-1"
                   ]
-                },
-                "sz": {
-                  "type": "string",
-                  "format": "decimal"
                 }
-              }
+              },
+              "x-forbidden-keys": [
+                "sz",
+                "newSz"
+              ]
             }
           },
           "attach_algo_ords": {
@@ -23611,12 +25807,12 @@
                   "x-decimal-sentinels": [
                     "-1"
                   ]
-                },
-                "sz": {
-                  "type": "string",
-                  "format": "decimal"
                 }
-              }
+              },
+              "x-forbidden-keys": [
+                "sz",
+                "newSz"
+              ]
             }
           },
           "adv_chase_params": {
@@ -23792,7 +25988,8 @@
         "properties": {
           "px": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           },
           "pxUsd": {
             "type": "string",
@@ -23850,12 +26047,16 @@
                 "tpTriggerRatio": {
                   "type": "string",
                   "format": "decimal",
-                  "x-positive": true
+                  "x-minimum": "-1",
+                  "x-exclusive-minimum": true,
+                  "x-signed": true,
+                  "x-nonzero": true
                 },
                 "slTriggerRatio": {
                   "type": "string",
                   "format": "decimal",
-                  "x-positive": true
+                  "x-minimum": "0",
+                  "x-exclusive-minimum": true
                 },
                 "callbackRatio": {
                   "type": "string",
@@ -23910,12 +26111,16 @@
                 "tpTriggerRatio": {
                   "type": "string",
                   "format": "decimal",
-                  "x-positive": true
+                  "x-minimum": "-1",
+                  "x-exclusive-minimum": true,
+                  "x-signed": true,
+                  "x-nonzero": true
                 },
                 "slTriggerRatio": {
                   "type": "string",
                   "format": "decimal",
-                  "x-positive": true
+                  "x-minimum": "0",
+                  "x-exclusive-minimum": true
                 },
                 "callbackRatio": {
                   "type": "string",
@@ -24276,6 +26481,14 @@
           "slPct": {
             "type": "string",
             "format": "decimal"
+          },
+          "reserve_funds": {
+            "type": "boolean",
+            "description": "For trading bot dca amend order algo, selects whether the bot retains reserved funds using a boolean flag."
+          },
+          "reserveFunds": {
+            "type": "boolean",
+            "description": "For trading bot dca amend order algo, selects whether the bot retains reserved funds using a boolean flag."
           }
         }
       },
@@ -24867,6 +27080,13 @@
           "investmentCcy": {
             "type": "string",
             "description": "trading_bot_recurring_order_algo/investmentCcy: selects currency identifiers or funding source categories for this operation."
+          },
+          "source": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For trading bot recurring order algo, selects currency identifiers or funding source categories for this operation."
           }
         }
       },
@@ -24912,7 +27132,8 @@
               "properties": {
                 "px": {
                   "type": "string",
-                  "format": "decimal"
+                  "format": "decimal",
+                  "x-positive": true
                 },
                 "pxUsd": {
                   "type": "string",
@@ -24970,12 +27191,16 @@
                       "tpTriggerRatio": {
                         "type": "string",
                         "format": "decimal",
-                        "x-positive": true
+                        "x-minimum": "-1",
+                        "x-exclusive-minimum": true,
+                        "x-signed": true,
+                        "x-nonzero": true
                       },
                       "slTriggerRatio": {
                         "type": "string",
                         "format": "decimal",
-                        "x-positive": true
+                        "x-minimum": "0",
+                        "x-exclusive-minimum": true
                       },
                       "callbackRatio": {
                         "type": "string",
@@ -25096,12 +27321,16 @@
                       "newTpTriggerRatio": {
                         "type": "string",
                         "format": "decimal",
-                        "x-positive": true
+                        "x-minimum": "-1",
+                        "x-exclusive-minimum": true,
+                        "x-signed": true,
+                        "x-nonzero": false
                       },
                       "newSlTriggerRatio": {
                         "type": "string",
                         "format": "decimal",
-                        "x-positive": true
+                        "x-minimum": "0",
+                        "x-exclusive-minimum": false
                       },
                       "newCallbackRatio": {
                         "type": "string",
@@ -25118,7 +27347,10 @@
                         "format": "decimal",
                         "x-positive": true
                       }
-                    }
+                    },
+                    "x-forbidden-keys": [
+                      "newSz"
+                    ]
                   }
                 }
               }
@@ -25514,11 +27746,55 @@
       },
       "rfq_cancel_batch_rfqs": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "rfq_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For rfq cancel batch rfqs, identifies existing orders or requests to query or cancel; contains no order quantities."
+          },
+          "cl_rfq_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For rfq cancel batch rfqs, identifies existing orders or requests to query or cancel; contains no order quantities."
+          },
+          "rfqIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For rfq cancel batch rfqs, identifies existing orders or requests to query or cancel; contains no order quantities."
+          },
+          "clRfqIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For rfq cancel batch rfqs, identifies existing orders or requests to query or cancel; contains no order quantities."
+          }
+        }
       },
       "cancel_rfq_batch_quotes": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "quote_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For cancel rfq batch quotes, identifies existing orders or requests to query or cancel; contains no order quantities."
+          },
+          "cl_quote_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For cancel rfq batch quotes, identifies existing orders or requests to query or cancel; contains no order quantities."
+          }
+        }
       },
       "set_savings_lending_rate": {
         "type": "object",
@@ -25866,7 +28142,16 @@
       },
       "get_max_withdrawal": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "ccy": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For get max withdrawal, selects currency identifiers or funding source categories for this operation.",
+            "x-delimited-string": true
+          }
+        }
       },
       "get_deposit_withdraw_status": {
         "type": "object",
@@ -25960,7 +28245,16 @@
       },
       "get_collateral_assets": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "collateral_enabled": {
+            "type": "boolean",
+            "description": "For get collateral assets, selects whether an asset serves as collateral using a boolean flag."
+          },
+          "collateralEnabled": {
+            "type": "boolean",
+            "description": "For get collateral assets, selects whether an asset serves as collateral using a boolean flag."
+          }
+        }
       },
       "set_fee_type": {
         "type": "object",
@@ -25977,7 +28271,16 @@
       },
       "set_collateral_assets": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "collateral_enabled": {
+            "type": "boolean",
+            "description": "For set collateral assets, selects whether an asset serves as collateral using a boolean flag."
+          },
+          "collateralEnabled": {
+            "type": "boolean",
+            "description": "For set collateral assets, selects whether an asset serves as collateral using a boolean flag."
+          }
+        }
       },
       "purchase_staking": {
         "type": "object",
@@ -26031,6 +28334,10 @@
                 "format": "decimal"
               }
             }
+          },
+          "from_account": {
+            "type": "object",
+            "description": "For create withdrawal, carries identity, signing, permission, or travel-rule metadata for this operation."
           }
         }
       },
@@ -26117,6 +28424,10 @@
                 "format": "decimal"
               }
             }
+          },
+          "from_account": {
+            "type": "object",
+            "description": "For sandbox withdrawal, carries identity, signing, permission, or travel-rule metadata for this operation."
           }
         }
       },
@@ -26151,6 +28462,10 @@
                 "format": "decimal"
               }
             }
+          },
+          "builderCode": {
+            "type": "object",
+            "description": "For set stop order, carries the attribution code and builder recipient metadata for this order."
           }
         }
       },
@@ -26401,7 +28716,16 @@
       },
       "batch_cancel_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "orderIDs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For batch cancel orders, identifies existing orders or requests to query or cancel; contains no order quantities.",
+            "x-delimited-string": true
+          }
+        }
       },
       "get_orders": {
         "type": "object",
@@ -26482,6 +28806,55 @@
       "get_withdrawal_status": {
         "type": "object",
         "properties": {}
+      },
+      "get_spot_depth": {
+        "type": "object",
+        "properties": {
+          "market": {
+            "type": "string"
+          },
+          "product_symbol": {
+            "type": "string"
+          }
+        }
+      },
+      "get_spot_trades": {
+        "type": "object",
+        "properties": {
+          "market": {
+            "type": "string"
+          },
+          "product_symbol": {
+            "type": "string"
+          }
+        }
+      },
+      "get_spot_symbol_info": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_price_history": {
+        "type": "object",
+        "properties": {
+          "symbol": {
+            "type": "string"
+          },
+          "resolution": {
+            "type": "string"
+          },
+          "from": {
+            "type": "integer"
+          },
+          "to": {
+            "type": "integer"
+          },
+          "from_time": {
+            "type": "integer"
+          },
+          "to_time": {
+            "type": "integer"
+          }
+        }
       }
     }
   },

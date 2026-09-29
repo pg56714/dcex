@@ -172,6 +172,23 @@ owners before using shared transport implementations. Ownership tests verify the
 router, owner and schema loader instead of relying on schema exceptions. Awaiting
 nonce lookup or signing alone never establishes transport ownership. Nondispatch
 allowances are bound to exact source bodies, so adding a sender invalidates them.
-Financial names on each exchange's never-exempt list cannot be waived by an integer
-annotation. Exemption reasons repeated more than four times after removing their
-identity prefix fail the completeness check.
+Financial name fragments (including price, amount, size, qty, fee, margin, collateral
+and share) cannot be exempted even with integer annotations. All 454 former input
+exemptions now have explicit control or structured declarations. Any future reasons
+are compared after stripping method/field tokens and `For ...,` prefixes; more than
+four repetitions fail, including nondispatch allowances.
+
+OKX attached TP ratios use signed exact decimals greater than -1; placement excludes
+zero, while amended TP/SL ratios allow zero to delete the attached order. SL ratios
+are positive except for amendment deletion. These bounds preserve the documented
+values without guessing the side of an existing order during amendments. Callback,
+activation and split-size fields retain positive rules. Nested amendment `newSz` is
+rejected; the algo-order attached schema rejects `sz`, which its official request
+table does not list. Absolute placement prices and Kraken convenience volumes are
+positive; documented Kraken relative-price controls remain supported.
+
+BingX trims optional attached strings before checking their shape; blank values are
+absent and empty objects are rejected. Fund literals outside owners are pinned by
+source hashes, and shared schema transports allow only audited routers and owner
+callers. Owner domain checks execute in release builds. Generator checks also reject
+orphaned files in their owned generated directories without writing or deleting them.

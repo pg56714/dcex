@@ -14,6 +14,57 @@ impl OndoClient {
         crate::exchanges::input_contracts::pairs("ondo", method_name, &params)?;
         let params = OndoParams::from_pairs(params);
         let response = match method_name {
+            "get_spot_depth" | "get_spot_trades" => {
+                params.ensure_allowed(&["market", "product_symbol"])?;
+                let raw = params
+                    .get("market")
+                    .or_else(|| params.get("product_symbol"))
+                    .ok_or_else(|| DcexError::InvalidInput("missing Ondo spot market".into()))?;
+                let market = raw.strip_suffix("-SPOT").unwrap_or(raw);
+                let parts: Vec<_> = market.split('-').collect();
+                if parts.len() != 2
+                    || parts.iter().any(|part| {
+                        part.is_empty()
+                            || !part.bytes().all(|b| b.is_ascii_alphanumeric() || b == b'_')
+                    })
+                {
+                    return Err(DcexError::InvalidInput(
+                        "Ondo spot market requires BASE-QUOTE or BASE-QUOTE-SPOT".into(),
+                    ));
+                }
+                let path = if method_name == "get_spot_depth" {
+                    SPOT_DEPTH
+                } else {
+                    SPOT_TRADES
+                };
+                self.spot_public_get(path, vec![("market".into(), market.into())])
+                    .await
+            }
+            "get_spot_symbol_info" => {
+                params.ensure_allowed(&[])?;
+                self.spot_public_get(SPOT_SYMBOL_INFO, vec![]).await
+            }
+            "get_spot_price_history" => {
+                params.ensure_allowed(&["symbol", "resolution", "from", "to"])?;
+                params.ensure_required(&["symbol", "resolution", "from", "to"])?;
+                let symbol = params.required("symbol")?;
+                if !symbol
+                    .bytes()
+                    .all(|b| b.is_ascii_alphanumeric() || b == b'_')
+                {
+                    return Err(DcexError::InvalidInput(
+                        "Ondo spot history requires a TradingView symbol such as SPYUSDC".into(),
+                    ));
+                }
+                params.optional_u64("from")?;
+                params.optional_u64("to")?;
+                params.ensure_time_order("from", "to")?;
+                self.spot_public_get(
+                    SPOT_HISTORY,
+                    params.only(&["symbol", "resolution", "from", "to"]),
+                )
+                .await
+            }
             "get_login_challenge" | "complete_login_challenge" => {
                 static ROUTES: std::sync::OnceLock<Vec<crate::exchanges::schema::Route>> =
                     std::sync::OnceLock::new();
@@ -132,6 +183,22 @@ impl OndoClient {
                 )
             })?;
         self.exchange_symbol(value)
+    }
+
+    async fn spot_public_get(
+        &self,
+        path: &str,
+        query: Vec<(String, String)>,
+    ) -> Result<ValidatedResponse> {
+        self.request(
+            crate::http::HttpMethod::Get,
+            path,
+            query,
+            None,
+            false,
+            std::collections::BTreeMap::new(),
+        )
+        .await
     }
 
     pub(super) fn market_query(

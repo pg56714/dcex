@@ -336,7 +336,12 @@
     "official_source": "https://docs.kraken.com/api-reference/funding-beta/list-funding-withdrawal-limits",
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "preferred_asset": {
+          "type": "object",
+          "description": "For get funding withdrawal limits, selects currency identifiers or funding source categories for this operation."
+        }
+      }
     }
   },
   {
@@ -494,7 +499,16 @@
     "official_source": "https://docs.kraken.com/api-reference/funding-beta/list-funding-withdrawals",
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "asset": {
+          "type": "object",
+          "description": "For get funding withdrawals, selects currency identifiers or funding source categories for this operation."
+        },
+        "scope": {
+          "type": "object",
+          "description": "For get funding withdrawals, carries identity, signing, permission, or travel-rule metadata for this operation."
+        }
+      }
     }
   },
   {

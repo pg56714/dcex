@@ -124,7 +124,12 @@
     ],
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "offset": {
+          "type": "integer",
+          "description": "skips an integer number of sub account deposit addresses records before returning the next page."
+        }
+      }
     }
   },
   {
@@ -155,7 +160,12 @@
     ],
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "offset": {
+          "type": "integer",
+          "description": "skips an integer number of sub account deposit history records before returning the next page."
+        }
+      }
     }
   },
   {

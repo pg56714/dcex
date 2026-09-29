@@ -118,10 +118,13 @@ impl super::client::KucoinClient {
         params: &super::params::KucoinParams,
         public: bool,
     ) -> crate::Result<Option<crate::exchange::ValidatedResponse>> {
-        debug_assert!(
-            crate::exchanges::schema::fund_domain(name)
-                == Some(crate::exchanges::schema::FundDomain::Withdrawals)
-        );
+        if crate::exchanges::schema::fund_domain(name)
+            != Some(crate::exchanges::schema::FundDomain::Withdrawals)
+        {
+            return Err(crate::DcexError::InvalidInput(
+                "fund operation routed to the wrong owner".into(),
+            ));
+        }
         self.table_request_transport(name, params, public).await
     }
 }
@@ -132,10 +135,13 @@ impl super::client::KucoinClient {
         name: &str,
         params: &super::params::KucoinParams,
     ) -> crate::Result<Option<crate::exchange::ValidatedResponse>> {
-        debug_assert!(
-            crate::exchanges::schema::fund_domain(name)
-                == Some(crate::exchanges::schema::FundDomain::Withdrawals)
-        );
+        if crate::exchanges::schema::fund_domain(name)
+            != Some(crate::exchanges::schema::FundDomain::Withdrawals)
+        {
+            return Err(crate::DcexError::InvalidInput(
+                "fund operation routed to the wrong owner".into(),
+            ));
+        }
         self.catalog_request_transport(name, params).await
     }
 }

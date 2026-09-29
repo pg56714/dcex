@@ -100,7 +100,32 @@
     "confirm": false,
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "registration_end_at": {
+          "type": "integer",
+          "description": "For get ua v2 affiliate query invitees, specifies a scheduling duration or timestamp in the endpoint time unit."
+        },
+        "registration_start_at": {
+          "type": "integer",
+          "description": "For get ua v2 affiliate query invitees, specifies a scheduling duration or timestamp in the endpoint time unit."
+        },
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of ua v2 affiliate query invitees records per response page; this integer counts records."
+        },
+        "registrationEndAt": {
+          "type": "integer",
+          "description": "For get ua v2 affiliate query invitees, specifies a scheduling duration or timestamp in the endpoint time unit."
+        },
+        "registrationStartAt": {
+          "type": "integer",
+          "description": "For get ua v2 affiliate query invitees, specifies a scheduling duration or timestamp in the endpoint time unit."
+        },
+        "pageSize": {
+          "type": "integer",
+          "description": "limits the number of ua v2 affiliate query invitees records per response page; this integer counts records."
+        }
+      }
     }
   },
   {
@@ -178,7 +203,16 @@
     "confirm": false,
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of ua v2 affiliate query my commission records per response page; this integer counts records."
+        },
+        "pageSize": {
+          "type": "integer",
+          "description": "limits the number of ua v2 affiliate query my commission records per response page; this integer counts records."
+        }
+      }
     }
   },
   {
@@ -268,7 +302,16 @@
     "confirm": false,
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of ua v2 affiliate query transaction by uid records per response page; this integer counts records."
+        },
+        "pageSize": {
+          "type": "integer",
+          "description": "limits the number of ua v2 affiliate query transaction by uid records per response page; this integer counts records."
+        }
+      }
     }
   },
   {
@@ -381,7 +424,16 @@
     "confirm": false,
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of ua v2 affiliate query transaction by time records per response page; this integer counts records."
+        },
+        "pageSize": {
+          "type": "integer",
+          "description": "limits the number of ua v2 affiliate query transaction by time records per response page; this integer counts records."
+        }
+      }
     }
   },
   {
@@ -467,7 +519,16 @@
     "confirm": false,
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of ua v2 affiliate query kumining records per response page; this integer counts records."
+        },
+        "pageSize": {
+          "type": "integer",
+          "description": "limits the number of ua v2 affiliate query kumining records per response page; this integer counts records."
+        }
+      }
     }
   },
   {
@@ -569,7 +630,32 @@
     "confirm": false,
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "registration_start_at": {
+          "type": "integer",
+          "description": "For get v2 affiliate query invitees, specifies a scheduling duration or timestamp in the endpoint time unit."
+        },
+        "registration_end_at": {
+          "type": "integer",
+          "description": "For get v2 affiliate query invitees, specifies a scheduling duration or timestamp in the endpoint time unit."
+        },
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of v2 affiliate query invitees records per response page; this integer counts records."
+        },
+        "registrationStartAt": {
+          "type": "integer",
+          "description": "For get v2 affiliate query invitees, specifies a scheduling duration or timestamp in the endpoint time unit."
+        },
+        "registrationEndAt": {
+          "type": "integer",
+          "description": "For get v2 affiliate query invitees, specifies a scheduling duration or timestamp in the endpoint time unit."
+        },
+        "pageSize": {
+          "type": "integer",
+          "description": "limits the number of v2 affiliate query invitees records per response page; this integer counts records."
+        }
+      }
     }
   },
   {
@@ -707,7 +793,16 @@
     "confirm": false,
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of v2 affiliate query my commission records per response page; this integer counts records."
+        },
+        "pageSize": {
+          "type": "integer",
+          "description": "limits the number of v2 affiliate query my commission records per response page; this integer counts records."
+        }
+      }
     }
   },
   {
@@ -795,7 +890,16 @@
     "confirm": false,
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of v2 affiliate query transaction by uid records per response page; this integer counts records."
+        },
+        "pageSize": {
+          "type": "integer",
+          "description": "limits the number of v2 affiliate query transaction by uid records per response page; this integer counts records."
+        }
+      }
     }
   },
   {
@@ -906,7 +1010,16 @@
     "confirm": false,
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of v2 affiliate query transaction by time records per response page; this integer counts records."
+        },
+        "pageSize": {
+          "type": "integer",
+          "description": "limits the number of v2 affiliate query transaction by time records per response page; this integer counts records."
+        }
+      }
     }
   },
   {
@@ -992,7 +1105,16 @@
     "confirm": false,
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of v2 affiliate query kumining records per response page; this integer counts records."
+        },
+        "pageSize": {
+          "type": "integer",
+          "description": "limits the number of v2 affiliate query kumining records per response page; this integer counts records."
+        }
+      }
     }
   }
 ]

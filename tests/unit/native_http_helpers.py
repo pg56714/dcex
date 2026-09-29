@@ -28,6 +28,9 @@ def _http_server(
                 "api_key": self.headers.get("X-MBX-APIKEY"),
                 "authorization": self.headers.get("Authorization"),
             }
+            for header, value in self.headers.items():
+                if header.lower().startswith("ondo-"):
+                    request[header] = value
             if bingx_api_key := self.headers.get("X-BX-APIKEY"):
                 request["bingx_api_key"] = bingx_api_key
             for header in ("access_token", "proxy_user"):

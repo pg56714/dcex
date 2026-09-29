@@ -53,7 +53,12 @@
     "scoped": false,
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of agent v1 asset partner data records per response page; this integer counts records."
+        }
+      }
     }
   },
   {
@@ -131,7 +136,12 @@
     "scoped": false,
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of agent v2 reward commission data list records per response page; this integer counts records."
+        }
+      }
     }
   },
   {
@@ -195,7 +205,12 @@
     "scoped": false,
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of agent v1 reward third commission data list records per response page; this integer counts records."
+        }
+      }
     }
   },
   {
@@ -259,7 +274,12 @@
     "scoped": false,
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of agent v1 commission data list referral code records per response page; this integer counts records."
+        }
+      }
     }
   },
   {
@@ -309,7 +329,12 @@
     "scoped": false,
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of agent v1 account invite account list records per response page; this integer counts records."
+        }
+      }
     }
   },
   {
@@ -384,7 +409,12 @@
     "scoped": false,
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of agent v1 asset deposit detail list records per response page; this integer counts records."
+        }
+      }
     }
   },
   {

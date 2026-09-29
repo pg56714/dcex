@@ -61,7 +61,15 @@
     "integers": [],
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "request": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "description": "For batch set collateral coins, lists coin identifiers and collateral switches or existing order identifiers."
+        }
+      }
     }
   },
   {

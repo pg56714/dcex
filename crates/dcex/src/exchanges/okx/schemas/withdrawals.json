@@ -144,6 +144,10 @@
         "amt": {
           "type": "string",
           "format": "decimal"
+        },
+        "rcvr_info": {
+          "type": "object",
+          "description": "For create withdrawal, carries identity, signing, permission, or travel-rule metadata for this operation."
         }
       }
     }

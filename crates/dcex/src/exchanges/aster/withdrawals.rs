@@ -86,10 +86,13 @@ impl super::client::AsterClient {
         p: &super::params::AsterParams,
         public: bool,
     ) -> crate::Result<Option<crate::exchange::ValidatedResponse>> {
-        debug_assert!(
-            crate::exchanges::schema::fund_domain(name)
-                == Some(crate::exchanges::schema::FundDomain::Withdrawals)
-        );
+        if crate::exchanges::schema::fund_domain(name)
+            != Some(crate::exchanges::schema::FundDomain::Withdrawals)
+        {
+            return Err(crate::DcexError::InvalidInput(
+                "fund operation routed to the wrong owner".into(),
+            ));
+        }
         self.prediction_dispatch_transport(name, p, public).await
     }
 }

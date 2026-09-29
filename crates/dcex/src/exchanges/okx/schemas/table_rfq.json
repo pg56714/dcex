@@ -97,7 +97,36 @@
     "schema": "{\"type\":\"object\",\"properties\":{\"rfqIds\":{\"type\":\"array\",\"items\":{\"type\":\"string\",\"properties\":{},\"required\":[]}},\"clRfqIds\":{\"type\":\"array\",\"items\":{\"type\":\"string\",\"properties\":{},\"required\":[]}}},\"required\":[]}",
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "rfq_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "For rfq cancel batch rfqs, identifies existing orders or requests to query or cancel; contains no order quantities."
+        },
+        "cl_rfq_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "For rfq cancel batch rfqs, identifies existing orders or requests to query or cancel; contains no order quantities."
+        },
+        "rfqIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "For rfq cancel batch rfqs, identifies existing orders or requests to query or cancel; contains no order quantities."
+        },
+        "clRfqIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "For rfq cancel batch rfqs, identifies existing orders or requests to query or cancel; contains no order quantities."
+        }
+      }
     }
   },
   {
@@ -403,7 +432,22 @@
     "schema": "{\"type\":\"object\",\"properties\":{\"quoteIds\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}},\"clQuoteIds\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}}},\"required\":[]}",
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "quote_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "For cancel rfq batch quotes, identifies existing orders or requests to query or cancel; contains no order quantities."
+        },
+        "cl_quote_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "For cancel rfq batch quotes, identifies existing orders or requests to query or cancel; contains no order quantities."
+        }
+      }
     }
   },
   {

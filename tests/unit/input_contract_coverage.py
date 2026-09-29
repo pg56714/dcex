@@ -25,16 +25,20 @@ def public_inputs(source):
             yield node.name, args, node.args.kwarg is not None
 
 
-NEVER_EXEMPT = {
-    exchange: {"price", "px", "qty", "quantity", "amount", "amt", "size", "sz", "volume", "margin", "collateral"}
-    for exchange in ["arcus", "aster", "backpack", "binance", "bingx", "bitget", "bybit", "extended", "hyperliquid", "kraken", "kucoin", "lighter", "mexc", "okx", "ondo"]
-}
-NEVER_EXEMPT["lighter"] |= {"base_amount", "quote_amount", "usdc_amount", "usd_amount", "initial_margin_fraction"}
+NEVER_EXEMPT = re.compile(r"price|amount|size|qty|quantity|fee|margin|collateral|share|volume|(?:^|_)(?:px|amt|sz)(?:$|_)", re.I)
 MAX_REASON_REPETITIONS = 4
 
 
+def normalized_reason(reason, identities=()):
+    reason = re.sub(r"\bFor\s+[^,]+,\s*", "", reason, flags=re.I)
+    for identity in sorted(identities, key=len, reverse=True):
+        for token in [identity, *re.split(r"[/.:]", identity)]:
+            reason = re.sub(r"\b" + re.escape(token) + r"\b", " ", reason, flags=re.I)
+    return re.sub(r"[^a-z0-9]+", " ", reason.lower()).strip()
+
+
 def validate_exemptions(exemptions):
-    reasons = Counter(reason.split(":", 1)[-1].strip().lower() for reason in exemptions.values())
+    reasons = Counter(normalized_reason(reason, exemptions) for reason in exemptions.values())
     assert all(count <= MAX_REASON_REPETITIONS for count in reasons.values()), reasons
 
 
@@ -49,7 +53,7 @@ def missing_declarations(source, methods, exemptions, exchange=""):
         for name, annotation in args.items():
             identity = f"{method}/{name}"
             if identity in exemptions:
-                assert name.replace("_", "").casefold() not in {field.replace("_", "").casefold() for field in NEVER_EXEMPT.get(exchange, set())}, (exchange, identity)
+                assert not NEVER_EXEMPT.search(name), (exchange, identity)
                 reason = exemptions[identity]
                 assert identity in reason and len(set(reason.split())) >= 8, identity
                 assert not NUMERIC.search(name) or re.fullmatch(r"(?:bool|int)(?: \| None)?", annotation), (identity, annotation)

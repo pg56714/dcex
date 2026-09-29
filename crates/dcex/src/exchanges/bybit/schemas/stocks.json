@@ -235,7 +235,12 @@
     "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75",
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of rwa stocks market get multiplier list records per response page; this integer counts records."
+        }
+      }
     }
   },
   {

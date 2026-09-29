@@ -2,7 +2,7 @@
 
 [English](endpoint-recheck.md) | **繁體中文**
 
-核對日期：2026-09-29。原始報表有 3,180 列；目前清冊共 4,846 列，另保存 15 家交易所的官方文件清冊。
+核對日期：2026-09-30。原始報表有 3,180 列；目前清冊共 4,857 列，另保存 15 家交易所的官方文件清冊。
 
 所有官方端點均納入範圍，包含提款、地址管理、做市商、RFQ、經紀商、推薦與合作夥伴操作。原先 111 個 excluded 列已處理，沒有保留範圍排除；這不代表所有新發現端點均已實作。
 
@@ -75,6 +75,13 @@ API 提款沒有第二次確認，送出即執行。建議交易用 API 金鑰�
 | 4712 | mexc | WS /ws (channel=incremental-order-book-maintenance-mechanism) | `unavailable` | [Docs](https://www.mexc.com/api-docs/futures/websocket-api/incremental-order-book-maintenance-mechanism) |
 | 4718 | mexc | WS /ws (channel=how-to-properly-maintain-a-local-copy-of-the-order-book) | `unavailable` | [Docs](https://www.mexc.com/api-docs/spot-v3/websocket-market-streams/how-to-properly-maintain-a-local-copy-of-the-order-book) |
 | 4736 | mexc | WS /ws (channel=deduction-info) | `unverified` | [Docs](https://www.mexc.com/api-docs/futures/websocket-api/deduction-info) |
+| 4851 | ondo | POST /v1/spot/orders | `blocked` | [Docs](https://docs.ondoperps.xyz/spot-trading) |
+| 4852 | ondo | DELETE /v1/spot/orders | `blocked` | [Docs](https://docs.ondoperps.xyz/spot-trading) |
+| 4853 | ondo | GET /v1/spot/orders | `blocked` | [Docs](https://docs.ondoperps.xyz/spot-trading) |
+| 4854 | ondo | POST /v1/spot/orders/batch | `blocked` | [Docs](https://docs.ondoperps.xyz/spot-trading) |
+| 4855 | ondo | DELETE /v1/spot/orders/batch | `blocked` | [Docs](https://docs.ondoperps.xyz/spot-trading) |
+| 4856 | ondo | GET /v1/spot/fills | `blocked` | [Docs](https://docs.ondoperps.xyz/spot-trading) |
+| 4857 | ondo | GET /v1/spot/candles | `blocked` | [Docs](https://docs.ondoperps.xyz/spot-trading) |
 
 ## 新增清冊的待處理列
 

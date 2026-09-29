@@ -60,6 +60,26 @@
         "slippageToleranceType": {
           "type": "string",
           "description": "create_strategy/slippageToleranceType: selects the documented mode, unit, or reference used by this operation."
+        },
+        "duration": {
+          "type": "integer",
+          "description": "For create strategy, specifies a scheduling duration or timestamp in the endpoint time unit."
+        },
+        "client_strategy_id": {
+          "type": "integer",
+          "description": "For create strategy, identifies a strategy rather than specifying its investment."
+        },
+        "randomized_interval_quantity": {
+          "type": "boolean",
+          "description": "For create strategy, enables randomized interval quantities with a boolean flag rather than specifying a quantity."
+        },
+        "clientStrategyId": {
+          "type": "integer",
+          "description": "For create strategy, identifies a strategy rather than specifying its investment."
+        },
+        "randomizedIntervalQuantity": {
+          "type": "boolean",
+          "description": "For create strategy, enables randomized interval quantities with a boolean flag rather than specifying a quantity."
         }
       }
     }
@@ -85,6 +105,14 @@
         "strategyId": {
           "type": "string",
           "description": "get_open_strategy/strategyId: identifies a strategy rather than specifying its investment."
+        },
+        "client_strategy_id": {
+          "type": "integer",
+          "description": "For get open strategy, identifies a strategy rather than specifying its investment."
+        },
+        "clientStrategyId": {
+          "type": "integer",
+          "description": "For get open strategy, identifies a strategy rather than specifying its investment."
         }
       }
     }
@@ -110,6 +138,14 @@
         "strategyId": {
           "type": "string",
           "description": "cancel_strategy/strategyId: identifies a strategy rather than specifying its investment."
+        },
+        "client_strategy_id": {
+          "type": "integer",
+          "description": "For cancel strategy, identifies a strategy rather than specifying its investment."
+        },
+        "clientStrategyId": {
+          "type": "integer",
+          "description": "For cancel strategy, identifies a strategy rather than specifying its investment."
         }
       }
     }
@@ -187,6 +223,10 @@
         "strategyId": {
           "type": "string",
           "description": "get_strategy_history/strategyId: identifies a strategy rather than specifying its investment."
+        },
+        "offset": {
+          "type": "integer",
+          "description": "skips an integer number of strategy history records before returning the next page."
         }
       }
     }

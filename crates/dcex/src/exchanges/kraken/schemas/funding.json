@@ -81,6 +81,10 @@
         "withdrawal_fee_token": {
           "type": "string",
           "description": "calculate_funding_fees/withdrawal_fee_token: selects currency identifiers or funding source categories for this operation."
+        },
+        "fee_included": {
+          "type": "boolean",
+          "description": "For calculate funding fees, selects whether the amount includes fees using a boolean flag."
         }
       }
     }

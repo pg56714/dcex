@@ -1,0 +1,13 @@
+# Ondo spot support
+
+The client supports public spot depth, trades, symbol information and TradingView history through `get_spot_depth`, `get_spot_trades`, `get_spot_symbol_info` and `get_spot_price_history` in Rust and Python sync/async. Depth and trades accept `SPY-USDC` or `SPY-USDC-SPOT`; history takes the TradingView symbol returned by symbol information, such as `SPYUSDC`, with Unix-second `from_time`/`to_time` bounds.
+
+The product table reads both `result.perps.tradingPairs` and `result.spot.tradingPairs` from `/v1/markets`. Enabled spot pairs use `BASE-QUOTE-SPOT`; disabled pairs are excluded. Quantity and price precision come from `baseIncrement` and `quoteIncrement` without floating-point conversion. Market responses, including token configuration, are preserved. The new public requests have no price or quantity inputs to declare; their symbol, resolution and time controls are explicitly declared in the input catalog.
+
+The [official spot overview](https://docs.ondoperps.xyz/spot-trading) describes fully funded token purchases and displayed stock-equivalent quantities. The underlying holdings are GM tokens, and eligible tokens can be allocated as perpetual collateral. Do not infer token-unit conversion from the displayed symbol: consult the raw `tokenConfig` metadata, including `ledgerUnit`, `sharesMultiplier`, `custodiedAs` and `collateralEligible` where returned.
+
+As of 2026-09-30, the [official documentation index](https://docs.ondoperps.xyz/llms.txt) has no spot private REST contract or spot WebSocket channel specification. Placement, cancellation, queries, batches, fills and candles remain **blocked** in the ledger. Planned private method/path entries are provisional, not published specifications. No private spot signing or order methods are implemented, and no live account requests or orders were made.
+
+The documented `get_account()` endpoint provides account information; `get_balance()` targets the perpetual margin summary at `/v1/perps/balance`. Neither published schema establishes how to retrieve spot GM-token balances. Spot holding queries and spot WebSocket subscriptions remain unverified; use the official interface for those balances until their API representation is documented. Existing perpetual methods must not be used with `-SPOT` symbols.
+
+Public paths are based on the supplied 2026-09-29 read-only observations and have offline wire coverage. New public probes on 2026-09-30 could not complete because TLS certificate validation reported an expired certificate. TLS verification remains enabled; offline implementation does not imply current live certification.

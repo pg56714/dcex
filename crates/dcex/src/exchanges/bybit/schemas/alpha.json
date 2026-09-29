@@ -68,7 +68,15 @@
     "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75",
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "order_status": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "For get alpha lp order list, identifies existing orders or requests to query or cancel; contains no order quantities."
+        }
+      }
     }
   },
   {
@@ -504,7 +512,15 @@
     "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75",
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "token_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "For request alpha prediction order book, selects currency identifiers or funding source categories for this operation."
+        }
+      }
     }
   },
   {
@@ -1297,7 +1313,15 @@
     "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75",
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "order_status": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "For get alpha trade order list, identifies existing orders or requests to query or cancel; contains no order quantities."
+        }
+      }
     }
   },
   {

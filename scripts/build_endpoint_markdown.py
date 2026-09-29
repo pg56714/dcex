@@ -157,6 +157,11 @@ def build_markdown() -> dict[Path, str]:
             if zh
             else "Offline tests verify routes, HTTP methods, parameters, signatures, WebSocket messages and response handling. They do not establish live account eligibility or exchange availability. No live orders, withdrawals or account-administration requests were submitted.\n\n- OKX/Bitget SBE returns raw bytes without a built-in decoder.\n- Lighter explorer uses a separate base URL; historical exports never automatically pay a fee.\n- The ledger records the exact gaps and resolution requirements for `unverified` and `blocked` rows.\n"
         )
+        text += (
+            "\nOndo 已支援永續合約與現貨公開行情及 product table；現貨私有交易維持 blocked，現貨餘額查詢及 WebSocket 規格尚未確認。詳見 [Ondo 現貨支援範圍](ondo-spot.zh_tw.md)。\n"
+            if zh
+            else "\nOndo supports perpetual futures and public spot market data with product-table entries. Private spot trading remains blocked; spot balance queries and WebSocket specifications are unverified. See [Ondo spot support](ondo-spot.md).\n"
+        )
         outputs[ROOT / f"docs/endpoint-audit{suffix}.md"] = text
         nav = (
             "[English](endpoint-recheck.md) | **繁體中文**"

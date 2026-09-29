@@ -144,6 +144,14 @@
         "amount": {
           "type": "string",
           "format": "decimal"
+        },
+        "fee_type": {
+          "type": "integer",
+          "description": "For create withdrawal, selects the withdrawal fee treatment using the documented integer enumeration."
+        },
+        "beneficiary": {
+          "type": "object",
+          "description": "For create withdrawal, carries identity, signing, permission, or travel-rule metadata for this operation."
         }
       }
     }

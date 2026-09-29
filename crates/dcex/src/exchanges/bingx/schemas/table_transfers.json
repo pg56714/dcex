@@ -48,7 +48,12 @@
     ],
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "offset": {
+          "type": "integer",
+          "description": "skips an integer number of internal transfer records records before returning the next page."
+        }
+      }
     }
   },
   {
@@ -77,7 +82,12 @@
     ],
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "offset": {
+          "type": "integer",
+          "description": "skips an integer number of sub account internal transfer records records before returning the next page."
+        }
+      }
     }
   }
 ]

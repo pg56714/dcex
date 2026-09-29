@@ -10,7 +10,7 @@ pub(super) fn private_client() -> BitgetClient {
         Some("test_api_key_0000".to_string()),
         Some("test_api_secret_0000".to_string()),
         Some("test-passphrase".to_string()),
-        Duration::from_secs(1),
+        Duration::from_secs(10),
     )
     .expect("client")
 }

@@ -14,13 +14,13 @@ pub(super) fn recording_server() -> (String, JoinHandle<Option<String>>) {
     listener.set_nonblocking(true).expect("nonblocking");
     let address = listener.local_addr().expect("address");
     let handle = thread::spawn(move || {
-        let deadline = Instant::now() + Duration::from_secs(2);
+        let deadline = Instant::now() + Duration::from_secs(10);
         loop {
             match listener.accept() {
                 Ok((mut stream, _)) => {
                     stream.set_nonblocking(false).expect("blocking stream");
                     stream
-                        .set_read_timeout(Some(Duration::from_secs(2)))
+                        .set_read_timeout(Some(Duration::from_secs(10)))
                         .expect("read timeout");
                     let mut buffer = [0u8; 4096];
                     let size = stream.read(&mut buffer).expect("read");

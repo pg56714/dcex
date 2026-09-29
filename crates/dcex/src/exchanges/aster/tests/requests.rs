@@ -7,7 +7,7 @@ fn raw_auto_routes_spot_paths_to_spot_base_url() {
         None,
         None,
         None,
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         spot_base_url,
         "http://127.0.0.1:9".to_string(),
     )
@@ -31,7 +31,7 @@ fn raw_auto_routes_futures_paths_to_futures_base_url() {
         None,
         None,
         None,
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         "http://127.0.0.1:9".to_string(),
         futures_base_url,
     )

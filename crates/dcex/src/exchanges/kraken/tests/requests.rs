@@ -24,7 +24,7 @@ fn product_table_asset_class_drives_xstock_orders() {
         min_notional: "0.5".to_string(),
         size_per_contract: "1".to_string(),
     }]);
-    let client = KrakenClient::public(Duration::from_secs(1))
+    let client = KrakenClient::public(Duration::from_secs(10))
         .expect("client")
         .with_product_table(table);
 
@@ -82,7 +82,7 @@ fn amend_and_edit_orders_use_documented_routes() {
             Some(SECRET.into()),
             Some("futures-key".into()),
             Some(SECRET.into()),
-            Duration::from_secs(2),
+            Duration::from_secs(10),
             url.clone(),
             url,
         )

@@ -110,7 +110,12 @@
     ],
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "offset": {
+          "type": "integer",
+          "description": "skips an integer number of travel rule deposit history records before returning the next page."
+        }
+      }
     }
   },
   {
@@ -190,7 +195,12 @@
     ],
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "offset": {
+          "type": "integer",
+          "description": "skips an integer number of travel rule deposit history v2 records before returning the next page."
+        }
+      }
     }
   },
   {
@@ -405,7 +415,12 @@
     ],
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "offset": {
+          "type": "integer",
+          "description": "skips an integer number of travel rule withdrawal history records before returning the next page."
+        }
+      }
     }
   },
   {
@@ -499,7 +514,12 @@
     ],
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "offset": {
+          "type": "integer",
+          "description": "skips an integer number of travel rule withdrawal history v2 records before returning the next page."
+        }
+      }
     }
   }
 ]

@@ -327,7 +327,12 @@
     "official_source": "https://docs.arcus.xyz/api-reference/referral/list-the-callers-invite-codes",
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "offset": {
+          "type": "integer",
+          "description": "skips an integer number of invite codes records before returning the next page."
+        }
+      }
     }
   },
   {

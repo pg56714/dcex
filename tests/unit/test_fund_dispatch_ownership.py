@@ -8,7 +8,14 @@ from pathlib import Path
 
 import pytest
 
-from tests.unit.rust_dispatch import fund_domain, misplaced_fund_arms, request_owners
+from tests.unit.rust_dispatch import (
+    fund_domain,
+    fund_literals,
+    misplaced_fund_arms,
+    request_owners,
+    unauthorized_transport_references,
+    unpinned_fund_literals,
+)
 from tests.unit.test_exchange_structure import EXCHANGES, NATIVE, ROOT
 
 
@@ -26,6 +33,32 @@ def test_all_fund_dispatch_arms_have_domain_owners(exchange):
             continue
         nondispatch = [entry for entry in json.loads((ROOT / "tests/fixtures/fund_nondispatch_arms.json").read_text(encoding="utf-8")) if entry["source"] == path.relative_to(NATIVE).as_posix()]
         assert not misplaced_fund_arms(path.read_text(encoding="utf-8"), path.name, owners, readonly, nondispatch), path
+
+
+@pytest.mark.parametrize("exchange", EXCHANGES)
+def test_every_fund_literal_outside_owners_is_hash_pinned(exchange):
+    allowances = json.loads((ROOT / "tests/fixtures/fund_literal_allowlist.json").read_text(encoding="utf-8"))
+    for path in (NATIVE / exchange).rglob("*.rs"):
+        if "tests" in path.parts:
+            continue
+        entries = [entry for entry in allowances if entry["source"] == path.relative_to(NATIVE).as_posix()]
+        assert not unpinned_fund_literals(path.read_text(encoding="utf-8"), path.name, entries), path
+
+
+@pytest.mark.parametrize("source", [
+    'const W: &str = "create_withdrawal3"; match name { W => self.signed_call(p) }',
+    'match (name, 1) { ("create_withdrawal3", _) => self.signed_call(p) }',
+    'match name { "create_withdrawal3" /* comment */ => self.signed_call(p) }',
+    'match name { "create_withdrawal" if !public => self.signed_call("POST", "/w", p).await }',
+    'static T: &[(&str, &str)] = &[("create_withdrawal3", "/api/v3/withdrawals")]; T.iter().find(|r| r.0 == name)',
+    r'const W: &str = "create_with\u{64}rawal3"; call(W);',
+])
+def test_fund_literal_mutations_cannot_depend_on_dispatch_syntax(source):
+    import hashlib
+    assert unpinned_fund_literals(source, "account.rs")
+    allowance = {"sha256": hashlib.sha256(source.encode()).hexdigest(), "names": list(fund_literals(source))}
+    assert not unpinned_fund_literals(source, "account.rs", [allowance])
+    assert unpinned_fund_literals(source + '; self.transport.execute(req);', "account.rs", [allowance])
 
 
 def test_new_withdrawal_arm_cannot_hide_in_account():
@@ -95,6 +128,7 @@ def test_catalog_dispatch_must_route_funds_through_domain_owner(route):
         assert f"FundDomain::{variant}) =>" in router and f"self.{owner}(" in router
         body = dict(functions((folder / (domain + ".rs")).read_text(encoding="utf-8")))[owner]
         assert "schema::fund_domain(" in body and f"FundDomain::{variant}" in body
+        assert "debug_assert!" not in body and "return Err(" in body
         assert f"self.{route['transport']}(" in body
 
 
@@ -152,3 +186,31 @@ def test_nondispatch_allowance_is_invalidated_by_added_sender():
 
 def test_await_and_transport_suffix_do_not_create_unlisted_owners():
     assert request_owners("async fn sign_only() { self.next_nonce().await } async fn decoy() { self.unknown_transport().await } fn route_only() { let method = HttpMethod::Post; }") == set()
+
+
+@pytest.mark.parametrize("route", catalog_routes())
+def test_schema_transports_have_only_audited_callers(route):
+    for path in (NATIVE / route["exchange"]).rglob("*.rs"):
+        if "tests" in path.parts:
+            continue
+        relative = path.relative_to(NATIVE / route["exchange"]).as_posix()
+        permitted = [route["method"]] if relative == route["source"] else []
+        if path.name in {"withdrawals.rs", "transfers.rs"}:
+            permitted.append(path.stem + "_" + route["method"])
+        assert not unauthorized_transport_references(path.read_text(encoding="utf-8"), route["transport"], permitted), (path, route)
+
+
+@pytest.mark.parametrize("transport", ["table_request_transport", "catalog_request_transport", "field_schema_request_transport"])
+def test_direct_schema_transport_call_mutation_is_rejected(transport):
+    source = f'async fn account(&self) {{ self.{transport}("fiat_withdraw", p, false).await }}'
+    assert unauthorized_transport_references(source, transport, ["table_request", "withdrawals_table_request"])
+
+
+def test_nondispatch_allowance_reasons_are_specific():
+    from collections import Counter
+
+    from tests.unit.input_contract_coverage import MAX_REASON_REPETITIONS, normalized_reason
+    entries = json.loads((ROOT / "tests/fixtures/fund_nondispatch_arms.json").read_text(encoding="utf-8"))
+    identities = [name for entry in entries for name in entry["names"]]
+    reasons = Counter(normalized_reason(entry["reason"], identities) for entry in entries)
+    assert all(count <= MAX_REASON_REPETITIONS for count in reasons.values()), reasons

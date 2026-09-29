@@ -91,7 +91,16 @@
     ],
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of withdrawal history records per response page; this integer counts records."
+        },
+        "pageSize": {
+          "type": "integer",
+          "description": "limits the number of withdrawal history records per response page; this integer counts records."
+        }
+      }
     }
   },
   {
@@ -209,7 +218,16 @@
     ],
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of uta withdrawal history records per response page; this integer counts records."
+        },
+        "pageSize": {
+          "type": "integer",
+          "description": "limits the number of uta withdrawal history records per response page; this integer counts records."
+        }
+      }
     }
   },
   {

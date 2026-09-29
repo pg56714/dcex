@@ -1184,6 +1184,14 @@
         "slPct": {
           "type": "string",
           "format": "decimal"
+        },
+        "reserve_funds": {
+          "type": "boolean",
+          "description": "For trading bot dca amend order algo, selects whether the bot retains reserved funds using a boolean flag."
+        },
+        "reserveFunds": {
+          "type": "boolean",
+          "description": "For trading bot dca amend order algo, selects whether the bot retains reserved funds using a boolean flag."
         }
       }
     }
@@ -2055,6 +2063,13 @@
         "investmentCcy": {
           "type": "string",
           "description": "trading_bot_recurring_order_algo/investmentCcy: selects currency identifiers or funding source categories for this operation."
+        },
+        "source": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "For trading bot recurring order algo, selects currency identifiers or funding source categories for this operation."
         }
       }
     }

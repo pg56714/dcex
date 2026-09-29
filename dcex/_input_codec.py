@@ -44,17 +44,27 @@ def normalize(
         value = value.value
     if value is None:
         return None
-    if value == "" and schema.get("x-empty-as-absent"):
+    if isinstance(value, str) and not value.strip() and schema.get("x-empty-as-absent"):
         return value
     if (
         isinstance(value, str)
-        and value.startswith(("{", "["))
-        and schema.get("type") in {"object", "array"}
+        and schema.get("x-delimited-string")
+        and not value.lstrip().startswith("[")
     ):
-        normalize(json.loads(value, parse_float=str), key, schema=schema)
+        if not all(part.strip() for part in value.split(",")):
+            raise ValueError(f"{key} requires nonempty comma-separated identifiers")
+        return value
+    if isinstance(value, str) and schema.get("type") in {"object", "array"}:
+        try:
+            parsed = json.loads(value.strip(), parse_float=str)
+        except json.JSONDecodeError as error:
+            raise ValueError(f"{key} must be a JSON {schema['type']}") from error
+        normalize(parsed, key, schema=schema)
         return value
     if schema.get("type") == "object" and not isinstance(value, dict):
         raise ValueError(f"{key} must be a JSON object")
+    if schema.get("x-nonempty-object") and value == {}:
+        raise ValueError(f"{key} must be a nonempty JSON object")
     if schema.get("format") == "decimal":
         if isinstance(value, float | bool):
             raise ValueError(f"{key} requires an exact decimal string or Decimal, not float/bool")
@@ -70,6 +80,16 @@ def normalize(
         digits = digits.removeprefix("-") if schema.get("x-signed") else digits
         if not _PLAIN.fullmatch(digits):
             raise ValueError(f"{key} requires a plain decimal string")
+        if "x-minimum" in schema:
+            number, minimum = Decimal(text), Decimal(schema["x-minimum"])
+            if (
+                number < minimum
+                or number == minimum
+                and schema.get("x-exclusive-minimum")
+                or number == 0
+                and schema.get("x-nonzero")
+            ):
+                raise ValueError(f"{key} requires a decimal within its declared range")
         if schema.get("x-positive") and not any(char in "123456789" for char in digits):
             raise ValueError(f"{key} must be a positive plain decimal string")
         if schema.get("x-percent-range") and text.endswith("%") and not 0 < Decimal(digits) <= 100:
@@ -81,6 +101,8 @@ def normalize(
             raise ValueError(f"{key or 'decimal'} must be finite")
         return format(value, "f")
     if isinstance(value, dict):
+        if forbidden := set(value).intersection(schema.get("x-forbidden-keys", [])):
+            raise ValueError(f"{key} contains unsupported fields: {', '.join(sorted(forbidden))}")
         properties = schema.get("properties", {})
         return {
             name: normalize(

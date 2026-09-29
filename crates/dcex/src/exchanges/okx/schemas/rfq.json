@@ -417,7 +417,22 @@
     "row": 1227,
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "quote_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "For cancel rfq batch quotes, identifies existing orders or requests to query or cancel; contains no order quantities."
+        },
+        "cl_quote_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "For cancel rfq batch quotes, identifies existing orders or requests to query or cancel; contains no order quantities."
+        }
+      }
     }
   },
   {

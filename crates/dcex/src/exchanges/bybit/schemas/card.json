@@ -188,7 +188,12 @@
     "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75",
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of card reward mall item list records per response page; this integer counts records."
+        }
+      }
     }
   },
   {
@@ -269,7 +274,12 @@
     "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75",
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of card reward points records records per response page; this integer counts records."
+        }
+      }
     }
   },
   {

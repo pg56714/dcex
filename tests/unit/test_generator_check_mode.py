@@ -36,3 +36,26 @@ def test_schema_table_formatting_uses_stdin_and_stdout():
     source = "fn example(){let _x=1;}\n"
     result = generation.formatted(Path("example.rs"), source)
     assert result == "fn example() {\n    let _x = 1;\n}\n"
+
+
+@pytest.mark.parametrize("emits_current", [False, True])
+def test_removed_domain_leaves_a_read_only_orphan_failure(tmp_path, monkeypatch, emits_current):
+    orphan = tmp_path / "removed_domain.py"
+    orphan.write_text('"""Old generated domain."""\n', encoding="utf-8")
+    before = orphan.read_bytes(), orphan.stat().st_mtime_ns
+    monkeypatch.setattr(generation, "ROOT", tmp_path)
+    monkeypatch.setattr(sys, "argv", ["generator", "--check"])
+
+    def render():
+        generation.own_directory(tmp_path, "*.py")
+        if emits_current:
+            generation.emit(tmp_path / "current.json", "{}\n")
+
+    def forbidden(*args, **kwargs):
+        raise AssertionError("check mode attempted a write or deletion")
+
+    monkeypatch.setattr(Path, "write_text", forbidden)
+    monkeypatch.setattr(Path, "unlink", forbidden)
+    monkeypatch.setattr(Path, "mkdir", forbidden)
+    assert generation.run(render) == 1
+    assert (orphan.read_bytes(), orphan.stat().st_mtime_ns) == before

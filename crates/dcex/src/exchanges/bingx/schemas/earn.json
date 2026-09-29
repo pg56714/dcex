@@ -32,7 +32,12 @@
     "scoped": false,
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of wealth v1 product dual currency order records records per response page; this integer counts records."
+        }
+      }
     }
   },
   {
@@ -125,6 +130,22 @@
         "investment_asset": {
           "type": "string",
           "description": "post_wealth_v1_product_dual_currency_invest_asset_list/investment_asset: selects currency identifiers or funding source categories for this operation."
+        },
+        "page_size": {
+          "type": "integer",
+          "description": "limits the number of post wealth v1 product dual currency invest asset list records per response page; this integer counts records."
+        },
+        "begin_duration": {
+          "type": "integer",
+          "description": "For post wealth v1 product dual currency invest asset list, specifies a scheduling duration or timestamp in the endpoint time unit."
+        },
+        "end_duration": {
+          "type": "integer",
+          "description": "For post wealth v1 product dual currency invest asset list, specifies a scheduling duration or timestamp in the endpoint time unit."
+        },
+        "duration": {
+          "type": "integer",
+          "description": "For post wealth v1 product dual currency invest asset list, specifies a scheduling duration or timestamp in the endpoint time unit."
         }
       }
     }
@@ -220,6 +241,13 @@
         "investment_asset": {
           "type": "string",
           "description": "post_wealth_v1_product_dual_currency_order/investment_asset: selects currency identifiers or funding source categories for this operation."
+        },
+        "select_accounts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "For post wealth v1 product dual currency order, carries identity, signing, permission, or travel-rule metadata for this operation."
         }
       }
     }

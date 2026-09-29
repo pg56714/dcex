@@ -130,7 +130,8 @@
         },
         "volume": {
           "type": "string",
-          "format": "decimal"
+          "format": "decimal",
+          "x-positive": true
         },
         "close[price]": {
           "type": "string",

@@ -90,3 +90,26 @@ class MarketHTTP(HTTPManager):
         return self._native_public(
             "complete_login_challenge", id=id, signature=signature, source=source
         )
+
+    def get_spot_depth(self, market: str) -> Any:
+        """Read spot depth using BASE-QUOTE or BASE-QUOTE-SPOT."""
+        return self._native_public("get_spot_depth", market=market)
+
+    def get_spot_trades(self, market: str) -> Any:
+        """Read public spot trades without account authentication."""
+        return self._native_public("get_spot_trades", market=market)
+
+    def get_spot_symbol_info(self) -> Any:
+        """List spot TradingView symbols such as SPYUSDC."""
+        return self._native_public("get_spot_symbol_info")
+
+    def get_spot_price_history(
+        self, symbol: str, resolution: str, from_time: int, to_time: int
+    ) -> Any:
+        """Read spot history with a TradingView symbol and Unix-second bounds."""
+        return self._native_public(
+            "get_spot_price_history",
+            symbol=symbol,
+            resolution=resolution,
+            **{"from": from_time, "to": to_time},
+        )

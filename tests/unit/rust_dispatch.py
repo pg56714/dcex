@@ -1,7 +1,7 @@
 """Source-preserving match-arm inspection for module ownership tests."""
 
-import re
 import hashlib
+import re
 
 TOKENS = re.compile(r'''//[^\n]*|/\*[\s\S]*?\*/|r(?P<hash>\#*)"[\s\S]*?"(?P=hash)|'(?:\\.|[^'\\\n])'|"(?:\\[\s\S]|[^"\\])*"''')
 
@@ -36,15 +36,49 @@ def arms(source):
         yield re.findall(r'"(\w+)"', match["keys"]), source[match.end():end]
 
 
-def functions(source):
+def function_spans(source):
     clean = mask(source)
-    for match in re.finditer(r"\bfn\s+(\w+)\s*(?:<[^{}]*>)?\(", clean):
-        start = clean.index("{", match.end())
+    for match in re.finditer(r"\bfn\s+(\w+)\b", clean):
+        boundary = re.search(r"[;{]", clean[match.end():])
+        if boundary is None or boundary[0] == ";":
+            continue
+        start = match.end() + boundary.start()
         end, depth = start + 1, 1
-        while depth:
+        while depth and end < len(clean):
             depth += (clean[end] == "{") - (clean[end] == "}")
             end += 1
-        yield match[1], source[start:end]
+        yield match[1], match.start(), start, end
+
+
+def functions(source):
+    for name, _, start, end in function_spans(source):
+        yield name, source[start:end]
+
+
+def fund_literals(source):
+    """Inspect every identifier string, independent of dispatch syntax."""
+    for token in TOKENS.finditer(source):
+        raw = token[0]
+        if raw.startswith(('"', 'r"', 'r#')):
+            name = raw[raw.index('"') + 1:raw.rindex('"')]
+            if raw.startswith('"'):
+                name = re.sub(r"\\x([0-9a-fA-F]{2})|\\u\{([0-9a-fA-F]+)\}", lambda match: chr(int(match[1] or match[2], 16)), name)
+            if re.fullmatch(r"\w+", name) and fund_domain(name.lower()):
+                yield name
+
+
+def unpinned_fund_literals(source, filename, allowances=()):
+    names = {name for name in fund_literals(source) if filename != fund_domain(name.lower()) + ".rs"}
+    digest = hashlib.sha256(source.encode()).hexdigest()
+    if any(entry["sha256"] == digest and names == set(entry["names"]) for entry in allowances):
+        return []
+    return sorted(names)
+
+
+def unauthorized_transport_references(source, transport, permitted_functions=()):
+    """A transport reference is legal only inside its definition or audited callers."""
+    allowed = [(start, end) for name, start, _, end in function_spans(source) if name == transport or name in permitted_functions]
+    return [match.start() for match in re.finditer(r"\b" + re.escape(transport) + r"\b", mask(source)) if not any(start <= match.start() < end for start, end in allowed)]
 
 
 def fund_domain(name):

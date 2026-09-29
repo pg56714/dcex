@@ -7,12 +7,20 @@ from collections.abc import Callable
 from pathlib import Path
 
 OUTPUTS: dict[Path, str] = {}
+DIRECTORIES: list[tuple[Path, str, tuple[str, ...], str | None]] = []
 ROOT = Path(__file__).resolve().parents[1]
 
 
 def emit(path: Path, content: str) -> None:
     """Collect output without touching the filesystem."""
     OUTPUTS[path] = content
+
+
+def own_directory(
+    folder: Path, pattern: str, excluded: tuple[str, ...] = (), marker: str | None = None
+) -> None:
+    """Declare output ownership even when the current domain emits no files."""
+    DIRECTORIES.append((folder, pattern, excluded, marker))
 
 
 def formatted(path: Path, content: str) -> str:
@@ -78,6 +86,7 @@ def run(render: Callable[[], None]) -> int:
     modes.add_argument("--check", action="store_true")
     args = parser.parse_args()
     OUTPUTS.clear()
+    DIRECTORIES.clear()
     render()
     outputs = {path: formatted(path, content) for path, content in OUTPUTS.items()}
     stale = [
@@ -85,10 +94,21 @@ def run(render: Callable[[], None]) -> int:
         for path, content in outputs.items()
         if not path.exists() or path.read_text(encoding="utf-8") != content
     ]
+    orphans = {
+        path
+        for folder, pattern, excluded, marker in DIRECTORIES
+        for path in folder.glob(pattern)
+        if path.is_file()
+        and path.name not in excluded
+        and path not in outputs
+        and (marker is None or marker in path.read_text(encoding="utf-8"))
+    }
+    for path in sorted(orphans):
+        print(f"Orphaned generated artifact: {path.relative_to(ROOT)}")
     for path in stale:
         if args.write:
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(outputs[path], encoding="utf-8", newline="\n")
         else:
             print(f"Generated artifact is stale: {path.relative_to(ROOT)}")
-    return int(bool(stale) and not args.write)
+    return int(bool(orphans) or bool(stale) and not args.write)
