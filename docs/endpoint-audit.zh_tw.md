@@ -50,9 +50,9 @@ API 提款沒有第二次確認，送出即執行。建議交易用 API 金鑰�
 ## 驗證與限制
 
 <!-- VERIFICATION -->
-- Rust 通過: `686`
+- Rust 通過: `687`
 - Rust 線上測試略過: `53`
-- Python 通過: `23401`
+- Python 通過: `23618`
 - Python 未選取: `944`
 - Python 略過: `0`
 - Python 預期失敗: `0`
