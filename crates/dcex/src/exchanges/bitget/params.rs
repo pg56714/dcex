@@ -118,7 +118,7 @@ pub(super) fn nonempty<'a>(params: &'a BitgetParams, key: &str) -> Result<&'a st
         .ok_or_else(|| invalid(&format!("{key} is required")))
 }
 
-pub(super) fn schema_invalid(message: &str) -> DcexError {
+pub(super) fn schema_invalid(message: impl std::fmt::Display) -> DcexError {
     DcexError::InvalidInput(format!("Bitget: {message}"))
 }
 
