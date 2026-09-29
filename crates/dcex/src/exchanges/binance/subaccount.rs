@@ -76,10 +76,10 @@ impl BinanceClient {
             "get_subaccount_assets" => (HttpMethod::Get, SUBACCOUNT_ASSETS, &["email"]),
             "get_subaccount_spot_summary" => (HttpMethod::Get, SUBACCOUNT_SPOT_SUMMARY, &[]),
             "transfer_subaccount_futures" => {
-                super::transfers::subaccount_transfer_route(method_name)
+                return self.subaccount_transfer_request(method_name, params).await;
             }
             "transfer_subaccount_margin" => {
-                super::transfers::subaccount_transfer_route(method_name)
+                return self.subaccount_transfer_request(method_name, params).await;
             }
             "get_subaccount_futures_transfer_history" => (
                 HttpMethod::Get,
@@ -87,7 +87,7 @@ impl BinanceClient {
                 &["email", "futuresType"],
             ),
             "transfer_between_subaccount_futures" => {
-                super::transfers::subaccount_transfer_route(method_name)
+                return self.subaccount_transfer_request(method_name, params).await;
             }
             "get_subaccount_spot_transfer_history" => {
                 (HttpMethod::Get, SUBACCOUNT_SPOT_TRANSFER_HISTORY, &[])
@@ -96,16 +96,16 @@ impl BinanceClient {
                 (HttpMethod::Get, SUBACCOUNT_UNIVERSAL_TRANSFER, &[])
             }
             "transfer_between_subaccounts" => {
-                super::transfers::subaccount_transfer_route(method_name)
+                return self.subaccount_transfer_request(method_name, params).await;
             }
             "get_subaccount_transfer_history" => {
                 (HttpMethod::Get, SUBACCOUNT_TRANSFER_HISTORY, &[])
             }
             "transfer_subaccount_to_master" => {
-                super::transfers::subaccount_transfer_route(method_name)
+                return self.subaccount_transfer_request(method_name, params).await;
             }
             "transfer_subaccount_to_subaccount" => {
-                super::transfers::subaccount_transfer_route(method_name)
+                return self.subaccount_transfer_request(method_name, params).await;
             }
             _ => return Ok(None),
         };

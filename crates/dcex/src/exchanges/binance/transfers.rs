@@ -286,3 +286,26 @@ impl super::client::BinanceClient {
         self.catalog_request_transport(name, p, public).await
     }
 }
+
+impl super::client::BinanceClient {
+    pub(super) async fn subaccount_transfer_request(
+        &self,
+        method_name: &str,
+        params: &super::params::PublicParams,
+    ) -> crate::Result<Option<crate::exchange::ValidatedResponse>> {
+        let (method, path, required) = subaccount_transfer_route(method_name);
+        for field in required {
+            params.required(field)?;
+        }
+        Ok(Some(
+            self.request(
+                method,
+                super::client::BinanceMarket::Spot,
+                path,
+                params.without(&[]),
+                true,
+            )
+            .await?,
+        ))
+    }
+}
