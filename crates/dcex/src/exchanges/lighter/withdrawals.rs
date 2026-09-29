@@ -1,5 +1,37 @@
 //! L2 withdrawals and recipient transfers.
 
+use super::trade::*;
+
+impl LighterClient {
+    pub(super) async fn withdraw_l2_request(
+        &self,
+        method_name: &str,
+        params: &LighterParams,
+    ) -> Result<Option<ValidatedResponse>> {
+        Ok(Some(
+            self.submit_signed_tx(
+                self.sign_withdrawal_or_approval(params, method_name == "approve_integrator")
+                    .await?,
+                params.optional_bool("price_protection")?,
+            )
+            .await?,
+        ))
+    }
+
+    pub(super) async fn transfer_l2_request(
+        &self,
+        params: &LighterParams,
+    ) -> Result<Option<ValidatedResponse>> {
+        Ok(Some(
+            self.submit_signed_tx(
+                self.sign_internal_transfer(params).await?,
+                params.optional_bool("price_protection")?,
+            )
+            .await?,
+        ))
+    }
+}
+
 mod withdrawal_signing {
     // Transaction 13 and 45 follow lighter-go's typed transaction hashes.
     use crate::exchanges::lighter::trade::*;

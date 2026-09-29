@@ -51,21 +51,12 @@ impl LighterClient {
         params: &LighterParams,
     ) -> Result<Option<ValidatedResponse>> {
         match method_name {
-            "withdraw_l2" | "approve_integrator" => Ok(Some(
-                self.submit_signed_tx(
-                    self.sign_withdrawal_or_approval(params, method_name == "approve_integrator")
-                        .await?,
-                    params.optional_bool("price_protection")?,
-                )
-                .await?,
-            )),
-            "transfer_l2_account" | "transfer_same_master_account" => Ok(Some(
-                self.submit_signed_tx(
-                    self.sign_internal_transfer(params).await?,
-                    params.optional_bool("price_protection")?,
-                )
-                .await?,
-            )),
+            "withdraw_l2" | "approve_integrator" => {
+                self.withdraw_l2_request(method_name, params).await
+            }
+            "transfer_l2_account" | "transfer_same_master_account" => {
+                self.transfer_l2_request(params).await
+            }
             "create_public_pool" | "update_public_pool" | "mint_shares" | "burn_shares"
             | "stake_assets" | "unstake_assets" => Ok(Some(
                 self.submit_signed_tx(

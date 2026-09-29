@@ -1,6 +1,6 @@
 //! Additional operations extracted from Bitget's published OpenAPI documentation.
 use crate::exchanges::bitget::{client::BitgetClient, params::BitgetParams};
-use crate::{DcexError, Result, exchange::ValidatedResponse, http::HttpMethod};
+use crate::{Result, exchange::ValidatedResponse, http::HttpMethod};
 use serde::Deserialize;
 use serde_json::{Map, Value};
 use std::sync::OnceLock;
@@ -16,9 +16,7 @@ struct Endpoint {
     fields: Vec<Field>,
 }
 
-fn invalid(message: impl std::fmt::Display) -> DcexError {
-    DcexError::InvalidInput(format!("Bitget: {message}"))
-}
+use crate::exchanges::bitget::params::schema_invalid as invalid;
 
 impl BitgetClient {
     pub(in crate::exchanges::bitget) async fn catalog_request(
