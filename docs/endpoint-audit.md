@@ -50,9 +50,9 @@ Method counts include aliases and signing helpers, not endpoints. Additions are 
 ## Verification and limits
 
 <!-- VERIFICATION -->
-- Rust passed: `687`
+- Rust passed: `690`
 - Rust live ignored: `53`
-- Python passed: `23618`
+- Python passed: `23984`
 - Python deselected: `944`
 - Python skipped: `0`
 - Python xfailed: `0`
