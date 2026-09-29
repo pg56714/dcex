@@ -178,6 +178,10 @@ pub(super) fn body_value(value: &str, number: bool, boolean: bool) -> Value {
     Value::String(value.to_string())
 }
 
+pub(in crate::exchanges::mexc) fn invalid(message: impl std::fmt::Display) -> crate::DcexError {
+    crate::DcexError::InvalidInput(format!("MEXC: {message}"))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -193,8 +197,4 @@ mod tests {
         let blank = MexcParams::from_pairs(vec![("orderId".to_string(), " ".to_string())]);
         assert!(require_one_identifier(&blank, &["orderId", "origClientOrderId"]).is_err());
     }
-}
-
-pub(in crate::exchanges::mexc) fn invalid(message: impl std::fmt::Display) -> crate::DcexError {
-    crate::DcexError::InvalidInput(format!("MEXC: {message}"))
 }
