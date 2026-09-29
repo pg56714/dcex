@@ -56,7 +56,7 @@ def fund_domain(name):
 
 
 # Only transport calls confer ownership. Awaiting a nonce or signer does not.
-SENDS = re.compile(r"HttpMethod::|(?<![\w.])(?:post|get|request)\s*\(|\.(?:submit_signed_tx|inventory_transport|private_request_bytes|post_private|get_private|request|private_post|private_get|public_get|private_post_value|get_request|post_request|submit_action|exchange_payload_at_nonce|additional_user_action|contract_get)\s*\(")
+SENDS = re.compile(r"(?<![\w.])(?:post|get|request)\s*\(|\.(?:execute|signed|spot_private|submit_signed_tx|inventory_transport|private_request_bytes|post_private|get_private|request|private_post|private_get|public_get|private_post_value|get_request|post_request|submit_action|exchange_payload_at_nonce|additional_user_action|contract_get)\s*\(")
 PURE_CALLS = {"Some", "Ok", "Err", "Box", "pin"}
 
 

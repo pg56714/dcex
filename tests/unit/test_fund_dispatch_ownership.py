@@ -151,4 +151,4 @@ def test_nondispatch_allowance_is_invalidated_by_added_sender():
 
 
 def test_await_and_transport_suffix_do_not_create_unlisted_owners():
-    assert request_owners("async fn sign_only() { self.next_nonce().await } async fn decoy() { self.unknown_transport().await }") == set()
+    assert request_owners("async fn sign_only() { self.next_nonce().await } async fn decoy() { self.unknown_transport().await } fn route_only() { let method = HttpMethod::Post; }") == set()

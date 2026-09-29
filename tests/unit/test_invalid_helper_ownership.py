@@ -21,7 +21,7 @@ def invalid_prefixes(source):
         body = source[start:end]
         if not re.search(r"->\s*(?:crate::)?DcexError", clean[match.start():start]) or not re.search(r"InvalidInput\s*\(\s*format!", mask(body)):
             continue
-        prefix = re.search(r'format!\("([^"{]*)', body)
+        prefix = re.search(r'InvalidInput\s*\(\s*format!\s*\(\s*"([^"{]*)', body)
         yield prefix[1] if prefix else ""
 
 
@@ -39,3 +39,12 @@ def test_duplicate_helper_with_different_signatures_is_detected():
     source = """fn invalid(message: &str) -> DcexError { DcexError::InvalidInput(format!("KuCoin: {message}")) }
 fn other<T: Display>(message: T) -> DcexError { DcexError::InvalidInput(format!("KuCoin: {}", message.into())) }"""
     assert list(invalid_prefixes(source)) == ["KuCoin: ", "KuCoin: "]
+
+
+def test_named_generic_and_multiline_error_constructors_are_scanned():
+    source = '''fn invalid_ws<T: Display>(message: T) -> DcexError {
+        DcexError::InvalidInput(format!(
+            "Binance WS: {message}"
+        ))
+    }'''
+    assert list(invalid_prefixes(source)) == ["Binance WS: "]
