@@ -3,6 +3,7 @@ use super::{
     client::{KucoinClient, KucoinMarket},
     params::{KucoinParams, validate_enum},
 };
+use crate::exchanges::kucoin::params::invalid;
 use crate::{DcexError, Result, exchange::ValidatedResponse, http::HttpMethod};
 use serde_json::Value;
 
@@ -95,9 +96,6 @@ impl KucoinClient {
             .await
             .map(Some)
     }
-}
-fn invalid(message: impl Into<String>) -> DcexError {
-    DcexError::InvalidInput(format!("KuCoin: {}", message.into()))
 }
 
 mod wrappers {

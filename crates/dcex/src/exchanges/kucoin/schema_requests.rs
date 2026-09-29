@@ -1,9 +1,10 @@
 //! Schema-driven request validation, encoding and dispatch.
 use super::client::{KucoinClient, KucoinMarket};
 use super::params::{KucoinParams, bool_value, validate_client_oid, validate_positive_number};
+use crate::Result;
 use crate::exchange::ValidatedResponse;
+use crate::exchanges::kucoin::params::invalid;
 use crate::http::HttpMethod;
-use crate::{DcexError, Result};
 use serde_json::Value;
 
 #[path = "generated/schema_tables.rs"]
@@ -78,15 +79,15 @@ impl KucoinClient {
             };
             let Some(input) = input else {
                 if field.required {
-                    return Err(invalid(&format!("{} is required", field.key)));
+                    return Err(invalid(format!("{} is required", field.key)));
                 }
                 continue;
             };
             if input.trim().is_empty() {
-                return Err(invalid(&format!("{} must not be empty", field.key)));
+                return Err(invalid(format!("{} must not be empty", field.key)));
             }
             if !field.choices.is_empty() && !field.choices.contains(&input) {
-                return Err(invalid(&format!("unsupported {}", field.key)));
+                return Err(invalid(format!("unsupported {}", field.key)));
             }
             if field.kind == 'd' {
                 crate::exchanges::schema::encode(field.key, input, "decimal")?;
@@ -96,11 +97,11 @@ impl KucoinClient {
                 'i' => {
                     let number: i64 = input
                         .parse()
-                        .map_err(|_| invalid(&format!("{} must be an integer", field.key)))?;
+                        .map_err(|_| invalid(format!("{} must be an integer", field.key)))?;
                     if field.minimum.is_some_and(|minimum| number < minimum)
                         || field.maximum.is_some_and(|maximum| number > maximum)
                     {
-                        return Err(invalid(&format!(
+                        return Err(invalid(format!(
                             "{} is outside its documented range",
                             field.key
                         )));
@@ -177,9 +178,6 @@ impl KucoinClient {
     }
 }
 
-fn invalid(message: &str) -> DcexError {
-    DcexError::InvalidInput(format!("KuCoin: {message}"))
-}
 fn canonical(symbol: &str) -> bool {
     symbol.ends_with("-SPOT") || symbol.ends_with("-SWAP") || symbol.ends_with("-PERP")
 }

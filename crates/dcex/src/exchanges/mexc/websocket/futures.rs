@@ -1,6 +1,7 @@
 //! MEXC contract WebSocket protocol (separate from Spot Protobuf streams).
 use crate::crypto::hmac_sha256_hex;
 use crate::exchange::unix_timestamp_ms;
+use crate::exchanges::mexc::params::invalid;
 use crate::ws::{WebSocketConfig, WebSocketConnection};
 use crate::{DcexError, Result};
 use serde_json::{Value, json};
@@ -282,9 +283,6 @@ impl MexcFuturesWebSocket {
     }
 }
 
-fn invalid(message: &str) -> DcexError {
-    DcexError::InvalidInput(format!("MEXC: {message}"))
-}
 fn normalize_symbol(symbol: &str) -> Result<String> {
     let symbol = if symbol.ends_with("-SWAP") {
         symbol.trim_end_matches("-SWAP").replace('-', "_")

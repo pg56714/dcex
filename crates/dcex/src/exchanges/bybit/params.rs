@@ -223,3 +223,7 @@ mod tests {
         assert_eq!(exchange_symbol_fallback("BTC-USD-H23-SWAP"), "BTCUSDH23");
     }
 }
+
+pub(in crate::exchanges::bybit) fn invalid(message: impl std::fmt::Display) -> crate::DcexError {
+    crate::DcexError::InvalidInput(format!("Bybit: {message}"))
+}

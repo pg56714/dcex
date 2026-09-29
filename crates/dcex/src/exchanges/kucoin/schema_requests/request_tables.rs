@@ -1,4 +1,5 @@
 //! Official affiliate, broker and copy-trading request schemas.
+use crate::exchanges::kucoin::params::invalid;
 use crate::exchanges::kucoin::{KucoinClient, KucoinMarket, params::KucoinParams};
 use crate::{DcexError, Result, exchange::ValidatedResponse, http::HttpMethod};
 use serde::Deserialize;
@@ -15,10 +16,6 @@ struct Endpoint {
     fields: Vec<Field>,
     json_body: bool,
     confirm: bool,
-}
-
-fn invalid(message: impl std::fmt::Display) -> DcexError {
-    DcexError::InvalidInput(format!("KuCoin: {message}"))
 }
 
 impl KucoinClient {

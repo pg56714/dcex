@@ -419,3 +419,7 @@ pub(super) fn json_value_string(value: &Value) -> String {
         Value::Array(_) | Value::Object(_) => value.to_string(),
     }
 }
+
+pub(in crate::exchanges::kucoin) fn invalid(message: impl std::fmt::Display) -> crate::DcexError {
+    crate::DcexError::InvalidInput(format!("KuCoin: {message}"))
+}

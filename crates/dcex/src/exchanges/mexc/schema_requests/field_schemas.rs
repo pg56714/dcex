@@ -1,4 +1,5 @@
 //! Withdrawals, rebates and MM STP groups from endpoint-specific official tables.
+use crate::exchanges::mexc::params::invalid;
 use crate::exchanges::mexc::{
     client::{MexcApi, MexcClient},
     params::{MexcParams, validate_u64_range},
@@ -150,10 +151,6 @@ impl MexcClient {
             .await
             .map(Some)
     }
-}
-
-fn invalid(message: impl Into<String>) -> DcexError {
-    DcexError::InvalidInput(format!("MEXC: {}", message.into()))
 }
 
 fn load_schemas() -> Vec<Endpoint> {

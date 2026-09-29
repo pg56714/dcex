@@ -194,3 +194,7 @@ mod tests {
         assert!(require_one_identifier(&blank, &["orderId", "origClientOrderId"]).is_err());
     }
 }
+
+pub(in crate::exchanges::mexc) fn invalid(message: impl std::fmt::Display) -> crate::DcexError {
+    crate::DcexError::InvalidInput(format!("MEXC: {message}"))
+}

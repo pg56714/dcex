@@ -1,5 +1,6 @@
 //! Additional V5 endpoints, keyed by reviewed official request schemas.
 use crate::exchange::ValidatedResponse;
+use crate::exchanges::bybit::params::invalid;
 use crate::exchanges::bybit::{client::BybitClient, params::BybitParams};
 use crate::http::HttpMethod;
 use crate::{DcexError, Result};
@@ -101,10 +102,6 @@ fn validate_conditions(path: &str, body: &Map<String, Value>) -> Result<()> {
         }
     }
     Ok(())
-}
-
-fn invalid(message: impl Into<String>) -> DcexError {
-    DcexError::InvalidInput(format!("Bybit: {}", message.into()))
 }
 
 fn load_schemas() -> Vec<Endpoint> {

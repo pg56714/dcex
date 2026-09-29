@@ -1,8 +1,9 @@
 //! Schema-driven request validation, encoding and dispatch.
 use super::{client::BybitClient, params::BybitParams};
+use crate::Result;
 use crate::exchange::ValidatedResponse;
+use crate::exchanges::bybit::params::invalid;
 use crate::http::HttpMethod;
-use crate::{DcexError, Result};
 use serde_json::{Map, Value};
 
 #[path = "generated/schema_tables.rs"]
@@ -526,9 +527,6 @@ fn validate_collateral(coin: &str, switch: &str) -> Result<()> {
         ));
     }
     Ok(())
-}
-fn invalid(message: &str) -> DcexError {
-    DcexError::InvalidInput(format!("Bybit: {message}"))
 }
 
 #[cfg(test)]
