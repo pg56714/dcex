@@ -2,8 +2,9 @@
 
 import ast
 import re
+from collections import Counter
 
-NUMERIC = re.compile(r"price|px|qty|quantity|amount|amt|size|sz|volume|vol|notional|funds|investment|collateral|margin|fee|lever|ratio|percent|pct|rate|offset|delta|spread|take_profit|stop_loss|(?:^|_)(?:tp|sl)(?:$|_)|trigger|trail|cost|budget|premium|slippage|value", re.I)
+NUMERIC = re.compile(r"price|px|qty|quantity|amount|amt|size|sz|volume|vol|notional|funds|investment|collateral|margin|fee|lever|ratio|percent|pct|rate|offset|delta|spread|take_?profit|stop_?loss|loss_?reserve|(?:^|_)(?:tp|sl)(?:$|_)|trigger|trail|cost|budget|premium|slippage|value", re.I)
 OPERATIONS = re.compile(r"order|amend|transfer|withdraw|batch", re.I)
 
 
@@ -24,7 +25,21 @@ def public_inputs(source):
             yield node.name, args, node.args.kwarg is not None
 
 
-def missing_declarations(source, methods, exemptions):
+NEVER_EXEMPT = {
+    exchange: {"price", "px", "qty", "quantity", "amount", "amt", "size", "sz", "volume", "margin", "collateral"}
+    for exchange in ["arcus", "aster", "backpack", "binance", "bingx", "bitget", "bybit", "extended", "hyperliquid", "kraken", "kucoin", "lighter", "mexc", "okx", "ondo"]
+}
+NEVER_EXEMPT["lighter"] |= {"base_amount", "quote_amount", "usdc_amount", "usd_amount", "initial_margin_fraction"}
+MAX_REASON_REPETITIONS = 4
+
+
+def validate_exemptions(exemptions):
+    reasons = Counter(reason.split(":", 1)[-1].strip().lower() for reason in exemptions.values())
+    assert all(count <= MAX_REASON_REPETITIONS for count in reasons.values()), reasons
+
+
+def missing_declarations(source, methods, exemptions, exchange=""):
+    validate_exemptions(exemptions)
     missing = []
     for method, args, variadic in public_inputs(source):
         schema = methods.get(method)
@@ -34,6 +49,7 @@ def missing_declarations(source, methods, exemptions):
         for name, annotation in args.items():
             identity = f"{method}/{name}"
             if identity in exemptions:
+                assert name.replace("_", "").casefold() not in {field.replace("_", "").casefold() for field in NEVER_EXEMPT.get(exchange, set())}, (exchange, identity)
                 reason = exemptions[identity]
                 assert identity in reason and len(set(reason.split())) >= 8, identity
                 assert not NUMERIC.search(name) or re.fullmatch(r"(?:bool|int)(?: \| None)?", annotation), (identity, annotation)

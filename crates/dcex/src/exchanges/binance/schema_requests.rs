@@ -34,6 +34,23 @@ impl BinanceClient {
         params: &PublicParams,
         public: bool,
     ) -> Result<Option<ValidatedResponse>> {
+        match crate::exchanges::schema::fund_domain(name) {
+            Some(crate::exchanges::schema::FundDomain::Withdrawals) => {
+                self.withdrawals_table_request(name, params, public).await
+            }
+            Some(crate::exchanges::schema::FundDomain::Transfers) => {
+                self.transfers_table_request(name, params, public).await
+            }
+            None => self.table_request_transport(name, params, public).await,
+        }
+    }
+
+    pub(in crate::exchanges::binance) async fn table_request_transport(
+        &self,
+        name: &str,
+        params: &PublicParams,
+        public: bool,
+    ) -> Result<Option<ValidatedResponse>> {
         let name = match name {
             "place_spot_sor_order" => "spot_sor_order",
             "test_spot_sor_order" => "spot_sor_order_test",

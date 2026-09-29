@@ -29,6 +29,23 @@ impl HyperliquidClient {
         params: &HyperliquidParams,
         public: bool,
     ) -> Result<Option<ValidatedResponse>> {
+        match crate::exchanges::schema::fund_domain(name) {
+            Some(crate::exchanges::schema::FundDomain::Withdrawals) => {
+                self.withdrawals_catalog_request(name, params, public).await
+            }
+            Some(crate::exchanges::schema::FundDomain::Transfers) => {
+                self.transfers_catalog_request(name, params, public).await
+            }
+            None => self.catalog_request_transport(name, params, public).await,
+        }
+    }
+
+    pub(in crate::exchanges::hyperliquid) async fn catalog_request_transport(
+        &self,
+        name: &str,
+        params: &HyperliquidParams,
+        public: bool,
+    ) -> Result<Option<ValidatedResponse>> {
         static OPERATIONS: OnceLock<Vec<Operation>> = OnceLock::new();
         let operations = OPERATIONS.get_or_init(load_schemas);
         let Some(op) = operations

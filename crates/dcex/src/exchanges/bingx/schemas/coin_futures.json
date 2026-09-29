@@ -158,7 +158,8 @@
               "format": "decimal",
               "x-positive": true
             }
-          }
+          },
+          "x-empty-as-absent": true
         },
         "stopPrice": {
           "type": "string",
@@ -177,7 +178,8 @@
               "format": "decimal",
               "x-positive": true
             }
-          }
+          },
+          "x-empty-as-absent": true
         },
         "stop_price": {
           "type": "string",
@@ -196,7 +198,8 @@
               "format": "decimal",
               "x-positive": true
             }
-          }
+          },
+          "x-empty-as-absent": true
         },
         "take_profit": {
           "type": "object",
@@ -211,7 +214,8 @@
               "format": "decimal",
               "x-positive": true
             }
-          }
+          },
+          "x-empty-as-absent": true
         }
       }
     }

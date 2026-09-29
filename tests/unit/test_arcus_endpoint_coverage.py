@@ -424,6 +424,8 @@ def _assert_wire(wire: WireCase, requests: list[dict[str, Any]]) -> dict[str, An
     assert len(requests) == wire.lookups + 1, paths
     assert all(request["method"] == "GET" for request in requests[: wire.lookups])
     final = requests[-1]
+    from tests.unit.wire_contracts import assert_wire_contract
+    assert_wire_contract("arcus", wire.method, final)
     assert final["method"] == EXPECTED_VERBS[wire.method]
     target = urlsplit(final["path"])
     assert target.path == wire.http_method_path

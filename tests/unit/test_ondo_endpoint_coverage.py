@@ -372,6 +372,8 @@ def _drain(received: queue.Queue[dict[str, Any]]) -> list[dict[str, Any]]:
 def _assert_request(wire: WireCase, requests: list[dict[str, Any]]) -> None:
     assert len(requests) == 1, requests
     request = requests[0]
+    from tests.unit.wire_contracts import assert_wire_contract
+    assert_wire_contract("ondo", wire.method, request)
     assert request["method"] == EXPECTED_VERBS[wire.method]
     assert unquote(request["path"]) == wire.target
     if wire.method in {"create_withdrawal", "sandbox_withdrawal"}:

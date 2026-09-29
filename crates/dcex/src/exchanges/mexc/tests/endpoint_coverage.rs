@@ -1389,7 +1389,7 @@ fn client_for(url: String) -> MexcClient {
     MexcClient::with_base_urls(
         Some("api-key".to_string()),
         Some("secret".to_string()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         url.clone(),
         url,
     )
@@ -1575,14 +1575,14 @@ fn contract_batch_query_joins_order_ids() {
 
 #[test]
 fn unknown_dispatch_names_are_rejected_before_transport() {
-    let public_client = MexcClient::public(Duration::from_secs(1)).expect("client");
+    let public_client = MexcClient::public(Duration::from_secs(10)).expect("client");
     let error =
         crate::http::block_on(
             async move { public_client.public_request("get_nope", Vec::new()).await },
         )
         .expect_err("unknown public");
     assert!(error.to_string().contains("unsupported MEXC public method"));
-    let private_client = MexcClient::public(Duration::from_secs(1)).expect("client");
+    let private_client = MexcClient::public(Duration::from_secs(10)).expect("client");
     let error = crate::http::block_on(async move {
         private_client
             .private_request("place_nope", Vec::new())

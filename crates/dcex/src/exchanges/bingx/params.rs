@@ -360,11 +360,17 @@ fn normalize_batch_value(value: Value) -> Result<Value> {
         for order in orders {
             for key in ["takeProfit", "stopLoss"] {
                 if let Some(attached) = order.get_mut(key) {
+                    if attached.is_null() || attached.as_str() == Some("") {
+                        continue;
+                    }
                     let value = if let Some(raw) = attached.as_str() {
                         serde_json::from_str(raw).map_err(|e| invalid(e.to_string()))?
                     } else {
                         attached.clone()
                     };
+                    if !value.is_object() {
+                        return Err(invalid(format!("parameter {key} must be a JSON object")));
+                    }
                     let encoded =
                         crate::exchanges::schema::encode_shape(value, &attached_shape, key)?;
                     *attached = Value::String(

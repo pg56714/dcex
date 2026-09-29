@@ -1744,6 +1744,8 @@ def _fail_if_native_is_stale(exc: ValueError) -> None:
 def _assert_route(case: RouteCase, received: queue.Queue[dict[str, Any]]) -> None:
     assert received.qsize() == 1, f"{case.method_name} sent {received.qsize()} requests"
     request = received.get_nowait()
+    from tests.unit.wire_contracts import assert_wire_contract
+    assert_wire_contract("bybit", case.method_name, request)
     split = urlsplit(request["path"])
     assert (request["verb"], split.path) == (case.verb, case.path)
     if case.signed:

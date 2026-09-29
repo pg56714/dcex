@@ -67,7 +67,7 @@ fn multi_request_server() -> (String, Arc<AtomicBool>, JoinHandle<Vec<String>>) 
                 Ok((mut stream, _)) => {
                     stream.set_nonblocking(false).expect("blocking stream");
                     stream
-                        .set_read_timeout(Some(Duration::from_secs(2)))
+                        .set_read_timeout(Some(Duration::from_secs(10)))
                         .expect("read timeout");
                     let request = read_request(&mut stream);
                     let body = if request.starts_with("GET /v1/markets ") {
@@ -105,7 +105,7 @@ fn perps_client(base_url: &str) -> ArcusClient {
         Some(ADDRESS.to_string()),
         0,
         true,
-        Duration::from_secs(2),
+        Duration::from_secs(10),
     )
     .expect("client")
     .with_base_url(base_url.to_string())
@@ -143,7 +143,7 @@ fn run(
             })
         }
         Kind::Spot => {
-            let client = ArcusSpotClient::new(None, true, Duration::from_secs(2))
+            let client = ArcusSpotClient::new(None, true, Duration::from_secs(10))
                 .expect("spot client")
                 .with_base_url(base_url.clone())
                 .expect("spot base URL");

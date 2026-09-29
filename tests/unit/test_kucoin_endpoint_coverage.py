@@ -2830,6 +2830,8 @@ def _assert_request(
     target, other = (spot, futures) if case.host == "spot" else (futures, spot)
     assert other.empty(), f"{case.method_name} was sent to the wrong KuCoin host"
     request = target.get_nowait()
+    from tests.unit.wire_contracts import assert_wire_contract
+    assert_wire_contract("kucoin", case.method_name, request)
     assert target.empty(), f"{case.method_name} sent more than one request"
 
     method, path = case.route.split(" ", 1)

@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any
 
 from scripts.build_bitget_wrappers import snake
+from scripts.generation import run
 from scripts.wrapper_codegen import write_python_wrappers, write_rust_wrappers, write_schemas
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -158,4 +159,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(run(main))

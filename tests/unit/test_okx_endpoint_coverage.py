@@ -2395,6 +2395,8 @@ def _drain(received: queue.Queue[dict[str, Any]]) -> None:
 
 
 def _assert_request(case: Case, request: dict[str, Any]) -> None:
+    from tests.unit.wire_contracts import assert_wire_contract
+    assert_wire_contract("okx", case.name, request)
     split = urlsplit(request["path"])
     assert request["method"] == case.method, case.name
     assert split.path == case.path, case.name

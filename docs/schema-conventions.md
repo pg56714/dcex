@@ -81,13 +81,13 @@ Run each command from the repository root:
 
 ```powershell
 uv run --no-sync python -m scripts.build_input_contracts --write
-uv run --no-sync python -m scripts.build_binance_wrappers
-uv run --no-sync python -m scripts.build_bitget_wrappers
-uv run --no-sync python -m scripts.build_bybit_wrappers
-uv run --no-sync python -m scripts.build_bingx_wrappers
-uv run --no-sync python -m scripts.build_hyperliquid_wrappers
-uv run --no-sync python -m scripts.build_kucoin_wrappers
-uv run --no-sync python -m scripts.build_schema_tables
+uv run --no-sync python -m scripts.build_binance_wrappers --write
+uv run --no-sync python -m scripts.build_bitget_wrappers --write
+uv run --no-sync python -m scripts.build_bybit_wrappers --write
+uv run --no-sync python -m scripts.build_bingx_wrappers --write
+uv run --no-sync python -m scripts.build_hyperliquid_wrappers --write
+uv run --no-sync python -m scripts.build_kucoin_wrappers --write
+uv run --no-sync python -m scripts.build_schema_tables --write
 uv run --no-sync ruff format dcex scripts
 uv run --no-sync ruff check dcex scripts --fix
 uv run --no-sync ruff format dcex scripts
@@ -129,12 +129,13 @@ this change does not assert batch transport support.
 is a signed decimal in the -0.99 to 1 range.
 The [official Backpack Rust client](https://github.com/backpack-exchange/bpx-api-client/blob/master/types/src/order.rs)
 serializes `TriggerQuantity::Percent` with a percent suffix. The `triggerQuantity`
-declaration therefore permits exact values such as `50%` through `x-percent`.
+declaration permits exact values such as `50%` through `x-percent`; `x-percent-range`
+requires percentages greater than 0 and at most 100, compared without binary floats.
 [Aster futures pegOffset](https://asterdex.github.io/aster-api-website/futures-v3/account%26trades/)
 is explicitly signed: BUY offsets can be negative. Its declaration preserves this existing behavior.
 
-The completeness guard compares captured OKX batch/amend payload names with nested
-declarations; renaming a declaration while leaving the actual wire field unchanged
+The completeness guard compares captured payload names from all 15 exchange
+endpoint-coverage suites with nested declarations; renaming a declaration while leaving the actual wire field unchanged
 fails the test. Numeric-name exemptions require a bool/int annotation and a
 field-qualified explanation. Currency and mode selectors have explicit nondecimal
 declarations. KuCoin deposited margin is positive; Bybit added margin is a signed delta.
@@ -142,7 +143,8 @@ declarations. KuCoin deposited margin is positive; Bybit added margin is a signe
 Bybit order quantity is positive except when both `reduceOnly` and `closeOnTrigger`
 are true, using the declared `x-zero-when` sibling conditions. This preserves the
 [documented perpetual/futures zero-quantity close](https://bybit-exchange.github.io/docs/v5/order/create-order).
-Kraken spot volume retains its zero-valued margin-close control. Positive rules also
+Kraken spot volume permits zero only with `reduce_only` or `ordertype=settle-position`;
+a list of `x-zero-when` condition groups expresses OR, while each group uses AND. Positive rules also
 cover the audited Bitget/MEXC/Kraken order sizes, transfer amounts and OKX/Bybit leverage.
 
 [BingX's published request guidance](https://github.com/BingX-API/api-ai-skills/blob/main/skills/swap-trade/SKILL.md)
@@ -156,3 +158,20 @@ it proves the cited source file exists, not that a particular function covers a
 route. Symbol-qualified references are validated when present; dedicated wire
 coverage tests remain the route-level evidence. Superseded reasons must contain
 at least four distinct words and cannot be padded single-token placeholders.
+
+All 11 `scripts/build_*.py` generators require explicit `--write` or `--check`. Check mode renders in memory, formats Rust through rustfmt stdin/stdout and Python through Ruff stdin/stdout, and exits nonzero on drift without writing. `python -B -m scripts.build_schema_tables --check` compares formatted Rust tables; CI checks every generator. Signature vectors use the isolated command `uv run --no-sync --with hyperliquid-python-sdk==0.24.0 python -B -m scripts.build_hyperliquid_action_vectors --check`.
+
+The [OKX amend-order documentation](https://www.okx.com/docs-v5/en/#order-book-trading-trade-post-amend-order)
+uses nested `attachAlgoOrds[].sz` for split take-profit quantities; `newSz` belongs
+to the main order. All three amend declarations preserve that distinction.
+Batch TP/SL requires an object; BingX null and empty optional attached values are
+left unencoded rather than serialized as the string `null`.
+
+Fund catalog entry points route withdrawal/transfer names through their domain
+owners before using shared transport implementations. Ownership tests verify the
+router, owner and schema loader instead of relying on schema exceptions. Awaiting
+nonce lookup or signing alone never establishes transport ownership. Nondispatch
+allowances are bound to exact source bodies, so adding a sender invalidates them.
+Financial names on each exchange's never-exempt list cannot be waived by an integer
+annotation. Exemption reasons repeated more than four times after removing their
+identity prefix fail the completeness check.

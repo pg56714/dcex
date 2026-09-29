@@ -24,6 +24,22 @@ impl KucoinClient {
         name: &str,
         params: &KucoinParams,
     ) -> Result<Option<ValidatedResponse>> {
+        match crate::exchanges::schema::fund_domain(name) {
+            Some(crate::exchanges::schema::FundDomain::Withdrawals) => {
+                self.withdrawals_catalog_request(name, params).await
+            }
+            Some(crate::exchanges::schema::FundDomain::Transfers) => {
+                self.transfers_catalog_request(name, params).await
+            }
+            None => self.catalog_request_transport(name, params).await,
+        }
+    }
+
+    pub(in crate::exchanges::kucoin) async fn catalog_request_transport(
+        &self,
+        name: &str,
+        params: &KucoinParams,
+    ) -> Result<Option<ValidatedResponse>> {
         static ENDPOINTS: OnceLock<Vec<Endpoint>> = OnceLock::new();
         let endpoints = ENDPOINTS.get_or_init(load_schemas);
         let Some(e) = endpoints.iter().find(|e| e.name == name) else {

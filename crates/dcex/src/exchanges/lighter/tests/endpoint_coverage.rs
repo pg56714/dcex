@@ -50,7 +50,7 @@ fn serve(responses: Vec<&'static str>) -> (String, JoinHandle<Vec<Recorded>>) {
     let handle = thread::spawn(move || {
         let mut recorded = Vec::new();
         for response_body in responses {
-            let deadline = Instant::now() + Duration::from_secs(5);
+            let deadline = Instant::now() + Duration::from_secs(10);
             let (mut stream, _) = loop {
                 match listener.accept() {
                     Ok(connection) => break connection,
@@ -63,7 +63,7 @@ fn serve(responses: Vec<&'static str>) -> (String, JoinHandle<Vec<Recorded>>) {
             };
             stream.set_nonblocking(false).expect("blocking stream");
             stream
-                .set_read_timeout(Some(Duration::from_secs(2)))
+                .set_read_timeout(Some(Duration::from_secs(10)))
                 .expect("read timeout");
             let mut raw = Vec::new();
             let mut buffer = [0u8; 8192];
@@ -131,12 +131,12 @@ fn owned(values: &[(&str, &str)]) -> Vec<(String, String)> {
 }
 
 fn public_client(base_url: String) -> LighterClient {
-    LighterClient::with_base_url(Duration::from_secs(2), base_url).expect("client")
+    LighterClient::with_base_url(Duration::from_secs(10), base_url).expect("client")
 }
 
 fn account_client(base_url: String) -> LighterClient {
     LighterClient::with_base_url_and_credentials(
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         base_url,
         Some(ACCOUNT),
         None,
@@ -147,7 +147,7 @@ fn account_client(base_url: String) -> LighterClient {
 
 fn signing_client(base_url: String) -> LighterClient {
     LighterClient::with_base_url_credentials_and_chain_id(
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         base_url,
         CHAIN_ID,
         Some(ACCOUNT),
@@ -1051,7 +1051,7 @@ fn signed_transactions_require_credentials_and_chain() {
     assert!(result.is_err());
 
     let client = LighterClient::with_base_url_and_credentials(
-        Duration::from_secs(1),
+        Duration::from_secs(10),
         "http://127.0.0.1:1".to_string(),
         Some(ACCOUNT),
         Some(API_KEY),

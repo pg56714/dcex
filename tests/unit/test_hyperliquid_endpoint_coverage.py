@@ -869,6 +869,8 @@ def test_wrapper_params_reach_official_wire_type(case: WrapperCase) -> None:
         requests.append(received.get_nowait())
     assert requests
     last = requests[-1]
+    from tests.unit.wire_contracts import assert_wire_contract
+    assert_wire_contract("hyperliquid", case.method, last)
     payload = json.loads(last["body"])
     assert last["method"] == "POST"
     if case.method == "borrow_lend_signed":

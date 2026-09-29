@@ -245,6 +245,19 @@
               }
             }
           }
+        },
+        "amount": {
+          "type": "object",
+          "properties": {
+            "asset_amount": {
+              "type": "object",
+              "properties": {
+                "amount": {
+                  "format": "decimal"
+                }
+              }
+            }
+          }
         }
       }
     }

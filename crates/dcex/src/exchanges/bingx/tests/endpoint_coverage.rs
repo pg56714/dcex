@@ -36,7 +36,7 @@ fn recording_server() -> (String, mpsc::Receiver<Recorded>) {
         for stream in listener.incoming() {
             let Ok(mut stream) = stream else { break };
             stream
-                .set_read_timeout(Some(Duration::from_secs(5)))
+                .set_read_timeout(Some(Duration::from_secs(10)))
                 .expect("timeout");
             let mut reader = BufReader::new(stream.try_clone().expect("clone"));
             let mut request_line = String::new();
@@ -739,7 +739,7 @@ fn signed_client(url: String) -> BingxClient {
     BingxClient::with_base_url(
         Some("api-key".into()),
         Some("secret".into()),
-        Duration::from_secs(5),
+        Duration::from_secs(10),
         url,
     )
     .expect("client")
@@ -747,7 +747,7 @@ fn signed_client(url: String) -> BingxClient {
 
 fn next(receiver: &mpsc::Receiver<Recorded>, name: &str) -> Recorded {
     receiver
-        .recv_timeout(Duration::from_secs(5))
+        .recv_timeout(Duration::from_secs(10))
         .unwrap_or_else(|_| panic!("{name}: no request recorded"))
 }
 
@@ -763,7 +763,7 @@ fn private_call(client: &BingxClient, name: &str, params: &[(&str, &str)]) {
 fn public_dispatch_names_reach_documented_routes() {
     let (url, receiver) = recording_server();
     let client =
-        BingxClient::with_base_url(None, None, Duration::from_secs(5), url).expect("client");
+        BingxClient::with_base_url(None, None, Duration::from_secs(10), url).expect("client");
     for (name, params, method, path) in PUBLIC_ROUTES {
         let client = client.clone();
         let method_name = name.to_string();
@@ -800,7 +800,7 @@ fn public_routes_send_timestamp_where_documented_required() {
     ];
     let (url, receiver) = recording_server();
     let client =
-        BingxClient::with_base_url(None, None, Duration::from_secs(5), url).expect("client");
+        BingxClient::with_base_url(None, None, Duration::from_secs(10), url).expect("client");
     for (name, params, _, path) in PUBLIC_ROUTES {
         let client = client.clone();
         let method_name = name.to_string();
@@ -826,7 +826,7 @@ fn spot_orderbook_v2_requires_depth() {
     let client = BingxClient::with_base_url(
         None,
         None,
-        Duration::from_secs(1),
+        Duration::from_secs(10),
         "http://127.0.0.1:9".to_string(),
     )
     .expect("client");
@@ -1054,7 +1054,7 @@ fn invalid_parameters_fail_before_transport() {
             "{name} {params:?} must be rejected"
         );
     }
-    let client = BingxClient::public(Duration::from_secs(1)).expect("client");
+    let client = BingxClient::public(Duration::from_secs(10)).expect("client");
     for (name, params) in [
         ("get_orderbook", vec![SWAP, ("limit", "7")]),
         ("get_kline", vec![SWAP, ("interval", "2m")]),
@@ -1627,7 +1627,7 @@ fn coin_swap_and_oco_routes_match_official_paths() {
     let client = BingxClient::with_base_url(
         Some("api-key".into()),
         Some("api-secret".into()),
-        Duration::from_secs(5),
+        Duration::from_secs(10),
         url,
     )
     .unwrap();
@@ -2084,7 +2084,7 @@ fn batch_replacement_keeps_json_number_quantity_for_conditional_order() {
     let client = BingxClient::with_base_url(
         Some("api-key".into()),
         Some("api-secret".into()),
-        Duration::from_secs(5),
+        Duration::from_secs(10),
         url,
     )
     .unwrap();

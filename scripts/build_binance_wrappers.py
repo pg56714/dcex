@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 from typing import Any
 
+from scripts.generation import run
 from scripts.wrapper_codegen import (
     generated_endpoints,
     write_python_wrappers,
@@ -166,4 +167,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(run(main))

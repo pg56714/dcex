@@ -955,6 +955,8 @@ def _fresh_nonce_case(case: WireCase) -> WireCase:
 def _assert_request(case: WireCase, requests: list[dict[str, Any]]) -> None:
     assert len(requests) == 1, requests
     request = requests[0]
+    from tests.unit.wire_contracts import assert_wire_contract
+    assert_wire_contract("aster", case.method, request)
     assert request["method"] == (case.verb or EXPECTED_VERBS[case.method])
     path, _, query = request["path"].partition("?")
     assert path == case.path

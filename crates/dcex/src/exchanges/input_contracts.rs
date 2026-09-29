@@ -30,10 +30,29 @@ pub(crate) fn relative_price(raw: &str) -> bool {
     PATTERN.is_match(raw)
 }
 
+fn allows_zero(schema: &Value, context: &Value) -> bool {
+    let matches = |conditions: &Value| {
+        conditions.as_object().is_some_and(|conditions| {
+            conditions.iter().all(|(key, allowed)| {
+                allowed
+                    .as_array()
+                    .is_some_and(|values| values.contains(&context[key]))
+            })
+        })
+    };
+    let conditions = &schema["x-zero-when"];
+    conditions
+        .as_array()
+        .map_or_else(|| matches(conditions), |groups| groups.iter().any(matches))
+}
+
 pub(crate) fn validate(value: &Value, schema: &Value, key: &str) -> Result<()> {
     let schema = resolve(schema);
     let invalid = || DcexError::InvalidInput(format!("{key} requires a plain decimal string"));
     if value.is_null() || schema.is_null() {
+        return Ok(());
+    }
+    if schema["x-empty-as-absent"] == true && value.as_str() == Some("") {
         return Ok(());
     }
     if matches!(schema["type"].as_str(), Some("object" | "array"))
@@ -41,6 +60,11 @@ pub(crate) fn validate(value: &Value, schema: &Value, key: &str) -> Result<()> {
     {
         let parsed: Value = serde_json::from_str(raw).map_err(|_| invalid())?;
         return validate(&parsed, schema, key);
+    }
+    if schema["type"] == "object" && !value.is_object() {
+        return Err(DcexError::InvalidInput(format!(
+            "{key} must be a JSON object"
+        )));
     }
     if schema["format"] == "decimal" {
         let raw = match value {
@@ -77,6 +101,24 @@ pub(crate) fn validate(value: &Value, schema: &Value, key: &str) -> Result<()> {
             && !digits.ends_with('.')
             && digits.bytes().all(|b| b == b'0' || b == b'.')
             && digits.bytes().filter(|b| *b == b'.').count() <= 1;
+        if zero && schema["x-positive"] == true {
+            return Err(DcexError::InvalidInput(format!(
+                "{key} must be a positive plain decimal string"
+            )));
+        }
+        if schema["x-percent-range"].is_array() && raw.ends_with('%') {
+            let (whole, fraction) = digits.split_once('.').unwrap_or((digits, ""));
+            let whole = whole.trim_start_matches('0');
+            if !positive
+                || whole.len() > 3
+                || (whole.len() == 3
+                    && (whole > "100" || whole == "100" && fraction.bytes().any(|b| b != b'0')))
+            {
+                return Err(DcexError::InvalidInput(format!(
+                    "{key} requires a decimal percentage greater than 0% and at most 100%"
+                )));
+            }
+        }
         if !(positive || zero && schema["x-positive"] != true) {
             return Err(invalid());
         }
@@ -84,13 +126,7 @@ pub(crate) fn validate(value: &Value, schema: &Value, key: &str) -> Result<()> {
     if let Some(object) = value.as_object() {
         for (name, child) in object {
             let field = &schema["properties"][name];
-            if field["x-zero-when"].as_object().is_some_and(|conditions| {
-                conditions.iter().all(|(key, allowed)| {
-                    allowed
-                        .as_array()
-                        .is_some_and(|values| values.contains(&value[key]))
-                })
-            }) {
+            if allows_zero(field, value) {
                 let mut relaxed = field.clone();
                 relaxed["x-positive"] = Value::Bool(false);
                 validate(child, &relaxed, name)?;
@@ -117,13 +153,7 @@ pub(crate) fn pairs(exchange: &str, method: &str, pairs: &[(String, String)]) ->
     for (key, raw) in pairs {
         let field = &schema["properties"][key];
         let value = Value::String(raw.clone());
-        if field["x-zero-when"].as_object().is_some_and(|conditions| {
-            conditions.iter().all(|(name, allowed)| {
-                allowed
-                    .as_array()
-                    .is_some_and(|values| values.contains(&context[name]))
-            })
-        }) {
+        if allows_zero(field, &context) {
             let mut relaxed = field.clone();
             relaxed["x-positive"] = Value::Bool(false);
             validate(&value, &relaxed, key)?;
@@ -152,7 +182,7 @@ pub(crate) fn input(
         )));
     }
     let raw = value.to_string();
-    if schema["x-zero-when"].is_object() {
+    if !schema["x-zero-when"].is_null() {
         // Typed builders validate sibling-dependent zero controls at dispatch.
         let mut deferred = schema.clone();
         deferred["x-positive"] = Value::Bool(false);
@@ -244,5 +274,64 @@ mod tests {
         assert!(pairs("bybit", "place_order", &duplicate).is_err());
         assert!(input("bybit", "place_order", "qty", &"0").is_ok());
         assert!(input("bybit", "place_order", "qty", &0.1_f64).is_err());
+    }
+
+    #[test]
+    fn batch_quantities_reject_zero_except_documented_closes() {
+        for (exchange, method, array, field) in [
+            ("okx", "place_batch_orders", "orders", "sz"),
+            ("bybit", "place_batch_order", "request", "qty"),
+            ("bitget", "place_futures_batch_orders", "orderList", "size"),
+            ("bingx", "place_swap_batch_order", "batchOrders", "quantity"),
+        ] {
+            let schema = endpoint(exchange, method, false);
+            assert!(validate(&json!({array: [{field: "0"}]}), schema, method).is_err());
+            assert!(validate(&json!({array: [{field: "1"}]}), schema, method).is_ok());
+        }
+        let schema = endpoint("bybit", "place_batch_order", false);
+        assert!(
+            validate(
+                &json!({"request": [{"qty": "0", "reduceOnly": true}]}),
+                schema,
+                "batch"
+            )
+            .is_err()
+        );
+        validate(
+            &json!({"request": [{"qty": "0", "reduceOnly": true, "closeOnTrigger": true}]}),
+            schema,
+            "batch",
+        )
+        .unwrap();
+    }
+
+    #[test]
+    fn kraken_zero_volume_requires_a_close_condition() {
+        let schema = endpoint("kraken", "place_spot_order", false);
+        assert!(
+            validate(
+                &json!({"volume": "0", "ordertype": "limit", "side": "buy"}),
+                schema,
+                "order"
+            )
+            .is_err()
+        );
+        for condition in [
+            json!({"volume": "0", "reduce_only": true}),
+            json!({"volume": "0", "ordertype": "settle-position"}),
+        ] {
+            validate(&condition, schema, "order").unwrap();
+        }
+    }
+
+    #[test]
+    fn percent_quantity_uses_exact_open_closed_bounds() {
+        let schema = &endpoint("backpack", "place_order", false)["properties"]["triggerQuantity"];
+        for valid in ["0.000000000000000001%", "50%", "100%", "00100.000%"] {
+            validate(&json!(valid), schema, "triggerQuantity").unwrap();
+        }
+        for invalid in ["0%", "150%", "100.000000000000000001%", "-1%"] {
+            assert!(validate(&json!(invalid), schema, "triggerQuantity").is_err());
+        }
     }
 }

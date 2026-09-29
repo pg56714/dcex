@@ -132,6 +132,20 @@
         "sz": {
           "type": "string",
           "format": "decimal"
+        },
+        "legs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sz": {
+                "format": "decimal"
+              },
+              "px": {
+                "format": "decimal"
+              }
+            }
+          }
         }
       }
     }
@@ -261,7 +275,26 @@
       ]
     },
     "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-set-quote-products",
-    "row": 1223
+    "row": 1223,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "maxBlockSz": {
+                "format": "decimal"
+              },
+              "makerPxBand": {
+                "format": "decimal"
+              }
+            }
+          }
+        }
+      }
+    }
   },
   {
     "name": "reset_rfq_mmp",

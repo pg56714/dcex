@@ -8,6 +8,23 @@ impl AsterClient {
         p: &AsterParams,
         public: bool,
     ) -> Result<Option<ValidatedResponse>> {
+        match crate::exchanges::schema::fund_domain(name) {
+            Some(crate::exchanges::schema::FundDomain::Withdrawals) => {
+                self.withdrawals_prediction_dispatch(name, p, public).await
+            }
+            Some(crate::exchanges::schema::FundDomain::Transfers) => {
+                self.transfers_prediction_dispatch(name, p, public).await
+            }
+            None => self.prediction_dispatch_transport(name, p, public).await,
+        }
+    }
+
+    pub(in crate::exchanges::aster) async fn prediction_dispatch_transport(
+        &self,
+        name: &str,
+        p: &AsterParams,
+        public: bool,
+    ) -> Result<Option<ValidatedResponse>> {
         if name == "noop_prediction" && !public {
             p.ensure_allowed(&["nonce"], &[])?;
             let nonce = p

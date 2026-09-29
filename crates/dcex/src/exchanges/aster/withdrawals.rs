@@ -78,3 +78,18 @@ impl AsterClient {
 }
 
 use crate::exchanges::aster::params::invalid;
+
+impl super::client::AsterClient {
+    pub(in crate::exchanges::aster) async fn withdrawals_prediction_dispatch(
+        &self,
+        name: &str,
+        p: &super::params::AsterParams,
+        public: bool,
+    ) -> crate::Result<Option<crate::exchange::ValidatedResponse>> {
+        debug_assert!(
+            crate::exchanges::schema::fund_domain(name)
+                == Some(crate::exchanges::schema::FundDomain::Withdrawals)
+        );
+        self.prediction_dispatch_transport(name, p, public).await
+    }
+}

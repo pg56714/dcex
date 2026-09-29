@@ -186,6 +186,22 @@
     ],
     "arrays": [],
     "limit": null,
-    "days": null
+    "days": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "positionList": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "qty": {
+                "format": "decimal"
+              }
+            }
+          }
+        }
+      }
+    }
   }
 ]

@@ -35,6 +35,22 @@ impl LighterClient {
         name: &str,
         p: &LighterParams,
     ) -> Result<Option<ValidatedResponse>> {
+        match crate::exchanges::schema::fund_domain(name) {
+            Some(crate::exchanges::schema::FundDomain::Withdrawals) => {
+                self.withdrawals_field_schema_request(name, p).await
+            }
+            Some(crate::exchanges::schema::FundDomain::Transfers) => {
+                self.transfers_field_schema_request(name, p).await
+            }
+            None => self.field_schema_request_transport(name, p).await,
+        }
+    }
+
+    pub(in crate::exchanges::lighter) async fn field_schema_request_transport(
+        &self,
+        name: &str,
+        p: &LighterParams,
+    ) -> Result<Option<ValidatedResponse>> {
         static ENDPOINTS: OnceLock<Vec<Endpoint>> = OnceLock::new();
         let endpoints = ENDPOINTS.get_or_init(load_schemas);
         let Some(e) = endpoints.iter().find(|e| e.name == name) else {

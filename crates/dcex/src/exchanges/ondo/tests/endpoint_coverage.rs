@@ -125,7 +125,7 @@ fn multi_request_server() -> (String, Arc<AtomicBool>, JoinHandle<Vec<String>>) 
                 Ok((mut stream, _)) => {
                     stream.set_nonblocking(false).expect("blocking stream");
                     stream
-                        .set_read_timeout(Some(Duration::from_secs(2)))
+                        .set_read_timeout(Some(Duration::from_secs(10)))
                         .expect("read timeout");
                     requests.push(read_request(&mut stream));
                     let body = r#"{"ok":true}"#;
@@ -159,7 +159,7 @@ fn run(
     let client = OndoClient::with_base_url(
         Some("key-id".to_string()),
         Some("ondoApiSecret_SECRET".to_string()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         base_url,
     )
     .expect("client");

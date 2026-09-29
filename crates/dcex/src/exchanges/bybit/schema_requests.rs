@@ -24,6 +24,23 @@ impl BybitClient {
         params: &BybitParams,
         public: bool,
     ) -> Result<Option<ValidatedResponse>> {
+        match crate::exchanges::schema::fund_domain(name) {
+            Some(crate::exchanges::schema::FundDomain::Withdrawals) => {
+                self.withdrawals_table_request(name, params, public).await
+            }
+            Some(crate::exchanges::schema::FundDomain::Transfers) => {
+                self.transfers_table_request(name, params, public).await
+            }
+            None => self.table_request_transport(name, params, public).await,
+        }
+    }
+
+    pub(in crate::exchanges::bybit) async fn table_request_transport(
+        &self,
+        name: &str,
+        params: &BybitParams,
+        public: bool,
+    ) -> Result<Option<ValidatedResponse>> {
         let Some(endpoint) = endpoints::endpoint(name) else {
             return Ok(None);
         };

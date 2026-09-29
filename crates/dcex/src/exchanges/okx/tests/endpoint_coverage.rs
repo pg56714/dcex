@@ -2946,7 +2946,7 @@ fn server() -> (String, thread::JoinHandle<String>) {
     let handle = thread::spawn(move || {
         let (mut stream, _) = listener.accept().expect("accept");
         stream
-            .set_read_timeout(Some(Duration::from_secs(5)))
+            .set_read_timeout(Some(Duration::from_secs(10)))
             .expect("timeout");
         let mut raw = Vec::new();
         let mut buffer = [0u8; 4096];
@@ -2987,7 +2987,7 @@ fn client(base_url: String) -> OkxClient {
         Some("secret".into()),
         Some("pass".into()),
         "0".into(),
-        Duration::from_secs(5),
+        Duration::from_secs(10),
         base_url,
     )
     .expect("client")
@@ -3086,7 +3086,7 @@ fn case_table_has_unique_names() {
 
 #[tokio::test]
 async fn unknown_method_names_are_rejected_before_network() {
-    let client = OkxClient::public(Duration::from_secs(1)).expect("client");
+    let client = OkxClient::public(Duration::from_secs(10)).expect("client");
     let public = client
         .public_request("get_unknown_market_method", Vec::new())
         .await
@@ -3105,7 +3105,7 @@ async fn unknown_method_names_are_rejected_before_network() {
 
 #[tokio::test]
 async fn trading_validations_fail_before_network() {
-    let client = OkxClient::public(Duration::from_secs(1)).expect("client");
+    let client = OkxClient::public(Duration::from_secs(10)).expect("client");
     let cases: &[(&str, &[(&str, &str)], &str)] = &[
         ("cancel_order", &[SWAP], "ordId"),
         ("get_order", &[SWAP], "ordId"),

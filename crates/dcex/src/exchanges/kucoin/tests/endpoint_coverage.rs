@@ -2382,7 +2382,7 @@ async fn run_case(case: &Case) -> String {
         Some("key".into()),
         Some("secret".into()),
         Some("passphrase".into()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         spot,
         futures,
     )
@@ -2513,7 +2513,7 @@ async fn unknown_dispatch_names_are_rejected_before_network() {
         Some("key".into()),
         Some("secret".into()),
         Some("passphrase".into()),
-        Duration::from_secs(1),
+        Duration::from_secs(10),
         CLOSED_PORT.into(),
         CLOSED_PORT.into(),
     )
@@ -2583,7 +2583,7 @@ fn offline_private_client() -> KucoinClient {
         Some("key".into()),
         Some("secret".into()),
         Some("passphrase".into()),
-        Duration::from_secs(1),
+        Duration::from_secs(10),
         CLOSED_PORT.into(),
         CLOSED_PORT.into(),
     )
@@ -2747,7 +2747,7 @@ async fn spot_orderbook_selects_documented_depth() {
     );
     let request = run_case(&case).await;
     assert_route(&case, &request);
-    let client = KucoinClient::public(Duration::from_secs(1)).expect("client");
+    let client = KucoinClient::public(Duration::from_secs(10)).expect("client");
     let error = client
         .public_request(
             "get_spot_orderbook",

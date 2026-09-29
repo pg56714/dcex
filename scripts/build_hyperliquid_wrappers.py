@@ -3,6 +3,7 @@
 import json
 from pathlib import Path
 
+from scripts.generation import run
 from scripts.wrapper_codegen import write_python_wrappers, write_rust_wrappers, write_schemas
 
 CONFIRMED = {"perp_deploy_disable_dex", "convert_to_multi_sig_user_signed"}
@@ -116,4 +117,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(run(main))

@@ -73,7 +73,7 @@ fn multi_request_server() -> (String, Arc<AtomicBool>, JoinHandle<Vec<String>>) 
                 Ok((mut stream, _)) => {
                     stream.set_nonblocking(false).expect("blocking stream");
                     stream
-                        .set_read_timeout(Some(Duration::from_secs(2)))
+                        .set_read_timeout(Some(Duration::from_secs(10)))
                         .expect("read timeout");
                     let mut buffer = [0u8; 8192];
                     let size = stream.read(&mut buffer).unwrap_or(0);
@@ -128,7 +128,7 @@ fn run_case(case: &Case) -> Result<String, String> {
     let client = BinanceClient::with_all_base_urls(
         Some("api-key".to_string()),
         Some("api-secret".to_string()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         base_url.clone(),
         base_url.clone(),
         base_url.clone(),

@@ -107,11 +107,11 @@
       "properties": {
         "fee_type": {
           "type": "string",
-          "description": "set_fee_type/fee_type: selects the documented mode, unit, or reference used by this operation."
+          "description": "selects the withdrawal fee treatment using the documented integer enumeration."
         },
         "feeType": {
           "type": "string",
-          "description": "set_fee_type/feeType: selects the documented mode, unit, or reference used by this operation."
+          "description": "selects the withdrawal fee treatment using the documented integer enumeration."
         }
       }
     }
@@ -268,6 +268,17 @@
         "amt": {
           "type": "string",
           "format": "decimal"
+        },
+        "adjustments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "amt": {
+                "format": "decimal"
+              }
+            }
+          }
         }
       }
     }

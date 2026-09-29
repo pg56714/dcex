@@ -14,7 +14,7 @@ from tests.unit.input_contract_coverage import missing_wire_declarations
 from dcex._input_codec import CATALOG
 
 
-ATTACHED_AMEND = dict(attachAlgoId="2", newTpTriggerPx="61000.125", newTpOrdPx="-1", newSlTriggerPx="50000.125", newSlOrdPx="-1")
+ATTACHED_AMEND = dict(attachAlgoId="2", sz="0.125", newTpTriggerPx="61000.125", newTpOrdPx="-1", newSlTriggerPx="50000.125", newSlOrdPx="-1")
 OKX_CASES = [
     ("amend_multiple_orders", {"orders": [dict(instId="BTC-USDT", ordId="1", newPx="60000.125", newSz="1", newPxUsd="60000.125", newPxVol="0.125", attachAlgoOrds=[ATTACHED_AMEND])]}, "/api/v5/trade/amend-batch-orders"),
     ("amend_order", dict(product_symbol="BTC-USDT", ordId="1", newPx="60000.125", attachAlgoOrds=[ATTACHED_AMEND]), "/api/v5/trade/amend-order"),
@@ -164,6 +164,9 @@ async def test_kraken_zero_volume_closing_order_reaches_wire(asynchronous, nativ
             kwargs = dict(product_symbol="BTC-USD", side="sell", ordertype="settle-position" if settle else "market", volume="0", leverage="2")
             if not settle:
                 kwargs["reduce_only"] = True
+            with pytest.raises(ValueError, match="positive plain decimal"):
+                await invoke(client, "place_spot_order", dict(product_symbol="BTC-USD", side="buy", ordertype="limit", price="100", volume="0"), native)
+            assert received.empty()
             await invoke(client, "place_spot_order", kwargs, native)
             request = received.get(timeout=2)
             assert urlsplit(request["path"]).path == "/0/private/AddOrder"
@@ -232,6 +235,11 @@ async def test_backpack_percent_trigger_quantity_reaches_wire(asynchronous, nati
             if method == "place_batch_orders":
                 order["symbol"] = "BTC_USDC_PERP"
                 del order["product_symbol"]
+            for invalid in ["0%", "150%", "100.000000000000000001%"]:
+                bad = {**order, "triggerQuantity": invalid}
+                with pytest.raises(ValueError, match="decimal percentage"):
+                    await invoke(client, method, {"orders": [bad]} if method == "place_batch_orders" else bad, native)
+                assert received.empty()
             await invoke(client, method, {"orders": [order]} if method == "place_batch_orders" else order, native)
             payload = json.loads(received.get(timeout=2)["body"])
             if method == "place_batch_orders":

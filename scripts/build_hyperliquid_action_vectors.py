@@ -2,7 +2,7 @@
 Generate independent signatures with the official hyperliquid-python-sdk package.
 
 Run in an isolated environment with ``uv run --no-sync --with hyperliquid-python-sdk
-python scripts/build_hyperliquid_action_vectors.py``. The fixture records the
+python -m scripts.build_hyperliquid_action_vectors --write``. The fixture records the
 installed SDK version; normal tests do not import or install the SDK.
 """
 
@@ -19,6 +19,8 @@ from hyperliquid.utils.signing import (  # pyright: ignore[reportMissingImports]
     sign_l1_action,
     sign_multi_sig_action,
 )
+
+from scripts.generation import emit, run
 
 ROOT = Path(__file__).resolve().parents[1]
 PRIVATE_KEY = "0x" + "11" * 32
@@ -73,10 +75,11 @@ def main() -> None:
         "wallet_address": wallet.address,
         "cases": cases,
     }
-    (ROOT / "tests/fixtures/signing/hyperliquid_actions.json").write_text(
-        json.dumps(output, indent=2) + "\n", encoding="utf-8"
+    emit(
+        ROOT / "tests/fixtures/signing/hyperliquid_actions.json",
+        json.dumps(output, indent=2) + "\n",
     )
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(run(main))

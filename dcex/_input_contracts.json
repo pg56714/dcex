@@ -1076,7 +1076,11 @@
           "triggerQuantity": {
             "type": "string",
             "format": "decimal",
-            "x-percent": true
+            "x-percent": true,
+            "x-percent-range": [
+              0,
+              100
+            ]
           },
           "trigger_price": {
             "type": "string",
@@ -1085,7 +1089,11 @@
           "trigger_quantity": {
             "type": "string",
             "format": "decimal",
-            "x-percent": true
+            "x-percent": true,
+            "x-percent-range": [
+              0,
+              100
+            ]
           },
           "stopLossTriggerBy": {
             "type": "string",
@@ -1163,7 +1171,11 @@
           "triggerQuantity": {
             "type": "string",
             "format": "decimal",
-            "x-percent": true
+            "x-percent": true,
+            "x-percent-range": [
+              0,
+              100
+            ]
           },
           "trigger_price": {
             "type": "string",
@@ -1172,7 +1184,11 @@
           "trigger_quantity": {
             "type": "string",
             "format": "decimal",
-            "x-percent": true
+            "x-percent": true,
+            "x-percent-range": [
+              0,
+              100
+            ]
           },
           "stopLossTriggerBy": {
             "type": "string",
@@ -1254,7 +1270,11 @@
           "triggerQuantity": {
             "type": "string",
             "format": "decimal",
-            "x-percent": true
+            "x-percent": true,
+            "x-percent-range": [
+              0,
+              100
+            ]
           },
           "trigger_price": {
             "type": "string",
@@ -1263,7 +1283,11 @@
           "trigger_quantity": {
             "type": "string",
             "format": "decimal",
-            "x-percent": true
+            "x-percent": true,
+            "x-percent-range": [
+              0,
+              100
+            ]
           },
           "stopLossTriggerBy": {
             "type": "string",
@@ -1414,7 +1438,11 @@
                 "triggerQuantity": {
                   "type": "string",
                   "format": "decimal",
-                  "x-percent": true
+                  "x-percent": true,
+                  "x-percent-range": [
+                    0,
+                    100
+                  ]
                 },
                 "trigger_price": {
                   "type": "string",
@@ -1423,7 +1451,11 @@
                 "trigger_quantity": {
                   "type": "string",
                   "format": "decimal",
-                  "x-percent": true
+                  "x-percent": true,
+                  "x-percent-range": [
+                    0,
+                    100
+                  ]
                 }
               }
             }
@@ -2526,7 +2558,7 @@
           },
           "priceProtect": {
             "type": "string",
-            "description": "place_futures_algo_order/priceProtect: controls an integer or boolean option rather than a transferred balance."
+            "description": "enables trigger-price protection with a boolean flag rather than specifying a price."
           },
           "priceMatch": {
             "type": "string",
@@ -2967,7 +2999,7 @@
           },
           "priceProtect": {
             "type": "string",
-            "description": "place_order/priceProtect: controls an integer or boolean option rather than a transferred balance."
+            "description": "enables trigger-price protection with a boolean flag rather than specifying a price."
           },
           "pegPriceType": {
             "type": "string",
@@ -4144,7 +4176,7 @@
           },
           "priceProtect": {
             "type": "string",
-            "description": "test_order/priceProtect: controls an integer or boolean option rather than a transferred balance."
+            "description": "enables trigger-price protection with a boolean flag rather than specifying a price."
           },
           "pegPriceType": {
             "type": "string",
@@ -6646,11 +6678,11 @@
         "properties": {
           "multi_assets_margin": {
             "type": "string",
-            "description": "set_futures_multi_assets_mode/multi_assets_margin: selects the settlement currency for the margin account."
+            "description": "enables or disables multi-assets margin mode using a boolean flag."
           },
           "multiAssetsMargin": {
             "type": "string",
-            "description": "set_futures_multi_assets_mode/multiAssetsMargin: selects the settlement currency for the margin account."
+            "description": "enables or disables multi-assets margin mode using a boolean flag."
           }
         }
       },
@@ -6851,7 +6883,8 @@
                 "format": "decimal",
                 "x-positive": true
               }
-            }
+            },
+            "x-empty-as-absent": true
           },
           "stopPrice": {
             "type": "string",
@@ -6870,7 +6903,8 @@
                 "format": "decimal",
                 "x-positive": true
               }
-            }
+            },
+            "x-empty-as-absent": true
           },
           "stop_price": {
             "type": "string",
@@ -6889,7 +6923,8 @@
                 "format": "decimal",
                 "x-positive": true
               }
-            }
+            },
+            "x-empty-as-absent": true
           },
           "take_profit": {
             "type": "object",
@@ -6904,7 +6939,8 @@
                 "format": "decimal",
                 "x-positive": true
               }
-            }
+            },
+            "x-empty-as-absent": true
           }
         }
       },
@@ -7189,7 +7225,8 @@
                 "format": "decimal",
                 "x-positive": true
               }
-            }
+            },
+            "x-empty-as-absent": true
           },
           "stopPrice": {
             "type": "string",
@@ -7208,7 +7245,8 @@
                 "format": "decimal",
                 "x-positive": true
               }
-            }
+            },
+            "x-empty-as-absent": true
           },
           "stop_price": {
             "type": "string",
@@ -7227,7 +7265,8 @@
                 "format": "decimal",
                 "x-positive": true
               }
-            }
+            },
+            "x-empty-as-absent": true
           },
           "take_profit": {
             "type": "object",
@@ -7242,7 +7281,8 @@
                 "format": "decimal",
                 "x-positive": true
               }
-            }
+            },
+            "x-empty-as-absent": true
           }
         }
       },
@@ -7384,7 +7424,8 @@
                 "format": "decimal",
                 "x-positive": true
               }
-            }
+            },
+            "x-empty-as-absent": true
           },
           "stopPrice": {
             "type": "string",
@@ -7403,7 +7444,8 @@
                 "format": "decimal",
                 "x-positive": true
               }
-            }
+            },
+            "x-empty-as-absent": true
           },
           "stop_price": {
             "type": "string",
@@ -7422,7 +7464,8 @@
                 "format": "decimal",
                 "x-positive": true
               }
-            }
+            },
+            "x-empty-as-absent": true
           },
           "take_profit": {
             "type": "object",
@@ -7437,7 +7480,8 @@
                 "format": "decimal",
                 "x-positive": true
               }
-            }
+            },
+            "x-empty-as-absent": true
           }
         }
       },
@@ -7539,7 +7583,8 @@
                 "format": "decimal",
                 "x-positive": true
               }
-            }
+            },
+            "x-empty-as-absent": true
           },
           "stopPrice": {
             "type": "string",
@@ -7558,7 +7603,8 @@
                 "format": "decimal",
                 "x-positive": true
               }
-            }
+            },
+            "x-empty-as-absent": true
           },
           "stop_price": {
             "type": "string",
@@ -7577,7 +7623,8 @@
                 "format": "decimal",
                 "x-positive": true
               }
-            }
+            },
+            "x-empty-as-absent": true
           },
           "take_profit": {
             "type": "object",
@@ -7592,7 +7639,8 @@
                 "format": "decimal",
                 "x-positive": true
               }
-            }
+            },
+            "x-empty-as-absent": true
           }
         }
       },
@@ -7666,7 +7714,8 @@
                 "format": "decimal",
                 "x-positive": true
               }
-            }
+            },
+            "x-empty-as-absent": true
           },
           "stopPrice": {
             "type": "string",
@@ -7685,7 +7734,8 @@
                 "format": "decimal",
                 "x-positive": true
               }
-            }
+            },
+            "x-empty-as-absent": true
           },
           "stop_price": {
             "type": "string",
@@ -7704,7 +7754,8 @@
                 "format": "decimal",
                 "x-positive": true
               }
-            }
+            },
+            "x-empty-as-absent": true
           },
           "take_profit": {
             "type": "object",
@@ -7719,7 +7770,8 @@
                 "format": "decimal",
                 "x-positive": true
               }
-            }
+            },
+            "x-empty-as-absent": true
           }
         }
       },
@@ -7811,7 +7863,8 @@
                       "format": "decimal",
                       "x-positive": true
                     }
-                  }
+                  },
+                  "x-empty-as-absent": true
                 },
                 "stopPrice": {
                   "type": "string",
@@ -7830,7 +7883,8 @@
                       "format": "decimal",
                       "x-positive": true
                     }
-                  }
+                  },
+                  "x-empty-as-absent": true
                 },
                 "stop_price": {
                   "type": "string",
@@ -7849,7 +7903,8 @@
                       "format": "decimal",
                       "x-positive": true
                     }
-                  }
+                  },
+                  "x-empty-as-absent": true
                 },
                 "take_profit": {
                   "type": "object",
@@ -7864,7 +7919,8 @@
                       "format": "decimal",
                       "x-positive": true
                     }
-                  }
+                  },
+                  "x-empty-as-absent": true
                 }
               }
             }
@@ -7919,7 +7975,8 @@
                       "format": "decimal",
                       "x-positive": true
                     }
-                  }
+                  },
+                  "x-empty-as-absent": true
                 },
                 "stopPrice": {
                   "type": "string",
@@ -7938,7 +7995,8 @@
                       "format": "decimal",
                       "x-positive": true
                     }
-                  }
+                  },
+                  "x-empty-as-absent": true
                 },
                 "stop_price": {
                   "type": "string",
@@ -7957,7 +8015,8 @@
                       "format": "decimal",
                       "x-positive": true
                     }
-                  }
+                  },
+                  "x-empty-as-absent": true
                 },
                 "take_profit": {
                   "type": "object",
@@ -7972,7 +8031,8 @@
                       "format": "decimal",
                       "x-positive": true
                     }
-                  }
+                  },
+                  "x-empty-as-absent": true
                 }
               }
             }
@@ -8046,7 +8106,8 @@
                 },
                 "quantity": {
                   "type": "string",
-                  "format": "decimal"
+                  "format": "decimal",
+                  "x-positive": true
                 },
                 "quoteOrderQty": {
                   "type": "string",
@@ -8069,7 +8130,8 @@
                       "format": "decimal",
                       "x-positive": true
                     }
-                  }
+                  },
+                  "x-empty-as-absent": true
                 },
                 "stopPrice": {
                   "type": "string",
@@ -8088,7 +8150,8 @@
                       "format": "decimal",
                       "x-positive": true
                     }
-                  }
+                  },
+                  "x-empty-as-absent": true
                 },
                 "stop_price": {
                   "type": "string",
@@ -8107,7 +8170,8 @@
                       "format": "decimal",
                       "x-positive": true
                     }
-                  }
+                  },
+                  "x-empty-as-absent": true
                 },
                 "take_profit": {
                   "type": "object",
@@ -8122,7 +8186,8 @@
                       "format": "decimal",
                       "x-positive": true
                     }
-                  }
+                  },
+                  "x-empty-as-absent": true
                 }
               }
             }
@@ -8154,7 +8219,8 @@
                 },
                 "quantity": {
                   "type": "string",
-                  "format": "decimal"
+                  "format": "decimal",
+                  "x-positive": true
                 },
                 "quoteOrderQty": {
                   "type": "string",
@@ -8177,7 +8243,8 @@
                       "format": "decimal",
                       "x-positive": true
                     }
-                  }
+                  },
+                  "x-empty-as-absent": true
                 },
                 "stopPrice": {
                   "type": "string",
@@ -8196,7 +8263,8 @@
                       "format": "decimal",
                       "x-positive": true
                     }
-                  }
+                  },
+                  "x-empty-as-absent": true
                 },
                 "stop_price": {
                   "type": "string",
@@ -8215,7 +8283,8 @@
                       "format": "decimal",
                       "x-positive": true
                     }
-                  }
+                  },
+                  "x-empty-as-absent": true
                 },
                 "take_profit": {
                   "type": "object",
@@ -8230,7 +8299,8 @@
                       "format": "decimal",
                       "x-positive": true
                     }
-                  }
+                  },
+                  "x-empty-as-absent": true
                 }
               }
             }
@@ -8805,7 +8875,7 @@
           },
           "margin_mode": {
             "type": "string",
-            "description": "classic_copytrading_future_copytrade_follower_copy_settings/margin_mode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           }
         }
       },
@@ -9947,7 +10017,7 @@
           },
           "margin_mode": {
             "type": "string",
-            "description": "place_futures_market_order/margin_mode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           },
           "margin_coin": {
             "type": "string",
@@ -9955,7 +10025,7 @@
           },
           "marginMode": {
             "type": "string",
-            "description": "place_futures_market_order/marginMode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           },
           "marginCoin": {
             "type": "string",
@@ -10018,7 +10088,7 @@
           },
           "margin_mode": {
             "type": "string",
-            "description": "place_futures_order/margin_mode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           },
           "margin_coin": {
             "type": "string",
@@ -10026,7 +10096,7 @@
           },
           "marginMode": {
             "type": "string",
-            "description": "place_futures_order/marginMode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           },
           "marginCoin": {
             "type": "string",
@@ -10103,7 +10173,7 @@
           },
           "margin_mode": {
             "type": "string",
-            "description": "place_futures_plan_order/margin_mode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           },
           "margin_coin": {
             "type": "string",
@@ -10123,7 +10193,7 @@
           },
           "marginMode": {
             "type": "string",
-            "description": "place_futures_plan_order/marginMode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           },
           "marginCoin": {
             "type": "string",
@@ -10221,6 +10291,10 @@
           "stopLossTriggerType": {
             "type": "string",
             "description": "place_futures_position_tpsl/stopLossTriggerType: selects the documented mode, unit, or reference used by this operation."
+          },
+          "stopLossClientOid": {
+            "type": "string",
+            "description": "Client-assigned identifier for the stop-loss order; not a trigger price."
           }
         }
       },
@@ -10589,7 +10663,7 @@
           },
           "margin_mode": {
             "type": "string",
-            "description": "place_uta_order/margin_mode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           },
           "tp_trigger_by": {
             "type": "string",
@@ -10609,7 +10683,7 @@
           },
           "marginMode": {
             "type": "string",
-            "description": "place_uta_order/marginMode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           },
           "tpTriggerBy": {
             "type": "string",
@@ -11154,6 +11228,16 @@
           "trailingGrid": {
             "type": "string",
             "description": "uta_trade_grid_create_bot/trailingGrid: selects trailing Grid identifiers or response filters for this operation."
+          },
+          "lossReserve": {
+            "type": "string",
+            "format": "decimal",
+            "x-positive": true
+          },
+          "loss_reserve": {
+            "type": "string",
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -11464,6 +11548,16 @@
           "trailingGrid": {
             "type": "string",
             "description": "uta_trade_grid_validate/trailingGrid: selects trailing Grid identifiers or response filters for this operation."
+          },
+          "lossReserve": {
+            "type": "string",
+            "format": "decimal",
+            "x-positive": true
+          },
+          "loss_reserve": {
+            "type": "string",
+            "format": "decimal",
+            "x-positive": true
           }
         }
       },
@@ -11933,7 +12027,8 @@
                 },
                 "size": {
                   "type": "string",
-                  "format": "decimal"
+                  "format": "decimal",
+                  "x-positive": true
                 },
                 "qty": {
                   "type": "string",
@@ -11993,7 +12088,8 @@
                 },
                 "size": {
                   "type": "string",
-                  "format": "decimal"
+                  "format": "decimal",
+                  "x-positive": true
                 },
                 "qty": {
                   "type": "string",
@@ -12012,7 +12108,7 @@
           },
           "margin_mode": {
             "type": "string",
-            "description": "place_futures_batch_orders/margin_mode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           },
           "margin_coin": {
             "type": "string",
@@ -12020,7 +12116,7 @@
           },
           "marginMode": {
             "type": "string",
-            "description": "place_futures_batch_orders/marginMode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           },
           "marginCoin": {
             "type": "string",
@@ -12368,11 +12464,11 @@
           },
           "margin_mode": {
             "type": "string",
-            "description": "set_uta_leverage/margin_mode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           },
           "marginMode": {
             "type": "string",
-            "description": "set_uta_leverage/marginMode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           }
         }
       },
@@ -12434,21 +12530,41 @@
           },
           "margin_mode": {
             "type": "string",
-            "description": "get_uta_pre_set_leverage/margin_mode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           },
           "marginMode": {
             "type": "string",
-            "description": "get_uta_pre_set_leverage/marginMode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           }
         }
       },
       "cancel_spot_batch_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "orderList": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "size": {
+                  "format": "decimal"
+                }
+              }
+            }
+          }
+        }
       },
       "cancel_uta_batch_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "orderList": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {}
+            }
+          }
+        }
       },
       "cancel_futures_batch_orders": {
         "type": "object",
@@ -12473,7 +12589,15 @@
       },
       "batch_create_classic_sub_accounts": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "accounts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {}
+            }
+          }
+        }
       },
       "get_spot_orderbook": {
         "type": "object",
@@ -12953,7 +13077,7 @@
         "properties": {
           "margin_mode": {
             "type": "string",
-            "description": "set_futures_margin_mode/margin_mode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           },
           "margin_coin": {
             "type": "string",
@@ -12965,7 +13089,7 @@
           },
           "marginMode": {
             "type": "string",
-            "description": "set_futures_margin_mode/marginMode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           }
         }
       },
@@ -13304,7 +13428,7 @@
           },
           "margin_mode": {
             "type": "string",
-            "description": "classic_copytrading_future_copytrade_follower_close_positions/margin_mode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           }
         }
       },
@@ -13443,13 +13567,29 @@
           },
           "margin_mode": {
             "type": "string",
-            "description": "classic_copytrading_future_copytrade_follower_close_positions/margin_mode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           }
         }
       },
       "close_copy_futures_trader_positions": {
         "type": "object",
         "properties": {}
+      },
+      "move_uta_positions": {
+        "type": "object",
+        "properties": {
+          "positionList": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "qty": {
+                  "format": "decimal"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "bybit": {
@@ -14225,6 +14365,9 @@
               "strikePrice": {
                 "type": "string",
                 "format": "decimal"
+              },
+              "selectPrice": {
+                "format": "decimal"
               }
             }
           },
@@ -14641,6 +14784,9 @@
         "properties": {
           "qty": {
             "type": "string",
+            "format": "decimal"
+          },
+          "price": {
             "format": "decimal"
           }
         }
@@ -15439,7 +15585,20 @@
                 },
                 "qty": {
                   "type": "string",
-                  "format": "decimal"
+                  "format": "decimal",
+                  "x-positive": true,
+                  "x-zero-when": {
+                    "reduceOnly": [
+                      true,
+                      "true",
+                      "True"
+                    ],
+                    "closeOnTrigger": [
+                      true,
+                      "true",
+                      "True"
+                    ]
+                  }
                 },
                 "slLimitPrice": {
                   "type": "string",
@@ -15711,7 +15870,22 @@
       },
       "cancel_batch_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "request": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "qty": {
+                  "format": "decimal"
+                },
+                "price": {
+                  "format": "decimal"
+                }
+              }
+            }
+          }
+        }
       },
       "get_earn_order_history": {
         "type": "object",
@@ -15794,6 +15968,12 @@
             "type": "string",
             "format": "decimal",
             "x-positive": true
+          },
+          "buyLeverage": {
+            "format": "decimal"
+          },
+          "sellLeverage": {
+            "format": "decimal"
           }
         }
       },
@@ -15982,7 +16162,7 @@
         "properties": {
           "margin_mode": {
             "type": "string",
-            "description": "set_margin_mode/margin_mode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           }
         }
       },
@@ -16191,6 +16371,22 @@
             "description": "get_user_escrow_sub_members/page_size: limits the number of result records returned by pagination."
           }
         }
+      },
+      "create_rfq_quote": {
+        "type": "object",
+        "properties": {
+          "quoteBuyList": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "price": {
+                  "format": "decimal"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "extended": {
@@ -16273,6 +16469,14 @@
             "type": "string",
             "format": "decimal",
             "x-positive": true
+          },
+          "settlement": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "format": "decimal"
+              }
+            }
           }
         }
       },
@@ -16294,6 +16498,17 @@
                     "format": "decimal"
                   }
                 }
+              }
+            }
+          },
+          "amount": {
+            "format": "decimal"
+          },
+          "settlement": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "format": "decimal"
               }
             }
           }
@@ -16334,7 +16549,20 @@
       },
       "place_rfq_order": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "qty": {
+            "format": "decimal"
+          },
+          "price": {
+            "format": "decimal"
+          },
+          "fee": {
+            "format": "decimal"
+          },
+          "rfqStartPrice": {
+            "format": "decimal"
+          }
+        }
       },
       "cancel_order": {
         "type": "object",
@@ -16372,7 +16600,12 @@
       },
       "get_assets": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "collateral": {
+            "type": "boolean",
+            "description": "Filter the assets listing by collateral eligibility using a boolean flag."
+          }
+        }
       }
     },
     "hyperliquid": {
@@ -16388,6 +16621,14 @@
             "type": "string",
             "format": "decimal",
             "x-percent": true
+          },
+          "action": {
+            "type": "object",
+            "properties": {
+              "maxFeeRate": {
+                "format": "decimal"
+              }
+            }
           }
         }
       },
@@ -16443,6 +16684,32 @@
                 "trigger_px": {
                   "type": "string",
                   "format": "decimal"
+                }
+              }
+            }
+          },
+          "action": {
+            "type": "object",
+            "properties": {
+              "orders": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "t": {
+                      "type": "object",
+                      "properties": {
+                        "trigger": {
+                          "type": "object",
+                          "properties": {
+                            "triggerPx": {
+                              "format": "decimal"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -16572,6 +16839,32 @@
           "slippage": {
             "type": "number",
             "description": "Local price tolerance fraction consumed by the market-order price calculation; not an exchange wire amount."
+          },
+          "action": {
+            "type": "object",
+            "properties": {
+              "orders": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "t": {
+                      "type": "object",
+                      "properties": {
+                        "trigger": {
+                          "type": "object",
+                          "properties": {
+                            "triggerPx": {
+                              "format": "decimal"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       },
@@ -16615,6 +16908,14 @@
           "amount": {
             "type": "string",
             "format": "decimal"
+          },
+          "action": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "format": "decimal"
+              }
+            }
           }
         }
       },
@@ -16624,6 +16925,14 @@
           "amount": {
             "type": "string",
             "format": "decimal"
+          },
+          "action": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "format": "decimal"
+              }
+            }
           }
         }
       },
@@ -16633,6 +16942,14 @@
           "amount": {
             "type": "string",
             "format": "decimal"
+          },
+          "action": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "format": "decimal"
+              }
+            }
           }
         }
       },
@@ -16643,6 +16960,14 @@
             "type": "string",
             "format": "decimal",
             "x-positive": true
+          },
+          "action": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "format": "decimal"
+              }
+            }
           }
         }
       },
@@ -16653,6 +16978,14 @@
             "type": "string",
             "format": "decimal",
             "x-positive": true
+          },
+          "action": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "format": "decimal"
+              }
+            }
           }
         }
       },
@@ -16663,6 +16996,14 @@
             "type": "string",
             "format": "decimal",
             "x-positive": true
+          },
+          "action": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "format": "decimal"
+              }
+            }
           }
         }
       },
@@ -16672,6 +17013,14 @@
           "amount": {
             "type": "string",
             "format": "decimal"
+          },
+          "action": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "format": "decimal"
+              }
+            }
           }
         }
       },
@@ -16756,6 +17105,14 @@
           "leverage": {
             "type": "string",
             "format": "decimal"
+          },
+          "action": {
+            "type": "object",
+            "properties": {
+              "leverage": {
+                "format": "decimal"
+              }
+            }
           }
         }
       },
@@ -16778,6 +17135,32 @@
       "withdraw_staking_signed": {
         "type": "object",
         "properties": {}
+      },
+      "borrow_lend_signed": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "format": "decimal"
+              }
+            }
+          }
+        }
+      },
+      "send_to_evm_with_data_signed": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "format": "decimal"
+              }
+            }
+          }
+        }
       }
     },
     "kraken": {
@@ -16889,6 +17272,19 @@
                         "format": "decimal"
                       }
                     }
+                  }
+                }
+              }
+            }
+          },
+          "amount": {
+            "type": "object",
+            "properties": {
+              "asset_amount": {
+                "type": "object",
+                "properties": {
+                  "amount": {
+                    "format": "decimal"
                   }
                 }
               }
@@ -17090,6 +17486,9 @@
           "size": {
             "type": "string",
             "format": "decimal"
+          },
+          "limitPrice": {
+            "format": "decimal"
           }
         }
       },
@@ -17103,6 +17502,9 @@
           "size": {
             "type": "string",
             "format": "decimal"
+          },
+          "limitPrice": {
+            "format": "decimal"
           }
         }
       },
@@ -17115,6 +17517,9 @@
           },
           "size": {
             "type": "string",
+            "format": "decimal"
+          },
+          "limitPrice": {
             "format": "decimal"
           }
         }
@@ -17208,6 +17613,9 @@
           "size": {
             "type": "string",
             "format": "decimal"
+          },
+          "limitPrice": {
+            "format": "decimal"
           }
         }
       },
@@ -17221,6 +17629,9 @@
           "size": {
             "type": "string",
             "format": "decimal"
+          },
+          "limitPrice": {
+            "format": "decimal"
           }
         }
       },
@@ -17233,6 +17644,9 @@
           },
           "size": {
             "type": "string",
+            "format": "decimal"
+          },
+          "limitPrice": {
             "format": "decimal"
           }
         }
@@ -17527,7 +17941,22 @@
           },
           "volume": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true,
+            "x-zero-when": [
+              {
+                "reduce_only": [
+                  true,
+                  "true",
+                  "True"
+                ]
+              },
+              {
+                "ordertype": [
+                  "settle-position"
+                ]
+              }
+            ]
           },
           "leverage": {
             "type": "string",
@@ -17867,6 +18296,25 @@
                 }
               }
             }
+          },
+          "json": {
+            "type": "object",
+            "properties": {
+              "batchOrder": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "size": {
+                      "format": "decimal"
+                    },
+                    "limitPrice": {
+                      "format": "decimal"
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       },
@@ -17947,7 +18395,7 @@
           },
           "margin_mode": {
             "type": "string",
-            "description": "set_futures_leverage_preference/margin_mode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           }
         }
       },
@@ -18395,7 +18843,7 @@
           },
           "margin_mode": {
             "type": "string",
-            "description": "post_v1_copy_trade_futures_st_orders/margin_mode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           },
           "stopPriceType": {
             "type": "string",
@@ -18403,7 +18851,7 @@
           },
           "marginMode": {
             "type": "string",
-            "description": "post_v1_copy_trade_futures_st_orders/marginMode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           }
         }
       },
@@ -18424,7 +18872,7 @@
           },
           "marginMode": {
             "type": "string",
-            "description": "place_futures_limit_buy_order/marginMode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           }
         }
       },
@@ -18445,7 +18893,7 @@
           },
           "marginMode": {
             "type": "string",
-            "description": "place_futures_limit_order/marginMode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           }
         }
       },
@@ -18466,7 +18914,7 @@
           },
           "marginMode": {
             "type": "string",
-            "description": "place_futures_limit_sell_order/marginMode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           }
         }
       },
@@ -18483,7 +18931,7 @@
           },
           "marginMode": {
             "type": "string",
-            "description": "place_futures_market_buy_order/marginMode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           }
         }
       },
@@ -18512,7 +18960,7 @@
           },
           "marginMode": {
             "type": "string",
-            "description": "place_futures_market_order/marginMode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           }
         }
       },
@@ -18529,7 +18977,7 @@
           },
           "marginMode": {
             "type": "string",
-            "description": "place_futures_market_sell_order/marginMode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           }
         }
       },
@@ -18578,7 +19026,7 @@
           },
           "marginMode": {
             "type": "string",
-            "description": "place_futures_order/marginMode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           },
           "stopPriceType": {
             "type": "string",
@@ -18603,7 +19051,7 @@
           },
           "marginMode": {
             "type": "string",
-            "description": "place_futures_post_only_limit_buy_order/marginMode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           }
         }
       },
@@ -18624,7 +19072,7 @@
           },
           "marginMode": {
             "type": "string",
-            "description": "place_futures_post_only_limit_order/marginMode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           }
         }
       },
@@ -18645,7 +19093,7 @@
           },
           "marginMode": {
             "type": "string",
-            "description": "place_futures_post_only_limit_sell_order/marginMode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           }
         }
       },
@@ -18698,7 +19146,7 @@
           },
           "margin_mode": {
             "type": "string",
-            "description": "place_futures_tpsl_order/margin_mode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           },
           "stopPriceType": {
             "type": "string",
@@ -18706,7 +19154,7 @@
           },
           "marginMode": {
             "type": "string",
-            "description": "place_futures_tpsl_order/marginMode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           }
         }
       },
@@ -19071,7 +19519,7 @@
           },
           "margin_mode": {
             "type": "string",
-            "description": "place_uta_order/margin_mode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           },
           "trigger_direction": {
             "type": "string",
@@ -19087,7 +19535,7 @@
           },
           "marginMode": {
             "type": "string",
-            "description": "place_uta_order/marginMode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           },
           "triggerDirection": {
             "type": "string",
@@ -19139,7 +19587,7 @@
           },
           "margin_mode": {
             "type": "string",
-            "description": "post_v1_copy_trade_futures_orders/margin_mode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           },
           "stopPriceType": {
             "type": "string",
@@ -19147,7 +19595,7 @@
           },
           "marginMode": {
             "type": "string",
-            "description": "post_v1_copy_trade_futures_orders/marginMode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           }
         }
       },
@@ -19180,7 +19628,7 @@
           },
           "margin_mode": {
             "type": "string",
-            "description": "post_v1_copy_trade_futures_orders_test/margin_mode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           },
           "stopPriceType": {
             "type": "string",
@@ -19188,7 +19636,7 @@
           },
           "marginMode": {
             "type": "string",
-            "description": "post_v1_copy_trade_futures_orders_test/marginMode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           }
         }
       },
@@ -19242,7 +19690,7 @@
           },
           "margin_mode": {
             "type": "string",
-            "description": "post_v1_copy_trade_futures_st_orders/margin_mode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           },
           "stopPriceType": {
             "type": "string",
@@ -19250,7 +19698,7 @@
           },
           "marginMode": {
             "type": "string",
-            "description": "post_v1_copy_trade_futures_st_orders/marginMode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           }
         }
       },
@@ -19395,7 +19843,7 @@
           },
           "marginMode": {
             "type": "string",
-            "description": "test_futures_order/marginMode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           },
           "stopPriceType": {
             "type": "string",
@@ -19485,6 +19933,20 @@
                 }
               }
             }
+          },
+          "orderList": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "price": {
+                  "format": "decimal"
+                },
+                "size": {
+                  "format": "decimal"
+                }
+              }
+            }
           }
         }
       },
@@ -19518,6 +19980,20 @@
                 }
               }
             }
+          },
+          "orderList": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "size": {
+                  "format": "decimal"
+                },
+                "price": {
+                  "format": "decimal"
+                }
+              }
+            }
           }
         }
       },
@@ -19547,6 +20023,17 @@
                 },
                 "visible_size": {
                   "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          },
+          "orderList": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "size": {
                   "format": "decimal"
                 }
               }
@@ -19597,6 +20084,9 @@
                 "visible_size": {
                   "type": "string",
                   "format": "decimal"
+                },
+                "leverage": {
+                  "format": "decimal"
                 }
               }
             }
@@ -19629,6 +20119,17 @@
                 },
                 "visible_size": {
                   "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          },
+          "orderList": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "funds": {
                   "format": "decimal"
                 }
               }
@@ -19676,11 +20177,11 @@
         "properties": {
           "margin_mode": {
             "type": "string",
-            "description": "set_futures_batch_margin_mode/margin_mode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           },
           "marginMode": {
             "type": "string",
-            "description": "set_futures_batch_margin_mode/marginMode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           }
         }
       },
@@ -19791,11 +20292,11 @@
         "properties": {
           "margin_mode": {
             "type": "string",
-            "description": "cancel_uta_orders_by_symbol/margin_mode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           },
           "marginMode": {
             "type": "string",
-            "description": "cancel_uta_orders_by_symbol/marginMode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           }
         }
       },
@@ -20165,7 +20666,7 @@
         "properties": {
           "marginMode": {
             "type": "string",
-            "description": "get_uta_position_tiers/marginMode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           }
         }
       },
@@ -20219,11 +20720,11 @@
         "properties": {
           "margin_mode": {
             "type": "string",
-            "description": "set_uta_margin_mode/margin_mode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           },
           "marginMode": {
             "type": "string",
-            "description": "set_uta_margin_mode/marginMode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           }
         }
       },
@@ -20232,11 +20733,11 @@
         "properties": {
           "margin_mode": {
             "type": "string",
-            "description": "get_uta_leverage/margin_mode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           },
           "marginMode": {
             "type": "string",
-            "description": "get_uta_leverage/marginMode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           }
         }
       },
@@ -20253,11 +20754,11 @@
         "properties": {
           "margin_mode": {
             "type": "string",
-            "description": "set_futures_margin_mode/margin_mode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           },
           "marginMode": {
             "type": "string",
-            "description": "set_futures_margin_mode/marginMode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           }
         }
       },
@@ -20350,11 +20851,11 @@
         "properties": {
           "margin_mode": {
             "type": "string",
-            "description": "post_v1_copy_trade_futures_position_change_margin_mode/margin_mode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           },
           "marginMode": {
             "type": "string",
-            "description": "post_v1_copy_trade_futures_position_change_margin_mode/marginMode: selects the account margin mode or its enabled state."
+            "description": "selects cross or isolated margin using the documented integer enumeration."
           }
         }
       }
@@ -20378,6 +20879,23 @@
           "max_spot_taker_fee": {
             "type": "string",
             "format": "decimal"
+          },
+          "tx_info": {
+            "type": "object",
+            "properties": {
+              "MaxPerpsTakerFee": {
+                "format": "decimal"
+              },
+              "MaxPerpsMakerFee": {
+                "format": "decimal"
+              },
+              "MaxSpotTakerFee": {
+                "format": "decimal"
+              },
+              "MaxSpotMakerFee": {
+                "format": "decimal"
+              }
+            }
           }
         }
       },
@@ -20387,6 +20905,14 @@
           "share_amount": {
             "type": "string",
             "format": "decimal"
+          },
+          "tx_info": {
+            "type": "object",
+            "properties": {
+              "ShareAmount": {
+                "format": "decimal"
+              }
+            }
           }
         }
       },
@@ -20429,6 +20955,28 @@
                 }
               }
             }
+          },
+          "tx_info": {
+            "type": "object",
+            "properties": {
+              "Orders": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "BaseAmount": {
+                      "format": "decimal"
+                    },
+                    "Price": {
+                      "format": "decimal"
+                    },
+                    "TriggerPrice": {
+                      "format": "decimal"
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       },
@@ -20454,6 +21002,20 @@
           "trigger_price": {
             "type": "string",
             "format": "decimal"
+          },
+          "tx_info": {
+            "type": "object",
+            "properties": {
+              "BaseAmount": {
+                "format": "decimal"
+              },
+              "Price": {
+                "format": "decimal"
+              },
+              "TriggerPrice": {
+                "format": "decimal"
+              }
+            }
           }
         }
       },
@@ -20467,6 +21029,17 @@
           "min_operator_share_rate": {
             "type": "string",
             "format": "decimal"
+          },
+          "tx_info": {
+            "type": "object",
+            "properties": {
+              "OperatorFee": {
+                "format": "decimal"
+              },
+              "MinOperatorShareRate": {
+                "format": "decimal"
+              }
+            }
           }
         }
       },
@@ -20489,6 +21062,14 @@
           "share_amount": {
             "type": "string",
             "format": "decimal"
+          },
+          "tx_info": {
+            "type": "object",
+            "properties": {
+              "ShareAmount": {
+                "format": "decimal"
+              }
+            }
           }
         }
       },
@@ -20514,6 +21095,20 @@
           "trigger_price": {
             "type": "string",
             "format": "decimal"
+          },
+          "tx_info": {
+            "type": "object",
+            "properties": {
+              "BaseAmount": {
+                "format": "decimal"
+              },
+              "Price": {
+                "format": "decimal"
+              },
+              "TriggerPrice": {
+                "format": "decimal"
+              }
+            }
           }
         }
       },
@@ -20722,6 +21317,14 @@
           "share_amount": {
             "type": "string",
             "format": "decimal"
+          },
+          "tx_info": {
+            "type": "object",
+            "properties": {
+              "ShareAmount": {
+                "format": "decimal"
+              }
+            }
           }
         }
       },
@@ -20745,6 +21348,17 @@
           "usdc_fee": {
             "type": "string",
             "format": "decimal"
+          },
+          "tx_info": {
+            "type": "object",
+            "properties": {
+              "Amount": {
+                "format": "decimal"
+              },
+              "USDCFee": {
+                "format": "decimal"
+              }
+            }
           }
         }
       },
@@ -20754,6 +21368,14 @@
           "share_amount": {
             "type": "string",
             "format": "decimal"
+          },
+          "tx_info": {
+            "type": "object",
+            "properties": {
+              "ShareAmount": {
+                "format": "decimal"
+              }
+            }
           }
         }
       },
@@ -20764,6 +21386,14 @@
             "type": "string",
             "format": "decimal",
             "x-signed": true
+          },
+          "tx_info": {
+            "type": "object",
+            "properties": {
+              "USDCAmount": {
+                "format": "decimal"
+              }
+            }
           }
         }
       },
@@ -20777,6 +21407,17 @@
           "min_operator_share_rate": {
             "type": "string",
             "format": "decimal"
+          },
+          "tx_info": {
+            "type": "object",
+            "properties": {
+              "OperatorFee": {
+                "format": "decimal"
+              },
+              "MinOperatorShareRate": {
+                "format": "decimal"
+              }
+            }
           }
         }
       },
@@ -20786,6 +21427,14 @@
           "amount": {
             "type": "string",
             "format": "decimal"
+          },
+          "tx_info": {
+            "type": "object",
+            "properties": {
+              "Amount": {
+                "format": "decimal"
+              }
+            }
           }
         }
       },
@@ -20872,7 +21521,16 @@
       },
       "submit_fast_withdrawal": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "tx_info": {
+            "type": "object",
+            "properties": {
+              "Amount": {
+                "format": "decimal"
+              }
+            }
+          }
+        }
       },
       "get_exchange_metrics": {
         "type": "object",
@@ -20951,7 +21609,16 @@
       },
       "update_leverage": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "tx_info": {
+            "type": "object",
+            "properties": {
+              "InitialMarginFraction": {
+                "format": "decimal"
+              }
+            }
+          }
+        }
       },
       "update_account_config": {
         "type": "object",
@@ -20964,6 +21631,41 @@
       "sign_update_account_asset_config": {
         "type": "object",
         "properties": {}
+      },
+      "transfer_same_master_account": {
+        "type": "object",
+        "properties": {
+          "tx_info": {
+            "type": "object",
+            "properties": {
+              "Amount": {
+                "format": "decimal"
+              },
+              "USDCFee": {
+                "format": "decimal"
+              }
+            }
+          }
+        }
+      },
+      "place_order": {
+        "type": "object",
+        "properties": {
+          "tx_info": {
+            "type": "object",
+            "properties": {
+              "BaseAmount": {
+                "format": "decimal"
+              },
+              "Price": {
+                "format": "decimal"
+              },
+              "TriggerPrice": {
+                "format": "decimal"
+              }
+            }
+          }
+        }
       }
     },
     "mexc": {
@@ -21186,6 +21888,9 @@
           "leverage": {
             "type": "string",
             "format": "decimal"
+          },
+          "price": {
+            "format": "decimal"
           }
         }
       },
@@ -21199,6 +21904,9 @@
           "leverage": {
             "type": "string",
             "format": "decimal"
+          },
+          "price": {
+            "format": "decimal"
           }
         }
       },
@@ -21211,6 +21919,9 @@
           },
           "leverage": {
             "type": "string",
+            "format": "decimal"
+          },
+          "price": {
             "format": "decimal"
           }
         }
@@ -21659,6 +22370,9 @@
                 "vol": {
                   "type": "string",
                   "format": "decimal"
+                },
+                "leverage": {
+                  "format": "decimal"
                 }
               }
             }
@@ -21882,6 +22596,17 @@
           "amt": {
             "type": "string",
             "format": "decimal"
+          },
+          "adjustments": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "amt": {
+                  "format": "decimal"
+                }
+              }
+            }
           }
         }
       },
@@ -22021,9 +22746,35 @@
                     "-1"
                   ]
                 },
-                "newSz": {
+                "sz": {
                   "type": "string",
-                  "format": "decimal"
+                  "format": "decimal",
+                  "x-positive": true
+                },
+                "newTpTriggerRatio": {
+                  "type": "string",
+                  "format": "decimal",
+                  "x-positive": true
+                },
+                "newSlTriggerRatio": {
+                  "type": "string",
+                  "format": "decimal",
+                  "x-positive": true
+                },
+                "newCallbackRatio": {
+                  "type": "string",
+                  "format": "decimal",
+                  "x-positive": true
+                },
+                "newCallbackSpread": {
+                  "type": "string",
+                  "format": "decimal",
+                  "x-positive": true
+                },
+                "newActivePx": {
+                  "type": "string",
+                  "format": "decimal",
+                  "x-positive": true
                 }
               }
             }
@@ -22055,9 +22806,35 @@
                     "-1"
                   ]
                 },
-                "newSz": {
+                "sz": {
                   "type": "string",
-                  "format": "decimal"
+                  "format": "decimal",
+                  "x-positive": true
+                },
+                "newTpTriggerRatio": {
+                  "type": "string",
+                  "format": "decimal",
+                  "x-positive": true
+                },
+                "newSlTriggerRatio": {
+                  "type": "string",
+                  "format": "decimal",
+                  "x-positive": true
+                },
+                "newCallbackRatio": {
+                  "type": "string",
+                  "format": "decimal",
+                  "x-positive": true
+                },
+                "newCallbackSpread": {
+                  "type": "string",
+                  "format": "decimal",
+                  "x-positive": true
+                },
+                "newActivePx": {
+                  "type": "string",
+                  "format": "decimal",
+                  "x-positive": true
                 }
               }
             }
@@ -22125,15 +22902,18 @@
         "properties": {
           "newPx": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           },
           "newPxUsd": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           },
           "newPxVol": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           },
           "newSz": {
             "type": "string",
@@ -22142,15 +22922,18 @@
           },
           "new_px": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           },
           "new_px_usd": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           },
           "new_px_vol": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           },
           "new_sz": {
             "type": "string",
@@ -22184,9 +22967,35 @@
                     "-1"
                   ]
                 },
-                "newSz": {
+                "sz": {
                   "type": "string",
-                  "format": "decimal"
+                  "format": "decimal",
+                  "x-positive": true
+                },
+                "newTpTriggerRatio": {
+                  "type": "string",
+                  "format": "decimal",
+                  "x-positive": true
+                },
+                "newSlTriggerRatio": {
+                  "type": "string",
+                  "format": "decimal",
+                  "x-positive": true
+                },
+                "newCallbackRatio": {
+                  "type": "string",
+                  "format": "decimal",
+                  "x-positive": true
+                },
+                "newCallbackSpread": {
+                  "type": "string",
+                  "format": "decimal",
+                  "x-positive": true
+                },
+                "newActivePx": {
+                  "type": "string",
+                  "format": "decimal",
+                  "x-positive": true
                 }
               }
             }
@@ -22218,9 +23027,35 @@
                     "-1"
                   ]
                 },
-                "newSz": {
+                "sz": {
                   "type": "string",
-                  "format": "decimal"
+                  "format": "decimal",
+                  "x-positive": true
+                },
+                "newTpTriggerRatio": {
+                  "type": "string",
+                  "format": "decimal",
+                  "x-positive": true
+                },
+                "newSlTriggerRatio": {
+                  "type": "string",
+                  "format": "decimal",
+                  "x-positive": true
+                },
+                "newCallbackRatio": {
+                  "type": "string",
+                  "format": "decimal",
+                  "x-positive": true
+                },
+                "newCallbackSpread": {
+                  "type": "string",
+                  "format": "decimal",
+                  "x-positive": true
+                },
+                "newActivePx": {
+                  "type": "string",
+                  "format": "decimal",
+                  "x-positive": true
                 }
               }
             }
@@ -22360,6 +23195,20 @@
           "sz": {
             "type": "string",
             "format": "decimal"
+          },
+          "legs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "sz": {
+                  "format": "decimal"
+                },
+                "px": {
+                  "format": "decimal"
+                }
+              }
+            }
           }
         }
       },
@@ -22575,6 +23424,14 @@
                 "sz": {
                   "type": "string",
                   "format": "decimal"
+                },
+                "from": {
+                  "type": "object",
+                  "properties": {
+                    "sz": {
+                      "format": "decimal"
+                    }
+                  }
                 }
               }
             }
@@ -22987,7 +23844,33 @@
                 },
                 "sz": {
                   "type": "string",
-                  "format": "decimal"
+                  "format": "decimal",
+                  "x-positive": true
+                },
+                "tpTriggerRatio": {
+                  "type": "string",
+                  "format": "decimal",
+                  "x-positive": true
+                },
+                "slTriggerRatio": {
+                  "type": "string",
+                  "format": "decimal",
+                  "x-positive": true
+                },
+                "callbackRatio": {
+                  "type": "string",
+                  "format": "decimal",
+                  "x-positive": true
+                },
+                "callbackSpread": {
+                  "type": "string",
+                  "format": "decimal",
+                  "x-positive": true
+                },
+                "activePx": {
+                  "type": "string",
+                  "format": "decimal",
+                  "x-positive": true
                 }
               }
             }
@@ -23021,7 +23904,33 @@
                 },
                 "sz": {
                   "type": "string",
-                  "format": "decimal"
+                  "format": "decimal",
+                  "x-positive": true
+                },
+                "tpTriggerRatio": {
+                  "type": "string",
+                  "format": "decimal",
+                  "x-positive": true
+                },
+                "slTriggerRatio": {
+                  "type": "string",
+                  "format": "decimal",
+                  "x-positive": true
+                },
+                "callbackRatio": {
+                  "type": "string",
+                  "format": "decimal",
+                  "x-positive": true
+                },
+                "callbackSpread": {
+                  "type": "string",
+                  "format": "decimal",
+                  "x-positive": true
+                },
+                "activePx": {
+                  "type": "string",
+                  "format": "decimal",
+                  "x-positive": true
                 }
               }
             }
@@ -24023,7 +24932,8 @@
                 },
                 "sz": {
                   "type": "string",
-                  "format": "decimal"
+                  "format": "decimal",
+                  "x-positive": true
                 },
                 "attachAlgoOrds": {
                   "type": "array",
@@ -24054,7 +24964,33 @@
                       },
                       "sz": {
                         "type": "string",
-                        "format": "decimal"
+                        "format": "decimal",
+                        "x-positive": true
+                      },
+                      "tpTriggerRatio": {
+                        "type": "string",
+                        "format": "decimal",
+                        "x-positive": true
+                      },
+                      "slTriggerRatio": {
+                        "type": "string",
+                        "format": "decimal",
+                        "x-positive": true
+                      },
+                      "callbackRatio": {
+                        "type": "string",
+                        "format": "decimal",
+                        "x-positive": true
+                      },
+                      "callbackSpread": {
+                        "type": "string",
+                        "format": "decimal",
+                        "x-positive": true
+                      },
+                      "activePx": {
+                        "type": "string",
+                        "format": "decimal",
+                        "x-positive": true
                       }
                     }
                   }
@@ -24152,9 +25088,35 @@
                           "-1"
                         ]
                       },
-                      "newSz": {
+                      "sz": {
                         "type": "string",
-                        "format": "decimal"
+                        "format": "decimal",
+                        "x-positive": true
+                      },
+                      "newTpTriggerRatio": {
+                        "type": "string",
+                        "format": "decimal",
+                        "x-positive": true
+                      },
+                      "newSlTriggerRatio": {
+                        "type": "string",
+                        "format": "decimal",
+                        "x-positive": true
+                      },
+                      "newCallbackRatio": {
+                        "type": "string",
+                        "format": "decimal",
+                        "x-positive": true
+                      },
+                      "newCallbackSpread": {
+                        "type": "string",
+                        "format": "decimal",
+                        "x-positive": true
+                      },
+                      "newActivePx": {
+                        "type": "string",
+                        "format": "decimal",
+                        "x-positive": true
                       }
                     }
                   }
@@ -24359,6 +25321,17 @@
               "properties": {
                 "amt": {
                   "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          },
+          "loanData": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "amt": {
                   "format": "decimal"
                 }
               }
@@ -24994,17 +25967,52 @@
         "properties": {
           "fee_type": {
             "type": "string",
-            "description": "set_fee_type/fee_type: selects the documented mode, unit, or reference used by this operation."
+            "description": "selects the withdrawal fee treatment using the documented integer enumeration."
           },
           "feeType": {
             "type": "string",
-            "description": "set_fee_type/feeType: selects the documented mode, unit, or reference used by this operation."
+            "description": "selects the withdrawal fee treatment using the documented integer enumeration."
           }
         }
       },
       "set_collateral_assets": {
         "type": "object",
         "properties": {}
+      },
+      "purchase_staking": {
+        "type": "object",
+        "properties": {
+          "investData": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "amt": {
+                  "format": "decimal"
+                }
+              }
+            }
+          }
+        }
+      },
+      "set_rfq_maker_instrument_settings": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "maxBlockSz": {
+                  "format": "decimal"
+                },
+                "makerPxBand": {
+                  "format": "decimal"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "ondo": {

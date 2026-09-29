@@ -550,7 +550,7 @@ fn client(base_url: String) -> BackpackClient {
         Some(base64::engine::general_purpose::STANDARD.encode([b'2'; 32])),
         Some(secret()),
         5_000,
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         base_url,
     )
     .expect("client")

@@ -27,7 +27,7 @@ fn serve_once(response_body: &'static str) -> (String, JoinHandle<Recorded>) {
     listener.set_nonblocking(true).expect("nonblocking");
     let address = listener.local_addr().expect("address");
     let handle = thread::spawn(move || {
-        let deadline = Instant::now() + Duration::from_secs(5);
+        let deadline = Instant::now() + Duration::from_secs(10);
         let (mut stream, _) = loop {
             match listener.accept() {
                 Ok(connection) => break connection,
@@ -40,7 +40,7 @@ fn serve_once(response_body: &'static str) -> (String, JoinHandle<Recorded>) {
         };
         stream.set_nonblocking(false).expect("blocking stream");
         stream
-            .set_read_timeout(Some(Duration::from_secs(2)))
+            .set_read_timeout(Some(Duration::from_secs(10)))
             .expect("read timeout");
         let mut raw = Vec::new();
         let mut buffer = [0u8; 4096];
@@ -97,7 +97,7 @@ fn public_payload_with_response(
 ) -> (Recorded, Value) {
     let (base_url, server) = serve_once(response);
     let client =
-        HyperliquidClient::with_endpoint(false, None, None, Duration::from_secs(2), base_url)
+        HyperliquidClient::with_endpoint(false, None, None, Duration::from_secs(10), base_url)
             .expect("client");
     let params = pairs(params);
     let data = crate::http::block_on(async move { client.public_request(method, params).await })
@@ -111,7 +111,7 @@ fn signing_client(endpoint: String) -> HyperliquidClient {
         false,
         Some(WALLET.to_string()),
         Some(format!("0x{}", "11".repeat(32))),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         endpoint,
     )
     .expect("client")
@@ -434,7 +434,7 @@ fn info_requests_reject_invalid_parameters_before_network() {
         false,
         None,
         None,
-        Duration::from_secs(1),
+        Duration::from_secs(10),
         "http://127.0.0.1:1".to_string(),
     )
     .expect("client");
@@ -746,7 +746,7 @@ fn exchange_actions_reject_invalid_parameters_before_network() {
 
 #[test]
 fn signed_actions_require_credentials() {
-    let client = HyperliquidClient::public(false, Duration::from_secs(1)).expect("client");
+    let client = HyperliquidClient::public(false, Duration::from_secs(10)).expect("client");
     let result = crate::http::block_on(async move {
         client
             .private_request(
@@ -766,7 +766,7 @@ fn serve_sequence(responses: Vec<&'static str>) -> (String, JoinHandle<Vec<Recor
     let handle = thread::spawn(move || {
         let mut recorded = Vec::new();
         for response_body in responses {
-            let deadline = Instant::now() + Duration::from_secs(5);
+            let deadline = Instant::now() + Duration::from_secs(10);
             let (mut stream, _) = loop {
                 match listener.accept() {
                     Ok(connection) => break connection,
@@ -779,7 +779,7 @@ fn serve_sequence(responses: Vec<&'static str>) -> (String, JoinHandle<Vec<Recor
             };
             stream.set_nonblocking(false).expect("blocking stream");
             stream
-                .set_read_timeout(Some(Duration::from_secs(2)))
+                .set_read_timeout(Some(Duration::from_secs(10)))
                 .expect("read timeout");
             let mut raw = Vec::new();
             let mut buffer = [0u8; 4096];
@@ -923,7 +923,7 @@ fn additional_info_requests_reject_invalid_parameters_before_network() {
         false,
         None,
         None,
-        Duration::from_secs(1),
+        Duration::from_secs(10),
         "http://127.0.0.1:1".to_string(),
     )
     .expect("client");

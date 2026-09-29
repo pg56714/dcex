@@ -884,6 +884,20 @@ def _case_kwargs(case: EndpointCase, method: Any) -> dict[str, Any]:
         kwargs["body"] = {"id": "signed-order", "market": "BTC-USD"}
     if case.exchange == "extended" and case.method_name == "get_candles":
         kwargs["limit"] = 50
+    object_samples = {
+        ("binance", "place_coin_futures_algo_order"): "fields",
+        ("extended", "create_withdrawal_signed"): "body",
+        ("hyperliquid", "borrow_lend_signed"): "action",
+        ("hyperliquid", "send_to_evm_with_data_signed"): "action",
+        ("kraken", "create_funding_withdrawal"): "body",
+        ("kraken", "create_user_rfq"): "request",
+        ("kraken", "simulate_futures_portfolio"): "portfolio",
+        ("okx", "trading_bot_signal_amend_tpsl"): "exit_setting_param",
+    }
+    if field := object_samples.get((case.exchange, case.method_name)):
+        # This test checks forwarding to the fake transport. Business-valid
+        # contents are covered by the real localhost endpoint tests.
+        kwargs[field] = {}
     return kwargs
 
 

@@ -32,6 +32,22 @@ impl MexcClient {
         name: &str,
         p: &MexcParams,
     ) -> Result<Option<ValidatedResponse>> {
+        match crate::exchanges::schema::fund_domain(name) {
+            Some(crate::exchanges::schema::FundDomain::Withdrawals) => {
+                self.withdrawals_field_schema_request(name, p).await
+            }
+            Some(crate::exchanges::schema::FundDomain::Transfers) => {
+                self.transfers_field_schema_request(name, p).await
+            }
+            None => self.field_schema_request_transport(name, p).await,
+        }
+    }
+
+    pub(in crate::exchanges::mexc) async fn field_schema_request_transport(
+        &self,
+        name: &str,
+        p: &MexcParams,
+    ) -> Result<Option<ValidatedResponse>> {
         if name == "place_contract_batch_orders" {
             p.ensure_allowed(&["orders"])?;
             let orders = p.json_required("orders")?;

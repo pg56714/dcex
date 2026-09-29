@@ -602,6 +602,8 @@ def test_sync_convert_wrappers_reach_official_paths(
         finally:
             client.close()
         request = _last_business_request(received)
+        from tests.unit.wire_contracts import assert_wire_contract
+        assert_wire_contract("binance", method, request)
 
     split = urlsplit(request["path"])
     assert split.path == path
@@ -637,6 +639,8 @@ async def test_async_convert_wrappers_reach_official_paths(
         finally:
             await client.close()
         request = _last_business_request(received)
+        from tests.unit.wire_contracts import assert_wire_contract
+        assert_wire_contract("binance", method, request)
 
     split = urlsplit(request["path"])
     assert split.path == path
@@ -663,6 +667,8 @@ def test_sync_futures_listen_key_calls_send_no_parameters(method: str) -> None:
         finally:
             client.close()
         request = _last_business_request(received)
+        from tests.unit.wire_contracts import assert_wire_contract
+        assert_wire_contract("binance", method, request)
 
     assert request["path"] == "/fapi/v1/listenKey"
     assert request["body"] == ""

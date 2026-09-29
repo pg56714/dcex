@@ -1108,6 +1108,8 @@ def _drain(received: "queue.Queue[dict[str, Any]]") -> None:
 
 
 def _assert_route(name: str, request: dict[str, Any]) -> None:
+    from tests.unit.wire_contracts import assert_wire_contract
+    assert_wire_contract("bingx", name, request)
     assert (request["method"], request["path"]) == ROUTES[name], name
     fields = request["query"]
     if request["body"]:

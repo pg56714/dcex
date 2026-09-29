@@ -1,0 +1,1255 @@
+{
+  "arcus/get_invite_codes": {
+    "offset": {
+      "reason": "pagination offset",
+      "values": [
+        "0"
+      ]
+    }
+  },
+  "aster/set_futures_multi_assets_mode": {
+    "multiAssetsMargin": {
+      "reason": "multi-assets mode flag",
+      "values": [
+        "false"
+      ]
+    }
+  },
+  "aster/place_futures_chase_order": {
+    "quantityUnit": {
+      "reason": "quantity unit selector",
+      "values": [
+        "BASE"
+      ]
+    }
+  },
+  "aster/set_futures_margin_type": {
+    "marginType": {
+      "reason": "margin mode selector",
+      "values": [
+        "ISOLATED"
+      ]
+    }
+  },
+  "aster/place_futures_strategy_order": {
+    "clientStrategyId": {
+      "reason": "client strategy identifier",
+      "values": [
+        "tpsl-1"
+      ]
+    },
+    "strategyType": {
+      "reason": "strategy kind selector",
+      "values": [
+        "OCO"
+      ]
+    },
+    "subOrderList/[]/strategySubId": {
+      "reason": "strategy leg identifier",
+      "values": [
+        1,
+        2
+      ]
+    }
+  },
+  "aster/update_futures_strategy_order": {
+    "strategyId": {
+      "reason": "strategy identifier",
+      "values": [
+        "9"
+      ]
+    },
+    "strategyType": {
+      "reason": "strategy kind selector",
+      "values": [
+        "OCO"
+      ]
+    },
+    "subOrderList/[]/strategySubId": {
+      "reason": "strategy leg identifier",
+      "values": [
+        2
+      ]
+    }
+  },
+  "aster/get_futures_strategy_open_order": {
+    "strategyId": {
+      "reason": "strategy identifier",
+      "values": [
+        "9"
+      ]
+    },
+    "strategyType": {
+      "reason": "strategy kind selector",
+      "values": [
+        "OCO"
+      ]
+    }
+  },
+  "aster/get_futures_strategy_history_order": {
+    "clientStrategyId": {
+      "reason": "client strategy identifier",
+      "values": [
+        "tpsl-1"
+      ]
+    },
+    "strategyType": {
+      "reason": "strategy kind selector",
+      "values": [
+        "OTO"
+      ]
+    }
+  },
+  "backpack/create_strategy": {
+    "strategyType": {
+      "reason": "strategy kind selector",
+      "values": [
+        "Scheduled"
+      ]
+    },
+    "duration": {
+      "reason": "strategy scheduling duration",
+      "values": [
+        60000
+      ]
+    }
+  },
+  "backpack/get_open_strategy": {
+    "strategyId": {
+      "reason": "strategy identifier",
+      "values": [
+        "100"
+      ]
+    }
+  },
+  "backpack/cancel_strategy": {
+    "clientStrategyId": {
+      "reason": "client strategy identifier",
+      "values": [
+        7
+      ]
+    }
+  },
+  "backpack/get_open_strategies": {
+    "strategyType": {
+      "reason": "strategy kind selector",
+      "values": [
+        "Scheduled"
+      ]
+    }
+  },
+  "bingx/change_margin_type": {
+    "marginType": {
+      "reason": "margin mode selector",
+      "values": [
+        "CROSSED"
+      ]
+    }
+  },
+  "bingx/get_spot_oco_history": {
+    "pageSize": {
+      "reason": "record count per page",
+      "values": [
+        "20"
+      ]
+    }
+  },
+  "bingx/get_spot_open_oco": {
+    "pageSize": {
+      "reason": "record count per page",
+      "values": [
+        "20"
+      ]
+    }
+  },
+  "bingx/get_spot_order_history": {
+    "pageSize": {
+      "reason": "record count per page",
+      "values": [
+        "100"
+      ]
+    }
+  },
+  "bingx/get_subaccount_all_account_balance": {
+    "pageSize": {
+      "reason": "record count per page",
+      "values": [
+        "10"
+      ]
+    }
+  },
+  "bingx/get_swap_margin_history": {
+    "pageSize": {
+      "reason": "record count per page",
+      "values": [
+        "20"
+      ]
+    }
+  },
+  "bingx/get_swap_twap_order_history": {
+    "pageSize": {
+      "reason": "record count per page",
+      "values": [
+        "20"
+      ]
+    }
+  },
+  "bingx/place_swap_twap_order": {
+    "priceType": {
+      "reason": "pricing mode selector",
+      "values": [
+        "constant"
+      ]
+    }
+  },
+  "bingx/set_coin_swap_margin_type": {
+    "marginType": {
+      "reason": "margin mode selector",
+      "values": [
+        "ISOLATED"
+      ]
+    }
+  },
+  "bitget/adjust_futures_position_margin": {
+    "marginCoin": {
+      "reason": "margin settlement currency",
+      "values": [
+        "USDT"
+      ]
+    }
+  },
+  "bitget/adjust_uta_position_margin": {
+    "operation": {
+      "reason": "operation kind selector",
+      "values": [
+        "add"
+      ]
+    }
+  },
+  "bitget/cancel_futures_batch_orders": {
+    "marginCoin": {
+      "reason": "margin settlement currency",
+      "values": [
+        "USDT"
+      ]
+    }
+  },
+  "bitget/cancel_futures_order": {
+    "marginCoin": {
+      "reason": "margin settlement currency",
+      "values": [
+        "USDT"
+      ]
+    }
+  },
+  "bitget/get_futures_account": {
+    "marginCoin": {
+      "reason": "margin settlement currency",
+      "values": [
+        "USDT"
+      ]
+    }
+  },
+  "bitget/get_futures_estimated_open_count": {
+    "marginCoin": {
+      "reason": "margin settlement currency",
+      "values": [
+        "USDT"
+      ]
+    }
+  },
+  "bitget/get_futures_liquidation_price": {
+    "marginCoin": {
+      "reason": "margin settlement currency",
+      "values": [
+        "USDT"
+      ]
+    }
+  },
+  "bitget/get_futures_max_open_quantity": {
+    "marginCoin": {
+      "reason": "margin settlement currency",
+      "values": [
+        "USDT"
+      ]
+    }
+  },
+  "bitget/get_futures_position": {
+    "marginCoin": {
+      "reason": "margin settlement currency",
+      "values": [
+        "USDT"
+      ]
+    }
+  },
+  "bitget/get_uta_pre_set_leverage": {
+    "marginMode": {
+      "reason": "margin mode selector",
+      "values": [
+        "crossed"
+      ]
+    }
+  },
+  "bitget/modify_futures_tpsl_order": {
+    "marginCoin": {
+      "reason": "margin settlement currency",
+      "values": [
+        "USDT"
+      ]
+    }
+  },
+  "bitget/place_futures_batch_orders": {
+    "marginMode": {
+      "reason": "margin mode selector",
+      "values": [
+        "crossed"
+      ]
+    },
+    "marginCoin": {
+      "reason": "margin settlement currency",
+      "values": [
+        "USDT"
+      ]
+    }
+  },
+  "bitget/place_futures_limit_buy_order": {
+    "marginMode": {
+      "reason": "margin mode selector",
+      "values": [
+        "crossed"
+      ]
+    },
+    "marginCoin": {
+      "reason": "margin settlement currency",
+      "values": [
+        "USDT"
+      ]
+    }
+  },
+  "bitget/place_futures_limit_order": {
+    "marginMode": {
+      "reason": "margin mode selector",
+      "values": [
+        "crossed"
+      ]
+    },
+    "marginCoin": {
+      "reason": "margin settlement currency",
+      "values": [
+        "USDT"
+      ]
+    }
+  },
+  "bitget/place_futures_limit_sell_order": {
+    "marginMode": {
+      "reason": "margin mode selector",
+      "values": [
+        "crossed"
+      ]
+    },
+    "marginCoin": {
+      "reason": "margin settlement currency",
+      "values": [
+        "USDT"
+      ]
+    }
+  },
+  "bitget/place_futures_market_buy_order": {
+    "marginMode": {
+      "reason": "margin mode selector",
+      "values": [
+        "crossed"
+      ]
+    },
+    "marginCoin": {
+      "reason": "margin settlement currency",
+      "values": [
+        "USDT"
+      ]
+    }
+  },
+  "bitget/place_futures_market_order": {
+    "marginMode": {
+      "reason": "margin mode selector",
+      "values": [
+        "crossed"
+      ]
+    },
+    "marginCoin": {
+      "reason": "margin settlement currency",
+      "values": [
+        "USDT"
+      ]
+    }
+  },
+  "bitget/place_futures_market_sell_order": {
+    "marginMode": {
+      "reason": "margin mode selector",
+      "values": [
+        "crossed"
+      ]
+    },
+    "marginCoin": {
+      "reason": "margin settlement currency",
+      "values": [
+        "USDT"
+      ]
+    }
+  },
+  "bitget/place_futures_order": {
+    "marginMode": {
+      "reason": "margin mode selector",
+      "values": [
+        "crossed"
+      ]
+    },
+    "marginCoin": {
+      "reason": "margin settlement currency",
+      "values": [
+        "USDT"
+      ]
+    }
+  },
+  "bitget/place_futures_plan_order": {
+    "marginMode": {
+      "reason": "margin mode selector",
+      "values": [
+        "isolated"
+      ]
+    },
+    "marginCoin": {
+      "reason": "margin settlement currency",
+      "values": [
+        "USDT"
+      ]
+    },
+    "triggerType": {
+      "reason": "trigger direction or reference selector",
+      "values": [
+        "mark_price"
+      ]
+    }
+  },
+  "bitget/place_futures_position_tpsl": {
+    "marginCoin": {
+      "reason": "margin settlement currency",
+      "values": [
+        "USDT"
+      ]
+    }
+  },
+  "bitget/place_futures_post_only_limit_buy_order": {
+    "marginMode": {
+      "reason": "margin mode selector",
+      "values": [
+        "crossed"
+      ]
+    },
+    "marginCoin": {
+      "reason": "margin settlement currency",
+      "values": [
+        "USDT"
+      ]
+    }
+  },
+  "bitget/place_futures_post_only_limit_order": {
+    "marginMode": {
+      "reason": "margin mode selector",
+      "values": [
+        "crossed"
+      ]
+    },
+    "marginCoin": {
+      "reason": "margin settlement currency",
+      "values": [
+        "USDT"
+      ]
+    }
+  },
+  "bitget/place_futures_post_only_limit_sell_order": {
+    "marginMode": {
+      "reason": "margin mode selector",
+      "values": [
+        "crossed"
+      ]
+    },
+    "marginCoin": {
+      "reason": "margin settlement currency",
+      "values": [
+        "USDT"
+      ]
+    }
+  },
+  "bitget/place_futures_tpsl_order": {
+    "marginCoin": {
+      "reason": "margin settlement currency",
+      "values": [
+        "USDT"
+      ]
+    }
+  },
+  "bitget/place_spot_plan_order": {
+    "triggerType": {
+      "reason": "trigger direction or reference selector",
+      "values": [
+        "fill_price"
+      ]
+    }
+  },
+  "bitget/reverse_futures_position": {
+    "marginCoin": {
+      "reason": "margin settlement currency",
+      "values": [
+        "USDT"
+      ]
+    }
+  },
+  "bitget/set_futures_auto_margin": {
+    "autoMargin": {
+      "reason": "automatic margin flag",
+      "values": [
+        "on"
+      ]
+    },
+    "marginCoin": {
+      "reason": "margin settlement currency",
+      "values": [
+        "USDT"
+      ]
+    }
+  },
+  "bitget/set_futures_leverage": {
+    "marginCoin": {
+      "reason": "margin settlement currency",
+      "values": [
+        "USDT"
+      ]
+    }
+  },
+  "bitget/set_futures_margin_mode": {
+    "marginCoin": {
+      "reason": "margin settlement currency",
+      "values": [
+        "USDT"
+      ]
+    },
+    "marginMode": {
+      "reason": "margin mode selector",
+      "values": [
+        "crossed"
+      ]
+    }
+  },
+  "bitget/set_uta_collateral_type": {
+    "collateralType": {
+      "reason": "collateral asset selection mode",
+      "values": [
+        "all"
+      ]
+    }
+  },
+  "bitget/uta_freeze_sub": {
+    "operation": {
+      "reason": "operation kind selector",
+      "values": [
+        "freeze"
+      ]
+    }
+  },
+  "bybit/get_crypto_loan_borrowable_collateralisable_number": {
+    "collateralCurrency": {
+      "reason": "collateral currency identifier",
+      "values": [
+        "USDT"
+      ]
+    }
+  },
+  "bybit/crypto_loan_fixed_repay_collateral": {
+    "collateralCoin": {
+      "reason": "collateral currency identifier",
+      "values": [
+        "USDT"
+      ]
+    }
+  },
+  "bybit/crypto_loan_flexible_repay_collateral": {
+    "collateralCoin": {
+      "reason": "collateral currency identifier",
+      "values": [
+        "USDT"
+      ]
+    }
+  },
+  "bybit/set_api_rate_limits": {
+    "list/[]/rate": {
+      "reason": "API request rate limit in requests per second",
+      "values": [
+        10
+      ]
+    }
+  },
+  "bybit/set_delta_mode": {
+    "deltaEnable": {
+      "reason": "delta mode flag",
+      "values": [
+        "1"
+      ]
+    }
+  },
+  "bybit/set_collateral_coin": {
+    "collateralSwitch": {
+      "reason": "collateral eligibility switch",
+      "values": [
+        "ON"
+      ]
+    }
+  },
+  "bybit/batch_set_collateral_coins": {
+    "request/[]/collateralSwitch": {
+      "reason": "collateral eligibility switch",
+      "values": [
+        "ON"
+      ]
+    }
+  },
+  "bybit/set_spot_margin_mode": {
+    "spotMarginMode": {
+      "reason": "spot margin mode selector",
+      "values": [
+        "1"
+      ]
+    }
+  },
+  "bybit/create_strategy": {
+    "strategyType": {
+      "reason": "strategy kind selector",
+      "values": [
+        "twap"
+      ]
+    },
+    "duration": {
+      "reason": "strategy scheduling duration",
+      "values": [
+        600
+      ]
+    }
+  },
+  "bybit/stop_strategy": {
+    "strategyId": {
+      "reason": "strategy identifier",
+      "values": [
+        "s1"
+      ]
+    }
+  },
+  "bybit/get_strategy_list": {
+    "pageSize": {
+      "reason": "record count per page",
+      "values": [
+        "50"
+      ]
+    }
+  },
+  "bybit/get_strategy_orders": {
+    "strategyId": {
+      "reason": "strategy identifier",
+      "values": [
+        "s1"
+      ]
+    }
+  },
+  "bybit/set_auto_add_margin": {
+    "autoAddMargin": {
+      "reason": "automatic margin flag",
+      "values": [
+        1
+      ]
+    }
+  },
+  "bybit/set_margin_mode": {
+    "setMarginMode": {
+      "reason": "account margin mode selector",
+      "values": [
+        "REGULAR_MARGIN"
+      ]
+    }
+  },
+  "extended/create_withdrawal_signed": {
+    "settlement/collateralId": {
+      "reason": "collateral asset identifier",
+      "values": [
+        "0x456"
+      ]
+    }
+  },
+  "extended/get_account_pnl_percentage_history": {
+    "priceMarket": {
+      "reason": "valuation market identifier",
+      "values": [
+        "ETH-USD"
+      ]
+    }
+  },
+  "extended/get_cumulative_account_pnl_percentage_history": {
+    "priceMarket": {
+      "reason": "valuation market identifier",
+      "values": [
+        "ETH-USD"
+      ]
+    }
+  },
+  "extended/get_assets": {
+    "collateral": {
+      "reason": "asset collateral eligibility filter",
+      "values": [
+        "false"
+      ]
+    }
+  },
+  "extended/submit_internal_transfer": {
+    "settlement/expirationTimestamp": {
+      "reason": "signed transfer expiry timestamp",
+      "values": [
+        478932
+      ]
+    }
+  },
+  "extended/place_order": {
+    "settlement/collateralPosition": {
+      "reason": "settlement collateral position identifier",
+      "values": [
+        "4"
+      ]
+    }
+  },
+  "extended/place_rfq_order": {
+    "settlement/collateralPosition": {
+      "reason": "settlement collateral position identifier",
+      "values": [
+        "4"
+      ]
+    }
+  },
+  "hyperliquid/borrow_lend_signed": {
+    "action/operation": {
+      "reason": "operation kind selector",
+      "values": [
+        "supply"
+      ]
+    }
+  },
+  "kraken/allocate_earn_funds": {
+    "strategy_id": {
+      "reason": "strategy identifier",
+      "values": [
+        "strategy"
+      ]
+    }
+  },
+  "kraken/calculate_funding_fees": {
+    "fee_included": {
+      "reason": "fee inclusion flag",
+      "values": [
+        "true"
+      ]
+    },
+    "withdrawal_fee_token": {
+      "reason": "server-issued fee quote token",
+      "values": [
+        "fee-token"
+      ]
+    }
+  },
+  "kraken/deallocate_earn_funds": {
+    "strategy_id": {
+      "reason": "strategy identifier",
+      "values": [
+        "strategy"
+      ]
+    }
+  },
+  "kraken/get_earn_allocation_status": {
+    "strategy_id": {
+      "reason": "strategy identifier",
+      "values": [
+        "strategy"
+      ]
+    }
+  },
+  "kraken/get_earn_deallocation_status": {
+    "strategy_id": {
+      "reason": "strategy identifier",
+      "values": [
+        "strategy"
+      ]
+    }
+  },
+  "kraken/set_futures_self_trade_strategy": {
+    "strategy": {
+      "reason": "self-trade strategy selector",
+      "values": [
+        "CANCEL_MAKER_SELF"
+      ]
+    }
+  },
+  "kucoin/create_withdrawal": {
+    "feeDeductType": {
+      "reason": "fee deduction mode",
+      "values": [
+        "EXTERNAL"
+      ]
+    }
+  },
+  "kucoin/set_uta_rate_limit": {
+    "list/[]/rate": {
+      "reason": "API request rate limit in requests per second",
+      "values": [
+        50
+      ]
+    }
+  },
+  "kucoin/set_futures_batch_margin_mode": {
+    "marginMode": {
+      "reason": "margin mode selector",
+      "values": [
+        "CROSS"
+      ]
+    }
+  },
+  "kucoin/get_margin_oco_orders": {
+    "pageSize": {
+      "reason": "record count per page",
+      "values": [
+        "20"
+      ]
+    }
+  },
+  "kucoin/place_futures_tpsl_order": {
+    "stopPriceType": {
+      "reason": "stop trigger reference selector",
+      "values": [
+        "MP"
+      ]
+    }
+  },
+  "kucoin/set_futures_margin_mode": {
+    "marginMode": {
+      "reason": "margin mode selector",
+      "values": [
+        "ISOLATED"
+      ]
+    }
+  },
+  "kucoin/cancel_uta_orders_by_symbol": {
+    "marginMode": {
+      "reason": "margin mode selector",
+      "values": [
+        "ISOLATED"
+      ]
+    }
+  },
+  "kucoin/set_uta_margin_mode": {
+    "marginMode": {
+      "reason": "margin mode selector",
+      "values": [
+        "CROSS"
+      ]
+    }
+  },
+  "kucoin/get_uta_leverage": {
+    "marginMode": {
+      "reason": "margin mode selector",
+      "values": [
+        "CROSS"
+      ]
+    }
+  },
+  "kucoin/get_uta_position_history": {
+    "pageSize": {
+      "reason": "record count per page",
+      "values": [
+        "20"
+      ]
+    }
+  },
+  "kucoin/get_uta_funding_history": {
+    "pageSize": {
+      "reason": "record count per page",
+      "values": [
+        "200"
+      ]
+    }
+  },
+  "kucoin/get_uta_position_tiers": {
+    "marginMode": {
+      "reason": "margin mode selector",
+      "values": [
+        "CROSS"
+      ]
+    }
+  },
+  "kucoin/get_subaccounts": {
+    "pageSize": {
+      "reason": "record count per page",
+      "values": [
+        "10"
+      ]
+    }
+  },
+  "kucoin/get_spot_subaccount_balances": {
+    "pageSize": {
+      "reason": "record count per page",
+      "values": [
+        "10"
+      ]
+    }
+  },
+  "kucoin/get_uta_subaccounts": {
+    "pageSize": {
+      "reason": "record count per page",
+      "values": [
+        "10"
+      ]
+    }
+  },
+  "kucoin/get_uta_subaccount_currency_assets": {
+    "pageSize": {
+      "reason": "record count per page",
+      "values": [
+        "50"
+      ]
+    }
+  },
+  "kucoin/place_uta_order": {
+    "sizeUnit": {
+      "reason": "quantity unit selector",
+      "values": [
+        "BASECCY"
+      ]
+    }
+  },
+  "kucoin/amend_uta_order": {
+    "sizeUnit": {
+      "reason": "quantity unit selector",
+      "values": [
+        "UNIT"
+      ]
+    },
+    "slTriggerPriceType": {
+      "reason": "stop-loss trigger reference selector",
+      "values": [
+        "MP"
+      ]
+    }
+  },
+  "lighter/get_pnl_leaderboard": {
+    "offset": {
+      "reason": "pagination offset",
+      "values": [
+        "0"
+      ]
+    }
+  },
+  "lighter/get_explorer_account_logs": {
+    "offset": {
+      "reason": "pagination offset",
+      "values": [
+        "1"
+      ]
+    }
+  },
+  "lighter/submit_lit_lease": {
+    "duration_days": {
+      "reason": "lease duration in days",
+      "values": [
+        "30"
+      ]
+    }
+  },
+  "lighter/get_transaction": {
+    "value": {
+      "reason": "account or transaction lookup identifier",
+      "values": [
+        "abc"
+      ]
+    }
+  },
+  "lighter/update_account_asset_config": {
+    "tx_info/AssetMarginMode": {
+      "reason": "asset margin mode selector",
+      "values": [
+        1
+      ]
+    }
+  },
+  "lighter/get_account": {
+    "value": {
+      "reason": "account or transaction lookup identifier",
+      "values": [
+        "12"
+      ]
+    }
+  },
+  "lighter/get_account_metadata": {
+    "value": {
+      "reason": "account or transaction lookup identifier",
+      "values": [
+        "12"
+      ]
+    }
+  },
+  "lighter/get_pnl": {
+    "value": {
+      "reason": "account or transaction lookup identifier",
+      "values": [
+        "12"
+      ]
+    }
+  },
+  "lighter/send_tx": {
+    "price_protection": {
+      "reason": "price-protection flag",
+      "values": [
+        "false"
+      ]
+    }
+  },
+  "lighter/update_leverage": {
+    "tx_info/MarginMode": {
+      "reason": "margin mode selector",
+      "values": [
+        0
+      ]
+    }
+  },
+  "mexc/amend_contract_plan_order": {
+    "triggerType": {
+      "reason": "trigger direction or reference selector",
+      "values": [
+        1
+      ]
+    }
+  },
+  "mexc/get_contract_closed_orders": {
+    "page_size": {
+      "reason": "record count per page",
+      "values": [
+        "10"
+      ]
+    }
+  },
+  "mexc/get_contract_fee_details": {
+    "page_size": {
+      "reason": "record count per page",
+      "values": [
+        "10"
+      ]
+    }
+  },
+  "mexc/get_contract_funding_rate_history": {
+    "page_size": {
+      "reason": "record count per page",
+      "values": [
+        "20"
+      ]
+    }
+  },
+  "mexc/get_contract_funding_records": {
+    "page_size": {
+      "reason": "record count per page",
+      "values": [
+        "20"
+      ]
+    }
+  },
+  "mexc/get_contract_history_orders": {
+    "page_size": {
+      "reason": "record count per page",
+      "values": [
+        "20"
+      ]
+    }
+  },
+  "mexc/get_contract_history_positions": {
+    "page_size": {
+      "reason": "record count per page",
+      "values": [
+        "20"
+      ]
+    }
+  },
+  "mexc/get_contract_open_orders": {
+    "page_size": {
+      "reason": "record count per page",
+      "values": [
+        "20"
+      ]
+    }
+  },
+  "mexc/get_contract_order_deals": {
+    "page_size": {
+      "reason": "record count per page",
+      "values": [
+        "20"
+      ]
+    }
+  },
+  "mexc/get_contract_plan_orders": {
+    "page_size": {
+      "reason": "record count per page",
+      "values": [
+        "20"
+      ]
+    }
+  },
+  "mexc/get_contract_risk_reverse_history": {
+    "page_size": {
+      "reason": "record count per page",
+      "values": [
+        "20"
+      ]
+    }
+  },
+  "mexc/get_contract_stop_orders": {
+    "page_size": {
+      "reason": "record count per page",
+      "values": [
+        "20"
+      ]
+    }
+  },
+  "mexc/get_contract_transfer_records": {
+    "page_size": {
+      "reason": "record count per page",
+      "values": [
+        "20"
+      ]
+    }
+  },
+  "mexc/get_rebate_affiliate_campaign": {
+    "pageSize": {
+      "reason": "record count per page",
+      "values": [
+        "10"
+      ]
+    }
+  },
+  "mexc/get_rebate_affiliate_commission": {
+    "pageSize": {
+      "reason": "record count per page",
+      "values": [
+        "10"
+      ]
+    }
+  },
+  "mexc/get_rebate_affiliate_commission_detail": {
+    "pageSize": {
+      "reason": "record count per page",
+      "values": [
+        "10"
+      ]
+    }
+  },
+  "mexc/get_rebate_affiliate_referral": {
+    "pageSize": {
+      "reason": "record count per page",
+      "values": [
+        "10"
+      ]
+    }
+  },
+  "mexc/get_rebate_affiliate_subaffiliates": {
+    "pageSize": {
+      "reason": "record count per page",
+      "values": [
+        "10"
+      ]
+    }
+  },
+  "mexc/get_rebate_affiliate_withdraw": {
+    "pageSize": {
+      "reason": "record count per page",
+      "values": [
+        "10"
+      ]
+    }
+  },
+  "mexc/place_contract_plan_order": {
+    "triggerType": {
+      "reason": "trigger direction or reference selector",
+      "values": [
+        1
+      ]
+    }
+  },
+  "okx/trading_bot_dca_create": {
+    "triggerParams/[]/triggerAction": {
+      "reason": "bot trigger action selector",
+      "values": [
+        "1"
+      ]
+    },
+    "triggerParams/[]/triggerStrategy": {
+      "reason": "bot trigger strategy selector",
+      "values": [
+        "1"
+      ]
+    }
+  },
+  "okx/trading_bot_recurring_order_algo": {
+    "investmentCcy": {
+      "reason": "investment currency identifier",
+      "values": [
+        "USDT"
+      ]
+    }
+  },
+  "okx/set_fee_type": {
+    "feeType": {
+      "reason": "fee mode selector",
+      "values": [
+        "1"
+      ]
+    }
+  },
+  "okx/get_collateral_assets": {
+    "collateralEnabled": {
+      "reason": "collateral eligibility flag",
+      "values": [
+        "false"
+      ]
+    }
+  },
+  "okx/estimate_convert_quote": {
+    "rfqSzCcy": {
+      "reason": "RFQ quantity currency identifier",
+      "values": [
+        "BTC"
+      ]
+    }
+  },
+  "okx/execute_convert_trade": {
+    "szCcy": {
+      "reason": "quantity currency identifier",
+      "values": [
+        "BTC"
+      ]
+    }
+  },
+  "okx/adjust_flexible_loan_collateral": {
+    "collateralCcy": {
+      "reason": "collateral currency identifier",
+      "values": [
+        "BTC"
+      ]
+    }
+  },
+  "okx/request_dual_investment_quote": {
+    "notionalCcy": {
+      "reason": "notional currency identifier",
+      "values": [
+        "USDT"
+      ]
+    }
+  }
+}

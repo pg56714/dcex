@@ -2945,6 +2945,8 @@ def _kwargs(method: Any, name: str) -> dict[str, Any]:  # noqa: ANN401
                 raise AssertionError(f"{name}: no sample value for {parameter.name}")
             kwargs[sample_name] = VALUES[sample_name]
     kwargs.update(EXTRA.get(name, {}))
+    if name in {"cancel_spot_batch_orders", "cancel_uta_batch_orders"}:
+        kwargs["orderList"] = [{"orderId": "123"}]
     return kwargs
 
 
@@ -2954,6 +2956,8 @@ def _drain(received: "queue.Queue[dict[str, Any]]") -> None:
 
 
 def _assert_route(name: str, request: dict[str, Any]) -> None:
+    from tests.unit.wire_contracts import assert_wire_contract
+    assert_wire_contract("bitget", name, request)
     method, path = ROUTES[name]
     assert (request["method"], request["path"]) == (method, path), name
     assert request["signed"] is (name not in PUBLIC_METHODS), name

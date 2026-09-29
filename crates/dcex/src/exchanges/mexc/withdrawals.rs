@@ -128,3 +128,17 @@ mod wrappers {
      ];
     }
 }
+
+impl super::client::MexcClient {
+    pub(in crate::exchanges::mexc) async fn withdrawals_field_schema_request(
+        &self,
+        name: &str,
+        p: &super::params::MexcParams,
+    ) -> crate::Result<Option<crate::exchange::ValidatedResponse>> {
+        debug_assert!(
+            crate::exchanges::schema::fund_domain(name)
+                == Some(crate::exchanges::schema::FundDomain::Withdrawals)
+        );
+        self.field_schema_request_transport(name, p).await
+    }
+}

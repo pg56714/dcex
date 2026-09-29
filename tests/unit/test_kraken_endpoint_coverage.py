@@ -750,6 +750,8 @@ def _client_kwargs(base_url: str) -> dict[str, Any]:
 
 
 def _assert_route(request: dict[str, Any], method_name: str) -> None:
+    from tests.unit.wire_contracts import assert_wire_contract
+    assert_wire_contract("kraken", method_name, request)
     _kwargs, http_method, path, family = CASES[method_name]
     completion = next((c for c in COMPLETION_CASES if c["name"] == method_name), None)
     if completion is not None:

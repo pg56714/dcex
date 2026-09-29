@@ -98,3 +98,18 @@ mod wrappers {
      ];
     }
 }
+
+impl super::client::OkxClient {
+    pub(in crate::exchanges::okx) async fn transfers_table_request(
+        &self,
+        name: &str,
+        p: &super::params::OkxParams,
+        public: bool,
+    ) -> crate::Result<Option<crate::exchange::ValidatedResponse>> {
+        debug_assert!(
+            crate::exchanges::schema::fund_domain(name)
+                == Some(crate::exchanges::schema::FundDomain::Transfers)
+        );
+        self.table_request_transport(name, p, public).await
+    }
+}

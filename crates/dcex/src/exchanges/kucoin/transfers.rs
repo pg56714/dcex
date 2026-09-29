@@ -122,3 +122,32 @@ mod wrappers {
      ];
     }
 }
+
+impl super::client::KucoinClient {
+    pub(in crate::exchanges::kucoin) async fn transfers_table_request(
+        &self,
+        name: &str,
+        params: &super::params::KucoinParams,
+        public: bool,
+    ) -> crate::Result<Option<crate::exchange::ValidatedResponse>> {
+        debug_assert!(
+            crate::exchanges::schema::fund_domain(name)
+                == Some(crate::exchanges::schema::FundDomain::Transfers)
+        );
+        self.table_request_transport(name, params, public).await
+    }
+}
+
+impl super::client::KucoinClient {
+    pub(in crate::exchanges::kucoin) async fn transfers_catalog_request(
+        &self,
+        name: &str,
+        params: &super::params::KucoinParams,
+    ) -> crate::Result<Option<crate::exchange::ValidatedResponse>> {
+        debug_assert!(
+            crate::exchanges::schema::fund_domain(name)
+                == Some(crate::exchanges::schema::FundDomain::Transfers)
+        );
+        self.catalog_request_transport(name, params).await
+    }
+}

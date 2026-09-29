@@ -33,6 +33,23 @@ impl KrakenClient {
         params: &KrakenParams,
         public: bool,
     ) -> Result<Option<ValidatedResponse>> {
+        match crate::exchanges::schema::fund_domain(name) {
+            Some(crate::exchanges::schema::FundDomain::Withdrawals) => {
+                self.withdrawals_table_request(name, params, public).await
+            }
+            Some(crate::exchanges::schema::FundDomain::Transfers) => {
+                self.transfers_table_request(name, params, public).await
+            }
+            None => self.table_request_transport(name, params, public).await,
+        }
+    }
+
+    pub(in crate::exchanges::kraken) async fn table_request_transport(
+        &self,
+        name: &str,
+        params: &KrakenParams,
+        public: bool,
+    ) -> Result<Option<ValidatedResponse>> {
         let Some(endpoint) = ENDPOINTS
             .iter()
             .find(|e| e.name == name && e.public == public)

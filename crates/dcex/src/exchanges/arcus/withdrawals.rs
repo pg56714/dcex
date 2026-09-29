@@ -101,3 +101,17 @@ pub(super) fn withdrawal_message(value: &Value, timestamp: u64) -> Result<Vec<u8
     ]);
     serde_json::to_vec(&typed).map_err(invalid)
 }
+
+impl super::client::ArcusClient {
+    pub(in crate::exchanges::arcus) async fn withdrawals_field_schema_request(
+        &self,
+        name: &str,
+        params: Vec<(String, String)>,
+    ) -> crate::Result<crate::exchange::ValidatedResponse> {
+        debug_assert!(
+            crate::exchanges::schema::fund_domain(name)
+                == Some(crate::exchanges::schema::FundDomain::Withdrawals)
+        );
+        self.field_schema_request_transport(name, params).await
+    }
+}

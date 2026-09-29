@@ -108,3 +108,18 @@ mod fund_dispatch {
         }
     }
 }
+
+impl super::client::AsterClient {
+    pub(in crate::exchanges::aster) async fn transfers_prediction_dispatch(
+        &self,
+        name: &str,
+        p: &super::params::AsterParams,
+        public: bool,
+    ) -> crate::Result<Option<crate::exchange::ValidatedResponse>> {
+        debug_assert!(
+            crate::exchanges::schema::fund_domain(name)
+                == Some(crate::exchanges::schema::FundDomain::Transfers)
+        );
+        self.prediction_dispatch_transport(name, p, public).await
+    }
+}

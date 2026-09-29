@@ -39,3 +39,32 @@ mod wrappers {
      ];
     }
 }
+
+impl super::client::KrakenClient {
+    pub(in crate::exchanges::kraken) async fn withdrawals_table_request(
+        &self,
+        name: &str,
+        params: &super::params::KrakenParams,
+        public: bool,
+    ) -> crate::Result<Option<crate::exchange::ValidatedResponse>> {
+        debug_assert!(
+            crate::exchanges::schema::fund_domain(name)
+                == Some(crate::exchanges::schema::FundDomain::Withdrawals)
+        );
+        self.table_request_transport(name, params, public).await
+    }
+}
+
+impl super::client::KrakenClient {
+    pub(in crate::exchanges::kraken) async fn withdrawals_field_schema_request(
+        &self,
+        name: &str,
+        params: &super::params::KrakenParams,
+    ) -> crate::Result<Option<crate::exchange::ValidatedResponse>> {
+        debug_assert!(
+            crate::exchanges::schema::fund_domain(name)
+                == Some(crate::exchanges::schema::FundDomain::Withdrawals)
+        );
+        self.field_schema_request_transport(name, params).await
+    }
+}

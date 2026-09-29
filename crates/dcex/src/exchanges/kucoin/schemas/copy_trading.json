@@ -328,7 +328,7 @@
         },
         "margin_mode": {
           "type": "string",
-          "description": "post_v1_copy_trade_futures_orders/margin_mode: selects the account margin mode or its enabled state."
+          "description": "selects cross or isolated margin using the documented integer enumeration."
         },
         "stopPriceType": {
           "type": "string",
@@ -336,7 +336,7 @@
         },
         "marginMode": {
           "type": "string",
-          "description": "post_v1_copy_trade_futures_orders/marginMode: selects the account margin mode or its enabled state."
+          "description": "selects cross or isolated margin using the documented integer enumeration."
         }
       }
     }
@@ -670,7 +670,7 @@
         },
         "margin_mode": {
           "type": "string",
-          "description": "post_v1_copy_trade_futures_orders_test/margin_mode: selects the account margin mode or its enabled state."
+          "description": "selects cross or isolated margin using the documented integer enumeration."
         },
         "stopPriceType": {
           "type": "string",
@@ -678,7 +678,7 @@
         },
         "marginMode": {
           "type": "string",
-          "description": "post_v1_copy_trade_futures_orders_test/marginMode: selects the account margin mode or its enabled state."
+          "description": "selects cross or isolated margin using the documented integer enumeration."
         }
       }
     }
@@ -1005,7 +1005,7 @@
         },
         "margin_mode": {
           "type": "string",
-          "description": "post_v1_copy_trade_futures_st_orders/margin_mode: selects the account margin mode or its enabled state."
+          "description": "selects cross or isolated margin using the documented integer enumeration."
         },
         "stopPriceType": {
           "type": "string",
@@ -1013,7 +1013,7 @@
         },
         "marginMode": {
           "type": "string",
-          "description": "post_v1_copy_trade_futures_st_orders/marginMode: selects the account margin mode or its enabled state."
+          "description": "selects cross or isolated margin using the documented integer enumeration."
         }
       }
     }
@@ -1490,11 +1490,11 @@
       "properties": {
         "margin_mode": {
           "type": "string",
-          "description": "post_v1_copy_trade_futures_position_change_margin_mode/margin_mode: selects the account margin mode or its enabled state."
+          "description": "selects cross or isolated margin using the documented integer enumeration."
         },
         "marginMode": {
           "type": "string",
-          "description": "post_v1_copy_trade_futures_position_change_margin_mode/marginMode: selects the account margin mode or its enabled state."
+          "description": "selects cross or isolated margin using the documented integer enumeration."
         }
       }
     }

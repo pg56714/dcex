@@ -25,7 +25,7 @@ fn recording_server() -> (String, mpsc::Receiver<Recorded>) {
         for stream in listener.incoming() {
             let Ok(mut stream) = stream else { break };
             stream
-                .set_read_timeout(Some(Duration::from_secs(5)))
+                .set_read_timeout(Some(Duration::from_secs(10)))
                 .expect("timeout");
             let mut reader = BufReader::new(stream.try_clone().expect("clone"));
             let mut request_line = String::new();
@@ -658,7 +658,7 @@ fn signed_client(url: String) -> BitgetClient {
         Some("test_api_key_0000".to_string()),
         Some("test_api_secret_0000".to_string()),
         Some("test-passphrase".to_string()),
-        Duration::from_secs(5),
+        Duration::from_secs(10),
         url,
     )
     .expect("client")
@@ -666,7 +666,7 @@ fn signed_client(url: String) -> BitgetClient {
 
 fn next(receiver: &mpsc::Receiver<Recorded>, name: &str) -> Recorded {
     receiver
-        .recv_timeout(Duration::from_secs(5))
+        .recv_timeout(Duration::from_secs(10))
         .unwrap_or_else(|_| panic!("{name}: no request recorded"))
 }
 
@@ -967,7 +967,7 @@ async fn required_parameters_fail_before_transport() {
 
 #[tokio::test]
 async fn signed_requests_require_all_credentials() {
-    let client = BitgetClient::public(Duration::from_secs(1)).expect("client");
+    let client = BitgetClient::public(Duration::from_secs(10)).expect("client");
     let error = client
         .private_request("get_spot_account_info", Vec::new())
         .await

@@ -131,3 +131,33 @@ mod wrappers {
      ];
     }
 }
+
+impl super::client::BingxClient {
+    pub(in crate::exchanges::bingx) async fn withdrawals_table_request(
+        &self,
+        name: &str,
+        params: &super::params::BingxParams,
+        public: bool,
+    ) -> crate::Result<Option<crate::exchange::ValidatedResponse>> {
+        debug_assert!(
+            crate::exchanges::schema::fund_domain(name)
+                == Some(crate::exchanges::schema::FundDomain::Withdrawals)
+        );
+        self.table_request_transport(name, params, public).await
+    }
+}
+
+impl super::client::BingxClient {
+    pub(in crate::exchanges::bingx) async fn withdrawals_catalog_request(
+        &self,
+        name: &str,
+        p: &super::params::BingxParams,
+        public: bool,
+    ) -> crate::Result<Option<crate::exchange::ValidatedResponse>> {
+        debug_assert!(
+            crate::exchanges::schema::fund_domain(name)
+                == Some(crate::exchanges::schema::FundDomain::Withdrawals)
+        );
+        self.catalog_request_transport(name, p, public).await
+    }
+}

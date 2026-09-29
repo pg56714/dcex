@@ -15,15 +15,17 @@ from tests.unit.test_exchange_structure import EXCHANGES, NATIVE, ROOT
 @pytest.mark.parametrize("exchange", EXCHANGES)
 def test_all_fund_dispatch_arms_have_domain_owners(exchange):
     folder = NATIVE / exchange
+    delegates = {name for route in catalog_routes() if route["exchange"] == exchange for name in [route["method"], route["transport"]]}
     owners = {}
     for domain in ["withdrawals", "transfers"]:
         path = folder / f"{domain}.rs"
-        owners[domain] = request_owners(path.read_text(encoding="utf-8")) if path.exists() else set()
+        owners[domain] = request_owners(path.read_text(encoding="utf-8"), delegates) if path.exists() else set()
     readonly = json.loads((ROOT / "tests/fixtures/fund_readonly_dispatch.json").read_text(encoding="utf-8")).get(exchange, {})
     for path in folder.rglob("*.rs"):
         if "tests" in path.relative_to(folder).parts:
             continue
-        assert not misplaced_fund_arms(path.read_text(encoding="utf-8"), path.name, owners, readonly), path
+        nondispatch = [entry for entry in json.loads((ROOT / "tests/fixtures/fund_nondispatch_arms.json").read_text(encoding="utf-8")) if entry["source"] == path.relative_to(NATIVE).as_posix()]
+        assert not misplaced_fund_arms(path.read_text(encoding="utf-8"), path.name, owners, readonly, nondispatch), path
 
 
 def test_new_withdrawal_arm_cannot_hide_in_account():
@@ -76,25 +78,77 @@ def test_other_dispatch_forms_and_fund_names_are_governed(source, name):
     assert misplaced_fund_arms(source, "account.rs", {}, {}) == [name]
 
 
-def misplaced_schema_operations(filename, rows, exceptions):
-    return [row["name"] for row in rows if fund_domain(row.get("name", "")) and not filename.startswith("table_" + fund_domain(row["name"])) and f'{filename}/{row["name"]}' not in exceptions]
+def catalog_routes():
+    return json.loads((ROOT / "tests/fixtures/fund_catalog_dispatch.json").read_text(encoding="utf-8"))
+
+
+@pytest.mark.parametrize("route", catalog_routes(), ids=lambda route: route["exchange"] + "/" + route["method"])
+def test_catalog_dispatch_must_route_funds_through_domain_owner(route):
+    from tests.unit.rust_dispatch import functions
+    folder = NATIVE / route["exchange"]
+    source = (folder / route["source"]).read_text(encoding="utf-8")
+    router = dict(functions(source))[route["method"]]
+    assert "schema::fund_domain(" in router
+    assert re.search(r"None\s*=>\s*\{?\s*self\." + route["transport"], router)
+    for domain, variant in [("withdrawals", "Withdrawals"), ("transfers", "Transfers")]:
+        owner = domain + "_" + route["method"]
+        assert f"FundDomain::{variant}) =>" in router and f"self.{owner}(" in router
+        body = dict(functions((folder / (domain + ".rs")).read_text(encoding="utf-8")))[owner]
+        assert "schema::fund_domain(" in body and f"FundDomain::{variant}" in body
+        assert f"self.{route['transport']}(" in body
 
 
 @pytest.mark.parametrize("exchange", EXCHANGES)
-def test_fund_schema_operations_have_named_ownership(exchange):
-    exceptions = json.loads((ROOT / "tests/fixtures/fund_schema_exceptions.json").read_text(encoding="utf-8")).get(exchange, {})
-    seen = set()
-    for path in (NATIVE / exchange / "schemas").glob("*.json"):
+def test_fund_schema_operations_have_actual_owner_routes(exchange):
+    folder = NATIVE / exchange
+    routed = {row["source"] for row in catalog_routes() if row["exchange"] == exchange}
+    supported = set()
+    pending = set()
+    for path in (folder / "schemas").glob("*.json"):
         rows = json.loads(path.read_text(encoding="utf-8"))
         if not isinstance(rows, list):
             continue
-        assert not misplaced_schema_operations(path.name, rows, exceptions), path
-        seen.update(f'{path.name}/{row["name"]}' for row in rows if "name" in row)
-    assert set(exceptions) <= seen
-    assert all(len(set(reason.split())) >= 8 for reason in exceptions.values())
+        names = {row["name"] for row in rows if fund_domain(row.get("name", ""))}
+        pending |= names
+        for loader in folder.rglob("*.rs"):
+            if "tests" in loader.parts:
+                continue
+            source = loader.read_text(encoding="utf-8")
+            if f"schemas/{path.name}\"" not in source:
+                continue
+            relative = loader.relative_to(folder).as_posix()
+            if loader.name in {"withdrawals.rs", "transfers.rs"} or relative in routed or relative == "generated/schema_tables.rs" and "schema_requests.rs" in routed:
+                supported |= names
+    assert not pending - supported, (exchange, sorted(pending - supported))
+    assert not (ROOT / "tests/fixtures/fund_schema_exceptions.json").exists()
 
 
-def test_new_schema_fund_operation_requires_domain_or_named_exception():
-    rows = [{"name": "create_new_withdrawal"}]
-    assert misplaced_schema_operations("broker.json", rows, {}) == ["create_new_withdrawal"]
-    assert not misplaced_schema_operations("table_withdrawals.json", rows, {})
+@pytest.mark.parametrize("source", [
+    'match name { "create_withdrawal3" => Box::pin(self.signed_call("POST", "/api/v3/withdrawals", p)) }',
+    'match name { "create_withdrawal3" => { self.withdrawal_request(m,p); self.transport.execute(req).await } }',
+    'match name { "create_withdrawal3" => { self.withdrawal_request(m,p); private_post!(req) } }',
+    'match name { "create_withdrawal3" => { self.withdrawal_request(m,p); self.transport.get(req).await } }',
+    'match name { "create_withdrawal3" => { self.withdrawal_request(m,p); private_post! { req } } }',
+    'if "create_withdrawal3" == name { self.signed_call(p) }',
+    'if name == "a" || name == "create_withdrawal3" { self.signed_call(p) }',
+    'if name.contains("withdraw") { self.signed_call(p) }',
+    'if matches!(name, "create_withdrawal3") { self.signed_call(p) }',
+    'match name { "create_withdrawal3" => ("POST", "/api/v3/withdrawals") }',
+    'match name { "create_withdrawal3" => Some(Route { method: "POST", path: "/withdraw" }) }',
+])
+def test_round_seven_fund_dispatch_bypass_mutations(source):
+    assert misplaced_fund_arms(source, "account.rs", {"withdrawals": {"withdrawal_request"}}, {})
+
+
+def test_nondispatch_allowance_is_invalidated_by_added_sender():
+    import hashlib
+    body = 'validate(params);'
+    entry = {"names": ["create_withdrawal3"], "sha256": hashlib.sha256(body.encode()).hexdigest()}
+    clean = f'match name {{ "create_withdrawal3" => {body} }}'
+    assert not misplaced_fund_arms(clean, "account.rs", {}, {}, [entry])
+    mutated = clean.replace(body, '{ validate(params); self.transport.execute(req).await }')
+    assert misplaced_fund_arms(mutated, "account.rs", {}, {}, [entry])
+
+
+def test_await_and_transport_suffix_do_not_create_unlisted_owners():
+    assert request_owners("async fn sign_only() { self.next_nonce().await } async fn decoy() { self.unknown_transport().await }") == set()

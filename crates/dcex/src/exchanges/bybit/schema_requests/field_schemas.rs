@@ -35,6 +35,28 @@ impl BybitClient {
         params: &BybitParams,
         public: bool,
     ) -> Result<Option<ValidatedResponse>> {
+        match crate::exchanges::schema::fund_domain(name) {
+            Some(crate::exchanges::schema::FundDomain::Withdrawals) => {
+                self.withdrawals_field_schema_request(name, params, public)
+                    .await
+            }
+            Some(crate::exchanges::schema::FundDomain::Transfers) => {
+                self.transfers_field_schema_request(name, params, public)
+                    .await
+            }
+            None => {
+                self.field_schema_request_transport(name, params, public)
+                    .await
+            }
+        }
+    }
+
+    pub(in crate::exchanges::bybit) async fn field_schema_request_transport(
+        &self,
+        name: &str,
+        params: &BybitParams,
+        public: bool,
+    ) -> Result<Option<ValidatedResponse>> {
         let Some(endpoint) = endpoints().get(name).filter(|e| e.public == public) else {
             return Ok(None);
         };

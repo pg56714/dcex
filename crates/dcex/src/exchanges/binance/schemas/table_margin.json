@@ -104,11 +104,11 @@
       "properties": {
         "multi_assets_margin": {
           "type": "string",
-          "description": "set_futures_multi_assets_mode/multi_assets_margin: selects the settlement currency for the margin account."
+          "description": "enables or disables multi-assets margin mode using a boolean flag."
         },
         "multiAssetsMargin": {
           "type": "string",
-          "description": "set_futures_multi_assets_mode/multiAssetsMargin: selects the settlement currency for the margin account."
+          "description": "enables or disables multi-assets margin mode using a boolean flag."
         }
       }
     }

@@ -70,13 +70,13 @@ key 中的原始括號，仍正常跳脫 value。簽章與實際送出的位元�
 
 ```powershell
 uv run --no-sync python -m scripts.build_input_contracts --write
-uv run --no-sync python -m scripts.build_binance_wrappers
-uv run --no-sync python -m scripts.build_bitget_wrappers
-uv run --no-sync python -m scripts.build_bybit_wrappers
-uv run --no-sync python -m scripts.build_bingx_wrappers
-uv run --no-sync python -m scripts.build_hyperliquid_wrappers
-uv run --no-sync python -m scripts.build_kucoin_wrappers
-uv run --no-sync python -m scripts.build_schema_tables
+uv run --no-sync python -m scripts.build_binance_wrappers --write
+uv run --no-sync python -m scripts.build_bitget_wrappers --write
+uv run --no-sync python -m scripts.build_bybit_wrappers --write
+uv run --no-sync python -m scripts.build_bingx_wrappers --write
+uv run --no-sync python -m scripts.build_hyperliquid_wrappers --write
+uv run --no-sync python -m scripts.build_kucoin_wrappers --write
+uv run --no-sync python -m scripts.build_schema_tables --write
 uv run --no-sync ruff format dcex scripts
 uv run --no-sync ruff check dcex scripts --fix
 uv run --no-sync ruff format dcex scripts
@@ -134,3 +134,22 @@ Rust ledger 中沒有 `::symbol` 的引用刻意維持**檔案層級證據**：
 只證明來源檔存在，不代表特定函式已覆蓋該路由。有符號引用時仍驗證符號；
 路由層級的證據由專屬 wire 測試提供。superseded 理由須包含至少四個不同單字，
 不能用重複單一字串填滿長度門檻。
+
+所有 11 支 `scripts/build_*.py` 都必須明確指定 `--write` 或 `--check`。`--check` 在記憶體渲染；Rust 使用 rustfmt 標準輸入／輸出，Python 使用 Ruff 標準輸入／輸出，檔案有差異時回傳非零但不寫入。執行 `python -B -m scripts.build_schema_tables --check` 也會檢查格式化後的 Rust 表格；CI 逐一執行全部產生器。簽章向量使用隔離的 `uv run --no-sync --with hyperliquid-python-sdk==0.24.0 python -B -m scripts.build_hyperliquid_action_vectors --check`。
+
+
+第七輪補充：wire 名稱完整性已涵蓋全部 15 個交易所的既有端點封包測試；
+控制欄位以端點、完整路徑及已核對值限定，一般 description 不會免除 decimal 檢查。
+Backpack 百分比必須大於 0 且不超過 100，以精確十進位方式比較。
+Kraken 現貨數量 0 僅允許 reduce_only 或 ordertype=settle-position；
+x-zero-when 的陣列表示條件群組之間 OR，各群組內仍為 AND。
+
+[OKX amend-order 官方文件](https://www.okx.com/docs-v5/en/#order-book-trading-trade-post-amend-order)
+以 attachAlgoOrds[].sz 表示分批止盈數量；newSz 屬於外層主訂單，三個 amend 宣告均保留此區別。
+批次 TP/SL 必須是物件；BingX 的 null 與空字串選填值保留原樣，不編碼成字串 null。
+
+資金 catalog 入口先將提款／轉帳名稱交由各自 owner，再使用共用 transport 實作。
+所有權測試核對路由、owner 及 schema 載入來源，不依賴 schema 例外清單。
+單純 await nonce 或簽章不構成送出證據；純驗證允許清單限定完整原始程式內容，加入送出即失效。
+各交易所不可免除清單中的金融欄位不會因 int 註記而放行；移除識別前綴後，
+同一免除理由重複超過 4 次即使完整性檢查失敗。

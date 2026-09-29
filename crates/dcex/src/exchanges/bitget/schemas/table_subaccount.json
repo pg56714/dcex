@@ -257,7 +257,15 @@
     "days": null,
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "accounts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {}
+          }
+        }
+      }
     }
   }
 ]

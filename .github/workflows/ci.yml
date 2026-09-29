@@ -35,6 +35,17 @@ jobs:
       - name: Install dependencies
         run: uv sync --locked
 
+      - name: Check generated artifacts without writing
+        run: |
+          for generator in scripts/build_*.py; do
+            module="scripts.$(basename "$generator" .py)"
+            if [ "$module" = "scripts.build_hyperliquid_action_vectors" ]; then
+              uv run --no-sync --with hyperliquid-python-sdk==0.24.0 python -B -m "$module" --check
+            else
+              uv run --no-sync python -B -m "$module" --check
+            fi
+          done
+
       - name: Rust format
         run: cargo fmt --all --check
 

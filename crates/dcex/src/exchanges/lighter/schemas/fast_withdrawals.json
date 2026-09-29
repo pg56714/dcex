@@ -18,7 +18,16 @@
     ],
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "tx_info": {
+          "type": "object",
+          "properties": {
+            "Amount": {
+              "format": "decimal"
+            }
+          }
+        }
+      }
     }
   }
 ]

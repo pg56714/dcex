@@ -5,6 +5,35 @@
 
 use crate::{DcexError, Result};
 
+/// Ownership for schema-driven fund operations, including future catalog rows.
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub(crate) enum FundDomain {
+    Withdrawals,
+    Transfers,
+}
+
+pub(crate) fn fund_domain(name: &str) -> Option<FundDomain> {
+    if name.contains("withdraw")
+        || name.contains("bridge")
+        || ["send_usd", "send_spot", "send_asset", "send_to_evm"]
+            .iter()
+            .any(|word| name.contains(word))
+        || matches!(
+            name,
+            "transfer_l2_account"
+                | "transfer_same_master_account"
+                | "transfer_master_internal"
+                | "transfer_sub_account_internal"
+        )
+    {
+        Some(FundDomain::Withdrawals)
+    } else if name.contains("transfer") {
+        Some(FundDomain::Transfers)
+    } else {
+        None
+    }
+}
+
 /// Shared metadata for hand-written adapters with conditional signing rules.
 pub(crate) struct Route {
     pub name: &'static str,

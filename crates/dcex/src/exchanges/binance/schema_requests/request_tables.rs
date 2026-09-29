@@ -22,6 +22,23 @@ impl BinanceClient {
         p: &PublicParams,
         public: bool,
     ) -> Result<Option<ValidatedResponse>> {
+        match crate::exchanges::schema::fund_domain(name) {
+            Some(crate::exchanges::schema::FundDomain::Withdrawals) => {
+                self.withdrawals_catalog_request(name, p, public).await
+            }
+            Some(crate::exchanges::schema::FundDomain::Transfers) => {
+                self.transfers_catalog_request(name, p, public).await
+            }
+            None => self.catalog_request_transport(name, p, public).await,
+        }
+    }
+
+    pub(in crate::exchanges::binance) async fn catalog_request_transport(
+        &self,
+        name: &str,
+        p: &PublicParams,
+        public: bool,
+    ) -> Result<Option<ValidatedResponse>> {
         static ENDPOINTS: OnceLock<Vec<Endpoint>> = OnceLock::new();
         let endpoints = ENDPOINTS.get_or_init(load_schemas);
         let Some(e) = endpoints

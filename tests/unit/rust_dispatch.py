@@ -1,6 +1,7 @@
 """Source-preserving match-arm inspection for module ownership tests."""
 
 import re
+import hashlib
 
 TOKENS = re.compile(r'''//[^\n]*|/\*[\s\S]*?\*/|r(?P<hash>\#*)"[\s\S]*?"(?P=hash)|'(?:\\.|[^'\\\n])'|"(?:\\[\s\S]|[^"\\])*"''')
 
@@ -54,41 +55,54 @@ def fund_domain(name):
     return "transfers" if "transfer" in name else None
 
 
-SENDS = re.compile(r"\.await|HttpMethod::|(?<![\w.])(?:post|get|request)\s*\(")
-INLINE_SEND = re.compile(r"HttpMethod::|\b(?:private_|public_|signed_)(?:post|get|request|put|delete|patch)\w*\s*\(|\.(?:post|request|put|delete|patch)\s*\(|(?<![\w.])(?:post|get|request)\s*\(")
-ROUTE = re.compile(r'Some\s*\(\s*\(\s*"(?:POST|GET|PUT|DELETE|PATCH)"')
+# Only transport calls confer ownership. Awaiting a nonce or signer does not.
+SENDS = re.compile(r"HttpMethod::|(?<![\w.])(?:post|get|request)\s*\(|\.(?:submit_signed_tx|inventory_transport|private_request_bytes|post_private|get_private|request|private_post|private_get|public_get|private_post_value|get_request|post_request|submit_action|exchange_payload_at_nonce|additional_user_action|contract_get)\s*\(")
+PURE_CALLS = {"Some", "Ok", "Err", "Box", "pin"}
 
 
-def request_owners(source):
-    return {name for name, body in functions(source) if SENDS.search(mask(body))}
+def request_owners(source, delegates=()):
+    bodies = dict(functions(source))
+    owners = {name for name, body in bodies.items() if SENDS.search(mask(body)) or set(re.findall(r"self\.(\w+)\s*\(", mask(body))) & set(delegates)}
+    while True:
+        expanded = owners | {name for name, body in bodies.items() if set(re.findall(r"self\.(\w+)\s*\(", mask(body))) & owners}
+        if expanded == owners:
+            return owners
+        owners = expanded
 
 
 def conditional_arms(source):
     clean = mask(source)
-    for match in re.finditer(r'\b(?:if|else\s+if)\s+\w+\s*==\s*"(\w+)"\s*\{', source):
-        if clean[match.start():match.start() + 2] not in {"if", "el"}:
+    for match in re.finditer(r"\bif\s+", clean):
+        start = clean.find("{", match.end())
+        if start < 0:
             continue
-        start, depth = match.end(), 1
-        end = start
-        while depth:
+        condition = source[match.start() + 2:start]
+        names = re.findall(r'"(\w+)"', condition)
+        if not names:
+            continue
+        end, depth = start + 1, 1
+        while depth and end < len(clean):
             depth += (clean[end] == "{") - (clean[end] == "}")
             end += 1
-        yield [match[1]], source[start:end - 1]
+        yield names, source[start + 1:end - 1]
 
 
-def misplaced_fund_arms(source, filename, owners, readonly):
+def misplaced_fund_arms(source, filename, owners, readonly, nondispatch=()):
     failures = []
     for names, body in [*arms(source), *conditional_arms(source)]:
         for name in names:
             domain = fund_domain(name)
-            if domain is None:
+            if domain is None or filename == domain + ".rs" or name in readonly:
                 continue
-            # Pure field-validation/configuration matches do not dispatch requests.
-            if not SENDS.search(mask(body)) and not ROUTE.search(body):
+            digest = hashlib.sha256(re.sub(r"\s+", " ", body.strip()).encode()).hexdigest()
+            if any(name in entry["names"] and digest == entry["sha256"] for entry in nondispatch):
                 continue
-            if filename == domain + ".rs" or name in readonly:
-                continue
-            called = set(re.findall(r"\b(\w+)\s*\(", mask(body)))
-            if INLINE_SEND.search(mask(body)) or ROUTE.search(body) or not called & owners.get(domain, set()):
+            clean = mask(body)
+            clean = re.sub(r"\b(?:params|p)\.(?:get|required|u64)\s*\(", "(", clean)
+            called = set(re.findall(r"\b(\w+)\s*(?:!\s*)?\(", clean))
+            allowed = owners.get(domain, set())
+            # A dispatch must be solely an owner delegation, never a decoy plus
+            # another call, macro, route table, or unrecognised sender.
+            if not called & allowed or called - allowed - PURE_CALLS or re.search(r"\b\w+!\s*[({\[]", clean):
                 failures.append(name)
     return failures

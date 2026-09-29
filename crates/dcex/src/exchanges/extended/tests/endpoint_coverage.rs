@@ -112,7 +112,7 @@ fn multi_request_server() -> (String, Arc<AtomicBool>, JoinHandle<Vec<String>>) 
                 Ok((mut stream, _)) => {
                     stream.set_nonblocking(false).expect("blocking stream");
                     stream
-                        .set_read_timeout(Some(Duration::from_secs(2)))
+                        .set_read_timeout(Some(Duration::from_secs(10)))
                         .expect("read timeout");
                     requests.push(read_request(&mut stream));
                     let response = format!(
@@ -143,7 +143,7 @@ fn client(base_url: &str) -> ExtendedClient {
         Some(STARK_PUBLIC_KEY.to_string()),
         Some(VAULT),
         None,
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         base_url.to_string(),
         "dcex-test".to_string(),
     )

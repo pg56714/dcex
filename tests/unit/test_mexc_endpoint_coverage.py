@@ -874,6 +874,8 @@ def _assert_route(requests: list[dict[str, Any]], method_name: str) -> None:
         endpoint = [request for request in requests if not request["sync"]]
     assert len(endpoint) == 1, (method_name, requests)
     request = endpoint[0]
+    from tests.unit.wire_contracts import assert_wire_contract
+    assert_wire_contract("mexc", method_name, request)
     assert request["method"] == http_method, method_name
     assert urlsplit(request["path"]).path == path, method_name
     if method_name in COMPLETION_BY_NAME:

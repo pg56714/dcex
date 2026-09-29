@@ -117,7 +117,7 @@
         },
         "margin_mode": {
           "type": "string",
-          "description": "classic_copytrading_future_copytrade_follower_copy_settings/margin_mode: selects the account margin mode or its enabled state."
+          "description": "selects cross or isolated margin using the documented integer enumeration."
         }
       }
     }
@@ -434,7 +434,7 @@
         },
         "margin_mode": {
           "type": "string",
-          "description": "classic_copytrading_future_copytrade_follower_close_positions/margin_mode: selects the account margin mode or its enabled state."
+          "description": "selects cross or isolated margin using the documented integer enumeration."
         }
       }
     }

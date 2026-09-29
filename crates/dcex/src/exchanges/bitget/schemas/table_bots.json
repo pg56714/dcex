@@ -309,6 +309,16 @@
         "trailingGrid": {
           "type": "string",
           "description": "uta_trade_grid_create_bot/trailingGrid: selects trailing Grid identifiers or response filters for this operation."
+        },
+        "lossReserve": {
+          "type": "string",
+          "format": "decimal",
+          "x-positive": true
+        },
+        "loss_reserve": {
+          "type": "string",
+          "format": "decimal",
+          "x-positive": true
         }
       }
     }
@@ -949,6 +959,16 @@
         "trailingGrid": {
           "type": "string",
           "description": "uta_trade_grid_validate/trailingGrid: selects trailing Grid identifiers or response filters for this operation."
+        },
+        "lossReserve": {
+          "type": "string",
+          "format": "decimal",
+          "x-positive": true
+        },
+        "loss_reserve": {
+          "type": "string",
+          "format": "decimal",
+          "x-positive": true
         }
       }
     }

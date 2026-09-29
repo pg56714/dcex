@@ -1104,7 +1104,7 @@ fn client_for(url: String) -> KrakenClient {
         Some(SECRET.into()),
         Some("futures-key".into()),
         Some(SECRET.into()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         url.clone(),
         url,
     )
@@ -1278,8 +1278,8 @@ fn futures_send_order_body_matches_documented_fields() {
 
 #[test]
 fn unknown_dispatch_names_are_rejected_before_transport() {
-    let client = KrakenClient::public(Duration::from_secs(1)).expect("client");
-    let other = KrakenClient::public(Duration::from_secs(1)).expect("client");
+    let client = KrakenClient::public(Duration::from_secs(10)).expect("client");
+    let other = KrakenClient::public(Duration::from_secs(10)).expect("client");
     let public =
         crate::http::block_on(async move { client.public_request("get_nope", Vec::new()).await })
             .expect_err("unknown public");

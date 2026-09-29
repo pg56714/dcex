@@ -23,6 +23,18 @@
     "get_bridge_quote": "Requests a non-binding bridge estimate; committing the quote is a separate withdrawal operation."
   },
   "lighter": {
-    "get_fastbridge_info": "Reads public fast-bridge configuration; does not create or commit a withdrawal."
+    "get_fastbridge_info": "Reads public fast-bridge configuration; does not create or commit a withdrawal.",
+    "get_fastwithdraw_info": "Reads fastwithdraw info metadata or history; no fund submission occurs.",
+    "get_transfer_history": "Reads transfer history metadata or history; no fund submission occurs.",
+    "get_transfer_fee_info": "Reads transfer fee info metadata or history; no fund submission occurs.",
+    "get_withdraw_history": "Reads withdraw history metadata or history; no fund submission occurs.",
+    "get_withdrawal_delay": "Reads withdrawal delay metadata or history; no fund submission occurs."
+  },
+  "arcus": {
+    "get_transfer_updates": "Reads transfer updates metadata or history; no fund submission occurs."
+  },
+  "backpack": {
+    "get_max_withdrawal_quantity": "Reads max withdrawal quantity metadata or history; no fund submission occurs.",
+    "get_withdrawals": "Reads withdrawals metadata or history; no fund submission occurs."
   }
 }

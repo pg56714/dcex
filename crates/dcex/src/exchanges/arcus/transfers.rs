@@ -138,3 +138,17 @@ mod wrappers {
      ];
     }
 }
+
+impl super::client::ArcusClient {
+    pub(in crate::exchanges::arcus) async fn transfers_field_schema_request(
+        &self,
+        name: &str,
+        params: Vec<(String, String)>,
+    ) -> crate::Result<crate::exchange::ValidatedResponse> {
+        debug_assert!(
+            crate::exchanges::schema::fund_domain(name)
+                == Some(crate::exchanges::schema::FundDomain::Transfers)
+        );
+        self.field_schema_request_transport(name, params).await
+    }
+}

@@ -172,6 +172,14 @@
               "sz": {
                 "type": "string",
                 "format": "decimal"
+              },
+              "from": {
+                "type": "object",
+                "properties": {
+                  "sz": {
+                    "format": "decimal"
+                  }
+                }
               }
             }
           }

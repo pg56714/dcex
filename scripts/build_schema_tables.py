@@ -4,6 +4,8 @@ import json
 import re
 from pathlib import Path
 
+from scripts.generation import emit, run
+
 ROOT = Path(__file__).resolve().parents[1] / "crates/dcex/src/exchanges"
 EXCHANGES = ("binance", "bitget", "bybit", "bingx", "kucoin", "kraken", "okx")
 
@@ -90,9 +92,8 @@ def main() -> None:
                 "}",
             ]
         destination = folder / f"generated/{output}.rs"
-        destination.parent.mkdir(exist_ok=True)
-        destination.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        emit(destination, "\n".join(lines) + "\n")
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(run(main))

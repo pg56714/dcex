@@ -595,6 +595,8 @@ def _fail_if_native_is_stale(exc: ValueError, case: Case) -> None:
 
 def _assert_request(case: Case, received: queue.Queue[dict[str, Any]]) -> None:
     request = received.get_nowait()
+    from tests.unit.wire_contracts import assert_wire_contract
+    assert_wire_contract("backpack", case.method_name, request)
     assert received.empty(), f"{case.method_name} sent more than one request"
     method, path = case.route.split(" ", 1)
     parts = urlsplit(request["path"])

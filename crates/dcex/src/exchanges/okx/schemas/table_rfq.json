@@ -271,6 +271,20 @@
         "sz": {
           "type": "string",
           "format": "decimal"
+        },
+        "legs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sz": {
+                "format": "decimal"
+              },
+              "px": {
+                "format": "decimal"
+              }
+            }
+          }
         }
       }
     }
@@ -316,7 +330,26 @@
     "bools": [
       "includeAll"
     ],
-    "schema": "{\"type\":\"object\",\"properties\":{\"instType\":{\"type\":\"string\"},\"includeAll\":{\"type\":\"boolean\"},\"data\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"instFamily\":{\"type\":\"string\"},\"instId\":{\"type\":\"string\"},\"maxBlockSz\":{\"type\":\"string\"},\"makerPxBand\":{\"type\":\"string\"}},\"required\":[]}}},\"required\":[\"instType\",\"data\"]}"
+    "schema": "{\"type\":\"object\",\"properties\":{\"instType\":{\"type\":\"string\"},\"includeAll\":{\"type\":\"boolean\"},\"data\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"instFamily\":{\"type\":\"string\"},\"instId\":{\"type\":\"string\"},\"maxBlockSz\":{\"type\":\"string\"},\"makerPxBand\":{\"type\":\"string\"}},\"required\":[]}}},\"required\":[\"instType\",\"data\"]}",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "maxBlockSz": {
+                "format": "decimal"
+              },
+              "makerPxBand": {
+                "format": "decimal"
+              }
+            }
+          }
+        }
+      }
+    }
   },
   {
     "name": "reset_rfq_mmp",

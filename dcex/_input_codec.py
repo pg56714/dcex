@@ -19,9 +19,14 @@ def resolve_schema(schema: dict[str, Any]) -> dict[str, Any]:
 
 
 def contextual_schema(schema: dict[str, Any], values: dict[str, Any]) -> dict[str, Any]:
-    """Allow a declared zero control only when all sibling conditions match."""
+    """Allow zero when one declared group of sibling conditions matches."""
     conditions = schema.get("x-zero-when")
-    if conditions and all(values.get(key) in allowed for key, allowed in conditions.items()):
+    if not conditions:
+        return schema
+    groups = conditions if isinstance(conditions, list) else [conditions]
+    if conditions and any(
+        all(values.get(key) in allowed for key, allowed in group.items()) for group in groups
+    ):
         return {**schema, "x-positive": False}
     return schema
 
@@ -39,6 +44,8 @@ def normalize(
         value = value.value
     if value is None:
         return None
+    if value == "" and schema.get("x-empty-as-absent"):
+        return value
     if (
         isinstance(value, str)
         and value.startswith(("{", "["))
@@ -46,6 +53,8 @@ def normalize(
     ):
         normalize(json.loads(value, parse_float=str), key, schema=schema)
         return value
+    if schema.get("type") == "object" and not isinstance(value, dict):
+        raise ValueError(f"{key} must be a JSON object")
     if schema.get("format") == "decimal":
         if isinstance(value, float | bool):
             raise ValueError(f"{key} requires an exact decimal string or Decimal, not float/bool")
@@ -63,6 +72,10 @@ def normalize(
             raise ValueError(f"{key} requires a plain decimal string")
         if schema.get("x-positive") and not any(char in "123456789" for char in digits):
             raise ValueError(f"{key} must be a positive plain decimal string")
+        if schema.get("x-percent-range") and text.endswith("%") and not 0 < Decimal(digits) <= 100:
+            raise ValueError(
+                f"{key} requires a decimal percentage greater than 0% and at most 100%"
+            )
     if isinstance(value, Decimal):
         if not value.is_finite():
             raise ValueError(f"{key or 'decimal'} must be finite")

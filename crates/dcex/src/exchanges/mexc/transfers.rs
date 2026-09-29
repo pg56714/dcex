@@ -243,3 +243,17 @@ mod wrappers {
      ];
     }
 }
+
+impl super::client::MexcClient {
+    pub(in crate::exchanges::mexc) async fn transfers_field_schema_request(
+        &self,
+        name: &str,
+        p: &super::params::MexcParams,
+    ) -> crate::Result<Option<crate::exchange::ValidatedResponse>> {
+        debug_assert!(
+            crate::exchanges::schema::fund_domain(name)
+                == Some(crate::exchanges::schema::FundDomain::Transfers)
+        );
+        self.field_schema_request_transport(name, p).await
+    }
+}

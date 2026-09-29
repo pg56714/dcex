@@ -1115,6 +1115,8 @@ def test_wrapper_params_reach_official_route(case: WrapperCase) -> None:
         requests.append(received.get_nowait())
     assert len(requests) == 1
     assert requests[0]["method"] == EXPECTED_VERBS[case.method]
+    from tests.unit.wire_contracts import assert_wire_contract
+    assert_wire_contract("lighter", case.method, requests[0])
     url = urlsplit(requests[0]["path"])
     query = parse_qsl(url.query)
     assert not any(key in {"authorization", "product_symbol", "type_", "from_"} for key, _ in query)
