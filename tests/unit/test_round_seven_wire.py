@@ -79,8 +79,8 @@ async def test_bingx_batch_attached_object_or_absent(asynchronous, native, value
                 request = received.get(timeout=10)
                 params = parse_qs(urlsplit(request["path"]).query or request["body"])
                 payload = json.loads(params["batchOrders"][0])[0]
-                assert payload.get("takeProfit") in (None, "")
-                assert payload.get("stopLoss") in (None, "")
+                assert "takeProfit" not in payload
+                assert "stopLoss" not in payload
             else:
                 with pytest.raises(ValueError, match="JSON object"):
                     await invoke(client, "place_swap_batch_order", args, native)

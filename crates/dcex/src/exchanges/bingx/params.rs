@@ -17,7 +17,10 @@ const BATCH_NUMERIC_FIELDS: &[&str] = &[
 pub(super) struct BingxParams(Vec<(String, String)>);
 
 impl BingxParams {
-    pub(super) fn from_pairs(params: Vec<(String, String)>) -> Self {
+    pub(super) fn from_pairs(mut params: Vec<(String, String)>) -> Self {
+        params.retain(|(key, value)| {
+            !matches!(key.as_str(), "takeProfit" | "stopLoss") || !value.trim().is_empty()
+        });
         Self(params)
     }
 
@@ -359,15 +362,16 @@ fn normalize_batch_value(value: Value) -> Result<Value> {
     if let Some(orders) = orders.as_array_mut() {
         for order in orders {
             for key in ["takeProfit", "stopLoss"] {
+                if order.get(key).is_some_and(|attached| {
+                    attached.is_null() || attached.as_str().is_some_and(|raw| raw.trim().is_empty())
+                }) {
+                    order
+                        .as_object_mut()
+                        .expect("validated order object")
+                        .remove(key);
+                    continue;
+                }
                 if let Some(attached) = order.get_mut(key) {
-                    if attached.is_null()
-                        || attached.as_str().is_some_and(|raw| raw.trim().is_empty())
-                    {
-                        if attached.is_string() {
-                            *attached = Value::String(String::new());
-                        }
-                        continue;
-                    }
                     let value = if let Some(raw) = attached.as_str() {
                         serde_json::from_str(raw.trim()).map_err(|_| {
                             invalid(format!("parameter {key} must be a JSON object"))
@@ -420,4 +424,28 @@ pub(super) fn python_list_string(value: &str) -> String {
 
 pub(in crate::exchanges::bingx) fn invalid(message: impl std::fmt::Display) -> crate::DcexError {
     crate::DcexError::InvalidInput(format!("BingX: {message}"))
+}
+
+#[cfg(test)]
+mod optional_attached_tests {
+    use super::*;
+
+    #[test]
+    fn blank_optional_fields_are_absent_in_pairs_and_batches() {
+        for blank in ["", "  ", "\t"] {
+            let params = BingxParams::from_pairs(vec![
+                ("takeProfit".into(), blank.into()),
+                ("stopLoss".into(), blank.into()),
+                ("quantity".into(), "1".into()),
+            ]);
+            assert_eq!(params.get("takeProfit"), None);
+            assert_eq!(params.get("stopLoss"), None);
+            assert_eq!(params.get("quantity"), Some("1"));
+            let orders = normalize_batch_value(serde_json::json!([{
+                "quantity": "1", "takeProfit": blank, "stopLoss": null,
+            }]))
+            .unwrap();
+            assert_eq!(orders, serde_json::json!([{"quantity": 1}]));
+        }
+    }
 }
