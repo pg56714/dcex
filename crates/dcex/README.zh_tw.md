@@ -52,7 +52,7 @@ cargo add tokio --features macros,rt-multi-thread
 
 私人 WebSocket 包含需驗證身分或指定地址的使用者資料流；Binance、Bybit、Bitget、OKX、KuCoin 與 Kraken 現貨提供交易 WebSocket；Hyperliquid 與 Lighter 可提交已簽名操作，Arcus 提供簽名請求建立介面。
 
-Lighter 支援 Mainnet 與 Robinhood，兩者使用不同憑證；可逐一為客戶端選擇網路，預設為 Mainnet。Ondo 支援永續合約、現貨公開 REST 行情（深度、成交、symbol 資訊及歷史資料）、現貨 product table，以及公開現貨 WebSocket 委託簿／成交訂閱。現貨私有交易在官方公布 API 規格前維持 blocked，詳見 [Ondo 現貨支援範圍](../../docs/ondo-spot.zh_tw.md)。Arcus Spot 使用獨立的 RFQ router，送出報價時須由外部錢包簽章；Arcus Perps 使用另一個客戶端，其私人交易流程尚未經實際環境驗證。
+Lighter 支援 Mainnet 與 Robinhood，兩者使用不同憑證；可逐一為客戶端選擇網路，預設為 Mainnet。Ondo 現貨目前僅支援公開行情（depth、trades、symbol_info、history 與 WS 現貨頻道）；官方尚未公布現貨交易 API，因此下單、撤單等私有操作傳入 `-SPOT` symbol 會在本地報錯，不會送出請求。Arcus Spot 使用獨立的 RFQ router，送出報價時須由外部錢包簽章；Arcus Perps 使用另一個客戶端，其私人交易流程尚未經實際環境驗證。
 
 ## Rust 快速開始
 
@@ -154,7 +154,3 @@ cargo run -p dcex --example binance_ws_public
 私人範例需相應憑證或使用者地址。[Python 套件 README](https://github.com/pg56714/dcex/blob/main/README.zh_tw.md) 說明 Python 用法。此 crate 採用 [MIT 授權](https://github.com/pg56714/dcex/blob/main/LICENSE)；其他授權資訊見[第三方聲明](https://github.com/pg56714/dcex/blob/main/THIRD_PARTY_NOTICES.md)。
 
 [端點覆蓋、限制與驗證紀錄](https://github.com/pg56714/dcex/blob/main/docs/endpoint-audit.zh_tw.md)。
-
-Ondo 現貨 WebSocket 訂閱接受 `SPY-USDC` 等交易所 symbol，也接受 `SPY-USDC-SPOT` 等 product-table symbol。格式錯誤的現貨列會略過並以 `log::warn!` 記錄，應用程式可透過 Rust `log` logger 控制輸出。呼叫永續交易方法前，請先篩選 `product_type == "swap"`。
-
-[升級至 rust-v0.12.0](../../docs/upgrade-0.34.0.zh_tw.md)

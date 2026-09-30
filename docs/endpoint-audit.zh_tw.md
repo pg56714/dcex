@@ -8,7 +8,7 @@
 
 API 提款沒有第二次確認，送出即執行。建議交易用 API 金鑰不要開啟提款權限。需要錢包授權的操作保留呼叫端提供的簽章；不臆測未公開的簽章規格。
 
-[互動覆蓋表](endpoint-coverage.html) · [逐列證據](endpoint-coverage-ledger.json) · [待處理項目](endpoint-recheck.zh_tw.md) · [方法索引](endpoint-methods.zh_tw.md)
+[互動覆蓋表](endpoint-coverage.html) · [逐列證據](endpoint-coverage-ledger.json)
 
 ## 覆蓋狀態
 
@@ -27,25 +27,25 @@ API 提款沒有第二次確認，送出即執行。建議交易用 API 金鑰�
 
 ## 交易所與 Python 方法
 
-方法數包含別名與簽章輔助方法，不是端點數；新增數以 `d0bbf8b0` 為基準。
+方法數包含別名與簽章輔助方法，不是端點數。
 
-| 交易所 | 公開方法 | 新增 | 已實作列 | 待處理列 |
-| --- | ---: | ---: | ---: | ---: |
-| [binance](official-endpoint-inventory/binance.json) | 758 | 449 | 748 | 0 |
-| [bybit](official-endpoint-inventory/bybit.json) | 448 | 278 | 434 | 0 |
-| [okx](official-endpoint-inventory/okx.json) | 404 | 228 | 388 | 0 |
-| [bitget](official-endpoint-inventory/bitget.json) | 638 | 500 | 610 | 0 |
-| [bingx](official-endpoint-inventory/bingx.json) | 210 | 121 | 191 | 0 |
-| [kraken](official-endpoint-inventory/kraken.json) | 164 | 98 | 148 | 0 |
-| [mexc](official-endpoint-inventory/mexc.json) | 176 | 56 | 157 | 0 |
-| [kucoin](official-endpoint-inventory/kucoin.json) | 368 | 252 | 340 | 0 |
-| [hyperliquid](official-endpoint-inventory/hyperliquid.json) | 146 | 100 | 118 | 0 |
-| [lighter](official-endpoint-inventory/lighter.json) | 136 | 64 | 110 | 0 |
-| [backpack](official-endpoint-inventory/backpack.json) | 82 | 18 | 79 | 0 |
-| [aster](official-endpoint-inventory/aster.json) | 157 | 69 | 152 | 0 |
-| [extended](official-endpoint-inventory/extended.json) | 72 | 31 | 72 | 0 |
-| [ondo](official-endpoint-inventory/ondo.json) | 82 | 11 | 76 | 0 |
-| [arcus](official-endpoint-inventory/arcus.json) | 90 | 50 | 77 | 0 |
+| 交易所 | 公開方法 | 已實作列 | 待處理列 |
+| --- | ---: | ---: | ---: |
+| [binance](official-endpoint-inventory/binance.json) | 758 | 748 | 0 |
+| [bybit](official-endpoint-inventory/bybit.json) | 448 | 434 | 0 |
+| [okx](official-endpoint-inventory/okx.json) | 404 | 388 | 0 |
+| [bitget](official-endpoint-inventory/bitget.json) | 638 | 610 | 0 |
+| [bingx](official-endpoint-inventory/bingx.json) | 210 | 191 | 0 |
+| [kraken](official-endpoint-inventory/kraken.json) | 164 | 148 | 0 |
+| [mexc](official-endpoint-inventory/mexc.json) | 176 | 157 | 0 |
+| [kucoin](official-endpoint-inventory/kucoin.json) | 368 | 340 | 0 |
+| [hyperliquid](official-endpoint-inventory/hyperliquid.json) | 146 | 118 | 0 |
+| [lighter](official-endpoint-inventory/lighter.json) | 136 | 110 | 0 |
+| [backpack](official-endpoint-inventory/backpack.json) | 82 | 79 | 0 |
+| [aster](official-endpoint-inventory/aster.json) | 157 | 152 | 0 |
+| [extended](official-endpoint-inventory/extended.json) | 72 | 72 | 0 |
+| [ondo](official-endpoint-inventory/ondo.json) | 82 | 76 | 0 |
+| [arcus](official-endpoint-inventory/arcus.json) | 90 | 77 | 0 |
 
 ## 驗證與限制
 
@@ -67,5 +67,3 @@ API 提款沒有第二次確認，送出即執行。建議交易用 API 金鑰�
 - OKX/Bitget SBE 回傳原始位元組，未內建解碼器。
 - Lighter explorer 使用獨立 base URL；歷史匯出不會自動付費。
 - `unverified` 與 `blocked` 的具體缺口及解除條件保留在清冊中。
-
-Ondo 已支援永續合約與現貨公開行情及 product table；現貨私有交易維持 blocked，現貨餘額查詢及 WebSocket 規格尚未確認。詳見 [Ondo 現貨支援範圍](ondo-spot.zh_tw.md)。

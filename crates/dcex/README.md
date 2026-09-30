@@ -55,7 +55,7 @@ Available endpoints differ by exchange. Documented withdrawal, market-maker and 
 
 Private WebSocket support includes authenticated or address-scoped user-data streams. Binance, Bybit, Bitget, OKX, KuCoin and Kraken Spot also expose authenticated trading WebSockets.
 
-Lighter supports Mainnet and Robinhood with separate credentials; select the network for each client (Mainnet is the default). Ondo supports perpetual futures, public spot REST data (depth, trades, symbol information and history), spot product-table entries, and public spot WebSocket book/trade subscriptions. Private spot trading remains blocked until official API specifications are published. See [Ondo spot support](../../docs/ondo-spot.md). Arcus Spot uses a separate RFQ router and an externally wallet-signed quote; Arcus Perps is a separate client whose private execution has not yet been live-verified.
+Lighter supports Mainnet and Robinhood with separate credentials; select the network for each client (Mainnet is the default). Ondo spot currently supports only public market data (depth, trades, symbol_info, history and WS spot channels); Ondo has not published its spot trading API, so private operations such as placing or cancelling orders with a `-SPOT` symbol fail locally without sending a request. Arcus Spot uses a separate RFQ router and an externally wallet-signed quote; Arcus Perps is a separate client whose private execution has not yet been live-verified.
 
 ## Rust quick start
 
@@ -155,7 +155,3 @@ cargo run -p dcex --example binance_ws_public
 ```
 
 Private examples require the corresponding credentials or user address. The [Python package README](https://github.com/pg56714/dcex/blob/main/README.md) covers Python usage. This crate uses the [MIT License](https://github.com/pg56714/dcex/blob/main/LICENSE); see the [third-party notices](https://github.com/pg56714/dcex/blob/main/THIRD_PARTY_NOTICES.md) for additional licenses.
-
-Ondo spot WebSocket subscriptions accept exchange symbols such as `SPY-USDC` and product-table symbols such as `SPY-USDC-SPOT`. Malformed spot rows are skipped with `log::warn!`; applications control those diagnostics through their Rust `log` logger. Filter product-table rows to `product_type == "swap"` before calling perpetual trading methods.
-
-[Upgrade to rust-v0.12.0](../../docs/upgrade-0.34.0.md)

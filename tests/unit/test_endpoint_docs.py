@@ -12,7 +12,9 @@ from scripts.build_endpoint_docs import LEDGER, OUTPUT, build_html
 
 
 def test_endpoint_markdown_matches_current_sources() -> None:
-    for path, content in build_markdown().items():
+    documents = build_markdown()
+    assert {path.name for path in documents} == {'endpoint-audit.md', 'endpoint-audit.zh_tw.md'}
+    for path, content in documents.items():
         assert path.read_text(encoding="utf-8") == content, path
 
 

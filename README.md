@@ -59,10 +59,7 @@ Documented withdrawal, market-maker and partner endpoints are in scope; current 
 | Ondo | Yes | Yes | Yes | Yes |
 | Arcus | Yes | Yes | Yes | Yes |
 
-Private WebSocket support includes authenticated or address-scoped user-data streams. Trading WebSocket APIs are available for Binance, Bybit, Bitget, OKX, KuCoin and Kraken Spot; Hyperliquid and Lighter accept signed actions, and Arcus provides signed request construction. Lighter Mainnet and Robinhood use separate credential profiles; select the network per client (Mainnet is the default); see [.env.example](.env.example) and the [Lighter examples](examples/async/lighter_private_readonly.py). Ondo supports perpetual futures and public spot market data (depth, trades, symbol info and history), with spot product-table entries and public spot WebSocket book/trade subscriptions. Private spot trading remains blocked until its official API specification is published; see [Ondo spot support](docs/ondo-spot.md).
-
-Ondo spot rows are public-data products and are not privately tradable through this client. Use `get_product_symbols(exchange="ondo", product_type="swap")` when iterating perpetual trading symbols; spot WS accepts exchange symbols such as `SPY-USDC` and product-table symbols such as `SPY-USDC-SPOT`.
-
+Private WebSocket support includes authenticated or address-scoped user-data streams. Trading WebSocket APIs are available for Binance, Bybit, Bitget, OKX, KuCoin and Kraken Spot; Hyperliquid and Lighter accept signed actions, and Arcus provides signed request construction. Lighter Mainnet and Robinhood use separate credential profiles; select the network per client (Mainnet is the default); see [.env.example](.env.example) and the [Lighter examples](examples/async/lighter_private_readonly.py). Ondo spot currently supports only public market data (depth, trades, symbol_info, history and WS spot channels); Ondo has not published its spot trading API, so private operations such as placing or cancelling orders with a `-SPOT` symbol fail locally without sending a request.
 
 [Endpoint coverage, limitations and verification](docs/endpoint-audit.md).
 
@@ -144,5 +141,3 @@ cargo run -p dcex --example binance_ws_public
 For direct Rust usage, see the [crate README](crates/dcex/README.md). The default test suite runs offline with `uv run pytest`; live suites are opt-in. See the [contributing guide](.github/CONTRIBUTING.md) for development and testing details.
 
 This project uses the [MIT License](LICENSE); see the [third-party notices](THIRD_PARTY_NOTICES.md) for additional licenses.
-
-[Upgrade to 0.34.0](docs/upgrade-0.34.0.md)

@@ -1,4 +1,4 @@
-"""Rebuild the bilingual audit and method index; run from the repository root."""
+"""Rebuild the bilingual endpoint audit; run from the repository root."""
 
 # ruff: noqa: E501 - bilingual Markdown paragraphs and table templates.
 
@@ -12,18 +12,15 @@ from pathlib import Path
 from scripts.build_endpoint_docs import EXCHANGE_ORDER as EXCHANGES
 
 ROOT = Path(__file__).resolve().parents[1]
-BASELINE = ROOT / "docs/endpoint-method-baseline.json"
 
 
 def build_markdown() -> dict[Path, str]:
-    """Render all six documents from the ledger and current method definitions."""
+    """Render the two audit documents from the ledger and current methods."""
     outputs = {}
     d = json.loads((ROOT / "docs/endpoint-coverage-ledger.json").read_text(encoding="utf-8"))
     counts = d["counts"]
     rows = d["rows"]
     methods = {}
-    additions = {}
-    method_info = {}
     for ex in EXCHANGES:
         names = {}
         modules = [importlib.import_module(f"dcex.{ex}.client")]
@@ -52,10 +49,7 @@ def build_markdown() -> dict[Path, str]:
                         inspect.getdoc(function) or "See the method signature and endpoint ledger."
                     )
                     names[name] = (file.as_posix(), doc.splitlines()[0].rstrip("."))
-        old = set(json.loads(BASELINE.read_text(encoding="utf-8"))["methods"][ex])
         methods[ex] = len(names)
-        additions[ex] = len(names.keys() - old)
-        method_info[ex] = {name: info for name, info in sorted(names.items()) if name not in old}
 
     status_meaning = {
         "implemented": (
@@ -114,9 +108,9 @@ def build_markdown() -> dict[Path, str]:
         )
         text = f"# {title}\n\n{nav}\n\n{intro}\n\n{scope}\n\n{safety}\n\n"
         text += (
-            "[互動覆蓋表](endpoint-coverage.html) · [逐列證據](endpoint-coverage-ledger.json) · [待處理項目](endpoint-recheck.zh_tw.md) · [方法索引](endpoint-methods.zh_tw.md)\n\n"
+            "[互動覆蓋表](endpoint-coverage.html) · [逐列證據](endpoint-coverage-ledger.json)\n\n"
             if zh
-            else "[Interactive coverage table](endpoint-coverage.html) · [Per-row evidence](endpoint-coverage-ledger.json) · [Remaining items](endpoint-recheck.md) · [Method index](endpoint-methods.md)\n\n"
+            else "[Interactive coverage table](endpoint-coverage.html) · [Per-row evidence](endpoint-coverage-ledger.json)\n\n"
         )
         text += (
             "## 覆蓋狀態\n\n清冊可能包含歷史列、分組列與重疊操作，不能用列數計算官方端點覆蓋百分比。\n\n| 狀態 | 列數 | 定義 |\n| --- | ---: | --- |\n"
@@ -126,13 +120,13 @@ def build_markdown() -> dict[Path, str]:
         for status, meaning in status_meaning.items():
             text += f"| `{status}` | {counts.get(status, 0):,} | {meaning[int(zh)]} |\n"
         text += (
-            "\n## 交易所與 Python 方法\n\n方法數包含別名與簽章輔助方法，不是端點數；新增數以 `d0bbf8b0` 為基準。\n\n| 交易所 | 公開方法 | 新增 | 已實作列 | 待處理列 |\n| --- | ---: | ---: | ---: | ---: |\n"
+            "\n## 交易所與 Python 方法\n\n方法數包含別名與簽章輔助方法，不是端點數。\n\n| 交易所 | 公開方法 | 已實作列 | 待處理列 |\n| --- | ---: | ---: | ---: |\n"
             if zh
-            else "\n## Exchanges and Python methods\n\nMethod counts include aliases and signing helpers, not endpoints. Additions are relative to `d0bbf8b0`.\n\n| Exchange | Public methods | Added | Implemented rows | Pending rows |\n| --- | ---: | ---: | ---: | ---: |\n"
+            else "\n## Exchanges and Python methods\n\nMethod counts include aliases and signing helpers, not endpoints.\n\n| Exchange | Public methods | Implemented rows | Pending rows |\n| --- | ---: | ---: | ---: |\n"
         )
         for ex in EXCHANGES:
             c = collections.Counter(r["status"] for r in rows if r["exchange"] == ex)
-            text += f"| [{ex}](official-endpoint-inventory/{ex}.json) | {methods[ex]} | {additions[ex]} | {c['implemented']} | {c['pending']} |\n"
+            text += f"| [{ex}](official-endpoint-inventory/{ex}.json) | {methods[ex]} | {c['implemented']} | {c['pending']} |\n"
         text += "\n## 驗證與限制\n\n" if zh else "\n## Verification and limits\n\n"
         verification = d["verification"]
         text += "<!-- VERIFICATION -->\n"
@@ -157,59 +151,7 @@ def build_markdown() -> dict[Path, str]:
             if zh
             else "Offline tests verify routes, HTTP methods, parameters, signatures, WebSocket messages and response handling. They do not establish live account eligibility or exchange availability. No live orders, withdrawals or account-administration requests were submitted.\n\n- OKX/Bitget SBE returns raw bytes without a built-in decoder.\n- Lighter explorer uses a separate base URL; historical exports never automatically pay a fee.\n- The ledger records the exact gaps and resolution requirements for `unverified` and `blocked` rows.\n"
         )
-        text += (
-            "\nOndo 已支援永續合約與現貨公開行情及 product table；現貨私有交易維持 blocked，現貨餘額查詢及 WebSocket 規格尚未確認。詳見 [Ondo 現貨支援範圍](ondo-spot.zh_tw.md)。\n"
-            if zh
-            else "\nOndo supports perpetual futures and public spot market data with product-table entries. Private spot trading remains blocked; spot balance queries and WebSocket specifications are unverified. See [Ondo spot support](ondo-spot.md).\n"
-        )
         outputs[ROOT / f"docs/endpoint-audit{suffix}.md"] = text
-        nav = (
-            "[English](endpoint-recheck.md) | **繁體中文**"
-            if zh
-            else "**English** | [繁體中文](endpoint-recheck.zh_tw.md)"
-        )
-        text = (
-            "# 端點複查：待處理項目" if zh else "# Endpoint recheck: remaining items"
-        ) + f"\n\n{nav}\n\n{intro}\n\n{scope}\n\n{safety}\n\n"
-        text += (
-            "[清冊與逐列原因](endpoint-coverage-ledger.json) · [可篩選的待處理列表](endpoint-coverage.html)\n\n"
-            if zh
-            else "[Ledger and per-row reasons](endpoint-coverage-ledger.json) · [Filterable remaining items](endpoint-coverage.html)\n\n"
-        )
-        text += (
-            "## 規格與可用性缺口\n\n| 列 | 交易所 | 操作 | 狀態 | 官方文件 |\n| ---: | --- | --- | --- | --- |\n"
-            if zh
-            else "## Specification and availability gaps\n\n| Row | Exchange | Operation | Status | Official reference |\n| ---: | --- | --- | --- | --- |\n"
-        )
-        for r in rows:
-            if r["status"] not in {"blocked", "unverified", "unavailable", "partial"}:
-                continue
-            text += f"| {r['row']} | {r['exchange']} | {r['endpoint'].replace('|', '/')} | `{r['status']}` | [Docs]({r['official_source']}) |\n"
-        text += (
-            "\n## 新增清冊的待處理列\n\n目前所有清冊列均有明確處理狀態；未公開規格或仍待確認者保留在上表。一般 WebSocket 支援不會自動算成每個官方主題均驗證完成。\n\n| 交易所 | REST／操作待處理 | WebSocket 待處理 |\n| --- | ---: | ---: |\n"
-            if zh
-            else "\n## Pending inventory rows\n\nEvery inventory row now has an explicit disposition; unresolved specifications and verification gaps remain in the table above. Generic WebSocket support does not automatically certify every documented topic.\n\n| Exchange | REST/action pending | WebSocket pending |\n| --- | ---: | ---: |\n"
-        )
-        for ex in EXCHANGES:
-            rs = [r for r in rows if r["exchange"] == ex and r["status"] == "pending"]
-            text += f"| {ex} | {sum(r['kind'] != 'WS' for r in rs)} | {sum(r['kind'] == 'WS' for r in rs)} |\n"
-        outputs[ROOT / f"docs/endpoint-recheck{suffix}.md"] = text
-        nav = (
-            "[English](endpoint-methods.md) | **繁體中文**"
-            if zh
-            else "**English** | [繁體中文](endpoint-methods.zh_tw.md)"
-        )
-        text = ("# 新增方法索引" if zh else "# New method index") + f"\n\n{nav}\n\n"
-        text += (
-            "相較 `d0bbf8b0` 新增的 Python 同步／非同步公開方法。數量包含別名及簽章輔助方法，不是端點數。提款與合作夥伴操作均納入範圍；API 提款沒有第二次確認，送出即執行。建議交易金鑰不要開啟提款權限。詳見[覆蓋與限制](endpoint-audit.zh_tw.md)。\n"
-            if zh
-            else "Public Python sync/async methods added relative to `d0bbf8b0`. Counts include aliases and signing helpers, not endpoints. Withdrawals and partner operations are in scope. API withdrawals have no second confirmation; they execute on submit. Trading keys should not have withdrawal permission. See [coverage and limitations](endpoint-audit.md).\n"
-        )
-        for ex in EXCHANGES:
-            text += f"\n## {ex.title()}\n\n"
-            for name, (file, doc) in method_info[ex].items():
-                text += f"- [`{name}`](../{file}) — {doc}.\n"
-        outputs[ROOT / f"docs/endpoint-methods{suffix}.md"] = text
     return outputs
 
 
@@ -217,7 +159,7 @@ def main() -> int:
     """Write only with --write; --check compares without modifying files."""
     parser = argparse.ArgumentParser(description=__doc__)
     mode = parser.add_mutually_exclusive_group(required=True)
-    mode.add_argument("--write", action="store_true", help="Regenerate all six Markdown documents")
+    mode.add_argument("--write", action="store_true", help="Regenerate both audit documents")
     mode.add_argument("--check", action="store_true", help="Fail if generated documents are stale")
     args = parser.parse_args()
     stale = []
