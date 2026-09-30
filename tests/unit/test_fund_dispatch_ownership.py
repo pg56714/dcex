@@ -231,7 +231,7 @@ def schema_row_hash(row):
 
 
 def schema_path_violations(rows, source, exceptions):
-    return [row["name"] for row in rows if fund_domain(row.get("path", "")) and not fund_domain(row.get("name", "")) and not any(e["source"] == source and e["name"] == row["name"] and e["sha256"] == schema_row_hash(row) and e["reason"].strip() for e in exceptions)]
+    return [row["name"] for row in rows if (fund_domain(row.get("path", "")) or fund_domain(row.get("type", ""))) and not fund_domain(row.get("name", "")) and not any(e["source"] == source and e["name"] == row["name"] and e["sha256"] == schema_row_hash(row) and e["reason"].strip() for e in exceptions)]
 
 
 def test_schema_path_exceptions_pin_exact_rows_and_reject_mutations():

@@ -293,7 +293,17 @@ def main() -> int:
         print("UNAPPROVED", key)
     for key in sorted(pinned - actual):
         print("STALE", key)
-    return int(actual != pinned)
+    route_errors = route_policy_violations()
+    for error in route_errors:
+        print(error)
+    return int(actual != pinned or bool(route_errors))
+
+
+def route_policy_violations(root: Path = ROOT) -> list[str]:
+    """Reject every new nonliteral transport route regardless of construction."""
+    from scripts.fund_routes import violations
+
+    return violations(root)
 
 
 if __name__ == "__main__":
