@@ -405,6 +405,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPWithdrawalsHTTP, HTTPManager):
     def get_funding_payments(
         self,
         product_symbol: str | None = None,
+        *,
         limit: int | None = None,
         offset: int | None = None,
         sortDirection: str | None = None,

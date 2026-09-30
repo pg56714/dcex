@@ -84,6 +84,7 @@ class MarketHTTP(HTTPManager):
     async def get_spot_orderbook_v2(
         self,
         product_symbol: str,
+        *,
         depth: int,
         type_: str = "step0",
     ) -> dict:

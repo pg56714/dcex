@@ -385,6 +385,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
     def cancel_spot_order(
         self,
         product_symbol: str,
+        *,
         order_id: int | str | None = None,
         client_order_id: str | None = None,
         cancel_restrictions: str | None = None,
@@ -444,6 +445,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
     def get_spot_order(
         self,
         product_symbol: str,
+        *,
         order_id: int | str | None = None,
         client_order_id: str | None = None,
         recv_window: int | None = None,
