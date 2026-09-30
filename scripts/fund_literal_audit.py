@@ -22,7 +22,10 @@ def masked(source: str) -> str:
 def domain(name: str) -> str | None:
     """Classify identifiers and endpoint paths, including encoded spellings."""
     name = name.lower()
-    if re.search(r"withdraw|send_(?:usd|spot|asset|to_evm)|bridge", name):
+    if re.search(
+        r"withdraw|send_(?:usd|spot|asset|to_evm)|usd_?send|spot_?send|send_?asset|send_?to_?evm|bridge",
+        name,
+    ):
         return "withdrawals"
     if name in {
         "transfer_l2_account",
@@ -94,22 +97,83 @@ def statement(source: str, position: int) -> str:
     return source[start:].strip()
 
 
+def balanced_end(clean: str, start: int) -> int:
+    """Find the end of a balanced Rust delimiter group."""
+    stack = []
+    for index in range(start, len(clean)):
+        char = clean[index]
+        if char in "([{":
+            stack.append(char)
+        elif char in ")]}":
+            stack.pop()
+            if not stack:
+                return index + 1
+    return len(clean)
+
+
 def production_source(source: str) -> str:
-    """Exclude test-only blocks without hiding production code that follows."""
+    """Mask only the attributed test item, including semicolon-only items."""
     clean = masked(source)
     spans = []
-    for match in re.finditer(r"#\s*\[\s*cfg\(test\)\s*\]", clean):
-        start = clean.find("{", match.end())
-        if start < 0:
+    for match in re.finditer(r"#\s*\[\s*cfg\s*\(\s*test\s*\)\s*\]", clean):
+        start = match.end()
+        while attribute := re.match(r"\s*#\s*\[", clean[start:]):
+            start = balanced_end(clean, start + attribute.end() - 1)
+        end = re.search(r"[;{]", clean[start:])
+        if end is None:
             continue
-        end, depth = start + 1, 1
-        while depth and end < len(clean):
-            depth += (clean[end] == "{") - (clean[end] == "}")
-            end += 1
-        spans.append((match.start(), end))
+        stop = start + end.start()
+        stop = stop + 1 if clean[stop] == ";" else balanced_end(clean, stop)
+        spans.append((match.start(), stop))
     for start, end in reversed(spans):
         source = source[:start] + " " * (end - start) + source[end:]
     return source
+
+
+def string_parts(source: str) -> list[str]:
+    """Read actual Rust string literals, ignoring comments and character tokens."""
+    return [decode(t[0]) for t in TOKENS.finditer(source) if t[0].startswith(('"', 'r"', "r#"))]
+
+
+def fund_fragments(parts: list[str]) -> bool:
+    """Recognise split fund identifiers and paths around format placeholders."""
+    if any(domain(part) for part in parts) or domain("".join(parts)):
+        return True
+    words = [word.lower() for part in parts for word in re.findall(r"[a-zA-Z]+", part)]
+    return any(
+        any(left.endswith(word[:cut]) for left in words)
+        and any(right.startswith(word[cut:]) for right in words)
+        for word in (
+            "withdraw",
+            "transfer",
+            "usdsend",
+            "spotsend",
+            "sendasset",
+            "sendtoevm",
+            "bridge",
+        )
+        for cut in range(2, len(word) - 1)
+    )
+
+
+def runtime_context(source: str, position: int) -> str:
+    """Include preceding local bindings used by a string assembly statement."""
+    context = statement(source, position)
+    clean = masked(source)
+    braces = []
+    for index, char in enumerate(clean[:position]):
+        if char == "{":
+            braces.append(index)
+        elif char == "}" and braces:
+            braces.pop()
+    start = braces[-1] + 1 if braces else 0
+    bindings = list(re.finditer(r"\blet\s+(?:mut\s+)?(\w+)\b", clean[start:position]))
+    for binding in reversed(bindings):
+        if re.search(r"\b" + re.escape(binding[1]) + r"\b", masked(context)):
+            value = statement(source, start + binding.start())
+            if value not in context:
+                context = value + "\n" + context
+    return context
 
 
 def occurrences(source: str, filename: str) -> Iterator[dict[str, str]]:
@@ -117,33 +181,36 @@ def occurrences(source: str, filename: str) -> Iterator[dict[str, str]]:
     source = production_source(source)
     clean = masked(source)
     candidates = []
+    assembly_contexts = {}
     for token in TOKENS.finditer(source):
         raw = token[0]
         if raw.startswith(('"', 'r"', "r#")):
             name = decode(raw)
             if (re.fullmatch(r"\w+", name) or "/" in name) and domain(name):
                 candidates.append((name, token.start()))
-    for match in re.finditer(r"\bconcat!\s*\((.*?)\)", source, re.S):
-        if not clean[match.start() :].startswith("concat!"):
-            continue
-        parts = [
-            decode(t[0]) for t in TOKENS.finditer(match[1]) if t[0].startswith(('"', 'r"', "r#"))
-        ]
+    for match in re.finditer(r"\bconcat!\s*([([{])", clean):
+        end = balanced_end(clean, match.end() - 1)
+        parts = string_parts(source[match.end() : end - 1])
         name = "".join(parts)
-        if domain(name) or any(domain(part) for part in parts):
+        if fund_fragments(parts):
             candidates.append((name, match.start()))
-    # Dynamically assembled names have no auditable literal. Require an explicit
-    # exception for the conversion statement even when the bytes are not constant.
     runtime_names = re.finditer(
-        r"\b(?:from_utf8(?:_unchecked|_lossy)?|from_iter)\s*\(|\bas\s+char\b|\.collect\s*::\s*<\s*String\s*>\s*\(",
+        r"\b(?:from_utf8(?:_unchecked|_lossy)?|from_utf16\w*|from_iter)\s*\(|\bchar\s*::\s*from\w*\s*\(|\bas\s+char\b|\.collect\s*::\s*<\s*String\s*>\s*\(",
         clean,
     )
     candidates.extend(("<runtime-string>", match.start()) for match in runtime_names)
+    for match in re.finditer(r"\bformat!\s*[([{]|\+|\.\s*(?:push_str|concat|join)\s*\(", clean):
+        context = runtime_context(source, match.start())
+        if fund_fragments(string_parts(context)):
+            candidates.append(("<runtime-string>", match.start()))
+            assembly_contexts[match.start()] = context
     seen = set()
     for name, position in candidates:
-        if (owner := domain(name)) is not None and filename == owner + ".rs":
+        if (owner := domain(name)) is not None and re.fullmatch(
+            r"crates/dcex/src/exchanges/[^/]+/" + owner + r"\.rs", filename
+        ):
             continue
-        context = statement(source, position)
+        context = assembly_contexts.get(position, statement(source, position))
         digest = hashlib.sha256(context.encode()).hexdigest()
         key = name, digest
         if key not in seen:
@@ -165,7 +232,7 @@ def inventory(root: Path = ROOT) -> list[dict[str, str]]:
     return [
         {"source": path.relative_to(root).as_posix(), **entry}
         for path in source_paths(root)
-        for entry in occurrences(path.read_text(encoding="utf8"), path.name)
+        for entry in occurrences(path.read_text(encoding="utf8"), path.relative_to(root).as_posix())
     ]
 
 

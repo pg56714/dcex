@@ -54,6 +54,18 @@
     "reason": "Applies withdrawal validation before the shared schema transport constructs the request."
   },
   {
+    "source": "crates/dcex/src/exchanges/arcus/transfers.rs",
+    "name": "<runtime-string>",
+    "sha256": "76bcfef241a727af27b539554ac8c37a1ecab79f7b7e2ff4a172863b44408080",
+    "reason": "Converts an Arcus transfer JSON decode failure into InvalidInput inside its transfer owner."
+  },
+  {
+    "source": "crates/dcex/src/exchanges/arcus/transfers.rs",
+    "name": "<runtime-string>",
+    "sha256": "cf8c4d4f2df0ad00e9f0665677fe5439b98cc33d7cf1e73890d104c43299e11b",
+    "reason": "Reports malformed Arcus transfer signature component length before any signed transfer submission."
+  },
+  {
     "source": "crates/dcex/src/exchanges/aster/account.rs",
     "name": "transfer_spot_futures",
     "sha256": "0a8ce21d5572a36d8d8a2d034af92d9b2bbddfb3d15d519f1932060951642d6d",
@@ -948,6 +960,12 @@
     "reason": "Defines Extended's internal account movement URL consumed by the transfer owner."
   },
   {
+    "source": "crates/dcex/src/exchanges/extended/withdrawals.rs",
+    "name": "<runtime-string>",
+    "sha256": "fcd03c1489035503cb0ee0334d493700b46f860781a81f3eea7ffe40b92c197c",
+    "reason": "Reports an unsupported Extended withdrawal parameter within the actual withdrawal owner."
+  },
+  {
     "source": "crates/dcex/src/exchanges/hyperliquid/private.rs",
     "name": "transfer_between_dexes",
     "sha256": "4aec7bf01c7b0850712a85b4e71b05cee31a22169f2a38b0fb281dc66f49f771",
@@ -1032,6 +1050,12 @@
     "reason": "Lists signed staking cash-out fields, including wei and signatureChainId."
   },
   {
+    "source": "crates/dcex/src/exchanges/hyperliquid/transfers.rs",
+    "name": "agentSendAsset",
+    "sha256": "e34e1801d497d3d790a512c1fb930c8123fc47313a20bd8b72a1bea99670f22c",
+    "reason": "Builds the agentSendAsset action in the audited Hyperliquid transfer owner before its owned action submission."
+  },
+  {
     "source": "crates/dcex/src/exchanges/hyperliquid/websocket/post.rs",
     "name": "usdClassTransfer",
     "sha256": "55a6e8cc90bbba6ed72de6134b8d19afb1ea7b99729ac395644b5e4187d3db7b",
@@ -1084,6 +1108,18 @@
     "name": "create_spot_withdrawal",
     "sha256": "9e4334ef29745217f568b5e4c20068f88b6e096930138f1c58de91d9c62af5f7",
     "reason": "Validates positive withdrawal amount in Kraken's schema adapter before owner routing."
+  },
+  {
+    "source": "crates/dcex/src/exchanges/kucoin/account.rs",
+    "name": "<runtime-string>",
+    "sha256": "1e5c93b07d0e3334d74000a0f69500be16889fc09cd28fddc935ee1c7cba19f3",
+    "reason": "Reports incompatible V2 margin account types before KuCoin transfer parameters are accepted."
+  },
+  {
+    "source": "crates/dcex/src/exchanges/kucoin/account.rs",
+    "name": "<runtime-string>",
+    "sha256": "893347fde65f3246b9b538567c3bb1a4472dcc010b6672d975ac3fed169f89b1",
+    "reason": "Reports a parameter disallowed for the selected KuCoin transfer direction; this expression only creates an error."
   },
   {
     "source": "crates/dcex/src/exchanges/kucoin/account.rs",
@@ -1176,10 +1212,22 @@
     "reason": "Decodes the existing KuCoin body only to assemble the authentication preimage."
   },
   {
+    "source": "crates/dcex/src/exchanges/kucoin/transfers.rs",
+    "name": "<runtime-string>",
+    "sha256": "6214f7a8d4bab36590513272dddbbeb3fd67000b1586fd5ba82665ae145d26d7",
+    "reason": "Formats the KuCoin unsupported transfer-type validation error; no request is constructed."
+  },
+  {
     "source": "crates/dcex/src/exchanges/kucoin/uta.rs",
     "name": "WITHDRAW",
     "sha256": "de0a19cfadeb0309d4fb4a172838e508597755e0d6e46dc34cfce744d133aa05",
     "reason": "Accepts cash-out records in the UTA ledger type filter."
+  },
+  {
+    "source": "crates/dcex/src/exchanges/kucoin/withdrawals.rs",
+    "name": "<runtime-string>",
+    "sha256": "94047798893f185b930a82853587f67b4f706c3b0d7111c815e77915400e1db3",
+    "reason": "Interpolates the validated withdrawal identifier into the DELETE cancellation path inside the actual KuCoin withdrawal owner."
   },
   {
     "source": "crates/dcex/src/exchanges/kucoin/wrappers.rs",
@@ -1426,6 +1474,12 @@
     "name": "../schemas/fast_withdrawals.json",
     "sha256": "0abb6029ef668754e0d42970a214839b527cfa8475ec7c8bb9fc331c0906d6af",
     "reason": "Loads fast-withdrawal schema metadata alongside referral and RFQ definitions."
+  },
+  {
+    "source": "crates/dcex/src/exchanges/lighter/schema_requests/field_schemas.rs",
+    "name": "<runtime-string>",
+    "sha256": "60467d73b3dae140dd248dad442fbd87ea8a2a3f95e1749cf0a8eef372290228",
+    "reason": "Names the missing fast-withdrawal field in a Lighter schema validation error."
   },
   {
     "source": "crates/dcex/src/exchanges/lighter/schema_requests/field_schemas.rs",

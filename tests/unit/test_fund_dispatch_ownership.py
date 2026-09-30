@@ -1,6 +1,7 @@
 """Dispatch names, including newly introduced names, determine fund ownership."""
 
 import importlib
+import hashlib
 import inspect
 import json
 import re
@@ -139,6 +140,8 @@ def test_fund_schema_operations_have_actual_owner_routes(exchange):
         rows = json.loads(path.read_text(encoding="utf-8"))
         if not isinstance(rows, list):
             continue
+        exceptions = json.loads((ROOT / "tests/fixtures/fund_schema_path_exceptions.json").read_text(encoding="utf8"))
+        assert not schema_path_violations(rows, path.relative_to(NATIVE).as_posix(), exceptions)
         names = {row["name"] for row in rows if fund_domain(row.get("name", ""))}
         pending |= names
         for loader in folder.rglob("*.rs"):
@@ -148,7 +151,7 @@ def test_fund_schema_operations_have_actual_owner_routes(exchange):
             if f"schemas/{path.name}\"" not in source:
                 continue
             relative = loader.relative_to(folder).as_posix()
-            if loader.name in {"withdrawals.rs", "transfers.rs"} or relative in routed or relative == "generated/schema_tables.rs" and "schema_requests.rs" in routed:
+            if relative in {"withdrawals.rs", "transfers.rs"} or relative in routed or relative == "generated/schema_tables.rs" and "schema_requests.rs" in routed:
                 supported |= names
     assert not pending - supported, (exchange, sorted(pending - supported))
     assert not (ROOT / "tests/fixtures/fund_schema_exceptions.json").exists()
@@ -221,3 +224,27 @@ def test_same_named_transport_in_foreign_impl_cannot_bypass_guard(transport):
     legitimate = source.replace("impl H", "impl BinanceClient")
     assert unauthorized_transport_references(legitimate, transport, [], impl_owner="BinanceClient")
     assert not unauthorized_transport_references(legitimate, transport, [], impl_owner="BinanceClient", allow_definition=True)
+
+
+def schema_row_hash(row):
+    return hashlib.sha256(json.dumps(row, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+
+
+def schema_path_violations(rows, source, exceptions):
+    return [row["name"] for row in rows if fund_domain(row.get("path", "")) and not fund_domain(row.get("name", "")) and not any(e["source"] == source and e["name"] == row["name"] and e["sha256"] == schema_row_hash(row) and e["reason"].strip() for e in exceptions)]
+
+
+def test_schema_path_exceptions_pin_exact_rows_and_reject_mutations():
+    from tests.unit.input_contract_coverage import normalized_reason, MAX_REASON_REPETITIONS
+    from collections import Counter
+    exceptions = json.loads((ROOT / "tests/fixtures/fund_schema_path_exceptions.json").read_text(encoding="utf8"))
+    assert len({(e['source'],e['name']) for e in exceptions}) == len(exceptions)
+    assert max(Counter(normalized_reason(e['reason'], [e['name']]) for e in exceptions).values()) <= MAX_REASON_REPETITIONS
+    for entry in exceptions:
+        rows = json.loads((NATIVE / entry['source']).read_text(encoding="utf8"))
+        row, = [row for row in rows if row['name'] == entry['name']]
+        assert schema_row_hash(row) == entry['sha256']
+        assert not schema_path_violations([row], entry['source'], exceptions)
+        changed = row | {'path': '/sapi/v1/capital/withdraw/apply'}
+        assert schema_path_violations([changed], entry['source'], exceptions) == [row['name']]
+        assert schema_path_violations([row], 'other/schemas/fake.json', exceptions) == [row['name']]

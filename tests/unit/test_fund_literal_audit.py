@@ -96,3 +96,59 @@ def test_generated_schema_inputs_cannot_add_an_unowned_fund_operation(tmp_path, 
     monkeypatch.setattr(ownership, "NATIVE", tmp_path)
     with pytest.raises(AssertionError, match="create_withdrawal_unowned"):
         ownership.test_fund_schema_operations_have_actual_owner_routes("binance")
+
+
+@pytest.mark.parametrize("item", ["use std::fmt;", "mod tests;", "#[allow(unused)] use std::fmt;", '#[allow(reason = "{example}")] mod tests;'])
+def test_semicolon_test_items_cannot_hide_production_mutations(item):
+    source = '#[cfg(test)] ' + item + ' fn production() { call("withdraw_real"); }'
+    assert [e["name"] for e in audit.occurrences(source, "account.rs")] == ["withdraw_real"]
+
+
+@pytest.mark.parametrize("source", [
+    'let n = format!("create_with{}", "drawal3");',
+    'let n = concat!["create_with","drawal3"];',
+    'let n = concat!{"create_with","drawal3"};',
+    'let n = ["create_with","drawal3"].concat();',
+    'let n = String::from_utf16(&bytes);',
+    'let n = String::from_utf16_lossy(&bytes);',
+    'let n = char::from_u32(code);',
+    'let n = char::from_u32_unchecked(code);',
+    'let n = format!("/sapi/v1/capital/with{}/apply", "draw");',
+    'let n = format!("/sapi/v1/capital/{}/apply", "with".to_owned() + "draw");',
+    'let n = ["/sapi/v1/capital/with", "draw/apply"].join("");',
+    'let n = "create_with".to_owned() + "drawal3";',
+    'let mut n = "create_with".to_string(); n.push_str("drawal3");',
+    'let parts = ["/sapi/v1/capital/with", "draw/apply"]; let n = parts.concat();',
+])
+def test_additional_runtime_string_mutations_require_a_pin(source):
+    assert list(audit.occurrences(source, "account.rs")), source
+
+
+@pytest.mark.parametrize("name", ["usdSend", "spotSend", "sendAsset", "sendToEvm", "usd_send", "spot_send", "SENDASSET"])
+def test_wire_action_alias_mutations_are_classified(name):
+    from tests.unit.rust_dispatch import fund_domain
+    assert audit.domain(name) == fund_domain(name) == "withdrawals"
+    assert list(audit.occurrences(f'const K: &str = "{name}";', "account.rs"))
+
+
+@pytest.mark.parametrize("owner,name", [("withdrawals", "create_withdrawal3"), ("transfers", "universal_transfer")])
+@pytest.mark.parametrize("folder", ["crates/dcex/src/ws", "crates/dcex-python/src", "crates/dcex/src/exchanges/binance/nested"])
+def test_owner_filename_decoys_are_not_exempt(tmp_path, owner, name, folder):
+    path = tmp_path / folder / f"{owner}.rs"
+    path.parent.mkdir(parents=True)
+    path.write_text(f'const K: &str = "{name}";', encoding="utf8")
+    assert audit.inventory(tmp_path)
+    real = tmp_path / "crates/dcex/src/exchanges/binance" / f"{owner}.rs"
+    real.parent.mkdir(parents=True, exist_ok=True)
+    real.write_text(path.read_text(encoding="utf8"), encoding="utf8")
+    assert all(e["source"] != real.relative_to(tmp_path).as_posix() for e in audit.inventory(tmp_path))
+
+
+def test_schema_fund_path_with_neutral_name_is_rejected(tmp_path, monkeypatch):
+    from tests.unit import test_fund_dispatch_ownership as ownership
+    schema = tmp_path / "binance/schemas/table_account.json"
+    schema.parent.mkdir(parents=True)
+    schema.write_text(json.dumps([{"name": "get_account_extra", "method": "POST", "path": "/sapi/v1/capital/withdraw/apply"}]), encoding="utf8")
+    monkeypatch.setattr(ownership, "NATIVE", tmp_path)
+    with pytest.raises(AssertionError, match="get_account_extra"):
+        ownership.test_fund_schema_operations_have_actual_owner_routes("binance")

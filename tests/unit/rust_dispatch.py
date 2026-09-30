@@ -96,7 +96,8 @@ def unauthorized_transport_references(source, transport, permitted_functions=(),
 
 
 def fund_domain(name):
-    if re.search(r"withdraw|send_(?:usd|spot|asset|to_evm)|bridge", name):
+    name = name.lower()
+    if re.search(r"withdraw|send_(?:usd|spot|asset|to_evm)|usd_?send|spot_?send|send_?asset|send_?to_?evm|bridge", name):
         return "withdrawals"
     if name in {"transfer_l2_account", "transfer_same_master_account", "sign_transfer_l2_account", "sign_transfer_same_master_account", "transfer_master_internal", "transfer_sub_account_internal"}:
         return "withdrawals"

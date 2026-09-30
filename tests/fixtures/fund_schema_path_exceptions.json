@@ -1,0 +1,38 @@
+[
+  {
+    "source": "binance/schemas/mining.json",
+    "name": "cancel_hashrate_resale_configuration",
+    "sha256": "d323566d1277a433f1fc79f211796e04d410f2bf40c86060dafdd34464c75844",
+    "reason": "Cancels a mining hash-power resale configuration; the hash-transfer route manages hashrate allocation, not an asset withdrawal."
+  },
+  {
+    "source": "binance/schemas/mining.json",
+    "name": "hashrate_resale_detail",
+    "sha256": "6969621d4c2310c83ccd9db5f6544b51e9487a719f90f7a30a342f2b64d2fe24",
+    "reason": "Reads mining hashrate resale profit details for an existing configuration."
+  },
+  {
+    "source": "binance/schemas/mining.json",
+    "name": "hashrate_resale_list",
+    "sha256": "9f925927f948d9e878eac08a5ef4a29791d6f314e91e12528a5e8f18c4239aeb",
+    "reason": "Lists existing mining hashrate resale configurations without creating a transfer."
+  },
+  {
+    "source": "binance/schemas/mining.json",
+    "name": "hashrate_resale_request",
+    "sha256": "076e3fba608dbd2fae3811730a507607db6e73127132ae9cdc91cb13edf82dfe",
+    "reason": "Creates a mining hashrate resale allocation under hash-transfer/config; this is mining capacity rather than wallet movement."
+  },
+  {
+    "source": "binance/schemas/table_mining.json",
+    "name": "get_cloud_mining_payment_and_refund_history",
+    "sha256": "b34398723c36edd7a238b3c0101db665d21fb1b8d3de96b56fc23fbfd65f9263",
+    "reason": "Queries cloud-mining payment/refund ledger history; queryByPage does not initiate the recorded transfers."
+  },
+  {
+    "source": "binance/schemas/table_transfers.json",
+    "name": "query_user_delegation_history",
+    "sha256": "92e8b70657298219d93b0af2374d1237a0798c6faa940f552a104fec50bf6447",
+    "reason": "Reads custody delegation transfer-history records with GET; it cannot submit a custody transfer."
+  }
+]
