@@ -20,7 +20,7 @@ fn ondo_spot_and_perpetual_products_preserve_precision_and_skip_disabled_pairs()
     let data = serde_json::json!({"result": {
         "perps": {"tradingPairs": [market("SPY-USDC.P", false)]},
         "spot": {"tradingPairs": [market("SPY-USDC", false), market("SPYon-USDC", true)]},
-        "tokenConfig": {"SPY": {"ledgerUnit": "shares", "sharesMultiplier": "100000000"}}
+        "tokenConfig": [{"symbol": "SPY", "ledgerUnit": "shares", "sharesMultiplier": "100000000"}]
     }});
     let rows = super::exchanges::ondo_market_rows(&data).unwrap();
     assert_eq!(rows.len(), 2);

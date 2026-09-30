@@ -589,7 +589,7 @@
       "operation_id": "get_spot_depth",
       "status": "implemented",
       "source_status": "observed public route",
-      "note": "Public route observed in the supplied 2026-09-29 review and covered by Rust/Python offline wire tests. Fresh 2026-09-30 public probes failed TLS certificate validation; no live certification. Spot API schema is not yet published."
+      "note": "Public route verified on 2026-09-30 using curl and the native client with TLS verification enabled, without authentication. Offline Rust/Python wire tests cover its request shape. The earlier Python certificate error was local CA-bundle behavior, not evidence of an expired Ondo server certificate. Spot API schema remains unpublished."
     },
     {
       "method": "GET",
@@ -598,7 +598,7 @@
       "operation_id": "get_spot_trades",
       "status": "implemented",
       "source_status": "observed public route",
-      "note": "Public route observed in the supplied 2026-09-29 review and covered by Rust/Python offline wire tests. Fresh 2026-09-30 public probes failed TLS certificate validation; no live certification. Spot API schema is not yet published."
+      "note": "Public route verified on 2026-09-30 using curl and the native client with TLS verification enabled, without authentication. Offline Rust/Python wire tests cover its request shape. The earlier Python certificate error was local CA-bundle behavior, not evidence of an expired Ondo server certificate. Spot API schema remains unpublished."
     },
     {
       "method": "GET",
@@ -607,7 +607,7 @@
       "operation_id": "get_spot_symbol_info",
       "status": "implemented",
       "source_status": "observed public route",
-      "note": "Public route observed in the supplied 2026-09-29 review and covered by Rust/Python offline wire tests. Fresh 2026-09-30 public probes failed TLS certificate validation; no live certification. Spot API schema is not yet published."
+      "note": "Public route verified on 2026-09-30 using curl and the native client with TLS verification enabled, without authentication. Offline Rust/Python wire tests cover its request shape. The earlier Python certificate error was local CA-bundle behavior, not evidence of an expired Ondo server certificate. Spot API schema remains unpublished."
     },
     {
       "method": "GET",
@@ -616,70 +616,103 @@
       "operation_id": "get_spot_price_history",
       "status": "implemented",
       "source_status": "observed public route",
-      "note": "Public route observed in the supplied 2026-09-29 review and covered by Rust/Python offline wire tests. Fresh 2026-09-30 public probes failed TLS certificate validation; no live certification. Spot API schema is not yet published."
+      "note": "Public route verified on 2026-09-30 using curl and the native client with TLS verification enabled, without authentication. Offline Rust/Python wire tests cover its request shape. The earlier Python certificate error was local CA-bundle behavior, not evidence of an expired Ondo server certificate. Spot API schema remains unpublished."
     },
     {
       "method": "POST",
       "path": "/v1/spot/orders",
       "official_source": "https://docs.ondoperps.xyz/spot-trading",
-      "operation_id": "place",
+      "operation_id": "",
       "status": "blocked",
       "source_status": "planned operation; API specification unpublished",
-      "note": "Official spot API spec not published; public endpoints were probed and working in the supplied 2026-09-29 review. This is a planned place operation with provisional method/path, not an official contract. No private request, signature assumption or live order was sent."
+      "note": "Official spot API specification remains unpublished as of 2026-09-30. This planned place operation has provisional method/path only; no method name, private request, signature assumption or live order is established."
     },
     {
       "method": "DELETE",
       "path": "/v1/spot/orders",
       "official_source": "https://docs.ondoperps.xyz/spot-trading",
-      "operation_id": "cancel",
+      "operation_id": "",
       "status": "blocked",
       "source_status": "planned operation; API specification unpublished",
-      "note": "Official spot API spec not published; public endpoints were probed and working in the supplied 2026-09-29 review. This is a planned cancel operation with provisional method/path, not an official contract. No private request, signature assumption or live order was sent."
+      "note": "Official spot API specification remains unpublished as of 2026-09-30. This planned cancel operation has provisional method/path only; no method name, private request, signature assumption or live order is established."
     },
     {
       "method": "GET",
       "path": "/v1/spot/orders",
       "official_source": "https://docs.ondoperps.xyz/spot-trading",
-      "operation_id": "query",
+      "operation_id": "",
       "status": "blocked",
       "source_status": "planned operation; API specification unpublished",
-      "note": "Official spot API spec not published; public endpoints were probed and working in the supplied 2026-09-29 review. This is a planned query operation with provisional method/path, not an official contract. No private request, signature assumption or live order was sent."
+      "note": "Official spot API specification remains unpublished as of 2026-09-30. This planned query operation has provisional method/path only; no method name, private request, signature assumption or live order is established."
     },
     {
       "method": "POST",
       "path": "/v1/spot/orders/batch",
       "official_source": "https://docs.ondoperps.xyz/spot-trading",
-      "operation_id": "batch placement",
+      "operation_id": "",
       "status": "blocked",
       "source_status": "planned operation; API specification unpublished",
-      "note": "Official spot API spec not published; public endpoints were probed and working in the supplied 2026-09-29 review. This is a planned batch placement operation with provisional method/path, not an official contract. No private request, signature assumption or live order was sent."
+      "note": "Official spot API specification remains unpublished as of 2026-09-30. This planned batch placement operation has provisional method/path only; no method name, private request, signature assumption or live order is established."
     },
     {
       "method": "DELETE",
       "path": "/v1/spot/orders/batch",
       "official_source": "https://docs.ondoperps.xyz/spot-trading",
-      "operation_id": "batch cancellation",
+      "operation_id": "",
       "status": "blocked",
       "source_status": "planned operation; API specification unpublished",
-      "note": "Official spot API spec not published; public endpoints were probed and working in the supplied 2026-09-29 review. This is a planned batch cancellation operation with provisional method/path, not an official contract. No private request, signature assumption or live order was sent."
+      "note": "Official spot API specification remains unpublished as of 2026-09-30. This planned batch cancellation operation has provisional method/path only; no method name, private request, signature assumption or live order is established."
     },
     {
       "method": "GET",
       "path": "/v1/spot/fills",
       "official_source": "https://docs.ondoperps.xyz/spot-trading",
-      "operation_id": "fills",
+      "operation_id": "",
       "status": "blocked",
       "source_status": "planned operation; API specification unpublished",
-      "note": "Official spot API spec not published; public endpoints were probed and working in the supplied 2026-09-29 review. This is a planned fills operation with provisional method/path, not an official contract. No private request, signature assumption or live order was sent."
+      "note": "Official spot API specification remains unpublished as of 2026-09-30. This planned fills operation has provisional method/path only; no method name, private request, signature assumption or live order is established."
     },
     {
       "method": "GET",
       "path": "/v1/spot/candles",
       "official_source": "https://docs.ondoperps.xyz/spot-trading",
-      "operation_id": "candles",
+      "operation_id": "",
       "status": "blocked",
       "source_status": "planned operation; API specification unpublished",
-      "note": "Official spot API spec not published; public endpoints were probed and working in the supplied 2026-09-29 review. This is a planned candles operation with provisional method/path, not an official contract. No private request, signature assumption or live order was sent."
+      "note": "Official spot API specification remains unpublished as of 2026-09-30. This planned candles operation has provisional method/path only; no method name, private request, signature assumption or live order is established."
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "topOfBooksSpot",
+      "title": "topOfBooksSpot",
+      "official_source": "https://api.ondoperps.xyz/ws",
+      "operation_id": "subscribe_spot_top_of_book",
+      "status": "protocol",
+      "source_status": "observed public channel",
+      "note": "Read-only Rust probe on 2026-09-30 with TLS verification and no login received a subscription acknowledgement for SPY-USDC. A depth update was also received. An unsupported-channel control was rejected. The public channel is observed; no official spot WS specification or private spot contract is inferred."
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "depthBooksSpot",
+      "title": "depthBooksSpot",
+      "official_source": "https://api.ondoperps.xyz/ws",
+      "operation_id": "subscribe_spot_depth",
+      "status": "protocol",
+      "source_status": "observed public channel",
+      "note": "Read-only Rust probe on 2026-09-30 with TLS verification and no login received a subscription acknowledgement for SPY-USDC. A depth update was also received. An unsupported-channel control was rejected. The public channel is observed; no official spot WS specification or private spot contract is inferred."
+    },
+    {
+      "method": "WS",
+      "path": "/ws",
+      "channel": "tradesSpot",
+      "title": "tradesSpot",
+      "official_source": "https://api.ondoperps.xyz/ws",
+      "operation_id": "subscribe_spot_trades",
+      "status": "protocol",
+      "source_status": "observed public channel",
+      "note": "Read-only Rust probe on 2026-09-30 with TLS verification and no login received a subscription acknowledgement for SPY-USDC. No trade event arrived within the 10-second observation window. An unsupported-channel control was rejected. The public channel is observed; no official spot WS specification or private spot contract is inferred."
     }
   ],
   "spot_spec_checked": "2026-09-30",

@@ -18,6 +18,9 @@ ONDO_PUBLIC = [
     "fundingRatesPerps",
     "markPricesPerps",
     "kLinePerps",
+    "topOfBooksSpot",
+    "depthBooksSpot",
+    "tradesSpot",
 ]
 
 ONDO_PRIVATE = [
@@ -112,14 +115,35 @@ async def test_ondo_connect_login_ping_and_subscriptions(channel):
                 await client.subscribe_klines("BTC-PERP", "1H")
                 expected.update(markets=["BTC-PERP"], resolution="1H")
             else:
+                market = "SPY-USDC" if channel.endswith("Spot") else "BTC-PERP"
                 await client.subscribe(
                     channel,
-                    ["BTC-PERP"] if channel == "ordersSummariesPerps" or not private else None,
+                    [market] if channel == "ordersSummariesPerps" or not private else None,
                 )
                 if channel == "ordersSummariesPerps" or not private:
-                    expected["markets"] = ["BTC-PERP"]
+                    expected["markets"] = [market]
             assert await asyncio.wait_for(client.recv(), 3) == expected
         finally:
             await client.close()
         assert not client.is_connected()
     assert received[-1] == expected
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("method,channel", [
+    ("subscribe_spot_top_of_book", "topOfBooksSpot"),
+    ("subscribe_spot_depth", "depthBooksSpot"),
+    ("subscribe_spot_trades", "tradesSpot"),
+])
+async def test_ondo_public_spot_helpers_send_no_authentication(method, channel):
+    async with authenticated_peer("ondo") as (url, received):
+        client = ondo.PublicClient(base_url=url, timeout=10)
+        try:
+            await client.connect()
+            await getattr(client, method)("SPY-USDC")
+            assert await client.recv() == {"op": "subscribe", "channel": channel, "markets": ["SPY-USDC"]}
+            await client.unsubscribe(channel, "SPY-USDC")
+            assert await client.recv() == {"op": "unsubscribe", "channel": channel, "markets": ["SPY-USDC"]}
+            assert all(event["op"] != "login" for event in received)
+        finally:
+            await client.close()

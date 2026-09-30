@@ -58,6 +58,18 @@ impl OndoPublicWebSocket {
         self.subscribe("tradesPerps", markets).await
     }
 
+    pub async fn subscribe_spot_top_of_book(&mut self, markets: Vec<String>) -> Result<()> {
+        self.subscribe("topOfBooksSpot", markets).await
+    }
+
+    pub async fn subscribe_spot_depth(&mut self, markets: Vec<String>) -> Result<()> {
+        self.subscribe("depthBooksSpot", markets).await
+    }
+
+    pub async fn subscribe_spot_trades(&mut self, markets: Vec<String>) -> Result<()> {
+        self.subscribe("tradesSpot", markets).await
+    }
+
     pub async fn subscribe_funding_rates(&mut self, markets: Vec<String>) -> Result<()> {
         self.subscribe("fundingRatesPerps", markets).await
     }
@@ -98,6 +110,9 @@ impl OndoPublicWebSocket {
                 | "tradesPerps"
                 | "fundingRatesPerps"
                 | "markPricesPerps"
+                | "topOfBooksSpot"
+                | "depthBooksSpot"
+                | "tradesSpot"
         ) {
             return Err(DcexError::InvalidInput(format!(
                 "unsupported Ondo public channel: {channel}"

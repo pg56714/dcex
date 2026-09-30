@@ -61,6 +61,8 @@ cargo add dcex
 
 私人 WebSocket 包含需驗證身分或指定地址的使用者資料流；Binance、Bybit、Bitget、OKX、KuCoin 與 Kraken 現貨提供交易 WebSocket；Hyperliquid 與 Lighter 可提交已簽名操作，Arcus 提供簽名請求建立介面。Lighter Mainnet 與 Robinhood 使用不同憑證；可逐一為客戶端選擇網路，預設為 Mainnet；參閱 [.env.example](.env.example) 與 [Lighter 範例](examples/async/lighter_private_readonly.py)。Ondo 支援永續合約與現貨公開行情（深度、成交、symbol 資訊及歷史資料），product table 亦包含現貨交易對。現貨私有交易在官方公布 API 規格前維持 blocked；詳見 [Ondo 現貨支援範圍](docs/ondo-spot.zh_tw.md)。
 
+Ondo 現貨列僅供公開行情使用，目前不能透過本 client 執行私有交易。逐筆操作永續商品時請使用 `get_product_symbols(exchange="ondo", product_type="swap")` 篩選；現貨 WS 使用 `SPY-USDC` 等交易所 symbol。
+
 ## Python 快速開始
 
 同步 HTTP：

@@ -8,6 +8,10 @@ Product table 從 `/v1/markets` 同時讀取 `result.perps.tradingPairs` 與 `re
 
 截至 2026-09-30，[官方文件索引](https://docs.ondoperps.xyz/llms.txt) 尚未公布現貨私有 REST 契約或現貨 WebSocket 頻道規格。下單、撤單、查單、批次、成交紀錄及 K 線在 ledger 維持 **blocked**。預定私有操作的 method／path 只是待確認項目，不代表官方規格。沒有實作現貨私有簽章或下單方法，也沒有發送實盤帳戶請求或訂單。
 
-已公布的 `get_account()` 提供帳戶資訊；`get_balance()` 對應 `/v1/perps/balance` 永續保證金摘要。這兩份官方 schema 都未確認現貨 GM token 餘額的查詢方式。因此現貨持倉查詢及現貨 WebSocket 訂閱維持 unverified；API 表示方式公布前，請透過官方介面查看相關餘額。既有永續方法不得搭配 `-SPOT` symbol 使用。
+已公布的 `get_account()` 提供帳戶資訊；`get_balance()` 對應 `/v1/perps/balance` 永續保證金摘要。這兩份官方 schema 都未確認現貨 GM token 餘額的查詢方式。因此現貨持倉查詢維持 unverified；API 表示方式公布前，請透過官方介面查看相關餘額。既有永續方法不得搭配 `-SPOT` symbol 使用。
 
-公開路徑依據工作單提供的 2026-09-29 唯讀觀察，並具備離線 wire 覆蓋。2026-09-30 的新公開查詢因 TLS 憑證驗證回報過期而未完成。TLS 驗證保持啟用；離線實作不代表目前已獲線上認證。
+2026-09-30 已透過 curl 與原生 client 成功查核全部四個現貨公開 GET，全程啟用 TLS 驗證且未提供憑證。先前 Python 憑證失敗反映本機 CA bundle 問題，不能據此認定 Ondo 伺服器憑證失效。
+
+公開 WebSocket 支援 `topOfBooksSpot`、`depthBooksSpot`、`tradesSpot`，可使用 `subscribe_spot_top_of_book`、`subscribe_spot_depth`、`subscribe_spot_trades` 或通用 `subscribe`／`unsubscribe`，傳入 `SPY-USDC` 等交易所 symbol。啟用 TLS 驗證的 Rust probe 收到三個通道的訂閱確認，以及兩個委託簿通道的資料更新；成交頻道在 10 秒觀察期間內未收到事件。不支援的對照通道被拒絕。這些屬於公開通道觀察，現貨 WS 官方契約及私有現貨通道仍未公布。
+
+現貨 product table 列（`product_type="spot"`）僅供公開行情，目前不能透過本 client 進行私有交易。逐筆操作永續交易方法前，請以 `get_product_symbols(exchange="ondo", product_type="swap")` 篩選。永續方法對 `-SPOT` symbol 回報中性的端點適用範圍錯誤；公開現貨 WS 使用不含 product table `-SPOT` 後綴的交易所 symbol。

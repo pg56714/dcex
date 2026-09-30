@@ -61,6 +61,8 @@ Documented withdrawal, market-maker and partner endpoints are in scope; current 
 
 Private WebSocket support includes authenticated or address-scoped user-data streams. Trading WebSocket APIs are available for Binance, Bybit, Bitget, OKX, KuCoin and Kraken Spot; Hyperliquid and Lighter accept signed actions, and Arcus provides signed request construction. Lighter Mainnet and Robinhood use separate credential profiles; select the network per client (Mainnet is the default); see [.env.example](.env.example) and the [Lighter examples](examples/async/lighter_private_readonly.py). Ondo supports perpetual futures and public spot market data (depth, trades, symbol info and history), with spot product-table entries. Private spot trading remains blocked until its official API specification is published; see [Ondo spot support](docs/ondo-spot.md).
 
+Ondo spot rows are public-data products and are not privately tradable through this client. Use `get_product_symbols(exchange="ondo", product_type="swap")` when iterating perpetual trading symbols; spot WS uses exchange symbols such as `SPY-USDC`.
+
 
 [Endpoint coverage, limitations and verification](docs/endpoint-audit.md).
 

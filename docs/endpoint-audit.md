@@ -2,7 +2,7 @@
 
 **English** | [繁體中文](endpoint-audit.zh_tw.md)
 
-Reviewed: 2026-09-30. The original report contained 3,180 rows; the reconciled ledger contains 4,857 rows, with official documentation inventories for all 15 exchanges.
+Reviewed: 2026-09-30. The original report contained 3,180 rows; the reconciled ledger contains 4,860 rows, with official documentation inventories for all 15 exchanges.
 
 All documented endpoints are in scope, including withdrawals, address management, market making, RFQ, broker, referral and partner operations. All 111 originally excluded rows have been addressed; there are no scope exclusions. This does not mean every newly discovered endpoint is implemented.
 
@@ -17,7 +17,7 @@ Historical, grouped and overlapping rows prevent converting these counts into an
 | Status | Rows | Definition |
 | --- | ---: | --- |
 | `implemented` | 3,700 | Exact offline HTTP route and public Rust/Python wrappers |
-| `protocol` | 403 | Asynchronous WebSocket protocol support with cited offline evidence; no live certification |
+| `protocol` | 406 | Asynchronous WebSocket protocol support with cited offline evidence; no live certification |
 | `superseded` | 686 | Historical or grouped row replaced by explicit current rows |
 | `unavailable` | 19 | Retired/unavailable operation, or documentation-only section with no endpoint |
 | `unverified` | 11 | Wrapper exists, but part of the official specification is incomplete |

@@ -1,4 +1,4 @@
-"""Ondo Perps WebSocket clients backed by the Rust core."""
+"""Ondo perpetual and public spot WebSocket clients backed by the Rust core."""
 
 # ruff: noqa: D102, D103
 
@@ -55,6 +55,15 @@ class PublicClient(AsyncWebSocketMixin):
 
     async def subscribe_depth(self, markets: str | list[str]) -> None:
         await self.subscribe("depthBooksPerps", markets)
+
+    async def subscribe_spot_top_of_book(self, markets: str | list[str]) -> None:
+        await self.subscribe("topOfBooksSpot", markets)
+
+    async def subscribe_spot_depth(self, markets: str | list[str]) -> None:
+        await self.subscribe("depthBooksSpot", markets)
+
+    async def subscribe_spot_trades(self, markets: str | list[str]) -> None:
+        await self.subscribe("tradesSpot", markets)
 
     async def subscribe_mark_prices(self, markets: str | list[str]) -> None:
         await self.subscribe("markPricesPerps", markets)

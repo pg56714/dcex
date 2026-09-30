@@ -473,13 +473,14 @@ def test_unsafe_requests_are_rejected_before_the_wire(
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("asynchronous", [False, True])
-async def test_spot_symbols_cannot_reach_perpetual_order_transport(asynchronous, server):
+@pytest.mark.parametrize("method", ["place_order", "get_trades"])
+async def test_spot_symbols_cannot_reach_perpetual_order_transport(asynchronous, server, method):
     base_url, received = server
     _drain(received)
     client = (AsyncClient if asynchronous else Client)(**_client_kwargs(base_url))
     try:
-        with pytest.raises(ValueError, match="spot private trading is blocked"):
-            result = client.place_order(market="SPY-USDC-SPOT", side="buy", type="limit", price="1", size="1")
+        with pytest.raises(ValueError, match=r"Ondo -SPOT symbols are only valid for get_spot_\* endpoints"):
+            result = getattr(client, method)(market="SPY-USDC-SPOT", **(dict(side="buy", type="limit", price="1", size="1") if method == "place_order" else {}))
             if asynchronous:
                 await result
         assert received.empty()

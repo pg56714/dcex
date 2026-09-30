@@ -74,7 +74,7 @@ def extended() -> ProductTable:
 
 
 def ondo() -> ProductTable:
-    """Fetch Ondo perpetual product metadata."""
+    """Fetch Ondo perpetual and enabled spot product metadata."""
     return _fetch("ondo")
 
 

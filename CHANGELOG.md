@@ -1,3 +1,7 @@
+## Unreleased
+
+- Add Ondo public spot market streams. Spot product-table rows remain unavailable for private trading; filter `product_type="swap"` before iterating perpetual order methods.
+
 ## 0.33.0 (2026-09-25)
 
 ### Feat
