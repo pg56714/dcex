@@ -1,3 +1,20 @@
+## 0.35.0 (2026-09-30)
+
+### BREAKING CHANGE
+
+- remove legacy aliases and resolve clippy arity warnings
+
+### Fix
+
+- use snake_case margin_coin in Bitget read-only examples
+- make shifted generated client constructors keyword-only
+- require keywords for shifted Python argument slots
+- normalize spot stream symbols, log skipped rows and update support docs
+
+### Refactor
+
+- remove obsolete source layout guard tooling
+
 ## 0.34.0 (2026-09-30)
 
 ### Feat

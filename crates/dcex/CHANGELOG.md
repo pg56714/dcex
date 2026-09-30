@@ -1,3 +1,17 @@
+## 0.13.0 (2026-09-30)
+
+### BREAKING CHANGE
+
+- remove legacy aliases and resolve clippy arity warnings
+
+### Fix
+
+- normalize spot stream symbols, log skipped rows and update support docs
+
+### Refactor
+
+- remove obsolete source layout guard tooling
+
 ## 0.12.0 (2026-09-30)
 
 ### Feat
