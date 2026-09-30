@@ -83,7 +83,7 @@ async def test_binance_review_names_and_fields(asynchronous, method, kwargs, pat
         request = next(r for r in list(received.queue) if urlsplit(r["path"]).path == path)
     pairs = parse_qsl(urlsplit(request["path"]).query or request["body"])
     if method == "wallet_dust_transfer":
-        assert [v for k, v in pairs if k == "asset"] == ["ETH", "LTC"]
+        assert [v for k, v in pairs if k == "asset"] == ["ETH,LTC"]
     if method == "set_coin_futures_leverage":
         assert dict(pairs)["symbol"] == "BTCUSD_PERP"
 

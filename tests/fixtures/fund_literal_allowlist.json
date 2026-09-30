@@ -356,8 +356,8 @@
   {
     "source": "crates/dcex/src/exchanges/binance/schema_requests.rs",
     "name": "wallet_dust_transfer",
-    "sha256": "fca9b9b4814ad803b9d8f0e32c17ff17dba575001210bb17da94a637314786f9",
-    "reason": "Collects and validates dust-conversion asset identifiers before building the existing request."
+    "sha256": "f3e29cf6853bcd80739244206de5e892afc6d5143ced22ca9fdc38e8853abeec",
+    "reason": "Combines repeated dust-conversion asset inputs into the officially specified single CSV parameter; the enclosing catalog transport is reachable only through the fund owner."
   },
   {
     "source": "crates/dcex/src/exchanges/binance/schema_requests/field_schemas.rs",

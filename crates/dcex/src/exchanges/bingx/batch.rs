@@ -99,7 +99,15 @@ mod trade_requests {
                     query.push(("orderIdList".to_string(), python_list_string(value)));
                 }
                 if let Some(value) = params.get("clientOrderIdList") {
-                    query.push(("clientOrderIdList".to_string(), python_list_string(value)));
+                    let ids: Vec<String> = serde_json::from_str(value).map_err(|_| {
+                        crate::exchanges::bingx::params::invalid(
+                            "clientOrderIdList must be a JSON array of strings",
+                        )
+                    })?;
+                    query.push((
+                        "clientOrderIdList".to_string(),
+                        serde_json::to_string(&ids).expect("string array"),
+                    ));
                 }
                 push_optional(&mut query, "recvWindow", params.get("recvWindow"));
                 self.private_delete(SWAP_CANCEL_BATCH_ORDER, query).await

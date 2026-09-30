@@ -241,7 +241,9 @@ pub(crate) fn pairs(exchange: &str, method: &str, pairs: &[(String, String)]) ->
     for (key, raw) in pairs {
         let field = &schema["properties"][key];
         let value = Value::String(raw.clone());
-        if allows_zero(field, &context) {
+        if field["x-repeated-query"] == true {
+            validate(&value, &field["items"], key)?;
+        } else if allows_zero(field, &context) {
             let mut relaxed = field.clone();
             relaxed["x-positive"] = Value::Bool(false);
             validate(&value, &relaxed, key)?;

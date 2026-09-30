@@ -1622,7 +1622,8 @@
             "items": {
               "type": "string"
             },
-            "description": "For get order history, selects the documented mode, unit, or reference used by this operation."
+            "description": "For get order history, selects the documented mode, unit, or reference used by this operation.",
+            "x-repeated-query": true
           }
         }
       },

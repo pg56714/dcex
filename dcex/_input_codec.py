@@ -53,14 +53,16 @@ def normalize(
     ):
         if not all(part.strip() for part in value.split(",")):
             raise ValueError(f"{key} requires nonempty comma-separated identifiers")
-        return value
+        return value.split(",")
     if isinstance(value, str) and schema.get("type") in {"object", "array"}:
         try:
             parsed = json.loads(value.strip(), parse_float=str)
         except json.JSONDecodeError as error:
             raise ValueError(f"{key} must be a JSON {schema['type']}") from error
-        normalize(parsed, key, schema=schema)
-        return value
+        normalized = normalize(parsed, key, schema=schema)
+        # Array wrappers may serialize again or expand repeated query keys.
+        # Decode once at the public boundary to preserve their wire shape.
+        return normalized if schema.get("type") == "array" else value
     if schema.get("type") == "object" and not isinstance(value, dict):
         raise ValueError(f"{key} must be a JSON object")
     if schema.get("x-nonempty-object") and value == {}:

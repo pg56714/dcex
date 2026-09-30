@@ -1,0 +1,1082 @@
+[
+  {
+    "exchange": "arcus",
+    "method": "batch_cancel_orders",
+    "field": "cancels",
+    "official_source": "https://docs.arcus.xyz/api-reference/exchange/batch-cancel-orders",
+    "argument": "cancels",
+    "wire_field": "cancels",
+    "representation": "json",
+    "values": [
+      {
+        "product_symbol": "BTC-USD",
+        "order_id": "ord-2"
+      }
+    ],
+    "kwargs": {}
+  },
+  {
+    "exchange": "aster",
+    "method": "cancel_futures_batch_orders",
+    "field": "orderIdList",
+    "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#cancel-multiple-orders-trade",
+    "argument": "orderIdList",
+    "wire_field": "orderIdList",
+    "representation": "json",
+    "values": [
+      1,
+      2
+    ],
+    "kwargs": {
+      "product_symbol": "BTC-USDT-SWAP"
+    }
+  },
+  {
+    "exchange": "aster",
+    "method": "cancel_futures_batch_orders",
+    "field": "origClientOrderIdList",
+    "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#cancel-multiple-orders-trade",
+    "argument": "origClientOrderIdList",
+    "wire_field": "origClientOrderIdList",
+    "representation": "json",
+    "values": [
+      "1",
+      "2"
+    ],
+    "kwargs": {
+      "product_symbol": "BTC-USDT-SWAP"
+    }
+  },
+  {
+    "exchange": "aster",
+    "method": "guarded_cancel_futures_batch_orders",
+    "field": "orderIdList",
+    "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#cancel-multiple-orders-guarded-trade",
+    "argument": "orderIdList",
+    "wire_field": "orderIdList",
+    "representation": "json",
+    "values": [
+      1,
+      2
+    ],
+    "kwargs": {
+      "product_symbol": "BTC-USDT-SWAP",
+      "nonce": 1700000000000123
+    }
+  },
+  {
+    "exchange": "aster",
+    "method": "guarded_cancel_futures_batch_orders",
+    "field": "origClientOrderIdList",
+    "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-futures-api-v3.md#cancel-multiple-orders-guarded-trade",
+    "argument": "origClientOrderIdList",
+    "wire_field": "origClientOrderIdList",
+    "representation": "json",
+    "values": [
+      "1",
+      "2"
+    ],
+    "kwargs": {
+      "product_symbol": "BTC-USDT-SWAP",
+      "nonce": 1700000000000123
+    }
+  },
+  {
+    "exchange": "aster",
+    "method": "cancel_all_spot_open_orders",
+    "field": "orderIdList",
+    "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api-tesetnet.md#L1409",
+    "argument": "orderIdList",
+    "wire_field": "orderIdList",
+    "representation": "json",
+    "values": [
+      1,
+      2
+    ],
+    "kwargs": {
+      "product_symbol": "BTC-USDT-SPOT"
+    }
+  },
+  {
+    "exchange": "aster",
+    "method": "cancel_all_spot_open_orders",
+    "field": "origClientOrderIdList",
+    "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api-tesetnet.md#L1409",
+    "argument": "origClientOrderIdList",
+    "wire_field": "origClientOrderIdList",
+    "representation": "json",
+    "values": [
+      "1",
+      "2"
+    ],
+    "kwargs": {
+      "product_symbol": "BTC-USDT-SPOT"
+    }
+  },
+  {
+    "exchange": "backpack",
+    "method": "get_order_history",
+    "field": "marketType",
+    "official_source": "https://docs.backpack.exchange/#tag/Order/operation/get_order_history",
+    "argument": "marketType",
+    "wire_field": "marketType",
+    "representation": "repeated",
+    "values": [
+      "SPOT",
+      "PERP"
+    ],
+    "kwargs": {}
+  },
+  {
+    "exchange": "binance",
+    "method": "cancel_options_batch_orders",
+    "field": "orderIds",
+    "official_source": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-options/api/rest-api/trade#cancel-multiple-option-orders",
+    "argument": "orderIds",
+    "wire_field": "orderIds",
+    "representation": "json",
+    "values": [
+      1,
+      2
+    ],
+    "kwargs": {
+      "product_symbol": "BTC-250328-80000-C"
+    }
+  },
+  {
+    "exchange": "binance",
+    "method": "cancel_options_batch_orders",
+    "field": "clientOrderIds",
+    "official_source": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-options/api/rest-api/trade#cancel-multiple-option-orders",
+    "argument": "clientOrderIds",
+    "wire_field": "clientOrderIds",
+    "representation": "json",
+    "values": [
+      "1",
+      "2"
+    ],
+    "kwargs": {
+      "product_symbol": "BTC-250328-80000-C"
+    }
+  },
+  {
+    "exchange": "binance",
+    "method": "cancel_futures_batch_orders",
+    "field": "order_ids",
+    "official_source": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/rest-api/trade#cancel-multiple-orders",
+    "argument": "order_ids",
+    "wire_field": "orderIdList",
+    "representation": "json",
+    "values": [
+      1,
+      2
+    ],
+    "kwargs": {
+      "product_symbol": "BTC-USDT-SWAP"
+    }
+  },
+  {
+    "exchange": "binance",
+    "method": "cancel_futures_batch_orders",
+    "field": "client_order_ids",
+    "official_source": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/rest-api/trade#cancel-multiple-orders",
+    "argument": "client_order_ids",
+    "wire_field": "origClientOrderIdList",
+    "representation": "json",
+    "values": [
+      "1",
+      "2"
+    ],
+    "kwargs": {
+      "product_symbol": "BTC-USDT-SWAP"
+    }
+  },
+  {
+    "exchange": "binance",
+    "method": "cancel_coin_futures_batch_orders",
+    "field": "order_ids",
+    "official_source": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-coin-m-futures/api/rest-api/trade#cancel-multiple-orders",
+    "argument": "order_ids",
+    "wire_field": "orderIdList",
+    "representation": "json",
+    "values": [
+      1,
+      2
+    ],
+    "kwargs": {
+      "symbol": "BTCUSD_PERP"
+    }
+  },
+  {
+    "exchange": "binance",
+    "method": "cancel_coin_futures_batch_orders",
+    "field": "client_order_ids",
+    "official_source": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-coin-m-futures/api/rest-api/trade#cancel-multiple-orders",
+    "argument": "client_order_ids",
+    "wire_field": "origClientOrderIdList",
+    "representation": "json",
+    "values": [
+      "1",
+      "2"
+    ],
+    "kwargs": {
+      "symbol": "BTCUSD_PERP"
+    }
+  },
+  {
+    "exchange": "binance",
+    "method": "wallet_dust_transfer",
+    "field": "asset",
+    "official_source": "https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/asset#dust-transfer",
+    "argument": "asset",
+    "wire_field": "asset",
+    "representation": "csv",
+    "values": [
+      "BTC",
+      "ETH"
+    ],
+    "kwargs": {}
+  },
+  {
+    "exchange": "binance",
+    "method": "prediction_batch_redeem",
+    "field": "token_ids",
+    "official_source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/redeem#batch-redeem",
+    "argument": "token_ids",
+    "wire_field": "tokenIds",
+    "representation": "json",
+    "values": [
+      "1",
+      "2"
+    ],
+    "kwargs": {
+      "wallet_address": "0x1111111111111111111111111111111111111111",
+      "wallet_id": "wallet-1"
+    }
+  },
+  {
+    "exchange": "binance",
+    "method": "prediction_batch_cancel_orders",
+    "field": "cancel_info_list",
+    "official_source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/trade#batch-cancel-orders",
+    "argument": "cancel_info_list",
+    "wire_field": "cancelInfoList",
+    "representation": "json",
+    "values": [
+      {
+        "orderId": "1"
+      }
+    ],
+    "kwargs": {
+      "wallet_address": "0x1111111111111111111111111111111111111111",
+      "wallet_id": "wallet-1"
+    }
+  },
+  {
+    "exchange": "bingx",
+    "method": "post_wealth_v1_product_dual_currency_order",
+    "field": "select_accounts",
+    "official_source": "https://bingx-api.github.io/docs-v3/#/en/Wealth/Dual-Currency/Dual-Currency%20Place%20Order",
+    "argument": "select_accounts",
+    "wire_field": "selectAccounts",
+    "representation": "json",
+    "values": [
+      "FUND",
+      "SPOT"
+    ],
+    "kwargs": {
+      "amount": "1",
+      "sku": "s",
+      "product_id": 1,
+      "strike_price": "10",
+      "quote_id": "q"
+    }
+  },
+  {
+    "exchange": "bingx",
+    "method": "cancel_spot_batch_orders",
+    "field": "order_ids",
+    "official_source": "https://bingx-api.github.io/docs-v3/#/en/Spot/Trades%20Endpoints/Cancel%20multiple%20orders",
+    "argument": "order_ids",
+    "wire_field": "orderIds",
+    "representation": "csv",
+    "values": [
+      "1",
+      "2"
+    ],
+    "kwargs": {
+      "product_symbol": "BTC-USDT-SPOT"
+    }
+  },
+  {
+    "exchange": "bingx",
+    "method": "cancel_spot_batch_orders",
+    "field": "client_order_ids",
+    "official_source": "https://bingx-api.github.io/docs-v3/#/en/Spot/Trades%20Endpoints/Cancel%20multiple%20orders",
+    "argument": "client_order_ids",
+    "wire_field": "clientOrderIDs",
+    "representation": "csv",
+    "values": [
+      "1",
+      "2"
+    ],
+    "kwargs": {
+      "product_symbol": "BTC-USDT-SPOT",
+      "order_ids": "1"
+    }
+  },
+  {
+    "exchange": "bingx",
+    "method": "cancel_swap_batch_order",
+    "field": "order_id_list",
+    "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Trades%20Endpoints/Cancel%20multiple%20orders",
+    "argument": "order_id_list",
+    "wire_field": "orderIdList",
+    "representation": "json",
+    "values": [
+      "1",
+      "2"
+    ],
+    "kwargs": {
+      "product_symbol": "BTC-USDT-SWAP"
+    },
+    "wire_values": [
+      1,
+      2
+    ]
+  },
+  {
+    "exchange": "bingx",
+    "method": "cancel_swap_batch_order",
+    "field": "client_order_id_list",
+    "official_source": "https://bingx-api.github.io/docs-v3/#/en/Swap/Trades%20Endpoints/Cancel%20multiple%20orders",
+    "argument": "client_order_id_list",
+    "wire_field": "clientOrderIdList",
+    "representation": "json",
+    "values": [
+      "abc123",
+      "00123"
+    ],
+    "kwargs": {
+      "product_symbol": "BTC-USDT-SWAP"
+    },
+    "wire_values": [
+      "abc123",
+      "00123"
+    ]
+  },
+  {
+    "exchange": "bitget",
+    "method": "cancel_spot_batch_orders",
+    "field": "order_list",
+    "official_source": "https://www.bitget.com/docs/catalog/classic-spot-trade/classic-spot-trade#batch-cancel-orders",
+    "argument": "order_list",
+    "wire_field": "orderList",
+    "representation": "json",
+    "values": [
+      {
+        "orderId": "1"
+      }
+    ],
+    "kwargs": {
+      "product_symbol": "BTC-USDT-SPOT"
+    }
+  },
+  {
+    "exchange": "bitget",
+    "method": "cancel_uta_batch_orders",
+    "field": "order_list",
+    "official_source": "https://www.bitget.com/legacy-docs/uta/trade/Cancel-Batch",
+    "argument": "order_list",
+    "wire_field": "$",
+    "representation": "json",
+    "values": [
+      {
+        "category": "SPOT",
+        "symbol": "BTCUSDT",
+        "orderId": "1"
+      }
+    ],
+    "kwargs": {}
+  },
+  {
+    "exchange": "bitget",
+    "method": "cancel_futures_batch_orders",
+    "field": "order_id_list",
+    "official_source": "https://www.bitget.com/docs/catalog/classic-contract-trade/classic-contract-trade#batch-cancel",
+    "argument": "order_id_list",
+    "wire_field": "orderIdList",
+    "representation": "json",
+    "values": [
+      {
+        "orderId": "1"
+      }
+    ],
+    "kwargs": {
+      "product_symbol": "BTC-USDT-SWAP"
+    }
+  },
+  {
+    "exchange": "bitget",
+    "method": "cancel_futures_batch_orders",
+    "field": "orderIdList",
+    "official_source": "https://www.bitget.com/docs/catalog/classic-contract-trade/classic-contract-trade#batch-cancel",
+    "argument": "order_id_list",
+    "wire_field": "orderIdList",
+    "representation": "json",
+    "values": [
+      {
+        "orderId": "1"
+      }
+    ],
+    "kwargs": {
+      "product_symbol": "BTC-USDT-SWAP"
+    }
+  },
+  {
+    "exchange": "bitget",
+    "method": "cancel_cross_margin_batch_orders",
+    "field": "orders",
+    "official_source": "https://www.bitget.com/docs/catalog/classic-margin-cross-trade/classic-margin-cross-trade#cross-batch-cancel-orders",
+    "argument": "orders",
+    "wire_field": "orderIdList",
+    "representation": "json",
+    "values": [
+      {
+        "orderId": "1"
+      }
+    ],
+    "kwargs": {
+      "product_symbol": "BTC-USDT-SPOT"
+    }
+  },
+  {
+    "exchange": "bitget",
+    "method": "cancel_cross_margin_batch_orders",
+    "field": "orderIdList",
+    "official_source": "https://www.bitget.com/docs/catalog/classic-margin-cross-trade/classic-margin-cross-trade#cross-batch-cancel-orders",
+    "argument": "orders",
+    "wire_field": "orderIdList",
+    "representation": "json",
+    "values": [
+      {
+        "orderId": "1"
+      }
+    ],
+    "kwargs": {
+      "product_symbol": "BTC-USDT-SPOT"
+    }
+  },
+  {
+    "exchange": "bitget",
+    "method": "cancel_isolated_margin_batch_orders",
+    "field": "orders",
+    "official_source": "https://www.bitget.com/api-doc/margin/isolated/trade/Isolated-Batch-Cancel-Orders",
+    "argument": "orders",
+    "wire_field": "orderIdList",
+    "representation": "json",
+    "values": [
+      {
+        "orderId": "1"
+      }
+    ],
+    "kwargs": {
+      "product_symbol": "BTC-USDT-SPOT"
+    }
+  },
+  {
+    "exchange": "bitget",
+    "method": "cancel_isolated_margin_batch_orders",
+    "field": "orderIdList",
+    "official_source": "https://www.bitget.com/api-doc/margin/isolated/trade/Isolated-Batch-Cancel-Orders",
+    "argument": "orders",
+    "wire_field": "orderIdList",
+    "representation": "json",
+    "values": [
+      {
+        "orderId": "1"
+      }
+    ],
+    "kwargs": {
+      "product_symbol": "BTC-USDT-SPOT"
+    }
+  },
+  {
+    "exchange": "bitget",
+    "method": "cancel_futures_plan_orders",
+    "field": "order_id_list",
+    "official_source": "https://www.bitget.com/docs/catalog/classic-contract-plan/classic-contract-plan#cancel-trigger-order",
+    "argument": "order_id_list",
+    "wire_field": "orderIdList",
+    "representation": "json",
+    "values": [
+      {
+        "orderId": "1"
+      }
+    ],
+    "kwargs": {
+      "product_symbol": "BTC-USDT-SWAP",
+      "product_type": "USDT-FUTURES"
+    }
+  },
+  {
+    "exchange": "bitget",
+    "method": "cancel_spot_plan_orders",
+    "field": "symbol_list",
+    "official_source": "https://www.bitget.com/docs/catalog/classic-spot-plan/classic-spot-plan#cancel-plan-orders-in-batch",
+    "argument": "symbol_list",
+    "wire_field": "symbolList",
+    "representation": "json",
+    "values": [
+      "BTCUSDT",
+      "ETHUSDT"
+    ],
+    "kwargs": {}
+  },
+  {
+    "exchange": "bitget",
+    "method": "classic_copytrading_spot_copytrade_follower_order_close_tracking",
+    "field": "tracking_no_list",
+    "official_source": "https://www.bitget.com/api-doc/classic/copytrading/spot-copytrade/follower/Order-Close-Tracking",
+    "argument": "tracking_no_list",
+    "wire_field": "trackingNoList",
+    "representation": "json",
+    "values": [
+      "1",
+      "2"
+    ],
+    "kwargs": {
+      "symbol": "BTCUSDT"
+    }
+  },
+  {
+    "exchange": "bitget",
+    "method": "classic_copytrading_spot_copytrade_follower_stop_order",
+    "field": "tracking_no_list",
+    "official_source": "https://www.bitget.com/api-doc/classic/copytrading/spot-copytrade/follower/Stop-Order",
+    "argument": "tracking_no_list",
+    "wire_field": "trackingNoList",
+    "representation": "json",
+    "values": [
+      "1",
+      "2"
+    ],
+    "kwargs": {}
+  },
+  {
+    "exchange": "bitget",
+    "method": "classic_copytrading_spot_copytrade_trader_order_close_tracking",
+    "field": "tracking_no_list",
+    "official_source": "https://www.bitget.com/docs/catalog/classic-copytrading-spot-trader/classic-copytrading-spot-copytrade-trader#sell-and-sell-in-batch",
+    "argument": "tracking_no_list",
+    "wire_field": "trackingNoList",
+    "representation": "json",
+    "values": [
+      "1",
+      "2"
+    ],
+    "kwargs": {
+      "symbol": "BTCUSDT"
+    }
+  },
+  {
+    "exchange": "bybit",
+    "method": "batch_set_collateral_coins",
+    "field": "request",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/account/batch-set-collateral",
+    "argument": "request",
+    "wire_field": "request",
+    "representation": "json",
+    "values": [
+      {
+        "coin": "BTC",
+        "collateralSwitch": "ON"
+      }
+    ],
+    "kwargs": {}
+  },
+  {
+    "exchange": "bybit",
+    "method": "get_transferable_amount",
+    "field": "coins",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/account/unified-trans-amnt",
+    "argument": "coins",
+    "wire_field": "coinName",
+    "representation": "csv",
+    "values": [
+      "BTC",
+      "USDT"
+    ],
+    "kwargs": {}
+  },
+  {
+    "exchange": "bybit",
+    "method": "get_alpha_lp_order_list",
+    "field": "order_status",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/lp/order-list",
+    "argument": "order_status",
+    "wire_field": "orderStatus",
+    "representation": "json",
+    "values": [
+      1,
+      2
+    ],
+    "kwargs": {}
+  },
+  {
+    "exchange": "bybit",
+    "method": "request_alpha_prediction_order_book",
+    "field": "token_ids",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/order-book",
+    "argument": "token_ids",
+    "wire_field": "tokenIds",
+    "representation": "json",
+    "values": [
+      "1",
+      "2"
+    ],
+    "kwargs": {}
+  },
+  {
+    "exchange": "bybit",
+    "method": "get_alpha_trade_order_list",
+    "field": "order_status",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/trade/order-list",
+    "argument": "order_status",
+    "wire_field": "orderStatus",
+    "representation": "json",
+    "values": [
+      1,
+      2
+    ],
+    "kwargs": {
+      "limit": 20,
+      "page_index": 1
+    }
+  },
+  {
+    "exchange": "hyperliquid",
+    "method": "cancel_batch_orders",
+    "field": "cancels",
+    "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-orders",
+    "argument": "cancels",
+    "wire_field": "cancels",
+    "representation": "json",
+    "values": [
+      {
+        "product_symbol": "[\"ETH\",1]",
+        "oid": 7
+      }
+    ],
+    "kwargs": {},
+    "wire_values": [
+      {
+        "a": 1,
+        "o": 7
+      }
+    ]
+  },
+  {
+    "exchange": "hyperliquid",
+    "method": "cancel_batch_orders_by_cloid",
+    "field": "cancels",
+    "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#cancel-orders-by-cloid",
+    "argument": "cancels",
+    "wire_field": "cancels",
+    "representation": "json",
+    "values": [
+      {
+        "product_symbol": "[\"ETH\",1]",
+        "cloid": "0x1234567890abcdef1234567890abcdef"
+      }
+    ],
+    "kwargs": {},
+    "wire_values": [
+      {
+        "asset": 1,
+        "cloid": "0x1234567890abcdef1234567890abcdef"
+      }
+    ]
+  },
+  {
+    "exchange": "kraken",
+    "method": "cancel_spot_batch_orders",
+    "field": "orders",
+    "official_source": "https://docs.kraken.com/api-reference/trading/cancel-order-batch",
+    "argument": "orders",
+    "wire_field": "orders",
+    "representation": "json",
+    "values": [
+      "1",
+      "2"
+    ],
+    "kwargs": {}
+  },
+  {
+    "exchange": "kraken",
+    "method": "cancel_spot_batch_orders",
+    "field": "cl_ord_ids",
+    "official_source": "https://docs.kraken.com/api-reference/trading/cancel-order-batch",
+    "argument": "cl_ord_ids",
+    "wire_field": "cl_ord_ids",
+    "representation": "json",
+    "values": [
+      "1",
+      "2"
+    ],
+    "kwargs": {}
+  },
+  {
+    "exchange": "kraken",
+    "method": "get_futures_order_status",
+    "field": "orderIds",
+    "official_source": "https://docs.kraken.com/api-reference/order-management/get-specific-orders-status",
+    "argument": "orderIds",
+    "wire_field": "orderIds",
+    "representation": "csv",
+    "values": [
+      "1",
+      "2"
+    ],
+    "kwargs": {}
+  },
+  {
+    "exchange": "kraken",
+    "method": "get_futures_order_status",
+    "field": "cliOrdIds",
+    "official_source": "https://docs.kraken.com/api-reference/order-management/get-specific-orders-status",
+    "argument": "cliOrdIds",
+    "wire_field": "cliOrdIds",
+    "representation": "csv",
+    "values": [
+      "1",
+      "2"
+    ],
+    "kwargs": {}
+  },
+  {
+    "exchange": "kucoin",
+    "method": "batch_cancel_uta_orders",
+    "field": "cancel_order_list",
+    "official_source": "https://www.kucoin.com/docs-new/v2/rest/ua/batch-cancel-order-by-id",
+    "argument": "cancel_order_list",
+    "wire_field": "cancelOrderList",
+    "representation": "json",
+    "values": [
+      {
+        "symbol": "XBTUSDTM",
+        "orderId": "1"
+      }
+    ],
+    "kwargs": {
+      "trade_type": "FUTURES"
+    }
+  },
+  {
+    "exchange": "kucoin",
+    "method": "cancel_futures_batch_orders",
+    "field": "order_ids",
+    "official_source": "https://www.kucoin.com/docs-new/3470241e0",
+    "argument": "order_ids",
+    "wire_field": "orderIdsList",
+    "representation": "json",
+    "values": [
+      "1",
+      "2"
+    ],
+    "kwargs": {}
+  },
+  {
+    "exchange": "kucoin",
+    "method": "cancel_futures_batch_orders",
+    "field": "client_orders",
+    "official_source": "https://www.kucoin.com/docs-new/3470241e0",
+    "argument": "client_orders",
+    "wire_field": "clientOidsList",
+    "representation": "json",
+    "values": [
+      {
+        "symbol": "XBTUSDTM",
+        "clientOid": "c-1"
+      }
+    ],
+    "kwargs": {}
+  },
+  {
+    "exchange": "kucoin",
+    "method": "set_futures_batch_margin_mode",
+    "field": "symbols",
+    "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/positions/batch-switch-margin-mode",
+    "argument": "symbols",
+    "wire_field": "symbols",
+    "representation": "json",
+    "values": [
+      "XBTUSDTM",
+      "ETHUSDTM"
+    ],
+    "kwargs": {
+      "margin_mode": "ISOLATED"
+    }
+  },
+  {
+    "exchange": "lighter",
+    "method": "get_transfer_history",
+    "field": "type_",
+    "official_source": "https://apidocs.lighter.xyz/reference/transfer_history",
+    "argument": "type_",
+    "wire_field": "type",
+    "representation": "csv",
+    "values": [
+      "L2Transfer",
+      "L2BurnShares"
+    ],
+    "kwargs": {
+      "account_index": 12,
+      "authorization": "test-token"
+    }
+  },
+  {
+    "exchange": "mexc",
+    "method": "cancel_contract_batch_orders_by_external_id",
+    "field": "orders",
+    "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/batch-cancel-by-external-order-id",
+    "argument": "orders",
+    "wire_field": "$",
+    "representation": "json",
+    "values": [
+      {
+        "symbol": "BTC_USDT",
+        "externalOid": "1"
+      }
+    ],
+    "kwargs": {}
+  },
+  {
+    "exchange": "mexc",
+    "method": "get_contract_batch_orders_by_external_id",
+    "field": "orders",
+    "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/batch-query-orders-by-external-order-id",
+    "argument": "orders",
+    "wire_field": "$",
+    "representation": "json",
+    "values": [
+      {
+        "symbol": "BTC_USDT",
+        "externalOid": "1"
+      }
+    ],
+    "kwargs": {}
+  },
+  {
+    "exchange": "mexc",
+    "method": "cancel_contract_orders",
+    "field": "orders",
+    "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/cancel-orders",
+    "argument": "orders",
+    "wire_field": "$",
+    "representation": "json",
+    "values": [
+      "1",
+      "2"
+    ],
+    "kwargs": {}
+  },
+  {
+    "exchange": "mexc",
+    "method": "get_contract_orders",
+    "field": "order_ids",
+    "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/batch-query-orders-by-order-id",
+    "argument": "order_ids",
+    "wire_field": "order_ids",
+    "representation": "csv",
+    "values": [
+      "1",
+      "2"
+    ],
+    "kwargs": {}
+  },
+  {
+    "exchange": "mexc",
+    "method": "cancel_contract_plan_orders",
+    "field": "orders",
+    "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/cancel-planned-orders",
+    "argument": "orders",
+    "wire_field": "$",
+    "representation": "json",
+    "values": [
+      {
+        "symbol": "BTC_USDT",
+        "orderId": "1"
+      }
+    ],
+    "kwargs": {}
+  },
+  {
+    "exchange": "mexc",
+    "method": "get_contract_trailing_orders",
+    "field": "states",
+    "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/query-trailing-orders",
+    "argument": "states",
+    "wire_field": "states",
+    "representation": "csv",
+    "values": [
+      0,
+      1
+    ],
+    "kwargs": {}
+  },
+  {
+    "exchange": "mexc",
+    "method": "cancel_contract_tpsl_orders",
+    "field": "orders",
+    "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/cancel-tpsl-planned-orders",
+    "argument": "orders",
+    "wire_field": "$",
+    "representation": "json",
+    "values": [
+      {
+        "stopPlanOrderId": "1"
+      }
+    ],
+    "kwargs": {}
+  },
+  {
+    "exchange": "okx",
+    "method": "trading_bot_recurring_order_algo",
+    "field": "source",
+    "official_source": "https://www.okx.com/docs-v5/en/#order-book-trading-recurring-buy-post-place-recurring-buy-order",
+    "argument": "source",
+    "wire_field": "source",
+    "representation": "json",
+    "values": [
+      "1"
+    ],
+    "kwargs": {
+      "stgy_name": "Strategy",
+      "recurring_list": [
+        {
+          "ccy": "BTC",
+          "ratio": "1"
+        }
+      ],
+      "period": "daily",
+      "recurring_time": "0",
+      "time_zone": "8",
+      "amt": "100",
+      "investment_ccy": "USDT",
+      "td_mode": "cash"
+    }
+  },
+  {
+    "exchange": "okx",
+    "method": "rfq_cancel_batch_rfqs",
+    "field": "rfq_ids",
+    "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-cancel-multiple-rfqs",
+    "argument": "rfq_ids",
+    "wire_field": "rfqIds",
+    "representation": "json",
+    "values": [
+      "1",
+      "2"
+    ],
+    "kwargs": {}
+  },
+  {
+    "exchange": "okx",
+    "method": "rfq_cancel_batch_rfqs",
+    "field": "cl_rfq_ids",
+    "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-cancel-multiple-rfqs",
+    "argument": "cl_rfq_ids",
+    "wire_field": "clRfqIds",
+    "representation": "json",
+    "values": [
+      "1",
+      "2"
+    ],
+    "kwargs": {}
+  },
+  {
+    "exchange": "okx",
+    "method": "rfq_cancel_batch_rfqs",
+    "field": "rfqIds",
+    "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-cancel-multiple-rfqs",
+    "argument": "rfq_ids",
+    "wire_field": "rfqIds",
+    "representation": "json",
+    "values": [
+      "1",
+      "2"
+    ],
+    "kwargs": {}
+  },
+  {
+    "exchange": "okx",
+    "method": "rfq_cancel_batch_rfqs",
+    "field": "clRfqIds",
+    "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-cancel-multiple-rfqs",
+    "argument": "cl_rfq_ids",
+    "wire_field": "clRfqIds",
+    "representation": "json",
+    "values": [
+      "1",
+      "2"
+    ],
+    "kwargs": {}
+  },
+  {
+    "exchange": "okx",
+    "method": "cancel_rfq_batch_quotes",
+    "field": "quote_ids",
+    "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-cancel-multiple-quotes",
+    "argument": "quote_ids",
+    "wire_field": "quoteIds",
+    "representation": "json",
+    "values": [
+      "1",
+      "2"
+    ],
+    "kwargs": {}
+  },
+  {
+    "exchange": "okx",
+    "method": "cancel_rfq_batch_quotes",
+    "field": "cl_quote_ids",
+    "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-cancel-multiple-quotes",
+    "argument": "cl_quote_ids",
+    "wire_field": "clQuoteIds",
+    "representation": "json",
+    "values": [
+      "1",
+      "2"
+    ],
+    "kwargs": {}
+  },
+  {
+    "exchange": "okx",
+    "method": "get_max_withdrawal",
+    "field": "ccy",
+    "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-maximum-withdrawals",
+    "argument": "ccy",
+    "wire_field": "ccy",
+    "representation": "csv",
+    "values": [
+      "BTC",
+      "USDT"
+    ],
+    "kwargs": {}
+  },
+  {
+    "exchange": "ondo",
+    "method": "batch_cancel_orders",
+    "field": "orderIDs",
+    "official_source": "https://docs.ondoperps.xyz/api-reference/orders/batch-cancel-orders",
+    "argument": "orderIDs",
+    "wire_field": "orderIDs",
+    "representation": "csv",
+    "values": [
+      "1",
+      "2"
+    ],
+    "kwargs": {}
+  }
+]

@@ -86,7 +86,14 @@ impl BinanceClient {
                 if assets.is_empty() || assets.iter().any(|(_, value)| value.trim().is_empty()) {
                     return Err(invalid("asset must contain at least one nonempty asset"));
                 }
-                query.extend(assets.into_iter().cloned());
+                query.push((
+                    "asset".into(),
+                    assets
+                        .into_iter()
+                        .map(|(_, value)| value.as_str())
+                        .collect::<Vec<_>>()
+                        .join(","),
+                ));
                 continue;
             }
             let canonical = if field.key == "symbol" {
