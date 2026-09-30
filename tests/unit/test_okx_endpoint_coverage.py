@@ -2490,7 +2490,7 @@ def test_sync_okx_wrapper_hits_official_route(
     client = Client(**_client_kwargs(base_url))
     result = getattr(client, case.name)(*case.args, **case.kwargs)
     assert result["code"] == "0"
-    _assert_request(case, received.get(timeout=5))
+    _assert_request(case, received.get(timeout=10))
     assert received.empty(), case.name
 
 
@@ -2511,7 +2511,7 @@ async def test_async_okx_wrapper_hits_official_route(
     finally:
         await client.close()
     assert result["code"] == "0"
-    _assert_request(case, received.get(timeout=5))
+    _assert_request(case, received.get(timeout=10))
     assert received.empty(), case.name
 
 

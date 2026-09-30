@@ -78,9 +78,14 @@ def python_mock_timeouts(source):
     tree = ast.parse(source)
     functions = {n.name: n for n in ast.walk(tree) if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))}
     texts = {name: ast.get_source_segment(source, node) for name, node in functions.items()}
-    local = {name for name, text in texts.items() if re.search(r'127\.0\.0\.1|localhost|(?:server|peer)\w*\s*\(', text) or any(isinstance(node, ast.keyword) and node.arg in {'base_url', 'endpoint', 'ws_base_url', 'http_base_url'} and not isinstance(node.value, ast.Constant) for node in ast.walk(functions[name]))}
+    local = {name for name, text in texts.items() if re.search(r'127\.0\.0\.1|localhost|(?:server|peer)\w*\s*\(', text)
+             or any(a.arg.endswith('server') for a in functions[name].args.posonlyargs + functions[name].args.args + functions[name].args.kwonlyargs)
+             or any(isinstance(node, ast.keyword) and node.arg and (node.arg in {'base_url', 'endpoint'} or node.arg.endswith('_base_url')) and not isinstance(node.value, ast.Constant) for node in ast.walk(functions[name]))}
+    callees = {name: {n.func.id for n in ast.walk(function) if isinstance(n, ast.Call) and isinstance(n.func, ast.Name)} & functions.keys()
+               for name, function in functions.items()}
     while True:
-        expanded = local | {name for name, text in texts.items() if any(re.search(r'\b' + re.escape(callee) + r'\s*\(', text) for callee in local)}
+        expanded = local | {name for name, calls in callees.items() if calls & local}
+        expanded |= {callee for name in local for callee in callees[name]}
         if expanded == local:
             break
         local = expanded
@@ -116,3 +121,15 @@ def test_python_mock_timeout_mutations(call):
 
 def test_python_timeout_controls_outside_local_io_remain_valid():
     assert not python_mock_timeouts('def clock():\n    timer.wait(timeout=1)\n')
+
+
+@pytest.mark.parametrize('source', [
+    'def test_wire(recording_server):\n    received.get(timeout=5)\n',
+    'def test_wire(server):\n    helper()\ndef helper():\n    Client(timeout=2)\n',
+    'def test_wire(http_server):\n    middle()\ndef middle():\n    helper()\ndef helper():\n    Client(timeout=2)\n',
+    'def helper():\n    Client(coin_futures_base_url=url, timeout=2)\n',
+    'def test_wire(*, ws_server):\n    received.get(timeout=5)\n',
+])
+def test_fixture_and_callee_mock_deadline_mutations(source):
+    assert python_mock_timeouts(source)
+    assert not python_mock_timeouts(source.replace('timeout=5', 'timeout=10').replace('timeout=2', 'timeout=10'))

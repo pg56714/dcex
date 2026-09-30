@@ -3008,7 +3008,7 @@ def test_sync_wrapper_reaches_documented_route(
     method = getattr(client, name)
     result = method(**_kwargs(method, name))
     assert result["code"] == "00000"
-    _assert_route(name, received.get(timeout=5))
+    _assert_route(name, received.get(timeout=10))
 
 
 @pytest.mark.parametrize("name", sorted(ROUTES))
@@ -3030,7 +3030,7 @@ def test_async_wrapper_reaches_documented_route(
 
     result = asyncio.run(call())
     assert result["code"] == "00000"
-    _assert_route(name, received.get(timeout=5))
+    _assert_route(name, received.get(timeout=10))
 
 
 def test_sync_order_helpers_send_fixed_side_type_and_force(
@@ -3045,18 +3045,18 @@ def test_sync_order_helpers_send_fixed_side_type_and_force(
     client.place_spot_post_only_limit_sell_order(
         product_symbol="BTC-USDT-SPOT", size="1", price="100"
     )
-    body = json.loads(received.get(timeout=5)["body"])
+    body = json.loads(received.get(timeout=10)["body"])
     assert body["symbol"] == "BTCUSDT"
     assert (body["side"], body["orderType"], body["force"]) == ("sell", "limit", "post_only")
 
     client.place_futures_market_buy_order(product_symbol="ETH-USDT-SWAP", size="2")
-    body = json.loads(received.get(timeout=5)["body"])
+    body = json.loads(received.get(timeout=10)["body"])
     assert body["symbol"] == "ETHUSDT"
     assert (body["side"], body["orderType"]) == ("buy", "market")
     assert body["productType"] == "USDT-FUTURES"
 
     client.get_futures_fee_rates(product_symbol="BTC-USDT-SWAP")
-    request = received.get(timeout=5)
+    request = received.get(timeout=10)
     assert request["query"] == {"symbol": "BTCUSDT", "businessType": "mix"}
 
 
@@ -3103,7 +3103,7 @@ def test_python_validation_rejects_ambiguous_leverage_and_loan_calls(
     assert received.empty()
 
     client.set_futures_leverage(product_symbol="BTC-USDT-SWAP", longLeverage="3")
-    body = json.loads(received.get(timeout=5)["body"])
+    body = json.loads(received.get(timeout=10)["body"])
     assert body["longLeverage"] == "3"
     assert "leverage" not in body
 

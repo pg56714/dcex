@@ -1217,7 +1217,7 @@ def test_sync_wrapper_reaches_documented_route(
     client = Client(**_client_kwargs(base_url))
     method = getattr(client, name)
     assert _call_checked_native(name, lambda: method(**_kwargs(method, name))) is not None
-    _assert_route(name, received.get(timeout=5))
+    _assert_route(name, received.get(timeout=10))
 
 
 @pytest.mark.parametrize("name", sorted(ROUTES))
@@ -1238,7 +1238,7 @@ def test_async_wrapper_reaches_documented_route(
             return await method(**kwargs)
 
     assert _call_checked_native(name, lambda: asyncio.run(call())) is not None
-    _assert_route(name, received.get(timeout=5))
+    _assert_route(name, received.get(timeout=10))
 
 
 def test_sync_helpers_pin_side_type_and_time_in_force(
@@ -1253,16 +1253,16 @@ def test_sync_helpers_pin_side_type_and_time_in_force(
     client.place_swap_post_only_sell_order(
         product_symbol="ETH-USDT-SWAP", quantity="1", price="100", position_side="SHORT"
     )
-    query = received.get(timeout=5)["query"]
+    query = received.get(timeout=10)["query"]
     assert query["symbol"] == "ETH-USDT"
     assert (query["side"], query["type"], query["timeInForce"]) == ("SELL", "LIMIT", "PostOnly")
 
     client.cancel_swap_all_orders(product_symbol="BTC-USDT-SWAP", type_="LIMIT")
-    query = received.get(timeout=5)["query"]
+    query = received.get(timeout=10)["query"]
     assert query["type"] == "LIMIT"
 
     client.get_spot_orderbook_v2(product_symbol="BTC-USDT-SPOT", depth=20)
-    query = received.get(timeout=5)["query"]
+    query = received.get(timeout=10)["query"]
     assert query["symbol"] == "BTC_USDT"
     assert query["type"] == "step0"
 
@@ -1299,7 +1299,7 @@ def test_public_routes_send_documented_timestamp(
     client = Client(**_client_kwargs(base_url))
     method = getattr(client, name)
     _call_checked_native(name, lambda: method(**_kwargs(method, name)))
-    query = received.get(timeout=5)["query"]
+    query = received.get(timeout=10)["query"]
     if name in PUBLIC_WITHOUT_TIMESTAMP:
         assert "timestamp" not in query, name
     else:

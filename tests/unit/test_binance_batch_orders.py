@@ -33,7 +33,7 @@ async def batch_client(asynchronous, base):
     client._native_client = native.BinanceHttpClient(
         api_key="key",
         api_secret="secret",
-        timeout=2,
+        timeout=10,
         spot_base_url=base,
         futures_base_url=base,
         coin_futures_base_url=base,
