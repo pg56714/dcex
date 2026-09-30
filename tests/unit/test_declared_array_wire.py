@@ -116,12 +116,12 @@ async def test_each_declared_array_has_equivalent_list_and_string_wire(case, asy
                 else:
                     expected = [str(v) for v in values] if case["representation"] in {"csv", "repeated"} else values
                     assert payload == case.get("wire_values", expected), (case, payload)
-                if exchange == "kraken" and case["method"] == "get_futures_order_status":
+                if exchange in {"kraken", "lighter"} and case["representation"] == "csv":
                     raw = parse_qs(urlsplit(requests[-1]["path"]).query or requests[-1]["body"])
                     assert raw[case["wire_field"]] == values
-                if exchange == "binance" and case["method"] == "wallet_dust_transfer":
+                if case["representation"] == "csv" and exchange not in {"kraken", "lighter"}:
                     raw = parse_qs(urlsplit(requests[-1]["path"]).query or requests[-1]["body"])
-                    assert raw["asset"] == [",".join(values)]
+                    assert raw[case["wire_field"]] == [",".join(map(str, values))]
                 results.append(payload)
             assert results[0] == results[1]
         finally:

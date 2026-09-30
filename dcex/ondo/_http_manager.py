@@ -33,6 +33,8 @@ def _params(**kwargs: object) -> list[tuple[str, str]]:
         }.get(key, key)
         if isinstance(value, bool):
             encoded = str(value).lower()
+        elif key == "orderIDs" and isinstance(value, list | tuple):
+            encoded = ",".join(str(order_id) for order_id in value)
         elif isinstance(value, dict | list | tuple):
             encoded = json.dumps(value, separators=(",", ":"), ensure_ascii=False)
         else:
