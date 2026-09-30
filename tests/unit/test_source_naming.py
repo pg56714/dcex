@@ -11,7 +11,9 @@ ROOT = Path(__file__).parents[2]
 
 def invalid_test_name(name):
     # Preserve normal mathematical and exchange-native terminology.
-    name = re.sub(r'round_trip\w*|round_tp_percent|preview\w*|pending_review|review_status', '', name.lower())
+    name = name.lower()
+    for native_term in ('round_trip', 'round_tp_percent', 'preview', 'pending_review', 'review_status'):
+        name = name.replace(native_term, '')
     return 'review' in name or bool(re.search(r'(?:^|_)round_', name))
 
 
@@ -50,6 +52,8 @@ def test_regression_names_describe_behavior():
     ('test_orders.py', 'def test_round_ten_orders(): pass'),
     ('test_orders.py', 'async def test_orders_review_validation(): pass'),
     ('test_orders.py', 'def test_ordersreviewvalidation(): pass'),
+    ('test_round_trip_review_orders.py', 'def test_orders(): pass'),
+    ('test_preview_review_orders.py', 'def test_orders(): pass'),
 ])
 def test_process_names_fail_repository_guard_by_mutation(tmp_path, surface, filename, source):
     folder = tmp_path / 'tests' / surface
