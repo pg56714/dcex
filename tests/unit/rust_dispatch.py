@@ -75,9 +75,25 @@ def unpinned_fund_literals(source, filename, allowances=()):
     return sorted(names)
 
 
-def unauthorized_transport_references(source, transport, permitted_functions=()):
-    """A transport reference is legal only inside its definition or audited callers."""
-    allowed = [(start, end) for name, start, _, end in function_spans(source) if name == transport or name in permitted_functions]
+def enclosing_impl(source, position):
+    clean = mask(source)
+    for match in re.finditer(r"\bimpl\s+(?:\w+::)*(\w+)\s*\{", clean):
+        end, depth = match.end(), 1
+        while end < len(clean) and depth:
+            depth += (clean[end] == "{") - (clean[end] == "}")
+            end += 1
+        if match.end() <= position < end:
+            return match[1]
+    return None
+
+
+def unauthorized_transport_references(source, transport, permitted_functions=(), *, impl_owner=None, allow_definition=False):
+    """Only the configured source file and impl may define the transport."""
+    allowed = [
+        (start, end) for name, start, _, end in function_spans(source)
+        if (name in permitted_functions or allow_definition and name == transport)
+        and (impl_owner is None or enclosing_impl(source, start) == impl_owner)
+    ]
     return [match.start() for match in re.finditer(r"\b" + re.escape(transport) + r"\b", mask(source)) if not any(start <= match.start() < end for start, end in allowed)]
 
 

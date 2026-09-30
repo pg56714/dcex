@@ -69,3 +69,16 @@ def test_lighter_pool_financial_fields_cannot_be_exempted(method, field):
     source = f"class Client:\n def {method}(self, {field}: int): pass\n"
     with pytest.raises(AssertionError):
         missing_declarations(source, {method: {"properties": {}}}, {identity: f"{identity}: integer control described with several distinct words to conceal missing financial coverage"}, "lighter")
+
+
+@pytest.mark.parametrize("field", ["leverage", "funds", "notional", "trigger_ratio", "tp_trigger_ratio", "take_profit", "stop_loss", "cost", "value", "vol", "lots", "newPx", "ordPx", "closeSz", "newAmt"])
+def test_all_numeric_aliases_reject_exemption_mutations(field):
+    identity = f"place_order/{field}"
+    source = f"class Client:\n def place_order(self, {field}: int): pass\n"
+    with pytest.raises(AssertionError):
+        missing_declarations(source, {"place_order": {"properties": {}}}, {identity: f"{identity}: integer field described as a harmless control with several distinct words"})
+
+
+def test_actual_pagination_names_can_have_specific_explanations():
+    identity = "get_orders/page_size"
+    assert not missing_declarations("class Client:\n def get_orders(self, page_size: int): pass\n", {"get_orders": {}}, {identity: f"{identity}: caps the number of historical records returned by one query response"})

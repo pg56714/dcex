@@ -197,7 +197,7 @@ def test_schema_transports_have_only_audited_callers(route):
         permitted = [route["method"]] if relative == route["source"] else []
         if path.name in {"withdrawals.rs", "transfers.rs"}:
             permitted.append(path.stem + "_" + route["method"])
-        assert not unauthorized_transport_references(path.read_text(encoding="utf-8"), route["transport"], permitted), (path, route)
+        assert not unauthorized_transport_references(path.read_text(encoding="utf-8"), route["transport"], permitted, impl_owner=route["exchange"].capitalize() + "Client", allow_definition=relative == route["source"]), (path, route)
 
 
 @pytest.mark.parametrize("transport", ["table_request_transport", "catalog_request_transport", "field_schema_request_transport"])
@@ -214,3 +214,13 @@ def test_nondispatch_allowance_reasons_are_specific():
     identities = [name for entry in entries for name in entry["names"]]
     reasons = Counter(normalized_reason(entry["reason"], identities) for entry in entries)
     assert all(count <= MAX_REASON_REPETITIONS for count in reasons.values()), reasons
+
+
+@pytest.mark.parametrize("transport", ["table_request_transport", "catalog_request_transport", "field_schema_request_transport"])
+def test_same_named_transport_in_foreign_impl_cannot_bypass_guard(transport):
+    source = f"struct H; impl H {{ async fn {transport}(&self, c: &BinanceClient) {{ c.{transport}(n, p, false).await }} }}"
+    assert unauthorized_transport_references(source, transport, [], impl_owner="BinanceClient")
+    assert unauthorized_transport_references(source, transport, [], impl_owner="BinanceClient", allow_definition=True)
+    legitimate = source.replace("impl H", "impl BinanceClient")
+    assert unauthorized_transport_references(legitimate, transport, [], impl_owner="BinanceClient")
+    assert not unauthorized_transport_references(legitimate, transport, [], impl_owner="BinanceClient", allow_definition=True)

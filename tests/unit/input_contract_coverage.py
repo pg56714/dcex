@@ -25,7 +25,8 @@ def public_inputs(source):
             yield node.name, args, node.args.kwarg is not None
 
 
-NEVER_EXEMPT = re.compile(r"price|amount|size|qty|quantity|fee|margin|collateral|share|volume|(?:^|_)(?:px|amt|sz)(?:$|_)", re.I)
+PAGINATION_NAMES = ("page", "page_size", "pageSize", "page_index", "pageIndex", "page_offset", "offset", "limit")
+NEVER_EXEMPT = re.compile(r"^(?!(?:" + "|".join(PAGINATION_NAMES) + r")$).*?(?:" + NUMERIC.pattern + r"|lots|share)", re.I)
 MAX_REASON_REPETITIONS = 4
 
 
