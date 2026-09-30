@@ -1,4 +1,4 @@
-"""Regression coverage for reviewed nonce, position-side and market boundaries."""
+"""Regression coverage for nonce, position-side and market boundaries."""
 
 import importlib
 import inspect

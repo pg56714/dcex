@@ -582,7 +582,7 @@ pub(super) fn validate_response(response: &HttpResponse) -> Result<Value> {
 }
 
 #[cfg(test)]
-mod review_explorer_tests {
+mod explorer_product_tests {
     use super::*;
 
     #[test]

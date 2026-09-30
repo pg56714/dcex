@@ -1,4 +1,4 @@
-"""New public numeric parameters must never bypass the declaration review."""
+"""New public numeric parameters must never bypass the declaration checks."""
 
 import json
 from pathlib import Path
@@ -32,7 +32,7 @@ def test_new_variadic_operation_requires_a_declaration():
     assert missing_declarations("class Trade:\n def withdraw_new(self, **params): pass\n", {}, {}) == [("withdraw_new", "<method>")]
 
 
-def test_numeric_exemption_cannot_disable_decimal_review():
+def test_numeric_exemption_cannot_disable_decimal_validation():
     source = "class Trade:\n def add_margin(self, margin: str): pass\n"
     with pytest.raises(AssertionError):
         missing_declarations(source, {}, {"add_margin/margin": "add_margin/margin: this string is deliberately described as a nonfinancial selector"})

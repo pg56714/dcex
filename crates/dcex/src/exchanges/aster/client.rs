@@ -563,7 +563,7 @@ pub(in crate::exchanges::aster) fn validate_nonce_window(nonce: u64) -> Result<(
 }
 
 #[cfg(test)]
-mod review_nonce_tests {
+mod nonce_uniqueness_tests {
     use super::*;
 
     pub(in crate::exchanges::aster) fn signed_client() -> AsterClient {

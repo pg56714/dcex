@@ -14,7 +14,7 @@ from tests.unit.native_http_helpers import _http_server
 @pytest.mark.asyncio
 @pytest.mark.parametrize("asynchronous", [False, True])
 @pytest.mark.parametrize("case", ["attached", "market_trigger", "batch"])
-async def test_round_five_regression_wire(asynchronous, case, monkeypatch):
+async def test_decimal_contract_regression_wire(asynchronous, case, monkeypatch):
     exchange = {"attached": "bingx", "market_trigger": "okx", "batch": "bybit"}[case]
     prefix = "dcex.async_support" if asynchronous else "dcex"
     cls = importlib.import_module(f"{prefix}.{exchange}.client").Client

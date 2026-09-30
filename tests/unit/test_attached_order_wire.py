@@ -1,4 +1,4 @@
-"""Round-six regressions through real public and native localhost requests."""
+"""Attached decimal fields through public and native localhost requests."""
 
 import importlib
 import inspect

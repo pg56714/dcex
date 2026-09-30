@@ -167,7 +167,7 @@ def test_fund_schema_operations_have_actual_owner_routes(exchange):
     'match name { "create_withdrawal3" => ("POST", "/api/v3/withdrawals") }',
     'match name { "create_withdrawal3" => Some(Route { method: "POST", path: "/withdraw" }) }',
 ])
-def test_round_seven_fund_dispatch_bypass_mutations(source):
+def test_fund_dispatch_inline_sender_mutations(source):
     assert misplaced_fund_arms(source, "account.rs", {"withdrawals": {"withdrawal_request"}}, {})
 
 

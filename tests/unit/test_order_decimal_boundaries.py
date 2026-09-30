@@ -8,8 +8,8 @@ from urllib.parse import parse_qs
 import pytest
 
 from tests.unit.native_http_helpers import _http_server
-from tests.unit.test_round_seven_wire import close
-from tests.unit.test_round_six_wire import invoke
+from tests.unit.test_attached_order_safety_wire import close
+from tests.unit.test_attached_order_wire import invoke
 
 RATIO_CASES = [
     (method, field, value)

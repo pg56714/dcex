@@ -75,7 +75,7 @@ async def test_binance_partial_cancel_replace_has_structured_outcomes(asynchrono
         ),
     ],
 )
-async def test_binance_review_names_and_fields(asynchronous, method, kwargs, path):
+async def test_binance_order_and_asset_names_and_fields(asynchronous, method, kwargs, path):
     payload = [{"orderId": 1}] if "batch" in method else {"ok": True}
     with _http_server(payload) as (base, received):
         async with batch_client(asynchronous, base) as client:

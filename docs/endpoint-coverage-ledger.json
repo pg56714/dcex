@@ -47760,10 +47760,10 @@
       "python_sync": false,
       "python_async": false,
       "methods": [],
-      "note": "Grouped row split into individually sourced endpoint/transaction rows during the 2026-09-28 review.",
+      "note": "Grouped row split into individually sourced endpoint/transaction rows during endpoint inventory reconciliation on 2026-09-28.",
       "evidence": [],
       "official_source": "https://docs.kraken.com/api-reference/funding-beta/claim-funding-deposit-address",
-      "superseded_reason": "Grouped row split into individually sourced endpoint/transaction rows during the 2026-09-28 review."
+      "superseded_reason": "Grouped row split into individually sourced endpoint/transaction rows during endpoint inventory reconciliation on 2026-09-28."
     },
     {
       "row": 2038,
@@ -48980,10 +48980,10 @@
       "python_sync": false,
       "python_async": false,
       "methods": [],
-      "note": "Grouped row split into individually sourced endpoint/transaction rows during the 2026-09-28 review.",
+      "note": "Grouped row split into individually sourced endpoint/transaction rows during endpoint inventory reconciliation on 2026-09-28.",
       "evidence": [],
       "official_source": "https://docs.kraken.com/api-reference/rfqs/list-open-offers-on-open-rfqs",
-      "superseded_reason": "Grouped row split into individually sourced endpoint/transaction rows during the 2026-09-28 review."
+      "superseded_reason": "Grouped row split into individually sourced endpoint/transaction rows during endpoint inventory reconciliation on 2026-09-28."
     },
     {
       "row": 2091,
@@ -61664,14 +61664,14 @@
       "python_sync": false,
       "python_async": false,
       "methods": [],
-      "note": "Grouped row split into individually sourced endpoint/transaction rows during the 2026-09-28 review.",
+      "note": "Grouped row split into individually sourced endpoint/transaction rows during endpoint inventory reconciliation on 2026-09-28.",
       "evidence": [],
       "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#check-builder-fee-approval",
       "official_sources": [
         "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#check-builder-fee-approval",
         "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint#query-approved-builders-for-user"
       ],
-      "superseded_reason": "Grouped row split into individually sourced endpoint/transaction rows during the 2026-09-28 review."
+      "superseded_reason": "Grouped row split into individually sourced endpoint/transaction rows during endpoint inventory reconciliation on 2026-09-28."
     },
     {
       "row": 2629,
@@ -64584,10 +64584,10 @@
       "python_sync": false,
       "python_async": false,
       "methods": [],
-      "note": "Grouped row split into individually sourced endpoint/transaction rows during the 2026-09-28 review.",
+      "note": "Grouped row split into individually sourced endpoint/transaction rows during endpoint inventory reconciliation on 2026-09-28.",
       "evidence": [],
       "official_source": "https://apidocs.lighter.xyz/reference/referral_create",
-      "superseded_reason": "Grouped row split into individually sourced endpoint/transaction rows during the 2026-09-28 review."
+      "superseded_reason": "Grouped row split into individually sourced endpoint/transaction rows during endpoint inventory reconciliation on 2026-09-28."
     },
     {
       "row": 2746,
@@ -65167,7 +65167,7 @@
       "python_sync": false,
       "python_async": false,
       "methods": [],
-      "note": "Grouped row split into individually sourced endpoint/transaction rows during the 2026-09-28 review.",
+      "note": "Grouped row split into individually sourced endpoint/transaction rows during endpoint inventory reconciliation on 2026-09-28.",
       "evidence": [
         "crates/dcex/src/exchanges/lighter/trade/pools.rs",
         "dcex/async_support/lighter/_trade_http.py::TradeHTTP.stake_assets",
@@ -65176,7 +65176,7 @@
         "dcex/lighter/_trade_http.py::TradeHTTP.unstake_assets"
       ],
       "official_source": "https://apidocs.lighter.xyz/reference/sendtx",
-      "superseded_reason": "Grouped row split into individually sourced endpoint/transaction rows during the 2026-09-28 review."
+      "superseded_reason": "Grouped row split into individually sourced endpoint/transaction rows during endpoint inventory reconciliation on 2026-09-28."
     },
     {
       "row": 2768,
@@ -65219,10 +65219,10 @@
       "python_sync": false,
       "python_async": false,
       "methods": [],
-      "note": "Grouped row split into individually sourced endpoint/transaction rows during the 2026-09-28 review.",
+      "note": "Grouped row split into individually sourced endpoint/transaction rows during endpoint inventory reconciliation on 2026-09-28.",
       "evidence": [],
       "official_source": "https://apidocs.lighter.xyz/reference/sendtx",
-      "superseded_reason": "Grouped row split into individually sourced endpoint/transaction rows during the 2026-09-28 review."
+      "superseded_reason": "Grouped row split into individually sourced endpoint/transaction rows during endpoint inventory reconciliation on 2026-09-28."
     },
     {
       "row": 2770,
@@ -75233,10 +75233,10 @@
       "python_sync": false,
       "python_async": false,
       "methods": [],
-      "note": "Grouped row split into individually sourced endpoint/transaction rows during the 2026-09-28 review.",
+      "note": "Grouped row split into individually sourced endpoint/transaction rows during endpoint inventory reconciliation on 2026-09-28.",
       "evidence": [],
       "official_source": "https://docs.arcus.xyz/api-reference/referral/create-referral-code",
-      "superseded_reason": "Grouped row split into individually sourced endpoint/transaction rows during the 2026-09-28 review."
+      "superseded_reason": "Grouped row split into individually sourced endpoint/transaction rows during endpoint inventory reconciliation on 2026-09-28."
     },
     {
       "row": 3171,

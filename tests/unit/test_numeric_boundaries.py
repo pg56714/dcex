@@ -1,4 +1,4 @@
-"""Round-four reported holes are rejected by actual sync/async endpoints."""
+"""Numeric boundaries are enforced by actual sync/async endpoints."""
 
 import importlib
 import inspect

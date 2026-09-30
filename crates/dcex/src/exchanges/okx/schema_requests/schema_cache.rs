@@ -19,12 +19,12 @@ pub(super) fn cached_schema(raw: &'static str) -> Result<Arc<Value>> {
 }
 
 #[cfg(test)]
-mod review_cache_tests {
+mod schema_cache_tests {
     use super::*;
     #[test]
     fn schema_is_parsed_once_and_shared_between_requests() {
-        let first = cached_schema(r#"{"type":"object","review_test":true}"#).unwrap();
-        let second = cached_schema(r#"{"type":"object","review_test":true}"#).unwrap();
+        let first = cached_schema(r#"{"type":"object","cache_test":true}"#).unwrap();
+        let second = cached_schema(r#"{"type":"object","cache_test":true}"#).unwrap();
         assert!(Arc::ptr_eq(&first, &second));
         assert!(cached_schema("invalid schema").is_err());
     }
