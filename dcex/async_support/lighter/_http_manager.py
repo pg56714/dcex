@@ -36,7 +36,7 @@ def _encoded_query(query: dict[str, Any]) -> str:
     return urlencode({key: _format_value(value) for key, value in query.items()}, doseq=True)
 
 
-@dataclass
+@dataclass(kw_only=True)
 class HTTPManager(BaseHTTPManager):
     """HTTP manager for Lighter REST APIs."""
 

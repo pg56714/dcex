@@ -16,7 +16,7 @@ from ..utils.helpers import generate_timestamp
 _native = load_native()
 
 
-@dataclass
+@dataclass(kw_only=True)
 class HTTPManager(BaseHTTPManager):
     EXCHANGE = Common.KUCOIN
 

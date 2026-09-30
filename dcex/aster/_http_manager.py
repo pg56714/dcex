@@ -38,7 +38,7 @@ def _filtered_query(query: Mapping[str, Any] | None) -> dict[str, str]:
     return {key: _format_value(value) for key, value in (query or {}).items() if value is not None}
 
 
-@dataclass
+@dataclass(kw_only=True)
 class HTTPManager(BaseHTTPManager):
     """HTTP manager for Aster V3 spot and futures APIs."""
 

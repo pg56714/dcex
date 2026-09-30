@@ -16,7 +16,7 @@ from ..product_table.manager import ProductTableManager
 _native = load_native()
 
 
-@dataclass
+@dataclass(kw_only=True)
 class HTTPManager(BaseHTTPManager):
     EXCHANGE = Common.KUCOIN
 

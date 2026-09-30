@@ -11,6 +11,7 @@ import pytest
 
 ROOT = Path(__file__).parents[2]
 BASELINE = json.loads((ROOT / 'tests/fixtures/python_signatures_0_33_0.json').read_text())
+EXPORTS = json.loads((ROOT / 'tests/fixtures/python_public_exports_0_33_0.json').read_text())
 
 
 def canonical(name):
@@ -19,8 +20,10 @@ def canonical(name):
 
 def public_callable(module, cls, name):
     imported = importlib.import_module(module)
-    owner = getattr(imported, cls) if cls else imported
-    if hasattr(owner, name):
+    owner = getattr(imported, cls, None) if cls else imported
+    if owner is None and (origin := EXPORTS['origins'].get(f'{module}:{cls}')):
+        owner = getattr(importlib.import_module(origin[0]), origin[1], None)
+    if owner is not None and hasattr(owner, name):
         return getattr(owner, name)
     # Account/trade methods moved to domain mixins; public Clients inherit them.
     client = importlib.import_module(module.rsplit('.', 1)[0] + '.client').Client
@@ -33,7 +36,7 @@ def shifted_slots(old, new):
 
 def test_all_existing_public_positional_slots_keep_their_meaning():
     errors = []
-    for module, cls, name, signature in BASELINE['signatures']:
+    for module, cls, name, signature in BASELINE['signatures'] + EXPORTS['constructors']:
         args = ast.parse(f'def f({signature}): pass').body[0].args
         old = [a.arg for a in args.posonlyargs + args.args if a.arg not in {'self', 'cls'}]
         function = public_callable(module, cls, name)
@@ -43,6 +46,19 @@ def test_all_existing_public_positional_slots_keep_their_meaning():
                if p.kind in (p.POSITIONAL_ONLY, p.POSITIONAL_OR_KEYWORD) and p.name not in {'self', 'cls'}]
         if changes := shifted_slots(old, new):
             errors.append((module, cls, name, changes))
+    assert not errors, errors
+
+
+def test_all_public_exports_keep_inherited_and_aliased_slots():
+    errors = []
+    for key, methods in EXPORTS['bindings'].items():
+        module, cls = key.split(':')
+        for name, signature in methods.items():
+            function = public_callable(module, cls, name)
+            new = [p.name for p in inspect.signature(function).parameters.values()
+                   if p.kind in (p.POSITIONAL_ONLY, p.POSITIONAL_OR_KEYWORD) and p.name not in {'self', 'cls'}]
+            if changed := shifted_slots(EXPORTS['positional'][signature], new):
+                errors.append((key, name, changed))
     assert not errors, errors
 
 
@@ -76,3 +92,19 @@ def test_inserted_removed_and_reordered_slots_fail_compatibility_guard():
     assert shifted_slots(['symbol', 'limit'], ['symbol', 'depth', 'limit'])
     assert shifted_slots(['symbol', 'limit', 'offset'], ['symbol', 'offset', 'limit'])
     assert not shifted_slots(['orderId', 'recvWindow'], ['order_id', 'recv_window'])
+
+
+@pytest.mark.parametrize('prefix', ['dcex', 'dcex.async_support'])
+@pytest.mark.parametrize('exchange,old_args,keyword_args', [
+    ('aster', (None, None, None, 'https://spot.example', 'https://futures.example', 10), {'timeout': 10}),
+    ('kucoin', ('https://spot.example', 'https://futures.example', 'key'), {'api_key': 'key'}),
+    ('lighter', ('https://api.example', 123), {'account_index': 123}),
+])
+def test_shifted_generated_constructors_reject_old_positions(prefix, exchange, old_args, keyword_args, monkeypatch):
+    cls = importlib.import_module(f'{prefix}.{exchange}.client').AccountHTTP
+    initialize = Mock(side_effect=AssertionError('must not initialize or send requests'))
+    monkeypatch.setattr(cls, '__post_init__', initialize, raising=False)
+    with pytest.raises(TypeError):
+        cls(*old_args)
+    initialize.assert_not_called()
+    inspect.signature(cls).bind(**keyword_args)
