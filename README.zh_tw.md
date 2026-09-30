@@ -143,3 +143,5 @@ cargo run -p dcex --example binance_ws_public
 本專案採用 [MIT 授權](LICENSE)；其他授權資訊見[第三方聲明](THIRD_PARTY_NOTICES.md)。
 
 [端點覆蓋、限制與驗證紀錄](docs/endpoint-audit.zh_tw.md)。
+
+[升級至 0.34.0](docs/upgrade-0.34.0.zh_tw.md)

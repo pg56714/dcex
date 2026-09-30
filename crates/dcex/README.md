@@ -157,3 +157,5 @@ cargo run -p dcex --example binance_ws_public
 Private examples require the corresponding credentials or user address. The [Python package README](https://github.com/pg56714/dcex/blob/main/README.md) covers Python usage. This crate uses the [MIT License](https://github.com/pg56714/dcex/blob/main/LICENSE); see the [third-party notices](https://github.com/pg56714/dcex/blob/main/THIRD_PARTY_NOTICES.md) for additional licenses.
 
 Ondo spot WebSocket subscriptions accept exchange symbols such as `SPY-USDC` and product-table symbols such as `SPY-USDC-SPOT`. Malformed spot rows are skipped with `log::warn!`; applications control those diagnostics through their Rust `log` logger. Filter product-table rows to `product_type == "swap"` before calling perpetual trading methods.
+
+[Upgrade to rust-v0.12.0](../../docs/upgrade-0.34.0.md)

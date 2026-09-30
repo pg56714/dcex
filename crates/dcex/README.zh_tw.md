@@ -156,3 +156,5 @@ cargo run -p dcex --example binance_ws_public
 [端點覆蓋、限制與驗證紀錄](https://github.com/pg56714/dcex/blob/main/docs/endpoint-audit.zh_tw.md)。
 
 Ondo 現貨 WebSocket 訂閱接受 `SPY-USDC` 等交易所 symbol，也接受 `SPY-USDC-SPOT` 等 product-table symbol。格式錯誤的現貨列會略過並以 `log::warn!` 記錄，應用程式可透過 Rust `log` logger 控制輸出。呼叫永續交易方法前，請先篩選 `product_type == "swap"`。
+
+[升級至 rust-v0.12.0](../../docs/upgrade-0.34.0.zh_tw.md)

@@ -144,3 +144,5 @@ cargo run -p dcex --example binance_ws_public
 For direct Rust usage, see the [crate README](crates/dcex/README.md). The default test suite runs offline with `uv run pytest`; live suites are opt-in. See the [contributing guide](.github/CONTRIBUTING.md) for development and testing details.
 
 This project uses the [MIT License](LICENSE); see the [third-party notices](THIRD_PARTY_NOTICES.md) for additional licenses.
+
+[Upgrade to 0.34.0](docs/upgrade-0.34.0.md)
