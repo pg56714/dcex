@@ -6,6 +6,8 @@ fixture 涵蓋全部 67 個新宣告欄位，包含 wire 名稱別名。`json` �
 
 Binance dust conversion 送出單一 `asset=BTC,ETH`；Backpack marketType 與 Binance prediction token IDs 使用重複 key。Bitget UTA 使用頂層 JSON 陣列，連結中的官方舊版範例可補足新版目錄顯示遺漏的陣列括號。BingX swap 批次 ID 使用 JSON 陣列：系統 ID 為數字，client ID 保留字串引號與前置零。Lighter 接受 CSV 輸入並送出重複 `type` query key。
 
+Kraken 查單 ID 在[官方 OpenAPI](https://docs.kraken.com/openapi/futures-rest.yaml) 宣告為 query array，依 [OpenAPI form／explode 預設規則](https://spec.openapis.org/oas/v3.1.0.html#parameter-object) 使用重複參數；list 與相容的 CSV 輸入均保留此 wire 格式。
+
 | 交易所 | 方法／欄位 | 字串輸入 | 官方來源 |
 |---|---|---|---|
 | arcus | `batch_cancel_orders.cancels` | json | [API](https://docs.arcus.xyz/api-reference/exchange/batch-cancel-orders) |

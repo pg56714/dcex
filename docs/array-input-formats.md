@@ -6,6 +6,8 @@ The fixture records all 67 newly declared fields, including wire-name aliases. `
 
 Binance dust conversion emits one `asset=BTC,ETH` parameter. Backpack market types and Binance prediction token IDs use repeated keys. Bitget UTA uses a top-level JSON array (the linked legacy example shows the array omitted by the newer catalogue rendering). BingX swap batch IDs use JSON arrays: numeric system IDs and quoted string client IDs, including leading zeros. Lighter accepts CSV input and emits repeated `type` query keys.
 
+Kraken order status IDs are declared as query arrays in its [official OpenAPI](https://docs.kraken.com/openapi/futures-rest.yaml). They use repeated parameters under the [OpenAPI form/explode defaults](https://spec.openapis.org/oas/v3.1.0.html#parameter-object); both list and compatible CSV input retain those repeated wire values.
+
 | Exchange | Method / field | String input | Official source |
 |---|---|---|---|
 | arcus | `batch_cancel_orders.cancels` | json | [API](https://docs.arcus.xyz/api-reference/exchange/batch-cancel-orders) |

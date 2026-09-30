@@ -36,8 +36,8 @@
     "names": [
       "wallet_dust_transfer"
     ],
-    "sha256": "b13c6c84b869dbfea35b8d4e4d9cb7439507624966f5da9892243f3cd7ed86a6",
-    "reason": "Collects repeated asset query parameters for dust conversion and rejects missing or blank currency identifiers."
+    "sha256": "389737bd151ded9a3b656e9957feccf3fc48db984f5932a1de02780bd967795b",
+    "reason": "Validates nonempty dust-conversion assets and combines them into one CSV parameter; this branch builds parameters and does not submit a request."
   },
   {
     "source": "bitget/schema_requests.rs",
