@@ -19,6 +19,7 @@ impl PythonBinanceHttpClient {
         portfolio_margin_base_url=None,
         alpha_base_url=None
     ))]
+    #[allow(clippy::too_many_arguments)]
     fn new(
         api_key: Option<String>,
         api_secret: Option<String>,

@@ -144,7 +144,7 @@ class GeneratedCopyTradingHTTP(MarketHTTP):
             ),
         )
 
-    async def classic_copytrading_future_copytrade_follower_close_positions(
+    async def close_copy_futures_follower_positions(
         self,
         *,
         product_type: str,
@@ -165,7 +165,7 @@ class GeneratedCopyTradingHTTP(MarketHTTP):
         """
         require_scope(symbol or tracking_no, all_symbols)
         return await self._native_private(
-            "classic_copytrading_future_copytrade_follower_close_positions",
+            "close_copy_futures_follower_positions",
             self._native_params(
                 **{
                     "productType": product_type,
@@ -348,7 +348,7 @@ class GeneratedCopyTradingHTTP(MarketHTTP):
             ),
         )
 
-    async def classic_copytrading_future_copytrade_trader_trader_order_close_positions(
+    async def close_copy_futures_trader_positions(
         self,
         *,
         product_type: str,
@@ -366,7 +366,7 @@ class GeneratedCopyTradingHTTP(MarketHTTP):
         """
         require_scope(symbol or tracking_no, all_symbols)
         return await self._native_private(
-            "classic_copytrading_future_copytrade_trader_trader_order_close_positions",
+            "close_copy_futures_trader_positions",
             self._native_params(
                 **{
                     "productType": product_type,

@@ -34,7 +34,7 @@
     "fields": []
   },
   {
-    "name": "get_accounts",
+    "name": "get_otc_loan_accounts",
     "path": "/api/v1/otc-loan/accounts",
     "method": "HttpMethod::Get",
     "market": "KucoinMarket::Spot",

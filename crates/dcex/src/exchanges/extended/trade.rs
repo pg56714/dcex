@@ -69,7 +69,7 @@ impl ExtendedClient {
                 let path = path_with_id(ORDERS, params.required("id")?);
                 self.private_get(&path, Vec::new()).await
             }
-            "get_orders_by_external_id" | "get_order_by_external_id" => {
+            "get_order_by_external_id" => {
                 params.ensure_allowed(&["externalId", "external_id"], &[])?;
                 params.ensure_exactly_one(&["externalId", "external_id"])?;
                 let external_id = if params.get("externalId").is_some() {

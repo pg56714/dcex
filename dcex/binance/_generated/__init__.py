@@ -35,5 +35,3 @@ class GeneratedHTTP(
     TradeHTTP,
 ):
     """Business-specific generated methods with compatible base precedence."""
-
-    get_c2c_trade_history = vars(GeneratedC2cHTTP)["get_c2_c_trade_history"]

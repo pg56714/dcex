@@ -75,10 +75,6 @@ class MarketHTTP(HTTPManager):
         """Get the public service greeting and health response."""
         return self._native_public("hello")
 
-    def ping(self) -> Any:
-        """Alias for the public /hello service check."""
-        return self._native_public("ping")
-
     def get_login_challenge(self, wallet_address: str, chain_id: str) -> Any:
         """Request a SIWE challenge for Ethereum (1) or Avalanche (43114)."""
         return self._native_public(

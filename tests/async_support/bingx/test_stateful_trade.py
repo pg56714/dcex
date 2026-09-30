@@ -131,8 +131,8 @@ async def _transferable(
 ) -> Decimal:
     data = (
         await client.get_transferable_coins(
-            fromAccount=from_account,
-            toAccount=to_account,
+            from_account=from_account,
+            to_account=to_account,
         )
     ).get("data", {})
     for item in data.get("coins", []):
@@ -178,8 +178,8 @@ async def _asset_transfer(
 ) -> None:
     assert (
         await client.asset_transfer(
-            fromAccount=from_account,
-            toAccount=to_account,
+            from_account=from_account,
+            to_account=to_account,
             asset=asset,
             amount=_fmt(amount),
         )
@@ -266,7 +266,7 @@ async def _cancel_spot_order(client: Client, order_id: str) -> object:
         try:
             return await client.cancel_spot_order(
                 product_symbol=SPOT_SYMBOL,
-                orderId=order_id,
+                order_id=order_id,
             )
         except FailedRequestError as exc:
             message = str(exc).lower()
@@ -284,7 +284,7 @@ async def _cancel_spot_batch_orders_if_present(client: Client, order_ids: list[s
     try:
         return await client.cancel_spot_batch_orders(
             product_symbol=SPOT_SYMBOL,
-            orderIds=order_ids,
+            order_ids=order_ids,
         )
     except FailedRequestError as exc:
         if _is_missing_spot_order_error(exc):
@@ -391,8 +391,8 @@ async def _spot_market_buy_delta(client: Client, quote_amount: Decimal) -> Decim
     assert (
         await client.place_spot_market_buy_order(
             product_symbol=SPOT_SYMBOL,
-            quoteOrderQty=_fmt(quote_amount),
-            clientOrderId=_client_order_id(),
+            quote_order_qty=_fmt(quote_amount),
+            client_order_id=_client_order_id(),
         )
         is not None
     )
@@ -533,7 +533,7 @@ async def _cleanup_spot_btc(client: Client, initial_btc: Decimal = Decimal("0"))
         await client.place_spot_market_sell_order(
             product_symbol=SPOT_SYMBOL,
             quantity=_fmt(sell_quantity),
-            clientOrderId=_client_order_id(),
+            client_order_id=_client_order_id(),
         )
         await asyncio.sleep(3)
     assert await _spot_available(client, "BTC") - initial_btc <= step
@@ -549,13 +549,13 @@ async def _exercise_spot_stateful_methods(client: Client) -> None:
             SPOT_SYMBOL,
             side="BUY",
             type_="LIMIT",
-            timeInForce="POC",
+            time_in_force="POC",
             quantity=quantity,
             price=price,
-            clientOrderId=_client_order_id(),
+            client_order_id=_client_order_id(),
         )
         order_id = order["data"]["orderId"]
-        assert await client.get_spot_order(product_symbol=SPOT_SYMBOL, orderId=order_id) is not None
+        assert await client.get_spot_order(product_symbol=SPOT_SYMBOL, order_id=order_id) is not None
         assert await _cancel_spot_order(client, order_id) is not None
         order_id = None
     finally:
@@ -569,8 +569,8 @@ async def _exercise_spot_stateful_methods(client: Client) -> None:
             side="BUY",
             quantity=quantity,
             price=price,
-            timeInForce="POC",
-            clientOrderId=_client_order_id(),
+            time_in_force="POC",
+            client_order_id=_client_order_id(),
         )
         order_id = order["data"]["orderId"]
         assert await client.cancel_spot_open_orders(product_symbol=SPOT_SYMBOL) is not None
@@ -587,7 +587,7 @@ async def _exercise_spot_stateful_methods(client: Client) -> None:
             side="BUY",
             quantity=quantity,
             price=price,
-            clientOrderId=_client_order_id(),
+            client_order_id=_client_order_id(),
         )
         order_id = order["data"]["orderId"]
         assert await _cancel_spot_order(client, order_id) is not None
@@ -602,7 +602,7 @@ async def _exercise_spot_stateful_methods(client: Client) -> None:
             SPOT_SYMBOL,
             quantity=quantity,
             price=price,
-            clientOrderId=_client_order_id(),
+            client_order_id=_client_order_id(),
         )
         order_id = order["data"]["orderId"]
         assert await _cancel_spot_order(client, order_id) is not None
@@ -649,7 +649,7 @@ async def _exercise_spot_stateful_methods(client: Client) -> None:
         await client.place_spot_market_sell_order(
             product_symbol=SPOT_SYMBOL,
             quantity=sell_quantity,
-            clientOrderId=_client_order_id(),
+            client_order_id=_client_order_id(),
         )
         is not None
     )
@@ -664,8 +664,8 @@ async def _exercise_spot_stateful_methods(client: Client) -> None:
                 SPOT_SYMBOL,
                 quantity=quantity,
                 price=price,
-                timeInForce="GTC",
-                clientOrderId=_client_order_id(),
+                time_in_force="GTC",
+                client_order_id=_client_order_id(),
             )
             is not None
         )
@@ -678,8 +678,8 @@ async def _exercise_spot_stateful_methods(client: Client) -> None:
                 SPOT_SYMBOL,
                 quantity=sell_quantity,
                 price=await _spot_fillable_limit_sell_price(client),
-                timeInForce="GTC",
-                clientOrderId=_client_order_id(),
+                time_in_force="GTC",
+                client_order_id=_client_order_id(),
             )
             is not None
         )
@@ -692,7 +692,7 @@ async def _exercise_spot_stateful_methods(client: Client) -> None:
             await client.place_spot_market_sell_order(
                 product_symbol=SPOT_SYMBOL,
                 quantity=sell_quantity,
-                clientOrderId=_client_order_id(),
+                client_order_id=_client_order_id(),
             )
 
     quote_amount = await _spot_market_quote_amount(client)
@@ -712,10 +712,10 @@ async def _exercise_spot_stateful_methods(client: Client) -> None:
             SPOT_SYMBOL,
             quantity=sell_quantity,
             price=await _spot_post_only_sell_price(client),
-            clientOrderId=_client_order_id(),
+            client_order_id=_client_order_id(),
         )
         order_id = order["data"]["orderId"]
-        assert await client.get_spot_order(product_symbol=SPOT_SYMBOL, orderId=order_id) is not None
+        assert await client.get_spot_order(product_symbol=SPOT_SYMBOL, order_id=order_id) is not None
     finally:
         if order_id is not None:
             await _cancel_spot_order(client, order_id)
@@ -725,7 +725,7 @@ async def _exercise_spot_stateful_methods(client: Client) -> None:
             await client.place_spot_market_sell_order(
                 product_symbol=SPOT_SYMBOL,
                 quantity=sell_quantity,
-                clientOrderId=_client_order_id(),
+                client_order_id=_client_order_id(),
             )
 
 
@@ -734,7 +734,7 @@ async def _exercise_swap_stateful_methods(client: Client) -> None:
     leverage = (await client.get_leverage(product_symbol=SWAP_SYMBOL))["data"]
     mode = (await client.get_position_mode())["data"]["dualSidePosition"]
     assert (
-        await client.change_margin_type(product_symbol=SWAP_SYMBOL, marginType=margin) is not None
+        await client.change_margin_type(product_symbol=SWAP_SYMBOL, margin_type=margin) is not None
     )
     assert (
         await client.set_leverage(
@@ -752,7 +752,7 @@ async def _exercise_swap_stateful_methods(client: Client) -> None:
         )
         is not None
     )
-    assert await client.set_position_mode(dualSidePosition=mode) is not None
+    assert await client.set_position_mode(dual_side_position=mode) is not None
 
     quantity, price = await _swap_order_params(client)
     await _ensure_swap_usdt_for_quantity(client, quantity)
@@ -761,11 +761,11 @@ async def _exercise_swap_stateful_methods(client: Client) -> None:
             product_symbol=SWAP_SYMBOL,
             type_="LIMIT",
             side="BUY",
-            positionSide="LONG",
+            position_side="LONG",
             quantity=float(quantity),
             price=float(price),
-            timeInForce="PostOnly",
-            clientOrderId=_client_order_id(),
+            time_in_force="PostOnly",
+            client_order_id=_client_order_id(),
         )
         is not None
     )
@@ -776,23 +776,23 @@ async def _exercise_swap_stateful_methods(client: Client) -> None:
             SWAP_SYMBOL,
             type_="LIMIT",
             side="BUY",
-            positionSide="LONG",
+            position_side="LONG",
             quantity=float(quantity),
             price=float(price),
-            timeInForce="PostOnly",
-            clientOrderId=_client_order_id(),
+            time_in_force="PostOnly",
+            client_order_id=_client_order_id(),
         )
         order_id = order["data"]["order"]["orderId"]
         assert (
-            await client.get_order_detail(product_symbol=SWAP_SYMBOL, orderId=order_id) is not None
+            await client.get_order_detail(product_symbol=SWAP_SYMBOL, order_id=order_id) is not None
         )
         assert (
-            await client.cancel_swap_order(product_symbol=SWAP_SYMBOL, orderId=order_id) is not None
+            await client.cancel_swap_order(product_symbol=SWAP_SYMBOL, order_id=order_id) is not None
         )
         order_id = None
     finally:
         if order_id is not None:
-            await client.cancel_swap_order(product_symbol=SWAP_SYMBOL, orderId=order_id)
+            await client.cancel_swap_order(product_symbol=SWAP_SYMBOL, order_id=order_id)
 
     order_id = None
     try:
@@ -801,9 +801,9 @@ async def _exercise_swap_stateful_methods(client: Client) -> None:
             side="BUY",
             quantity=float(quantity),
             price=float(price),
-            positionSide="LONG",
-            timeInForce="PostOnly",
-            clientOrderId=_client_order_id(),
+            position_side="LONG",
+            time_in_force="PostOnly",
+            client_order_id=_client_order_id(),
         )
         order_id = order["data"]["order"]["orderId"]
         assert await client.cancel_swap_all_orders(product_symbol=SWAP_SYMBOL) is not None
@@ -811,7 +811,7 @@ async def _exercise_swap_stateful_methods(client: Client) -> None:
         await asyncio.sleep(1)
     finally:
         if order_id is not None:
-            await client.cancel_swap_order(product_symbol=SWAP_SYMBOL, orderId=order_id)
+            await client.cancel_swap_order(product_symbol=SWAP_SYMBOL, order_id=order_id)
 
     order_id = None
     try:
@@ -820,17 +820,17 @@ async def _exercise_swap_stateful_methods(client: Client) -> None:
             side="BUY",
             quantity=float(quantity),
             price=float(price),
-            positionSide="LONG",
-            clientOrderId=_client_order_id(),
+            position_side="LONG",
+            client_order_id=_client_order_id(),
         )
         order_id = order["data"]["order"]["orderId"]
         assert (
-            await client.cancel_swap_order(product_symbol=SWAP_SYMBOL, orderId=order_id) is not None
+            await client.cancel_swap_order(product_symbol=SWAP_SYMBOL, order_id=order_id) is not None
         )
         order_id = None
     finally:
         if order_id is not None:
-            await client.cancel_swap_order(product_symbol=SWAP_SYMBOL, orderId=order_id)
+            await client.cancel_swap_order(product_symbol=SWAP_SYMBOL, order_id=order_id)
 
     order_id = None
     try:
@@ -838,17 +838,17 @@ async def _exercise_swap_stateful_methods(client: Client) -> None:
             SWAP_SYMBOL,
             quantity=float(quantity),
             price=float(price),
-            positionSide="LONG",
-            clientOrderId=_client_order_id(),
+            position_side="LONG",
+            client_order_id=_client_order_id(),
         )
         order_id = order["data"]["order"]["orderId"]
         assert (
-            await client.cancel_swap_order(product_symbol=SWAP_SYMBOL, orderId=order_id) is not None
+            await client.cancel_swap_order(product_symbol=SWAP_SYMBOL, order_id=order_id) is not None
         )
         order_id = None
     finally:
         if order_id is not None:
-            await client.cancel_swap_order(product_symbol=SWAP_SYMBOL, orderId=order_id)
+            await client.cancel_swap_order(product_symbol=SWAP_SYMBOL, order_id=order_id)
 
     order_id = None
     try:
@@ -857,17 +857,17 @@ async def _exercise_swap_stateful_methods(client: Client) -> None:
             SWAP_SYMBOL,
             quantity=float(quantity),
             price=float(high_price),
-            positionSide="SHORT",
-            clientOrderId=_client_order_id(),
+            position_side="SHORT",
+            client_order_id=_client_order_id(),
         )
         order_id = order["data"]["order"]["orderId"]
         assert (
-            await client.cancel_swap_order(product_symbol=SWAP_SYMBOL, orderId=order_id) is not None
+            await client.cancel_swap_order(product_symbol=SWAP_SYMBOL, order_id=order_id) is not None
         )
         order_id = None
     finally:
         if order_id is not None:
-            await client.cancel_swap_order(product_symbol=SWAP_SYMBOL, orderId=order_id)
+            await client.cancel_swap_order(product_symbol=SWAP_SYMBOL, order_id=order_id)
 
     order_id = None
     try:
@@ -891,14 +891,14 @@ async def _exercise_swap_stateful_methods(client: Client) -> None:
             assert (
                 await client.cancel_swap_batch_order(
                     product_symbol=SWAP_SYMBOL,
-                    orderIdList=[order_id],
+                    order_id_list=[order_id],
                 )
                 is not None
             )
             order_id = None
     finally:
         if order_id is not None:
-            await client.cancel_swap_order(product_symbol=SWAP_SYMBOL, orderId=order_id)
+            await client.cancel_swap_order(product_symbol=SWAP_SYMBOL, order_id=order_id)
 
     order_id = None
     try:
@@ -906,22 +906,22 @@ async def _exercise_swap_stateful_methods(client: Client) -> None:
             product_symbol=SWAP_SYMBOL,
             quantity=float(quantity),
             price=float(price),
-            positionSide="LONG",
-            clientOrderId=_client_order_id(),
+            position_side="LONG",
+            client_order_id=_client_order_id(),
         )
         order_id = order["data"]["order"]["orderId"]
         replacement_price = _fmt(Decimal(price) * Decimal("0.99"))
         assert (
             await client.replace_swap_order(
                 product_symbol=SWAP_SYMBOL,
-                orderId=str(order_id),
-                cancelReplaceMode="STOP_ON_FAILURE",
+                order_id=str(order_id),
+                cancel_replace_mode="STOP_ON_FAILURE",
                 type_="LIMIT",
                 side="BUY",
-                positionSide="LONG",
+                position_side="LONG",
                 quantity=float(quantity),
                 price=float(replacement_price),
-                timeInForce="PostOnly",
+                time_in_force="PostOnly",
             )
             is not None
         )
@@ -930,7 +930,7 @@ async def _exercise_swap_stateful_methods(client: Client) -> None:
         await asyncio.sleep(1)
     finally:
         if order_id is not None:
-            await client.cancel_swap_order(product_symbol=SWAP_SYMBOL, orderId=order_id)
+            await client.cancel_swap_order(product_symbol=SWAP_SYMBOL, order_id=order_id)
 
     await _ensure_swap_usdt_for_quantity(client, quantity)
     assert (
@@ -938,14 +938,14 @@ async def _exercise_swap_stateful_methods(client: Client) -> None:
             SWAP_SYMBOL,
             side="BUY",
             quantity=float(quantity),
-            positionSide="LONG",
-            clientOrderId=_client_order_id(),
+            position_side="LONG",
+            client_order_id=_client_order_id(),
         )
         is not None
     )
     position_id = await _wait_for_position(client, "LONG")
     assert position_id is not None
-    assert await client.close_swap_position(positionId=position_id) is not None
+    assert await client.close_swap_position(position_id=position_id) is not None
     await asyncio.sleep(3)
 
     await _ensure_swap_usdt_for_quantity(client, quantity)
@@ -953,14 +953,14 @@ async def _exercise_swap_stateful_methods(client: Client) -> None:
         await client.place_swap_market_buy_order(
             SWAP_SYMBOL,
             quantity=float(quantity),
-            positionSide="LONG",
-            clientOrderId=_client_order_id(),
+            position_side="LONG",
+            client_order_id=_client_order_id(),
         )
         is not None
     )
     position_id = await _wait_for_position(client, "LONG")
     assert position_id is not None
-    assert await client.close_swap_position(positionId=position_id) is not None
+    assert await client.close_swap_position(position_id=position_id) is not None
     await asyncio.sleep(3)
 
     await _ensure_swap_usdt_for_quantity(client, quantity)
@@ -968,8 +968,8 @@ async def _exercise_swap_stateful_methods(client: Client) -> None:
         await client.place_swap_market_sell_order(
             SWAP_SYMBOL,
             quantity=float(quantity),
-            positionSide="SHORT",
-            clientOrderId=_client_order_id(),
+            position_side="SHORT",
+            client_order_id=_client_order_id(),
         )
         is not None
     )
@@ -983,9 +983,9 @@ async def _exercise_swap_stateful_methods(client: Client) -> None:
             SWAP_SYMBOL,
             quantity=float(quantity),
             price=await _swap_fillable_limit_buy_price(client),
-            positionSide="LONG",
-            timeInForce="GTC",
-            clientOrderId=_client_order_id(),
+            position_side="LONG",
+            time_in_force="GTC",
+            client_order_id=_client_order_id(),
         )
         is not None
     )
@@ -999,9 +999,9 @@ async def _exercise_swap_stateful_methods(client: Client) -> None:
             SWAP_SYMBOL,
             quantity=float(quantity),
             price=await _swap_fillable_limit_sell_price(client),
-            positionSide="SHORT",
-            timeInForce="GTC",
-            clientOrderId=_client_order_id(),
+            position_side="SHORT",
+            time_in_force="GTC",
+            client_order_id=_client_order_id(),
         )
         is not None
     )
@@ -1029,6 +1029,6 @@ async def test_async_trade_read_endpoints(client):
     await _skip_if_existing_state(client)
 
     assert await client.get_order_history(product_symbol=SWAP_SYMBOL, limit=5) is not None
-    assert await client.get_spot_order_history(product_symbol=SPOT_SYMBOL, pageSize=5) is not None
+    assert await client.get_spot_order_history(product_symbol=SPOT_SYMBOL, page_size=5) is not None
     assert await client.get_spot_my_trades(product_symbol=SPOT_SYMBOL, limit=5) is not None
     assert await client.get_spot_commission_rate(product_symbol=SPOT_SYMBOL) is not None

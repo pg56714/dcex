@@ -30,10 +30,10 @@ def test_sync_bingx_subaccount_wrappers_forward_official_fields() -> None:
     native = _SyncNative()
     client._native_client = native
 
-    client.get_subaccounts(1, 100, subUid=22, isFeeze=False)
+    client.get_subaccounts(1, 100, sub_uid=22, is_feeze=False)
     client.get_subaccount_assets(22)
-    client.get_subaccount_all_account_balance(1, 10, subUid=22, accountType="spot")
-    client.get_subaccount_transfer_history(22, type_="FUND_SUB", pagingSize=20)
+    client.get_subaccount_all_account_balance(1, 10, sub_uid=22, account_type="spot")
+    client.get_subaccount_transfer_history(22, type_="FUND_SUB", paging_size=20)
     client.get_subaccount_transferable_amounts(11, 1, 22, 3)
     client.transfer_subaccount_assets("USDT", "1", 11, 1, 1, 22, 2, 3, "funding")
 
@@ -72,10 +72,10 @@ async def test_async_bingx_subaccount_wrappers_forward_official_fields() -> None
     native = _AsyncNative()
     client._native_client = native
 
-    await client.get_subaccounts(subAccountString="alpha1", limit=10)
-    await client.get_subaccount_assets("22", recvWindow=5_000)
-    await client.get_subaccount_all_account_balance(accountType="stdFutures")
-    await client.get_subaccount_transfer_history("22", pageId=1, pagingSize=100)
+    await client.get_subaccounts(sub_account_string="alpha1", limit=10)
+    await client.get_subaccount_assets("22", recv_window=5_000)
+    await client.get_subaccount_all_account_balance(account_type="stdFutures")
+    await client.get_subaccount_transfer_history("22", page_id=1, paging_size=100)
 
     assert native.calls == [
         (

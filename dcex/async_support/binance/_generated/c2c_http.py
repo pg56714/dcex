@@ -12,7 +12,7 @@ from .._trade_http import TradeHTTP
 class GeneratedC2cHTTP(MarketHTTP, TradeHTTP):
     """C2c API methods."""
 
-    async def get_c2_c_trade_history(
+    async def get_c2c_trade_history(
         self,
         *,
         trade_type: str | None = None,
@@ -28,7 +28,7 @@ class GeneratedC2cHTTP(MarketHTTP, TradeHTTP):
         Source: https://developers.binance.com/en/docs/catalog/investment-and-services-c2-c/api/rest-api/~#get-c2-ctrade-history
         """
         return await self._native_private(
-            "get_c2_c_trade_history",
+            "get_c2c_trade_history",
             [
                 (
                     key,

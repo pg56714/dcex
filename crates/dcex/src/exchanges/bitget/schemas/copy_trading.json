@@ -361,7 +361,7 @@
     }
   },
   {
-    "name": "classic_copytrading_future_copytrade_follower_close_positions",
+    "name": "close_copy_futures_follower_positions",
     "method": "POST",
     "path": "/api/v2/copy/mix-follower/close-positions",
     "public": false,
@@ -865,7 +865,7 @@
     }
   },
   {
-    "name": "classic_copytrading_future_copytrade_trader_trader_order_close_positions",
+    "name": "close_copy_futures_trader_positions",
     "method": "POST",
     "path": "/api/v2/copy/mix-trader/order-close-positions",
     "public": false,

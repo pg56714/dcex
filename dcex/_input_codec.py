@@ -2,6 +2,7 @@
 
 import json
 import re
+from collections.abc import Mapping
 from decimal import Decimal
 from enum import Enum
 from pathlib import Path
@@ -125,3 +126,9 @@ def normalize_params(values: dict[str, Any]) -> dict[str, Any]:
 def encode_json(value: Any, *, signed_fields: tuple[str, ...] = (), **options: Any) -> str:  # noqa: ANN401
     """Keep the existing call signature; endpoint schemas now own signed opt-ins."""
     return json.dumps(normalize(value, signed_fields=frozenset(signed_fields)), **options)
+
+
+def wire_keywords(values: Mapping[str, Any], fields: Mapping[str, str]) -> dict[str, Any]:
+    """Restore official wire field names when serializing Python parameters."""
+    reverse = {python: wire for wire, python in fields.items()}
+    return {reverse.get(key, key): value for key, value in values.items()}

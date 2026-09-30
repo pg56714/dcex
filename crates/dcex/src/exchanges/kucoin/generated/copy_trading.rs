@@ -7,8 +7,6 @@ crate::exchanges::impl_exchange_method_wrappers! {
     private [
         post_v1_copy_trade_futures_orders(client_oid => "clientOid", side => "side", symbol => "symbol", type_ => "type", size => "size"),
         post_v1_copy_trade_futures_orders_test(client_oid => "clientOid", side => "side", symbol => "symbol", leverage => "leverage", type_ => "type", size => "size"),
-        post_v1_copy_trade_futures_st_orders(client_oid => "clientOid", side => "side", symbol => "symbol", leverage => "leverage", type_ => "type", size => "size"),
-        /// Canonical name; the original method remains available.
         place_copy_futures_stop_order(client_oid => "clientOid", side => "side", symbol => "symbol", leverage => "leverage", type_ => "type", size => "size"),
         delete_v1_copy_trade_futures_orders(),
         delete_v1_copy_trade_futures_orders_client_order(symbol => "symbol", client_oid => "clientOid"),

@@ -2,14 +2,12 @@
 
 from typing import Any
 
-from ..._keyword_aliases import legacy_keywords
 from ._http_manager import HTTPManager
 
 
 class TradeHTTPBatchHTTP(HTTPManager):
     """Batch methods moved from TradeHTTP."""
 
-    @legacy_keywords({"orderList": "order_list", "batchMode": "batch_mode"})
     async def place_spot_batch_orders(
         self,
         order_list: list[dict[str, Any]],
@@ -26,7 +24,6 @@ class TradeHTTPBatchHTTP(HTTPManager):
             ),
         )
 
-    @legacy_keywords({"orderList": "order_list", "batchMode": "batch_mode"})
     async def cancel_spot_batch_orders(
         self,
         order_list: list[dict[str, Any]],
@@ -43,7 +40,6 @@ class TradeHTTPBatchHTTP(HTTPManager):
             ),
         )
 
-    @legacy_keywords({"orderList": "order_list"})
     async def place_uta_batch_orders(self, order_list: list[dict[str, Any]]) -> dict[str, Any]:
         """Place Bitget UTA orders in batch."""
         return await self._native_private(
@@ -51,7 +47,6 @@ class TradeHTTPBatchHTTP(HTTPManager):
             self._native_params(orderList=order_list),
         )
 
-    @legacy_keywords({"orderList": "order_list"})
     async def cancel_uta_batch_orders(self, order_list: list[dict[str, Any]]) -> dict[str, Any]:
         """Cancel Bitget UTA orders in batch."""
         return await self._native_private(
@@ -59,14 +54,6 @@ class TradeHTTPBatchHTTP(HTTPManager):
             self._native_params(orderList=order_list),
         )
 
-    @legacy_keywords(
-        {
-            "orderList": "order_list",
-            "productType": "product_type",
-            "marginMode": "margin_mode",
-            "marginCoin": "margin_coin",
-        }
-    )
     async def place_futures_batch_orders(
         self,
         order_list: list[dict[str, Any]],
@@ -87,9 +74,6 @@ class TradeHTTPBatchHTTP(HTTPManager):
             ),
         )
 
-    @legacy_keywords(
-        {"orderIdList": "order_id_list", "productType": "product_type", "marginCoin": "margin_coin"}
-    )
     async def cancel_futures_batch_orders(
         self,
         product_symbol: str | None = None,

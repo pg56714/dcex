@@ -137,6 +137,3 @@ class TradeHTTPWithdrawalsHTTP(HTTPManager):
         https://github.com/elliottech/lighter-go/blob/main/types/txtypes/withdraw.go
         """
         return await self._native_sign("sign_withdraw_l2", self._native_params(**locals()))
-
-    transfer_same_master_account = transfer_l2_account
-    sign_transfer_same_master_account = sign_transfer_l2_account

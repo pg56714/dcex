@@ -77,22 +77,22 @@ def test_get_api_key_info(client):
 
 @pytest.mark.private
 def test_get_transferable_coins_to_spot(client):
-    res = client.get_transferable_coins(fromAccount="fund", toAccount="spot")
+    res = client.get_transferable_coins(from_account="fund", to_account="spot")
     assert res is not None
 
 
 @pytest.mark.private
 def test_get_transferable_coins_to_swap(client):
-    res = client.get_transferable_coins(fromAccount="fund", toAccount="USDTMPerp")
+    res = client.get_transferable_coins(from_account="fund", to_account="USDTMPerp")
     assert res is not None
 
 
 @pytest.mark.private
 def test_get_asset_transfer_records(client):
     res = client.get_asset_transfer_records(
-        fromAccount="fund",
-        toAccount="spot",
-        pageSize=5,
+        from_account="fund",
+        to_account="spot",
+        page_size=5,
     )
     assert res is not None
 
@@ -102,8 +102,8 @@ def test_subaccount_read_endpoints(client):
     uid = client.get_account_uid()["data"]["uid"]
     subaccounts = client.get_subaccounts(page=1, limit=10)
     assert subaccounts is not None
-    assert client.get_subaccount_all_account_balance(pageIndex=1, pageSize=10) is not None
-    assert client.get_subaccount_transfer_history(uid=uid, pagingSize=10) is not None
+    assert client.get_subaccount_all_account_balance(page_index=1, page_size=10) is not None
+    assert client.get_subaccount_transfer_history(uid=uid, paging_size=10) is not None
 
     accounts = subaccounts.get("data", {}).get("subAccountList", [])
     if accounts:

@@ -424,7 +424,7 @@ CASES = [
     ),
     priv("get_order", "/api/v1/user/orders/42", id=42),
     priv("get_order_by_external_id", "/api/v1/user/orders/external/cid-1", externalId="cid-1"),
-    priv("get_orders_by_external_id", "/api/v1/user/orders/external/cid-2", externalId="cid-2"),
+    priv("get_order_by_external_id", "/api/v1/user/orders/external/cid-2", externalId="cid-2"),
     priv("place_order", "/api/v1/user/order", expect_body=PRESIGNED, body=PRESIGNED),
     priv("place_rfq_order", "/api/v1/user/order/rfq", expect_body=RFQ_ORDER, body=RFQ_ORDER),
     priv("cancel_order", "/api/v1/user/order/42", id=42),

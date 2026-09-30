@@ -54,9 +54,6 @@ class TradeHTTP(HTTPManager):
             self._native_params(externalId=externalId),
         )
 
-    def get_orders_by_external_id(self, externalId: str) -> Any:  # noqa: N803, ANN401
-        return self.get_order_by_external_id(externalId)
-
     def sign_create_order(
         self,
         *,

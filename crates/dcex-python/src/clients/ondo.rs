@@ -30,6 +30,7 @@ impl PythonOndoHttpClient {
     }
 
     #[pyo3(signature = (method, path, params=None, body=None, signed=false, headers=None))]
+    #[allow(clippy::too_many_arguments)]
     fn request_raw_json(
         &self,
         py: Python<'_>,
@@ -55,6 +56,7 @@ impl PythonOndoHttpClient {
     }
 
     #[pyo3(signature = (method, path, params=None, body=None, signed=false, headers=None))]
+    #[allow(clippy::too_many_arguments)]
     fn request_raw_json_async<'py>(
         &self,
         py: Python<'py>,

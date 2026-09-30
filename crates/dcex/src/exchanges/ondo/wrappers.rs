@@ -5,7 +5,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
     public [
         get_login_challenge(wallet_address => "walletAddress", chain_id => "chainId"),
         complete_login_challenge(id => "id", signature => "signature"),
-        get_status(), hello(), ping(), get_markets(),
+        get_status(), hello(), get_markets(),
         get_spot_depth(market => "market"), get_spot_trades(market => "market"),
         get_spot_symbol_info(),
         get_spot_price_history(symbol => "symbol", resolution => "resolution", from_time => "from", to_time => "to"),

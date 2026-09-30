@@ -31,20 +31,20 @@ API 提款沒有第二次確認，送出即執行。建議交易用 API 金鑰�
 
 | 交易所 | 公開方法 | 已實作列 | 待處理列 |
 | --- | ---: | ---: | ---: |
-| [binance](official-endpoint-inventory/binance.json) | 758 | 748 | 0 |
+| [binance](official-endpoint-inventory/binance.json) | 753 | 748 | 0 |
 | [bybit](official-endpoint-inventory/bybit.json) | 448 | 434 | 0 |
 | [okx](official-endpoint-inventory/okx.json) | 404 | 388 | 0 |
-| [bitget](official-endpoint-inventory/bitget.json) | 638 | 610 | 0 |
+| [bitget](official-endpoint-inventory/bitget.json) | 629 | 610 | 0 |
 | [bingx](official-endpoint-inventory/bingx.json) | 210 | 191 | 0 |
 | [kraken](official-endpoint-inventory/kraken.json) | 164 | 148 | 0 |
 | [mexc](official-endpoint-inventory/mexc.json) | 176 | 157 | 0 |
-| [kucoin](official-endpoint-inventory/kucoin.json) | 368 | 340 | 0 |
-| [hyperliquid](official-endpoint-inventory/hyperliquid.json) | 146 | 118 | 0 |
-| [lighter](official-endpoint-inventory/lighter.json) | 136 | 110 | 0 |
+| [kucoin](official-endpoint-inventory/kucoin.json) | 365 | 340 | 0 |
+| [hyperliquid](official-endpoint-inventory/hyperliquid.json) | 145 | 118 | 0 |
+| [lighter](official-endpoint-inventory/lighter.json) | 133 | 110 | 0 |
 | [backpack](official-endpoint-inventory/backpack.json) | 82 | 79 | 0 |
-| [aster](official-endpoint-inventory/aster.json) | 157 | 152 | 0 |
-| [extended](official-endpoint-inventory/extended.json) | 72 | 72 | 0 |
-| [ondo](official-endpoint-inventory/ondo.json) | 82 | 76 | 0 |
+| [aster](official-endpoint-inventory/aster.json) | 156 | 152 | 0 |
+| [extended](official-endpoint-inventory/extended.json) | 71 | 72 | 0 |
+| [ondo](official-endpoint-inventory/ondo.json) | 81 | 76 | 0 |
 | [arcus](official-endpoint-inventory/arcus.json) | 90 | 77 | 0 |
 
 ## 驗證與限制

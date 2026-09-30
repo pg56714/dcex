@@ -260,7 +260,7 @@ async def _futures_positions(client: Client) -> list[dict]:
         ]
     return [
         item
-        for item in _items(_assert_ok(await client.get_futures_positions(marginCoin="USDT")))
+        for item in _items(_assert_ok(await client.get_futures_positions(margin_coin="USDT")))
         if item.get("symbol") == EXCHANGE_SYMBOL
     ]
 
@@ -286,9 +286,9 @@ async def _transfer(client: Client, amount: Decimal, from_type: str, to_type: st
         await client.transfer(
             coin="USDT",
             amount=_fmt(amount),
-            fromType=from_type,
-            toType=to_type,
-            clientOid=_client_oid(),
+            from_type=from_type,
+            to_type=to_type,
+            client_oid=_client_oid(),
         )
     )
     await asyncio.sleep(2)
@@ -327,26 +327,26 @@ async def _return_futures_margin(client: Client, amount: Decimal) -> None:
 async def _cancel_spot(client: Client, order_id: str) -> None:
     if await _is_uta(client):
         try:
-            _assert_ok(await client.cancel_uta_order(orderId=order_id, category="SPOT"))
+            _assert_ok(await client.cancel_uta_order(order_id=order_id, category="SPOT"))
         except FailedRequestError as exc:
             if not _is_missing_order_error(exc):
                 raise
         await asyncio.sleep(1)
         return
-    _assert_ok(await client.cancel_spot_order(SPOT_SYMBOL, orderId=order_id))
+    _assert_ok(await client.cancel_spot_order(SPOT_SYMBOL, order_id=order_id))
     await asyncio.sleep(1)
 
 
 async def _cancel_futures(client: Client, order_id: str) -> None:
     if await _is_uta(client):
         try:
-            _assert_ok(await client.cancel_uta_order(orderId=order_id, category="USDT-FUTURES"))
+            _assert_ok(await client.cancel_uta_order(order_id=order_id, category="USDT-FUTURES"))
         except FailedRequestError as exc:
             if not _is_missing_order_error(exc):
                 raise
         await asyncio.sleep(1)
         return
-    _assert_ok(await client.cancel_futures_order(SWAP_SYMBOL, orderId=order_id))
+    _assert_ok(await client.cancel_futures_order(SWAP_SYMBOL, order_id=order_id))
     await asyncio.sleep(1)
 
 
@@ -365,8 +365,8 @@ async def _place_spot_limit(
             "limit",
             size,
             price=price,
-            timeInForce=force,
-            clientOid=_client_oid(),
+            time_in_force=force,
+            client_oid=_client_oid(),
         )
     return await client.place_spot_limit_order(SPOT_SYMBOL, side, size, price, force)
 
@@ -379,7 +379,7 @@ async def _place_spot_market(client: Client, side: str, size: str) -> dict:
             side,
             "market",
             size,
-            clientOid=_client_oid(),
+            client_oid=_client_oid(),
         )
     return await client.place_spot_market_order(SPOT_SYMBOL, side, size)
 
@@ -430,8 +430,8 @@ async def _cancel_spot_batch(client: Client, order_id: str) -> dict:
 
 async def _get_spot_order(client: Client, order_id: str) -> dict:
     if await _is_uta(client):
-        return await client.get_uta_order(orderId=order_id)
-    return await client.get_spot_order(orderId=order_id)
+        return await client.get_uta_order(order_id=order_id)
+    return await client.get_spot_order(order_id=order_id)
 
 
 async def _get_spot_history_orders(client: Client) -> dict:
@@ -461,9 +461,9 @@ async def _place_futures_limit(
             "limit",
             size,
             price=price,
-            timeInForce=force,
-            clientOid=_client_oid(),
-            marginMode="crossed",
+            time_in_force=force,
+            client_oid=_client_oid(),
+            margin_mode="crossed",
         )
     return await client.place_futures_limit_order(SWAP_SYMBOL, side, size, price, force)
 
@@ -482,16 +482,16 @@ async def _place_futures_market(
             side,
             "market",
             size,
-            clientOid=_client_oid(),
-            reduceOnly=reduce_only_value,
-            marginMode="crossed",
+            client_oid=_client_oid(),
+            reduce_only=reduce_only_value,
+            margin_mode="crossed",
         )
     classic_reduce_only = reduce_only.upper() if reduce_only is not None else None
     return await client.place_futures_market_order(
         SWAP_SYMBOL,
         side,
         size,
-        reduceOnly=classic_reduce_only,
+        reduce_only=classic_reduce_only,
     )
 
 
@@ -542,8 +542,8 @@ async def _cancel_futures_batch(client: Client, order_id: str) -> dict:
 
 async def _get_futures_order(client: Client, order_id: str) -> dict:
     if await _is_uta(client):
-        return await client.get_uta_order(orderId=order_id)
-    return await client.get_futures_order(SWAP_SYMBOL, orderId=order_id)
+        return await client.get_uta_order(order_id=order_id)
+    return await client.get_futures_order(SWAP_SYMBOL, order_id=order_id)
 
 
 async def _get_futures_history_orders(client: Client) -> dict:
@@ -790,7 +790,7 @@ async def test_futures_stateful_order_lifecycle(client):
                     SWAP_SYMBOL,
                     "sell",
                     size,
-                    reduceOnly="YES",
+                    reduce_only="YES",
                 )
             )
         await asyncio.sleep(2)

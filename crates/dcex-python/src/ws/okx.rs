@@ -351,6 +351,7 @@ impl PythonOkxPrivateWebSocketClient {
     }
 
     #[pyo3(signature = (channel, inst_type=None, inst_id=None, ccy=None, inst_family=None, sprd_id=None))]
+    #[allow(clippy::too_many_arguments)]
     fn subscribe_channel<'py>(
         &self,
         py: Python<'py>,
@@ -377,6 +378,7 @@ impl PythonOkxPrivateWebSocketClient {
     }
 
     #[pyo3(signature = (channel, inst_type=None, inst_id=None, ccy=None, inst_family=None, sprd_id=None))]
+    #[allow(clippy::too_many_arguments)]
     fn unsubscribe_channel<'py>(
         &self,
         py: Python<'py>,

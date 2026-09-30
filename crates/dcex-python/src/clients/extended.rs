@@ -18,6 +18,7 @@ impl PythonExtendedHttpClient {
         base_url=None,
         user_agent="dcex-rust/0.1".to_string()
     ))]
+    #[allow(clippy::too_many_arguments)]
     fn new(
         api_key: Option<String>,
         stark_private_key: Option<String>,
@@ -56,6 +57,7 @@ impl PythonExtendedHttpClient {
         signed=false,
         headers=None
     ))]
+    #[allow(clippy::too_many_arguments)]
     fn request_raw_json(
         &self,
         py: Python<'_>,
@@ -88,6 +90,7 @@ impl PythonExtendedHttpClient {
         signed=false,
         headers=None
     ))]
+    #[allow(clippy::too_many_arguments)]
     fn request_raw_json_async<'py>(
         &self,
         py: Python<'py>,

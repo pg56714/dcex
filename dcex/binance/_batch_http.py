@@ -14,8 +14,6 @@ class TradeHTTPBatchHTTP(HTTPManager):
 
     _params: Any
 
-    _required_alias: Any
-
     def place_options_batch_orders(self, orders: list[dict[str, Any]]) -> dict[str, Any]:
         """Place options orders; inspect both the ok and errors result arrays."""
         return self._native_private(
@@ -133,9 +131,8 @@ class TradeHTTPBatchHTTP(HTTPManager):
 
     def cancel_coin_futures_batch_orders(
         self,
-        product_symbol: str | None = None,
+        product_symbol: str,
         *,
-        symbol: str | None = None,
         order_ids: list[int] | None = None,
         client_order_ids: list[str] | None = None,
         recv_window: int | None = None,
@@ -150,7 +147,7 @@ class TradeHTTPBatchHTTP(HTTPManager):
         return self._native_private(
             "cancel_coin_futures_batch_orders",
             self._params(
-                product_symbol=self._required_alias(product_symbol, symbol, "product_symbol"),
+                product_symbol=product_symbol,
                 orderIdList=dumps(order_ids) if order_ids is not None else None,
                 origClientOrderIdList=dumps(client_order_ids)
                 if client_order_ids is not None

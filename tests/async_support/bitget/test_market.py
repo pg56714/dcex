@@ -65,7 +65,7 @@ async def test_get_spot_history_kline(client):
     res = await client.get_spot_history_kline(
         product_symbol="BTC-USDT-SPOT",
         granularity="1min",
-        endTime=end_time,
+        end_time=end_time,
         limit=5,
     )
     _assert_success(res)
@@ -155,7 +155,7 @@ async def test_get_futures_current_funding_rate(client):
 async def test_get_futures_history_funding_rate(client):
     res = await client.get_futures_history_funding_rate(
         product_symbol="BTC-USDT-SWAP",
-        pageSize=5,
+        page_size=5,
     )
     _assert_success(res)
     assert res["data"]

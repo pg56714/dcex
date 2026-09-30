@@ -9,8 +9,6 @@ crate::exchanges::impl_exchange_method_wrappers! {
         classic_copytrading_future_copytrade_follower_query_current_orders(product_type => "productType"),
         classic_copytrading_future_copytrade_follower_query_history_orders(product_type => "productType"),
         classic_copytrading_future_copytrade_follower_setting_tpsl(tracking_no => "trackingNo", product_type => "productType"),
-        classic_copytrading_future_copytrade_follower_close_positions(product_type => "productType"),
-        /// Canonical name; the original method remains available.
         close_copy_futures_follower_positions(product_type => "productType"),
         classic_copytrading_future_copytrade_follower_query_settings(trader_id => "traderId"),
         classic_copytrading_future_copytrade_follower_settings(trader_id => "traderId", settings => "settings"),
@@ -20,8 +18,6 @@ crate::exchanges::impl_exchange_method_wrappers! {
         classic_copytrading_future_copytrade_trader_create_copy_api(passphrase => "passphrase"),
         classic_copytrading_future_copytrade_trader_trader_order_current_track(product_type => "productType"),
         classic_copytrading_future_copytrade_trader_trader_order_history_track(product_type => "productType"),
-        classic_copytrading_future_copytrade_trader_trader_order_close_positions(product_type => "productType"),
-        /// Canonical name; the original method remains available.
         close_copy_futures_trader_positions(product_type => "productType"),
         classic_copytrading_future_copytrade_trader_trader_order_modify_tpsl(tracking_no => "trackingNo", product_type => "productType"),
         classic_copytrading_future_copytrade_trader_trader_order_total_detail(),

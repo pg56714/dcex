@@ -532,7 +532,7 @@
     "days": null
   },
   {
-    "name": "uta_delete_sub",
+    "name": "delete_uta_subaccount",
     "path": "/api/v3/user/delete-sub",
     "post": true,
     "public": false,

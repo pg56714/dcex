@@ -11,10 +11,6 @@ impl KucoinClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         crate::exchanges::input_contracts::pairs("kucoin", method_name, &params)?;
-        let method_name = match method_name {
-            "place_copy_futures_stop_order" => "post_v1_copy_trade_futures_st_orders",
-            other => other,
-        };
         if method_name == "cancel_margin_stop_order_by_id_raw" {
             // Official docs omit all request parameters. Preserve the caller's query.
             return self
@@ -28,11 +24,6 @@ impl KucoinClient {
                 )
                 .await;
         }
-        let method_name = match method_name {
-            "get_uta_oes_currency" => "get_uta_oe_scurrency",
-            "get_otc_loan_accounts" => "get_accounts",
-            other => other,
-        };
         let params = super::super::operation_guards::validate("kucoin", method_name, params)?;
         let params = KucoinParams::from_pairs(params);
         if let Some(response) = self.catalog_request(method_name, &params).await? {

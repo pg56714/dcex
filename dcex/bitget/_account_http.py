@@ -2,8 +2,6 @@
 
 from typing import Any
 
-from dcex._keyword_aliases import legacy_keywords
-
 from ._http_manager import HTTPManager
 from ._transfers_http import AccountHTTPTransfersHTTP
 
@@ -40,7 +38,6 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
         """Retrieve Bitget spot account information."""
         return self._native_private("get_spot_account_info", [])
 
-    @legacy_keywords({"assetType": "asset_type"})
     def get_spot_account_assets(
         self,
         coin: str | None = None,
@@ -52,15 +49,6 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
             self._native_params(coin=coin, assetType=asset_type),
         )
 
-    @legacy_keywords(
-        {
-            "groupType": "group_type",
-            "businessType": "business_type",
-            "startTime": "start_time",
-            "endTime": "end_time",
-            "idLessThan": "id_less_than",
-        }
-    )
     def get_spot_account_bills(
         self,
         coin: str | None = None,
@@ -85,14 +73,6 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
             ),
         )
 
-    @legacy_keywords(
-        {
-            "startTime": "start_time",
-            "endTime": "end_time",
-            "orderId": "order_id",
-            "idLessThan": "id_less_than",
-        }
-    )
     def get_deposit_records(
         self,
         start_time: int | str,
@@ -135,14 +115,6 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
         """Retrieve Bitget UTA API account information."""
         return self._native_private("get_uta_account_info", [])
 
-    @legacy_keywords(
-        {
-            "posSide": "pos_side",
-            "marginMode": "margin_mode",
-            "longLeverage": "long_leverage",
-            "shortLeverage": "short_leverage",
-        }
-    )
     def set_uta_leverage(
         self,
         category: str,
@@ -171,7 +143,6 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
             ),
         )
 
-    @legacy_keywords({"holdMode": "hold_mode"})
     def set_uta_hold_mode(self, hold_mode: str) -> dict[str, Any]:
         """Set Bitget UTA holding mode."""
         return self._native_private(
@@ -179,7 +150,6 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
             self._native_params(holdMode=hold_mode),
         )
 
-    @legacy_keywords({"marginCoin": "margin_coin", "productType": "product_type"})
     def get_futures_account(
         self,
         product_symbol: str,
@@ -196,7 +166,6 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
             ),
         )
 
-    @legacy_keywords({"productType": "product_type"})
     def get_futures_accounts(
         self,
         product_type: str = "USDT-FUTURES",
@@ -207,16 +176,6 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
             self._native_params(productType=product_type),
         )
 
-    @legacy_keywords(
-        {
-            "productType": "product_type",
-            "businessType": "business_type",
-            "onlyFunding": "only_funding",
-            "idLessThan": "id_less_than",
-            "startTime": "start_time",
-            "endTime": "end_time",
-        }
-    )
     def get_futures_account_bills(
         self,
         product_type: str = "USDT-FUTURES",
@@ -243,15 +202,6 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
             ),
         )
 
-    @legacy_keywords(
-        {
-            "marginCoin": "margin_coin",
-            "productType": "product_type",
-            "holdSide": "hold_side",
-            "longLeverage": "long_leverage",
-            "shortLeverage": "short_leverage",
-        }
-    )
     def set_futures_leverage(
         self,
         product_symbol: str,
@@ -282,9 +232,6 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
             ),
         )
 
-    @legacy_keywords(
-        {"marginMode": "margin_mode", "marginCoin": "margin_coin", "productType": "product_type"}
-    )
     def set_futures_margin_mode(
         self,
         product_symbol: str,
@@ -303,7 +250,6 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
             ),
         )
 
-    @legacy_keywords({"posMode": "pos_mode", "productType": "product_type"})
     def set_futures_position_mode(
         self,
         pos_mode: str,
@@ -315,7 +261,6 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
             self._native_params(productType=product_type, posMode=pos_mode),
         )
 
-    @legacy_keywords({"productType": "product_type", "marginCoin": "margin_coin"})
     def get_futures_positions(
         self,
         product_type: str = "USDT-FUTURES",
@@ -327,7 +272,6 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
             self._native_params(productType=product_type, marginCoin=margin_coin),
         )
 
-    @legacy_keywords({"productType": "product_type", "marginCoin": "margin_coin"})
     def get_futures_position(
         self,
         product_symbol: str,
@@ -368,9 +312,6 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
         """Get supported Crypto Loan assets, limits, rates, and collateral ratios."""
         return self._native_private("get_crypto_loan_coins", self._native_params(coin=coin))
 
-    @legacy_keywords(
-        {"loanCoin": "loan_coin", "pledgeCoin": "pledge_coin", "pledgeAmount": "pledge_amount"}
-    )
     def get_crypto_loan_interest(
         self,
         loan_coin: str,
@@ -389,14 +330,6 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
             ),
         )
 
-    @legacy_keywords(
-        {
-            "loanCoin": "loan_coin",
-            "pledgeCoin": "pledge_coin",
-            "pledgeAmount": "pledge_amount",
-            "loanAmount": "loan_amount",
-        }
-    )
     def borrow_crypto_loan(
         self,
         loan_coin: str,
@@ -419,7 +352,6 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
             ),
         )
 
-    @legacy_keywords({"orderId": "order_id", "loanCoin": "loan_coin", "pledgeCoin": "pledge_coin"})
     def get_crypto_loan_ongoing(
         self,
         order_id: str | None = None,
@@ -432,17 +364,6 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
             self._native_params(orderId=order_id, loanCoin=loan_coin, pledgeCoin=pledge_coin),
         )
 
-    @legacy_keywords(
-        {
-            "startTime": "start_time",
-            "endTime": "end_time",
-            "orderId": "order_id",
-            "loanCoin": "loan_coin",
-            "pledgeCoin": "pledge_coin",
-            "pageNum": "page_num",
-            "pageSize": "page_size",
-        }
-    )
     def get_crypto_loan_borrow_history(
         self,
         start_time: str,
@@ -469,9 +390,6 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
             ),
         )
 
-    @legacy_keywords(
-        {"orderId": "order_id", "repayAll": "repay_all", "repayUnlock": "repay_unlock"}
-    )
     def repay_crypto_loan(
         self,
         order_id: str,
@@ -490,17 +408,6 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
             ),
         )
 
-    @legacy_keywords(
-        {
-            "startTime": "start_time",
-            "endTime": "end_time",
-            "orderId": "order_id",
-            "loanCoin": "loan_coin",
-            "pledgeCoin": "pledge_coin",
-            "pageNum": "page_num",
-            "pageSize": "page_size",
-        }
-    )
     def get_crypto_loan_repay_history(
         self,
         start_time: str,
@@ -525,9 +432,6 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
             ),
         )
 
-    @legacy_keywords(
-        {"orderId": "order_id", "pledgeCoin": "pledge_coin", "reviseType": "revise_type"}
-    )
     def revise_crypto_loan_pledge(
         self, order_id: str, amount: str, pledge_coin: str, revise_type: str
     ) -> dict[str, Any]:
@@ -542,17 +446,6 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
             ),
         )
 
-    @legacy_keywords(
-        {
-            "startTime": "start_time",
-            "endTime": "end_time",
-            "orderId": "order_id",
-            "reviseSide": "revise_side",
-            "pledgeCoin": "pledge_coin",
-            "pageNum": "page_num",
-            "pageSize": "page_size",
-        }
-    )
     def get_crypto_loan_pledge_history(
         self,
         start_time: str,
@@ -577,17 +470,6 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
             ),
         )
 
-    @legacy_keywords(
-        {
-            "startTime": "start_time",
-            "endTime": "end_time",
-            "orderId": "order_id",
-            "loanCoin": "loan_coin",
-            "pledgeCoin": "pledge_coin",
-            "pageNum": "page_num",
-            "pageSize": "page_size",
-        }
-    )
     def get_crypto_loan_liquidations(
         self,
         start_time: str,
@@ -618,9 +500,6 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
         """Get Crypto Loan liabilities and collateral assets."""
         return self._native_private("get_crypto_loan_debts", [])
 
-    @legacy_keywords(
-        {"repayableCoinList": "repayable_coin_list", "paymentCoinList": "payment_coin_list"}
-    )
     def repay_uta_liability(
         self, repayable_coin_list: list[str], payment_coin_list: list[str]
     ) -> dict[str, Any]:
@@ -641,13 +520,6 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
         """Retrieve coins supported as custom UTA collateral."""
         return self._native_private("get_uta_custom_collateral_coins", [])
 
-    @legacy_keywords(
-        {
-            "marginMode": "margin_mode",
-            "longLeverage": "long_leverage",
-            "shortLeverage": "short_leverage",
-        }
-    )
     def get_uta_pre_set_leverage(
         self,
         category: str,

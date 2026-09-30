@@ -11,7 +11,7 @@ pub(super) fn validate(
             method,
             "upgrade_to_uta"
                 | "upgrade_classic_account"
-                | "uta_delete_sub"
+                | "delete_uta_subaccount"
                 | "set_uta_account_mode"
                 | "set_futures_asset_mode"
                 | "move_uta_positions"
@@ -21,10 +21,7 @@ pub(super) fn validate(
         "bybit" => matches!(method, "delete_api_key" | "modify_api_key"),
         "kucoin" => method == "set_uta_account_mode",
         "ondo" => method == "delete_api_key",
-        "aster" => matches!(
-            method,
-            "exchange_futures_assets" | "trigger_futures_asset_exchange"
-        ),
+        "aster" => matches!(method, "trigger_futures_asset_exchange"),
         _ => false,
     };
     if confirmed && !take_flag(&mut params, "confirm")? {
@@ -40,8 +37,8 @@ pub(super) fn validate(
                 | "close_uta_positions"
                 | "cancel_futures_plan_orders"
                 | "cancel_spot_plan_orders"
-                | "classic_copytrading_future_copytrade_follower_close_positions"
-                | "classic_copytrading_future_copytrade_trader_trader_order_close_positions"
+                | "close_copy_futures_follower_positions"
+                | "close_copy_futures_trader_positions"
         ),
         "bingx" => matches!(
             method,

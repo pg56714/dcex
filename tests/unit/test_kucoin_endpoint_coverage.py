@@ -165,7 +165,7 @@ CASES: tuple[Case, ...] = (
         signed=True,
     ),
     Case(
-        "get_accounts",
+        "get_otc_loan_accounts",
         {},
         "GET /api/v1/otc-loan/accounts",
         host="spot",
@@ -192,7 +192,7 @@ CASES: tuple[Case, ...] = (
         signed=True,
     ),
     Case(
-        "get_uta_oe_scurrency",
+        "get_uta_oes_currency",
         {},
         "GET /api/ua/v2/oes/currency",
         host="spot",
@@ -2896,16 +2896,6 @@ def _wrapper_names(mode: str) -> set[str]:
             if inspect.getsourcefile(member) == str(path):
                 names.add(name)
     return names
-
-
-from dataclasses import replace
-
-ALIASES = {"get_uta_oe_scurrency": "get_uta_oes_currency", "get_accounts": "get_otc_loan_accounts"}
-CASES = tuple(CASES) + tuple(
-    replace(case, method_name=ALIASES[case.method_name])
-    for case in CASES
-    if case.method_name in ALIASES
-)
 
 
 @pytest.mark.parametrize("mode", ["sync", "async"])

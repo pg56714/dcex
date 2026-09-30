@@ -87,7 +87,7 @@ UTA_CASES = (
     (
         "bitget",
         "get_uta_pre_set_leverage",
-        {"category": "USDT-FUTURES", "marginMode": "cross"},
+        {"category": "USDT-FUTURES", "margin_mode": "cross"},
         "NATIVE_PRIVATE",
     ),
     (
@@ -116,7 +116,7 @@ UTA_CASES = (
         {
             "product_symbol": "RAAPL-USDT-SPOT",
             "side": "buy",
-            "orderType": "limit",
+            "order_type": "limit",
             "qty": "1",
             "price": "100",
             "category": "SPOT",
@@ -128,7 +128,7 @@ UTA_CASES = (
         "cancel_reality_order",
         {
             "product_symbol": "RAAPL-USDT-SPOT",
-            "orderId": "123",
+            "order_id": "123",
             "category": "SPOT",
         },
         "NATIVE_PRIVATE",
@@ -142,7 +142,7 @@ UTA_CASES = (
     (
         "bitget",
         "modify_uta_strategy_order",
-        {"qty": "1", "orderId": "123"},
+        {"qty": "1", "order_id": "123"},
         "NATIVE_PRIVATE",
     ),
     (
@@ -201,6 +201,15 @@ UTA_CASES = (
 )
 
 
+def _expected_query(exchange: str, kwargs: dict[str, str]) -> list[tuple[str, str]]:
+    fields = (
+        {"margin_mode": "marginMode", "order_type": "orderType", "order_id": "orderId"}
+        if exchange == "bitget"
+        else {}
+    )
+    return [(fields.get(key, key), str(value)) for key, value in kwargs.items()]
+
+
 @pytest.mark.parametrize(("exchange", "method_name", "kwargs", "request_type"), UTA_CASES)
 def test_sync_uta_wrappers_only_build_native_requests(
     exchange: str,
@@ -218,7 +227,7 @@ def test_sync_uta_wrappers_only_build_native_requests(
         {
             "method": request_type,
             "path": method_name,
-            "query": [(key, str(value)) for key, value in kwargs.items()],
+            "query": _expected_query(exchange, kwargs),
         }
     ]
 
@@ -241,6 +250,6 @@ async def test_async_uta_wrappers_only_build_native_requests(
         {
             "method": request_type,
             "path": method_name,
-            "query": [(key, str(value)) for key, value in kwargs.items()],
+            "query": _expected_query(exchange, kwargs),
         }
     ]

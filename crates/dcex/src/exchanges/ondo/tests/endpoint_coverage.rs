@@ -287,7 +287,7 @@ fn public_market_data_routes_match_official_paths() {
         },
         private("invalidate_jwt", &[], "GET", "/v1/auth/invalidate_jwt"),
         public("hello", &[], "GET", "/hello"),
-        public("ping", &[], "GET", "/hello"),
+        public("hello", &[], "GET", "/hello"),
         public("get_markets", &[], "GET", "/v1/markets"),
         public(
             "get_spot_depth",

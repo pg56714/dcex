@@ -51,13 +51,6 @@ impl BinanceClient {
         params: &PublicParams,
         public: bool,
     ) -> Result<Option<ValidatedResponse>> {
-        let name = match name {
-            "place_spot_sor_order" => "spot_sor_order",
-            "test_spot_sor_order" => "spot_sor_order_test",
-            "sign_futures_tradfi_perps_contract" => "futures_futures_tradfi_perps_contract",
-            "liquidate_margin_account" => "margin_margin_manual_liquidation",
-            other => other,
-        };
         let Some(endpoint) = ENDPOINTS
             .iter()
             .find(|e| e.name == name && e.public == public)

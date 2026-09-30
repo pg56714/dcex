@@ -172,7 +172,7 @@ def route_evidence() -> tuple[RouteEvidence, ...]:
     for operation in module.OPERATIONS:
         add(
             "bitget",
-            module.snake(operation["operationId"]),
+            module.operation_name(operation),
             operation["method"].upper(),
             operation["path"],
             "tests/unit/test_bitget_schema_requests.py::test_inventory_wire",

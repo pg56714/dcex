@@ -101,8 +101,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPWithdrawalsHTTP, HTTPManager):
         """Create a Lighter order."""
         return await self._native_private("create_order", self._native_params(**locals()))
 
-    place_order = create_order
-
     async def sign_cancel_order(
         self,
         market_index: int,

@@ -40,7 +40,7 @@ impl AsterClient {
             }
         }
 
-        if name == "exchange_futures_assets" {
+        if name == "trigger_futures_asset_exchange" {
             let response = self
                 .request_raw_auto(method, path, p.only(fields), true)
                 .await?;

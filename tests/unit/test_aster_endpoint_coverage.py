@@ -233,7 +233,7 @@ CASES = [
         **{"listen_key": "example"},
     ),
     pub("get_asset_logos", "/fapi/v3/common/asset/all-asset-logo", {}, **{}),
-    priv("exchange_futures_assets", "/fapi/v3/assetExchange", {}, confirm=True),
+    priv("trigger_futures_asset_exchange", "/fapi/v3/assetExchange", {}, confirm=True),
     priv("get_sub_accounts", "/fapi/v3/getSubAccountList", {}, **{}),
     priv("get_direct_announcements", "/fapi/v3/announcement/direct", {}, **{}),
     priv("get_direct_announcement", "/fapi/v3/announcement/directById", {"id": "1"}, **{"id": 1}),
@@ -984,7 +984,6 @@ def _assert_request(case: WireCase, requests: list[dict[str, Any]]) -> None:
 
 from dataclasses import replace
 
-ALIASES = {"exchange_futures_assets": "trigger_futures_asset_exchange"}
 CASES += [
     WireCase(c["name"], c["kwargs"], c["path"], c["wire"], True, c["verb"])
     for c in json.loads(
@@ -1028,9 +1027,6 @@ CASES += [
     ),
     WireCase("noop_prediction", {"nonce": 1}, "/api/v3/noop", {}, True, "POST"),
 ]
-CASES = tuple(CASES) + tuple(
-    replace(case, method=ALIASES[case.method]) for case in CASES if case.method in ALIASES
-)
 
 
 def test_every_endpoint_wrapper_has_a_wire_case() -> None:
@@ -1212,9 +1208,9 @@ async def test_asset_exchange_accepts_empty_success_response(asynchronous: bool)
         try:
             if asynchronous:
                 await client.async_init()
-                assert await client.exchange_futures_assets(confirm=True) == {}
+                assert await client.trigger_futures_asset_exchange(confirm=True) == {}
             else:
-                assert client.exchange_futures_assets(confirm=True) == {}
+                assert client.trigger_futures_asset_exchange(confirm=True) == {}
         finally:
             if asynchronous:
                 await client.close()

@@ -520,8 +520,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             "trigger_futures_asset_exchange", self._native_params(confirm=confirm)
         )
 
-    exchange_futures_assets = trigger_futures_asset_exchange
-
     def get_sub_accounts(self) -> dict[str, Any] | list[Any]:
         """GET /fapi/v3/getSubAccountList."""
         return self._native_private("get_sub_accounts", self._native_params())

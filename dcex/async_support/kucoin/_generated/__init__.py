@@ -19,7 +19,3 @@ class GeneratedHTTP(
     TradeHTTP,
 ):
     """Business-specific generated methods with compatible base precedence."""
-
-    place_copy_futures_stop_order = vars(GeneratedCopyTradingHTTP)[
-        "post_v1_copy_trade_futures_st_orders"
-    ]

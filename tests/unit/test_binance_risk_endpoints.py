@@ -1364,7 +1364,7 @@ CASES = [
         False,
     ),
     (
-        "futures_futures_tradfi_perps_contract",
+        "sign_futures_tradfi_perps_contract",
         {},
         "POST",
         "/fapi/v1/stock/contract",
@@ -1565,7 +1565,7 @@ CASES = [
         False,
     ),
     (
-        "margin_margin_manual_liquidation",
+        "liquidate_margin_account",
         {"kind_type": "MARGIN"},
         "POST",
         "/sapi/v1/margin/manual-liquidation",
@@ -1688,11 +1688,11 @@ CASES = [
         False,
     ),
     (
-        "spot_sor_order",
+        "place_spot_sor_order",
         {
             "symbol": "BTCUSDT",
             "side": "BUY",
-            "kind_type": "LIMIT",
+            "order_type": "LIMIT",
             "quantity": "1.25",
             "price": "50000",
             "time_in_force": "GTC",
@@ -1711,11 +1711,11 @@ CASES = [
         False,
     ),
     (
-        "spot_sor_order_test",
+        "test_spot_sor_order",
         {
             "symbol": "BTCUSDT",
             "side": "BUY",
-            "kind_type": "LIMIT",
+            "order_type": "LIMIT",
             "quantity": "1.25",
             "price": "50000",
             "time_in_force": "GTC",

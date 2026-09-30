@@ -685,7 +685,7 @@ fn signed_transactions_use_official_tx_types_and_fields() {
     );
 
     let (tx_type, info, _) = submitted_tx(
-        "place_order",
+        "create_order",
         &[
             ("market_index", "0"),
             ("client_order_index", "1"),
@@ -1864,7 +1864,7 @@ fn same_master_transfer_has_no_external_wallet_signature() {
     let client = signing_client("http://127.0.0.1:1".into());
     let tx = block_on(async move {
         client
-            .sign_transfer_same_master_account(pairs(&[
+            .sign_transfer_l2_account(pairs(&[
                 ("to_account_index", "13"),
                 ("asset_index", "3"),
                 ("from_route_type", "0"),

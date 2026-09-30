@@ -115,8 +115,8 @@ def _fund_available(client: Client, asset: str) -> Decimal:
 
 def _transferable(client: Client, from_account: str, to_account: str, asset: str) -> Decimal:
     data = client.get_transferable_coins(
-        fromAccount=from_account,
-        toAccount=to_account,
+        from_account=from_account,
+        to_account=to_account,
     ).get("data", {})
     for item in data.get("coins", []):
         if item.get("asset") == asset:
@@ -173,7 +173,7 @@ def _is_missing_spot_order_error(exc: FailedRequestError) -> bool:
 
 def _cancel_spot_order(client: Client, order_id: str) -> object:
     try:
-        return client.cancel_spot_order(product_symbol=SPOT_SYMBOL, orderId=order_id)
+        return client.cancel_spot_order(product_symbol=SPOT_SYMBOL, order_id=order_id)
     except FailedRequestError as exc:
         if _is_missing_spot_order_error(exc):
             return {"code": 0, "data": {}}
@@ -182,7 +182,7 @@ def _cancel_spot_order(client: Client, order_id: str) -> object:
 
 def _cancel_spot_batch_orders_if_present(client: Client, order_ids: list[str]) -> object:
     try:
-        return client.cancel_spot_batch_orders(product_symbol=SPOT_SYMBOL, orderIds=order_ids)
+        return client.cancel_spot_batch_orders(product_symbol=SPOT_SYMBOL, order_ids=order_ids)
     except FailedRequestError as exc:
         if _is_missing_spot_order_error(exc):
             return {"code": 0, "data": {}}
@@ -290,8 +290,8 @@ def _spot_market_buy_delta(client: Client, quote_amount: Decimal) -> Decimal:
     assert (
         client.place_spot_market_buy_order(
             product_symbol=SPOT_SYMBOL,
-            quoteOrderQty=_fmt(quote_amount),
-            clientOrderId=f"dcex{uuid.uuid4().hex[:16]}",
+            quote_order_qty=_fmt(quote_amount),
+            client_order_id=f"dcex{uuid.uuid4().hex[:16]}",
         )
         is not None
     )
@@ -407,8 +407,8 @@ def _ensure_usdt_for_account(
 
         try:
             client.asset_transfer(
-                fromAccount=from_account,
-                toAccount=to_account,
+                from_account=from_account,
+                to_account=to_account,
                 asset="USDT",
                 amount=_fmt(min(amount, available)),
             )
@@ -482,7 +482,7 @@ def _cleanup_spot_btc(client: Client, initial_btc: Decimal = Decimal("0")) -> No
         client.place_spot_market_sell_order(
             product_symbol=SPOT_SYMBOL,
             quantity=_fmt(sell_quantity),
-            clientOrderId=f"dcex{uuid.uuid4().hex[:16]}",
+            client_order_id=f"dcex{uuid.uuid4().hex[:16]}",
         )
         time.sleep(2)
     assert _spot_available(client, "BTC") - initial_btc <= step
@@ -505,7 +505,7 @@ def _cleanup_state(client: Client) -> None:
 def test_swap_margin_leverage_and_position_mode_idempotent(client):
     _skip_if_swap_state(client)
     margin = client.get_margin_type(product_symbol=SWAP_SYMBOL)["data"]["marginType"]
-    assert client.change_margin_type(product_symbol=SWAP_SYMBOL, marginType=margin) is not None
+    assert client.change_margin_type(product_symbol=SWAP_SYMBOL, margin_type=margin) is not None
 
     leverage = client.get_leverage(product_symbol=SWAP_SYMBOL)["data"]
     assert (
@@ -526,7 +526,7 @@ def test_swap_margin_leverage_and_position_mode_idempotent(client):
     )
 
     mode = client.get_position_mode()["data"]["dualSidePosition"]
-    assert client.set_position_mode(dualSidePosition=mode) is not None
+    assert client.set_position_mode(dual_side_position=mode) is not None
 
 
 @pytest.mark.private
@@ -546,14 +546,14 @@ def test_swap_post_only_order_lifecycle(client):
             product_symbol=SWAP_SYMBOL,
             quantity=float(quantity),
             price=float(price),
-            positionSide="LONG",
-            clientOrderId=f"dcex-{uuid.uuid4().hex}",
+            position_side="LONG",
+            client_order_id=f"dcex-{uuid.uuid4().hex}",
         )
         order_id = order["data"]["order"]["orderId"]
-        assert client.get_order_detail(product_symbol=SWAP_SYMBOL, orderId=order_id) is not None
+        assert client.get_order_detail(product_symbol=SWAP_SYMBOL, order_id=order_id) is not None
     finally:
         if order_id is not None:
-            client.cancel_swap_order(product_symbol=SWAP_SYMBOL, orderId=order_id)
+            client.cancel_swap_order(product_symbol=SWAP_SYMBOL, order_id=order_id)
 
 
 @pytest.mark.private
@@ -583,14 +583,14 @@ def test_swap_batch_order_and_cancel_batch(client):
             assert (
                 client.cancel_swap_batch_order(
                     product_symbol=SWAP_SYMBOL,
-                    orderIdList=[order_id],
+                    order_id_list=[order_id],
                 )
                 is not None
             )
             order_id = None
     finally:
         if order_id is not None:
-            client.cancel_swap_order(product_symbol=SWAP_SYMBOL, orderId=order_id)
+            client.cancel_swap_order(product_symbol=SWAP_SYMBOL, order_id=order_id)
 
 
 @pytest.mark.private
@@ -604,8 +604,8 @@ def test_swap_cancel_all_orders(client):
             product_symbol=SWAP_SYMBOL,
             quantity=float(quantity),
             price=float(price),
-            positionSide="LONG",
-            clientOrderId=f"dcex-{uuid.uuid4().hex}",
+            position_side="LONG",
+            client_order_id=f"dcex-{uuid.uuid4().hex}",
         )
         order_id = order["data"]["order"]["orderId"]
         assert client.cancel_swap_all_orders(product_symbol=SWAP_SYMBOL) is not None
@@ -614,7 +614,7 @@ def test_swap_cancel_all_orders(client):
         assert not _swap_open_orders(client)
     finally:
         if order_id is not None:
-            client.cancel_swap_order(product_symbol=SWAP_SYMBOL, orderId=order_id)
+            client.cancel_swap_order(product_symbol=SWAP_SYMBOL, order_id=order_id)
 
 
 @pytest.mark.private
@@ -628,22 +628,22 @@ def test_swap_replace_order(client):
             product_symbol=SWAP_SYMBOL,
             quantity=float(quantity),
             price=float(price),
-            positionSide="LONG",
-            clientOrderId=f"dcex-{uuid.uuid4().hex}",
+            position_side="LONG",
+            client_order_id=f"dcex-{uuid.uuid4().hex}",
         )
         order_id = order["data"]["order"]["orderId"]
         new_price = _fmt(Decimal(price) * Decimal("0.99"))
         assert (
             client.replace_swap_order(
                 product_symbol=SWAP_SYMBOL,
-                orderId=str(order_id),
-                cancelReplaceMode="STOP_ON_FAILURE",
+                order_id=str(order_id),
+                cancel_replace_mode="STOP_ON_FAILURE",
                 type_="LIMIT",
                 side="BUY",
-                positionSide="LONG",
+                position_side="LONG",
                 quantity=float(quantity),
                 price=float(new_price),
-                timeInForce="PostOnly",
+                time_in_force="PostOnly",
             )
             is not None
         )
@@ -651,7 +651,7 @@ def test_swap_replace_order(client):
         client.cancel_swap_all_orders(product_symbol=SWAP_SYMBOL)
     finally:
         if order_id is not None:
-            client.cancel_swap_order(product_symbol=SWAP_SYMBOL, orderId=order_id)
+            client.cancel_swap_order(product_symbol=SWAP_SYMBOL, order_id=order_id)
 
 
 @pytest.mark.private
@@ -666,14 +666,14 @@ def test_swap_market_buy_and_close_position(client):
             client.place_swap_market_buy_order(
                 product_symbol=SWAP_SYMBOL,
                 quantity=float(quantity),
-                positionSide="LONG",
-                clientOrderId=f"dcex-{uuid.uuid4().hex}",
+                position_side="LONG",
+                client_order_id=f"dcex-{uuid.uuid4().hex}",
             )
             is not None
         )
         position_id = _wait_for_position(client, "LONG")
         assert position_id is not None
-        assert client.close_swap_position(positionId=position_id) is not None
+        assert client.close_swap_position(position_id=position_id) is not None
         time.sleep(2)
         assert not _positions(client)
     finally:
@@ -693,8 +693,8 @@ def test_swap_market_sell_and_close_all_positions(client):
             client.place_swap_market_sell_order(
                 product_symbol=SWAP_SYMBOL,
                 quantity=float(quantity),
-                positionSide="SHORT",
-                clientOrderId=f"dcex-{uuid.uuid4().hex}",
+                position_side="SHORT",
+                client_order_id=f"dcex-{uuid.uuid4().hex}",
             )
             is not None
         )
@@ -720,9 +720,9 @@ def test_swap_fillable_limit_buy_and_sell(client):
                 product_symbol=SWAP_SYMBOL,
                 quantity=float(quantity),
                 price=_swap_fillable_limit_buy_price(client),
-                positionSide="LONG",
-                timeInForce="GTC",
-                clientOrderId=f"dcex-{uuid.uuid4().hex}",
+                position_side="LONG",
+                time_in_force="GTC",
+                client_order_id=f"dcex-{uuid.uuid4().hex}",
             )
             is not None
         )
@@ -736,9 +736,9 @@ def test_swap_fillable_limit_buy_and_sell(client):
                 product_symbol=SWAP_SYMBOL,
                 quantity=float(quantity),
                 price=_swap_fillable_limit_sell_price(client),
-                positionSide="SHORT",
-                timeInForce="GTC",
-                clientOrderId=f"dcex-{uuid.uuid4().hex}",
+                position_side="SHORT",
+                time_in_force="GTC",
+                client_order_id=f"dcex-{uuid.uuid4().hex}",
             )
             is not None
         )
@@ -765,14 +765,14 @@ def test_swap_post_only_sell_order_lifecycle(client):
             product_symbol=SWAP_SYMBOL,
             quantity=float(quantity),
             price=float(price),
-            positionSide="SHORT",
-            clientOrderId=f"dcex-{uuid.uuid4().hex}",
+            position_side="SHORT",
+            client_order_id=f"dcex-{uuid.uuid4().hex}",
         )
         order_id = order["data"]["order"]["orderId"]
-        assert client.get_order_detail(product_symbol=SWAP_SYMBOL, orderId=order_id) is not None
+        assert client.get_order_detail(product_symbol=SWAP_SYMBOL, order_id=order_id) is not None
     finally:
         if order_id is not None:
-            client.cancel_swap_order(product_symbol=SWAP_SYMBOL, orderId=order_id)
+            client.cancel_swap_order(product_symbol=SWAP_SYMBOL, order_id=order_id)
 
 
 @pytest.mark.private
@@ -786,10 +786,10 @@ def test_spot_post_only_order_lifecycle(client):
             product_symbol=SPOT_SYMBOL,
             quantity=quantity,
             price=price,
-            clientOrderId=f"dcex-{uuid.uuid4().hex}",
+            client_order_id=f"dcex-{uuid.uuid4().hex}",
         )
         order_id = order["data"]["orderId"]
-        assert client.get_spot_order(product_symbol=SPOT_SYMBOL, orderId=order_id) is not None
+        assert client.get_spot_order(product_symbol=SPOT_SYMBOL, order_id=order_id) is not None
     finally:
         if order_id is not None:
             _cancel_spot_order(client, order_id)
@@ -811,7 +811,7 @@ def test_spot_market_buy_and_sell(client):
             client.place_spot_market_sell_order(
                 product_symbol=SPOT_SYMBOL,
                 quantity=sell_quantity,
-                clientOrderId=f"dcex{uuid.uuid4().hex[:16]}",
+                client_order_id=f"dcex{uuid.uuid4().hex[:16]}",
             )
             is not None
         )
@@ -836,8 +836,8 @@ def test_spot_fillable_limit_buy_and_sell(client):
                 product_symbol=SPOT_SYMBOL,
                 quantity=quantity,
                 price=price,
-                timeInForce="GTC",
-                clientOrderId=f"dcex{uuid.uuid4().hex[:16]}",
+                time_in_force="GTC",
+                client_order_id=f"dcex{uuid.uuid4().hex[:16]}",
             )
             is not None
         )
@@ -850,8 +850,8 @@ def test_spot_fillable_limit_buy_and_sell(client):
                 product_symbol=SPOT_SYMBOL,
                 quantity=sell_quantity,
                 price=_spot_fillable_limit_sell_price(client),
-                timeInForce="GTC",
-                clientOrderId=f"dcex{uuid.uuid4().hex[:16]}",
+                time_in_force="GTC",
+                client_order_id=f"dcex{uuid.uuid4().hex[:16]}",
             )
             is not None
         )
@@ -881,10 +881,10 @@ def test_spot_post_only_sell_order_lifecycle(client):
             product_symbol=SPOT_SYMBOL,
             quantity=sell_quantity,
             price=_spot_post_only_sell_price(client),
-            clientOrderId=f"dcex{uuid.uuid4().hex[:16]}",
+            client_order_id=f"dcex{uuid.uuid4().hex[:16]}",
         )
         order_id = order["data"]["orderId"]
-        assert client.get_spot_order(product_symbol=SPOT_SYMBOL, orderId=order_id) is not None
+        assert client.get_spot_order(product_symbol=SPOT_SYMBOL, order_id=order_id) is not None
     finally:
         if order_id is not None:
             _cancel_spot_order(client, order_id)
@@ -935,7 +935,7 @@ def test_spot_cancel_all_orders(client):
             product_symbol=SPOT_SYMBOL,
             quantity=quantity,
             price=price,
-            clientOrderId=f"dcex-{uuid.uuid4().hex}",
+            client_order_id=f"dcex-{uuid.uuid4().hex}",
         )
         order_id = order["data"]["orderId"]
         assert client.cancel_spot_open_orders(product_symbol=SPOT_SYMBOL) is not None
@@ -959,15 +959,15 @@ def test_trade_read_and_test_order_endpoints(client):
             product_symbol=SWAP_SYMBOL,
             type_="LIMIT",
             side="BUY",
-            positionSide="LONG",
+            position_side="LONG",
             quantity=float(quantity),
             price=float(price),
-            timeInForce="PostOnly",
-            clientOrderId=f"dcex-{uuid.uuid4().hex}",
+            time_in_force="PostOnly",
+            client_order_id=f"dcex-{uuid.uuid4().hex}",
         )
         is not None
     )
     assert client.get_order_history(product_symbol=SWAP_SYMBOL, limit=5) is not None
-    assert client.get_spot_order_history(product_symbol=SPOT_SYMBOL, pageSize=5) is not None
+    assert client.get_spot_order_history(product_symbol=SPOT_SYMBOL, page_size=5) is not None
     assert client.get_spot_my_trades(product_symbol=SPOT_SYMBOL, limit=5) is not None
     assert client.get_spot_commission_rate(product_symbol=SPOT_SYMBOL) is not None

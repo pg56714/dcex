@@ -233,20 +233,6 @@ class TradeHTTP(TradeHTTPTransfersHTTP, TradeHTTPBatchHTTP, TradeHTTPWithdrawals
         """Update leverage for a product."""
         return await self._native_private("update_leverage", self._native_params(**locals()))
 
-    async def update_isolate_margin(
-        self,
-        product_symbol: str,
-        isBuy: bool,
-        ntli: int,
-        vaultAddress: str | None = None,
-        expiresAfter: int | None = None,
-    ) -> dict[str, Any]:
-        """Update isolated margin for a product."""
-        return await self._native_private(
-            "update_isolate_margin",
-            self._native_params(**locals()),
-        )
-
     async def update_isolated_margin(
         self,
         product_symbol: str,

@@ -1466,7 +1466,7 @@
     }
   },
   {
-    "name": "margin_margin_manual_liquidation",
+    "name": "liquidate_margin_account",
     "market": "BinanceMarket::Spot",
     "symbol_market": "BinanceMarket::Spot",
     "method": "HttpMethod::Post",

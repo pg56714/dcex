@@ -147,7 +147,7 @@ WRAPPER_CASES = [
     ),
     _case(
         "private",
-        "transfer_same_master_account",
+        "transfer_l2_account",
         (),
         [
             ("to_account_index", "13"),
@@ -171,7 +171,7 @@ WRAPPER_CASES = [
     ),
     _case(
         "sign",
-        "sign_transfer_same_master_account",
+        "sign_transfer_l2_account",
         (),
         [
             ("to_account_index", "13"),
@@ -883,7 +883,7 @@ WRAPPER_CASES = [
         "/api/v1/sendTxBatch",
     ),
     _case("private", "create_order", ORDER_ARGS, ORDER_PARAMS, 14, nonce=5),
-    _case("private", "place_order", ORDER_ARGS, ORDER_PARAMS, 14, nonce=5),
+    _case("private", "create_order", ORDER_ARGS, ORDER_PARAMS, 14, nonce=5),
     _case("sign", "sign_create_order", ORDER_ARGS, ORDER_PARAMS, 14, nonce=5),
     _case(
         "private",
@@ -1001,7 +1001,6 @@ def _public_methods(cls: type) -> set[str]:
     } - NON_ENDPOINT_METHODS
 
 
-from dataclasses import replace
 
 COMPLETION_CASES = json.loads(
     (Path(__file__).parents[1] / "fixtures/lighter_request_cases.json").read_text(encoding="utf-8")
@@ -1010,15 +1009,6 @@ WRAPPER_CASES.extend(
     _case(x["kind"], x["name"], (), [tuple(p) for p in x["params"]], x["path"], **x["kwargs"])
     for x in COMPLETION_CASES
 )
-
-ALIASES = {
-    "transfer_same_master_account": "transfer_l2_account",
-    "sign_transfer_same_master_account": "sign_transfer_l2_account",
-}
-WRAPPER_CASES = tuple(WRAPPER_CASES) + tuple(
-    replace(case, method=ALIASES[case.method]) for case in WRAPPER_CASES if case.method in ALIASES
-)
-
 
 def test_every_lighter_wrapper_has_a_coverage_case() -> None:
     """New sync or async wrappers must be added to this offline coverage table."""
@@ -1049,9 +1039,7 @@ def test_sync_wrapper_forwards_native_name_and_params(case: WrapperCase) -> None
     mocks = _mocks(asynchronous=False)
     _install(client, mocks)
     getattr(client, case.method)(*case.args, **case.kwargs)
-    native_name = (
-        "create_order" if case.method == "place_order" else ALIASES.get(case.method, case.method)
-    )
+    native_name = case.method
     for kind, mock in mocks.items():
         if kind == case.kind:
             mock.assert_called_once_with(native_name, case.params)
@@ -1067,9 +1055,7 @@ async def test_async_wrapper_forwards_native_name_and_params(case: WrapperCase) 
     mocks = _mocks(asynchronous=True)
     _install(client, mocks)
     await getattr(client, case.method)(*case.args, **case.kwargs)
-    native_name = (
-        "create_order" if case.method == "place_order" else ALIASES.get(case.method, case.method)
-    )
+    native_name = case.method
     for kind, mock in mocks.items():
         if kind == case.kind:
             mock.assert_awaited_once_with(native_name, case.params)
@@ -1093,9 +1079,7 @@ def _signing_native(base_url: str) -> Any:  # noqa: ANN401
 @pytest.mark.parametrize("case", WRAPPER_CASES, ids=lambda case: case.id)
 def test_wrapper_params_reach_official_route(case: WrapperCase) -> None:
     """The Rust client accepts the wrapper params and emits the official route."""
-    native_name = (
-        "create_order" if case.method == "place_order" else ALIASES.get(case.method, case.method)
-    )
+    native_name = case.method
     if case.kind == "sign":
         tx_type, tx_info, tx_hash, error = _signing_native("http://127.0.0.1:1").sign_request(
             native_name, case.params

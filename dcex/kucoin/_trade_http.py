@@ -2864,8 +2864,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPWithdrawalsHTTP, TradeHTTPTransfers
         """
         return self._native_private("get_otc_loan_accounts", self._native_params())
 
-    get_accounts = get_otc_loan_accounts
-
     def get_discount_rate_configs(self) -> dict[str, Any]:
         """
         GET /api/v1/otc-loan/discount-rate-configs.

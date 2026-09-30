@@ -3315,7 +3315,7 @@ async fn remaining_routes_preserve_parameters_and_authentication() {
             "{}",
         ),
         (
-            "uta_small_assets_trade",
+            "convert_uta_small_assets",
             "POST",
             "/api/v3/convert/small-assets-trade",
             false,
@@ -3323,7 +3323,7 @@ async fn remaining_routes_preserve_parameters_and_authentication() {
             "{\"fromCoinList\":[\"ETH\"]}",
         ),
         (
-            "uta_delete_sub",
+            "delete_uta_subaccount",
             "POST",
             "/api/v3/user/delete-sub",
             false,
@@ -3476,7 +3476,7 @@ async fn remaining_routes_preserve_parameters_and_authentication() {
             "{\"fromCoin\":\"BTC\",\"toCoin\":\"USDT\",\"fromCoinSize\":\"0.1\"}",
         ),
         (
-            "classic_trade",
+            "convert_classic_asset",
             "POST",
             "/api/v2/convert/trade",
             false,

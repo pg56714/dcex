@@ -2,16 +2,12 @@
 
 from typing import Any
 
-from ..._keyword_aliases import legacy_keywords
 from ._http_manager import HTTPManager
 
 
 class AccountHTTPTransfersHTTP(HTTPManager):
     """Transfers methods moved from AccountHTTP."""
 
-    @legacy_keywords(
-        {"fromAccount": "from_account", "toAccount": "to_account", "recvWindow": "recv_window"}
-    )
     async def get_transferable_coins(
         self,
         from_account: str,
@@ -28,9 +24,6 @@ class AccountHTTPTransfersHTTP(HTTPManager):
             ),
         )
 
-    @legacy_keywords(
-        {"fromAccount": "from_account", "toAccount": "to_account", "recvWindow": "recv_window"}
-    )
     async def asset_transfer(
         self,
         from_account: str,
@@ -51,19 +44,6 @@ class AccountHTTPTransfersHTTP(HTTPManager):
             ),
         )
 
-    @legacy_keywords(
-        {
-            "fromAccount": "from_account",
-            "toAccount": "to_account",
-            "transferId": "transfer_id",
-            "tranId": "tran_id",
-            "startTime": "start_time",
-            "endTime": "end_time",
-            "pageIndex": "page_index",
-            "pageSize": "page_size",
-            "recvWindow": "recv_window",
-        }
-    )
     async def get_asset_transfer_records(
         self,
         from_account: str | None = None,
@@ -92,16 +72,6 @@ class AccountHTTPTransfersHTTP(HTTPManager):
             ),
         )
 
-    @legacy_keywords(
-        {
-            "tranId": "tran_id",
-            "startTime": "start_time",
-            "endTime": "end_time",
-            "pageId": "page_id",
-            "pagingSize": "paging_size",
-            "recvWindow": "recv_window",
-        }
-    )
     async def get_subaccount_transfer_history(
         self,
         uid: int | str,
@@ -128,15 +98,6 @@ class AccountHTTPTransfersHTTP(HTTPManager):
             ),
         )
 
-    @legacy_keywords(
-        {
-            "fromUid": "from_uid",
-            "fromAccountType": "from_account_type",
-            "toUid": "to_uid",
-            "toAccountType": "to_account_type",
-            "recvWindow": "recv_window",
-        }
-    )
     async def get_subaccount_transferable_amounts(
         self,
         from_uid: int | str,
@@ -157,19 +118,6 @@ class AccountHTTPTransfersHTTP(HTTPManager):
             ),
         )
 
-    @legacy_keywords(
-        {
-            "assetName": "asset_name",
-            "transferAmount": "transfer_amount",
-            "fromUid": "from_uid",
-            "fromType": "from_type",
-            "fromAccountType": "from_account_type",
-            "toUid": "to_uid",
-            "toType": "to_type",
-            "toAccountType": "to_account_type",
-            "recvWindow": "recv_window",
-        }
-    )
     async def transfer_subaccount_assets(
         self,
         asset_name: str,

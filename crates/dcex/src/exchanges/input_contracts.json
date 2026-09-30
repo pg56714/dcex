@@ -3967,6 +3967,14 @@
           "strategyType": {
             "type": "integer",
             "description": "For place spot sor order, selects the strategy category used by the endpoint."
+          },
+          "recvWindow": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "recv_window": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -4383,64 +4391,6 @@
           }
         }
       },
-      "spot_sor_order": {
-        "type": "object",
-        "properties": {
-          "icebergQty": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "iceberg_qty": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "price": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "quantity": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "recvWindow": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "recv_window": {
-            "type": "string",
-            "format": "decimal"
-          }
-        }
-      },
-      "spot_sor_order_test": {
-        "type": "object",
-        "properties": {
-          "icebergQty": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "iceberg_qty": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "price": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "quantity": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "recvWindow": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "recv_window": {
-            "type": "string",
-            "format": "decimal"
-          }
-        }
-      },
       "submit_broker_deposit_questionnaire": {
         "type": "object",
         "properties": {
@@ -4665,6 +4615,14 @@
           "strategyType": {
             "type": "integer",
             "description": "For test spot sor order, selects the strategy category used by the endpoint."
+          },
+          "recvWindow": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "recv_window": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -10013,54 +9971,6 @@
           }
         }
       },
-      "classic_earn_elite_redeem": {
-        "type": "object",
-        "properties": {
-          "amount": {
-            "type": "string",
-            "format": "decimal"
-          }
-        }
-      },
-      "classic_earn_elite_subscribe": {
-        "type": "object",
-        "properties": {
-          "amount": {
-            "type": "string",
-            "format": "decimal"
-          }
-        }
-      },
-      "classic_earn_loan_borrow": {
-        "type": "object",
-        "properties": {
-          "loanAmount": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "loan_amount": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "pledgeAmount": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "pledge_amount": {
-            "type": "string",
-            "format": "decimal"
-          }
-        }
-      },
-      "classic_earn_loan_repay": {
-        "type": "object",
-        "properties": {
-          "amount": {
-            "type": "string",
-            "format": "decimal"
-          }
-        }
-      },
       "classic_earn_loan_revise_pledge": {
         "type": "object",
         "properties": {
@@ -10074,35 +9984,6 @@
         "type": "object",
         "properties": {
           "amount": {
-            "type": "string",
-            "format": "decimal"
-          }
-        }
-      },
-      "classic_trade": {
-        "type": "object",
-        "properties": {
-          "cnvtPrice": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "cnvt_price": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "fromCoinSize": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "from_coin_size": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "toCoinSize": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "to_coin_size": {
             "type": "string",
             "format": "decimal"
           }
@@ -13984,10 +13865,6 @@
         "type": "object",
         "properties": {}
       },
-      "classic_copytrading_future_copytrade_trader_trader_order_close_positions": {
-        "type": "object",
-        "properties": {}
-      },
       "classic_copytrading_future_copytrade_trader_trader_order_total_detail": {
         "type": "object",
         "properties": {}
@@ -14539,19 +14416,6 @@
           "page_size": {
             "type": "string",
             "description": "classic_broker_subaccount_get_broker_trade_volume/page_size: limits the number of result records returned by pagination."
-          }
-        }
-      },
-      "classic_copytrading_future_copytrade_follower_close_positions": {
-        "type": "object",
-        "properties": {
-          "margin_coin": {
-            "type": "string",
-            "description": "classic_copytrading_future_copytrade_follower_close_positions/margin_coin: selects the settlement currency for the margin account."
-          },
-          "margin_mode": {
-            "type": "string",
-            "description": "selects cross or isolated margin using the documented integer enumeration."
           }
         }
       },
@@ -17835,10 +17699,6 @@
         "type": "object",
         "properties": {}
       },
-      "get_orders_by_external_id": {
-        "type": "object",
-        "properties": {}
-      },
       "place_rfq_order": {
         "type": "object",
         "properties": {
@@ -21058,55 +20918,6 @@
           }
         }
       },
-      "post_v1_copy_trade_futures_st_orders": {
-        "type": "object",
-        "properties": {
-          "price": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "size": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "triggerStopDownPrice": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "triggerStopUpPrice": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "trigger_stop_down_price": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "trigger_stop_up_price": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "leverage": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "stop_price_type": {
-            "type": "string",
-            "description": "post_v1_copy_trade_futures_st_orders/stop_price_type: selects the documented mode, unit, or reference used by this operation."
-          },
-          "margin_mode": {
-            "type": "string",
-            "description": "selects cross or isolated margin using the documented integer enumeration."
-          },
-          "stopPriceType": {
-            "type": "string",
-            "description": "post_v1_copy_trade_futures_st_orders/stopPriceType: selects the documented mode, unit, or reference used by this operation."
-          },
-          "marginMode": {
-            "type": "string",
-            "description": "selects cross or isolated margin using the documented integer enumeration."
-          }
-        }
-      },
       "post_v2_copy_trade_get_cross_mode_margin_requirement": {
         "type": "object",
         "properties": {
@@ -23638,41 +23449,6 @@
           "asset_margin_mode": {
             "type": "integer",
             "description": "For sign update account asset config, selects the asset margin mode using the documented integer enumeration."
-          }
-        }
-      },
-      "transfer_same_master_account": {
-        "type": "object",
-        "properties": {
-          "tx_info": {
-            "type": "object",
-            "properties": {
-              "Amount": {
-                "format": "decimal"
-              },
-              "USDCFee": {
-                "format": "decimal"
-              }
-            }
-          }
-        }
-      },
-      "place_order": {
-        "type": "object",
-        "properties": {
-          "tx_info": {
-            "type": "object",
-            "properties": {
-              "BaseAmount": {
-                "format": "decimal"
-              },
-              "Price": {
-                "format": "decimal"
-              },
-              "TriggerPrice": {
-                "format": "decimal"
-              }
-            }
           }
         }
       }

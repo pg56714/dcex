@@ -2,8 +2,6 @@
 
 from typing import Any
 
-from dcex._keyword_aliases import legacy_keywords
-
 from ._http_manager import HTTPManager
 from ._transfers_http import AccountHTTPTransfersHTTP
 
@@ -11,7 +9,6 @@ from ._transfers_http import AccountHTTPTransfersHTTP
 class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
     """HTTP client for BingX account-related API endpoints backed by Rust."""
 
-    @legacy_keywords({"recvWindow": "recv_window"})
     def get_account_balance(self, recv_window: int | None = None) -> dict[str, Any]:
         """Get account balance."""
         return self._native_private(
@@ -19,7 +16,6 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
             self._native_params(recvWindow=recv_window),
         )
 
-    @legacy_keywords({"recvWindow": "recv_window"})
     def get_swap_account_balance(self, recv_window: int | None = None) -> dict[str, Any]:
         """Get swap account balance."""
         return self._native_private(
@@ -27,14 +23,12 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
             self._native_params(recvWindow=recv_window),
         )
 
-    @legacy_keywords({"recvWindow": "recv_window"})
     def get_swap_commission_rate(self, recv_window: int | None = None) -> dict[str, Any]:
         """Get current maker/taker fee rates for perpetuals."""
         return self._native_private(
             "get_swap_commission_rate", self._native_params(recvWindow=recv_window)
         )
 
-    @legacy_keywords({"recvWindow": "recv_window"})
     def get_spot_account_balance(
         self,
         recv_window: int | None = None,
@@ -45,7 +39,6 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
             self._native_params(recvWindow=recv_window),
         )
 
-    @legacy_keywords({"recvWindow": "recv_window"})
     def get_fund_account_balance(
         self,
         asset: str | None = None,
@@ -57,7 +50,6 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
             self._native_params(asset=asset, recvWindow=recv_window),
         )
 
-    @legacy_keywords({"accountType": "account_type", "recvWindow": "recv_window"})
     def get_all_account_balance(
         self,
         account_type: str | None = None,
@@ -69,7 +61,6 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
             self._native_params(accountType=account_type, recvWindow=recv_window),
         )
 
-    @legacy_keywords({"recvWindow": "recv_window"})
     def get_account_uid(
         self,
         recv_window: int | None = None,
@@ -80,7 +71,6 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
             self._native_params(recvWindow=recv_window),
         )
 
-    @legacy_keywords({"apiKey": "api_key", "recvWindow": "recv_window"})
     def get_api_key_info(
         self,
         uid: int | str,
@@ -93,14 +83,6 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
             self._native_params(uid=uid, apiKey=api_key, recvWindow=recv_window),
         )
 
-    @legacy_keywords(
-        {
-            "subUid": "sub_uid",
-            "subAccountString": "sub_account_string",
-            "isFeeze": "is_feeze",
-            "recvWindow": "recv_window",
-        }
-    )
     def get_subaccounts(
         self,
         page: int = 1,
@@ -123,7 +105,6 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
             ),
         )
 
-    @legacy_keywords({"subUid": "sub_uid", "recvWindow": "recv_window"})
     def get_subaccount_assets(
         self,
         sub_uid: int | str,
@@ -135,15 +116,6 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
             self._native_params(subUid=sub_uid, recvWindow=recv_window),
         )
 
-    @legacy_keywords(
-        {
-            "pageIndex": "page_index",
-            "pageSize": "page_size",
-            "subUid": "sub_uid",
-            "accountType": "account_type",
-            "recvWindow": "recv_window",
-        }
-    )
     def get_subaccount_all_account_balance(
         self,
         page_index: int = 1,
@@ -164,7 +136,6 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
             ),
         )
 
-    @legacy_keywords({"recvWindow": "recv_window"})
     def get_open_positions(
         self,
         product_symbol: str | None = None,
@@ -176,7 +147,6 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
             self._native_params(product_symbol=product_symbol, recvWindow=recv_window),
         )
 
-    @legacy_keywords({"recvWindow": "recv_window"})
     def get_fund_flow(
         self,
         product_symbol: str | None = None,

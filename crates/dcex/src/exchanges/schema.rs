@@ -20,10 +20,7 @@ pub(crate) fn fund_domain(name: &str) -> Option<FundDomain> {
             .any(|word| name.contains(word))
         || matches!(
             name,
-            "transfer_l2_account"
-                | "transfer_same_master_account"
-                | "transfer_master_internal"
-                | "transfer_sub_account_internal"
+            "transfer_l2_account" | "transfer_master_internal" | "transfer_sub_account_internal"
         )
     {
         Some(FundDomain::Withdrawals)

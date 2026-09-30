@@ -1,6 +1,6 @@
 [
   {
-    "name": "get_c2_c_trade_history",
+    "name": "get_c2c_trade_history",
     "method": "GET",
     "path": "/sapi/v1/c2c/orderMatch/listUserOrderHistory",
     "public": false,

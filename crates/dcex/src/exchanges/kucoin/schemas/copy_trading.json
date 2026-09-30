@@ -684,7 +684,7 @@
     }
   },
   {
-    "name": "post_v1_copy_trade_futures_st_orders",
+    "name": "place_copy_futures_stop_order",
     "method": "POST",
     "path": "/api/v1/copy-trade/futures/st-orders",
     "market": "futures",

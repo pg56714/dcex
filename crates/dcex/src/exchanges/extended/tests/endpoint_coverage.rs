@@ -476,7 +476,7 @@ fn private_order_routes_match_official_paths() {
             "/api/v1/user/orders/42",
         ),
         private(
-            "get_orders_by_external_id",
+            "get_order_by_external_id",
             &[("external_id", "cid-1")],
             "GET",
             "/api/v1/user/orders/external/cid-1",
@@ -717,7 +717,7 @@ fn unsafe_requests_are_rejected_before_any_request() {
     // Path segments cannot be injected.
     assert_rejected_offline(
         Kind::Private,
-        "get_orders_by_external_id",
+        "get_order_by_external_id",
         pairs(&[("externalId", "../x")]),
     );
     assert_rejected_offline(

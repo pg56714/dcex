@@ -105,7 +105,6 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_asset_logos(),
     ];
     private [
-        exchange_futures_assets(),
         trigger_futures_asset_exchange(),
         get_sub_accounts(),
         get_direct_announcements(),

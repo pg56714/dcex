@@ -3,7 +3,6 @@
 from json import dumps
 from typing import Any
 
-from ..._keyword_aliases import legacy_keywords
 from ..._operation_guards import require_confirmation, require_scope
 from ._batch_http import TradeHTTPBatchHTTP
 from ._http_manager import HTTPManager
@@ -14,21 +13,6 @@ from ._withdrawals_http import TradeHTTPWithdrawalsHTTP
 class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawalsHTTP, HTTPManager):
     """Async HTTP client for Bitget private trading operations."""
 
-    @legacy_keywords(
-        {
-            "orderType": "order_type",
-            "clientOid": "client_oid",
-            "triggerPrice": "trigger_price",
-            "tpslType": "tpsl_type",
-            "requestTime": "request_time",
-            "receiveWindow": "receive_window",
-            "stpMode": "stp_mode",
-            "presetTakeProfitPrice": "preset_take_profit_price",
-            "executeTakeProfitPrice": "execute_take_profit_price",
-            "presetStopLossPrice": "preset_stop_loss_price",
-            "executeStopLossPrice": "execute_stop_loss_price",
-        }
-    )
     async def place_spot_order(
         self,
         product_symbol: str,
@@ -71,7 +55,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords({"clientOid": "client_oid"})
     async def place_spot_market_order(
         self,
         product_symbol: str,
@@ -90,7 +73,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords({"clientOid": "client_oid"})
     async def place_spot_market_buy_order(
         self,
         product_symbol: str,
@@ -103,7 +85,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             self._native_params(product_symbol=product_symbol, size=size, clientOid=client_oid),
         )
 
-    @legacy_keywords({"clientOid": "client_oid"})
     async def place_spot_market_sell_order(
         self,
         product_symbol: str,
@@ -116,7 +97,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             self._native_params(product_symbol=product_symbol, size=size, clientOid=client_oid),
         )
 
-    @legacy_keywords({"clientOid": "client_oid"})
     async def place_spot_limit_order(
         self,
         product_symbol: str,
@@ -139,7 +119,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords({"clientOid": "client_oid"})
     async def place_spot_limit_buy_order(
         self,
         product_symbol: str,
@@ -158,7 +137,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords({"clientOid": "client_oid"})
     async def place_spot_limit_sell_order(
         self,
         product_symbol: str,
@@ -177,7 +155,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords({"clientOid": "client_oid"})
     async def place_spot_post_only_limit_order(
         self,
         product_symbol: str,
@@ -198,7 +175,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords({"clientOid": "client_oid"})
     async def place_spot_post_only_limit_buy_order(
         self,
         product_symbol: str,
@@ -217,7 +193,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords({"clientOid": "client_oid"})
     async def place_spot_post_only_limit_sell_order(
         self,
         product_symbol: str,
@@ -236,7 +211,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords({"orderId": "order_id", "clientOid": "client_oid", "tpslType": "tpsl_type"})
     async def cancel_spot_order(
         self,
         product_symbol: str,
@@ -255,14 +229,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords(
-        {
-            "orderId": "order_id",
-            "clientOid": "client_oid",
-            "requestTime": "request_time",
-            "receiveWindow": "receive_window",
-        }
-    )
     async def get_spot_order(
         self,
         order_id: str | None = None,
@@ -281,17 +247,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords(
-        {
-            "idLessThan": "id_less_than",
-            "startTime": "start_time",
-            "endTime": "end_time",
-            "orderId": "order_id",
-            "tpslType": "tpsl_type",
-            "requestTime": "request_time",
-            "receiveWindow": "receive_window",
-        }
-    )
     async def get_spot_open_orders(
         self,
         product_symbol: str | None = None,
@@ -320,17 +275,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords(
-        {
-            "idLessThan": "id_less_than",
-            "startTime": "start_time",
-            "endTime": "end_time",
-            "orderId": "order_id",
-            "tpslType": "tpsl_type",
-            "requestTime": "request_time",
-            "receiveWindow": "receive_window",
-        }
-    )
     async def get_spot_history_orders(
         self,
         product_symbol: str | None = None,
@@ -359,14 +303,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords(
-        {
-            "orderId": "order_id",
-            "idLessThan": "id_less_than",
-            "startTime": "start_time",
-            "endTime": "end_time",
-        }
-    )
     async def get_spot_fills(
         self,
         product_symbol: str | None = None,
@@ -389,25 +325,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords(
-        {
-            "orderType": "order_type",
-            "timeInForce": "time_in_force",
-            "posSide": "pos_side",
-            "clientOid": "client_oid",
-            "reduceOnly": "reduce_only",
-            "stpMode": "stp_mode",
-            "marginMode": "margin_mode",
-            "tpTriggerBy": "tp_trigger_by",
-            "slTriggerBy": "sl_trigger_by",
-            "takeProfit": "take_profit",
-            "stopLoss": "stop_loss",
-            "tpOrderType": "tp_order_type",
-            "slOrderType": "sl_order_type",
-            "tpLimitPrice": "tp_limit_price",
-            "slLimitPrice": "sl_limit_price",
-        }
-    )
     async def place_uta_order(
         self,
         category: str,
@@ -458,7 +375,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords({"orderType": "order_type", "clientOid": "client_oid"})
     async def place_reality_order(
         self,
         product_symbol: str,
@@ -483,7 +399,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords({"orderId": "order_id", "clientOid": "client_oid"})
     async def cancel_uta_order(
         self,
         order_id: str | None = None,
@@ -496,7 +411,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             self._native_params(orderId=order_id, clientOid=client_oid, category=category),
         )
 
-    @legacy_keywords({"orderId": "order_id", "clientOid": "client_oid"})
     async def cancel_reality_order(
         self,
         product_symbol: str,
@@ -515,7 +429,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords({"orderId": "order_id", "clientOid": "client_oid"})
     async def get_uta_order(
         self,
         order_id: str | None = None,
@@ -527,7 +440,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             self._native_params(orderId=order_id, clientOid=client_oid),
         )
 
-    @legacy_keywords({"startTime": "start_time", "endTime": "end_time"})
     async def get_uta_open_orders(
         self,
         category: str | None = None,
@@ -552,7 +464,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords({"startTime": "start_time", "endTime": "end_time"})
     async def get_uta_history_orders(
         self,
         category: str,
@@ -577,7 +488,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords({"orderId": "order_id", "startTime": "start_time", "endTime": "end_time"})
     async def get_uta_fills(
         self,
         category: str | None = None,
@@ -600,7 +510,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords({"posSide": "pos_side"})
     async def get_uta_positions(
         self,
         category: str,
@@ -619,22 +528,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords(
-        {
-            "orderType": "order_type",
-            "marginMode": "margin_mode",
-            "marginCoin": "margin_coin",
-            "productType": "product_type",
-            "tradeSide": "trade_side",
-            "clientOid": "client_oid",
-            "reduceOnly": "reduce_only",
-            "presetStopSurplusPrice": "preset_stop_surplus_price",
-            "presetStopLossPrice": "preset_stop_loss_price",
-            "presetStopSurplusExecutePrice": "preset_stop_surplus_execute_price",
-            "presetStopLossExecutePrice": "preset_stop_loss_execute_price",
-            "stpMode": "stp_mode",
-        }
-    )
     async def place_futures_order(
         self,
         product_symbol: str,
@@ -679,16 +572,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords(
-        {
-            "marginMode": "margin_mode",
-            "marginCoin": "margin_coin",
-            "productType": "product_type",
-            "tradeSide": "trade_side",
-            "clientOid": "client_oid",
-            "reduceOnly": "reduce_only",
-        }
-    )
     async def place_futures_market_order(
         self,
         product_symbol: str,
@@ -728,7 +611,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             self._native_params(product_symbol=product_symbol, size=size),
         )
 
-    @legacy_keywords({"reduceOnly": "reduce_only"})
     async def place_futures_market_sell_order(
         self,
         product_symbol: str,
@@ -745,7 +627,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords({"clientOid": "client_oid"})
     async def place_futures_limit_order(
         self,
         product_symbol: str,
@@ -768,7 +649,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords({"clientOid": "client_oid"})
     async def place_futures_limit_buy_order(
         self,
         product_symbol: str,
@@ -787,7 +667,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords({"clientOid": "client_oid"})
     async def place_futures_limit_sell_order(
         self,
         product_symbol: str,
@@ -806,7 +685,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords({"clientOid": "client_oid"})
     async def place_futures_post_only_limit_order(
         self,
         product_symbol: str,
@@ -827,7 +705,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords({"clientOid": "client_oid"})
     async def place_futures_post_only_limit_buy_order(
         self,
         product_symbol: str,
@@ -846,7 +723,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords({"clientOid": "client_oid"})
     async def place_futures_post_only_limit_sell_order(
         self,
         product_symbol: str,
@@ -865,14 +741,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords(
-        {
-            "orderId": "order_id",
-            "clientOid": "client_oid",
-            "productType": "product_type",
-            "marginCoin": "margin_coin",
-        }
-    )
     async def cancel_futures_order(
         self,
         product_symbol: str,
@@ -893,9 +761,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords(
-        {"orderId": "order_id", "clientOid": "client_oid", "productType": "product_type"}
-    )
     async def get_futures_order(
         self,
         product_symbol: str,
@@ -914,16 +779,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords(
-        {
-            "productType": "product_type",
-            "orderId": "order_id",
-            "clientOid": "client_oid",
-            "idLessThan": "id_less_than",
-            "startTime": "start_time",
-            "endTime": "end_time",
-        }
-    )
     async def get_futures_open_orders(
         self,
         product_symbol: str | None = None,
@@ -952,17 +807,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords(
-        {
-            "productType": "product_type",
-            "startTime": "start_time",
-            "endTime": "end_time",
-            "idLessThan": "id_less_than",
-            "orderId": "order_id",
-            "clientOid": "client_oid",
-            "orderSource": "order_source",
-        }
-    )
     async def get_futures_history_orders(
         self,
         product_symbol: str | None = None,
@@ -991,15 +835,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords(
-        {
-            "orderId": "order_id",
-            "productType": "product_type",
-            "idLessThan": "id_less_than",
-            "startTime": "start_time",
-            "endTime": "end_time",
-        }
-    )
     async def get_futures_fills(
         self,
         product_symbol: str | None = None,
@@ -1033,7 +868,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             self._native_params(category=category, product_symbol=product_symbol, **params),
         )
 
-    @legacy_keywords({"orderId": "order_id", "clientOid": "client_oid"})
     async def modify_uta_strategy_order(
         self,
         order_id: str,
@@ -1047,7 +881,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             self._native_params(qty=qty, orderId=order_id, clientOid=client_oid, **params),
         )
 
-    @legacy_keywords({"orderId": "order_id", "clientOid": "client_oid"})
     async def cancel_uta_strategy_order(
         self,
         order_id: str,
@@ -1073,7 +906,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords({"startTime": "start_time", "endTime": "end_time"})
     async def get_uta_history_strategy_orders(
         self,
         category: str,
@@ -3157,8 +2989,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             "convert_uta_small_assets", self._native_params(fromCoinList=from_coin_list)
         )
 
-    uta_small_assets_trade = convert_uta_small_assets
-
     async def delete_uta_subaccount(self, sub_uid: str, *, confirm: bool = False) -> dict[str, Any]:
         """
         Call ``POST /api/v3/user/delete-sub``.
@@ -3169,8 +2999,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         return await self._native_private(
             "delete_uta_subaccount", self._native_params(confirm=confirm, subUid=sub_uid)
         )
-
-    uta_delete_sub = delete_uta_subaccount
 
     async def uta_freeze_sub(self, sub_uid: str, operation: str) -> dict[str, Any]:
         """Call ``POST /api/v3/user/freeze-sub``."""
@@ -3354,8 +3182,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    classic_trade = convert_classic_asset
-
     async def get_classic_convert_record(
         self,
         start_time: int,
@@ -3445,8 +3271,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    classic_earn_elite_subscribe = subscribe_classic_elite
-
     async def get_classic_earn_elite_subscribe_result(self, *, order_id: str) -> dict[str, Any]:
         """
         GET /api/v2/earn/elite/subscribe-result. Native symbols and decimal strings.
@@ -3495,8 +3319,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
                 coin=coin,
             ),
         )
-
-    classic_earn_elite_redeem = redeem_classic_elite
 
     async def get_classic_earn_elite_redeem_info(self, *, product_id: str) -> dict[str, Any]:
         """
@@ -3562,8 +3384,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    classic_earn_loan_borrow = borrow_classic_earn_loan
-
     async def get_classic_earn_loan_ongoing_orders(
         self,
         *,
@@ -3600,8 +3420,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
                 orderId=order_id, repayAll=repay_all, amount=amount, repayUnlock=repay_unlock
             ),
         )
-
-    classic_earn_loan_repay = repay_classic_earn_loan
 
     async def get_classic_earn_loan_repay_history(
         self,

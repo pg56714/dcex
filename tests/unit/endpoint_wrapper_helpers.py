@@ -868,11 +868,11 @@ def _case_kwargs(case: EndpointCase, method: Any) -> dict[str, Any]:
         "cancel_uta_order",
         "get_uta_order",
     }:
-        kwargs["orderId"] = "test-order-id"
+        kwargs["order_id"] = "test-order-id"
     if case.exchange == "bitget" and case.method_name == "set_futures_leverage":
         kwargs["leverage"] = "5"
     if case.exchange == "bitget" and case.method_name == "borrow_crypto_loan":
-        kwargs["loanAmount"] = "1"
+        kwargs["loan_amount"] = "1"
     if case.exchange == "backpack" and case.method_name in {"cancel_order", "get_open_order"}:
         kwargs["orderId"] = "test-order-id"
     if case.exchange == "backpack" and case.method_name in {

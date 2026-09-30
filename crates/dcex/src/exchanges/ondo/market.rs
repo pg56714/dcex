@@ -106,7 +106,7 @@ impl OndoClient {
                 params.ensure_allowed(&[])?;
                 self.public_get(STATUS, Vec::new()).await
             }
-            "hello" | "ping" => {
+            "hello" => {
                 params.ensure_allowed(&[])?;
                 self.public_get(HELLO, Vec::new()).await
             }

@@ -1332,7 +1332,7 @@ fn additional_account_routes() {
             &[],
         ),
         private(
-            "exchange_futures_assets",
+            "trigger_futures_asset_exchange",
             &[("confirm", "true")],
             "POST",
             "/fapi/v3/assetExchange",

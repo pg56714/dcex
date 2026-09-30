@@ -72,7 +72,7 @@ const PUBLIC_CASES: &[Case] = &[
         "GET /api/v3/currencies",
     ),
     public(
-        "get_uta_oe_scurrency",
+        "get_uta_oes_currency",
         Host::Spot,
         &[],
         "GET /api/ua/v2/oes/currency",
@@ -556,7 +556,7 @@ const PRIVATE_CASES: &[Case] = &[
         "GET /api/v1/otc-loan/loan",
     ),
     private(
-        "get_accounts",
+        "get_otc_loan_accounts",
         Host::Spot,
         &[],
         "GET /api/v1/otc-loan/accounts",

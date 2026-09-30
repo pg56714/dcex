@@ -102,7 +102,7 @@ class GeneratedCopyTradingHTTP(TradeHTTP):
             ),
         )
 
-    async def post_v1_copy_trade_futures_st_orders(
+    async def place_copy_futures_stop_order(
         self,
         *,
         client_oid: str,
@@ -128,7 +128,7 @@ class GeneratedCopyTradingHTTP(TradeHTTP):
         Source: https://www.kucoin.com/docs-new/rest/copy-trading/add-take-profit-and-stop-loss-order
         """
         return await self._native_private(
-            "post_v1_copy_trade_futures_st_orders",
+            "place_copy_futures_stop_order",
             self._native_params(
                 clientOid=client_oid,
                 side=side,

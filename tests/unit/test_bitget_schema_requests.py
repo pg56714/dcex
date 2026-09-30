@@ -11,7 +11,7 @@ from urllib.parse import parse_qsl, urlsplit
 
 import pytest
 
-from scripts.build_bitget_wrappers import snake
+from scripts.build_bitget_wrappers import operation_name, snake
 from scripts.wrapper_codegen import load_schemas
 from tests.unit.endpoint_wrapper_helpers import generated_method_members
 from tests.unit.native_http_helpers import _http_server
@@ -26,7 +26,7 @@ OPERATIONS = [
             encoding="utf-8"
         )
     )["operations"]
-    if snake(op["operationId"]) in NAMES
+    if operation_name(op) in NAMES
 ]
 
 
@@ -55,7 +55,7 @@ def case(op):
     body = sample(content[0]["schema"]) if content else None
     values = {**query, **(body or {})}
     kwargs = {snake(key): value for key, value in values.items()}
-    name = snake(op["operationId"])
+    name = operation_name(op)
     signature = inspect.signature(
         getattr(importlib.import_module("dcex.bitget.client").Client, name)
     )

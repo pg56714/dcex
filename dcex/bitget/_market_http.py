@@ -2,7 +2,6 @@
 
 from typing import Any
 
-from dcex._keyword_aliases import legacy_keywords
 from dcex._schema_codec import normalize_params
 
 from .._native_http import request_native_json
@@ -78,7 +77,6 @@ class MarketHTTP(HTTPManager):
             ),
         )
 
-    @legacy_keywords({"startTime": "start_time", "endTime": "end_time"})
     def get_spot_kline(
         self,
         product_symbol: str,
@@ -99,7 +97,6 @@ class MarketHTTP(HTTPManager):
             ),
         )
 
-    @legacy_keywords({"endTime": "end_time"})
     def get_spot_history_kline(
         self,
         product_symbol: str,
@@ -129,9 +126,6 @@ class MarketHTTP(HTTPManager):
             self._native_params(product_symbol=product_symbol, limit=limit),
         )
 
-    @legacy_keywords(
-        {"idLessThan": "id_less_than", "startTime": "start_time", "endTime": "end_time"}
-    )
     def get_spot_market_trades(
         self,
         product_symbol: str,
@@ -152,7 +146,6 @@ class MarketHTTP(HTTPManager):
             ),
         )
 
-    @legacy_keywords({"productType": "product_type"})
     def get_futures_contracts(
         self,
         product_symbol: str | None = None,
@@ -167,7 +160,6 @@ class MarketHTTP(HTTPManager):
             ),
         )
 
-    @legacy_keywords({"productType": "product_type"})
     def get_futures_ticker(
         self,
         product_symbol: str,
@@ -182,7 +174,6 @@ class MarketHTTP(HTTPManager):
             ),
         )
 
-    @legacy_keywords({"productType": "product_type"})
     def get_futures_tickers(self, product_type: str = "USDT-FUTURES") -> dict[str, Any]:
         """Retrieve Bitget futures tickers."""
         return self._native_public(
@@ -190,7 +181,6 @@ class MarketHTTP(HTTPManager):
             self._native_params(productType=product_type),
         )
 
-    @legacy_keywords({"productType": "product_type"})
     def get_futures_orderbook(
         self,
         product_symbol: str,
@@ -209,14 +199,6 @@ class MarketHTTP(HTTPManager):
             ),
         )
 
-    @legacy_keywords(
-        {
-            "productType": "product_type",
-            "startTime": "start_time",
-            "endTime": "end_time",
-            "kLineType": "k_line_type",
-        }
-    )
     def get_futures_kline(
         self,
         product_symbol: str,
@@ -241,9 +223,6 @@ class MarketHTTP(HTTPManager):
             ),
         )
 
-    @legacy_keywords(
-        {"productType": "product_type", "startTime": "start_time", "endTime": "end_time"}
-    )
     def get_futures_history_kline(
         self,
         product_symbol: str,
@@ -266,7 +245,6 @@ class MarketHTTP(HTTPManager):
             ),
         )
 
-    @legacy_keywords({"productType": "product_type"})
     def get_futures_recent_trades(
         self,
         product_symbol: str,
@@ -283,7 +261,6 @@ class MarketHTTP(HTTPManager):
             ),
         )
 
-    @legacy_keywords({"productType": "product_type"})
     def get_futures_current_funding_rate(
         self,
         product_symbol: str | None = None,
@@ -298,7 +275,6 @@ class MarketHTTP(HTTPManager):
             ),
         )
 
-    @legacy_keywords({"productType": "product_type", "pageSize": "page_size", "pageNo": "page_no"})
     def get_futures_history_funding_rate(
         self,
         product_symbol: str,
@@ -317,7 +293,6 @@ class MarketHTTP(HTTPManager):
             ),
         )
 
-    @legacy_keywords({"productType": "product_type"})
     def get_futures_open_interest(
         self,
         product_symbol: str,
@@ -388,7 +363,6 @@ class MarketHTTP(HTTPManager):
             self._native_params(category=category, product_symbol=product_symbol, limit=limit),
         )
 
-    @legacy_keywords({"startTime": "start_time", "endTime": "end_time"})
     def get_uta_kline(
         self,
         category: str,
@@ -413,7 +387,6 @@ class MarketHTTP(HTTPManager):
             ),
         )
 
-    @legacy_keywords({"startTime": "start_time", "endTime": "end_time"})
     def get_uta_history_kline(
         self,
         category: str,

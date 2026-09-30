@@ -251,7 +251,7 @@
     ]
   },
   {
-    "name": "futures_futures_tradfi_perps_contract",
+    "name": "sign_futures_tradfi_perps_contract",
     "market": "BinanceMarket::Futures",
     "symbol_market": "BinanceMarket::Futures",
     "method": "HttpMethod::Post",

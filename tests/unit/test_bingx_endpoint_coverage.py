@@ -21,6 +21,8 @@ from urllib.parse import parse_qsl, urlsplit
 
 import pytest
 
+from scripts.build_bitget_wrappers import snake
+
 pytest.importorskip("dcex._native")
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -1073,17 +1075,26 @@ ADDITIONAL_FIELDS.update(
 )
 
 
+def _python_fields(method, values):
+    """Translate wire sample names to the current Python signature."""
+    parameters = inspect.signature(method).parameters
+    return {
+        key if key in parameters else snake(key).replace("_i_ds", "_ids"): value
+        for key, value in values.items()
+    }
+
+
 def _kwargs(method: Any, name: str) -> dict[str, Any]:  # noqa: ANN401
     if name == "replace_swap_batch_orders":
         return {"orders": BATCH_REPLACEMENT}
     for case_name, kwargs, *_ in ADDITIONAL_CASES:
         if name == case_name:
-            return kwargs.copy()
+            return _python_fields(method, kwargs.copy())
     for case_name, kwargs, *_ in CONTROL_CASES:
         if name == case_name:
-            return kwargs.copy()
+            return _python_fields(method, kwargs.copy())
     kwargs: dict[str, Any] = {}
-    aliases = {new: old for old, new in getattr(method, "__legacy_keywords__", {}).items()}
+    samples = _python_fields(method, VALUES)
     for parameter in inspect.signature(method).parameters.values():
         if parameter.kind in {inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD}:
             continue
@@ -1091,15 +1102,15 @@ def _kwargs(method: Any, name: str) -> dict[str, Any]:  # noqa: ANN401
             continue
         if parameter.name == "product_symbol":
             kwargs[parameter.name] = "BTC-USDT-SPOT" if "spot" in name else "BTC-USDT-SWAP"
-        elif aliases.get(parameter.name, parameter.name) in VALUES:
-            sample_name = aliases.get(parameter.name, parameter.name)
-            kwargs[sample_name] = VALUES[sample_name]
+        elif parameter.name in samples:
+            sample_name = parameter.name
+            kwargs[sample_name] = samples[sample_name]
         elif parameter.name == "type_":
             kwargs[parameter.name] = "LIMIT"
         else:
             raise AssertionError(f"{name}: no sample value for {parameter.name}")
     kwargs.update(EXTRA.get(name, {}))
-    return kwargs
+    return _python_fields(method, kwargs)
 
 
 def _drain(received: "queue.Queue[dict[str, Any]]") -> None:
@@ -1233,8 +1244,7 @@ def test_async_wrapper_reaches_documented_route(
     async def call() -> Any:  # noqa: ANN401
         async with Client(**_client_kwargs(base_url)) as client:
             method = getattr(client, name)
-            aliases = getattr(method, "__legacy_keywords__", {})
-            kwargs = {aliases.get(key, key): value for key, value in _kwargs(method, name).items()}
+            kwargs = _kwargs(method, name)
             return await method(**kwargs)
 
     assert _call_checked_native(name, lambda: asyncio.run(call())) is not None
@@ -1317,13 +1327,13 @@ def test_public_routes_send_documented_timestamp(
             {
                 "product_symbol": "BTC-USDT-SWAP",
                 "side": "BUY",
-                "positionSide": "LONG",
-                "priceType": "constant",
-                "priceVariance": "1",
-                "triggerPrice": "100",
+                "position_side": "LONG",
+                "price_type": "constant",
+                "price_variance": "1",
+                "trigger_price": "100",
                 "interval": 4,
-                "amountPerOrder": "1",
-                "totalAmount": "10",
+                "amount_per_order": "1",
+                "total_amount": "10",
             },
         ),
         (
@@ -1331,21 +1341,21 @@ def test_public_routes_send_documented_timestamp(
             {
                 "product_symbol": "BTC-USDT-SWAP",
                 "side": "BUY",
-                "positionSide": "LONG",
-                "priceType": "constant",
-                "priceVariance": "1",
-                "triggerPrice": "100",
+                "position_side": "LONG",
+                "price_type": "constant",
+                "price_variance": "1",
+                "trigger_price": "100",
                 "interval": 10,
-                "amountPerOrder": "11",
-                "totalAmount": "10",
+                "amount_per_order": "11",
+                "total_amount": "10",
             },
         ),
         ("amend_swap_order", {"product_symbol": "BTC-USDT-SWAP", "quantity": "1"}),
         (
             "get_swap_position_history",
-            {"product_symbol": "BTC-USDT-SWAP", "startTs": 1, "endTs": 8000000000},
+            {"product_symbol": "BTC-USDT-SWAP", "start_ts": 1, "end_ts": 8000000000},
         ),
-        ("set_swap_asset_mode", {"assetMode": "invalid", "confirm": True}),
+        ("set_swap_asset_mode", {"asset_mode": "invalid", "confirm": True}),
     ],
 )
 async def test_new_risk_controls_reject_invalid_input_before_transport(

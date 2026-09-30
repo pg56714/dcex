@@ -20,6 +20,8 @@ from urllib.parse import parse_qsl, urlsplit
 
 import pytest
 
+from scripts.build_bitget_wrappers import snake
+
 pytest.importorskip("dcex._native")
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -2014,7 +2016,7 @@ CONTROL_CASES.extend(
         ),
         ("get_uta_small_assets", {}, "GET", "/api/v3/convert/small-assets", False, {}),
         (
-            "uta_small_assets_trade",
+            "convert_uta_small_assets",
             {"from_coin_list": ["ETH"]},
             "POST",
             "/api/v3/convert/small-assets-trade",
@@ -2022,7 +2024,7 @@ CONTROL_CASES.extend(
             {"fromCoinList": ["ETH"]},
         ),
         (
-            "uta_delete_sub",
+            "delete_uta_subaccount",
             {"sub_uid": "2", "confirm": True},
             "POST",
             "/api/v3/user/delete-sub",
@@ -2170,7 +2172,7 @@ CONTROL_CASES.extend(
             {"fromCoin": "BTC", "toCoin": "USDT", "fromCoinSize": "0.1"},
         ),
         (
-            "classic_trade",
+            "convert_classic_asset",
             {
                 "from_coin": "BTC",
                 "from_coin_size": "0.1",
@@ -2382,7 +2384,7 @@ CONTROL_CASES.extend(
         ),
         ("get_classic_earn_elite_product", {}, "GET", "/api/v2/earn/elite/product", False, {}),
         (
-            "classic_earn_elite_subscribe",
+            "subscribe_classic_elite",
             {"product_sub_id": "1", "amount": "100"},
             "POST",
             "/api/v2/earn/elite/subscribe",
@@ -2406,7 +2408,7 @@ CONTROL_CASES.extend(
             {"productId": "1"},
         ),
         (
-            "classic_earn_elite_redeem",
+            "redeem_classic_elite",
             {
                 "product_id": "1",
                 "product_sub_id": "1",
@@ -2459,7 +2461,7 @@ CONTROL_CASES.extend(
             {"loanCoin": "BTC", "pledgeCoin": "USDT", "daily": "7", "pledgeAmount": "100"},
         ),
         (
-            "classic_earn_loan_borrow",
+            "borrow_classic_earn_loan",
             {"loan_coin": "BTC", "pledge_coin": "USDT", "daily": "7", "pledge_amount": "100"},
             "POST",
             "/api/v2/earn/loan/borrow",
@@ -2475,7 +2477,7 @@ CONTROL_CASES.extend(
             {},
         ),
         (
-            "classic_earn_loan_repay",
+            "repay_classic_earn_loan",
             {"order_id": "1", "repay_all": "yes"},
             "POST",
             "/api/v2/earn/loan/repay",
@@ -2825,21 +2827,6 @@ CONTROL_CASES.extend(
 ROUTES.update({name: (verb, path) for name, _, verb, path, _, _ in CONTROL_CASES})
 PUBLIC_METHODS.update(name for name, _, _, _, public, _ in CONTROL_CASES if public)
 PUBLIC_METHODS.difference_update(name for name, _, _, _, public, _ in CONTROL_CASES if not public)
-ALIASES = {
-    "classic_trade": "convert_classic_asset",
-    "uta_small_assets_trade": "convert_uta_small_assets",
-    "classic_earn_elite_subscribe": "subscribe_classic_elite",
-    "classic_earn_elite_redeem": "redeem_classic_elite",
-    "classic_earn_loan_borrow": "borrow_classic_earn_loan",
-    "classic_earn_loan_repay": "repay_classic_earn_loan",
-    "uta_delete_sub": "delete_uta_subaccount",
-}
-CONTROL_CASES.extend(
-    (ALIASES[name], kwargs, verb, path, public, body)
-    for name, kwargs, verb, path, public, body in tuple(CONTROL_CASES)
-    if name in ALIASES
-)
-ROUTES.update({name: (verb, path) for name, _, verb, path, _, _ in CONTROL_CASES})
 COMPLETION_CASES = json.loads(
     (Path(__file__).parents[1] / "fixtures/bitget_request_cases.json").read_text(encoding="utf-8")
 )
@@ -2931,23 +2918,32 @@ def _client_kwargs(base_url: str) -> dict[str, Any]:
     }
 
 
+def _python_fields(method, values):
+    """Translate wire sample names to the current Python signature."""
+    parameters = inspect.signature(method).parameters
+    return {
+        key if key in parameters else snake(key).replace("_i_ds", "_ids"): value
+        for key, value in values.items()
+    }
+
+
 def _kwargs(method: Any, name: str) -> dict[str, Any]:  # noqa: ANN401
     if name in {case[0] for case in CONTROL_CASES}:
-        return EXTRA[name].copy()
+        return _python_fields(method, EXTRA[name].copy())
     kwargs: dict[str, Any] = {}
-    aliases = {new: old for old, new in getattr(method, "__legacy_keywords__", {}).items()}
+    samples = _python_fields(method, VALUES)
     for parameter in inspect.signature(method).parameters.values():
         if parameter.kind in {inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD}:
             continue
         if parameter.default is inspect.Parameter.empty:
-            sample_name = aliases.get(parameter.name, parameter.name)
-            if sample_name not in VALUES:
+            sample_name = parameter.name
+            if sample_name not in samples:
                 raise AssertionError(f"{name}: no sample value for {parameter.name}")
-            kwargs[sample_name] = VALUES[sample_name]
+            kwargs[sample_name] = samples[sample_name]
     kwargs.update(EXTRA.get(name, {}))
     if name in {"cancel_spot_batch_orders", "cancel_uta_batch_orders"}:
         kwargs["orderList"] = [{"orderId": "123"}]
-    return kwargs
+    return _python_fields(method, kwargs)
 
 
 def _drain(received: "queue.Queue[dict[str, Any]]") -> None:
@@ -3024,8 +3020,7 @@ def test_async_wrapper_reaches_documented_route(
     async def call() -> Any:  # noqa: ANN401
         async with Client(**_client_kwargs(base_url)) as client:
             method = getattr(client, name)
-            aliases = getattr(method, "__legacy_keywords__", {})
-            kwargs = {aliases.get(key, key): value for key, value in _kwargs(method, name).items()}
+            kwargs = _kwargs(method, name)
             return await method(**kwargs)
 
     result = asyncio.run(call())
@@ -3084,10 +3079,10 @@ def test_python_validation_rejects_ambiguous_leverage_and_loan_calls(
     base_url, received = server
     _drain(received)
     client = Client(**_client_kwargs(base_url))
-    loan = {"loanCoin": "USDT", "pledgeCoin": "BTC", "daily": "SEVEN"}
+    loan = {"loan_coin": "USDT", "pledge_coin": "BTC", "daily": "SEVEN"}
     with pytest.raises(ValueError, match="leverage, longLeverage, or shortLeverage"):
         client.set_futures_leverage(product_symbol="BTC-USDT-SWAP")
-    for amounts in ({}, {"pledgeAmount": "1", "loanAmount": "1"}):
+    for amounts in ({}, {"pledge_amount": "1", "loan_amount": "1"}):
         with pytest.raises(ValueError, match="exactly one of pledgeAmount or loanAmount"):
             client.borrow_crypto_loan(**loan, **amounts)
 
@@ -3095,14 +3090,14 @@ def test_python_validation_rejects_ambiguous_leverage_and_loan_calls(
         async with AsyncClient(**_client_kwargs(base_url)) as async_client:
             with pytest.raises(ValueError, match="leverage, longLeverage, or shortLeverage"):
                 await async_client.set_futures_leverage(product_symbol="BTC-USDT-SWAP")
-            for amounts in ({}, {"pledgeAmount": "1", "loanAmount": "1"}):
+            for amounts in ({}, {"pledge_amount": "1", "loan_amount": "1"}):
                 with pytest.raises(ValueError, match="exactly one of pledgeAmount or loanAmount"):
                     await async_client.borrow_crypto_loan(**loan, **amounts)
 
     asyncio.run(call_async())
     assert received.empty()
 
-    client.set_futures_leverage(product_symbol="BTC-USDT-SWAP", longLeverage="3")
+    client.set_futures_leverage(product_symbol="BTC-USDT-SWAP", long_leverage="3")
     body = json.loads(received.get(timeout=10)["body"])
     assert body["longLeverage"] == "3"
     assert "leverage" not in body

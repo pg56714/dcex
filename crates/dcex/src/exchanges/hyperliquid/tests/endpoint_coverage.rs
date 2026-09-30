@@ -526,7 +526,7 @@ fn exchange_actions_match_official_wire_format() {
             json!({"type": "updateLeverage", "asset": 1, "isCross": false, "leverage": 5}),
         ),
         (
-            "update_isolate_margin",
+            "update_isolated_margin",
             vec![
                 ("product_symbol", ETH),
                 ("isBuy", "true"),
@@ -1396,7 +1396,7 @@ fn update_isolated_margin_alias_matches_legacy_name() {
         expected
     );
     assert_eq!(
-        private_payload("update_isolate_margin", &params).body["action"],
+        private_payload("update_isolated_margin", &params).body["action"],
         expected
     );
 }

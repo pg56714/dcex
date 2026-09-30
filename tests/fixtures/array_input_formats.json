@@ -204,7 +204,7 @@
       2
     ],
     "kwargs": {
-      "symbol": "BTCUSD_PERP"
+      "product_symbol": "BTCUSD_PERP"
     }
   },
   {
@@ -220,7 +220,7 @@
       "2"
     ],
     "kwargs": {
-      "symbol": "BTCUSD_PERP"
+      "product_symbol": "BTCUSD_PERP"
     }
   },
   {

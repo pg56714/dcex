@@ -36,6 +36,7 @@ impl PythonArcusSpotHttpClient {
     }
 
     #[pyo3(signature = (quote_json, taker, signature, permits_json=None, route_tag=None, builder_fee_bps=None))]
+    #[allow(clippy::too_many_arguments)]
     fn build_signed_quote_json(
         &self,
         py: Python<'_>,

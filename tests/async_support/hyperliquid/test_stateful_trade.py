@@ -407,7 +407,7 @@ async def test_signed_account_actions_that_do_not_require_margin(client):
         await client.update_leverage(product_symbol=SYMBOL, isCross=True, leverage=10)
     )
     _assert_exchange_response(
-        await client.update_isolate_margin(product_symbol=SYMBOL, isBuy=True, ntli=0)
+        await client.update_isolated_margin(product_symbol=SYMBOL, isBuy=True, ntli=0)
     )
 
 

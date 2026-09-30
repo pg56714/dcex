@@ -72,7 +72,7 @@
     "days": null
   },
   {
-    "name": "uta_small_assets_trade",
+    "name": "convert_uta_small_assets",
     "path": "/api/v3/convert/small-assets-trade",
     "post": true,
     "public": false,
@@ -140,7 +140,7 @@
     }
   },
   {
-    "name": "classic_trade",
+    "name": "convert_classic_asset",
     "path": "/api/v2/convert/trade",
     "post": true,
     "public": false,

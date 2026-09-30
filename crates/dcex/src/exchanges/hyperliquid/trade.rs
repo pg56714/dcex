@@ -212,7 +212,7 @@ impl HyperliquidClient {
         self.submit_action(action, params).await
     }
 
-    pub(in crate::exchanges::hyperliquid) async fn update_isolate_margin_from_params(
+    pub(in crate::exchanges::hyperliquid) async fn update_isolated_margin_from_params(
         &self,
         params: &HyperliquidParams,
     ) -> Result<ValidatedResponse> {
@@ -854,7 +854,7 @@ pub(in crate::exchanges::hyperliquid) fn validate_private_params(
             "vaultAddress",
             "expiresAfter",
         ],
-        "update_isolate_margin" | "update_isolated_margin" => &[
+        "update_isolated_margin" => &[
             "product_symbol",
             "isBuy",
             "ntli",

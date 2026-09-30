@@ -281,6 +281,7 @@ impl PythonLighterPrivateWebSocketClient {
         http_base_url=None,
         network=None
     ))]
+    #[allow(clippy::too_many_arguments)]
     fn new(
         account_index: u64,
         api_key_index: u64,

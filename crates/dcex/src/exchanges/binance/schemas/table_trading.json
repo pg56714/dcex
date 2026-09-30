@@ -1059,7 +1059,7 @@
     ]
   },
   {
-    "name": "spot_sor_order",
+    "name": "place_spot_sor_order",
     "market": "BinanceMarket::Spot",
     "symbol_market": "BinanceMarket::Spot",
     "method": "HttpMethod::Post",
@@ -1201,6 +1201,22 @@
           "type": "string",
           "format": "decimal"
         },
+        "strategy_id": {
+          "type": "integer",
+          "description": "For place spot sor order, identifies a strategy rather than specifying its investment."
+        },
+        "strategy_type": {
+          "type": "integer",
+          "description": "For place spot sor order, selects the strategy category used by the endpoint."
+        },
+        "strategyId": {
+          "type": "integer",
+          "description": "For place spot sor order, identifies a strategy rather than specifying its investment."
+        },
+        "strategyType": {
+          "type": "integer",
+          "description": "For place spot sor order, selects the strategy category used by the endpoint."
+        },
         "recvWindow": {
           "type": "string",
           "format": "decimal"
@@ -1213,7 +1229,7 @@
     }
   },
   {
-    "name": "spot_sor_order_test",
+    "name": "test_spot_sor_order",
     "market": "BinanceMarket::Spot",
     "symbol_market": "BinanceMarket::Spot",
     "method": "HttpMethod::Post",
@@ -1361,6 +1377,30 @@
         "quantity": {
           "type": "string",
           "format": "decimal"
+        },
+        "compute_commission_rates": {
+          "type": "boolean",
+          "description": "For test spot sor order, requests commission-rate estimates in the test-order response using a boolean flag."
+        },
+        "strategy_id": {
+          "type": "integer",
+          "description": "For test spot sor order, identifies a strategy rather than specifying its investment."
+        },
+        "strategy_type": {
+          "type": "integer",
+          "description": "For test spot sor order, selects the strategy category used by the endpoint."
+        },
+        "computeCommissionRates": {
+          "type": "boolean",
+          "description": "For test spot sor order, requests commission-rate estimates in the test-order response using a boolean flag."
+        },
+        "strategyId": {
+          "type": "integer",
+          "description": "For test spot sor order, identifies a strategy rather than specifying its investment."
+        },
+        "strategyType": {
+          "type": "integer",
+          "description": "For test spot sor order, selects the strategy category used by the endpoint."
         },
         "recvWindow": {
           "type": "string",

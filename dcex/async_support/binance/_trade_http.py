@@ -2230,17 +2230,16 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
 
     async def set_coin_futures_margin_type(
         self,
-        product_symbol: str | None = None,
+        product_symbol: str,
         margin_type: str | None = None,
         *,
-        symbol: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any] | list[dict[str, Any]]:
         """Call ``POST /dapi/v1/marginType`` with signed authentication."""
         return await self._native_private(
             "set_coin_futures_margin_type",
             self._params(
-                product_symbol=self._required_alias(product_symbol, symbol, "product_symbol"),
+                product_symbol=product_symbol,
                 marginType=margin_type,
                 recvWindow=recv_window,
             ),
@@ -2248,17 +2247,16 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
 
     async def set_coin_futures_cancel_countdown(
         self,
-        product_symbol: str | None = None,
+        product_symbol: str,
         countdown_time: int | None = None,
         *,
-        symbol: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any] | list[dict[str, Any]]:
         """Call ``POST /dapi/v1/countdownCancelAll`` with signed authentication."""
         return await self._native_private(
             "set_coin_futures_cancel_countdown",
             self._params(
-                product_symbol=self._required_alias(product_symbol, symbol, "product_symbol"),
+                product_symbol=product_symbol,
                 countdownTime=countdown_time,
                 recvWindow=recv_window,
             ),
@@ -2304,17 +2302,16 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
 
     async def set_coin_futures_leverage(
         self,
-        product_symbol: str | None = None,
+        product_symbol: str,
         leverage: int | None = None,
         *,
-        symbol: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any] | list[dict[str, Any]]:
         """Call ``POST /dapi/v1/leverage`` with signed authentication."""
         return await self._native_private(
             "set_coin_futures_leverage",
             self._params(
-                product_symbol=self._required_alias(product_symbol, symbol, "product_symbol"),
+                product_symbol=product_symbol,
                 leverage=leverage,
                 recvWindow=recv_window,
             ),
@@ -4454,10 +4451,8 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
 
         """
         return await self._native_private(
-            "futures_futures_tradfi_perps_contract", self._params(recvWindow=recv_window)
+            "sign_futures_tradfi_perps_contract", self._params(recvWindow=recv_window)
         )
-
-    futures_futures_tradfi_perps_contract = sign_futures_tradfi_perps_contract
 
     async def get_futures_order_modify_history(
         self,
@@ -4838,11 +4833,9 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
 
         """
         return await self._native_private(
-            "margin_margin_manual_liquidation",
+            "liquidate_margin_account",
             self._params(type=kind_type, symbol=symbol, recvWindow=recv_window),
         )
-
-    margin_margin_manual_liquidation = liquidate_margin_account
 
     async def query_margin_liquidation_loan(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
@@ -5011,8 +5004,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         *,
         symbol: str,
         side: str,
-        order_type: str | None = None,
-        kind_type: str | None = None,
+        order_type: str,
         quantity: str,
         time_in_force: str | None = None,
         price: str | None = None,
@@ -5033,11 +5025,11 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
 
         """
         return await self._native_private(
-            "spot_sor_order",
+            "place_spot_sor_order",
             self._params(
                 symbol=symbol,
                 side=side,
-                type=self._required_alias(order_type, kind_type, "order_type"),
+                type=order_type,
                 quantity=quantity,
                 timeInForce=time_in_force,
                 price=price,
@@ -5051,15 +5043,12 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    spot_sor_order = place_spot_sor_order
-
     async def test_spot_sor_order(
         self,
         *,
         symbol: str,
         side: str,
-        order_type: str | None = None,
-        kind_type: str | None = None,
+        order_type: str,
         quantity: str,
         compute_commission_rates: bool | None = None,
         time_in_force: str | None = None,
@@ -5081,11 +5070,11 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
 
         """
         return await self._native_private(
-            "spot_sor_order_test",
+            "test_spot_sor_order",
             self._params(
                 symbol=symbol,
                 side=side,
-                type=self._required_alias(order_type, kind_type, "order_type"),
+                type=order_type,
                 quantity=quantity,
                 computeCommissionRates=compute_commission_rates,
                 timeInForce=time_in_force,
@@ -5099,8 +5088,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
                 recvWindow=recv_window,
             ),
         )
-
-    spot_sor_order_test = test_spot_sor_order
 
     async def wallet_account_info(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
@@ -7229,16 +7216,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         return await self._native_private(
             "disable_isolated_margin_account", self._params(symbol=symbol, recvWindow=recv_window)
         )
-
-    @staticmethod
-    def _required_alias(value: str | None, legacy: str | None, label: str) -> str:
-        """Resolve a required value while retaining a deprecated keyword alias."""
-        if value is not None and legacy is not None:
-            raise ValueError(f"Use only {label} or its legacy alias")
-        result = value if value is not None else legacy
-        if result is None:
-            raise ValueError(f"{label} is required")
-        return result
 
     async def get_options_cancel_countdown(
         self, *, underlying: str | None = None, recv_window: int | None = None

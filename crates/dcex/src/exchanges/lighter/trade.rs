@@ -54,9 +54,7 @@ impl LighterClient {
             "withdraw_l2" | "approve_integrator" => {
                 self.withdraw_l2_request(method_name, params).await
             }
-            "transfer_l2_account" | "transfer_same_master_account" => {
-                self.transfer_l2_request(params).await
-            }
+            "transfer_l2_account" => self.transfer_l2_request(params).await,
             "create_public_pool" | "update_public_pool" | "mint_shares" | "burn_shares"
             | "stake_assets" | "unstake_assets" => Ok(Some(
                 self.submit_signed_tx(
@@ -205,7 +203,7 @@ impl LighterClient {
                 )
                 .await?,
             )),
-            "create_order" | "place_order" => Ok(Some(
+            "create_order" => Ok(Some(
                 self.submit_signed_tx(
                     self.sign_create_order_from_params(params).await?,
                     params.optional_bool("price_protection")?,
@@ -261,9 +259,7 @@ impl LighterClient {
                 self.sign_withdrawal_or_approval(params, method_name == "sign_approve_integrator")
                     .await
             }
-            "sign_transfer_l2_account" | "sign_transfer_same_master_account" => {
-                self.sign_internal_transfer(params).await
-            }
+            "sign_transfer_l2_account" => self.sign_internal_transfer(params).await,
 
             "sign_create_public_pool"
             | "sign_update_public_pool"

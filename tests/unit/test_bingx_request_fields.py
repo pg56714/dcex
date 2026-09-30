@@ -79,8 +79,8 @@ def test_sync_bingx_forwards_official_spot_fields() -> None:
         "BTC-USDT-SPOT",
         quantity="0.001",
         price="100000",
-        newClientOrderId="client_1",
-        recvWindow=5_000,
+        new_client_order_id="client_1",
+        recv_window=5_000,
     )
 
     assert dict(calls[0]["query"]) == {
@@ -99,13 +99,13 @@ async def test_async_bingx_forwards_current_swap_fields() -> None:
 
     await client.replace_swap_order(
         "BTC-USDT-SWAP",
-        cancelReplaceMode="STOP_ON_FAILURE",
+        cancel_replace_mode="STOP_ON_FAILURE",
         type_="MARKET",
         side="BUY",
-        positionSide="BOTH",
-        cancelClientOrderId="old-order",
-        quoteOrderQty=25,
-        recvWindow=5_000,
+        position_side="BOTH",
+        cancel_client_order_id="old-order",
+        quote_order_qty=25,
+        recv_window=5_000,
     )
 
     query = dict(calls[0]["query"])

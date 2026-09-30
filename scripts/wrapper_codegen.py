@@ -15,19 +15,6 @@ from scripts.generation import emit, own_directory
 
 ROOT = Path(__file__).resolve().parents[1]
 
-METHOD_ALIASES = {
-    "binance": {"get_c2c_trade_history": "get_c2_c_trade_history"},
-    "bitget": {
-        "close_copy_futures_follower_positions": (
-            "classic_copytrading_future_copytrade_follower_close_positions"
-        ),
-        "close_copy_futures_trader_positions": (
-            "classic_copytrading_future_copytrade_trader_trader_order_close_positions"
-        ),
-    },
-    "kucoin": {"place_copy_futures_stop_order": "post_v1_copy_trade_futures_st_orders"},
-}
-
 
 def endpoint_domains(exchange: str) -> dict[str, str]:
     """Load explicit business ownership; new endpoints require classification."""
@@ -93,12 +80,6 @@ def write_rust_wrappers(exchange: str, source: str) -> None:
             comments = re.findall(r"^\s*(///[^\n]*)", match[1][previous_end : method.start()], re.M)
             declaration = "\n        ".join([*comments, method[0]])
             groups[domains[method[1]]][visibility].append(declaration)
-            for canonical, legacy in METHOD_ALIASES.get(exchange, {}).items():
-                if legacy == method[1]:
-                    groups[domains[legacy]][visibility].append(
-                        "/// Canonical name; the original method remains available.\n        "
-                        + method[0].replace(legacy, canonical, 1)
-                    )
             previous_end = method.end()
     folder = ROOT / "crates/dcex/src/exchanges" / exchange / "generated"
     own_directory(folder, "*.rs", schema_output_names(exchange))
@@ -188,8 +169,4 @@ def write_python_wrappers(exchange: str, asynchronous: bool, source: str) -> Non
         '    """Business-specific generated methods with compatible base precedence."""',
         "",
     ]
-    for canonical, legacy in METHOD_ALIASES.get(exchange, {}).items():
-        domain = domains[legacy]
-        owner = "Generated" + "".join(word.capitalize() for word in domain.split("_")) + "HTTP"
-        init += [f'    {canonical} = vars({owner})["{legacy}"]']
     emit(folder / "__init__.py", "\n".join(init))

@@ -90,13 +90,13 @@ async def test_spot_account_read_endpoints(client):
     _assert_ok(await client.get_spot_account_info())
     _assert_ok(await client.get_spot_account_assets(coin="USDT"))
     _assert_ok(await client.get_spot_account_bills(coin="USDT", limit=20))
-    _assert_ok(await client.get_transferable_coins(fromType="spot", toType="usdt_futures"))
+    _assert_ok(await client.get_transferable_coins(from_type="spot", to_type="usdt_futures"))
     _assert_ok(await client.get_transfer_records(coin="USDT", limit=20))
     _assert_ok(
         await client.get_deposit_records(
             coin="USDT",
-            startTime=start_time,
-            endTime=end_time,
+            start_time=start_time,
+            end_time=end_time,
             limit=20,
         )
     )

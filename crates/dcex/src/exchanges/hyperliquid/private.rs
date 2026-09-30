@@ -144,9 +144,7 @@ impl HyperliquidClient {
             "modify_order" => self.modify_order_from_params(&params).await,
             "modify_batch_orders" => self.modify_batch_orders_from_params(&params).await,
             "update_leverage" => self.update_leverage_from_params(&params).await,
-            "update_isolate_margin" | "update_isolated_margin" => {
-                self.update_isolate_margin_from_params(&params).await
-            }
+            "update_isolated_margin" => self.update_isolated_margin_from_params(&params).await,
             "place_twap_order" => self.place_twap_order_from_params(&params).await,
             "cancel_twap_order" => self.cancel_twap_order_from_params(&params).await,
             _ => Err(DcexError::InvalidInput(format!(

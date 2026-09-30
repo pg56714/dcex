@@ -13,6 +13,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def operation_name(op: dict[str, Any]) -> str:
     """Derive a stable method name from the documented route."""
+    if op["path"] == "/api/v1/copy-trade/futures/st-orders":
+        return "place_copy_futures_stop_order"
     return snake(
         op["method"]
         + "_"

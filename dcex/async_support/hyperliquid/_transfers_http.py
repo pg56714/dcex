@@ -50,8 +50,7 @@ class TradeHTTPTransfersHTTP(HTTPManager):
     async def transfer_vault_usd(
         self,
         *,
-        target_vault: str | None = None,
-        vault_address: str | None = None,
+        target_vault: str,
         is_deposit: bool,
         usd: int,
         nonce: int | None = None,
@@ -60,14 +59,11 @@ class TradeHTTPTransfersHTTP(HTTPManager):
         """
         Transfer raw USD units to/from target_vault (1 USD = 1,000,000 units).
 
-        vault_address is a compatibility alias for target_vault, not a signing vault.
         """
-        if (target_vault is None) == (vault_address is None):
-            raise ValueError("provide exactly one of target_vault or vault_address")
         return await self._native_private(
             "transfer_vault_usd",
             self._native_params(
-                targetVault=target_vault if target_vault is not None else vault_address,
+                targetVault=target_vault,
                 isDeposit=is_deposit,
                 usd=usd,
                 nonce=nonce,

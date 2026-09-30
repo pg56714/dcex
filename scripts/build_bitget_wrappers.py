@@ -23,6 +23,15 @@ def snake(value: str) -> str:
     return value + "_" if keyword.iskeyword(value) or value in {"self", "type"} else value
 
 
+def operation_name(op: dict[str, str]) -> str:
+    """Choose the canonical public name for a documented operation."""
+    if op["path"] == "/api/v2/copy/mix-follower/close-positions":
+        return "close_copy_futures_follower_positions"
+    if op["path"] == "/api/v2/copy/mix-trader/order-close-positions":
+        return "close_copy_futures_trader_positions"
+    return snake(op["operationId"])
+
+
 def main() -> None:
     """Regenerate the committed artifacts from the documented source data."""
     selected = generated_endpoints("bitget")
@@ -33,7 +42,7 @@ def main() -> None:
     )["operations"]
     specs = []
     for op in operations:
-        if snake(op["operationId"]) not in selected or "demo-placeholder" in op["path"]:
+        if operation_name(op) not in selected or "demo-placeholder" in op["path"]:
             continue
         fields = []
         for param in op["parameters"]:
@@ -83,7 +92,7 @@ def main() -> None:
         )
         specs.append(
             {
-                "name": snake(op["operationId"]),
+                "name": operation_name(op),
                 "method": op["method"].upper(),
                 "path": op["path"],
                 "public": public,

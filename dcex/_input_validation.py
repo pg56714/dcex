@@ -47,7 +47,6 @@ def _validated(function: Any, schema: dict[str, Any]) -> Any:  # noqa: ANN401
         for parameter in signature.parameters.values()
         if parameter.kind in (parameter.POSITIONAL_ONLY, parameter.POSITIONAL_OR_KEYWORD)
     ]
-    aliases = getattr(function, "__legacy_keywords__", {})
     properties = schema.get("properties", {})
 
     def arguments(
@@ -68,9 +67,7 @@ def _validated(function: Any, schema: dict[str, Any]) -> Any:  # noqa: ANN401
             key: normalize(
                 value,
                 key=key,
-                schema=contextual_schema(
-                    properties.get(key, properties.get(aliases.get(key), {})), context
-                ),
+                schema=contextual_schema(properties.get(key, {}), context),
             )
             for key, value in kwargs.items()
         }

@@ -366,6 +366,7 @@ impl PythonKrakenPrivateWebSocketClient {
         ratecounter=false,
         users=None
     ))]
+    #[allow(clippy::too_many_arguments)]
     fn subscribe_executions<'py>(
         &self,
         py: Python<'py>,

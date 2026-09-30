@@ -107,7 +107,7 @@ CASES = [
     ),
     case("invalidate_jwt", "/v1/auth/invalidate_jwt"),
     case("hello", "/hello"),
-    case("ping", "/hello"),
+    case("hello", "/hello"),
     # Market data
     case("get_status", "/status"),
     case("get_markets", "/v1/markets"),

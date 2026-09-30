@@ -1656,7 +1656,7 @@
       "python_sync": true,
       "python_async": true,
       "methods": [
-        "spot_sor_order"
+        "place_spot_sor_order"
       ],
       "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
       "evidence": [
@@ -1680,7 +1680,7 @@
       "python_sync": true,
       "python_async": true,
       "methods": [
-        "spot_sor_order_test"
+        "test_spot_sor_order"
       ],
       "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
       "evidence": [
@@ -3595,7 +3595,7 @@
       "python_sync": true,
       "python_async": true,
       "methods": [
-        "futures_futures_tradfi_perps_contract"
+        "sign_futures_tradfi_perps_contract"
       ],
       "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
       "evidence": [
@@ -10588,7 +10588,7 @@
       "python_sync": true,
       "python_async": true,
       "methods": [
-        "margin_margin_manual_liquidation"
+        "liquidate_margin_account"
       ],
       "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
       "evidence": [
@@ -36315,7 +36315,7 @@
       "python_sync": true,
       "python_async": true,
       "methods": [
-        "classic_trade"
+        "convert_classic_asset"
       ],
       "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
       "evidence": [
@@ -40064,7 +40064,7 @@
       "python_sync": true,
       "python_async": true,
       "methods": [
-        "uta_delete_sub"
+        "delete_uta_subaccount"
       ],
       "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
       "evidence": [
@@ -40639,7 +40639,7 @@
       "python_sync": true,
       "python_async": true,
       "methods": [
-        "uta_small_assets_trade"
+        "convert_uta_small_assets"
       ],
       "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
       "evidence": [
@@ -41513,7 +41513,7 @@
       "python_sync": true,
       "python_async": true,
       "methods": [
-        "classic_earn_elite_subscribe"
+        "subscribe_classic_elite"
       ],
       "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
       "evidence": [
@@ -41582,7 +41582,7 @@
       "python_sync": true,
       "python_async": true,
       "methods": [
-        "classic_earn_elite_redeem"
+        "redeem_classic_elite"
       ],
       "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
       "evidence": [
@@ -41927,7 +41927,7 @@
       "python_sync": true,
       "python_async": true,
       "methods": [
-        "classic_earn_loan_borrow"
+        "borrow_classic_earn_loan"
       ],
       "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
       "evidence": [
@@ -41973,7 +41973,7 @@
       "python_sync": true,
       "python_async": true,
       "methods": [
-        "classic_earn_loan_repay"
+        "repay_classic_earn_loan"
       ],
       "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
       "evidence": [
@@ -54030,7 +54030,7 @@
       "python_sync": true,
       "python_async": true,
       "methods": [
-        "get_uta_oe_scurrency"
+        "get_uta_oes_currency"
       ],
       "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
       "evidence": [
@@ -60181,7 +60181,7 @@
       "python_sync": true,
       "python_async": true,
       "methods": [
-        "get_accounts"
+        "get_otc_loan_accounts"
       ],
       "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
       "evidence": [
@@ -62048,7 +62048,6 @@
       "python_sync": true,
       "python_async": true,
       "methods": [
-        "update_isolate_margin",
         "update_isolated_margin"
       ],
       "note": "Hyperliquid /info type or /exchange action; see wire-type/signature fixtures. Signed wallet actions require caller-provided signatures.",
@@ -68988,7 +68987,7 @@
       "python_sync": true,
       "python_async": true,
       "methods": [
-        "exchange_futures_assets"
+        "trigger_futures_asset_exchange"
       ],
       "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
       "evidence": [
@@ -71337,8 +71336,7 @@
       "python_sync": true,
       "python_async": true,
       "methods": [
-        "get_order_by_external_id",
-        "get_orders_by_external_id"
+        "get_order_by_external_id"
       ],
       "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
       "evidence": [
@@ -72209,8 +72207,7 @@
       "python_sync": true,
       "python_async": true,
       "methods": [
-        "hello",
-        "ping"
+        "hello"
       ],
       "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
       "evidence": [
@@ -80709,7 +80706,7 @@
       "python_sync": true,
       "python_async": true,
       "methods": [
-        "post_v1_copy_trade_futures_st_orders"
+        "place_copy_futures_stop_order"
       ],
       "official_source": "https://www.kucoin.com/docs-new/rest/copy-trading/add-take-profit-and-stop-loss-order",
       "evidence": [
@@ -88798,7 +88795,7 @@
       "python_sync": true,
       "python_async": true,
       "methods": [
-        "get_c2_c_trade_history"
+        "get_c2c_trade_history"
       ],
       "note": "Dedicated Rust and sync/async Python wrappers; official request fields, HTTP verb, query/body, host selection, and authentication verified by offline wire tests. Not tested with a live account.",
       "evidence": [
@@ -92542,7 +92539,7 @@
       "python_sync": true,
       "python_async": true,
       "methods": [
-        "classic_copytrading_future_copytrade_follower_close_positions"
+        "close_copy_futures_follower_positions"
       ],
       "note": "Typed wrappers follow the published operation schema, including query/body placement. Sync and async native HTTP, every documented field and HMAC signature verified offline.",
       "evidence": [
@@ -92758,7 +92755,7 @@
       "python_sync": true,
       "python_async": true,
       "methods": [
-        "classic_copytrading_future_copytrade_trader_trader_order_close_positions"
+        "close_copy_futures_trader_positions"
       ],
       "note": "Typed wrappers follow the published operation schema, including query/body placement. Sync and async native HTTP, every documented field and HMAC signature verified offline.",
       "evidence": [

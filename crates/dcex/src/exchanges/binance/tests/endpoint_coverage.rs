@@ -3400,7 +3400,7 @@ fn remaining_account_and_market_endpoints_use_documented_routes() {
             "/fapi/v1/pmAccountInfo",
         ),
         private(
-            "futures_futures_tradfi_perps_contract",
+            "sign_futures_tradfi_perps_contract",
             &[],
             "POST",
             "/fapi/v1/stock/contract",
@@ -3545,7 +3545,7 @@ fn remaining_account_and_market_endpoints_use_documented_routes() {
             "/sapi/v1/margin/liquidation-loan/repay",
         ),
         private(
-            "margin_margin_manual_liquidation",
+            "liquidate_margin_account",
             &[("type", "MARGIN")],
             "POST",
             "/sapi/v1/margin/manual-liquidation",
@@ -3644,7 +3644,7 @@ fn remaining_account_and_market_endpoints_use_documented_routes() {
             "/api/v3/uiKlines",
         ),
         private(
-            "spot_sor_order",
+            "place_spot_sor_order",
             &[
                 ("symbol", "BTCUSDT"),
                 ("side", "BUY"),
@@ -3657,7 +3657,7 @@ fn remaining_account_and_market_endpoints_use_documented_routes() {
             "/api/v3/sor/order",
         ),
         private(
-            "spot_sor_order_test",
+            "test_spot_sor_order",
             &[
                 ("symbol", "BTCUSDT"),
                 ("side", "BUY"),

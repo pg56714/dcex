@@ -15,7 +15,7 @@ from tests.unit.test_binance_batch_orders import invoke
 CONFIRMED = [
     ("bitget", "upgrade_to_uta", {}),
     ("bitget", "upgrade_classic_account", {}),
-    ("bitget", "uta_delete_sub", {"sub_uid": "123"}),
+    ("bitget", "delete_uta_subaccount", {"sub_uid": "123"}),
     ("bitget", "set_uta_account_mode", {"mode": "basic"}),
     ("bitget", "set_futures_asset_mode", {"product_type": "USDT-FUTURES", "asset_mode": "single"}),
     (
@@ -34,12 +34,12 @@ CONFIRMED = [
         },
     ),
     ("bingx", "reverse_swap_position", {"type_": "MARKET", "product_symbol": "BTC-USDT-SWAP"}),
-    ("bingx", "set_swap_asset_mode", {"assetMode": "singleAsset"}),
+    ("bingx", "set_swap_asset_mode", {"asset_mode": "singleAsset"}),
     ("bybit", "delete_api_key", {}),
     ("bybit", "modify_api_key", {"read_only": 1}),
     ("kucoin", "set_uta_account_mode", {"account_type": "UNIFIED"}),
     ("ondo", "delete_api_key", {"apiKeyID": "key"}),
-    ("aster", "exchange_futures_assets", {}),
+    ("aster", "trigger_futures_asset_exchange", {}),
 ]
 SCOPED = [
     ("bitget", "close_futures_positions", {"product_type": "USDT-FUTURES"}),

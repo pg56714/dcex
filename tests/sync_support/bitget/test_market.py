@@ -57,7 +57,7 @@ def test_get_spot_history_kline(client):
     res = client.get_spot_history_kline(
         product_symbol="BTC-USDT-SPOT",
         granularity="1min",
-        endTime=end_time,
+        end_time=end_time,
         limit=5,
     )
     _assert_success(res)
@@ -130,7 +130,7 @@ def test_get_futures_current_funding_rate(client):
 
 
 def test_get_futures_history_funding_rate(client):
-    res = client.get_futures_history_funding_rate(product_symbol="BTC-USDT-SWAP", pageSize=5)
+    res = client.get_futures_history_funding_rate(product_symbol="BTC-USDT-SWAP", page_size=5)
     _assert_success(res)
     assert res["data"]
 

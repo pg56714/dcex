@@ -23,6 +23,8 @@ def wire_name(name: str) -> str:
 
 def operation_name(op: dict[str, Any]) -> str:
     """Disambiguate separate Alpha and prediction API namespaces."""
+    if op["path"] == "/sapi/v1/c2c/orderMatch/listUserOrderHistory":
+        return "get_c2c_trade_history"
     prefix = (
         "alpha_"
         if op["path"].startswith("/bapi/")

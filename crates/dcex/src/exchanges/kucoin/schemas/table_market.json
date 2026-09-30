@@ -1045,7 +1045,7 @@
     "fields": []
   },
   {
-    "name": "get_uta_oe_scurrency",
+    "name": "get_uta_oes_currency",
     "path": "/api/ua/v2/oes/currency",
     "method": "HttpMethod::Get",
     "market": "KucoinMarket::Spot",

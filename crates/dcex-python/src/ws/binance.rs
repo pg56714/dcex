@@ -303,6 +303,7 @@ impl PythonBinancePrivateWebSocketClient {
         options_http_base_url=None,
         portfolio_margin_http_base_url=None
     ))]
+    #[allow(clippy::too_many_arguments)]
     fn new(
         api_key: String,
         api_secret: String,

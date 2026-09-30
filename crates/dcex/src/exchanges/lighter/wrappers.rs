@@ -70,7 +70,6 @@ crate::exchanges::impl_exchange_method_wrappers! {
 
 
         modify_order(market_index => "market_index", order_index => "order_index", base_amount => "base_amount", price => "price"),
-        place_order(market_index => "market_index", client_order_index => "client_order_index", base_amount => "base_amount", price => "price", is_ask => "is_ask", order_type => "order_type", time_in_force => "time_in_force"),
         send_tx(tx_type => "tx_type", tx_info => "tx_info"),
 
         update_leverage(market_index => "market_index", fraction => "fraction", margin_mode => "margin_mode"),
@@ -217,17 +216,9 @@ crate::exchanges::impl_exchange_method_wrappers! {@extend;LighterClient;public [
 
 crate::exchanges::impl_exchange_method_wrappers! {@extend; LighterClient; public [get_pnl_leaderboard(time_window => "time_window",sort_by => "sort_by",sort_dir => "sort_dir",limit => "limit",offset => "offset"),get_explorer_account_logs(param => "param",limit => "limit",offset => "offset"),get_explorer_account_positions(param => "param"),get_explorer_account_assets(param => "param"),get_explorer_batches(),get_explorer_batch(batch_id => "batchId"),get_explorer_blocks(),get_explorer_block(block_id => "blockId"),get_explorer_log(hash => "hash"),get_explorer_markets(),get_explorer_market_logs(symbol => "symbol"),search_explorer(q => "q"),get_explorer_transaction_stats(aggregation_period => "aggregation_period"),get_explorer_total()]; private [export_historical_trades(l1_address => "l1_address",date => "date")];}
 
-crate::exchanges::impl_exchange_method_wrappers! {@extend; LighterClient; public []; private [transfer_same_master_account(to_account_index => "to_account_index",asset_index => "asset_index",from_route_type => "from_route_type",to_route_type => "to_route_type",amount => "amount"),
-/// The recipient may be another user. Transfers have no second confirmation; they execute on submit.
+crate::exchanges::impl_exchange_method_wrappers! {@extend; LighterClient; public []; private [/// The recipient may be another user. Transfers have no second confirmation; they execute on submit.
 transfer_l2_account(to_account_index => "to_account_index",asset_index => "asset_index",from_route_type => "from_route_type",to_route_type => "to_route_type",amount => "amount")];}
 impl LighterClient {
-    pub async fn sign_transfer_same_master_account(
-        &self,
-        params: Vec<(String, String)>,
-    ) -> Result<LighterSignedTransaction> {
-        self.sign_request("sign_transfer_same_master_account", params)
-            .await
-    }
     pub async fn sign_transfer_l2_account(
         &self,
         params: Vec<(String, String)>,

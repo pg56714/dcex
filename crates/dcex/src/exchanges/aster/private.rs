@@ -24,7 +24,7 @@ impl AsterClient {
                 .await;
         }
         let method_name = if method_name == "trigger_futures_asset_exchange" {
-            "exchange_futures_assets"
+            "trigger_futures_asset_exchange"
         } else {
             method_name
         };

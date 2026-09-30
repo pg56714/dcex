@@ -108,7 +108,7 @@ def batch_kwargs(method):
         }
     if method.startswith("cancel"):
         return (
-            {"symbol": "BTCUSD_PERP", "order_ids": [1, 2]}
+            {"product_symbol": "BTCUSD_PERP", "order_ids": [1, 2]}
             if coin
             else {"product_symbol": "BTC-USDT-SWAP", "order_ids": [1, 2]}
         )

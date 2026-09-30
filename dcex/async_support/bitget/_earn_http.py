@@ -2,8 +2,6 @@
 
 from typing import Any
 
-from dcex._keyword_aliases import legacy_keywords
-
 from ._http_manager import HTTPManager
 
 
@@ -23,14 +21,6 @@ class EarnHTTP(HTTPManager):
             "get_savings_products", self._native_params(coin=coin, filter=filter)
         )
 
-    @legacy_keywords(
-        {
-            "periodType": "period_type",
-            "startTime": "start_time",
-            "endTime": "end_time",
-            "idLessThan": "id_less_than",
-        }
-    )
     async def get_savings_assets(
         self,
         period_type: str,
@@ -51,15 +41,6 @@ class EarnHTTP(HTTPManager):
             id_less_than,
         )
 
-    @legacy_keywords(
-        {
-            "periodType": "period_type",
-            "orderType": "order_type",
-            "startTime": "start_time",
-            "endTime": "end_time",
-            "idLessThan": "id_less_than",
-        }
-    )
     async def get_savings_records(
         self,
         period_type: str,
@@ -106,7 +87,6 @@ class EarnHTTP(HTTPManager):
             ),
         )
 
-    @legacy_keywords({"productId": "product_id", "periodType": "period_type"})
     async def get_savings_subscription_info(
         self, product_id: str, period_type: str
     ) -> dict[str, Any]:
@@ -115,7 +95,6 @@ class EarnHTTP(HTTPManager):
             self._native_params(productId=product_id, periodType=period_type),
         )
 
-    @legacy_keywords({"productId": "product_id", "periodType": "period_type"})
     async def subscribe_savings(
         self, product_id: str, period_type: str, amount: str
     ) -> dict[str, Any]:
@@ -124,7 +103,6 @@ class EarnHTTP(HTTPManager):
             self._native_params(productId=product_id, periodType=period_type, amount=amount),
         )
 
-    @legacy_keywords({"orderId": "order_id", "periodType": "period_type"})
     async def get_savings_subscription_result(
         self, order_id: str, period_type: str
     ) -> dict[str, Any]:
@@ -133,9 +111,6 @@ class EarnHTTP(HTTPManager):
             self._native_params(orderId=order_id, periodType=period_type),
         )
 
-    @legacy_keywords(
-        {"productId": "product_id", "periodType": "period_type", "orderId": "order_id"}
-    )
     async def redeem_savings(
         self,
         product_id: str,
@@ -154,7 +129,6 @@ class EarnHTTP(HTTPManager):
             ),
         )
 
-    @legacy_keywords({"orderId": "order_id", "periodType": "period_type"})
     async def get_savings_redemption_result(
         self, order_id: str, period_type: str
     ) -> dict[str, Any]:
@@ -166,13 +140,11 @@ class EarnHTTP(HTTPManager):
     async def get_elite_earn_products(self) -> dict[str, Any]:
         return await self._native_private("get_elite_earn_products", [])
 
-    @legacy_keywords({"productId": "product_id"})
     async def get_elite_earn_subscription_info(self, product_id: str) -> dict[str, Any]:
         return await self._native_private(
             "get_elite_earn_subscription_info", self._native_params(productId=product_id)
         )
 
-    @legacy_keywords({"productSubId": "product_sub_id", "paymentAccount": "payment_account"})
     async def subscribe_elite_earn(
         self,
         product_sub_id: str,
@@ -191,27 +163,16 @@ class EarnHTTP(HTTPManager):
             ),
         )
 
-    @legacy_keywords({"orderId": "order_id"})
     async def get_elite_earn_subscription_result(self, order_id: str) -> dict[str, Any]:
         return await self._native_private(
             "get_elite_earn_subscription_result", self._native_params(orderId=order_id)
         )
 
-    @legacy_keywords({"productId": "product_id"})
     async def get_elite_earn_redemption_info(self, product_id: str) -> dict[str, Any]:
         return await self._native_private(
             "get_elite_earn_redemption_info", self._native_params(productId=product_id)
         )
 
-    @legacy_keywords(
-        {
-            "productId": "product_id",
-            "productSubId": "product_sub_id",
-            "redeemType": "redeem_type",
-            "receiveAccount": "receive_account",
-            "advancedSettle": "advanced_settle",
-        }
-    )
     async def redeem_elite_earn(
         self,
         product_id: str,
@@ -239,7 +200,6 @@ class EarnHTTP(HTTPManager):
     async def get_elite_earn_assets(self) -> dict[str, Any]:
         return await self._native_private("get_elite_earn_assets", [])
 
-    @legacy_keywords({"startTime": "start_time", "endTime": "end_time"})
     async def get_elite_earn_records(
         self,
         type: str,

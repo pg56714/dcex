@@ -192,7 +192,7 @@ WRAPPER_CASES = [
         ],
         "vaultTransfer",
         **{
-            "vault_address": "0xabababababababababababababababababababab",
+            "target_vault": "0xabababababababababababababababababababab",
             "is_deposit": True,
             "usd": 100,
         },
@@ -666,7 +666,7 @@ WRAPPER_CASES = [
         "updateLeverage",
     ),
     _action(
-        "update_isolate_margin",
+        "update_isolated_margin",
         (ETH, True, 1000000),
         [("product_symbol", ETH), ("isBuy", "true"), ("ntli", "1000000")],
         "updateIsolatedMargin",

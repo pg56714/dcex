@@ -12,16 +12,6 @@ impl BitgetClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         crate::exchanges::input_contracts::pairs("bitget", method_name, &params)?;
-        let method_name = match method_name {
-            "convert_classic_asset" => "classic_trade",
-            "convert_uta_small_assets" => "uta_small_assets_trade",
-            "subscribe_classic_elite" => "classic_earn_elite_subscribe",
-            "redeem_classic_elite" => "classic_earn_elite_redeem",
-            "borrow_classic_earn_loan" => "classic_earn_loan_borrow",
-            "repay_classic_earn_loan" => "classic_earn_loan_repay",
-            "delete_uta_subaccount" => "uta_delete_sub",
-            other => other,
-        };
         let params = BitgetParams::from_pairs(params);
         if let Some(response) = self.catalog_request(method_name, &params, true).await? {
             return Ok(response);

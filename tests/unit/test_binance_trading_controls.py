@@ -177,7 +177,7 @@ CASES = [
     ),
     (
         "cancel_coin_futures_batch_orders",
-        {"symbol": "BTCUSD_PERP", "order_ids": [123, 456]},
+        {"product_symbol": "BTCUSD_PERP", "order_ids": [123, 456]},
         "/dapi/v1/batchOrders",
         {"symbol": "BTCUSD_PERP", "orderIdList": [123, 456]},
     ),
@@ -265,13 +265,13 @@ CASES = [
     ),
     (
         "set_coin_futures_margin_type",
-        {"symbol": "BTCUSD_PERP", "margin_type": "ISOLATED"},
+        {"product_symbol": "BTCUSD_PERP", "margin_type": "ISOLATED"},
         "/dapi/v1/marginType",
         {"symbol": "BTCUSD_PERP", "marginType": "ISOLATED"},
     ),
     (
         "set_coin_futures_cancel_countdown",
-        {"symbol": "BTCUSD_PERP", "countdown_time": 0},
+        {"product_symbol": "BTCUSD_PERP", "countdown_time": 0},
         "/dapi/v1/countdownCancelAll",
         {"symbol": "BTCUSD_PERP", "countdownTime": "0"},
     ),
@@ -295,7 +295,7 @@ CASES = [
     ),
     (
         "set_coin_futures_leverage",
-        {"symbol": "BTCUSD_PERP", "leverage": 5},
+        {"product_symbol": "BTCUSD_PERP", "leverage": 5},
         "/dapi/v1/leverage",
         {"symbol": "BTCUSD_PERP", "leverage": "5"},
     ),
@@ -397,7 +397,7 @@ async def test_controls_sign_and_encode_native_requests(
         ),
         (
             "cancel_coin_futures_batch_orders",
-            {"symbol": "BTCUSD_PERP", "order_ids": [1], "client_order_ids": ["id"]},
+            {"product_symbol": "BTCUSD_PERP", "order_ids": [1], "client_order_ids": ["id"]},
             "exactly one",
         ),
         (
@@ -422,7 +422,7 @@ async def test_controls_sign_and_encode_native_requests(
             {"product_symbol": "BTC-USDT-SWAP", "countdown_time": -1},
             "countdownTime",
         ),
-        ("set_coin_futures_leverage", {"symbol": "BTCUSD_PERP", "leverage": 126}, "leverage"),
+        ("set_coin_futures_leverage", {"product_symbol": "BTCUSD_PERP", "leverage": 126}, "leverage"),
         ("get_spot_all_order_lists", {"from_id": 1, "start_time": 1}, "fromId"),
         (
             "set_futures_margin_type",

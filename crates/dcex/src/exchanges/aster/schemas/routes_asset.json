@@ -1,6 +1,6 @@
 [
   {
-    "name": "exchange_futures_assets",
+    "name": "trigger_futures_asset_exchange",
     "path": "/fapi/v3/assetExchange",
     "method": "HttpMethod::Post",
     "is_public": false,

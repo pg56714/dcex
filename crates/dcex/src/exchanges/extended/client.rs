@@ -59,6 +59,7 @@ impl ExtendedClient {
         })
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub fn with_base_url_and_stark(
         api_key: Option<String>,
         stark_private_key: Option<String>,

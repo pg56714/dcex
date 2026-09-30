@@ -1193,7 +1193,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPWithdrawalsHTTP, TradeHTTPTransfers
         *,
         all_symbols: bool = False,
         product_symbol: str | None = None,
-        recvWindow: int | None = None,
     ) -> dict[str, Any]:
         """
         Cancel Spot open orders.
@@ -1201,14 +1200,12 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPWithdrawalsHTTP, TradeHTTPTransfers
         Provide product_symbol, or all_symbols=True to cancel all open spot orders.
         """
         require_scope(product_symbol, all_symbols)
-        if recv_window is not None and recvWindow is not None:
-            raise ValueError("use only recv_window or its legacy recvWindow alias")
         return self._native_private(
             "cancel_spot_all_orders",
             self._native_params(
                 all_symbols=all_symbols,
                 product_symbol=product_symbol,
-                recvWindow=recv_window if recv_window is not None else recvWindow,
+                recvWindow=recv_window,
             ),
         )
 

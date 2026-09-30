@@ -67,6 +67,7 @@ impl PythonLighterHttpClient {
         chain_id=None,
         explorer_base_url=None
     ))]
+    #[allow(clippy::too_many_arguments)]
     fn new(
         timeout: f64,
         base_url: Option<String>,

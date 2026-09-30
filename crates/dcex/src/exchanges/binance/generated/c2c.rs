@@ -5,8 +5,6 @@ crate::exchanges::impl_exchange_method_wrappers! {
     public [
     ];
     private [
-        get_c2_c_trade_history(),
-        /// Canonical name; the original method remains available.
         get_c2c_trade_history(),
     ];
 }

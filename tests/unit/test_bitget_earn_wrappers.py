@@ -36,13 +36,13 @@ def test_sync_bitget_earn_wrappers_forward_official_fields() -> None:
     client.get_earn_account_assets("USDT")
     client.get_savings_products("USDT", filter="available_and_held")
     client.get_savings_assets("flexible", limit=10)
-    client.get_savings_records("fixed", orderType="pay_interest", limit=20)
+    client.get_savings_records("fixed", order_type="pay_interest", limit=20)
     client.subscribe_savings("product", "flexible", "1")
-    client.redeem_savings("product", "fixed", "1", orderId="asset-order")
+    client.redeem_savings("product", "fixed", "1", order_id="asset-order")
     client.get_elite_earn_products()
-    client.subscribe_elite_earn("product-sub", "1", paymentAccount="unified")
+    client.subscribe_elite_earn("product-sub", "1", payment_account="unified")
     client.redeem_elite_earn(
-        "product", "product-sub", "standard", "1", "unified", advancedSettle="no"
+        "product", "product-sub", "standard", "1", "unified", advanced_settle="no"
     )
     client.get_elite_earn_records("interest", limit=20)
 

@@ -3,9 +3,8 @@
 from decimal import Decimal
 from typing import Any
 
-from dcex._schema_codec import normalize_params
+from dcex._schema_codec import normalize_params, wire_keywords
 
-from .._keyword_aliases import legacy_keywords, wire_keywords
 from .._operation_guards import require_confirmation, require_scope
 from ._batch_http import TradeHTTPBatchHTTP
 from ._http_manager import HTTPManager
@@ -21,16 +20,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         values.pop("self", None)
         return self._native_params(**values)
 
-    @legacy_keywords(
-        {
-            "timeInForce": "time_in_force",
-            "quoteOrderQty": "quote_order_qty",
-            "stopPrice": "stop_price",
-            "newClientOrderId": "new_client_order_id",
-            "clientOrderId": "client_order_id",
-            "recvWindow": "recv_window",
-        }
-    )
     def place_spot_order(
         self,
         product_symbol: str,
@@ -63,14 +52,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords(
-        {
-            "quoteOrderQty": "quote_order_qty",
-            "clientOrderId": "client_order_id",
-            "newClientOrderId": "new_client_order_id",
-            "recvWindow": "recv_window",
-        }
-    )
     def place_spot_market_buy_order(
         self,
         product_symbol: str,
@@ -95,13 +76,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords(
-        {
-            "clientOrderId": "client_order_id",
-            "newClientOrderId": "new_client_order_id",
-            "recvWindow": "recv_window",
-        }
-    )
     def place_spot_market_sell_order(
         self,
         product_symbol: str,
@@ -125,14 +99,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords(
-        {
-            "timeInForce": "time_in_force",
-            "clientOrderId": "client_order_id",
-            "newClientOrderId": "new_client_order_id",
-            "recvWindow": "recv_window",
-        }
-    )
     def place_spot_limit_order(
         self,
         product_symbol: str,
@@ -160,14 +126,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords(
-        {
-            "timeInForce": "time_in_force",
-            "clientOrderId": "client_order_id",
-            "newClientOrderId": "new_client_order_id",
-            "recvWindow": "recv_window",
-        }
-    )
     def place_spot_limit_buy_order(
         self,
         product_symbol: str,
@@ -194,14 +152,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords(
-        {
-            "timeInForce": "time_in_force",
-            "clientOrderId": "client_order_id",
-            "newClientOrderId": "new_client_order_id",
-            "recvWindow": "recv_window",
-        }
-    )
     def place_spot_limit_sell_order(
         self,
         product_symbol: str,
@@ -228,13 +178,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords(
-        {
-            "clientOrderId": "client_order_id",
-            "newClientOrderId": "new_client_order_id",
-            "recvWindow": "recv_window",
-        }
-    )
     def place_spot_post_only_order(
         self,
         product_symbol: str,
@@ -260,13 +203,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords(
-        {
-            "clientOrderId": "client_order_id",
-            "newClientOrderId": "new_client_order_id",
-            "recvWindow": "recv_window",
-        }
-    )
     def place_spot_post_only_buy_order(
         self,
         product_symbol: str,
@@ -291,13 +227,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords(
-        {
-            "clientOrderId": "client_order_id",
-            "newClientOrderId": "new_client_order_id",
-            "recvWindow": "recv_window",
-        }
-    )
     def place_spot_post_only_sell_order(
         self,
         product_symbol: str,
@@ -322,19 +251,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords(
-        {
-            "cancelReplaceMode": "cancel_replace_mode",
-            "cancelOrderId": "cancel_order_id",
-            "cancelClientOrderID": "cancel_client_order_id",
-            "cancelRestrictions": "cancel_restrictions",
-            "quoteOrderQty": "quote_order_qty",
-            "stopPrice": "stop_price",
-            "timeInForce": "time_in_force",
-            "newClientOrderId": "new_client_order_id",
-            "recvWindow": "recv_window",
-        }
-    )
     def replace_spot_order(
         self,
         product_symbol: str,
@@ -373,15 +289,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords(
-        {
-            "orderId": "order_id",
-            "clientOrderID": "client_order_id",
-            "clientOrderId": "client_order_id",
-            "cancelRestrictions": "cancel_restrictions",
-            "recvWindow": "recv_window",
-        }
-    )
     def cancel_spot_order(
         self,
         product_symbol: str,
@@ -407,7 +314,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords({"recvWindow": "recv_window"})
     def cancel_spot_open_orders(
         self,
         product_symbol: str | None = None,
@@ -419,7 +325,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             self._native_call_params(wire_keywords(locals(), {"recvWindow": "recv_window"})),
         )
 
-    @legacy_keywords({"timeOut": "time_out", "recvWindow": "recv_window"})
     def set_spot_cancel_all_after(
         self,
         type_: str,
@@ -434,14 +339,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords(
-        {
-            "orderId": "order_id",
-            "clientOrderID": "client_order_id",
-            "clientOrderId": "client_order_id",
-            "recvWindow": "recv_window",
-        }
-    )
     def get_spot_order(
         self,
         product_symbol: str,
@@ -465,7 +362,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords({"recvWindow": "recv_window"})
     def get_spot_open_orders(
         self,
         product_symbol: str | None = None,
@@ -477,16 +373,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             self._native_call_params(wire_keywords(locals(), {"recvWindow": "recv_window"})),
         )
 
-    @legacy_keywords(
-        {
-            "orderId": "order_id",
-            "startTime": "start_time",
-            "endTime": "end_time",
-            "pageIndex": "page_index",
-            "pageSize": "page_size",
-            "recvWindow": "recv_window",
-        }
-    )
     def get_spot_order_history(
         self,
         product_symbol: str | None = None,
@@ -517,15 +403,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords(
-        {
-            "orderId": "order_id",
-            "startTime": "start_time",
-            "endTime": "end_time",
-            "fromId": "from_id",
-            "recvWindow": "recv_window",
-        }
-    )
     def get_spot_my_trades(
         self,
         product_symbol: str,
@@ -553,7 +430,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords({"recvWindow": "recv_window"})
     def get_spot_commission_rate(
         self,
         product_symbol: str,
@@ -565,25 +441,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             self._native_call_params(wire_keywords(locals(), {"recvWindow": "recv_window"})),
         )
 
-    @legacy_keywords(
-        {
-            "positionSide": "position_side",
-            "reduceOnly": "reduce_only",
-            "quoteOrderQty": "quote_order_qty",
-            "stopPrice": "stop_price",
-            "priceRate": "price_rate",
-            "stopLoss": "stop_loss",
-            "takeProfit": "take_profit",
-            "workingType": "working_type",
-            "clientOrderId": "client_order_id",
-            "recvWindow": "recv_window",
-            "timeInForce": "time_in_force",
-            "closePosition": "close_position",
-            "activationPrice": "activation_price",
-            "stopGuaranteed": "stop_guaranteed",
-            "positionId": "position_id",
-        }
-    )
     def place_swap_order(
         self,
         product_symbol: str,
@@ -634,25 +491,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords(
-        {
-            "positionSide": "position_side",
-            "reduceOnly": "reduce_only",
-            "quoteOrderQty": "quote_order_qty",
-            "stopPrice": "stop_price",
-            "priceRate": "price_rate",
-            "stopLoss": "stop_loss",
-            "takeProfit": "take_profit",
-            "workingType": "working_type",
-            "clientOrderId": "client_order_id",
-            "recvWindow": "recv_window",
-            "timeInForce": "time_in_force",
-            "closePosition": "close_position",
-            "activationPrice": "activation_price",
-            "stopGuaranteed": "stop_guaranteed",
-            "positionId": "position_id",
-        }
-    )
     def test_swap_order(
         self,
         product_symbol: str,
@@ -703,14 +541,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords(
-        {
-            "clientOrderId": "client_order_id",
-            "reduceOnly": "reduce_only",
-            "positionSide": "position_side",
-            "recvWindow": "recv_window",
-        }
-    )
     def place_swap_market_order(
         self,
         product_symbol: str,
@@ -737,14 +567,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords(
-        {
-            "positionSide": "position_side",
-            "clientOrderId": "client_order_id",
-            "reduceOnly": "reduce_only",
-            "recvWindow": "recv_window",
-        }
-    )
     def place_swap_market_buy_order(
         self,
         product_symbol: str,
@@ -770,14 +592,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords(
-        {
-            "positionSide": "position_side",
-            "clientOrderId": "client_order_id",
-            "reduceOnly": "reduce_only",
-            "recvWindow": "recv_window",
-        }
-    )
     def place_swap_market_sell_order(
         self,
         product_symbol: str,
@@ -803,15 +617,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords(
-        {
-            "clientOrderId": "client_order_id",
-            "timeInForce": "time_in_force",
-            "reduceOnly": "reduce_only",
-            "positionSide": "position_side",
-            "recvWindow": "recv_window",
-        }
-    )
     def place_swap_limit_order(
         self,
         product_symbol: str,
@@ -841,15 +646,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords(
-        {
-            "positionSide": "position_side",
-            "timeInForce": "time_in_force",
-            "clientOrderId": "client_order_id",
-            "reduceOnly": "reduce_only",
-            "recvWindow": "recv_window",
-        }
-    )
     def place_swap_limit_buy_order(
         self,
         product_symbol: str,
@@ -878,15 +674,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords(
-        {
-            "positionSide": "position_side",
-            "timeInForce": "time_in_force",
-            "clientOrderId": "client_order_id",
-            "reduceOnly": "reduce_only",
-            "recvWindow": "recv_window",
-        }
-    )
     def place_swap_limit_sell_order(
         self,
         product_symbol: str,
@@ -915,15 +702,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords(
-        {
-            "clientOrderId": "client_order_id",
-            "timeInForce": "time_in_force",
-            "reduceOnly": "reduce_only",
-            "positionSide": "position_side",
-            "recvWindow": "recv_window",
-        }
-    )
     def place_swap_post_only_order(
         self,
         product_symbol: str,
@@ -953,14 +731,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords(
-        {
-            "positionSide": "position_side",
-            "clientOrderId": "client_order_id",
-            "reduceOnly": "reduce_only",
-            "recvWindow": "recv_window",
-        }
-    )
     def place_swap_post_only_buy_order(
         self,
         product_symbol: str,
@@ -987,14 +757,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords(
-        {
-            "positionSide": "position_side",
-            "clientOrderId": "client_order_id",
-            "reduceOnly": "reduce_only",
-            "recvWindow": "recv_window",
-        }
-    )
     def place_swap_post_only_sell_order(
         self,
         product_symbol: str,
@@ -1021,9 +783,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords(
-        {"orderId": "order_id", "clientOrderId": "client_order_id", "recvWindow": "recv_window"}
-    )
     def cancel_swap_order(
         self,
         product_symbol: str,
@@ -1046,7 +805,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords({"recvWindow": "recv_window"})
     def cancel_swap_all_orders(
         self,
         product_symbol: str | None = None,
@@ -1059,30 +817,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             self._native_call_params(wire_keywords(locals(), {"recvWindow": "recv_window"})),
         )
 
-    @legacy_keywords(
-        {
-            "cancelReplaceMode": "cancel_replace_mode",
-            "positionSide": "position_side",
-            "orderId": "order_id",
-            "cancelClientOrderId": "cancel_client_order_id",
-            "cancelOrderId": "cancel_order_id",
-            "cancelRestrictions": "cancel_restrictions",
-            "reduceOnly": "reduce_only",
-            "quoteOrderQty": "quote_order_qty",
-            "stopPrice": "stop_price",
-            "priceRate": "price_rate",
-            "workingType": "working_type",
-            "stopLoss": "stop_loss",
-            "takeProfit": "take_profit",
-            "clientOrderId": "client_order_id",
-            "closePosition": "close_position",
-            "activationPrice": "activation_price",
-            "stopGuaranteed": "stop_guaranteed",
-            "timeInForce": "time_in_force",
-            "positionId": "position_id",
-            "recvWindow": "recv_window",
-        }
-    )
     def replace_swap_order(
         self,
         product_symbol: str,
@@ -1143,7 +877,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords({"positionId": "position_id", "recvWindow": "recv_window"})
     def close_swap_position(
         self,
         position_id: str,
@@ -1157,7 +890,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords({"recvWindow": "recv_window"})
     def close_swap_all_positions(
         self,
         product_symbol: str | None = None,
@@ -1169,9 +901,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             self._native_call_params(wire_keywords(locals(), {"recvWindow": "recv_window"})),
         )
 
-    @legacy_keywords(
-        {"orderId": "order_id", "clientOrderId": "client_order_id", "recvWindow": "recv_window"}
-    )
     def get_order_detail(
         self,
         product_symbol: str,
@@ -1194,7 +923,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords({"recvWindow": "recv_window"})
     def get_open_orders(
         self,
         product_symbol: str | None = None,
@@ -1207,14 +935,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             self._native_call_params(wire_keywords(locals(), {"recvWindow": "recv_window"})),
         )
 
-    @legacy_keywords(
-        {
-            "orderId": "order_id",
-            "startTime": "start_time",
-            "endTime": "end_time",
-            "recvWindow": "recv_window",
-        }
-    )
     def get_order_history(
         self,
         product_symbol: str | None = None,
@@ -1241,7 +961,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords({"marginType": "margin_type", "recvWindow": "recv_window"})
     def change_margin_type(
         self,
         product_symbol: str,
@@ -1256,7 +975,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords({"recvWindow": "recv_window"})
     def get_margin_type(
         self,
         product_symbol: str,
@@ -1268,7 +986,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             self._native_call_params(wire_keywords(locals(), {"recvWindow": "recv_window"})),
         )
 
-    @legacy_keywords({"recvWindow": "recv_window"})
     def set_leverage(
         self,
         product_symbol: str,
@@ -1282,7 +999,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             self._native_call_params(wire_keywords(locals(), {"recvWindow": "recv_window"})),
         )
 
-    @legacy_keywords({"recvWindow": "recv_window"})
     def get_leverage(
         self,
         product_symbol: str,
@@ -1294,7 +1010,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             self._native_call_params(wire_keywords(locals(), {"recvWindow": "recv_window"})),
         )
 
-    @legacy_keywords({"dualSidePosition": "dual_side_position", "recvWindow": "recv_window"})
     def set_position_mode(
         self,
         dual_side_position: str,
@@ -1311,7 +1026,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords({"recvWindow": "recv_window"})
     def get_position_mode(self, recv_window: int | None = None) -> dict[str, Any]:
         """Get position mode."""
         return self._native_private(
@@ -1319,7 +1033,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             self._native_call_params(wire_keywords(locals(), {"recvWindow": "recv_window"})),
         )
 
-    @legacy_keywords({"timeOut": "time_out", "recvWindow": "recv_window"})
     def set_swap_cancel_all_after(
         self, type_: str, time_out: int, *, recv_window: int | None = None
     ) -> dict[str, Any]:
@@ -1331,9 +1044,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords(
-        {"orderId": "order_id", "clientOrderId": "client_order_id", "recvWindow": "recv_window"}
-    )
     def get_swap_open_order(
         self,
         product_symbol: str,
@@ -1357,14 +1067,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords(
-        {
-            "autoCloseType": "auto_close_type",
-            "startTime": "start_time",
-            "endTime": "end_time",
-            "recvWindow": "recv_window",
-        }
-    )
     def get_swap_force_orders(
         self,
         *,
@@ -1392,15 +1094,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords(
-        {
-            "tradingUnit": "trading_unit",
-            "startTs": "start_ts",
-            "endTs": "end_ts",
-            "orderId": "order_id",
-            "recvWindow": "recv_window",
-        }
-    )
     def get_swap_trade_fills(
         self,
         trading_unit: str,
@@ -1428,9 +1121,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords(
-        {"positionSide": "position_side", "positionId": "position_id", "recvWindow": "recv_window"}
-    )
     def adjust_swap_position_margin(
         self,
         product_symbol: str,
@@ -1456,9 +1146,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords(
-        {"orderId": "order_id", "clientOrderId": "client_order_id", "recvWindow": "recv_window"}
-    )
     def amend_swap_order(
         self,
         product_symbol: str,
@@ -1483,17 +1170,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords(
-        {
-            "positionSide": "position_side",
-            "priceType": "price_type",
-            "priceVariance": "price_variance",
-            "triggerPrice": "trigger_price",
-            "amountPerOrder": "amount_per_order",
-            "totalAmount": "total_amount",
-            "recvWindow": "recv_window",
-        }
-    )
     def place_swap_twap_order(
         self,
         product_symbol: str,
@@ -1527,7 +1203,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords({"mainOrderId": "main_order_id", "recvWindow": "recv_window"})
     def cancel_swap_twap_order(
         self, main_order_id: str, *, recv_window: int | None = None
     ) -> dict[str, Any]:
@@ -1541,7 +1216,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords({"recvWindow": "recv_window"})
     def get_swap_open_twap_orders(
         self, *, product_symbol: str | None = None, recv_window: int | None = None
     ) -> dict[str, Any]:
@@ -1551,15 +1225,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             self._native_call_params(wire_keywords(locals(), {"recvWindow": "recv_window"})),
         )
 
-    @legacy_keywords(
-        {
-            "pageIndex": "page_index",
-            "pageSize": "page_size",
-            "startTime": "start_time",
-            "endTime": "end_time",
-            "recvWindow": "recv_window",
-        }
-    )
     def get_swap_twap_order_history(
         self,
         page_index: int,
@@ -1587,7 +1252,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords({"mainOrderId": "main_order_id", "recvWindow": "recv_window"})
     def get_swap_twap_order(
         self, main_order_id: str, *, recv_window: int | None = None
     ) -> dict[str, Any]:
@@ -1601,7 +1265,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords({"recvWindow": "recv_window"})
     def get_swap_asset_mode(self, *, recv_window: int | None = None) -> dict[str, Any]:
         """Call ``GET /openApi/swap/v1/trade/assetMode``."""
         return self._native_private(
@@ -1609,7 +1272,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             self._native_call_params(wire_keywords(locals(), {"recvWindow": "recv_window"})),
         )
 
-    @legacy_keywords({"assetMode": "asset_mode", "recvWindow": "recv_window"})
     def set_swap_asset_mode(
         self, asset_mode: str, *, recv_window: int | None = None, confirm: bool = False
     ) -> dict[str, Any]:
@@ -1625,7 +1287,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords({"recvWindow": "recv_window"})
     def get_swap_multi_asset_rules(self, *, recv_window: int | None = None) -> dict[str, Any]:
         """Call ``GET /openApi/swap/v1/trade/multiAssetsRules``."""
         return self._native_private(
@@ -1633,7 +1294,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             self._native_call_params(wire_keywords(locals(), {"recvWindow": "recv_window"})),
         )
 
-    @legacy_keywords({"recvWindow": "recv_window"})
     def get_swap_margin_assets(self, *, recv_window: int | None = None) -> dict[str, Any]:
         """Call ``GET /openApi/swap/v1/user/marginAssets``."""
         return self._native_private(
@@ -1641,14 +1301,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             self._native_call_params(wire_keywords(locals(), {"recvWindow": "recv_window"})),
         )
 
-    @legacy_keywords(
-        {
-            "orderId": "order_id",
-            "startTime": "start_time",
-            "endTime": "end_time",
-            "recvWindow": "recv_window",
-        }
-    )
     def get_swap_full_orders(
         self,
         limit: int,
@@ -1675,17 +1327,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords(
-        {
-            "startTs": "start_ts",
-            "endTs": "end_ts",
-            "orderId": "order_id",
-            "lastFillId": "last_fill_id",
-            "pageIndex": "page_index",
-            "pageSize": "page_size",
-            "recvWindow": "recv_window",
-        }
-    )
     def get_swap_fill_history(
         self,
         product_symbol: str,
@@ -1718,16 +1359,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords(
-        {
-            "startTs": "start_ts",
-            "endTs": "end_ts",
-            "positionId": "position_id",
-            "pageIndex": "page_index",
-            "pageSize": "page_size",
-            "recvWindow": "recv_window",
-        }
-    )
     def get_swap_position_history(
         self,
         product_symbol: str,
@@ -1758,16 +1389,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords(
-        {
-            "positionId": "position_id",
-            "startTime": "start_time",
-            "endTime": "end_time",
-            "pageIndex": "page_index",
-            "pageSize": "page_size",
-            "recvWindow": "recv_window",
-        }
-    )
     def get_swap_margin_history(
         self,
         product_symbol: str,
@@ -1797,7 +1418,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    @legacy_keywords({"recvWindow": "recv_window"})
     def get_swap_maintenance_margin_ratios(
         self, product_symbol: str, *, recv_window: int | None = None
     ) -> dict[str, Any]:
@@ -1807,13 +1427,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             self._native_call_params(wire_keywords(locals(), {"recvWindow": "recv_window"})),
         )
 
-    @legacy_keywords(
-        {
-            "positionId": "position_id",
-            "functionSwitch": "function_switch",
-            "recvWindow": "recv_window",
-        }
-    )
     def set_swap_auto_add_margin(
         self,
         product_symbol: str,

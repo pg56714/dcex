@@ -129,11 +129,6 @@ crate::exchanges::impl_exchange_method_wrappers! {
         schedule_cancel(),
 
 
-        update_isolate_margin(
-            product_symbol => "product_symbol",
-            is_buy => "isBuy",
-            ntli => "ntli"
-        ),
         update_isolated_margin(
             product_symbol => "product_symbol",
             is_buy => "isBuy",

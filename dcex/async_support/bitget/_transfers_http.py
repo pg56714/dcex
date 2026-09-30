@@ -2,14 +2,12 @@
 
 from typing import Any
 
-from ..._keyword_aliases import legacy_keywords
 from ._http_manager import HTTPManager
 
 
 class AccountHTTPTransfersHTTP(HTTPManager):
     """Transfers methods moved from AccountHTTP."""
 
-    @legacy_keywords({"fromType": "from_type", "toType": "to_type", "clientOid": "client_oid"})
     async def transfer(
         self,
         coin: str,
@@ -32,16 +30,6 @@ class AccountHTTPTransfersHTTP(HTTPManager):
             ),
         )
 
-    @legacy_keywords(
-        {
-            "fromType": "from_type",
-            "startTime": "start_time",
-            "endTime": "end_time",
-            "clientOid": "client_oid",
-            "pageNum": "page_num",
-            "idLessThan": "id_less_than",
-        }
-    )
     async def get_transfer_records(
         self,
         coin: str,
@@ -68,7 +56,6 @@ class AccountHTTPTransfersHTTP(HTTPManager):
             ),
         )
 
-    @legacy_keywords({"fromType": "from_type", "toType": "to_type"})
     async def get_transferable_coins(
         self,
         from_type: str,
