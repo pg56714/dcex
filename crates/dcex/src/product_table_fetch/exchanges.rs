@@ -1132,25 +1132,34 @@ pub(super) fn ondo_market_rows(data: &Value) -> Result<Vec<MarketInfo>> {
             if market.get("disabled").and_then(Value::as_bool) == Some(true) {
                 continue;
             }
-            let pair = market.get("pair").unwrap_or(&Value::Null);
-            let base = required_string(pair, "base")?;
-            let quote = required_string(pair, "quote")?;
-            let symbol = required_string(market, "market")?;
-            let base_increment = required_string(market, "baseIncrement")?;
-            rows.push(MarketInfo {
-                exchange: "ondo".to_string(),
-                exchange_symbol: symbol,
-                product_symbol: format!("{base}-{quote}-{suffix}"),
-                product_type: product_type.to_string(),
-                exchange_type: exchange_type.to_string(),
-                price_precision: required_string(market, "quoteIncrement")?,
-                size_precision: base_increment.clone(),
-                min_size: base_increment,
-                base_currency: base,
-                quote_currency: quote,
-                min_notional: "0".to_string(),
-                size_per_contract: "1".to_string(),
-            });
+            let parse = || -> Result<MarketInfo> {
+                let pair = market.get("pair").unwrap_or(&Value::Null);
+                let base = required_string(pair, "base")?;
+                let quote = required_string(pair, "quote")?;
+                let symbol = required_string(market, "market")?;
+                let base_increment = required_string(market, "baseIncrement")?;
+                Ok(MarketInfo {
+                    exchange: "ondo".to_string(),
+                    exchange_symbol: symbol,
+                    product_symbol: format!("{base}-{quote}-{suffix}"),
+                    product_type: product_type.to_string(),
+                    exchange_type: exchange_type.to_string(),
+                    price_precision: required_string(market, "quoteIncrement")?,
+                    size_precision: base_increment.clone(),
+                    min_size: base_increment,
+                    base_currency: base,
+                    quote_currency: quote,
+                    min_notional: "0".to_string(),
+                    size_per_contract: "1".to_string(),
+                })
+            };
+            match parse() {
+                Ok(row) => rows.push(row),
+                Err(error) if group == "spot" => {
+                    eprintln!("Skipping malformed Ondo spot product: {error}");
+                }
+                Err(error) => return Err(error),
+            }
         }
     }
     Ok(rows)

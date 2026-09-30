@@ -432,3 +432,37 @@ fn builds_arcus_stock_perpetual_market_metadata() {
     assert_eq!(row.product_symbol, "AAPL-USD-SWAP");
     assert_eq!(row.min_notional, "5");
 }
+
+#[test]
+fn malformed_ondo_spot_rows_do_not_discard_perpetual_products() {
+    let valid = serde_json::json!({
+        "market": "SPY-USDC", "pair": {"base": "SPY", "quote": "USDC"},
+        "baseIncrement": "0.001", "quoteIncrement": "0.01"
+    });
+    for path in [
+        "baseIncrement",
+        "quoteIncrement",
+        "market",
+        "pair",
+        "pair.base",
+        "pair.quote",
+    ] {
+        let mut malformed = valid.clone();
+        if let Some((parent, child)) = path.split_once('.') {
+            malformed[parent].as_object_mut().unwrap().remove(child);
+        } else {
+            malformed.as_object_mut().unwrap().remove(path);
+        }
+        let mut perp = valid.clone();
+        perp["market"] = serde_json::json!("SPY-USDC.P");
+        let data = serde_json::json!({"result": {
+            "perps": {"tradingPairs": [perp]},
+            "spot": {"tradingPairs": [malformed, valid.clone()]}
+        }});
+        let rows =
+            super::exchanges::ondo_market_rows(&data).expect("spot failure must be isolated");
+        assert_eq!(rows.len(), 2, "{path}");
+        assert_eq!(rows[0].product_symbol, "SPY-USDC-SWAP");
+        assert_eq!(rows[1].product_symbol, "SPY-USDC-SPOT");
+    }
+}
