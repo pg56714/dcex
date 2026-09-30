@@ -192,3 +192,5 @@ absent and empty objects are rejected. Fund literals outside owners are pinned b
 source hashes, and shared schema transports allow only audited routers and owner
 callers. Owner domain checks execute in release builds. Generator checks also reject
 orphaned files in their owned generated directories without writing or deleting them.
+
+The shared input-contract validators enforce declared decimal rules and structured JSON constraints. Integer and boolean entries in this catalog describe the endpoint inputs; they do not add runtime type enforcement. Endpoint wire adapters retain their own integer/boolean validation. For OKX algo orders, the official specification requires either `sz` or `closeFraction`; it does not document a zero-size exception. An explicitly supplied `sz` must therefore be positive; a full close can omit it and use `closeFraction=1`.

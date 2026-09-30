@@ -93,8 +93,60 @@ async def test_kraken_convenience_zero_volume_never_reaches_wire(asynchronous, n
                 await invoke(client, method, args, native)
             assert received.empty()
             args["volume"] = "0.125"
+            if "limit" in method or method == "edit_spot_order":
+                for price in ["0", "0.000"]:
+                    args["price"] = price
+                    with pytest.raises(ValueError, match="decimal"):
+                        await invoke(client, method, args, native)
+                    assert received.empty()
+                args["price"] = "+5%"
             await invoke(client, method, args, native)
-            assert parse_qs(received.get(timeout=10)["body"])["volume"] == ["0.125"]
+            payload = parse_qs(received.get(timeout=10)["body"])
+            assert payload["volume"] == ["0.125"]
+            if "price" in args:
+                assert payload["price"] == [args["price"]]
+        finally:
+            await close(client)
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("asynchronous", [False, True])
+@pytest.mark.parametrize("native", [False, True])
+@pytest.mark.parametrize("field,valid,invalid", [
+    ("tpTriggerRatio", "-0.1", ["abc", "0", "-1"]),
+    ("slTriggerRatio", "0.1", ["abc", "0", "-0.1"]),
+    ("sz", "0.125", ["0", "0.000"]),
+])
+async def test_okx_algo_placement_decimal_rules_on_wire(asynchronous, native, field, valid, invalid):
+    prefix = "dcex.async_support" if asynchronous else "dcex"
+    cls = importlib.import_module(f"{prefix}.okx.client").Client
+    with _http_server({"code": "0", "data": []}) as (base, received):
+        client = cls(api_key="key", api_secret="secret", passphrase="pass", base_api=base, preload_product_table=False)
+        if asynchronous:
+            await client.async_init()
+        try:
+            args = dict(product_symbol="BTC-USDT-SWAP", side="sell", sz="1")
+            args.update(dict(tdMode="cross", ordType="conditional", slTriggerPx="65000", slOrdPx="-1") if native else dict(trade_mode="cross", order_type="conditional", sl_trigger_px="65000", sl_ord_px="-1"))
+            attached = {}
+            if field != "sz":
+                args["attach_algo_ords"] = [attached]
+            target = args if field == "sz" else attached
+            for value in invalid:
+                target[field] = value
+                with pytest.raises(ValueError, match="decimal"):
+                    await invoke(client, "place_algo_order", args, native)
+                assert received.empty()
+            target[field] = valid
+            await invoke(client, "place_algo_order", args, native)
+            payload = json.loads(received.get(timeout=10)["body"])
+            assert (payload if field == "sz" else payload["attachAlgoOrds"][0])[field] == valid
+            if field == "sz":
+                del args["sz"]
+                args["closeFraction" if native else "close_fraction"] = "1"
+                args["reduceOnly" if native else "reduce_only"] = True
+                await invoke(client, "place_algo_order", args, native)
+                payload = json.loads(received.get(timeout=10)["body"])
+                assert payload["closeFraction"] == "1" and "sz" not in payload
         finally:
             await close(client)
 

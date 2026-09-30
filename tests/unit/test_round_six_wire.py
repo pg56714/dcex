@@ -235,9 +235,9 @@ async def test_backpack_percent_trigger_quantity_reaches_wire(asynchronous, nati
             if method == "place_batch_orders":
                 order["symbol"] = "BTC_USDC_PERP"
                 del order["product_symbol"]
-            for invalid in ["0%", "150%", "100.000000000000000001%"]:
+            for invalid in ["0", "0.000", "0%", "150%", "100.000000000000000001%"]:
                 bad = {**order, "triggerQuantity": invalid}
-                with pytest.raises(ValueError, match="decimal percentage"):
+                with pytest.raises(ValueError, match="decimal"):
                     await invoke(client, method, {"orders": [bad]} if method == "place_batch_orders" else bad, native)
                 assert received.empty()
             await invoke(client, method, {"orders": [order]} if method == "place_batch_orders" else order, native)
@@ -245,6 +245,12 @@ async def test_backpack_percent_trigger_quantity_reaches_wire(asynchronous, nati
             if method == "place_batch_orders":
                 payload = payload[0]
             assert payload["triggerQuantity"] == "50%"
+            order["triggerQuantity"] = "0.125"
+            await invoke(client, method, {"orders": [order]} if method == "place_batch_orders" else order, native)
+            payload = json.loads(received.get(timeout=10)["body"])
+            if method == "place_batch_orders":
+                payload = payload[0]
+            assert payload["triggerQuantity"] == "0.125"
         finally:
             result = client.close()
             if inspect.isawaitable(result):

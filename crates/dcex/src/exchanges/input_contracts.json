@@ -1187,7 +1187,8 @@
             "x-percent-range": [
               0,
               100
-            ]
+            ],
+            "x-positive": true
           },
           "trigger_price": {
             "type": "string",
@@ -1282,7 +1283,8 @@
             "x-percent-range": [
               0,
               100
-            ]
+            ],
+            "x-positive": true
           },
           "trigger_price": {
             "type": "string",
@@ -1381,7 +1383,8 @@
             "x-percent-range": [
               0,
               100
-            ]
+            ],
+            "x-positive": true
           },
           "trigger_price": {
             "type": "string",
@@ -1549,7 +1552,8 @@
                   "x-percent-range": [
                     0,
                     100
-                  ]
+                  ],
+                  "x-positive": true
                 },
                 "trigger_price": {
                   "type": "string",
@@ -18731,7 +18735,8 @@
           "price": {
             "type": "string",
             "format": "decimal",
-            "x-relative": "kraken_relative_price"
+            "x-relative": "kraken_relative_price",
+            "x-positive": true
           },
           "price2": {
             "type": "string",
@@ -19004,7 +19009,8 @@
           "price": {
             "type": "string",
             "format": "decimal",
-            "x-relative": "kraken_relative_price"
+            "x-relative": "kraken_relative_price",
+            "x-positive": true
           },
           "volume": {
             "type": "string",
@@ -19044,7 +19050,8 @@
           "price": {
             "type": "string",
             "format": "decimal",
-            "x-relative": "kraken_relative_price"
+            "x-relative": "kraken_relative_price",
+            "x-positive": true
           },
           "volume": {
             "type": "string",
@@ -19084,7 +19091,8 @@
           "price": {
             "type": "string",
             "format": "decimal",
-            "x-relative": "kraken_relative_price"
+            "x-relative": "kraken_relative_price",
+            "x-positive": true
           },
           "volume": {
             "type": "string",
@@ -19129,7 +19137,8 @@
           "price": {
             "type": "string",
             "format": "decimal",
-            "x-relative": "kraken_relative_price"
+            "x-relative": "kraken_relative_price",
+            "x-positive": true
           },
           "price2": {
             "type": "string",
@@ -19169,7 +19178,8 @@
           "price": {
             "type": "string",
             "format": "decimal",
-            "x-relative": "kraken_relative_price"
+            "x-relative": "kraken_relative_price",
+            "x-positive": true
           },
           "price2": {
             "type": "string",
@@ -19209,7 +19219,8 @@
           "price": {
             "type": "string",
             "format": "decimal",
-            "x-relative": "kraken_relative_price"
+            "x-relative": "kraken_relative_price",
+            "x-positive": true
           },
           "price2": {
             "type": "string",
@@ -19311,7 +19322,8 @@
           "price": {
             "type": "string",
             "format": "decimal",
-            "x-relative": "kraken_relative_price"
+            "x-relative": "kraken_relative_price",
+            "x-positive": true
           },
           "volume": {
             "type": "string",
@@ -19351,7 +19363,8 @@
           "price": {
             "type": "string",
             "format": "decimal",
-            "x-relative": "kraken_relative_price"
+            "x-relative": "kraken_relative_price",
+            "x-positive": true
           },
           "volume": {
             "type": "string",
@@ -19391,7 +19404,8 @@
           "price": {
             "type": "string",
             "format": "decimal",
-            "x-relative": "kraken_relative_price"
+            "x-relative": "kraken_relative_price",
+            "x-positive": true
           },
           "volume": {
             "type": "string",
@@ -25707,7 +25721,8 @@
           },
           "sz": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-positive": true
           },
           "szLimit": {
             "type": "string",
@@ -25773,6 +25788,20 @@
                   "x-decimal-sentinels": [
                     "-1"
                   ]
+                },
+                "tpTriggerRatio": {
+                  "type": "string",
+                  "format": "decimal",
+                  "x-minimum": "-1",
+                  "x-exclusive-minimum": true,
+                  "x-signed": true,
+                  "x-nonzero": true
+                },
+                "slTriggerRatio": {
+                  "type": "string",
+                  "format": "decimal",
+                  "x-minimum": "0",
+                  "x-exclusive-minimum": true
                 }
               },
               "x-forbidden-keys": [
@@ -25807,6 +25836,20 @@
                   "x-decimal-sentinels": [
                     "-1"
                   ]
+                },
+                "tpTriggerRatio": {
+                  "type": "string",
+                  "format": "decimal",
+                  "x-minimum": "-1",
+                  "x-exclusive-minimum": true,
+                  "x-signed": true,
+                  "x-nonzero": true
+                },
+                "slTriggerRatio": {
+                  "type": "string",
+                  "format": "decimal",
+                  "x-minimum": "0",
+                  "x-exclusive-minimum": true
                 }
               },
               "x-forbidden-keys": [

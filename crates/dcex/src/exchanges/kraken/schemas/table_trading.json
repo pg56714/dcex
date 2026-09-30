@@ -121,7 +121,8 @@
         "price": {
           "type": "string",
           "format": "decimal",
-          "x-relative": "kraken_relative_price"
+          "x-relative": "kraken_relative_price",
+          "x-positive": true
         },
         "price2": {
           "type": "string",
