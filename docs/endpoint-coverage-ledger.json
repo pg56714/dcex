@@ -115871,7 +115871,7 @@
       "python_sync": null,
       "python_async": true,
       "methods": [],
-      "note": "Read-only Rust probe on 2026-09-30 with TLS verification and no login received a subscription acknowledgement for SPY-USDC. A depth update was also received. An unsupported-channel control was rejected. The public channel is observed; no official spot WS specification or private spot contract is inferred.",
+      "note": "Read-only Rust probe on 2026-09-30 with TLS verification and no login received a subscription acknowledgement for SPY-USDC. A top-of-book update was also received. An unsupported-channel control was rejected. The public channel is observed; no official spot WS specification or private spot contract is inferred.",
       "evidence": [
         "tests/unit/test_ws_ondo.py::test_ondo_public_spot_helpers_send_no_authentication"
       ],
@@ -115937,7 +115937,7 @@
     "native_profile": "release",
     "live_authenticated_operations": false,
     "clippy_existing_warnings": 14,
-    "note": "Order and ownership verification: Rust workspace/all-features (CARGO_PROFILE_TEST_DEBUG=0; assertions unchanged) 693 passed, 53 live ignored; Python 24134 passed, 944 live/private/stateful/generated cases deselected. Release native rebuilt after .pyd holder and exclusive-access checks. 278 order wire regressions pass; ratio and convenience-volume regressions have 80 failing-before cases. Fund literal, transport caller and financial exemption mutations cover every requested bypass. All 11 generators pass read-only --check with unchanged contents and mtimes. Full pre-commit, Ruff, Pyright, rustfmt and Clippy pass (14/173 existing Clippy warnings). Public Ondo spot routes/product table implemented; private spot trading blocked pending official specifications. No private live operations were invoked; current public probes failed TLS validation, recorded separately from supplied earlier observations.",
+    "note": "Order and ownership verification: Rust workspace/all-features (CARGO_PROFILE_TEST_DEBUG=0; assertions unchanged) 693 passed, 53 live ignored; Python 24134 passed, 944 live/private/stateful/generated cases deselected. Release native rebuilt after .pyd holder and exclusive-access checks. 278 order wire regressions pass; ratio and convenience-volume regressions have 80 failing-before cases. Fund literal, transport caller and financial exemption mutations cover every requested bypass. All 11 generators pass read-only --check with unchanged contents and mtimes. Full pre-commit, Ruff, Pyright, rustfmt and Clippy pass (14/173 existing Clippy warnings). Public Ondo spot routes/product table implemented; private spot trading blocked pending official specifications. No private live operations were invoked. Subsequent TLS-verified public probes confirmed all four Ondo spot GET routes and book-channel WS data; the earlier Python TLS failure was local to its CA bundle.",
     "python_deselected": 944,
     "clippy_all_targets_warnings": 173
   }

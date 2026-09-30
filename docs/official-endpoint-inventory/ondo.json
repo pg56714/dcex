@@ -690,7 +690,7 @@
       "operation_id": "subscribe_spot_top_of_book",
       "status": "protocol",
       "source_status": "observed public channel",
-      "note": "Read-only Rust probe on 2026-09-30 with TLS verification and no login received a subscription acknowledgement for SPY-USDC. A depth update was also received. An unsupported-channel control was rejected. The public channel is observed; no official spot WS specification or private spot contract is inferred."
+      "note": "Read-only Rust probe on 2026-09-30 with TLS verification and no login received a subscription acknowledgement for SPY-USDC. A top-of-book update was also received. An unsupported-channel control was rejected. The public channel is observed; no official spot WS specification or private spot contract is inferred."
     },
     {
       "method": "WS",

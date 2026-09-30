@@ -12,6 +12,6 @@ Product table 從 `/v1/markets` 同時讀取 `result.perps.tradingPairs` 與 `re
 
 2026-09-30 已透過 curl 與原生 client 成功查核全部四個現貨公開 GET，全程啟用 TLS 驗證且未提供憑證。先前 Python 憑證失敗反映本機 CA bundle 問題，不能據此認定 Ondo 伺服器憑證失效。
 
-公開 WebSocket 支援 `topOfBooksSpot`、`depthBooksSpot`、`tradesSpot`，可使用 `subscribe_spot_top_of_book`、`subscribe_spot_depth`、`subscribe_spot_trades` 或通用 `subscribe`／`unsubscribe`，傳入 `SPY-USDC` 等交易所 symbol。啟用 TLS 驗證的 Rust probe 收到三個通道的訂閱確認，以及兩個委託簿通道的資料更新；成交頻道在 10 秒觀察期間內未收到事件。不支援的對照通道被拒絕。這些屬於公開通道觀察，現貨 WS 官方契約及私有現貨通道仍未公布。
+公開 WebSocket 支援 `topOfBooksSpot`、`depthBooksSpot`、`tradesSpot`，可使用 `subscribe_spot_top_of_book`、`subscribe_spot_depth`、`subscribe_spot_trades` 或通用 `subscribe`／`unsubscribe`，傳入 `SPY-USDC` 等交易所 symbol 或 `SPY-USDC-SPOT` 等 product-table symbol。啟用 TLS 驗證的 Rust probe 收到三個通道的訂閱確認，以及兩個委託簿通道的資料更新；成交頻道在 10 秒觀察期間內未收到事件。不支援的對照通道被拒絕。這些屬於公開通道觀察，現貨 WS 官方契約及私有現貨通道仍未公布。
 
-現貨 product table 列（`product_type="spot"`）僅供公開行情，目前不能透過本 client 進行私有交易。逐筆操作永續交易方法前，請以 `get_product_symbols(exchange="ondo", product_type="swap")` 篩選。永續方法對 `-SPOT` symbol 回報中性的端點適用範圍錯誤；公開現貨 WS 使用不含 product table `-SPOT` 後綴的交易所 symbol。
+現貨 product table 列（`product_type="spot"`）僅供公開行情，目前不能透過本 client 進行私有交易。逐筆操作永續交易方法前，請以 `get_product_symbols(exchange="ondo", product_type="swap")` 篩選。永續方法對 `-SPOT` symbol 回報中性的端點適用範圍錯誤；公開現貨 WS 的 subscribe／unsubscribe 會去除可選的 `-SPOT` 後綴。

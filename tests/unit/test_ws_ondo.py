@@ -135,15 +135,20 @@ async def test_ondo_connect_login_ping_and_subscriptions(channel):
     ("subscribe_spot_depth", "depthBooksSpot"),
     ("subscribe_spot_trades", "tradesSpot"),
 ])
-async def test_ondo_public_spot_helpers_send_no_authentication(method, channel):
+@pytest.mark.parametrize("markets,expected", [
+    ("SPY-USDC", ["SPY-USDC"]),
+    ("SPY-USDC-SPOT", ["SPY-USDC"]),
+    (["SPY-USDC-SPOT", "QQQ-USDC"], ["SPY-USDC", "QQQ-USDC"]),
+])
+async def test_ondo_public_spot_helpers_send_no_authentication(method, channel, markets, expected):
     async with authenticated_peer("ondo") as (url, received):
         client = ondo.PublicClient(base_url=url, timeout=10)
         try:
             await client.connect()
-            await getattr(client, method)("SPY-USDC")
-            assert await client.recv() == {"op": "subscribe", "channel": channel, "markets": ["SPY-USDC"]}
-            await client.unsubscribe(channel, "SPY-USDC")
-            assert await client.recv() == {"op": "unsubscribe", "channel": channel, "markets": ["SPY-USDC"]}
+            await getattr(client, method)(markets)
+            assert await client.recv() == {"op": "subscribe", "channel": channel, "markets": expected}
+            await client.unsubscribe(channel, markets)
+            assert await client.recv() == {"op": "unsubscribe", "channel": channel, "markets": expected}
             assert all(event["op"] != "login" for event in received)
         finally:
             await client.close()

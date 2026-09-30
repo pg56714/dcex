@@ -118,6 +118,14 @@ impl OndoPublicWebSocket {
                 "unsupported Ondo public channel: {channel}"
             )));
         }
+        let markets: Vec<String> = if channel.ends_with("Spot") {
+            markets
+                .into_iter()
+                .map(|market| market.strip_suffix("-SPOT").unwrap_or(&market).to_owned())
+                .collect()
+        } else {
+            markets
+        };
         if markets.is_empty() {
             self.connection
                 .send_json(&json!({"op": op, "channel": channel}))

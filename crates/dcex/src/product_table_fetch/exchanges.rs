@@ -1156,7 +1156,7 @@ pub(super) fn ondo_market_rows(data: &Value) -> Result<Vec<MarketInfo>> {
             match parse() {
                 Ok(row) => rows.push(row),
                 Err(error) if group == "spot" => {
-                    eprintln!("Skipping malformed Ondo spot product: {error}");
+                    log::warn!("Skipping malformed Ondo spot product: {error}");
                 }
                 Err(error) => return Err(error),
             }
