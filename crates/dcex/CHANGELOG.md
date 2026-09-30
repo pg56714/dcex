@@ -1,3 +1,52 @@
+## 0.12.0 (2026-09-30)
+
+### Feat
+
+- support observed public spot streams and clarify trading scope
+- expand endpoint coverage and document remaining gaps
+- expand endpoint wrappers and regression coverage
+- expand trading and risk endpoint coverage
+
+### Fix
+
+- preserve declared array inputs and documented wire formats
+- omit blank optional attached order fields
+- enforce remaining algo and convenience order decimal bounds
+- isolate malformed spot products from perpetual metadata
+- validate inputs and fund owners, harden checks and add Ondo spot data
+- validate attached orders and enforce fund dispatch ownership
+- align numeric wire contracts and fund ownership
+- preserve signed peg offsets and canonical alias contracts
+- cover leverage fields and verify signed wire inputs
+- complete numeric contracts and strengthen audit checks
+- restore attached orders and batch decimal contracts
+- scope decimal rules to explicit endpoint schemas
+- preserve exact coin swap attached prices
+- require explicit position sides and repair documentation checks
+- enforce order safety and reconcile endpoint coverage
+- complete endpoint coverage and reconcile inventory
+- address endpoint audit findings and expand regression coverage
+
+### Refactor
+
+- name regression tests and coverage records by behavior
+- move Binance subaccount submissions to transfers
+- remove redundant Bitget helper borrows
+- preserve display inputs for Bitget error helper
+- move Lighter submissions into withdrawal owner
+- place shared helpers before test modules
+- move bridge commitment into withdrawal modules
+- consolidate remaining same-prefix error helpers
+- remove redundant error message borrows
+- consolidate exchange error constructors
+- enforce dispatch ownership across exchange modules
+- consolidate fund handlers and internal module names
+- unify private dispatch and enforce exchange layout
+- standardize native test modules and schema adapters
+- standardize fund movement and batch modules
+- unify schema validation and lossless numeric encoding
+- organize exchange modules and schemas by domain
+
 ## 0.11.0 (2026-09-25)
 
 ### Feat

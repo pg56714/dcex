@@ -1,3 +1,45 @@
+## 0.34.0 (2026-09-30)
+
+### Feat
+
+- support observed public spot streams and clarify trading scope
+- expand endpoint coverage and document remaining gaps
+- expand endpoint wrappers and regression coverage
+- expand trading and risk endpoint coverage
+
+### Fix
+
+- retain comma-separated cancellation IDs after normalization
+- preserve declared array inputs and documented wire formats
+- omit blank optional attached order fields
+- enforce remaining algo and convenience order decimal bounds
+- share schema output ownership and detect unmarked orphans
+- validate inputs and fund owners, harden checks and add Ondo spot data
+- validate attached orders and enforce fund dispatch ownership
+- align numeric wire contracts and fund ownership
+- preserve signed peg offsets and canonical alias contracts
+- cover leverage fields and verify signed wire inputs
+- complete numeric contracts and strengthen audit checks
+- restore attached orders and batch decimal contracts
+- scope decimal rules to explicit endpoint schemas
+- preserve exact coin swap attached prices
+- require explicit position sides and repair documentation checks
+- enforce order safety and reconcile endpoint coverage
+- complete endpoint coverage and reconcile inventory
+- address endpoint audit findings and expand regression coverage
+
+### Refactor
+
+- name regression tests and coverage records by behavior
+- move bridge commitment into withdrawal modules
+- consolidate remaining same-prefix error helpers
+- enforce dispatch ownership across exchange modules
+- unify private dispatch and enforce exchange layout
+- align Arcus clients with standard HTTP modules
+- standardize fund movement and batch modules
+- unify schema validation and lossless numeric encoding
+- organize exchange modules and schemas by domain
+
 ## Unreleased
 
 - Add Ondo public spot market streams. Spot product-table rows remain unavailable for private trading; filter `product_type="swap"` before iterating perpetual order methods.
