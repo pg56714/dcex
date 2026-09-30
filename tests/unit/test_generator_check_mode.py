@@ -59,3 +59,26 @@ def test_removed_domain_leaves_a_read_only_orphan_failure(tmp_path, monkeypatch,
     monkeypatch.setattr(Path, "mkdir", forbidden)
     assert generation.run(render) == 1
     assert (orphan.read_bytes(), orphan.stat().st_mtime_ns) == before
+
+
+@pytest.mark.parametrize("exchange", ["kraken", "okx"])
+def test_sole_schema_owner_rejects_unmarked_rust_orphans(tmp_path, monkeypatch, exchange):
+    from scripts.generated_ownership import register_schema_directories
+    folder = tmp_path / exchange / "generated"
+    folder.mkdir(parents=True)
+    orphan = folder / "unmarked.rs"
+    orphan.write_text("fn unexpected() {}\n", encoding="utf8")
+    before = orphan.read_bytes(), orphan.stat().st_mtime_ns
+    monkeypatch.setattr(generation, "ROOT", tmp_path)
+    monkeypatch.setattr(sys, "argv", ["generator", "--check"])
+    assert generation.run(lambda: register_schema_directories(tmp_path)) == 1
+    assert before == (orphan.read_bytes(), orphan.stat().st_mtime_ns)
+
+
+def test_new_schema_output_is_shared_without_hardcoded_exclusion(monkeypatch):
+    from scripts import generated_ownership
+    monkeypatch.setattr(generated_ownership, "SCHEMA_JOBS", [
+        *generated_ownership.SCHEMA_JOBS, ("binance", "new", "table_new", "new_schema")
+    ])
+    assert "new_schema.rs" in generated_ownership.schema_output_names("binance")
+    assert "new_schema.rs" not in generated_ownership.schema_output_names("okx")
