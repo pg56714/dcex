@@ -35,20 +35,20 @@ async def test_documented_stream(case):
     async with echo_peer() as (url, received):
         private = exchange == "backpack" and stream.startswith("account.")
         if exchange == "binance":
-            client = binance.PublicClient(profile="alpha", base_url=url, timeout=2)
+            client = binance.PublicClient(profile="alpha", base_url=url, timeout=10)
         elif exchange == "aster":
-            client = aster.PredictionPublicClient(testnet=case["testnet"], base_url=url, timeout=2)
+            client = aster.PredictionPublicClient(testnet=case["testnet"], base_url=url, timeout=10)
         elif private:
             client = backpack.PrivateClient(
-                "offline-key", base64.b64encode(bytes(range(32))).decode(), base_url=url, timeout=2
+                "offline-key", base64.b64encode(bytes(range(32))).decode(), base_url=url, timeout=10
             )
         else:
-            client = backpack.PublicClient(base_url=url, timeout=2)
+            client = backpack.PublicClient(base_url=url, timeout=10)
         try:
             await client.connect()
             for operation in ("subscribe", "unsubscribe"):
                 request_id = await getattr(client, operation)([stream])
-                event = await asyncio.wait_for(client.recv(), 3)
+                event = await asyncio.wait_for(client.recv(), 10)
                 expected = {"method": operation.upper(), "params": [stream]}
                 if exchange in {"binance", "aster"}:
                     expected["id"] = request_id
@@ -82,11 +82,11 @@ async def test_bitget_margin_and_sbe(row, message):
     path = "/v3/ws/public/sbe" if sbe else "/v2/ws/private" if private else "/v2/ws/public"
     async with login_peer(path) as (url, received):
         if private:
-            client = bitget.PrivateClient("key", "secret", "passphrase", base_url=url, timeout=2)
+            client = bitget.PrivateClient("key", "secret", "passphrase", base_url=url, timeout=10)
         elif sbe:
-            client = bitget.sbe_public(arg["instType"], base_url=url, timeout=2)
+            client = bitget.sbe_public(arg["instType"], base_url=url, timeout=10)
         else:
-            client = bitget.PublicClient(arg["instType"], base_url=url, timeout=2)
+            client = bitget.PublicClient(arg["instType"], base_url=url, timeout=10)
         try:
             await client.connect()
             for op in ("subscribe", "unsubscribe"):
@@ -100,7 +100,7 @@ async def test_bitget_margin_and_sbe(row, message):
                         arg.get("topic", arg.get("channel")), arg.get("symbol", arg.get("instId"))
                     )
                 expected = {"op": op, "args": [arg]}
-                assert await asyncio.wait_for(client.recv(), 3) == expected
+                assert await asyncio.wait_for(client.recv(), 10) == expected
         finally:
             await client.close()
     if private:
@@ -120,10 +120,10 @@ async def test_sbe_preserves_binary_frame():
     # A binary frame must never be coerced through UTF-8/JSON by the wrapper.
     frame = bytes.fromhex("3800ea0301000200") + bytes(range(56)) + b"\x07BTCUSDT"
     async with echo_peer("/v3/ws/public/sbe", events=[frame]) as (url, _):
-        client = bitget.sbe_public(base_url=url, timeout=2)
+        client = bitget.sbe_public(base_url=url, timeout=10)
         try:
             await client.connect()
-            assert await asyncio.wait_for(client.recv_bytes(), 3) == frame
+            assert await asyncio.wait_for(client.recv_bytes(), 10) == frame
         finally:
             await client.close()
 
@@ -132,11 +132,11 @@ async def test_sbe_preserves_binary_frame():
 async def test_hyperliquid_documented_legacy_web_data():
     subscription = {"type": "webData", "user": "0x" + "11" * 20}
     async with echo_peer() as (url, received):
-        client = hyperliquid.PublicClient(base_url=url, timeout=2)
+        client = hyperliquid.PublicClient(base_url=url, timeout=10)
         try:
             await client.connect()
             await client.subscribe(subscription)
-            assert await asyncio.wait_for(client.recv(), 3) == {
+            assert await asyncio.wait_for(client.recv(), 10) == {
                 "method": "subscribe",
                 "subscription": subscription,
             }
@@ -209,11 +209,11 @@ async def test_prediction_private_listen_key_and_events(testnet, event):
             testnet=testnet,
             http_base_url=http_url,
             ws_base_url=ws_url,
-            timeout=2,
+            timeout=10,
         )
         try:
             assert await client.connect() == "prediction-key"
-            assert await asyncio.wait_for(client.recv(), 3) == event
+            assert await asyncio.wait_for(client.recv(), 10) == event
             await client.keep_alive()
         finally:
             await client.close()

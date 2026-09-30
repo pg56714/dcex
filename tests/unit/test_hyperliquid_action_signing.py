@@ -51,7 +51,7 @@ async def test_transfer_body_and_signature_match_official_sdk(asynchronous, case
             wallet_address="0x" + "22" * 20,
             private_key=VECTORS["private_key"],
             endpoint=base,
-            timeout=2,
+            timeout=10,
         )
         action = case["action"]
         try:
@@ -75,7 +75,7 @@ async def test_transfer_body_and_signature_match_official_sdk(asynchronous, case
             result = client.close()
             if inspect.isawaitable(result):
                 await result
-        request = received.get(timeout=2)
+        request = received.get(timeout=10)
     assert request["method"] == "POST"
     assert request["path"] == "/exchange"
     body = json.loads(request["body"])

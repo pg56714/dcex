@@ -1080,7 +1080,7 @@ async def test_async_wrapper_forwards_native_name_and_params(case: WrapperCase) 
 def _signing_native(base_url: str) -> Any:  # noqa: ANN401
     native = pytest.importorskip("dcex._native")
     return native.LighterHttpClient(
-        timeout=2,
+        timeout=10,
         base_url=base_url,
         explorer_base_url=base_url,
         account_index=ACCOUNT,

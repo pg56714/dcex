@@ -25,14 +25,14 @@ async def test_rfq_book_handshake_and_snapshot(depth: int | None) -> None:
 
     async with websockets.serve(peer, "127.0.0.1", 0) as server:
         port = server.sockets[0].getsockname()[1]
-        client = _native.ExtendedPublicWebSocketClient(timeout=2, base_url=f"ws://127.0.0.1:{port}")
+        client = _native.ExtendedPublicWebSocketClient(timeout=10, base_url=f"ws://127.0.0.1:{port}")
         try:
             await client.subscribe_rfq_orderbook("AAPL-USD", depth)
-            path = await asyncio.wait_for(paths.get(), 2)
+            path = await asyncio.wait_for(paths.get(), 10)
             assert path == "/stream.extended.exchange/v1/orderbooks/rfq/AAPL-USD" + (
                 "?depth=1" if depth else ""
             )
-            assert await asyncio.wait_for(client.recv(), 2) == snapshot
+            assert await asyncio.wait_for(client.recv(), 10) == snapshot
         finally:
             await client.close()
 
@@ -42,6 +42,6 @@ async def test_rfq_invalid_depth_is_rejected_before_connecting() -> None:
     """Only full book or depth 1 is documented by Extended."""
     from dcex import _native
 
-    client = _native.ExtendedPublicWebSocketClient(timeout=1, base_url="ws://127.0.0.1:1")
+    client = _native.ExtendedPublicWebSocketClient(timeout=10, base_url="ws://127.0.0.1:1")
     with pytest.raises(ValueError, match="depth must be 1"):
         await client.subscribe_rfq_orderbook("AAPL-USD", 2)

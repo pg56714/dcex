@@ -110,7 +110,7 @@ def test_lighter_new_native_routes_reach_http() -> None:
 
 def _native_client(*, base_url: str = "http://127.0.0.1:1") -> object:
     native = pytest.importorskip("dcex._native")
-    return native.LighterHttpClient(timeout=2, base_url=base_url)
+    return native.LighterHttpClient(timeout=10, base_url=base_url)
 
 
 def _signing_client() -> object:

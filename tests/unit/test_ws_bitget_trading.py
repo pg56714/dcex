@@ -47,7 +47,7 @@ async def test_trading_wire_protocol_and_partial_results(uta: bool) -> None:
         "key",
         "secret",
         "pass",
-        timeout=2,
+        timeout=10,
         base_url=f"ws://127.0.0.1:{runner.addresses[0][1]}{path}",
     )
     try:

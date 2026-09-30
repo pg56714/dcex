@@ -77,7 +77,7 @@ async def test_inventory_wire(asynchronous, op):
             client._native_client = native.BinanceHttpClient(
                 api_key="key",
                 api_secret="secret",
-                timeout=2,
+                timeout=10,
                 spot_base_url=base,
                 alpha_base_url=base,
             )

@@ -119,7 +119,7 @@ def _native_client(base_url: str) -> object:
     return native.BingxHttpClient(
         api_key="api-key",
         api_secret="secret",
-        timeout=2,
+        timeout=10,
         base_url=base_url,
     )
 

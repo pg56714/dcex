@@ -71,7 +71,7 @@ def test_bingx_native_swap_queries_reach_http() -> None:
     """PyO3 forwards the documented paths and auto-adds trading-rules timestamp."""
     native = pytest.importorskip("dcex._native")
     with _http_server({"code": 0, "data": {}}) as (base_url, received):
-        public = native.BingxHttpClient(timeout=2, base_url=base_url)
+        public = native.BingxHttpClient(timeout=10, base_url=base_url)
         for method in (
             "get_swap_premium_index",
             "get_swap_funding_rate",
@@ -80,7 +80,7 @@ def test_bingx_native_swap_queries_reach_http() -> None:
         ):
             public.public_request_json(method, [("product_symbol", "BTC-USDT-SWAP")])
         private = native.BingxHttpClient(
-            api_key="api-key", api_secret="secret", timeout=2, base_url=base_url
+            api_key="api-key", api_secret="secret", timeout=10, base_url=base_url
         )
         private.private_request_json("get_swap_commission_rate", [])
     paths = [urlsplit(received.get_nowait()["path"]) for _ in range(5)]

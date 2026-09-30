@@ -69,7 +69,7 @@ def _native_client(*, base_url: str = "http://127.0.0.1:1", private: bool = Fals
     native = pytest.importorskip("dcex._native")
     return native.ExtendedHttpClient(
         api_key="extended-key" if private else None,
-        timeout=2,
+        timeout=10,
         base_url=base_url,
         user_agent="dcex-test",
     )

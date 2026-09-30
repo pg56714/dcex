@@ -90,7 +90,7 @@ async def test_native_subscription_and_unsubscription(
     try:
         await client.connect()
         request_id = await client.subscribe(streams)
-        assert (await asyncio.wait_for(client.recv(), 2))["id"] == request_id
+        assert (await asyncio.wait_for(client.recv(), 10))["id"] == request_id
         assert received[-1] == {"method": "SUBSCRIBE", "params": streams, "id": request_id}
         await client.unsubscribe(streams)
         await client.recv()

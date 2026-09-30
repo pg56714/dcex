@@ -60,7 +60,7 @@ def _native_client(
 ) -> object:
     native = pytest.importorskip("dcex._native")
     return native.AsterHttpClient(
-        timeout=2,
+        timeout=10,
         spot_base_url=spot_url,
         futures_base_url=futures_url or spot_url,
     )

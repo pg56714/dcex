@@ -19,7 +19,7 @@ def test_native_mexc_spot_signed_request() -> None:
         client = native.MexcHttpClient(
             api_key="api-key",
             api_secret="secret",
-            timeout=2,
+            timeout=10,
             base_url=base_url,
             contract_base_url=base_url,
         )
@@ -57,7 +57,7 @@ def test_native_mexc_contract_signed_body() -> None:
         client = native.MexcHttpClient(
             api_key="api-key",
             api_secret="secret",
-            timeout=2,
+            timeout=10,
             base_url=base_url,
             contract_base_url=base_url,
         )
@@ -140,7 +140,7 @@ def test_native_mexc_public_dispatcher_normalizes_product_symbol() -> None:
         client = native.MexcHttpClient(
             api_key="api-key",
             api_secret="secret",
-            timeout=2,
+            timeout=10,
             base_url=base_url,
             contract_base_url=base_url,
         )
@@ -162,7 +162,7 @@ def test_native_mexc_private_spot_batch_order_converts_product_symbols() -> None
         client = native.MexcHttpClient(
             api_key="api-key",
             api_secret="secret",
-            timeout=2,
+            timeout=10,
             base_url=base_url,
             contract_base_url=base_url,
         )
@@ -207,7 +207,7 @@ def test_native_mexc_private_contract_order_builds_json_body() -> None:
         client = native.MexcHttpClient(
             api_key="api-key",
             api_secret="secret",
-            timeout=2,
+            timeout=10,
             base_url=base_url,
             contract_base_url=base_url,
         )

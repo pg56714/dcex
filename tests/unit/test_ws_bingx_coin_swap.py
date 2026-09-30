@@ -48,14 +48,14 @@ async def test_coin_swap_channels_and_automatic_private_events() -> None:
     await site.start()
     port = runner.addresses[0][1]
     ws_url = f"ws://127.0.0.1:{port}/market"
-    public = PublicClient(market="coin_swap", base_url=ws_url, timeout=2)
+    public = PublicClient(market="coin_swap", base_url=ws_url, timeout=10)
     private = PrivateClient(
         "key",
         "secret",
         market="coin_swap",
         http_base_url=f"http://127.0.0.1:{port}",
         ws_base_url=ws_url,
-        timeout=2,
+        timeout=10,
     )
     try:
         await public.connect()

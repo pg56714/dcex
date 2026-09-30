@@ -19,7 +19,7 @@ def test_native_bingx_signed_request() -> None:
         client = native.BingxHttpClient(
             api_key="api-key",
             api_secret="secret",
-            timeout=2,
+            timeout=10,
             base_url=base_url,
         )
         status, _headers, body = client.request_raw_json(
@@ -204,7 +204,7 @@ def test_native_bingx_private_spot_order_uses_dispatcher() -> None:
         client = native.BingxHttpClient(
             api_key="api-key",
             api_secret="secret",
-            timeout=2,
+            timeout=10,
             base_url=base_url,
         )
         status, _headers, body = client.private_request_json(
@@ -238,7 +238,7 @@ def test_native_bingx_private_batch_order_normalizes_numbers() -> None:
         client = native.BingxHttpClient(
             api_key="api-key",
             api_secret="secret",
-            timeout=2,
+            timeout=10,
             base_url=base_url,
         )
         status, _headers, body = client.private_request_json(

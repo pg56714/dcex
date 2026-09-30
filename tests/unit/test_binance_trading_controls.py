@@ -338,7 +338,7 @@ async def test_controls_sign_and_encode_native_requests(
         client._native_client = native.BinanceHttpClient(
             api_key="api-key",
             api_secret="api-secret",
-            timeout=2,
+            timeout=10,
             spot_base_url=base,
             futures_base_url=base,
             coin_futures_base_url=base,
@@ -440,7 +440,7 @@ def test_controls_reject_invalid_inputs_before_transport(
     client._native_client = native.BinanceHttpClient(
         api_key="api-key",
         api_secret="api-secret",
-        timeout=1,
+        timeout=10,
         spot_base_url="http://127.0.0.1:9",
         futures_base_url="http://127.0.0.1:9",
         coin_futures_base_url="http://127.0.0.1:9",

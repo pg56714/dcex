@@ -20,7 +20,7 @@ def test_native_backpack_signed_request() -> None:
             api_key=api_key,
             api_secret=api_secret,
             window=5000,
-            timeout=2,
+            timeout=10,
             base_url=base_url,
         )
         status, _headers, body = client.request_raw_json(

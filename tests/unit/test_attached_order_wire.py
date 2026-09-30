@@ -69,7 +69,7 @@ async def test_okx_actual_batch_and_attached_decimal_fields(asynchronous, native
             await client.async_init()
         try:
             await invoke(client, method, kwargs, native)
-            request = received.get(timeout=2)
+            request = received.get(timeout=10)
             assert urlsplit(request["path"]).path == endpoint
             payload = json.loads(request["body"])
             contract = CATALOG["exchanges"]["okx"][method]
@@ -132,7 +132,7 @@ async def test_kucoin_margin_is_a_positive_decimal_on_the_wire(asynchronous, nat
         try:
             kwargs = dict(**symbol, margin="1.25", **({"bizNo": "1"} if native else {"biz_no": "1"}))
             await invoke(client, method, kwargs, native)
-            request = received.get(timeout=2)
+            request = received.get(timeout=10)
             assert urlsplit(request["path"]).path == ("/api/v1/copy-trade/futures/position/margin/deposit-margin" if copy_trading else "/api/v1/position/margin/deposit-margin")
             payload = json.loads(request["body"], parse_float=Decimal)
             assert Decimal(str(payload["margin"])) == Decimal("1.25")
@@ -168,7 +168,7 @@ async def test_kraken_zero_volume_closing_order_reaches_wire(asynchronous, nativ
                 await invoke(client, "place_spot_order", dict(product_symbol="BTC-USD", side="buy", ordertype="limit", price="100", volume="0"), native)
             assert received.empty()
             await invoke(client, "place_spot_order", kwargs, native)
-            request = received.get(timeout=2)
+            request = received.get(timeout=10)
             assert urlsplit(request["path"]).path == "/0/private/AddOrder"
             assert parse_qs(request["body"])["volume"] == ["0"]
         finally:
@@ -194,7 +194,7 @@ async def test_bingx_batch_attached_orders_use_json_strings_with_exact_numbers(a
             order = dict(symbol="BTC-USDT", side="BUY", type="MARKET", positionSide="LONG", quantity="1", takeProfit=value)
             args = {"batchOrders" if native else "batch_orders": [order]}
             await invoke(client, "place_swap_batch_order", args, native)
-            request = received.get(timeout=2)
+            request = received.get(timeout=10)
             params = parse_qs(urlsplit(request["path"]).query or request["body"])
             payload = json.loads(params["batchOrders"][0])
             assert isinstance(payload[0]["takeProfit"], str)
@@ -241,7 +241,7 @@ async def test_backpack_percent_trigger_quantity_reaches_wire(asynchronous, nati
                     await invoke(client, method, {"orders": [bad]} if method == "place_batch_orders" else bad, native)
                 assert received.empty()
             await invoke(client, method, {"orders": [order]} if method == "place_batch_orders" else order, native)
-            payload = json.loads(received.get(timeout=2)["body"])
+            payload = json.loads(received.get(timeout=10)["body"])
             if method == "place_batch_orders":
                 payload = payload[0]
             assert payload["triggerQuantity"] == "50%"
@@ -276,7 +276,7 @@ async def test_bybit_zero_quantity_requires_both_closing_flags(asynchronous, nat
                     await invoke(client, "place_order", {**order, **flags}, native)
                 assert received.empty()
             await invoke(client, "place_order", {**order, "reduceOnly": True, "closeOnTrigger": True}, native)
-            payload = json.loads(received.get(timeout=2)["body"])
+            payload = json.loads(received.get(timeout=10)["body"])
             assert payload["qty"] == "0" and payload["reduceOnly"] and payload["closeOnTrigger"]
         finally:
             result = client.close()

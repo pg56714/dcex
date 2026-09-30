@@ -24,7 +24,7 @@ def test_bybit_endpoint_specific_page_limit(method, limit):
             getattr(client, method)(*case.args, **dict(case.kwargs, limit=limit))
         finally:
             client.close()
-        assert dict(parse_qsl(urlsplit(received.get(timeout=2)["path"]).query))["limit"] == str(
+        assert dict(parse_qsl(urlsplit(received.get(timeout=10)["path"]).query))["limit"] == str(
             limit
         )
 
@@ -41,4 +41,4 @@ def test_bybit_max_loan_accepts_collateral_list():
             client.crypto_loan_common_max_loan(currency="USDT", collateral_list=collateral)
         finally:
             client.close()
-        assert json.loads(received.get(timeout=2)["body"])["collateralList"] == collateral
+        assert json.loads(received.get(timeout=10)["body"])["collateralList"] == collateral

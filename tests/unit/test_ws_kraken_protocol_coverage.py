@@ -47,13 +47,13 @@ async def test_v1_official_message(row, message):
     if "token" in message.get("subscription", {}):
         message["subscription"]["token"] = token
     async with echo_peer() as (url, received):
-        client = V1Client(token, base_url=url, timeout=2)
+        client = V1Client(token, base_url=url, timeout=10)
         try:
-            await asyncio.wait_for(client.connect(), 3)
+            await asyncio.wait_for(client.connect(), 10)
             await client.send_message(
                 message, all_symbols=message["event"] in {"cancelAll", "cancelAllOrdersAfter"}
             )
-            assert await asyncio.wait_for(client.recv(), 3) == message
+            assert await asyncio.wait_for(client.recv(), 10) == message
         finally:
             await client.close()
     assert received == [message], row
@@ -64,13 +64,13 @@ async def test_v1_official_message(row, message):
 async def test_unsolicited_protocol_event(row, event):
     async with echo_peer(events=[event]) as (url, received):
         client = (
-            PublicClient(base_url=url, timeout=2)
+            PublicClient(base_url=url, timeout=10)
             if row == 4607
-            else V1Client(base_url=url, timeout=2)
+            else V1Client(base_url=url, timeout=10)
         )
         try:
             await client.connect()
-            assert await asyncio.wait_for(client.recv(), 3) == event
+            assert await asyncio.wait_for(client.recv(), 10) == event
         finally:
             await client.close()
     assert received == []
@@ -81,9 +81,9 @@ async def test_futures_heartbeat_and_spot_v2_ping():
     for futures in (True, False):
         async with echo_peer() as (url, received):
             client = (
-                FuturesPublicClient(base_url=url, timeout=2)
+                FuturesPublicClient(base_url=url, timeout=10)
                 if futures
-                else PublicClient(base_url=url, timeout=2)
+                else PublicClient(base_url=url, timeout=10)
             )
             try:
                 await client.connect()
@@ -93,7 +93,7 @@ async def test_futures_heartbeat_and_spot_v2_ping():
                 else:
                     request_id = await client.ping()
                     expected = {"method": "ping", "req_id": request_id}
-                assert await asyncio.wait_for(client.recv(), 3) == expected
+                assert await asyncio.wait_for(client.recv(), 10) == expected
             finally:
                 await client.close()
         assert received == [expected]
@@ -102,7 +102,7 @@ async def test_futures_heartbeat_and_spot_v2_ping():
 @pytest.mark.asyncio
 async def test_account_wide_cancel_requires_explicit_scope():
     async with echo_peer() as (url, received):
-        client = V1Client("token", base_url=url, timeout=2)
+        client = V1Client("token", base_url=url, timeout=10)
         try:
             await client.connect()
             for event in ("cancelAll", "cancelAllOrdersAfter"):

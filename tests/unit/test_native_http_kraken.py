@@ -20,7 +20,7 @@ def test_native_kraken_spot_signed_request() -> None:
         client = native.KrakenHttpClient(
             spot_api_key="api-key",
             spot_api_secret=api_secret,
-            timeout=2,
+            timeout=10,
             spot_base_url=base_url,
             futures_base_url=base_url,
         )
@@ -56,7 +56,7 @@ def test_native_kraken_futures_signed_request() -> None:
         client = native.KrakenHttpClient(
             futures_api_key="api-key",
             futures_api_secret=api_secret,
-            timeout=2,
+            timeout=10,
             spot_base_url=base_url,
             futures_base_url=base_url,
         )

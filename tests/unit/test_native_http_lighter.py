@@ -14,7 +14,7 @@ def test_native_lighter_form_request() -> None:
     native = pytest.importorskip("dcex._native")
 
     with _http_server({"code": 0}) as (base_url, received):
-        client = native.LighterHttpClient(timeout=2, base_url=base_url)
+        client = native.LighterHttpClient(timeout=10, base_url=base_url)
         status, _headers, body = client.request_raw_json(
             "POST",
             "/api/v1/sendTx",

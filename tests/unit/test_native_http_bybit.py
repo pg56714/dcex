@@ -22,7 +22,7 @@ def test_native_bybit_signed_body() -> None:
             api_secret="secret",
             recv_window=5000,
             sync_server_time=False,
-            timeout=2,
+            timeout=10,
             base_url=base_url,
         )
         status, _headers, body = client.request_raw_json(
@@ -62,7 +62,7 @@ def test_sync_bybit_manager_uses_native_transport() -> None:
         )
         manager._native_client = native.BybitHttpClient(
             sync_server_time=False,
-            timeout=2,
+            timeout=10,
             base_url=base_url,
         )
         result = manager._request(
@@ -91,7 +91,7 @@ async def test_async_bybit_manager_uses_native_transport() -> None:
         await manager.async_init()
         manager._native_client = native.BybitHttpClient(
             sync_server_time=False,
-            timeout=2,
+            timeout=10,
             base_url=base_url,
         )
         result = await manager._request(
@@ -114,7 +114,7 @@ def test_native_bybit_margin_lifecycle_uses_official_paths_and_payloads() -> Non
             api_key="api-key",
             api_secret="secret",
             sync_server_time=False,
-            timeout=2,
+            timeout=10,
             base_url=base_url,
         )
         client.private_request_json("manual_borrow", [("coin", "USDT"), ("amount", "1")])

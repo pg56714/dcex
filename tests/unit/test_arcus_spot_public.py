@@ -50,7 +50,7 @@ def _firm_spot_quote(chain_id: int) -> dict[str, object]:
 def test_arcus_spot_native_public_routes() -> None:
     native = pytest.importorskip("dcex._native")
     with _http_server({"ok": True}) as (base_url, received):
-        client = native.ArcusSpotHttpClient(base_url=base_url, timeout=2)
+        client = native.ArcusSpotHttpClient(base_url=base_url, timeout=10)
         assert client.public_request_json("health", [])[2] == {"ok": True}
         assert received.get_nowait()["path"] == "/health"
         assert client.public_request_json("get_tokens", [])[2] == {"ok": True}

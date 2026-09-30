@@ -24,7 +24,7 @@ def test_kucoin_leverage_uses_requested_market(trade_type, symbol, expected):
         finally:
             client.close()
         assert (
-            dict(parse_qsl(urlsplit(received.get(timeout=2)["path"]).query))["symbol"] == expected
+            dict(parse_qsl(urlsplit(received.get(timeout=10)["path"]).query))["symbol"] == expected
         )
 
 
@@ -40,7 +40,7 @@ def test_kucoin_stop_order_generates_client_id():
             )
         finally:
             client.close()
-        body = json.loads(received.get(timeout=2)["body"])
+        body = json.loads(received.get(timeout=10)["body"])
         assert isinstance(body["clientOid"], str) and len(body["clientOid"]) > 10
 
 

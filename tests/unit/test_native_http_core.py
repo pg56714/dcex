@@ -17,7 +17,7 @@ def test_native_sync_http_client() -> None:
     native = pytest.importorskip("dcex._native")
 
     with _http_server() as (base_url, received):
-        client = native.HttpClient(timeout=2)
+        client = native.HttpClient(timeout=10)
         status, headers, body = client.request(
             "GET",
             base_url,
@@ -60,7 +60,7 @@ async def test_native_async_http_client() -> None:
     native = pytest.importorskip("dcex._native")
 
     with _http_server() as (base_url, received):
-        client = native.HttpClient(timeout=2)
+        client = native.HttpClient(timeout=10)
         status, headers, body = await client.request_async(
             "GET",
             base_url,

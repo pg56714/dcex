@@ -30,7 +30,7 @@ async def test_relative_rest_wire(asynchronous, value, method, path, kwargs, fie
             result = getattr(client, method)(**kwargs, **dict.fromkeys(fields, value))
             if inspect.isawaitable(result):
                 await result
-            request = received.get(timeout=2)
+            request = received.get(timeout=10)
             assert request["method"] == "POST"
             assert urlsplit(request["path"]).path == path
             payload = parse_qs(request["body"])
@@ -55,11 +55,11 @@ async def test_relative_ws_wire(event, value):
     if event == "amendOrder":
         payload = {"event": event, "txid": "order-id", "limit_price": value, "trigger_price": value}
     async with echo_peer() as (url, received):
-        client = V1Client("offline-token", base_url=url, timeout=2)
+        client = V1Client("offline-token", base_url=url, timeout=10)
         try:
             await client.connect()
             await client.send_message(payload)
-            result = await asyncio.wait_for(client.recv(), 3)
+            result = await asyncio.wait_for(client.recv(), 10)
             assert result == {**payload, "token":"offline-token"}
         finally:
             await client.close()

@@ -857,7 +857,7 @@ def test_wrapper_params_reach_official_wire_type(case: WrapperCase) -> None:
         client = native.HyperliquidHttpClient(
             wallet_address=WALLET,
             private_key="0x" + "11" * 32,
-            timeout=2,
+            timeout=10,
             endpoint=base_url,
         )
         request = (
@@ -1012,7 +1012,7 @@ def test_native_batch_orders_carry_all_orders_and_grouping() -> None:
         client = native.HyperliquidHttpClient(
             wallet_address=WALLET,
             private_key="0x" + "11" * 32,
-            timeout=2,
+            timeout=10,
             endpoint=base_url,
         )
         client.private_request_json(

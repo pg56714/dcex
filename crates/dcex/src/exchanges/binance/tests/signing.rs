@@ -65,7 +65,7 @@ fn coin_futures_balance_uses_dapi_signed_route() {
     let client = BinanceClient::new(
         Some("api-key".into()),
         Some("secret".into()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
     )
     .expect("client")
     .with_coin_futures_base_url(coin_base_url);

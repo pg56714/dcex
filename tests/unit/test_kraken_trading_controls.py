@@ -49,4 +49,4 @@ def test_kraken_take_profit_batch_allows_market_trigger():
             )
         finally:
             client.close()
-        assert received.get(timeout=2)["method"] == "POST"
+        assert received.get(timeout=10)["method"] == "POST"

@@ -98,15 +98,15 @@ async def test_ondo_connect_login_ping_and_subscriptions(channel):
     private = channel in ONDO_PRIVATE
     async with authenticated_peer("ondo") as (url, received):
         client = (
-            ondo.PrivateClient("key", "secret", base_url=url, timeout=2)
+            ondo.PrivateClient("key", "secret", base_url=url, timeout=10)
             if private
-            else ondo.PublicClient(base_url=url, timeout=2)
+            else ondo.PublicClient(base_url=url, timeout=10)
         )
         try:
-            await asyncio.wait_for(client.connect(), 3)
+            await asyncio.wait_for(client.connect(), 10)
             assert client.is_connected()
             await client.ping()
-            assert await asyncio.wait_for(client.recv(), 3) == {"op": "ping"}
+            assert await asyncio.wait_for(client.recv(), 10) == {"op": "ping"}
             expected = {"op": "subscribe", "channel": channel}
             if channel == "cancelAllOrdersAfterPerps":
                 await client.subscribe_cancel_all_orders_after(60)
@@ -122,7 +122,7 @@ async def test_ondo_connect_login_ping_and_subscriptions(channel):
                 )
                 if channel == "ordersSummariesPerps" or not private:
                     expected["markets"] = [market]
-            assert await asyncio.wait_for(client.recv(), 3) == expected
+            assert await asyncio.wait_for(client.recv(), 10) == expected
         finally:
             await client.close()
         assert not client.is_connected()

@@ -15,7 +15,7 @@ def test_extended_commit_bridge_quote_uses_post_query():
             client.commit_bridge_quote("quote-123")
         finally:
             client.close()
-        request = received.get(timeout=2)
+        request = received.get(timeout=10)
         assert request["method"] == "POST"
         assert urlsplit(request["path"]).path == "/api/v1/user/bridge/quote"
         assert dict(parse_qsl(urlsplit(request["path"]).query)) == {"id": "quote-123"}

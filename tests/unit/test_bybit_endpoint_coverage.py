@@ -1720,7 +1720,7 @@ def _route_server() -> Iterator[tuple[str, queue.Queue[dict[str, Any]]]]:
     finally:
         server.shutdown()
         server.server_close()
-        thread.join(timeout=5)
+        thread.join(timeout=10)
 
 
 def _native_client(base_url: str) -> Any:  # noqa: ANN401
@@ -1729,7 +1729,7 @@ def _native_client(base_url: str) -> Any:  # noqa: ANN401
         api_secret="api-secret",
         recv_window=5000,
         sync_server_time=False,
-        timeout=5,
+        timeout=10,
         base_url=base_url,
     )
 

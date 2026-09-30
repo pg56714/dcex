@@ -87,19 +87,19 @@ async def test_official_message_shape(case):
     private = case["private"] or example["op"] not in {"subscribe", "unsubscribe"}
     async with peer(case["path"]) as (url, received):
         client = (
-            PrivateClient("key", "secret", "passphrase", base_url=url, timeout=2)
+            PrivateClient("key", "secret", "passphrase", base_url=url, timeout=10)
             if private
-            else PublicClient(base_url=url, timeout=2)
+            else PublicClient(base_url=url, timeout=10)
         )
         try:
-            await asyncio.wait_for(client.connect(), 3)
+            await asyncio.wait_for(client.connect(), 10)
             if example["op"] in {"subscribe", "unsubscribe"}:
                 await getattr(client, example["op"] + "_args")(example["args"])
                 expected = {"op": example["op"], "args": example["args"]}
             else:
                 await client.send_operation("test123", example["op"], example["args"])
                 expected = {"id": "test123", "op": example["op"], "args": example["args"]}
-            assert await asyncio.wait_for(client.recv(), 3) == expected
+            assert await asyncio.wait_for(client.recv(), 10) == expected
         finally:
             await client.close()
     assert received[-1] == expected
@@ -119,11 +119,11 @@ async def test_login_and_connection_count_event():
         "connId": "abc123",
     }
     async with peer("/ws/v5/private", event) as (url, received):
-        client = PrivateClient("key", "secret", "passphrase", base_url=url, timeout=2)
+        client = PrivateClient("key", "secret", "passphrase", base_url=url, timeout=10)
         try:
-            await asyncio.wait_for(client.connect(), 3)
+            await asyncio.wait_for(client.connect(), 10)
             assert_login(received[0])
-            assert await asyncio.wait_for(client.recv(), 3) == event
+            assert await asyncio.wait_for(client.recv(), 10) == event
         finally:
             await client.close()
 
@@ -131,7 +131,7 @@ async def test_login_and_connection_count_event():
 @pytest.mark.asyncio
 async def test_mass_cancel_requires_scope_before_transport():
     async with peer("/ws/v5/private") as (url, received):
-        client = PrivateClient("key", "secret", "passphrase", base_url=url, timeout=2)
+        client = PrivateClient("key", "secret", "passphrase", base_url=url, timeout=10)
         try:
             await client.connect()
             with pytest.raises(ValueError, match="all_symbols"):

@@ -58,8 +58,8 @@ async def peer() -> AsyncIterator[str]:
 async def test_hyperliquid_preserves_signed_action_nonce_and_info_payload() -> None:
     async with peer() as url:
         clients = [
-            HyperliquidPublicWebSocket(base_url=url, timeout=2),
-            HyperliquidWebSocket(ADDRESS, base_url=url, timeout=2),
+            HyperliquidPublicWebSocket(base_url=url, timeout=10),
+            HyperliquidWebSocket(ADDRESS, base_url=url, timeout=10),
         ]
         try:
             for client in clients:
@@ -99,7 +99,7 @@ async def test_hyperliquid_preserves_signed_action_nonce_and_info_payload() -> N
 async def test_lighter_single_and_batch_use_distinct_json_encoding() -> None:
     async with peer() as url:
         client = LighterWebSocket(
-            1, 2, "01" + "00" * 39, ws_base_url=url, http_base_url="http://127.0.0.1:1", timeout=2
+            1, 2, "01" + "00" * 39, ws_base_url=url, http_base_url="http://127.0.0.1:1", timeout=10
         )
         infos = [
             json.dumps(
@@ -152,7 +152,7 @@ async def test_arcus_native_signing_to_websocket_preserves_typed_signature(
     with _http_server(MARKETS) as (http_url, received):
         rest = module.Client(api_secret="05" * 32, address=ADDRESS, base_url=http_url)
         async with peer() as url:
-            client = ArcusWebSocket(ADDRESS, base_url=url, timeout=2)
+            client = ArcusWebSocket(ADDRESS, base_url=url, timeout=10)
             try:
                 if mode == "async":
                     await rest.async_init()

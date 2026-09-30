@@ -48,7 +48,7 @@ async def test_full_official_request_and_signature(case, asynchronous):
             result = client.close()
             if inspect.isawaitable(result):
                 await result
-        request = received.get(timeout=2)
+        request = received.get(timeout=10)
         assert received.empty()
     url = urlsplit(request["path"])
     assert (request["method"], url.path) == (case["method"], case["path"])

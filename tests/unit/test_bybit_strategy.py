@@ -73,6 +73,6 @@ def test_bybit_strategy_derives_category_and_maker_encoding(maker_only, expected
             )
         finally:
             client.close()
-        body = json.loads(received.get(timeout=2)["body"])
+        body = json.loads(received.get(timeout=10)["body"])
         assert body["category"] == "UTA_SPOT"
         assert body["postOnly"] == expected

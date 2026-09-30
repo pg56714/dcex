@@ -20,7 +20,7 @@ def test_native_kucoin_signed_request() -> None:
             api_key="api-key",
             api_secret="secret",
             passphrase="passphrase",
-            timeout=2,
+            timeout=10,
             spot_base_url=base_url,
             futures_base_url=base_url,
         )

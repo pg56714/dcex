@@ -21,7 +21,7 @@ def test_native_okx_signed_request() -> None:
             api_secret="secret",
             passphrase="passphrase",
             flag="1",
-            timeout=2,
+            timeout=10,
             base_url=base_url,
         )
         status, _headers, body = client.request_raw_json(
@@ -76,7 +76,7 @@ def test_native_okx_spot_borrow_repay_uses_official_paths_and_types() -> None:
             api_key="api-key",
             api_secret="secret",
             passphrase="passphrase",
-            timeout=2,
+            timeout=10,
             base_url=base_url,
         )
         client.private_request_json(

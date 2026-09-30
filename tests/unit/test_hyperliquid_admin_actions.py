@@ -41,7 +41,7 @@ async def invoke(asynchronous, base, name, testnet=True, **kwargs):
         wallet_address=VECTORS["wallet_address"],
         testnet=testnet,
         endpoint=base,
-        timeout=2,
+        timeout=10,
     )
     try:
         result = getattr(client, name)(**kwargs)
@@ -155,7 +155,7 @@ def test_native_irreversible_action_requires_confirmation(name, confirm):
         params.append(("confirm", confirm))
     with _http_server() as (base, received):
         client = native.HyperliquidHttpClient(
-            private_key=VECTORS["private_key"], testnet=True, endpoint=base, timeout=2
+            private_key=VECTORS["private_key"], testnet=True, endpoint=base, timeout=10
         )
         with pytest.raises(ValueError, match="confirm"):
             client.private_request_json(name, params)

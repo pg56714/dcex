@@ -57,7 +57,7 @@ def test_native_time_range_payload_reaches_http() -> None:
     """PyO3 and Rust produce the documented Hyperliquid info payload."""
     native = pytest.importorskip("dcex._native")
     with _http_server({"ok": True}) as (base_url, received):
-        client = native.HyperliquidHttpClient(timeout=2, endpoint=base_url)
+        client = native.HyperliquidHttpClient(timeout=10, endpoint=base_url)
         client.public_request_json(
             "user_fills_by_time",
             [

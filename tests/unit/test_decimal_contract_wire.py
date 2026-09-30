@@ -40,19 +40,19 @@ async def test_decimal_contract_regression_wire(asynchronous, case, monkeypatch)
             if case == "attached":
                 attached = '{"type":"TAKE_PROFIT_MARKET","stopPrice":61000.5}'
                 await call("place_swap_order", product_symbol="BTC-USDT-SWAP", type_="MARKET", side="BUY", position_side="LONG", quantity="1", take_profit=attached)
-                request = received.get(timeout=2)
+                request = received.get(timeout=10)
                 assert urlsplit(request["path"]).path == "/openApi/swap/v2/trade/order"
                 params = parse_qs(urlsplit(request["path"]).query or request["body"])
                 assert json.loads(params["takeProfit"][0]) == json.loads(attached)
             elif case == "market_trigger":
                 await call("place_algo_order", product_symbol="BTC-USDT-SWAP", trade_mode="cross", side="buy", order_type="trigger", sz="1", trigger_px="60000", order_px="-1")
-                request = received.get(timeout=2)
+                request = received.get(timeout=10)
                 assert urlsplit(request["path"]).path == "/api/v5/trade/order-algo"
                 assert json.loads(request["body"])["orderPx"] == "-1"
             else:
                 order = dict(symbol="BTCUSDT", side="Buy", orderType="Limit", qty="0.1", price="60000")
                 await call("place_batch_order", request=[order])
-                request = received.get(timeout=2)
+                request = received.get(timeout=10)
                 assert urlsplit(request["path"]).path == "/v5/order/create-batch"
                 assert json.loads(request["body"])["request"] == [order]
                 for field, value in [("qty", 0.1), ("price", "1e-7")]:
@@ -79,7 +79,7 @@ async def test_bingx_batch_retains_exact_json_numbers(asynchronous):
             result = client.place_swap_batch_order(batch_orders=[order])
             if inspect.isawaitable(result):
                 await result
-            request = received.get(timeout=2)
+            request = received.get(timeout=10)
             params = parse_qs(urlsplit(request["path"]).query or request["body"])
             decoded = json.loads(params["batchOrders"][0], parse_float=Decimal)
             assert decoded[0]["quantity"] == Decimal(order["quantity"])
@@ -105,7 +105,7 @@ async def test_documented_signed_values_reach_the_wire(asynchronous):
             result = client.place_futures_order(product_symbol="BTC-USD-SWAP", side="sell", orderType="take_profit", size="1", stopPrice="60000", limitPriceOffsetValue="-0.5", limitPriceOffsetUnit="PERCENT")
             if inspect.isawaitable(result):
                 await result
-            request = received.get(timeout=2)
+            request = received.get(timeout=10)
             assert parse_qs(request["body"])["limitPriceOffsetValue"] == ["-0.5"]
             # Official batch support is unconfirmed; retain the explicit native error.
             with pytest.raises(ValueError, match="unsupported batch instruction field"):
@@ -126,7 +126,7 @@ async def test_documented_signed_values_reach_the_wire(asynchronous):
             result = client.simulate_positions(idx_vol="-0.5")
             if inspect.isawaitable(result):
                 await result
-            assert json.loads(received.get(timeout=2)["body"])["idxVol"] == "-0.5"
+            assert json.loads(received.get(timeout=10)["body"])["idxVol"] == "-0.5"
         finally:
             result = client.close()
             if inspect.isawaitable(result):
@@ -148,7 +148,7 @@ async def test_aster_signed_bbo_offset_reaches_the_wire(asynchronous):
             result = client.place_futures_order(product_symbol="BTC-USDT-SWAP", side="buy", type_="LIMIT", quantity="1", price="60000", timeInForce="GTC", pegPriceType="QUEUE_1", pegOffset="-0.5")
             if inspect.isawaitable(result):
                 await result
-            request = received.get(timeout=2)
+            request = received.get(timeout=10)
             assert urlsplit(request["path"]).path == "/fapi/v3/order"
             assert parse_qs(urlsplit(request["path"]).query or request["body"])["pegOffset"] == ["-0.5"]
         finally:

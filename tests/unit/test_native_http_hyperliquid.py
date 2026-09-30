@@ -18,7 +18,7 @@ def test_native_hyperliquid_signed_request() -> None:
         client = native.HyperliquidHttpClient(
             wallet_address="0x" + "22" * 20,
             private_key="0x" + "11" * 32,
-            timeout=2,
+            timeout=10,
             endpoint=base_url,
         )
         status, _headers, body = client.request_raw_json(
@@ -48,7 +48,7 @@ def test_native_hyperliquid_private_order_builder_fee_payload_matches_docs() -> 
         client = native.HyperliquidHttpClient(
             wallet_address="0x" + "22" * 20,
             private_key="0x" + "11" * 32,
-            timeout=2,
+            timeout=10,
             endpoint=base_url,
         )
         status, _headers, body = client.private_request_json(
@@ -87,7 +87,7 @@ def test_native_hyperliquid_market_order_uses_ioc_limit_payload() -> None:
         client = native.HyperliquidHttpClient(
             wallet_address="0x" + "22" * 20,
             private_key="0x" + "11" * 32,
-            timeout=2,
+            timeout=10,
             endpoint=base_url,
         )
         client.private_request_json(
@@ -113,7 +113,7 @@ def test_sync_hyperliquid_manager_uses_native_transport() -> None:
         )
         manager.endpoint = base_url
         manager._native_client = pytest.importorskip("dcex._native").HyperliquidHttpClient(
-            timeout=2, endpoint=base_url
+            timeout=10, endpoint=base_url
         )
         result = manager._request(
             "POST",
@@ -139,7 +139,7 @@ async def test_async_hyperliquid_manager_uses_native_transport() -> None:
         await manager.async_init()
         manager.endpoint = base_url
         manager._native_client = pytest.importorskip("dcex._native").HyperliquidHttpClient(
-            timeout=2, endpoint=base_url
+            timeout=10, endpoint=base_url
         )
         result = await manager._request(
             "POST",

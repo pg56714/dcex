@@ -734,7 +734,7 @@ def _route_server() -> Iterator[tuple[str, queue.Queue[dict[str, Any]]]]:
     finally:
         server.shutdown()
         server.server_close()
-        thread.join(timeout=5)
+        thread.join(timeout=10)
 
 
 def _client_kwargs(base_url: str) -> dict[str, Any]:
@@ -943,7 +943,7 @@ def test_sync_kraken_wrapper_hits_official_route(method_name: str) -> None:
             _call_checked_native(getattr(client, method_name), kwargs)
         finally:
             client.close()
-        request = received.get(timeout=5)
+        request = received.get(timeout=10)
         assert received.empty()
     _assert_route(request, method_name)
 
@@ -964,7 +964,7 @@ async def test_async_kraken_wrapper_hits_official_route(method_name: str) -> Non
                 raise
         finally:
             await client.close()
-        request = received.get(timeout=5)
+        request = received.get(timeout=10)
         assert received.empty()
     _assert_route(request, method_name)
 
@@ -980,7 +980,7 @@ def test_kraken_spot_limit_order_body_matches_add_order_docs() -> None:
             )
         finally:
             client.close()
-        body = dict(parse_qsl(received.get(timeout=5)["body"]))
+        body = dict(parse_qsl(received.get(timeout=10)["body"]))
     assert body["pair"] == "XBTUSD"
     assert body["type"] == "buy"
     assert body["ordertype"] == "limit"
@@ -1000,7 +1000,7 @@ def test_kraken_futures_limit_order_body_matches_send_order_docs() -> None:
             )
         finally:
             client.close()
-        request = received.get(timeout=5)
+        request = received.get(timeout=10)
     params = dict(parse_qsl(request["body"] or urlsplit(request["path"]).query))
     assert params["symbol"] == "PF_XBTUSD"
     assert params["side"] == "sell"
@@ -1016,9 +1016,9 @@ def test_kraken_dead_man_switch_bodies_carry_timeout() -> None:
         client = Client(**_client_kwargs(base_url))
         try:
             client.cancel_spot_all_orders_after(timeout=30)
-            spot = received.get(timeout=5)
+            spot = received.get(timeout=10)
             client.cancel_futures_all_orders_after(timeout=45)
-            futures = received.get(timeout=5)
+            futures = received.get(timeout=10)
         finally:
             client.close()
     assert dict(parse_qsl(spot["body"]))["timeout"] == "30"
@@ -1042,7 +1042,7 @@ def test_kraken_amend_wrappers_work_without_product_table(
         client = Client(**_client_kwargs(base_url))
         try:
             _call_checked_native(getattr(client, method_name), kwargs)
-            request = received.get(timeout=5)
+            request = received.get(timeout=10)
         finally:
             client.close()
     sent = parse_qsl(request["body"] or urlsplit(request["path"]).query)

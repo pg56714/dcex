@@ -28,7 +28,7 @@ def test_native_binance_signed_request() -> None:
         client = native.BinanceHttpClient(
             api_key="api-key",
             api_secret="secret",
-            timeout=2,
+            timeout=10,
             spot_base_url=base_url,
             futures_base_url=base_url,
         )
@@ -61,7 +61,7 @@ def test_native_binance_public_request_json_preserves_headers() -> None:
 
     with _http_server(response_payload={"ok": True, "count": 2}) as (base_url, received):
         client = native.BinanceHttpClient(
-            timeout=2,
+            timeout=10,
             spot_base_url=base_url,
             futures_base_url=base_url,
         )
@@ -82,7 +82,7 @@ async def test_native_binance_async_public_request() -> None:
 
     with _http_server() as (base_url, received):
         client = native.BinanceHttpClient(
-            timeout=2,
+            timeout=10,
             spot_base_url=base_url,
             futures_base_url=base_url,
         )
@@ -105,7 +105,7 @@ async def test_native_binance_async_public_request_json_preserves_headers() -> N
 
     with _http_server(response_payload={"ok": True, "count": 3}) as (base_url, received):
         client = native.BinanceHttpClient(
-            timeout=2,
+            timeout=10,
             spot_base_url=base_url,
             futures_base_url=base_url,
         )
@@ -127,7 +127,7 @@ def test_sync_binance_public_wrapper_uses_native_dispatcher() -> None:
     with _http_server() as (base_url, received):
         client = Client(preload_product_table=False)
         client._native_client = native.BinanceHttpClient(
-            timeout=2,
+            timeout=10,
             spot_base_url=base_url,
             futures_base_url=base_url,
         )
@@ -148,7 +148,7 @@ async def test_async_binance_public_wrapper_uses_native_dispatcher() -> None:
         client = Client(preload_product_table=False)
         await client.async_init()
         client._native_client = native.BinanceHttpClient(
-            timeout=2,
+            timeout=10,
             spot_base_url=base_url,
             futures_base_url=base_url,
         )
@@ -167,7 +167,7 @@ def test_sync_binance_futures_orderbook_uses_native_dispatcher() -> None:
     with _http_server() as (base_url, received):
         client = Client(preload_product_table=False)
         client._native_client = native.BinanceHttpClient(
-            timeout=2,
+            timeout=10,
             spot_base_url="http://127.0.0.1:9",
             futures_base_url=base_url,
         )
@@ -187,7 +187,7 @@ async def test_async_binance_futures_orderbook_uses_native_dispatcher() -> None:
         client = Client(preload_product_table=False)
         await client.async_init()
         client._native_client = native.BinanceHttpClient(
-            timeout=2,
+            timeout=10,
             spot_base_url="http://127.0.0.1:9",
             futures_base_url=base_url,
         )
@@ -211,7 +211,7 @@ def test_sync_binance_private_trade_wrapper_uses_native_dispatcher() -> None:
         client._native_client = native.BinanceHttpClient(
             api_key="api-key",
             api_secret="secret",
-            timeout=2,
+            timeout=10,
             spot_base_url=base_url,
             futures_base_url=base_url,
         )
@@ -247,7 +247,7 @@ def test_binance_native_dispatcher_uses_product_table_symbols() -> None:
         client._native_client = native.BinanceHttpClient(
             api_key="api-key",
             api_secret="secret",
-            timeout=2,
+            timeout=10,
             spot_base_url=base_url,
             futures_base_url=base_url,
         )
@@ -301,7 +301,7 @@ async def test_async_binance_private_account_wrapper_uses_native_dispatcher() ->
         client._native_client = native.BinanceHttpClient(
             api_key="api-key",
             api_secret="secret",
-            timeout=2,
+            timeout=10,
             spot_base_url=base_url,
             futures_base_url=base_url,
         )

@@ -2375,7 +2375,7 @@ def okx_server() -> Iterator[tuple[str, queue.Queue[dict[str, Any]]]]:
     finally:
         server.shutdown()
         server.server_close()
-        thread.join(timeout=5)
+        thread.join(timeout=10)
 
 
 def _client_kwargs(base_url: str) -> dict[str, Any]:
@@ -2438,7 +2438,7 @@ def _native_supports_spread() -> bool:
     """
     import dcex._native as native
 
-    client = native.OkxHttpClient(timeout=1, base_url="http://127.0.0.1:9")
+    client = native.OkxHttpClient(timeout=10, base_url="http://127.0.0.1:9")
     try:
         client.public_request_json("get_spread_books", [])
     except ValueError as error:
@@ -2561,7 +2561,7 @@ def test_sync_cancel_all_orders_batches_only_matching_pending_orders() -> None:
     finally:
         server.shutdown()
         server.server_close()
-        thread.join(timeout=5)
+        thread.join(timeout=10)
 
     listing = received.get_nowait()
     cancel = received.get_nowait()

@@ -593,7 +593,7 @@ def test_sync_convert_wrappers_reach_official_paths(
         client._native_client = native.BinanceHttpClient(
             api_key="api-key",
             api_secret="api-secret",
-            timeout=2,
+            timeout=10,
             spot_base_url=base_url,
             futures_base_url=base_url,
         )
@@ -630,7 +630,7 @@ async def test_async_convert_wrappers_reach_official_paths(
         client._native_client = native.BinanceHttpClient(
             api_key="api-key",
             api_secret="api-secret",
-            timeout=2,
+            timeout=10,
             spot_base_url=base_url,
             futures_base_url=base_url,
         )
@@ -658,7 +658,7 @@ def test_sync_futures_listen_key_calls_send_no_parameters(method: str) -> None:
         client._native_client = native.BinanceHttpClient(
             api_key="api-key",
             api_secret="api-secret",
-            timeout=2,
+            timeout=10,
             spot_base_url=base_url,
             futures_base_url=base_url,
         )

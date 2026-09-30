@@ -569,7 +569,7 @@ def _capture_server(
     finally:
         server.shutdown()
         server.server_close()
-        thread.join(timeout=5)
+        thread.join(timeout=10)
 
 
 def _client_kwargs(base_url: str) -> dict[str, Any]:

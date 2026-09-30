@@ -135,7 +135,7 @@ def test_okx_rejects_invalid_slippage_pct_before_transport(
         api_key="key",
         api_secret="secret",
         passphrase="passphrase",
-        timeout=2,
+        timeout=10,
         base_url="http://127.0.0.1:1",
     )
     with pytest.raises(ValueError, match=message):

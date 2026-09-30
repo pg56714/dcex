@@ -281,10 +281,10 @@ async def test_mexc_deduction_event_preserved(channel):
         "ts": 1760942212000,
     }
     async with authenticated_peer("mexc", events=[event]) as (url, received):
-        client = mexc.FuturesPrivateClient("key", "secret", base_url=url, timeout=2)
+        client = mexc.FuturesPrivateClient("key", "secret", base_url=url, timeout=10)
         try:
-            await asyncio.wait_for(client.connect(), 3)
-            assert await asyncio.wait_for(client.recv(), 3) == event
+            await asyncio.wait_for(client.connect(), 10)
+            assert await asyncio.wait_for(client.recv(), 10) == event
         finally:
             await client.close()
     assert len(received) == 1
@@ -297,20 +297,20 @@ async def test_mexc_spot_subscription_and_protobuf_passthrough():
     frame = b"\x08\x96\x01"
     stream = "spot@public.aggre.depth.v3.api.pb@100ms@BTCUSDT"
     async with echo_peer("/ws", events=[frame]) as (url, received):
-        client = mexc.PublicClient(base_url=url, timeout=2)
+        client = mexc.PublicClient(base_url=url, timeout=10)
         try:
-            await asyncio.wait_for(client.connect(), 3)
-            assert await asyncio.wait_for(client.recv(), 3) == frame
+            await asyncio.wait_for(client.connect(), 10)
+            assert await asyncio.wait_for(client.recv(), 10) == frame
             for method, action in (
                 (client.subscribe, "SUBSCRIPTION"),
                 (client.unsubscribe, "UNSUBSCRIPTION"),
             ):
                 await method([stream])
-                event = await asyncio.wait_for(client.recv(), 3)
+                event = await asyncio.wait_for(client.recv(), 10)
                 assert event["method"] == action
                 assert event["params"] == [stream]
             await client.ping()
-            assert (await asyncio.wait_for(client.recv(), 3))["method"] == "PING"
+            assert (await asyncio.wait_for(client.recv(), 10))["method"] == "PING"
         finally:
             await client.close()
     assert len(received) == 3

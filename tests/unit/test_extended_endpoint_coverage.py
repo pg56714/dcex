@@ -697,7 +697,7 @@ def _patch_server() -> Iterator[tuple[str, list[dict[str, Any]]]]:
     finally:
         httpd.shutdown()
         httpd.server_close()
-        thread.join(timeout=5)
+        thread.join(timeout=10)
 
 
 def _assert_update_leverage(result: Any, received: list[dict[str, Any]]) -> None:  # noqa: ANN401

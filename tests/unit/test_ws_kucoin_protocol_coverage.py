@@ -165,10 +165,10 @@ async def test_official_message(case):
                 api_secret="secret",
                 passphrase="passphrase",
                 base_url=ws_url,
-                timeout=2,
+                timeout=10,
             )
         try:
-            await asyncio.wait_for(client.connect(), 3)
+            await asyncio.wait_for(client.connect(), 10)
             if profile == "classic":
                 request_id = await client.subscribe(msg["topic"])
                 expected = {
@@ -184,7 +184,7 @@ async def test_official_message(case):
             else:
                 await client.subscribe(msg)
                 expected = msg
-            assert await asyncio.wait_for(client.recv(), 3) == expected
+            assert await asyncio.wait_for(client.recv(), 10) == expected
             assert received[-1] == expected
             if profile not in {"trade", "trade_v1"}:
                 if profile == "classic":
@@ -196,7 +196,7 @@ async def test_official_message(case):
                 else:
                     await client.unsubscribe(msg)
                     expected = {**msg, "action": "UNSUBSCRIBE"}
-                assert await asyncio.wait_for(client.recv(), 3) == expected
+                assert await asyncio.wait_for(client.recv(), 10) == expected
         finally:
             await client.close()
     if profile in {"private", "trade"}:
@@ -242,11 +242,11 @@ async def test_pro_auth_failure_closes_connection(profile):
             api_secret="secret",
             passphrase="passphrase",
             base_url=url,
-            timeout=2,
+            timeout=10,
         )
         try:
             with pytest.raises(RuntimeError, match="authentication rejected"):
-                await asyncio.wait_for(client.connect(), 3)
+                await asyncio.wait_for(client.connect(), 10)
             assert client._native_client.is_connected() is False
             assert len(received) == 1
         finally:

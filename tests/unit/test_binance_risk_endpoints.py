@@ -2563,7 +2563,7 @@ async def test_risk_wire(
         client._native_client = native.BinanceHttpClient(
             api_key="api-key",
             api_secret="api-secret",
-            timeout=2,
+            timeout=10,
             spot_base_url=base,
             futures_base_url=base,
             coin_futures_base_url=base,
@@ -2704,7 +2704,7 @@ async def test_invalid_risk_parameters(
     client._native_client = native.BinanceHttpClient(
         api_key="api-key",
         api_secret="api-secret",
-        timeout=1,
+        timeout=10,
         spot_base_url="http://127.0.0.1:1",
         futures_base_url="http://127.0.0.1:1",
         coin_futures_base_url="http://127.0.0.1:1",

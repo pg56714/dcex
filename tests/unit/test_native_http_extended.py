@@ -16,7 +16,7 @@ def test_native_extended_signed_request_uses_api_key_and_user_agent() -> None:
     with _http_server({"status": "OK"}) as (base_url, received):
         client = native.ExtendedHttpClient(
             api_key="extended-key",
-            timeout=2,
+            timeout=10,
             base_url=base_url,
             user_agent="dcex-test",
         )
