@@ -68,11 +68,9 @@ def fund_literals(source):
 
 
 def unpinned_fund_literals(source, filename, allowances=()):
-    names = {name for name in fund_literals(source) if filename != fund_domain(name.lower()) + ".rs"}
-    digest = hashlib.sha256(source.encode()).hexdigest()
-    if any(entry["sha256"] == digest and names == set(entry["names"]) for entry in allowances):
-        return []
-    return sorted(names)
+    from scripts.fund_literal_audit import occurrences
+    pinned = {(entry["name"], entry["sha256"]) for entry in allowances}
+    return [entry for entry in occurrences(source, filename) if (entry["name"], entry["sha256"]) not in pinned]
 
 
 def enclosing_impl(source, position):

@@ -10,7 +10,6 @@ import pytest
 
 from tests.unit.rust_dispatch import (
     fund_domain,
-    fund_literals,
     misplaced_fund_arms,
     request_owners,
     unauthorized_transport_references,
@@ -35,14 +34,10 @@ def test_all_fund_dispatch_arms_have_domain_owners(exchange):
         assert not misplaced_fund_arms(path.read_text(encoding="utf-8"), path.name, owners, readonly, nondispatch), path
 
 
-@pytest.mark.parametrize("exchange", EXCHANGES)
-def test_every_fund_literal_outside_owners_is_hash_pinned(exchange):
+def test_every_fund_literal_outside_owners_is_statement_pinned():
+    from scripts.fund_literal_audit import identity, inventory
     allowances = json.loads((ROOT / "tests/fixtures/fund_literal_allowlist.json").read_text(encoding="utf-8"))
-    for path in (NATIVE / exchange).rglob("*.rs"):
-        if "tests" in path.parts:
-            continue
-        entries = [entry for entry in allowances if entry["source"] == path.relative_to(NATIVE).as_posix()]
-        assert not unpinned_fund_literals(path.read_text(encoding="utf-8"), path.name, entries), path
+    assert {identity(entry) for entry in inventory()} == {identity(entry) for entry in allowances}
 
 
 @pytest.mark.parametrize("source", [
@@ -54,11 +49,13 @@ def test_every_fund_literal_outside_owners_is_hash_pinned(exchange):
     r'const W: &str = "create_with\u{64}rawal3"; call(W);',
 ])
 def test_fund_literal_mutations_cannot_depend_on_dispatch_syntax(source):
-    import hashlib
+    from scripts.fund_literal_audit import occurrences
     assert unpinned_fund_literals(source, "account.rs")
-    allowance = {"sha256": hashlib.sha256(source.encode()).hexdigest(), "names": list(fund_literals(source))}
-    assert not unpinned_fund_literals(source, "account.rs", [allowance])
-    assert unpinned_fund_literals(source + '; self.transport.execute(req);', "account.rs", [allowance])
+    allowances = list(occurrences(source, "account.rs"))
+    assert not unpinned_fund_literals(source, "account.rs", allowances)
+    assert unpinned_fund_literals(source.replace("create_with", "create_another_with"), "account.rs", allowances)
+    # An unrelated statement does not require re-approving existing exceptions.
+    assert not unpinned_fund_literals(source + '; log_status();', "account.rs", allowances)
 
 
 def test_new_withdrawal_arm_cannot_hide_in_account():
