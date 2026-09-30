@@ -194,3 +194,5 @@ callers. Owner domain checks execute in release builds. Generator checks also re
 orphaned files in their owned generated directories without writing or deleting them.
 
 The shared input-contract validators enforce declared decimal rules and structured JSON constraints. Integer and boolean entries in this catalog describe the endpoint inputs; they do not add runtime type enforcement. Endpoint wire adapters retain their own integer/boolean validation. For OKX algo orders, the official specification requires either `sz` or `closeFraction`; it does not document a zero-size exception. An explicitly supplied `sz` must therefore be positive; a full close can omit it and use `closeFraction=1`.
+
+Rust diagnostics use the `log` facade: callers must install a Rust logger to observe warnings, including skipped malformed Ondo spot product rows. The Python extension does not bridge Rust `log` records into Python `logging`; configuring the Python `dcex` logger alone will not expose these warnings.

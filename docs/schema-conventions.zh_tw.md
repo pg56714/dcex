@@ -169,3 +169,5 @@ router 與 owner 呼叫；owner 的領域驗證在 release 建置也會執行。
 同時拒絕所屬生成目錄中的孤兒檔案，檢查時不寫入或刪除。
 
 共用輸入契約驗證器會執行已宣告的小數規則與 JSON 結構限制。此目錄中的 integer／boolean 宣告用於描述端點輸入，不會額外啟用執行期型別驗證；各端點的封包轉換器仍保留既有整數與布林驗證。OKX 策略單官方規格要求提供 `sz` 或 `closeFraction`，未記載數量為零的例外；因此明確提供的 `sz` 必須為正數，全部平倉可省略數量並使用 `closeFraction=1`。
+
+Rust 診斷使用 `log` facade：呼叫端須設定 Rust logger 才能看到警告，包含格式錯誤而被略過的 Ondo 現貨商品列。Python 擴充目前不會將 Rust `log` 紀錄轉送至 Python `logging`；只設定 Python 的 `dcex` logger 無法看到這些警告。
