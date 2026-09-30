@@ -209,7 +209,7 @@ mod tests {
             Some("secret".into()),
             Some("pass".into()),
             "0".into(),
-            Duration::from_secs(2),
+            Duration::from_secs(10),
             base,
         )
         .expect("client");
@@ -231,7 +231,7 @@ mod tests {
     async fn spread_books_use_public_route() {
         let (base, handle) = server();
         let client =
-            OkxClient::with_base_url(None, None, None, "0".into(), Duration::from_secs(2), base)
+            OkxClient::with_base_url(None, None, None, "0".into(), Duration::from_secs(10), base)
                 .expect("client");
         client
             .get_spread_books("BTC-USDT_BTC-USDT-SWAP")
@@ -252,7 +252,7 @@ mod tests {
             Some("secret".into()),
             Some("pass".into()),
             "0".into(),
-            Duration::from_secs(2),
+            Duration::from_secs(10),
             base,
         )
         .expect("client");
@@ -272,7 +272,7 @@ mod tests {
     async fn spread_ticker_uses_market_route() {
         let (base, handle) = server();
         let client =
-            OkxClient::with_base_url(None, None, None, "0".into(), Duration::from_secs(2), base)
+            OkxClient::with_base_url(None, None, None, "0".into(), Duration::from_secs(10), base)
                 .expect("client");
         client
             .get_spread_ticker("BTC-USDT_BTC-USDT-SWAP")

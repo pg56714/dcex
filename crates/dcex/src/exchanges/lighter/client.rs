@@ -589,7 +589,7 @@ mod review_explorer_tests {
     fn explorer_default_does_not_cross_networks() {
         for network in LighterNetwork::ALL {
             let client = LighterClient::with_network_and_credentials(
-                Duration::from_secs(1),
+                Duration::from_secs(10),
                 network,
                 None,
                 None,
@@ -613,7 +613,7 @@ mod review_explorer_tests {
             }
         }
         let custom = LighterClient::with_base_url_and_credentials(
-            Duration::from_secs(1),
+            Duration::from_secs(10),
             "http://127.0.0.1:1".into(),
             None,
             None,

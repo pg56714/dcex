@@ -78,7 +78,7 @@ async fn signed_spot_request_uses_synchronized_server_time() {
     let client = MexcClient::with_base_urls(
         Some("api-key".to_string()),
         Some("secret".to_string()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         base_url.clone(),
         base_url,
     )

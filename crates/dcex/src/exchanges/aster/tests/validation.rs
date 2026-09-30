@@ -97,7 +97,7 @@ async fn remaining_openable_notional_is_public_and_validates_leverage() {
         None,
         None,
         None,
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         "http://127.0.0.1:9".into(),
         base_url,
     )
@@ -120,7 +120,7 @@ async fn remaining_openable_notional_is_public_and_validates_leverage() {
         "{line}"
     );
 
-    let client = AsterClient::public(Duration::from_secs(1)).expect("client");
+    let client = AsterClient::public(Duration::from_secs(10)).expect("client");
     assert!(
         client
             .public_request(

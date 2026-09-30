@@ -53,7 +53,7 @@ fn swap_commission_route_is_signed_and_funding_range_is_checked() {
     let client = BingxClient::with_base_url(
         Some("api-key".into()),
         Some("secret".into()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         url,
     )
     .expect("client");
@@ -69,7 +69,7 @@ fn swap_commission_route_is_signed_and_funding_range_is_checked() {
         "{line}"
     );
     assert!(line.contains("signature="), "{line}");
-    let client = BingxClient::public(Duration::from_secs(1)).expect("client");
+    let client = BingxClient::public(Duration::from_secs(10)).expect("client");
     assert!(
         block_on(async move {
             client

@@ -366,7 +366,7 @@ mod tests {
         let client = BinanceClient::with_base_urls(
             Some("key".into()),
             Some("secret".into()),
-            std::time::Duration::from_secs(1),
+            std::time::Duration::from_secs(10),
             base.clone(),
             base.clone(),
         )

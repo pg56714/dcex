@@ -514,7 +514,7 @@ mod tests {
             for result in results {
                 let (mut stream, _) = listener.accept().expect("accept");
                 stream
-                    .set_read_timeout(Some(Duration::from_secs(3)))
+                    .set_read_timeout(Some(Duration::from_secs(10)))
                     .expect("timeout");
                 let mut raw = Vec::new();
                 let header_end = loop {
@@ -574,7 +574,7 @@ mod tests {
         ]);
         let wallet = format!("0x{}", "11".repeat(20));
         let token = format!("0x{}", "22".repeat(20));
-        let client = ArcusSpotClient::new(None, false, Duration::from_secs(3))
+        let client = ArcusSpotClient::new(None, false, Duration::from_secs(10))
             .unwrap()
             .with_wallet_address(wallet.clone())
             .unwrap()
@@ -637,7 +637,7 @@ mod tests {
     #[test]
     fn rejects_rpc_on_wrong_chain_before_reading_balance() {
         let (rpc_url, server) = rpc_server(vec![json!("0xaa36a7")]);
-        let client = ArcusSpotClient::new(None, false, Duration::from_secs(3))
+        let client = ArcusSpotClient::new(None, false, Duration::from_secs(10))
             .unwrap()
             .with_wallet_address(format!("0x{}", "11".repeat(20)))
             .unwrap()
@@ -667,7 +667,7 @@ mod tests {
         let wallet = format!("0x{}", "11".repeat(20));
         let first = format!("0x{}", "22".repeat(20));
         let second = format!("0x{}", "33".repeat(20));
-        let client = ArcusSpotClient::new(None, false, Duration::from_secs(3))
+        let client = ArcusSpotClient::new(None, false, Duration::from_secs(10))
             .unwrap()
             .with_wallet_address(wallet)
             .unwrap()

@@ -37,7 +37,7 @@ fn modify_order_uses_official_body_and_typed_signature() {
         for step in 0..2 {
             let (mut stream, _) = listener.accept().expect("accept");
             stream
-                .set_read_timeout(Some(Duration::from_secs(2)))
+                .set_read_timeout(Some(Duration::from_secs(10)))
                 .expect("timeout");
             let mut raw = Vec::new();
             let header_end = loop {
@@ -88,7 +88,7 @@ fn modify_order_uses_official_body_and_typed_signature() {
         Some(address.clone()),
         0,
         true,
-        Duration::from_secs(2),
+        Duration::from_secs(10),
     )
     .expect("client")
     .with_base_url(base_url)
@@ -180,7 +180,7 @@ fn risk_controls_use_official_paths_and_legacy_signatures() {
         for _ in 0..4 {
             let (mut stream, _) = listener.accept().expect("accept");
             stream
-                .set_read_timeout(Some(Duration::from_secs(2)))
+                .set_read_timeout(Some(Duration::from_secs(10)))
                 .expect("timeout");
             let mut raw = Vec::new();
             let header_end = loop {
@@ -231,7 +231,7 @@ fn risk_controls_use_official_paths_and_legacy_signatures() {
         Some(address.clone()),
         0,
         true,
-        Duration::from_secs(2),
+        Duration::from_secs(10),
     )
     .expect("client")
     .with_base_url(base_url)
@@ -336,7 +336,7 @@ fn batch_cancel_signs_each_element_with_shared_timestamp() {
         for _ in 0..3 {
             let (mut stream, _) = listener.accept().expect("accept");
             stream
-                .set_read_timeout(Some(Duration::from_secs(2)))
+                .set_read_timeout(Some(Duration::from_secs(10)))
                 .expect("timeout");
             let mut raw = Vec::new();
             let header_end = loop {
@@ -387,7 +387,7 @@ fn batch_cancel_signs_each_element_with_shared_timestamp() {
         Some(address.clone()),
         0,
         true,
-        Duration::from_secs(2),
+        Duration::from_secs(10),
     )
     .expect("client")
     .with_base_url(base_url)

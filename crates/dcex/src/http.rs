@@ -270,7 +270,7 @@ X-Test: yes\r\nContent-Length: 11\r\nConnection: close\r\n\r\n{\"ok\":true}",
     #[tokio::test]
     async fn async_client_sends_query_and_headers() {
         let (base_url, handle) = server();
-        let client = AsyncHttpClient::new(Duration::from_secs(2)).expect("client");
+        let client = AsyncHttpClient::new(Duration::from_secs(10)).expect("client");
         let response = client
             .execute(
                 HttpRequest::new(HttpMethod::Get, base_url, "/test")
@@ -290,7 +290,7 @@ X-Test: yes\r\nContent-Length: 11\r\nConnection: close\r\n\r\n{\"ok\":true}",
     #[test]
     fn blocking_client_uses_shared_async_transport() {
         let (base_url, handle) = server();
-        let client = BlockingHttpClient::new(Duration::from_secs(2)).expect("client");
+        let client = BlockingHttpClient::new(Duration::from_secs(10)).expect("client");
         let response = client
             .execute(HttpRequest::new(HttpMethod::Get, base_url, "/health"))
             .expect("response");

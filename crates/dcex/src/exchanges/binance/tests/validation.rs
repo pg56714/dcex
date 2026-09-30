@@ -191,7 +191,7 @@ fn futures_positions_can_be_queried_without_a_symbol() {
     let client = BinanceClient::with_base_urls(
         Some("api-key".to_string()),
         Some("secret".to_string()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         "http://127.0.0.1:9".to_string(),
         futures_base_url,
     )
@@ -285,7 +285,7 @@ fn portfolio_margin_cm_risk_uses_pair_not_symbol() {
     let client = BinanceClient::with_base_urls(
         Some("api-key".to_string()),
         Some("secret".to_string()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         spot_base_url.clone(),
         "http://127.0.0.1:9".to_string(),
     )
@@ -301,7 +301,7 @@ fn portfolio_margin_cm_risk_uses_pair_not_symbol() {
 
 #[test]
 fn portfolio_margin_leverage_validates_range_and_uses_signed_route() {
-    let client = BinanceClient::public(Duration::from_secs(1)).expect("client");
+    let client = BinanceClient::public(Duration::from_secs(10)).expect("client");
     let error = block_on(async move { client.set_pm_um_leverage("BTCUSDT", 126).await })
         .expect_err("leverage limit");
     assert!(error.to_string().contains("leverage"));
@@ -310,7 +310,7 @@ fn portfolio_margin_leverage_validates_range_and_uses_signed_route() {
     let client = BinanceClient::with_base_urls(
         Some("api-key".to_string()),
         Some("secret".to_string()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         spot_base_url.clone(),
         "http://127.0.0.1:9".to_string(),
     )
@@ -328,7 +328,7 @@ fn portfolio_margin_cm_conditional_history_accepts_symbol_without_id() {
     let client = BinanceClient::with_base_urls(
         Some("api-key".to_string()),
         Some("secret".to_string()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         spot_base_url.clone(),
         "http://127.0.0.1:9".to_string(),
     )

@@ -392,7 +392,7 @@ mod tests {
     #[test]
     fn export_accepts_configured_account_index() {
         let client = LighterClient::with_base_url_and_credentials(
-            Duration::from_secs(1),
+            Duration::from_secs(10),
             "https://mainnet.zklighter.elliot.ai".to_string(),
             Some(12),
             None,

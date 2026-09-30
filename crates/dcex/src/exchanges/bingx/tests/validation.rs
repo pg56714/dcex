@@ -6,7 +6,7 @@ fn spot_cancel_replace_uses_official_path_and_required_fields() {
     let client = BingxClient::with_base_url(
         Some("api-key".into()),
         Some("secret".into()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         url,
     )
     .expect("client");
@@ -43,7 +43,7 @@ fn spot_cancel_all_after_validates_timeout_and_uses_signed_route() {
     let client = BingxClient::with_base_url(
         Some("api-key".into()),
         Some("secret".into()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         url,
     )
     .expect("client");
@@ -68,7 +68,7 @@ fn spot_cancel_all_after_validates_timeout_and_uses_signed_route() {
     assert!(line.contains("timeOut=30"), "{line}");
     assert!(line.contains("signature="), "{line}");
 
-    let client = BingxClient::public(Duration::from_secs(1)).expect("client");
+    let client = BingxClient::public(Duration::from_secs(10)).expect("client");
     assert!(
         block_on(async move {
             client

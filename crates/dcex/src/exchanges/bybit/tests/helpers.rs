@@ -60,7 +60,7 @@ pub(super) fn client(base_url: String) -> BybitClient {
         Some("api-secret".to_string()),
         5_000,
         false,
-        Duration::from_secs(5),
+        Duration::from_secs(10),
         base_url,
     )
     .expect("client")

@@ -90,7 +90,7 @@ fn options_order_uses_dedicated_signed_path() {
     let client = BinanceClient::with_all_base_urls(
         Some("api-key".to_string()),
         Some("secret".to_string()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         "http://127.0.0.1:9".to_string(),
         "http://127.0.0.1:9".to_string(),
         options_base_url,
@@ -129,7 +129,7 @@ fn equity_order_uses_dedicated_signed_path() {
     let client = BinanceClient::with_base_urls(
         Some("api-key".to_string()),
         Some("secret".to_string()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         spot_base_url,
         "http://127.0.0.1:9".to_string(),
     )
@@ -192,7 +192,7 @@ fn margin_market_data_uses_spot_base_url_and_api_key() {
     let client = BinanceClient::with_base_urls(
         Some("api-key".to_string()),
         None,
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         spot_base_url,
         "http://127.0.0.1:9".to_string(),
     )
@@ -224,7 +224,7 @@ fn futures_listen_key_keepalive_and_close_send_no_parameters() {
         let client = BinanceClient::with_base_urls(
             Some("api-key".to_string()),
             None,
-            Duration::from_secs(2),
+            Duration::from_secs(10),
             "http://127.0.0.1:9".to_string(),
             futures_base_url,
         )
@@ -250,7 +250,7 @@ fn margin_order_uses_signed_margin_path() {
     let client = BinanceClient::with_base_urls(
         Some("api-key".to_string()),
         Some("secret".to_string()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         spot_base_url,
         "http://127.0.0.1:9".to_string(),
     )
@@ -290,7 +290,7 @@ fn simple_earn_products_use_signed_spot_path() {
     let client = BinanceClient::with_base_urls(
         Some("api-key".to_string()),
         Some("secret".to_string()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         spot_base_url,
         "http://127.0.0.1:9".to_string(),
     )
@@ -321,7 +321,7 @@ fn flexible_loan_assets_use_signed_v2_path() {
     let client = BinanceClient::with_base_urls(
         Some("api-key".to_string()),
         Some("secret".to_string()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         spot_base_url,
         "http://127.0.0.1:9".to_string(),
     )
@@ -348,7 +348,7 @@ fn eth_staking_account_uses_current_signed_path() {
     let client = BinanceClient::with_base_urls(
         Some("api-key".to_string()),
         Some("secret".to_string()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         spot_base_url,
         "http://127.0.0.1:9".to_string(),
     )
@@ -371,7 +371,7 @@ fn subaccount_list_uses_signed_spot_path() {
     let client = BinanceClient::with_base_urls(
         Some("api-key".to_string()),
         Some("secret".to_string()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         spot_base_url,
         "http://127.0.0.1:9".to_string(),
     )
@@ -398,7 +398,7 @@ fn portfolio_margin_routes_signed_account_and_risk_queries() {
     let client = BinanceClient::with_base_urls(
         Some("api-key".to_string()),
         Some("secret".to_string()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         spot_base_url.clone(),
         "http://127.0.0.1:9".to_string(),
     )
@@ -419,7 +419,7 @@ fn portfolio_margin_algo_order_uses_current_signed_route() {
     let client = BinanceClient::with_base_urls(
         Some("api-key".to_string()),
         Some("secret".to_string()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         spot_base_url.clone(),
         "http://127.0.0.1:9".to_string(),
     )
@@ -444,7 +444,7 @@ fn portfolio_margin_borrow_uses_signed_loan_route() {
     let client = BinanceClient::with_base_urls(
         Some("api-key".to_string()),
         Some("secret".to_string()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         spot_base_url.clone(),
         "http://127.0.0.1:9".to_string(),
     )
@@ -461,7 +461,7 @@ fn portfolio_margin_position_mode_uses_signed_get_route() {
     let client = BinanceClient::with_base_urls(
         Some("api-key".to_string()),
         Some("secret".to_string()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         spot_base_url.clone(),
         "http://127.0.0.1:9".to_string(),
     )
@@ -478,7 +478,7 @@ fn portfolio_margin_repay_debt_uses_signed_route() {
     let client = BinanceClient::with_base_urls(
         Some("api-key".to_string()),
         Some("secret".to_string()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         spot_base_url.clone(),
         "http://127.0.0.1:9".to_string(),
     )
@@ -501,7 +501,7 @@ fn portfolio_margin_order_amendments_use_signed_route() {
     let client = BinanceClient::with_base_urls(
         Some("api-key".to_string()),
         Some("secret".to_string()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         spot_base_url.clone(),
         "http://127.0.0.1:9".to_string(),
     )

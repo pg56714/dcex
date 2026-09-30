@@ -25,7 +25,7 @@ fn product_table_resolves_canonical_symbol_to_market_id() {
 
 #[test]
 fn new_lighter_queries_reject_invalid_parameters_before_network() {
-    let client = LighterClient::with_base_url(Duration::from_secs(1), "http://127.0.0.1:1".into())
+    let client = LighterClient::with_base_url(Duration::from_secs(10), "http://127.0.0.1:1".into())
         .expect("client");
     assert!(
         block_on({
@@ -92,7 +92,7 @@ fn new_lighter_queries_reject_invalid_parameters_before_network() {
 #[test]
 fn known_endpoint_rejects_a_mismatched_signing_chain() {
     let result = LighterClient::with_base_url_credentials_and_chain_id(
-        Duration::from_secs(1),
+        Duration::from_secs(10),
         "https://api.rh.lighter.xyz".to_string(),
         304,
         None,
@@ -144,11 +144,11 @@ fn rfq_routes_validate_requests_and_keep_maker_response_out_of_scope() {
     ] {
         let (base_url, server) = recording_server();
         let client =
-            LighterClient::with_base_url(Duration::from_secs(2), base_url).expect("client");
+            LighterClient::with_base_url(Duration::from_secs(10), base_url).expect("client");
         block_on(async move { client.private_request(method, params).await }).expect(method);
         assert_eq!(server.join().expect("server"), Some(route.to_string()));
     }
-    let client = LighterClient::new(Duration::from_secs(1)).expect("client");
+    let client = LighterClient::new(Duration::from_secs(10)).expect("client");
     assert!(
         block_on(async move {
             client

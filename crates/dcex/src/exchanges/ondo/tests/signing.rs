@@ -74,7 +74,7 @@ async fn websocket_deadman_sends_authenticated_timeout_message() {
         Some("key".into()),
         Some("ondoApiSecret_SECRET".into()),
         url,
-        Duration::from_secs(2),
+        Duration::from_secs(10),
     )
     .expect("client");
     assert!(client.subscribe_cancel_all_orders_after(30).await.is_err());

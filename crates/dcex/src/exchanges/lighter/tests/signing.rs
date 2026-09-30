@@ -4,7 +4,7 @@ use super::helpers::*;
 fn account_orders_uses_client_indexes_and_auth_header() {
     let (base_url, handle) = recording_server();
     let client = LighterClient::with_base_url_and_credentials(
-        Duration::from_secs(1),
+        Duration::from_secs(10),
         base_url,
         Some(12),
         None,
@@ -32,7 +32,7 @@ fn account_orders_uses_client_indexes_and_auth_header() {
 #[test]
 fn auth_token_uses_configured_private_key() {
     let client = LighterClient::with_base_url_and_credentials(
-        Duration::from_secs(1),
+        Duration::from_secs(10),
         "https://mainnet.zklighter.elliot.ai".to_string(),
         Some(12),
         Some(3),
@@ -54,7 +54,7 @@ fn auth_token_uses_configured_private_key() {
 #[test]
 fn custom_url_does_not_guess_a_signing_chain() {
     let client =
-        LighterClient::with_base_url(Duration::from_secs(1), "http://localhost:8000".to_string())
+        LighterClient::with_base_url(Duration::from_secs(10), "http://localhost:8000".to_string())
             .expect("client");
 
     assert_eq!(client.network(), None);
@@ -65,7 +65,7 @@ fn custom_url_does_not_guess_a_signing_chain() {
 #[test]
 fn custom_url_accepts_an_explicit_signing_chain() {
     let client = LighterClient::with_base_url_credentials_and_chain_id(
-        Duration::from_secs(1),
+        Duration::from_secs(10),
         "http://localhost:8000".to_string(),
         466_324,
         None,

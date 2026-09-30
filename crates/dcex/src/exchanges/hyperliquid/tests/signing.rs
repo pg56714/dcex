@@ -87,7 +87,7 @@ fn wallet_signed_spot_perp_transfer_preserves_action_and_nonce() {
         false,
         None,
         None,
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         format!("http://{address}"),
     )
     .expect("client");

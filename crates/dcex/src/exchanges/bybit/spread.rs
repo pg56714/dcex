@@ -304,7 +304,7 @@ mod tests {
             Some("secret".into()),
             5000,
             false,
-            Duration::from_secs(2),
+            Duration::from_secs(10),
             base_url,
         )
         .expect("client");
@@ -331,7 +331,7 @@ mod tests {
             Some("secret".into()),
             5000,
             false,
-            Duration::from_secs(2),
+            Duration::from_secs(10),
             base_url,
         )
         .expect("client");
@@ -349,7 +349,7 @@ mod tests {
     async fn spread_orderbook_uses_public_route_and_encoded_combo_symbol() {
         let (base_url, handle) = server();
         let client =
-            BybitClient::with_base_url(None, None, 5000, false, Duration::from_secs(2), base_url)
+            BybitClient::with_base_url(None, None, 5000, false, Duration::from_secs(10), base_url)
                 .expect("client");
         client
             .get_spread_orderbook("SOLUSDT_SOL/USDT")

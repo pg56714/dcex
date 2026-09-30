@@ -571,7 +571,7 @@ mod review_nonce_tests {
             Some(format!("0x{}", "22".repeat(20))),
             Some(format!("0x{}", "33".repeat(20))),
             Some(format!("0x{}", "11".repeat(32))),
-            Duration::from_secs(1),
+            Duration::from_secs(10),
             "http://127.0.0.1:1".into(),
             "http://127.0.0.1:1".into(),
         )

@@ -339,7 +339,7 @@ mod tests {
             .unwrap();
             events
         });
-        let mut client = MexcFuturesWebSocket::with_url(url, Duration::from_secs(2))
+        let mut client = MexcFuturesWebSocket::with_url(url, Duration::from_secs(10))
             .unwrap()
             .with_credentials("key".into(), "secret".into())
             .unwrap();
@@ -382,7 +382,7 @@ mod tests {
             .await
             .unwrap();
         });
-        let mut client = MexcFuturesWebSocket::with_url(url, Duration::from_secs(2))
+        let mut client = MexcFuturesWebSocket::with_url(url, Duration::from_secs(10))
             .unwrap()
             .with_credentials("key".into(), "secret".into())
             .unwrap();

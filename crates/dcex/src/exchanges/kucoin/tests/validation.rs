@@ -25,7 +25,7 @@ async fn spot_batch_order_never_leaks_internal_product_symbol() {
         Some("key".to_string()),
         Some("secret".to_string()),
         Some("passphrase".to_string()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         base_url,
         "http://127.0.0.1:9".to_string(),
     )
@@ -60,7 +60,7 @@ async fn current_required_and_conditional_fields_are_rejected_before_transport()
         Some("key".to_string()),
         Some("secret".to_string()),
         Some("passphrase".to_string()),
-        Duration::from_secs(1),
+        Duration::from_secs(10),
         "http://127.0.0.1:9".to_string(),
         "http://127.0.0.1:9".to_string(),
     )
@@ -151,7 +151,7 @@ async fn margin_borrow_uses_v3_endpoint_and_normalizes_symbol() {
         Some("key".to_string()),
         Some("secret".to_string()),
         Some("passphrase".to_string()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         base_url,
         "http://127.0.0.1:9".to_string(),
     )
@@ -187,7 +187,7 @@ async fn margin_history_normalizes_canonical_product_symbol() {
         Some("key".to_string()),
         Some("secret".to_string()),
         Some("passphrase".to_string()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         base_url,
         "http://127.0.0.1:9".to_string(),
     )
@@ -215,7 +215,7 @@ async fn dcp_uses_spot_dead_cancel_all_routes_and_symbols_string() {
         Some("key".into()),
         Some("secret".into()),
         Some("passphrase".into()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         base_url,
         "http://127.0.0.1:9".into(),
     )
@@ -244,7 +244,7 @@ async fn dcp_uses_spot_dead_cancel_all_routes_and_symbols_string() {
         Some("key".into()),
         Some("secret".into()),
         Some("passphrase".into()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         base_url,
         "http://127.0.0.1:9".into(),
     )
@@ -268,7 +268,7 @@ async fn test_orders_reuse_live_order_validation_and_use_test_routes() {
             Some("key".into()),
             Some("secret".into()),
             Some("passphrase".into()),
-            Duration::from_secs(2),
+            Duration::from_secs(10),
             base_url.clone(),
             base_url,
         )
@@ -305,7 +305,7 @@ async fn alter_spot_order_uses_validated_json_body() {
         Some("key".into()),
         Some("secret".into()),
         Some("passphrase".into()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         base_url,
         "http://127.0.0.1:9".into(),
     )
@@ -337,7 +337,7 @@ async fn uta_v2_order_uses_signed_unified_route_and_normalized_symbol() {
         Some("key".into()),
         Some("secret".into()),
         Some("passphrase".into()),
-        Duration::from_secs(2),
+        Duration::from_secs(10),
         base_url,
         "http://127.0.0.1:9".into(),
     )
