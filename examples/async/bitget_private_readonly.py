@@ -21,7 +21,7 @@ async def main() -> None:
         spot_assets = await client.get_spot_account_assets(coin="USDT")
         print(spot_assets)
 
-        futures_positions = await client.get_futures_positions(marginCoin="USDT")
+        futures_positions = await client.get_futures_positions(margin_coin="USDT")
         print(futures_positions)
     finally:
         await client.close()
