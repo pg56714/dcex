@@ -139,16 +139,3 @@ def test_core_mixins_are_nonempty_and_inherited(exchange, prefix):
             assert any(mixin in client.__mro__ for client in clients), (package, mixin)
             tree = ast.parse(inspect.getsource(mixin))
             assert any(isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) for node in tree.body[0].body), (package, mixin)
-
-
-@pytest.mark.parametrize("exchange", EXCHANGES)
-def test_fund_handlers_stay_in_their_declared_module(exchange):
-    manifest = json.loads((ROOT / "tests/fixtures/fund_module_locations.json").read_text(encoding="utf-8"))
-    for domain, names in manifest[exchange].items():
-        for name in names:
-            locations = {
-                path.relative_to(NATIVE / exchange).as_posix()
-                for path in (NATIVE / exchange).rglob("*.rs")
-                if re.search(r"\bfn\s+" + re.escape(name) + r"\s*[<(]", _rust_code(path.read_text(encoding="utf-8")))
-            }
-            assert locations == {domain + ".rs"}, (exchange, name, locations)

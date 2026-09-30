@@ -168,15 +168,12 @@ Batch TP/SL requires an object; BingX null and empty optional attached values ar
 left unencoded rather than serialized as the string `null`.
 
 Fund catalog entry points route withdrawal/transfer names through their domain
-owners before using shared transport implementations. Ownership tests verify the
-router, owner and schema loader instead of relying on schema exceptions. Awaiting
-nonce lookup or signing alone never establishes transport ownership. Nondispatch
-allowances are bound to exact source bodies, so adding a sender invalidates them.
+owners before using shared transport implementations.
 Financial name fragments (including price, amount, size, qty, fee, margin, collateral
 and share) cannot be exempted even with integer annotations. All 454 former input
 exemptions now have explicit control or structured declarations. Any future reasons
 are compared after stripping method/field tokens and `For ...,` prefixes; more than
-four repetitions fail, including nondispatch allowances.
+four repetitions fail.
 
 OKX attached TP ratios use signed exact decimals greater than -1; placement excludes
 zero, while amended TP/SL ratios allow zero to delete the attached order. SL ratios
@@ -188,9 +185,7 @@ table does not list. Absolute placement prices and Kraken convenience volumes ar
 positive; documented Kraken relative-price controls remain supported.
 
 BingX trims optional attached strings before checking their shape; blank values are
-absent and empty objects are rejected. Fund literals outside owners are pinned by
-source hashes, and shared schema transports allow only audited routers and owner
-callers. Owner domain checks execute in release builds. Generator checks also reject
+absent and empty objects are rejected. Generator checks also reject
 orphaned files in their owned generated directories without writing or deleting them.
 
 The shared input-contract validators enforce declared decimal rules and structured JSON constraints. Integer and boolean entries in this catalog describe the endpoint inputs; they do not add runtime type enforcement. Endpoint wire adapters retain their own integer/boolean validation. For OKX algo orders, the official specification requires either `sz` or `closeFraction`; it does not document a zero-size exception. An explicitly supplied `sz` must therefore be positive; a full close can omit it and use `closeFraction=1`.

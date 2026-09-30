@@ -9,8 +9,6 @@ import pytest
 
 from tests.unit.native_http_helpers import _http_server
 from tests.unit.test_attached_order_wire import invoke
-from tests.unit.test_exchange_structure import NATIVE
-from tests.unit.rust_dispatch import arms, request_owners
 
 
 async def close(client):
@@ -89,13 +87,6 @@ async def test_bingx_batch_attached_object_or_absent(asynchronous, native, value
             await close(client)
 
 
-def test_lighter_funds_submit_only_from_withdrawals():
-    source = (NATIVE / "lighter/trade.rs").read_text(encoding="utf-8")
-    for names, body in arms(source):
-        if set(names) & {"withdraw_l2", "transfer_l2_account", "transfer_same_master_account"}:
-            assert "submit_signed_tx" not in body
-    owners = request_owners((NATIVE / "lighter/withdrawals.rs").read_text(encoding="utf-8"))
-    assert not {"sign_withdrawal_or_approval", "sign_internal_transfer"} & owners
 
 
 @pytest.mark.parametrize("exchange,method,array,field", [

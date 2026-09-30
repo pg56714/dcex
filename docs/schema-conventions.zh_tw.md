@@ -149,12 +149,10 @@ x-zero-when 的陣列表示條件群組之間 OR，各群組內仍為 AND。
 批次 TP/SL 必須是物件；BingX 的 null 與空字串選填值保留原樣，不編碼成字串 null。
 
 資金 catalog 入口先將提款／轉帳名稱交由各自 owner，再使用共用 transport 實作。
-所有權測試核對路由、owner 及 schema 載入來源，不依賴 schema 例外清單。
-單純 await nonce 或簽章不構成送出證據；純驗證允許清單限定完整原始程式內容，加入送出即失效。
 金融名稱片段（包括 price、amount、size、qty、fee、margin、collateral、share）
 不會因 int 註記而獲得豁免。原先 454 筆輸入豁免均已改為明確的控制或結構宣告。
 未來理由會先去掉 method／field 名稱與 `For ...,` 前綴再比較；同一理由重複超過
-4 次即使完整性檢查失敗，純驗證允許清單亦適用。
+4 次即使完整性檢查失敗。
 
 OKX 附帶 TP 比例接受大於 -1 的精確有號 decimal；下單時排除零，修改 TP／SL
 比例時允許以零刪除附帶委託。SL 比例除改單刪除外均為正值。這些界限保留官方
@@ -164,8 +162,7 @@ OKX 附帶 TP 比例接受大於 -1 的精確有號 decimal；下單時排除零
 的 Kraken 相對價格控制仍保留。
 
 BingX 選填附帶字串先 trim 再檢查形狀；空白視為未提供，空物件則拒絕。
-資金 owner 以外的資金字串由來源雜湊固定，schema transport 只允許已稽核的
-router 與 owner 呼叫；owner 的領域驗證在 release 建置也會執行。產生器檢查
+產生器檢查
 同時拒絕所屬生成目錄中的孤兒檔案，檢查時不寫入或刪除。
 
 共用輸入契約驗證器會執行已宣告的小數規則與 JSON 結構限制。此目錄中的 integer／boolean 宣告用於描述端點輸入，不會額外啟用執行期型別驗證；各端點的封包轉換器仍保留既有整數與布林驗證。OKX 策略單官方規格要求提供 `sz` 或 `closeFraction`，未記載數量為零的例外；因此明確提供的 `sz` 必須為正數，全部平倉可省略數量並使用 `closeFraction=1`。

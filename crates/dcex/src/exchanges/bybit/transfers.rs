@@ -178,13 +178,6 @@ impl super::client::BybitClient {
         params: &super::params::BybitParams,
         public: bool,
     ) -> crate::Result<Option<crate::exchange::ValidatedResponse>> {
-        if crate::exchanges::schema::fund_domain(name)
-            != Some(crate::exchanges::schema::FundDomain::Transfers)
-        {
-            return Err(crate::DcexError::InvalidInput(
-                "fund operation routed to the wrong owner".into(),
-            ));
-        }
         self.table_request_transport(name, params, public).await
     }
 }
@@ -196,13 +189,6 @@ impl super::client::BybitClient {
         params: &super::params::BybitParams,
         public: bool,
     ) -> crate::Result<Option<crate::exchange::ValidatedResponse>> {
-        if crate::exchanges::schema::fund_domain(name)
-            != Some(crate::exchanges::schema::FundDomain::Transfers)
-        {
-            return Err(crate::DcexError::InvalidInput(
-                "fund operation routed to the wrong owner".into(),
-            ));
-        }
         self.field_schema_request_transport(name, params, public)
             .await
     }

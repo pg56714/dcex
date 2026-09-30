@@ -48,8 +48,8 @@ def generated_endpoints(exchange: str) -> set[str]:
 def wrapper_domains(exchange: str) -> dict[str, str]:
     """Apply source-module ownership independently of request schema catalogs."""
     domains = endpoint_domains(exchange)
-    overrides = json.loads((ROOT / "scripts/fund_module_domains.json").read_text(encoding="utf-8"))
-    domains.update(overrides.get(exchange, {}))
+    config = json.loads((ROOT / "scripts/endpoint_domains.json").read_text(encoding="utf-8"))
+    domains.update(config[exchange].get("wrapper_domains", {}))
     return domains
 
 

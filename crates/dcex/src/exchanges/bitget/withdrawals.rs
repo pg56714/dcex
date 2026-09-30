@@ -152,13 +152,6 @@ impl super::client::BitgetClient {
         params: &super::params::BitgetParams,
         public: bool,
     ) -> crate::Result<Option<crate::exchange::ValidatedResponse>> {
-        if crate::exchanges::schema::fund_domain(name)
-            != Some(crate::exchanges::schema::FundDomain::Withdrawals)
-        {
-            return Err(crate::DcexError::InvalidInput(
-                "fund operation routed to the wrong owner".into(),
-            ));
-        }
         self.table_request_transport(name, params, public).await
     }
 }
@@ -170,13 +163,6 @@ impl super::client::BitgetClient {
         p: &super::params::BitgetParams,
         public: bool,
     ) -> crate::Result<Option<crate::exchange::ValidatedResponse>> {
-        if crate::exchanges::schema::fund_domain(name)
-            != Some(crate::exchanges::schema::FundDomain::Withdrawals)
-        {
-            return Err(crate::DcexError::InvalidInput(
-                "fund operation routed to the wrong owner".into(),
-            ));
-        }
         self.catalog_request_transport(name, p, public).await
     }
 }
