@@ -37,7 +37,7 @@ pub(super) fn arcus_market_info(market: &Value) -> Result<MarketInfo> {
     let quote = required_string(market, "quoteAsset")?;
     Ok(MarketInfo {
         exchange: "arcus".into(),
-        exchange_symbol: required_string(market, "marketId")?,
+        exchange_symbol: required_string(market, "marketDisplayName")?,
         product_symbol: format!("{base}-{quote}-SWAP"),
         product_type: "swap".into(),
         exchange_type: value_string(market, "type", "PERPETUAL"),
@@ -116,7 +116,15 @@ fn aster_market_info(market: &Value, product_type: &str) -> Result<MarketInfo> {
 
 pub(super) async fn fetch_backpack(timeout: Duration) -> Result<Vec<MarketInfo>> {
     let client = BackpackClient::public(5_000, timeout)?;
-    let response = client.public_request("get_markets", vec![]).await?;
+    let response = client
+        .public_request(
+            "get_markets",
+            ["SPOT", "PERP", "IPERP", "DATED", "PREDICTION"]
+                .into_iter()
+                .map(|kind| ("marketType".into(), kind.into()))
+                .collect(),
+        )
+        .await?;
     let securities = client.public_request("get_securities", vec![]).await?;
     let mut rows = Vec::new();
     for market in value_array(Some(&response.data)) {
@@ -126,7 +134,10 @@ pub(super) async fn fetch_backpack(timeout: Duration) -> Result<Vec<MarketInfo>>
             continue;
         }
         let market_type = value_string(market, "marketType", "").to_ascii_uppercase();
-        if !matches!(market_type.as_str(), "SPOT" | "PERP" | "IPERP" | "DATED") {
+        if !matches!(
+            market_type.as_str(),
+            "SPOT" | "PERP" | "IPERP" | "DATED" | "PREDICTION"
+        ) {
             continue;
         }
         let symbol = required_string(market, "symbol")?;
@@ -137,6 +148,7 @@ pub(super) async fn fetch_backpack(timeout: Duration) -> Result<Vec<MarketInfo>>
             "SPOT" => "spot",
             "PERP" | "IPERP" => "swap",
             "DATED" => "futures",
+            "PREDICTION" => "prediction",
             _ => unreachable!(),
         };
         let filters = market.get("filters").and_then(Value::as_object);
@@ -496,6 +508,31 @@ pub(super) fn okx_unlisted_option_family(error: &DcexError) -> bool {
     )
 }
 
+pub(super) fn bingx_swap_market_info(market: &Value) -> Result<MarketInfo> {
+    let symbol = required_string(market, "symbol")?;
+    let (base, quote) = split_last(&symbol, '-')?;
+    let price_places = value_i32(market, "pricePrecision", 0);
+    let quantity_places = value_i32(market, "quantityPrecision", 0);
+    Ok(MarketInfo {
+        exchange: "bingx".to_string(),
+        exchange_symbol: symbol,
+        product_symbol: format!("{base}-{quote}-SWAP"),
+        product_type: "swap".to_string(),
+        exchange_type: "perpetual".to_string(),
+        price_precision: decimal_precision_or_zero(price_places),
+        size_precision: decimal_precision_or_zero(quantity_places),
+        min_size: value_string(
+            market,
+            "tradeMinQuantity",
+            &value_string(market, "size", "0"),
+        ),
+        base_currency: base,
+        quote_currency: quote,
+        min_notional: value_string(market, "tradeMinUSDT", "0"),
+        size_per_contract: "1".to_string(),
+    })
+}
+
 pub(super) async fn fetch_bingx(timeout: Duration) -> Result<Vec<MarketInfo>> {
     let client = BingxClient::public(timeout)?;
     let swap = client
@@ -506,24 +543,7 @@ pub(super) async fn fetch_bingx(timeout: Duration) -> Result<Vec<MarketInfo>> {
         .await?;
     let mut rows = Vec::new();
     for market in response_array(&swap, &["data"]) {
-        let symbol = required_string(market, "symbol")?;
-        let (base, quote) = canonical_market_pair(market, "displayName", &symbol)?;
-        let price_places = value_i32(market, "pricePrecision", 0);
-        let quantity_places = value_i32(market, "quantityPrecision", 0);
-        rows.push(MarketInfo {
-            exchange: "bingx".to_string(),
-            exchange_symbol: symbol,
-            product_symbol: format!("{base}-{quote}-SWAP"),
-            product_type: "swap".to_string(),
-            exchange_type: "perpetual".to_string(),
-            price_precision: decimal_precision_or_zero(price_places),
-            size_precision: decimal_precision_or_zero(quantity_places),
-            min_size: decimal_precision_or_zero(quantity_places),
-            base_currency: base,
-            quote_currency: quote,
-            min_notional: value_string(market, "tradeMinUSDT", "0"),
-            size_per_contract: value_string(market, "size", "1"),
-        });
+        rows.push(bingx_swap_market_info(market)?);
     }
     let spot_data = spot.data.get("data").unwrap_or(&Value::Null);
     let spot_symbols = spot_data.get("symbols").unwrap_or(spot_data);
@@ -545,31 +565,21 @@ pub(super) async fn fetch_bingx(timeout: Duration) -> Result<Vec<MarketInfo>> {
             size_per_contract: "1".to_string(),
         });
     }
-    disambiguate_bingx_products(&mut rows);
+    validate_bingx_products(&rows)?;
     Ok(rows)
 }
 
-pub(super) fn disambiguate_bingx_products(rows: &mut [MarketInfo]) {
-    let mut counts = HashMap::new();
-    for row in rows.iter() {
-        *counts.entry(row.product_symbol.clone()).or_insert(0usize) += 1;
-    }
-    for row in rows.iter_mut() {
-        if counts.get(&row.product_symbol).copied().unwrap_or(0) < 2 {
-            continue;
-        }
-        // Preserve display aliases for unique products (including equities).
-        // Only colliding aliases fall back to the exchange's unique symbol.
-        if let Ok((base, quote)) = split_last(&row.exchange_symbol, '-') {
-            let native_product =
-                format!("{base}-{quote}-{}", row.product_type.to_ascii_uppercase());
-            if native_product != row.product_symbol {
-                row.base_currency = base;
-                row.quote_currency = quote;
-                row.product_symbol = native_product;
-            }
+pub(super) fn validate_bingx_products(rows: &[MarketInfo]) -> Result<()> {
+    let mut names = HashMap::new();
+    for row in rows {
+        if let Some(previous) = names.insert(&row.product_symbol, &row.exchange_symbol) {
+            return Err(DcexError::Decode(format!(
+                "duplicate BingX product symbol: {}; conflicting exchange symbols: {previous}, {}",
+                row.product_symbol, row.exchange_symbol
+            )));
         }
     }
+    Ok(())
 }
 
 pub(super) async fn fetch_bitget(timeout: Duration) -> Result<Vec<MarketInfo>> {
@@ -578,12 +588,6 @@ pub(super) async fn fetch_bitget(timeout: Duration) -> Result<Vec<MarketInfo>> {
         .public_request(
             "get_uta_instruments",
             vec![("category".to_string(), "SPOT".to_string())],
-        )
-        .await?;
-    let futures = client
-        .public_request(
-            "get_futures_contracts",
-            vec![("productType".to_string(), "USDT-FUTURES".to_string())],
         )
         .await?;
     let mut rows = Vec::new();
@@ -609,33 +613,7 @@ pub(super) async fn fetch_bitget(timeout: Duration) -> Result<Vec<MarketInfo>> {
             size_per_contract: "1".to_string(),
         });
     }
-    for market in response_array(&futures, &["data"]) {
-        let status = first_non_empty(
-            value_string(market, "symbolStatus", ""),
-            value_string(market, "status", ""),
-        )
-        .to_ascii_lowercase();
-        if !status.is_empty() && !matches!(status.as_str(), "normal" | "online") {
-            continue;
-        }
-        let base = required_string(market, "baseCoin")?;
-        let quote = required_string(market, "quoteCoin")?;
-        rows.push(MarketInfo {
-            exchange: "bitget".to_string(),
-            exchange_symbol: required_string(market, "symbol")?,
-            product_symbol: format!("{base}-{quote}-SWAP"),
-            product_type: "swap".to_string(),
-            exchange_type: value_string(market, "symbolType", "USDT-FUTURES"),
-            price_precision: decimal_precision(value_i32(market, "pricePlace", 0)),
-            size_precision: decimal_precision(value_i32(market, "volumePlace", 0)),
-            min_size: value_string(market, "minTradeNum", "0"),
-            base_currency: base,
-            quote_currency: quote,
-            min_notional: value_string(market, "minTradeUSDT", "0"),
-            size_per_contract: value_string(market, "sizeMultiplier", "1"),
-        });
-    }
-    for category in ["COIN-FUTURES", "USDC-FUTURES"] {
+    for category in ["USDT-FUTURES", "COIN-FUTURES", "USDC-FUTURES"] {
         let response = client
             .public_request(
                 "get_uta_instruments",
@@ -780,10 +758,18 @@ pub(super) async fn fetch_extended(timeout: Duration) -> Result<Vec<MarketInfo>>
     Ok(rows)
 }
 
-fn extended_market_info(market: &Value) -> Result<MarketInfo> {
+pub(super) fn extended_market_info(market: &Value) -> Result<MarketInfo> {
     let symbol = required_string(market, "name")?;
     let market_type = value_string(market, "type", "PERPETUAL");
-    let (base, quote) = canonical_market_pair(market, "uiName", &symbol)?;
+    let (base, quote) = if market_type == "SPOT" {
+        let (base, quote) = split_last(&symbol, '-')?;
+        (
+            base.strip_suffix("SPOT").unwrap_or(&base).to_string(),
+            quote,
+        )
+    } else {
+        canonical_market_pair(market, "uiName", &symbol)?
+    };
     let config = market.get("tradingConfig").unwrap_or(&Value::Null);
     let product_type = if market_type == "SPOT" {
         "spot"

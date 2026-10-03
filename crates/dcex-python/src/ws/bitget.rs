@@ -260,27 +260,6 @@ impl PythonBitgetPrivateWebSocketClient {
                 .map_err(to_py_runtime_error)
         })
     }
-    fn classic_trade_request<'py>(
-        &self,
-        py: Python<'py>,
-        id: String,
-        inst_type: String,
-        inst_id: String,
-        channel: String,
-        params: String,
-    ) -> PyResult<Bound<'py, PyAny>> {
-        let params: serde_json::Value = serde_json::from_str(&params)
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
-        let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            client
-                .lock()
-                .await
-                .classic_trade_request(&id, &inst_type, &inst_id, &channel, params)
-                .await
-                .map_err(to_py_runtime_error)
-        })
-    }
 
     fn close<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
@@ -378,89 +357,41 @@ impl PythonBitgetPrivateWebSocketClient {
         })
     }
 
-    #[pyo3(signature = (inst_type=None, inst_id=None))]
-    fn subscribe_orders<'py>(
-        &self,
-        py: Python<'py>,
-        inst_type: Option<String>,
-        inst_id: Option<String>,
-    ) -> PyResult<Bound<'py, PyAny>> {
+    fn subscribe_orders<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             let mut client = client.lock().await;
-            let inst_type = default_private_inst_type(inst_type, client.is_uta_v3());
-            if let Some(inst_id) = inst_id {
-                client
-                    .subscribe_orders_for_inst_id(&inst_type, &inst_id)
-                    .await
-            } else {
-                client.subscribe_orders(&inst_type).await
-            }
-            .map_err(to_py_runtime_error)
+            client.subscribe_orders().await.map_err(to_py_runtime_error)
         })
     }
 
-    #[pyo3(signature = (inst_type=None, inst_id=None))]
-    fn subscribe_fills<'py>(
-        &self,
-        py: Python<'py>,
-        inst_type: Option<String>,
-        inst_id: Option<String>,
-    ) -> PyResult<Bound<'py, PyAny>> {
+    fn subscribe_fills<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             let mut client = client.lock().await;
-            let inst_type = default_private_inst_type(inst_type, client.is_uta_v3());
-            if let Some(inst_id) = inst_id {
-                client
-                    .subscribe_fills_for_inst_id(&inst_type, &inst_id)
-                    .await
-            } else {
-                client.subscribe_fills(&inst_type).await
-            }
-            .map_err(to_py_runtime_error)
+            client.subscribe_fills().await.map_err(to_py_runtime_error)
         })
     }
 
-    #[pyo3(signature = (inst_type=None, inst_id=None))]
-    fn subscribe_positions<'py>(
-        &self,
-        py: Python<'py>,
-        inst_type: Option<String>,
-        inst_id: Option<String>,
-    ) -> PyResult<Bound<'py, PyAny>> {
+    fn subscribe_positions<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             let mut client = client.lock().await;
-            let inst_type = default_private_inst_type(inst_type, client.is_uta_v3());
-            if let Some(inst_id) = inst_id {
-                client
-                    .subscribe_positions_for_inst_id(&inst_type, &inst_id)
-                    .await
-            } else {
-                client.subscribe_positions(&inst_type).await
-            }
-            .map_err(to_py_runtime_error)
+            client
+                .subscribe_positions()
+                .await
+                .map_err(to_py_runtime_error)
         })
     }
 
-    #[pyo3(signature = (inst_type=None, coin=None))]
-    fn subscribe_account<'py>(
-        &self,
-        py: Python<'py>,
-        inst_type: Option<String>,
-        coin: Option<String>,
-    ) -> PyResult<Bound<'py, PyAny>> {
+    fn subscribe_account<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             let mut client = client.lock().await;
-            let inst_type = default_private_inst_type(inst_type, client.is_uta_v3());
-            if let Some(coin) = coin {
-                client.subscribe_account_for_coin(&inst_type, &coin).await
-            } else {
-                client.subscribe_account(&inst_type).await
-            }
-            .map_err(to_py_runtime_error)
+            client
+                .subscribe_account()
+                .await
+                .map_err(to_py_runtime_error)
         })
     }
 

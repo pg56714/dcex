@@ -9,7 +9,72 @@ from pathlib import Path
 import pytest
 from dotenv import load_dotenv
 
+from tests.live_gate import stateful_tests_enabled
+from tests.stateful_reporting import DETAILS, RESULTS, initial_result, update_report, write_results
+
 load_dotenv(override=False)
+
+
+@pytest.fixture
+def stateful_result(request: pytest.FixtureRequest) -> dict[str, str]:
+    """Allow the order lifecycle to record its market, stage and sanitized result."""
+    result = request.node.stash.get(DETAILS, initial_result(request.node.nodeid))
+    request.node.stash[DETAILS] = result
+    return result
+
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_makereport(item: pytest.Item, call: pytest.CallInfo):
+    """Collect one redacted result per stateful test, including setup failures."""
+    outcome = yield
+    if item.get_closest_marker("stateful") is None:
+        return
+    report = outcome.get_result()
+    results = item.config.stash.get(RESULTS, {})
+    item.config.stash[RESULTS] = results
+    details = item.stash.get(DETAILS, initial_result(item.nodeid))
+    if report.when == "teardown" and not report.failed:
+        return
+    if report.when == "setup" and not (report.failed or report.skipped):
+        return
+    if report.when == "teardown" and item.nodeid in results:
+        details = results[item.nodeid]
+    results[item.nodeid] = update_report(details, report)
+
+
+def pytest_sessionfinish(session: pytest.Session, exitstatus: int) -> None:
+    """Persist stateful summaries without changing ordinary offline runs."""
+    results = session.config.stash.get(RESULTS, {})
+    write_results(Path(session.config.rootpath) / "live-results", list(results.values()))
+
+
+def pytest_terminal_summary(
+    terminalreporter: object, exitstatus: int, config: pytest.Config
+) -> None:
+    """Display a compact stateful status table without raw exchange responses."""
+    results = config.stash.get(RESULTS, {})
+    if not results:
+        return
+    terminalreporter.write_sep("=", "Stateful results")
+    terminalreporter.write_line(
+        "exchange | mode | market | stage | status | client_order_id | cleanup"
+    )
+    for row in results.values():
+        terminalreporter.write_line(
+            " | ".join(
+                row[key]
+                for key in (
+                    "exchange",
+                    "mode",
+                    "market",
+                    "stage",
+                    "status",
+                    "client_order_id",
+                    "cleanup",
+                )
+            )
+        )
+
 
 _LIVE_TEST_DIRS = {"sync_support", "async_support"}
 _relative_path_key = pytest.StashKey[Path | None]()
@@ -39,30 +104,6 @@ _GENERATED_METHOD_NAMES = {
     "post_account_bills_history_archive",
     "post_monthly_statement",
 }
-_STATEFUL_METHOD_NAMES = {
-    "get_listen_key",
-    "keep_alive_listen_key",
-}
-_STATEFUL_METHOD_PREFIXES = (
-    "amend",
-    "cancel",
-    "change",
-    "close",
-    "create",
-    "funds_transfer",
-    "future_dual_mode_switch",
-    "modify",
-    "place",
-    "post_withdraw",
-    "repay",
-    "set",
-    "submit_leverage",
-    "switch",
-    "transfer",
-    "update",
-    "upgrade",
-    "withdraw",
-)
 
 
 def _relative_test_path(config: pytest.Config, item: pytest.Item) -> Path | None:
@@ -79,17 +120,11 @@ def _is_live_path(relative_path: Path | None) -> bool:
 
 
 def _is_stateful_path(relative_path: Path | None) -> bool:
-    return bool(relative_path and relative_path.name.startswith("test_stateful"))
+    return bool(relative_path and relative_path.name == "test_stateful_trade.py")
 
 
-def _calls_client_method(item: pytest.Item, names: set[str] | None = None) -> bool:
-    """
-    Check whether a test's AST calls certain client methods.
-
-    When *names* is provided the check is an exact-match lookup against that
-    set.  When *names* is ``None`` the check falls back to prefix-matching
-    against ``_STATEFUL_METHOD_PREFIXES``.
-    """
+def _calls_client_method(item: pytest.Item, names: set[str]) -> bool:
+    """Check whether a test's AST calls an explicitly named client method."""
     test_function = getattr(item, "obj", None)
     if test_function is None:
         return False
@@ -104,15 +139,9 @@ def _calls_client_method(item: pytest.Item, names: set[str] | None = None) -> bo
         if not isinstance(node, ast.Call) or not isinstance(node.func, ast.Attribute):
             continue
         method_name = node.func.attr
-        if names is not None and method_name in names:
-            return True
-        if names is None and method_name.startswith(_STATEFUL_METHOD_PREFIXES):
+        if method_name in names:
             return True
     return False
-
-
-def _calls_stateful_client_method(item: pytest.Item) -> bool:
-    return _calls_client_method(item, _STATEFUL_METHOD_NAMES) or _calls_client_method(item)
 
 
 def _calls_generated_client_method(item: pytest.Item) -> bool:
@@ -136,7 +165,7 @@ def _private_env_vars(item: pytest.Item, relative_path: Path | None) -> tuple[st
 
 
 def _stateful_tests_enabled() -> bool:
-    return os.getenv("RUN_LIVE_TRADING_TESTS") == "1"
+    return stateful_tests_enabled()
 
 
 def pytest_runtest_setup(item: pytest.Item) -> None:
@@ -150,13 +179,6 @@ def pytest_runtest_setup(item: pytest.Item) -> None:
         and not _stateful_tests_enabled()
     ):
         pytest.skip("Set RUN_LIVE_TRADING_TESTS=1 before running a stateful live test.")
-
-    if (
-        _is_live_path(relative_path)
-        and item.get_closest_marker("live_fill") is not None
-        and os.getenv("RUN_LIVE_FILL_TESTS") != "1"
-    ):
-        pytest.skip("Set RUN_LIVE_FILL_TESTS=1 before running a live fill test.")
 
     missing = [name for name in _private_env_vars(item, relative_path) if not os.getenv(name)]
     if missing:
@@ -175,7 +197,5 @@ def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item
         if is_live_test and _calls_generated_client_method(item):
             item.add_marker(pytest.mark.generated)
 
-        if is_live_test and (
-            _is_stateful_path(relative_path) or _calls_stateful_client_method(item)
-        ):
+        if is_live_test and _is_stateful_path(relative_path):
             item.add_marker(pytest.mark.stateful)

@@ -82,50 +82,6 @@
     "days": null
   },
   {
-    "name": "get_futures_open_interest_limit",
-    "path": "/api/v2/mix/market/oi-limit",
-    "post": false,
-    "public": true,
-    "fields": [
-      "productType",
-      "symbol"
-    ],
-    "required": [
-      "productType"
-    ],
-    "arrays": [],
-    "limit": null,
-    "days": null
-  },
-  {
-    "name": "get_futures_position_tiers",
-    "path": "/api/v2/mix/market/query-position-lever",
-    "post": false,
-    "public": true,
-    "fields": [
-      "productType",
-      "symbol"
-    ],
-    "required": [
-      "productType",
-      "symbol"
-    ],
-    "arrays": [],
-    "limit": null,
-    "days": null
-  },
-  {
-    "name": "get_futures_discount_rates",
-    "path": "/api/v2/mix/market/discount-rate",
-    "post": false,
-    "public": true,
-    "fields": [],
-    "required": [],
-    "arrays": [],
-    "limit": null,
-    "days": null
-  },
-  {
     "name": "get_futures_interest_exchange_rates",
     "path": "/api/v2/mix/market/exchange-rate",
     "post": false,
@@ -459,23 +415,6 @@
     "public": true,
     "fields": [
       "symbol"
-    ],
-    "required": [
-      "symbol"
-    ],
-    "arrays": [],
-    "limit": null,
-    "days": null
-  },
-  {
-    "name": "get_classic_merge_depth",
-    "path": "/api/v2/spot/market/merge-depth",
-    "post": false,
-    "public": true,
-    "fields": [
-      "symbol",
-      "precision",
-      "limit"
     ],
     "required": [
       "symbol"

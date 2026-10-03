@@ -255,7 +255,15 @@ fn normalize_kucoin_currency(value: &str) -> String {
 fn normalize_kraken_currency(value: &str) -> String {
     let alias = match value {
         "XXBT" | "XBT" => Some("BTC"),
-        "XDG" => Some("DOGE"),
+        "XDG" | "XXDG" => Some("DOGE"),
+        "XETH" => Some("ETH"),
+        "XLTC" => Some("LTC"),
+        "XXRP" => Some("XRP"),
+        "XXLM" => Some("XLM"),
+        "XXMR" => Some("XMR"),
+        "XETC" => Some("ETC"),
+        "XREP" => Some("REP"),
+        "XZEC" => Some("ZEC"),
         "ZUSD" => Some("USD"),
         "ZEUR" => Some("EUR"),
         "ZGBP" => Some("GBP"),
@@ -266,9 +274,6 @@ fn normalize_kraken_currency(value: &str) -> String {
     };
     if let Some(alias) = alias {
         return alias.to_string();
-    }
-    if value.len() > 3 && (value.starts_with('X') || value.starts_with('Z')) {
-        return normalize_kraken_currency(&value[1..]);
     }
     value.to_string()
 }

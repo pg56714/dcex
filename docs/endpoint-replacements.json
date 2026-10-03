@@ -433,5 +433,2755 @@
       }
     ],
     "official_source": "https://www.kucoin.com/docs-new/3470259w0"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/mix/market/discount-rate",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/market/discount-rate",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/mix/market/merge-depth",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/market/orderbook",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/mix/market/ticker",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/market/tickers",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/mix/market/tickers",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/market/tickers",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/mix/market/fills",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/market/fills",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/mix/market/candles",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/market/candles",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/mix/market/history-candles",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/market/history-candles",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/mix/market/open-interest",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/market/open-interest",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/mix/market/current-fund-rate",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/market/current-fund-rate",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/mix/market/history-fund-rate",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/market/history-fund-rate",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/mix/market/contracts",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/market/instruments",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/mix/market/oi-limit",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/market/oi-limit",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/mix/account/account",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/account/assets",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/mix/account/accounts",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/account/assets",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/mix/account/sub-account-assets",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/account/sub-unified-assets",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/mix/account/max-open",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/account/max-open-available",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/mix/account/set-leverage",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/account/set-leverage",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/mix/account/set-margin",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/account/set-margin",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/mix/account/set-position-mode",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/account/set-hold-mode",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/mix/account/bill",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/account/financial-records",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/mix/market/query-position-lever",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/market/position-tier",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/mix/position/single-position",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/position/current-position",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/mix/position/history-position",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/position/history-position",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/mix/position/adlRank",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/position/adlRank",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/mix/position/all-position",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/position/current-position",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/mix/order/place-order",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/trade/place-order",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/mix/order/batch-place-order",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/trade/place-batch",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/mix/order/modify-order",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/trade/modify-order",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/mix/order/cancel-order",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/trade/cancel-order",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/mix/order/batch-cancel-orders",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/trade/cancel-batch",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/mix/order/close-positions",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/trade/close-positions",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/mix/order/detail",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/trade/order-info",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/mix/order/fills",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/trade/fills",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/mix/order/fill-history",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/trade/fills",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/mix/order/orders-pending",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/trade/unfilled-orders",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/mix/order/orders-history",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/trade/history-orders",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/mix/order/cancel-all-orders",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/trade/cancel-symbol-order",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/mix/order/modify-tpsl-order",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/trade/modify-strategy-order",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/mix/order/place-plan-order",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/trade/place-strategy-order",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/mix/order/place-pos-tpsl",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/trade/place-strategy-order",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/mix/order/place-tpsl-order",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/trade/place-strategy-order",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/mix/order/plan-sub-order",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/trade/strategy-sub-orders",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/mix/order/modify-plan-order",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/trade/modify-strategy-order",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/mix/order/cancel-plan-order",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/trade/cancel-strategy-order",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/mix/order/orders-plan-pending",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/trade/unfilled-strategy-orders",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/mix/order/orders-plan-history",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/trade/history-strategy-orders",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/spot/public/symbols",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/market/instruments",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/spot/market/tickers",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/market/tickers",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/spot/market/orderbook",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/market/orderbook",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/spot/market/merge-depth",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/market/orderbook",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/spot/market/fills",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/market/fills",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/spot/market/candles",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/market/candles",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/spot/market/history-candles",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/market/history-candles",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/spot/trade/place-order",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/trade/place-order",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/spot/trade/batch-orders",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/trade/place-batch",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/spot/trade/cancel-order",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/trade/cancel-order",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/spot/trade/batch-cancel-order",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/trade/cancel-batch",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/spot/trade/cancel-symbol-order",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/trade/cancel-symbol-order",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/spot/trade/cancel-replace-order",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/trade/modify-order",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/spot/trade/batch-cancel-replace-order",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/trade/batch-modify-order",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/spot/trade/orderInfo",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/trade/order-info",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/spot/trade/unfilled-orders",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/trade/unfilled-orders",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/spot/trade/history-orders",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/trade/history-orders",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/spot/trade/fills",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/trade/fills",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/spot/trade/place-plan-order",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/trade/place-strategy-order",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/spot/trade/modify-plan-order",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/trade/modify-strategy-order",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/spot/trade/cancel-plan-order",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/trade/cancel-strategy-order",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/spot/trade/batch-cancel-plan-order",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/trade/cancel-strategy-order",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/spot/trade/current-plan-order",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/trade/unfilled-strategy-orders",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/spot/trade/history-plan-order",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/trade/history-strategy-orders",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/spot/trade/plan-sub-order",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/trade/strategy-sub-orders",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/spot/account/info",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/account/settings",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/spot/account/assets",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/account/assets",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/spot/account/bills",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/account/financial-records",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/spot/account/subaccount-assets",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/account/sub-unified-assets",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/spot/account/deduct-info",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/account/deduct-info",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/spot/account/switch-deduct",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/account/switch-deduct",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/margin/crossed/account/assets",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/account/assets",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/margin/crossed/account/borrow",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/account/borrow",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/margin/crossed/account/repay",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/account/repay",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/margin/crossed/account/max-borrowable-amount",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/account/max-borrowable",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/margin/crossed/account/max-transfer-out-amount",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/account/max-transferable",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/margin/crossed/place-order",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/trade/place-order",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/margin/crossed/batch-place-order",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/trade/place-batch",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/margin/crossed/cancel-order",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/trade/cancel-order",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/margin/crossed/batch-cancel-order",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/trade/cancel-batch",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/margin/crossed/open-orders",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/trade/unfilled-orders",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/margin/crossed/history-orders",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/trade/history-orders",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/margin/crossed/fills",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/trade/fills",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/margin/isolated/account/assets",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/account/assets",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/margin/isolated/account/borrow",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/account/borrow",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/margin/isolated/account/repay",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/account/repay",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/margin/isolated/account/max-borrowable-amount",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/account/max-borrowable",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/margin/isolated/account/max-transfer-out-amount",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/account/max-transferable",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/margin/isolated/place-order",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/trade/place-order",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/margin/isolated/batch-place-order",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/trade/place-batch",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/margin/isolated/cancel-order",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/trade/cancel-order",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/margin/isolated/batch-cancel-order",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/trade/cancel-batch",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/margin/isolated/open-orders",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/trade/unfilled-orders",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/margin/isolated/history-orders",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/trade/history-orders",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/margin/isolated/fills",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/trade/fills",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/margin/crossed/financial-records",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/account/financial-records",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/margin/isolated/financial-records",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/account/financial-records",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": null,
+      "path": null,
+      "host": null,
+      "channel": "candle",
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": null,
+        "path": null,
+        "host": null,
+        "channel": "uta-public",
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": null,
+      "path": null,
+      "host": null,
+      "channel": "trade",
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": null,
+        "path": null,
+        "host": null,
+        "channel": "uta-public",
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": null,
+      "path": null,
+      "host": null,
+      "channel": "orders",
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": null,
+        "path": null,
+        "host": null,
+        "channel": "uta-private",
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": null,
+      "path": null,
+      "host": null,
+      "channel": "positions",
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": null,
+        "path": null,
+        "host": null,
+        "channel": "uta-private",
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": null,
+      "path": null,
+      "host": null,
+      "channel": "orders-algo",
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": null,
+        "path": null,
+        "host": null,
+        "channel": "uta-private",
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": null,
+      "path": null,
+      "host": null,
+      "channel": "adl-noti",
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": null,
+        "path": null,
+        "host": null,
+        "channel": "uta-private",
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": null,
+      "path": null,
+      "host": null,
+      "channel": "place-order/cancel-order",
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": null,
+        "path": null,
+        "host": null,
+        "channel": "uta-trading",
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
   }
 ]

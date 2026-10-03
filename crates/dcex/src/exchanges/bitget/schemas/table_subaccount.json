@@ -1,34 +1,5 @@
 [
   {
-    "name": "get_futures_sub_account_assets",
-    "path": "/api/v2/mix/account/sub-account-assets",
-    "post": false,
-    "public": false,
-    "fields": [
-      "productType"
-    ],
-    "required": [
-      "productType"
-    ],
-    "arrays": [],
-    "limit": null,
-    "days": null
-  },
-  {
-    "name": "get_spot_sub_account_assets",
-    "path": "/api/v2/spot/account/subaccount-assets",
-    "post": false,
-    "public": false,
-    "fields": [
-      "idLessThan",
-      "limit"
-    ],
-    "required": [],
-    "arrays": [],
-    "limit": null,
-    "days": null
-  },
-  {
     "name": "get_uta_sub_accounts",
     "path": "/api/v3/user/sub-list",
     "post": false,

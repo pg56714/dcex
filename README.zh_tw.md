@@ -59,6 +59,8 @@ cargo add dcex
 | Ondo | 支援 | 支援 | 支援 | 支援 |
 | Arcus | 支援 | 支援 | 支援 | 支援 |
 
+Bitget 自 2026-09-15 起遷移至 UTA；本函式庫已移除有 UTA 替代的 classic 端點，交易請使用 UTA 帳戶。未確認替代方案的端點暫予保留，理由列於端點 ledger。參閱 [官方 UTA 升級指南](https://www.bitget.com/docs/classic/uta-api-upgrade-guide) 與 [帳戶設定](https://www.bitget.com/docs/catalog/account/account-settings)。
+
 私人 WebSocket 包含需驗證身分或指定地址的使用者資料流；Binance、Bybit、Bitget、OKX、KuCoin 與 Kraken 現貨提供交易 WebSocket；Hyperliquid 與 Lighter 可提交已簽名操作，Arcus 提供簽名請求建立介面。Lighter Mainnet 與 Robinhood 使用不同憑證；可逐一為客戶端選擇網路，預設為 Mainnet；參閱 [.env.example](.env.example) 與 [Lighter 範例](examples/async/lighter_private_readonly.py)。Ondo 現貨目前僅支援公開行情（depth、trades、symbol_info、history 與 WS 現貨頻道）；官方尚未公布現貨交易 API，因此下單、撤單等私有操作傳入 `-SPOT` symbol 會在本地報錯，不會送出請求。
 
 ## Python 快速開始

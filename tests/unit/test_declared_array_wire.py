@@ -159,9 +159,9 @@ async def test_array_and_json_string_preserve_documented_wire_shape(exchange, en
                 await result
 
 
-def test_array_format_fixture_covers_all_sixty_seven_declarations():
+def test_array_format_fixture_covers_retained_declarations():
     from dcex._input_codec import CATALOG
-    assert len(CASES) == len({(c['exchange'], c['method'], c['field']) for c in CASES}) == 67
+    assert len(CASES) == len({(c['exchange'], c['method'], c['field']) for c in CASES}) == 58
     for case in CASES:
         field = CATALOG['exchanges'][case['exchange']][case['method']]['properties'][case['field']]
         assert field['type'] == 'array'

@@ -5,17 +5,19 @@ import pytest
 from dcex._input_codec import CATALOG, normalize
 
 
-@pytest.mark.parametrize("exchange,method,field", [
-    ("bitget", "place_futures_order", "size"),
-    ("bitget", "transfer", "amount"),
-    ("okx", "funds_transfer", "amt"),
-    ("okx", "amend_order", "newSz"),
-    ("okx", "set_leverage", "lever"),
-    ("bybit", "set_leverage", "leverage"),
-    ("kraken", "place_futures_order", "size"),
-    ("mexc", "place_contract_order", "vol"),
-    ("mexc", "place_spot_order", "quoteOrderQty"),
-])
+@pytest.mark.parametrize(
+    "exchange,method,field",
+    [
+        ("bitget", "transfer", "amount"),
+        ("okx", "funds_transfer", "amt"),
+        ("okx", "amend_order", "newSz"),
+        ("okx", "set_leverage", "lever"),
+        ("bybit", "set_leverage", "leverage"),
+        ("kraken", "place_futures_order", "size"),
+        ("mexc", "place_contract_order", "vol"),
+        ("mexc", "place_spot_order", "quoteOrderQty"),
+    ],
+)
 def test_audited_positive_fields_reject_zero(exchange, method, field):
     schema = CATALOG["exchanges"][exchange][method]
     for value in ["0", "0.000", 0]:

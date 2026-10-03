@@ -17,10 +17,10 @@ def main() -> None:
         passphrase=require_env("BITGET_PASSPHRASE"),
     )
 
-    spot_assets = client.get_spot_account_assets(coin="USDT")
+    spot_assets = client.get_uta_account_assets()
     print(spot_assets)
 
-    futures_positions = client.get_futures_positions(margin_coin="USDT")
+    futures_positions = client.get_uta_positions(category="USDT-FUTURES")
     print(futures_positions)
 
 

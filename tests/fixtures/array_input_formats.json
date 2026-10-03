@@ -338,7 +338,7 @@
       "2"
     ],
     "kwargs": {
-      "product_symbol": "BTC-USDT-SWAP"
+      "product_symbol": "BTC-USDT"
     },
     "wire_values": [
       1,
@@ -358,29 +358,12 @@
       "00123"
     ],
     "kwargs": {
-      "product_symbol": "BTC-USDT-SWAP"
+      "product_symbol": "BTC-USDT"
     },
     "wire_values": [
       "abc123",
       "00123"
     ]
-  },
-  {
-    "exchange": "bitget",
-    "method": "cancel_spot_batch_orders",
-    "field": "order_list",
-    "official_source": "https://www.bitget.com/docs/catalog/classic-spot-trade/classic-spot-trade#batch-cancel-orders",
-    "argument": "order_list",
-    "wire_field": "orderList",
-    "representation": "json",
-    "values": [
-      {
-        "orderId": "1"
-      }
-    ],
-    "kwargs": {
-      "product_symbol": "BTC-USDT-SPOT"
-    }
   },
   {
     "exchange": "bitget",
@@ -396,140 +379,6 @@
         "symbol": "BTCUSDT",
         "orderId": "1"
       }
-    ],
-    "kwargs": {}
-  },
-  {
-    "exchange": "bitget",
-    "method": "cancel_futures_batch_orders",
-    "field": "order_id_list",
-    "official_source": "https://www.bitget.com/docs/catalog/classic-contract-trade/classic-contract-trade#batch-cancel",
-    "argument": "order_id_list",
-    "wire_field": "orderIdList",
-    "representation": "json",
-    "values": [
-      {
-        "orderId": "1"
-      }
-    ],
-    "kwargs": {
-      "product_symbol": "BTC-USDT-SWAP"
-    }
-  },
-  {
-    "exchange": "bitget",
-    "method": "cancel_futures_batch_orders",
-    "field": "orderIdList",
-    "official_source": "https://www.bitget.com/docs/catalog/classic-contract-trade/classic-contract-trade#batch-cancel",
-    "argument": "order_id_list",
-    "wire_field": "orderIdList",
-    "representation": "json",
-    "values": [
-      {
-        "orderId": "1"
-      }
-    ],
-    "kwargs": {
-      "product_symbol": "BTC-USDT-SWAP"
-    }
-  },
-  {
-    "exchange": "bitget",
-    "method": "cancel_cross_margin_batch_orders",
-    "field": "orders",
-    "official_source": "https://www.bitget.com/docs/catalog/classic-margin-cross-trade/classic-margin-cross-trade#cross-batch-cancel-orders",
-    "argument": "orders",
-    "wire_field": "orderIdList",
-    "representation": "json",
-    "values": [
-      {
-        "orderId": "1"
-      }
-    ],
-    "kwargs": {
-      "product_symbol": "BTC-USDT-SPOT"
-    }
-  },
-  {
-    "exchange": "bitget",
-    "method": "cancel_cross_margin_batch_orders",
-    "field": "orderIdList",
-    "official_source": "https://www.bitget.com/docs/catalog/classic-margin-cross-trade/classic-margin-cross-trade#cross-batch-cancel-orders",
-    "argument": "orders",
-    "wire_field": "orderIdList",
-    "representation": "json",
-    "values": [
-      {
-        "orderId": "1"
-      }
-    ],
-    "kwargs": {
-      "product_symbol": "BTC-USDT-SPOT"
-    }
-  },
-  {
-    "exchange": "bitget",
-    "method": "cancel_isolated_margin_batch_orders",
-    "field": "orders",
-    "official_source": "https://www.bitget.com/api-doc/margin/isolated/trade/Isolated-Batch-Cancel-Orders",
-    "argument": "orders",
-    "wire_field": "orderIdList",
-    "representation": "json",
-    "values": [
-      {
-        "orderId": "1"
-      }
-    ],
-    "kwargs": {
-      "product_symbol": "BTC-USDT-SPOT"
-    }
-  },
-  {
-    "exchange": "bitget",
-    "method": "cancel_isolated_margin_batch_orders",
-    "field": "orderIdList",
-    "official_source": "https://www.bitget.com/api-doc/margin/isolated/trade/Isolated-Batch-Cancel-Orders",
-    "argument": "orders",
-    "wire_field": "orderIdList",
-    "representation": "json",
-    "values": [
-      {
-        "orderId": "1"
-      }
-    ],
-    "kwargs": {
-      "product_symbol": "BTC-USDT-SPOT"
-    }
-  },
-  {
-    "exchange": "bitget",
-    "method": "cancel_futures_plan_orders",
-    "field": "order_id_list",
-    "official_source": "https://www.bitget.com/docs/catalog/classic-contract-plan/classic-contract-plan#cancel-trigger-order",
-    "argument": "order_id_list",
-    "wire_field": "orderIdList",
-    "representation": "json",
-    "values": [
-      {
-        "orderId": "1"
-      }
-    ],
-    "kwargs": {
-      "product_symbol": "BTC-USDT-SWAP",
-      "product_type": "USDT-FUTURES"
-    }
-  },
-  {
-    "exchange": "bitget",
-    "method": "cancel_spot_plan_orders",
-    "field": "symbol_list",
-    "official_source": "https://www.bitget.com/docs/catalog/classic-spot-plan/classic-spot-plan#cancel-plan-orders-in-batch",
-    "argument": "symbol_list",
-    "wire_field": "symbolList",
-    "representation": "json",
-    "values": [
-      "BTCUSDT",
-      "ETHUSDT"
     ],
     "kwargs": {}
   },

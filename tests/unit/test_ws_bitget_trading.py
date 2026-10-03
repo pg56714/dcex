@@ -1,18 +1,14 @@
 """Exercise native Bitget trading frames and partial acknowledgements locally."""
 
-# ruff: noqa: D103
 import json
 from typing import Any
-
 import pytest
 from aiohttp import WSMsgType, web
-
 from dcex.ws.bitget import PrivateClient
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("uta", [False, True])
-async def test_trading_wire_protocol_and_partial_results(uta: bool) -> None:
+async def test_trading_wire_protocol_and_partial_results() -> None:
     frames: list[dict[str, Any]] = []
     partial = {
         "event": "trade",
@@ -37,7 +33,7 @@ async def test_trading_wire_protocol_and_partial_results(uta: bool) -> None:
         return peer
 
     app = web.Application()
-    path = "/v3/ws/private" if uta else "/v2/ws/private"
+    path = "/v3/ws/private"
     app.router.add_get(path, socket)
     runner = web.AppRunner(app)
     await runner.setup()
@@ -52,74 +48,43 @@ async def test_trading_wire_protocol_and_partial_results(uta: bool) -> None:
     )
     try:
         await client.connect()
-        if uta:
-            order = {
-                "symbol": "BTCUSDT",
-                "orderType": "limit",
-                "price": "123.4500",
-                "qty": "0.001",
-                "side": "buy",
-                "receiveWindow": "5000",
-            }
-            await client.place_order("single", order, category="spot", request_time=1700000000000)
-            assert await client.recv() == {
-                "op": "trade",
-                "id": "single",
-                "topic": "place-order",
-                "category": "spot",
-                "requestTime": "1700000000000",
-                "args": [order],
-            }
-            batch_order = {k: v for k, v in order.items() if k != "receiveWindow"}
-            await client.place_batch_orders("place", [batch_order], category="spot")
-            assert (await client.recv())["topic"] == "batch-place"
-            await client.modify_order(
-                "modify", {"orderId": "1", "price": "124", "requestId": 123}, category="spot"
-            )
-            assert (await client.recv())["args"][0]["requestId"] == 123
-            await client.modify_batch_orders(
-                "batch", [{"orderId": "1", "qty": "2"}, {"orderId": "2", "qty": "3"}]
-            )
-            assert await client.recv() == partial
-            await client.cancel_order("cancel", {"clientOid": "client-1"})
-            assert (await client.recv())["args"] == [{"clientOid": "client-1"}]
-            await client.cancel_batch_orders("cancels", [{"orderId": "1"}, {"orderId": "2"}])
-            assert (await client.recv())["topic"] == "batch-cancel"
-        else:
-            for inst_type in ["SPOT", "USDT-FUTURES"]:
-                params = {
-                    "orderType": "limit",
-                    "side": "buy",
-                    "size": "0.001",
-                    "price": "123.4500",
-                    "force": "gtc",
-                }
-                if inst_type != "SPOT":
-                    params.update(marginCoin="USDT", marginMode="crossed", reduceOnly="YES")
-                for channel, payload in [
-                    ("place-order", params),
-                    ("cancel-order", {"clientOid": "client-1"}),
-                ]:
-                    await client.classic_trade_request(
-                        "classic", inst_type, "BTCUSDT", channel, payload
-                    )
-                    assert await client.recv() == {
-                        "op": "trade",
-                        "args": [
-                            {
-                                "id": "classic",
-                                "instType": inst_type,
-                                "instId": "BTCUSDT",
-                                "channel": channel,
-                                "params": payload,
-                            }
-                        ],
-                    }
+        order = {
+            "symbol": "BTCUSDT",
+            "orderType": "limit",
+            "price": "123.4500",
+            "qty": "0.001",
+            "side": "buy",
+            "receiveWindow": "5000",
+        }
+        await client.place_order("single", order, category="spot", request_time=1700000000000)
+        assert await client.recv() == {
+            "op": "trade",
+            "id": "single",
+            "topic": "place-order",
+            "category": "spot",
+            "requestTime": "1700000000000",
+            "args": [order],
+        }
+        batch_order = {k: v for k, v in order.items() if k != "receiveWindow"}
+        await client.place_batch_orders("place", [batch_order], category="spot")
+        assert (await client.recv())["topic"] == "batch-place"
+        await client.modify_order(
+            "modify", {"orderId": "1", "price": "124", "requestId": 123}, category="spot"
+        )
+        assert (await client.recv())["args"][0]["requestId"] == 123
+        await client.modify_batch_orders(
+            "batch", [{"orderId": "1", "qty": "2"}, {"orderId": "2", "qty": "3"}]
+        )
+        assert await client.recv() == partial
+        await client.cancel_order("cancel", {"clientOid": "client-1"})
+        assert (await client.recv())["args"] == [{"clientOid": "client-1"}]
+        await client.cancel_batch_orders("cancels", [{"orderId": "1"}, {"orderId": "2"}])
+        assert (await client.recv())["topic"] == "batch-cancel"
     finally:
         await client.close()
         await runner.cleanup()
-    assert len(frames) == (6 if uta else 4)
-    assert all("apiCode" not in json.dumps(frame) for frame in frames)
+    assert len(frames) == 6
+    assert all(("apiCode" not in json.dumps(frame) for frame in frames))
 
 
 @pytest.mark.asyncio

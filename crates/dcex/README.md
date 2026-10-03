@@ -53,6 +53,8 @@ Available endpoints differ by exchange. Documented withdrawal, market-maker and 
 | Ondo | Yes | Yes | Yes |
 | Arcus | Yes | Yes | Yes |
 
+Bitget began migrating accounts to UTA on 2026-09-15. Classic endpoints with verified UTA replacements have been removed; use a UTA account for trading. Endpoints without a confirmed replacement remain documented in the endpoint ledger. See the [official UTA upgrade guide](https://www.bitget.com/docs/classic/uta-api-upgrade-guide) and [account settings](https://www.bitget.com/docs/catalog/account/account-settings).
+
 Private WebSocket support includes authenticated or address-scoped user-data streams. Binance, Bybit, Bitget, OKX, KuCoin and Kraken Spot also expose authenticated trading WebSockets.
 
 Lighter supports Mainnet and Robinhood with separate credentials; select the network for each client (Mainnet is the default). Ondo spot currently supports only public market data (depth, trades, symbol_info, history and WS spot channels); Ondo has not published its spot trading API, so private operations such as placing or cancelling orders with a `-SPOT` symbol fail locally without sending a request. Arcus Spot uses a separate RFQ router and an externally wallet-signed quote; Arcus Perps is a separate client whose private execution has not yet been live-verified.

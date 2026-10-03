@@ -15,6 +15,10 @@ UTA_PRIVATE_WS_URL = "wss://ws.bitget.com/v3/ws/private"
 class PublicClient(AsyncWebSocketMixin):
     """Async Bitget public market WebSocket client."""
 
+    def set_product_table(self, table: Any) -> None:  # noqa: ANN401
+        """Use exact canonical/native symbols from a native ProductTable."""
+        self._native_client.set_product_table(table)
+
     def __init__(
         self,
         inst_type: str = "SPOT",
@@ -86,8 +90,7 @@ class PrivateClient(AsyncWebSocketMixin):
     """
     Async Bitget private WebSocket client.
 
-    On the classic V2 endpoint ``inst_type`` defaults to ``USDT-FUTURES``. On the
-    UTA V3 endpoint (see :func:`uta_private`) it defaults to ``UTA`` and the
+    The default UTA V3 endpoint uses ``inst_type=UTA``; the
     order/fill/position/account helpers send ``{"instType": "UTA", "topic": ...}``
     subscriptions that cover every product type.
     """
@@ -146,14 +149,6 @@ class PrivateClient(AsyncWebSocketMixin):
             request_id, topic, json.dumps(args, allow_nan=False), category, request_time
         )
 
-    async def classic_trade_request(
-        self, request_id: str, inst_type: str, inst_id: str, channel: str, params: dict[str, Any]
-    ) -> None:
-        """Send a V2 order operation using the exchange-native instrument ID."""
-        await self._native_client.classic_trade_request(
-            request_id, inst_type, inst_id, channel, json.dumps(params, allow_nan=False)
-        )
-
     async def place_order(
         self,
         request_id: str,
@@ -202,7 +197,7 @@ class PrivateClient(AsyncWebSocketMixin):
         inst_id: str | None = None,
         coin: str | None = None,
     ) -> None:
-        """Subscribe to a Bitget private channel."""
+        """Subscribe to a private channel; MARGIN/positions-history require a V2 base_url."""
         await self._native_client.subscribe_channel(inst_type, channel, inst_id, coin)
 
     async def unsubscribe_channel(
@@ -215,40 +210,24 @@ class PrivateClient(AsyncWebSocketMixin):
         """Unsubscribe from a Bitget private channel."""
         await self._native_client.unsubscribe_channel(inst_type, channel, inst_id, coin)
 
-    async def subscribe_orders(
-        self,
-        inst_type: str | None = None,
-        inst_id: str | None = None,
-    ) -> None:
+    async def subscribe_orders(self) -> None:
         """Subscribe to order update events."""
-        await self._native_client.subscribe_orders(inst_type, inst_id)
+        await self._native_client.subscribe_orders()
 
-    async def subscribe_fills(
-        self,
-        inst_type: str | None = None,
-        inst_id: str | None = None,
-    ) -> None:
+    async def subscribe_fills(self) -> None:
         """Subscribe to fill update events."""
-        await self._native_client.subscribe_fills(inst_type, inst_id)
+        await self._native_client.subscribe_fills()
 
-    async def subscribe_positions(
-        self,
-        inst_type: str | None = None,
-        inst_id: str | None = None,
-    ) -> None:
+    async def subscribe_positions(self) -> None:
         """Subscribe to position update events."""
-        await self._native_client.subscribe_positions(inst_type, inst_id)
+        await self._native_client.subscribe_positions()
 
-    async def subscribe_account(
-        self,
-        inst_type: str | None = None,
-        coin: str | None = None,
-    ) -> None:
+    async def subscribe_account(self) -> None:
         """Subscribe to account balance events."""
-        await self._native_client.subscribe_account(inst_type, coin)
+        await self._native_client.subscribe_account()
 
     async def subscribe_equity(self, inst_type: str | None = None) -> None:
-        """Subscribe to equity update events."""
+        """Subscribe to equity events; requires a V2 private WebSocket base_url."""
         await self._native_client.subscribe_equity(inst_type)
 
     async def subscribe_reality_orderbook(self, symbol: str) -> None:

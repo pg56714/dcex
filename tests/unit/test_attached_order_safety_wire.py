@@ -20,7 +20,16 @@ async def close(client):
 @pytest.mark.asyncio
 @pytest.mark.parametrize("asynchronous", [False, True])
 @pytest.mark.parametrize("native", [False, True])
-@pytest.mark.parametrize("method", ["amend_order", "amend_algo_order", "amend_multiple_orders", "place_order", "place_batch_orders"])
+@pytest.mark.parametrize(
+    "method",
+    [
+        "amend_order",
+        "amend_algo_order",
+        "amend_multiple_orders",
+        "place_order",
+        "place_batch_orders",
+    ],
+)
 @pytest.mark.parametrize("field", ["sz", "newCallbackRatio", "newCallbackSpread", "newActivePx"])
 async def test_okx_amend_attached_decimal_fields(asynchronous, native, method, field):
     if method.startswith("place") and field.startswith("new"):
@@ -33,15 +42,28 @@ async def test_okx_amend_attached_decimal_fields(asynchronous, native, method, f
         if method == "amend_algo_order":
             return dict(product_symbol="BTC-USDT-SWAP", algo_id="1", attach_algo_ords=attached)
         if method == "amend_multiple_orders":
-            return {"orders": [dict(instId="BTC-USDT-SWAP", ordId="1", newSz="1", attachAlgoOrds=attached)]}
-        order = dict(tdMode="cash", side="buy", ordType="limit", sz="1", px="60000", attachAlgoOrds=attached)
+            return {
+                "orders": [
+                    dict(instId="BTC-USDT-SWAP", ordId="1", newSz="1", attachAlgoOrds=attached)
+                ]
+            }
+        order = dict(
+            tdMode="cash", side="buy", ordType="limit", sz="1", px="60000", attachAlgoOrds=attached
+        )
         if method == "place_order":
             return dict(product_symbol="BTC-USDT", **order)
         return {"orders": [dict(instId="BTC-USDT", **order)]}
+
     prefix = "dcex.async_support" if asynchronous else "dcex"
     cls = importlib.import_module(f"{prefix}.okx.client").Client
     with _http_server({"code": "0", "data": []}) as (base, received):
-        client = cls(api_key="key", api_secret="secret", passphrase="pass", base_api=base, preload_product_table=False)
+        client = cls(
+            api_key="key",
+            api_secret="secret",
+            passphrase="pass",
+            base_api=base,
+            preload_product_table=False,
+        )
         if asynchronous:
             await client.async_init()
         try:
@@ -70,7 +92,15 @@ async def test_bingx_batch_attached_object_or_absent(asynchronous, native, value
         if asynchronous:
             await client.async_init()
         try:
-            order = dict(symbol="BTC-USDT", side="BUY", type="MARKET", positionSide="LONG", quantity="1", takeProfit=value, stopLoss=value)
+            order = dict(
+                symbol="BTC-USDT",
+                side="BUY",
+                type="MARKET",
+                positionSide="LONG",
+                quantity="1",
+                takeProfit=value,
+                stopLoss=value,
+            )
             args = {"batchOrders" if native else "batch_orders": [order]}
             if value is None or isinstance(value, str) and not value.strip():
                 await invoke(client, "place_swap_batch_order", args, native)
@@ -87,16 +117,17 @@ async def test_bingx_batch_attached_object_or_absent(asynchronous, native, value
             await close(client)
 
 
-
-
-@pytest.mark.parametrize("exchange,method,array,field", [
-    ("okx", "place_batch_orders", "orders", "sz"),
-    ("bybit", "place_batch_order", "request", "qty"),
-    ("bitget", "place_futures_batch_orders", "orderList", "size"),
-    ("bingx", "place_swap_batch_order", "batchOrders", "quantity"),
-])
+@pytest.mark.parametrize(
+    "exchange,method,array,field",
+    [
+        ("okx", "place_batch_orders", "orders", "sz"),
+        ("bybit", "place_batch_order", "request", "qty"),
+        ("bingx", "place_swap_batch_order", "batchOrders", "quantity"),
+    ],
+)
 def test_batch_zero_sizes_follow_single_order_rules(exchange, method, array, field):
     from dcex._input_codec import CATALOG, normalize
+
     schema = CATALOG["exchanges"][exchange][method]
     with pytest.raises(ValueError, match="positive plain decimal"):
         normalize({array: [{field: "0"}]}, schema=schema)
@@ -107,6 +138,7 @@ def test_batch_zero_sizes_follow_single_order_rules(exchange, method, array, fie
 
 def test_okx_amend_prices_have_consistent_single_and_batch_rules():
     from dcex._input_codec import CATALOG, normalize
+
     for method in ["amend_order", "amend_multiple_orders"]:
         for field in ["newPx", "newPxUsd", "newPxVol"]:
             value = {field: "0"}

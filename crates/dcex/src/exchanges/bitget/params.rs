@@ -65,26 +65,25 @@ impl BitgetParams {
     }
 }
 
-pub(super) fn is_canonical_product_symbol(product_symbol: &str) -> bool {
-    product_symbol.contains('-')
-}
-
-pub(super) fn exchange_symbol_fallback(product_symbol: &str) -> String {
-    let mut parts = product_symbol.split('-');
-    match (parts.next(), parts.next(), parts.next()) {
-        (Some(base), Some(quote), Some(_kind)) => format!("{base}{quote}"),
-        _ => product_symbol.to_string(),
+pub(super) fn exchange_symbol_fallback(product_symbol: &str) -> Result<String> {
+    let parts = product_symbol.split('-').collect::<Vec<_>>();
+    if parts.len() < 3 {
+        return Ok(product_symbol.to_string());
     }
-}
-
-pub(super) fn insert_optional_string(
-    body: &mut Map<String, Value>,
-    key: &str,
-    value: Option<&str>,
-) {
-    if let Some(value) = value {
-        body.insert(key.to_string(), Value::String(value.to_string()));
+    if parts.iter().any(|part| part.is_empty()) {
+        return Err(DcexError::InvalidInput(
+            "bitget product symbol must not contain empty components".into(),
+        ));
     }
+    let symbol = match parts.as_slice() {
+        [base, "USD", "SWAP"] => format!("{base}USD_CM"),
+        [base, "USDC", "SWAP"] => format!("{base}PERP"),
+        [base, quote, "SPOT" | "SWAP"] => format!("{base}{quote}"),
+        _ => return Err(DcexError::InvalidInput(
+            "cannot safely resolve bitget product symbol; load the product table or pass the official exchange symbol".into(),
+        )),
+    };
+    Ok(symbol.to_ascii_uppercase())
 }
 
 pub(super) fn insert_optional_value(
@@ -127,4 +126,24 @@ pub(super) fn schema_required<'a>(params: &'a BitgetParams, key: &str) -> Result
         .get(key)
         .filter(|value| !value.trim().is_empty())
         .ok_or_else(|| schema_invalid(format!("{key} is required")))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn canonical_bitget_symbols_use_exchange_uppercase() {
+        assert_eq!(
+            exchange_symbol_fallback("rCVCO-USDT-SPOT").unwrap(),
+            "RCVCOUSDT"
+        );
+    }
+
+    #[test]
+    fn public_market_symbol_samples() {
+        crate::exchanges::symbol_tests::check("bitget", |symbol, _mode| {
+            exchange_symbol_fallback(symbol)
+        });
+    }
 }

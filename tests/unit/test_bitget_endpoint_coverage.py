@@ -34,35 +34,16 @@ WRAPPER_FILES = (
     "_market_http.py",
     "_trade_http.py",
 )
-WRAPPER_FILES += tuple(str(p.relative_to(ROOT / "dcex/bitget")) for p in sorted((ROOT / "dcex/bitget/_generated").glob("*_http.py")))
+WRAPPER_FILES += tuple(
+    str(p.relative_to(ROOT / "dcex/bitget"))
+    for p in sorted((ROOT / "dcex/bitget/_generated").glob("*_http.py"))
+)
 
 PLACE_SPOT = ("POST", "/api/v2/spot/trade/place-order")
 PLACE_FUTURES = ("POST", "/api/v2/mix/order/place-order")
 
 # Python wrapper name -> (HTTP method, documented path).
 ROUTES: dict[str, tuple[str, str]] = {
-    "modify_futures_tpsl_order": ("POST", "/api/v2/mix/order/modify-tpsl-order"),
-    "place_futures_plan_order": ("POST", "/api/v2/mix/order/place-plan-order"),
-    "place_futures_position_tpsl": ("POST", "/api/v2/mix/order/place-pos-tpsl"),
-    "place_futures_tpsl_order": ("POST", "/api/v2/mix/order/place-tpsl-order"),
-    "get_futures_plan_sub_order": ("GET", "/api/v2/mix/order/plan-sub-order"),
-    "modify_futures_plan_order": ("POST", "/api/v2/mix/order/modify-plan-order"),
-    "cancel_futures_plan_orders": ("POST", "/api/v2/mix/order/cancel-plan-order"),
-    "get_pending_futures_plan_orders": ("GET", "/api/v2/mix/order/orders-plan-pending"),
-    "get_futures_plan_order_history": ("GET", "/api/v2/mix/order/orders-plan-history"),
-    "place_spot_plan_order": ("POST", "/api/v2/spot/trade/place-plan-order"),
-    "modify_spot_plan_order": ("POST", "/api/v2/spot/trade/modify-plan-order"),
-    "cancel_spot_plan_order": ("POST", "/api/v2/spot/trade/cancel-plan-order"),
-    "cancel_spot_plan_orders": ("POST", "/api/v2/spot/trade/batch-cancel-plan-order"),
-    "get_pending_spot_plan_orders": ("GET", "/api/v2/spot/trade/current-plan-order"),
-    "get_spot_plan_order_history": ("GET", "/api/v2/spot/trade/history-plan-order"),
-    "get_spot_plan_sub_order": ("GET", "/api/v2/spot/trade/plan-sub-order"),
-    "modify_futures_order": ("POST", "/api/v2/mix/order/modify-order"),
-    "close_futures_positions": ("POST", "/api/v2/mix/order/close-positions"),
-    "cancel_all_futures_orders": ("POST", "/api/v2/mix/order/cancel-all-orders"),
-    "cancel_spot_orders_by_symbol": ("POST", "/api/v2/spot/trade/cancel-symbol-order"),
-    "cancel_replace_spot_order": ("POST", "/api/v2/spot/trade/cancel-replace-order"),
-    "adjust_futures_position_margin": ("POST", "/api/v2/mix/account/set-margin"),
     "get_futures_symbol_price": ("GET", "/api/v2/mix/market/symbol-price"),
     "modify_uta_order": ("POST", "/api/v3/trade/modify-order"),
     "cancel_uta_orders_by_symbol": ("POST", "/api/v3/trade/cancel-symbol-order"),
@@ -75,24 +56,8 @@ ROUTES: dict[str, tuple[str, str]] = {
     "get_uta_current_funding_rate": ("GET", "/api/v3/market/current-fund-rate"),
     # Classic spot market data.
     "get_spot_coins": ("GET", "/api/v2/spot/public/coins"),
-    "get_spot_symbols": ("GET", "/api/v2/spot/public/symbols"),
-    "get_spot_tickers": ("GET", "/api/v2/spot/market/tickers"),
-    "get_spot_orderbook": ("GET", "/api/v2/spot/market/orderbook"),
-    "get_spot_kline": ("GET", "/api/v2/spot/market/candles"),
-    "get_spot_history_kline": ("GET", "/api/v2/spot/market/history-candles"),
-    "get_spot_recent_trades": ("GET", "/api/v2/spot/market/fills"),
     "get_spot_market_trades": ("GET", "/api/v2/spot/market/fills-history"),
     # Classic futures market data.
-    "get_futures_contracts": ("GET", "/api/v2/mix/market/contracts"),
-    "get_futures_ticker": ("GET", "/api/v2/mix/market/ticker"),
-    "get_futures_tickers": ("GET", "/api/v2/mix/market/tickers"),
-    "get_futures_orderbook": ("GET", "/api/v2/mix/market/merge-depth"),
-    "get_futures_kline": ("GET", "/api/v2/mix/market/candles"),
-    "get_futures_history_kline": ("GET", "/api/v2/mix/market/history-candles"),
-    "get_futures_recent_trades": ("GET", "/api/v2/mix/market/fills"),
-    "get_futures_current_funding_rate": ("GET", "/api/v2/mix/market/current-fund-rate"),
-    "get_futures_history_funding_rate": ("GET", "/api/v2/mix/market/history-fund-rate"),
-    "get_futures_open_interest": ("GET", "/api/v2/mix/market/open-interest"),
     # UTA / Reality market data.
     "get_uta_instruments": ("GET", "/api/v3/market/instruments"),
     "get_uta_tickers": ("GET", "/api/v3/market/tickers"),
@@ -109,9 +74,6 @@ ROUTES: dict[str, tuple[str, str]] = {
     "get_futures_fee_rates": ("GET", "/api/v2/common/trade-rate"),
     "get_all_account_balance": ("GET", "/api/v2/account/all-account-balance"),
     "get_funding_assets": ("GET", "/api/v2/account/funding-assets"),
-    "get_spot_account_info": ("GET", "/api/v2/spot/account/info"),
-    "get_spot_account_assets": ("GET", "/api/v2/spot/account/assets"),
-    "get_spot_account_bills": ("GET", "/api/v2/spot/account/bills"),
     "transfer": ("POST", "/api/v2/spot/wallet/transfer"),
     "get_transfer_records": ("GET", "/api/v2/spot/account/transferRecords"),
     "get_transferable_coins": ("GET", "/api/v2/spot/wallet/transfer-coin-info"),
@@ -127,14 +89,7 @@ ROUTES: dict[str, tuple[str, str]] = {
     "get_uta_pre_set_leverage": ("GET", "/api/v3/account/pre-set-leverage"),
     "set_uta_leverage": ("POST", "/api/v3/account/set-leverage"),
     "set_uta_hold_mode": ("POST", "/api/v3/account/set-hold-mode"),
-    "get_futures_account": ("GET", "/api/v2/mix/account/account"),
-    "get_futures_accounts": ("GET", "/api/v2/mix/account/accounts"),
-    "get_futures_account_bills": ("GET", "/api/v2/mix/account/bill"),
-    "set_futures_leverage": ("POST", "/api/v2/mix/account/set-leverage"),
     "set_futures_margin_mode": ("POST", "/api/v2/mix/account/set-margin-mode"),
-    "set_futures_position_mode": ("POST", "/api/v2/mix/account/set-position-mode"),
-    "get_futures_positions": ("GET", "/api/v2/mix/position/all-position"),
-    "get_futures_position": ("GET", "/api/v2/mix/position/single-position"),
     # Crypto loans / UTA liability.
     "get_crypto_loan_coins": ("GET", "/api/v3/loan/coins"),
     "get_crypto_loan_interest": ("GET", "/api/v3/loan/interest"),
@@ -168,23 +123,6 @@ ROUTES: dict[str, tuple[str, str]] = {
     "get_elite_earn_assets": ("GET", "/api/v3/earn/elite-assets"),
     "get_elite_earn_records": ("GET", "/api/v3/earn/elite-records"),
     # Classic spot trading.
-    "place_spot_order": PLACE_SPOT,
-    "place_spot_market_order": PLACE_SPOT,
-    "place_spot_market_buy_order": PLACE_SPOT,
-    "place_spot_market_sell_order": PLACE_SPOT,
-    "place_spot_limit_order": PLACE_SPOT,
-    "place_spot_limit_buy_order": PLACE_SPOT,
-    "place_spot_limit_sell_order": PLACE_SPOT,
-    "place_spot_post_only_limit_order": PLACE_SPOT,
-    "place_spot_post_only_limit_buy_order": PLACE_SPOT,
-    "place_spot_post_only_limit_sell_order": PLACE_SPOT,
-    "place_spot_batch_orders": ("POST", "/api/v2/spot/trade/batch-orders"),
-    "cancel_spot_order": ("POST", "/api/v2/spot/trade/cancel-order"),
-    "cancel_spot_batch_orders": ("POST", "/api/v2/spot/trade/batch-cancel-order"),
-    "get_spot_order": ("GET", "/api/v2/spot/trade/orderInfo"),
-    "get_spot_open_orders": ("GET", "/api/v2/spot/trade/unfilled-orders"),
-    "get_spot_history_orders": ("GET", "/api/v2/spot/trade/history-orders"),
-    "get_spot_fills": ("GET", "/api/v2/spot/trade/fills"),
     # UTA trading.
     "place_uta_order": ("POST", "/api/v3/trade/place-order"),
     "place_reality_order": ("POST", "/api/v3/trade/place-reality-order"),
@@ -203,23 +141,6 @@ ROUTES: dict[str, tuple[str, str]] = {
     "get_uta_unfilled_strategy_orders": ("GET", "/api/v3/trade/unfilled-strategy-orders"),
     "get_uta_history_strategy_orders": ("GET", "/api/v3/trade/history-strategy-orders"),
     # Classic futures trading.
-    "place_futures_order": PLACE_FUTURES,
-    "place_futures_market_order": PLACE_FUTURES,
-    "place_futures_market_buy_order": PLACE_FUTURES,
-    "place_futures_market_sell_order": PLACE_FUTURES,
-    "place_futures_limit_order": PLACE_FUTURES,
-    "place_futures_limit_buy_order": PLACE_FUTURES,
-    "place_futures_limit_sell_order": PLACE_FUTURES,
-    "place_futures_post_only_limit_order": PLACE_FUTURES,
-    "place_futures_post_only_limit_buy_order": PLACE_FUTURES,
-    "place_futures_post_only_limit_sell_order": PLACE_FUTURES,
-    "place_futures_batch_orders": ("POST", "/api/v2/mix/order/batch-place-order"),
-    "cancel_futures_order": ("POST", "/api/v2/mix/order/cancel-order"),
-    "cancel_futures_batch_orders": ("POST", "/api/v2/mix/order/batch-cancel-orders"),
-    "get_futures_order": ("GET", "/api/v2/mix/order/detail"),
-    "get_futures_open_orders": ("GET", "/api/v2/mix/order/orders-pending"),
-    "get_futures_history_orders": ("GET", "/api/v2/mix/order/orders-history"),
-    "get_futures_fills": ("GET", "/api/v2/mix/order/fills"),
 }
 
 PUBLIC_METHODS = {
@@ -230,22 +151,6 @@ PUBLIC_METHODS = {
     not in {
         "get_spot_fee_rates",
         "get_futures_fee_rates",
-        "get_spot_account_info",
-        "get_spot_account_assets",
-        "get_spot_account_bills",
-        "get_spot_order",
-        "get_spot_open_orders",
-        "get_spot_history_orders",
-        "get_spot_fills",
-        "get_futures_account",
-        "get_futures_accounts",
-        "get_futures_account_bills",
-        "get_futures_positions",
-        "get_futures_position",
-        "get_futures_order",
-        "get_futures_open_orders",
-        "get_futures_history_orders",
-        "get_futures_fills",
         "get_uta_account_assets",
         "get_uta_account_info",
         "get_uta_all_fee_rates",
@@ -267,35 +172,13 @@ PUBLIC_METHODS = {
 
 PUBLIC_METHODS.difference_update(
     {
-        "modify_futures_order",
         "adjust_uta_position_margin",
-        "modify_futures_plan_order",
-        "cancel_spot_orders_by_symbol",
-        "get_spot_plan_order_history",
-        "place_futures_plan_order",
         "close_uta_positions",
         "get_uta_position_history",
-        "place_futures_position_tpsl",
         "cancel_uta_orders_by_symbol",
         "modify_uta_order",
-        "get_spot_plan_sub_order",
-        "modify_spot_plan_order",
-        "close_futures_positions",
-        "place_spot_plan_order",
-        "get_futures_plan_sub_order",
-        "adjust_futures_position_margin",
-        "modify_futures_tpsl_order",
-        "place_futures_tpsl_order",
-        "get_pending_futures_plan_orders",
         "get_uta_financial_records",
-        "cancel_futures_plan_orders",
-        "cancel_replace_spot_order",
-        "get_futures_plan_order_history",
-        "cancel_spot_plan_order",
         "set_uta_cancel_countdown",
-        "cancel_spot_plan_orders",
-        "get_pending_spot_plan_orders",
-        "cancel_all_futures_orders",
     }
 )
 
@@ -340,304 +223,16 @@ VALUES: dict[str, Any] = {
 
 # Optional parameters that the documented endpoint requires.
 EXTRA: dict[str, dict[str, Any]] = {
-    "get_spot_order": {"orderId": "1"},
-    "cancel_spot_order": {"orderId": "1"},
     "get_uta_order": {"orderId": "1"},
     "cancel_uta_order": {"orderId": "1"},
-    "get_futures_order": {"orderId": "1"},
-    "cancel_futures_order": {"orderId": "1"},
     "cancel_reality_order": {"orderId": "1"},
     "cancel_uta_strategy_order": {"orderId": "1"},
     "modify_uta_strategy_order": {"orderId": "1"},
-    "place_spot_order": {"force": "gtc"},
-    "set_futures_leverage": {"leverage": "5"},
     "borrow_crypto_loan": {"pledgeAmount": "1"},
 }
 
 
 CONTROL_CASES = [
-    (
-        "modify_futures_tpsl_order",
-        {
-            "margin_coin": "USDT",
-            "product_type": "USDT-FUTURES",
-            "product_symbol": "BTC-USDT-SWAP",
-            "trigger_price": "59000",
-            "size": "",
-            "order_id": "123",
-            "execute_price": "0",
-        },
-        "POST",
-        "/api/v2/mix/order/modify-tpsl-order",
-        False,
-        {
-            "marginCoin": "USDT",
-            "productType": "USDT-FUTURES",
-            "symbol": "BTCUSDT",
-            "triggerPrice": "59000",
-            "size": "",
-            "orderId": "123",
-            "executePrice": "0",
-        },
-    ),
-    (
-        "place_futures_plan_order",
-        {
-            "plan_type": "normal_plan",
-            "product_symbol": "BTC-USDT-SWAP",
-            "product_type": "USDT-FUTURES",
-            "margin_mode": "isolated",
-            "margin_coin": "USDT",
-            "size": "1",
-            "trigger_price": "59000",
-            "trigger_type": "mark_price",
-            "side": "buy",
-            "order_type": "market",
-        },
-        "POST",
-        "/api/v2/mix/order/place-plan-order",
-        False,
-        {
-            "planType": "normal_plan",
-            "symbol": "BTCUSDT",
-            "productType": "USDT-FUTURES",
-            "marginMode": "isolated",
-            "marginCoin": "USDT",
-            "size": "1",
-            "triggerPrice": "59000",
-            "triggerType": "mark_price",
-            "side": "buy",
-            "orderType": "market",
-        },
-    ),
-    (
-        "place_futures_position_tpsl",
-        {
-            "margin_coin": "USDT",
-            "product_type": "USDT-FUTURES",
-            "product_symbol": "BTC-USDT-SWAP",
-            "hold_side": "long",
-            "stop_loss_trigger_price": "59000",
-        },
-        "POST",
-        "/api/v2/mix/order/place-pos-tpsl",
-        False,
-        {
-            "marginCoin": "USDT",
-            "productType": "USDT-FUTURES",
-            "symbol": "BTCUSDT",
-            "holdSide": "long",
-            "stopLossTriggerPrice": "59000",
-        },
-    ),
-    (
-        "place_futures_tpsl_order",
-        {
-            "margin_coin": "USDT",
-            "product_type": "USDT-FUTURES",
-            "product_symbol": "BTC-USDT-SWAP",
-            "plan_type": "loss_plan",
-            "trigger_price": "59000",
-            "hold_side": "long",
-            "size": "1",
-        },
-        "POST",
-        "/api/v2/mix/order/place-tpsl-order",
-        False,
-        {
-            "marginCoin": "USDT",
-            "productType": "USDT-FUTURES",
-            "symbol": "BTCUSDT",
-            "planType": "loss_plan",
-            "triggerPrice": "59000",
-            "holdSide": "long",
-            "size": "1",
-        },
-    ),
-    (
-        "get_futures_plan_sub_order",
-        {"plan_type": "normal_plan", "plan_order_id": "123", "product_type": "USDT-FUTURES"},
-        "GET",
-        "/api/v2/mix/order/plan-sub-order",
-        False,
-        {"planType": "normal_plan", "planOrderId": "123", "productType": "USDT-FUTURES"},
-    ),
-    (
-        "modify_futures_plan_order",
-        {
-            "product_type": "USDT-FUTURES",
-            "order_id": "123",
-            "new_trigger_price": "0.05",
-            "new_stop_loss_trigger_price": "0",
-        },
-        "POST",
-        "/api/v2/mix/order/modify-plan-order",
-        False,
-        {
-            "productType": "USDT-FUTURES",
-            "orderId": "123",
-            "newTriggerPrice": "0.05",
-            "newStopLossTriggerPrice": "0",
-        },
-    ),
-    (
-        "cancel_futures_plan_orders",
-        {
-            "product_type": "USDT-FUTURES",
-            "product_symbol": "BTC-USDT-SWAP",
-            "order_id_list": [{"orderId": "123"}],
-        },
-        "POST",
-        "/api/v2/mix/order/cancel-plan-order",
-        False,
-        {"productType": "USDT-FUTURES", "symbol": "BTCUSDT", "orderIdList": [{"orderId": "123"}]},
-    ),
-    (
-        "get_pending_futures_plan_orders",
-        {"plan_type": "normal_plan", "product_type": "USDT-FUTURES"},
-        "GET",
-        "/api/v2/mix/order/orders-plan-pending",
-        False,
-        {"planType": "normal_plan", "productType": "USDT-FUTURES"},
-    ),
-    (
-        "get_futures_plan_order_history",
-        {"plan_type": "normal_plan", "product_type": "USDT-FUTURES"},
-        "GET",
-        "/api/v2/mix/order/orders-plan-history",
-        False,
-        {"planType": "normal_plan", "productType": "USDT-FUTURES"},
-    ),
-    (
-        "place_spot_plan_order",
-        {
-            "product_symbol": "BTC-USDT-SPOT",
-            "side": "buy",
-            "trigger_price": "59000",
-            "order_type": "market",
-            "size": "1",
-            "trigger_type": "fill_price",
-        },
-        "POST",
-        "/api/v2/spot/trade/place-plan-order",
-        False,
-        {
-            "symbol": "BTCUSDT",
-            "side": "buy",
-            "triggerPrice": "59000",
-            "orderType": "market",
-            "size": "1",
-            "triggerType": "fill_price",
-        },
-    ),
-    (
-        "modify_spot_plan_order",
-        {"trigger_price": "59000", "order_type": "market", "size": "1", "order_id": "123"},
-        "POST",
-        "/api/v2/spot/trade/modify-plan-order",
-        False,
-        {"triggerPrice": "59000", "orderType": "market", "size": "1", "orderId": "123"},
-    ),
-    (
-        "cancel_spot_plan_order",
-        {"order_id": "123"},
-        "POST",
-        "/api/v2/spot/trade/cancel-plan-order",
-        False,
-        {"orderId": "123"},
-    ),
-    (
-        "cancel_spot_plan_orders",
-        {"symbol_list": ["BTC-USDT-SPOT"]},
-        "POST",
-        "/api/v2/spot/trade/batch-cancel-plan-order",
-        False,
-        {"symbolList": ["BTCUSDT"]},
-    ),
-    ("get_pending_spot_plan_orders", {}, "GET", "/api/v2/spot/trade/current-plan-order", False, {}),
-    ("get_spot_plan_order_history", {}, "GET", "/api/v2/spot/trade/history-plan-order", False, {}),
-    (
-        "get_spot_plan_sub_order",
-        {"plan_order_id": "123"},
-        "GET",
-        "/api/v2/spot/trade/plan-sub-order",
-        False,
-        {"planOrderId": "123"},
-    ),
-    (
-        "modify_futures_order",
-        {
-            "product_symbol": "BTC-USDT-SWAP",
-            "product_type": "USDT-FUTURES",
-            "new_client_oid": "replacement",
-            "order_id": "123",
-            "new_price": "61000",
-            "new_size": "1",
-        },
-        "POST",
-        "/api/v2/mix/order/modify-order",
-        False,
-        {
-            "symbol": "BTCUSDT",
-            "productType": "USDT-FUTURES",
-            "newClientOid": "replacement",
-            "orderId": "123",
-            "newPrice": "61000",
-            "newSize": "1",
-        },
-    ),
-    (
-        "close_futures_positions",
-        {"product_type": "USDT-FUTURES", "all_symbols": True},
-        "POST",
-        "/api/v2/mix/order/close-positions",
-        False,
-        {"productType": "USDT-FUTURES"},
-    ),
-    (
-        "cancel_all_futures_orders",
-        {"product_type": "USDT-FUTURES"},
-        "POST",
-        "/api/v2/mix/order/cancel-all-orders",
-        False,
-        {"productType": "USDT-FUTURES"},
-    ),
-    (
-        "cancel_spot_orders_by_symbol",
-        {"product_symbol": "BTC-USDT-SPOT"},
-        "POST",
-        "/api/v2/spot/trade/cancel-symbol-order",
-        False,
-        {"symbol": "BTCUSDT"},
-    ),
-    (
-        "cancel_replace_spot_order",
-        {"product_symbol": "BTC-USDT-SPOT", "price": "60000", "size": "1", "order_id": "123"},
-        "POST",
-        "/api/v2/spot/trade/cancel-replace-order",
-        False,
-        {"symbol": "BTCUSDT", "price": "60000", "size": "1", "orderId": "123"},
-    ),
-    (
-        "adjust_futures_position_margin",
-        {
-            "product_symbol": "BTC-USDT-SWAP",
-            "product_type": "USDT-FUTURES",
-            "margin_coin": "USDT",
-            "hold_side": "long",
-            "amount": "-1",
-        },
-        "POST",
-        "/api/v2/mix/account/set-margin",
-        False,
-        {
-            "symbol": "BTCUSDT",
-            "productType": "USDT-FUTURES",
-            "marginCoin": "USDT",
-            "holdSide": "long",
-            "amount": "-1",
-        },
-    ),
     (
         "get_futures_symbol_price",
         {"product_symbol": "BTC-USDT-SWAP", "product_type": "USDT-FUTURES"},
@@ -790,23 +385,6 @@ CONTROL_CASES.extend(
             {"symbol": "BTCUSDT", "productType": "USDT-FUTURES"},
         ),
         (
-            "get_futures_open_interest_limit",
-            {"product_type": "USDT-FUTURES"},
-            "GET",
-            "/api/v2/mix/market/oi-limit",
-            True,
-            {"productType": "USDT-FUTURES"},
-        ),
-        (
-            "get_futures_position_tiers",
-            {"product_type": "USDT-FUTURES", "product_symbol": "BTC-USDT-SWAP"},
-            "GET",
-            "/api/v2/mix/market/query-position-lever",
-            True,
-            {"productType": "USDT-FUTURES", "symbol": "BTCUSDT"},
-        ),
-        ("get_futures_discount_rates", {}, "GET", "/api/v2/mix/market/discount-rate", True, {}),
-        (
             "get_futures_interest_exchange_rates",
             {},
             "GET",
@@ -823,14 +401,6 @@ CONTROL_CASES.extend(
             {"coin": "USDT"},
         ),
         ("get_futures_vip_fee_rates", {}, "GET", "/api/v2/mix/market/vip-fee-rate", True, {}),
-        (
-            "get_futures_sub_account_assets",
-            {"product_type": "USDT-FUTURES"},
-            "GET",
-            "/api/v2/mix/account/sub-account-assets",
-            False,
-            {"productType": "USDT-FUTURES"},
-        ),
         (
             "get_futures_estimated_open_count",
             {
@@ -872,28 +442,6 @@ CONTROL_CASES.extend(
                 "posSide": "long",
                 "orderType": "limit",
                 "openAmount": "10",
-                "openPrice": "100",
-            },
-        ),
-        (
-            "get_futures_max_open_quantity",
-            {
-                "product_symbol": "BTC-USDT-SWAP",
-                "product_type": "USDT-FUTURES",
-                "margin_coin": "USDT",
-                "pos_side": "long",
-                "order_type": "limit",
-                "open_price": "100",
-            },
-            "GET",
-            "/api/v2/mix/account/max-open",
-            False,
-            {
-                "symbol": "BTCUSDT",
-                "productType": "USDT-FUTURES",
-                "marginCoin": "USDT",
-                "posSide": "long",
-                "orderType": "limit",
                 "openPrice": "100",
             },
         ),
@@ -968,22 +516,6 @@ CONTROL_CASES.extend(
             {"productType": "USDT-FUTURES"},
         ),
         (
-            "get_futures_position_history",
-            {},
-            "GET",
-            "/api/v2/mix/position/history-position",
-            False,
-            {},
-        ),
-        (
-            "get_futures_adl_rank",
-            {"product_type": "USDT-FUTURES"},
-            "GET",
-            "/api/v2/mix/position/adlRank",
-            False,
-            {"productType": "USDT-FUTURES"},
-        ),
-        (
             "reverse_futures_position",
             {
                 "product_symbol": "BTC-USDT-SWAP",
@@ -1003,26 +535,10 @@ CONTROL_CASES.extend(
             },
         ),
         (
-            "get_futures_fill_history",
-            {"product_type": "USDT-FUTURES"},
-            "GET",
-            "/api/v2/mix/order/fill-history",
-            False,
-            {"productType": "USDT-FUTURES"},
-        ),
-        (
             "get_spot_sub_account_transfer_records",
             {},
             "GET",
             "/api/v2/spot/account/sub-main-trans-record",
-            False,
-            {},
-        ),
-        (
-            "get_spot_sub_account_assets",
-            {},
-            "GET",
-            "/api/v2/spot/account/subaccount-assets",
             False,
             {},
         ),
@@ -1048,23 +564,6 @@ CONTROL_CASES.extend(
                 "toUserId": "2",
             },
         ),
-        ("get_cross_margin_assets", {}, "GET", "/api/v2/margin/crossed/account/assets", False, {}),
-        (
-            "borrow_cross_margin_asset",
-            {"coin": "USDT", "borrow_amount": "1"},
-            "POST",
-            "/api/v2/margin/crossed/account/borrow",
-            False,
-            {"coin": "USDT", "borrowAmount": "1"},
-        ),
-        (
-            "repay_cross_margin_asset",
-            {"coin": "USDT", "repay_amount": "1"},
-            "POST",
-            "/api/v2/margin/crossed/account/repay",
-            False,
-            {"coin": "USDT", "repayAmount": "1"},
-        ),
         (
             "get_cross_margin_risk_rate",
             {},
@@ -1072,22 +571,6 @@ CONTROL_CASES.extend(
             "/api/v2/margin/crossed/account/risk-rate",
             False,
             {},
-        ),
-        (
-            "get_cross_margin_max_borrowable",
-            {"coin": "USDT"},
-            "GET",
-            "/api/v2/margin/crossed/account/max-borrowable-amount",
-            False,
-            {"coin": "USDT"},
-        ),
-        (
-            "get_cross_margin_max_transferable",
-            {"coin": "USDT"},
-            "GET",
-            "/api/v2/margin/crossed/account/max-transfer-out-amount",
-            False,
-            {"coin": "USDT"},
         ),
         (
             "flash_repay_cross_margin_assets",
@@ -1154,116 +637,12 @@ CONTROL_CASES.extend(
             {"startTime": "1700000000000"},
         ),
         (
-            "get_cross_margin_financial_records",
-            {"start_time": 1700000000000},
-            "GET",
-            "/api/v2/margin/crossed/financial-records",
-            False,
-            {"startTime": "1700000000000"},
-        ),
-        (
-            "place_cross_margin_order",
-            {
-                "product_symbol": "BTC-USDT-SWAP",
-                "order_type": "limit",
-                "loan_type": "normal",
-                "force": "gtc",
-                "side": "buy",
-                "price": "100",
-                "base_size": "1",
-            },
-            "POST",
-            "/api/v2/margin/crossed/place-order",
-            False,
-            {
-                "symbol": "BTCUSDT",
-                "orderType": "limit",
-                "loanType": "normal",
-                "force": "gtc",
-                "side": "buy",
-                "price": "100",
-                "baseSize": "1",
-            },
-        ),
-        (
-            "cancel_cross_margin_order",
-            {"product_symbol": "BTC-USDT-SWAP", "order_id": "123"},
-            "POST",
-            "/api/v2/margin/crossed/cancel-order",
-            False,
-            {"symbol": "BTCUSDT", "orderId": "123"},
-        ),
-        (
-            "get_cross_margin_open_orders",
-            {"product_symbol": "BTC-USDT-SWAP", "start_time": 1700000000000},
-            "GET",
-            "/api/v2/margin/crossed/open-orders",
-            False,
-            {"symbol": "BTCUSDT", "startTime": "1700000000000"},
-        ),
-        (
-            "get_cross_margin_order_history",
-            {"product_symbol": "BTC-USDT-SWAP", "start_time": 1700000000000},
-            "GET",
-            "/api/v2/margin/crossed/history-orders",
-            False,
-            {"symbol": "BTCUSDT", "startTime": "1700000000000"},
-        ),
-        (
-            "get_cross_margin_fills",
-            {"product_symbol": "BTC-USDT-SWAP", "start_time": 1700000000000},
-            "GET",
-            "/api/v2/margin/crossed/fills",
-            False,
-            {"symbol": "BTCUSDT", "startTime": "1700000000000"},
-        ),
-        (
-            "get_isolated_margin_assets",
-            {},
-            "GET",
-            "/api/v2/margin/isolated/account/assets",
-            False,
-            {},
-        ),
-        (
-            "borrow_isolated_margin_asset",
-            {"product_symbol": "BTC-USDT-SWAP", "coin": "USDT", "borrow_amount": "1"},
-            "POST",
-            "/api/v2/margin/isolated/account/borrow",
-            False,
-            {"symbol": "BTCUSDT", "coin": "USDT", "borrowAmount": "1"},
-        ),
-        (
-            "repay_isolated_margin_asset",
-            {"repay_amount": "1", "coin": "USDT", "product_symbol": "BTC-USDT-SWAP"},
-            "POST",
-            "/api/v2/margin/isolated/account/repay",
-            False,
-            {"repayAmount": "1", "coin": "USDT", "symbol": "BTCUSDT"},
-        ),
-        (
             "get_isolated_margin_risk_rate",
             {},
             "GET",
             "/api/v2/margin/isolated/account/risk-rate",
             False,
             {},
-        ),
-        (
-            "get_isolated_margin_max_borrowable",
-            {"product_symbol": "BTC-USDT-SWAP"},
-            "GET",
-            "/api/v2/margin/isolated/account/max-borrowable-amount",
-            False,
-            {"symbol": "BTCUSDT"},
-        ),
-        (
-            "get_isolated_margin_max_transferable",
-            {"product_symbol": "BTC-USDT-SWAP"},
-            "GET",
-            "/api/v2/margin/isolated/account/max-transfer-out-amount",
-            False,
-            {"symbol": "BTCUSDT"},
         ),
         (
             "flash_repay_isolated_margin_assets",
@@ -1326,70 +705,6 @@ CONTROL_CASES.extend(
             {"product_symbol": "BTC-USDT-SWAP", "start_time": 1700000000000},
             "GET",
             "/api/v2/margin/isolated/liquidation-history",
-            False,
-            {"symbol": "BTCUSDT", "startTime": "1700000000000"},
-        ),
-        (
-            "get_isolated_margin_financial_records",
-            {"product_symbol": "BTC-USDT-SWAP", "start_time": 1700000000000},
-            "GET",
-            "/api/v2/margin/isolated/financial-records",
-            False,
-            {"symbol": "BTCUSDT", "startTime": "1700000000000"},
-        ),
-        (
-            "place_isolated_margin_order",
-            {
-                "product_symbol": "BTC-USDT-SWAP",
-                "order_type": "limit",
-                "loan_type": "normal",
-                "force": "gtc",
-                "side": "buy",
-                "price": "100",
-                "base_size": "1",
-            },
-            "POST",
-            "/api/v2/margin/isolated/place-order",
-            False,
-            {
-                "symbol": "BTCUSDT",
-                "orderType": "limit",
-                "loanType": "normal",
-                "force": "gtc",
-                "side": "buy",
-                "price": "100",
-                "baseSize": "1",
-            },
-        ),
-        (
-            "cancel_isolated_margin_order",
-            {"product_symbol": "BTC-USDT-SWAP", "order_id": "123"},
-            "POST",
-            "/api/v2/margin/isolated/cancel-order",
-            False,
-            {"symbol": "BTCUSDT", "orderId": "123"},
-        ),
-        (
-            "get_isolated_margin_open_orders",
-            {"product_symbol": "BTC-USDT-SWAP", "start_time": 1700000000000},
-            "GET",
-            "/api/v2/margin/isolated/open-orders",
-            False,
-            {"symbol": "BTCUSDT", "startTime": "1700000000000"},
-        ),
-        (
-            "get_isolated_margin_order_history",
-            {"product_symbol": "BTC-USDT-SWAP", "start_time": 1700000000000},
-            "GET",
-            "/api/v2/margin/isolated/history-orders",
-            False,
-            {"symbol": "BTCUSDT", "startTime": "1700000000000"},
-        ),
-        (
-            "get_isolated_margin_fills",
-            {"product_symbol": "BTC-USDT-SWAP", "start_time": 1700000000000},
-            "GET",
-            "/api/v2/margin/isolated/fills",
             False,
             {"symbol": "BTCUSDT", "startTime": "1700000000000"},
         ),
@@ -1584,105 +899,6 @@ PUBLIC_METHODS.difference_update(name for name, _, _, _, public, _ in CONTROL_CA
 CONTROL_CASES.extend(
     [
         (
-            "place_cross_margin_batch_orders",
-            {
-                "orders": [
-                    {
-                        "orderType": "market",
-                        "side": "buy",
-                        "loanType": "normal",
-                        "force": "gtc",
-                        "quoteSize": "100",
-                    }
-                ],
-                "product_symbol": "BTC-USDT-SPOT",
-            },
-            "POST",
-            "/api/v2/margin/crossed/batch-place-order",
-            False,
-            {
-                "symbol": "BTCUSDT",
-                "orderList": [
-                    {
-                        "orderType": "market",
-                        "side": "buy",
-                        "loanType": "normal",
-                        "force": "gtc",
-                        "quoteSize": "100",
-                    }
-                ],
-            },
-        ),
-        (
-            "place_isolated_margin_batch_orders",
-            {
-                "orders": [
-                    {
-                        "orderType": "market",
-                        "side": "buy",
-                        "loanType": "normal",
-                        "force": "gtc",
-                        "quoteSize": "100",
-                    }
-                ],
-                "product_symbol": "BTC-USDT-SPOT",
-            },
-            "POST",
-            "/api/v2/margin/isolated/batch-place-order",
-            False,
-            {
-                "symbol": "BTCUSDT",
-                "orderList": [
-                    {
-                        "orderType": "market",
-                        "side": "buy",
-                        "loanType": "normal",
-                        "force": "gtc",
-                        "quoteSize": "100",
-                    }
-                ],
-            },
-        ),
-        (
-            "cancel_cross_margin_batch_orders",
-            {
-                "orders": [{"orderId": "123"}, {"clientOid": "order-2"}],
-                "product_symbol": "BTC-USDT-SPOT",
-            },
-            "POST",
-            "/api/v2/margin/crossed/batch-cancel-order",
-            False,
-            {"symbol": "BTCUSDT", "orderIdList": [{"orderId": "123"}, {"clientOid": "order-2"}]},
-        ),
-        (
-            "cancel_isolated_margin_batch_orders",
-            {
-                "orders": [{"orderId": "123"}, {"clientOid": "order-2"}],
-                "product_symbol": "BTC-USDT-SPOT",
-            },
-            "POST",
-            "/api/v2/margin/isolated/batch-cancel-order",
-            False,
-            {"symbol": "BTCUSDT", "orderIdList": [{"orderId": "123"}, {"clientOid": "order-2"}]},
-        ),
-        (
-            "batch_cancel_replace_spot_orders",
-            {
-                "orders": [
-                    {
-                        "product_symbol": "BTC-USDT-SPOT",
-                        "orderId": "123",
-                        "price": "100",
-                        "size": "1",
-                    }
-                ]
-            },
-            "POST",
-            "/api/v2/spot/trade/batch-cancel-replace-order",
-            False,
-            {"orderList": [{"symbol": "BTCUSDT", "orderId": "123", "price": "100", "size": "1"}]},
-        ),
-        (
             "modify_uta_batch_orders",
             {
                 "orders": [
@@ -1811,8 +1027,8 @@ CONTROL_CASES.extend(
             {"deduct": "on"},
         ),
         ("get_uta_fee_deduction", {}, "GET", "/api/v3/account/deduct-info", False, {}),
-        ("upgrade_to_uta", {"confirm": True}, "POST", "/api/v3/account/switch", False, {}),
-        ("get_uta_upgrade_status", {}, "GET", "/api/v3/account/switch-status", False, {}),
+        ("switch_to_classic_account", {"confirm": True}, "POST", "/api/v3/account/switch", False, {}),
+        ("get_account_switch_status", {}, "GET", "/api/v3/account/switch-status", False, {}),
         (
             "get_futures_margin_mode_switch_quota",
             {},
@@ -1836,31 +1052,6 @@ CONTROL_CASES.extend(
             "/api/v2/margin/isolated/liquidation-order",
             False,
             {},
-        ),
-        (
-            "get_classic_account_upgrade_status",
-            {},
-            "GET",
-            "/api/v2/spot/account/upgrade-status",
-            False,
-            {},
-        ),
-        (
-            "upgrade_classic_account",
-            {"confirm": True},
-            "POST",
-            "/api/v2/spot/account/upgrade",
-            False,
-            {},
-        ),
-        ("get_spot_fee_deduction", {}, "GET", "/api/v2/spot/account/deduct-info", False, {}),
-        (
-            "set_spot_fee_deduction",
-            {"deduct": "on"},
-            "POST",
-            "/api/v2/spot/account/switch-deduct",
-            False,
-            {"deduct": "on"},
         ),
         (
             "set_spot_deposit_account",
@@ -2200,14 +1391,6 @@ CONTROL_CASES.extend(
             "/api/v2/convert/convert-record",
             False,
             {"startTime": "1700000000000", "endTime": "1700000001000"},
-        ),
-        (
-            "get_classic_merge_depth",
-            {"product_symbol": "BTC-USDT-SWAP"},
-            "GET",
-            "/api/v2/spot/market/merge-depth",
-            True,
-            {"symbol": "BTCUSDT"},
         ),
         (
             "get_classic_auction",
@@ -2941,7 +2124,7 @@ def _kwargs(method: Any, name: str) -> dict[str, Any]:  # noqa: ANN401
                 raise AssertionError(f"{name}: no sample value for {parameter.name}")
             kwargs[sample_name] = samples[sample_name]
     kwargs.update(EXTRA.get(name, {}))
-    if name in {"cancel_spot_batch_orders", "cancel_uta_batch_orders"}:
+    if name in {"cancel_uta_batch_orders"}:
         kwargs["orderList"] = [{"orderId": "123"}]
     return _python_fields(method, kwargs)
 
@@ -2953,6 +2136,7 @@ def _drain(received: "queue.Queue[dict[str, Any]]") -> None:
 
 def _assert_route(name: str, request: dict[str, Any]) -> None:
     from tests.unit.wire_contracts import assert_wire_contract
+
     assert_wire_contract("bitget", name, request)
     method, path = ROUTES[name]
     assert (request["method"], request["path"]) == (method, path), name
@@ -3028,33 +2212,6 @@ def test_async_wrapper_reaches_documented_route(
     _assert_route(name, received.get(timeout=10))
 
 
-def test_sync_order_helpers_send_fixed_side_type_and_force(
-    server: tuple[str, "queue.Queue[dict[str, Any]]"],
-) -> None:
-    """Convenience helpers pin side/type/force and map canonical symbols."""
-    from dcex.bitget.client import Client
-
-    base_url, received = server
-    _drain(received)
-    client = Client(**_client_kwargs(base_url))
-    client.place_spot_post_only_limit_sell_order(
-        product_symbol="BTC-USDT-SPOT", size="1", price="100"
-    )
-    body = json.loads(received.get(timeout=10)["body"])
-    assert body["symbol"] == "BTCUSDT"
-    assert (body["side"], body["orderType"], body["force"]) == ("sell", "limit", "post_only")
-
-    client.place_futures_market_buy_order(product_symbol="ETH-USDT-SWAP", size="2")
-    body = json.loads(received.get(timeout=10)["body"])
-    assert body["symbol"] == "ETHUSDT"
-    assert (body["side"], body["orderType"]) == ("buy", "market")
-    assert body["productType"] == "USDT-FUTURES"
-
-    client.get_futures_fee_rates(product_symbol="BTC-USDT-SWAP")
-    request = received.get(timeout=10)
-    assert request["query"] == {"symbol": "BTCUSDT", "businessType": "mix"}
-
-
 def test_sync_client_error_surfaces_bitget_code(
     server: tuple[str, "queue.Queue[dict[str, Any]]"],
 ) -> None:
@@ -3069,7 +2226,7 @@ def test_sync_client_error_surfaces_bitget_code(
     assert received.empty()
 
 
-def test_python_validation_rejects_ambiguous_leverage_and_loan_calls(
+def test_python_validation_rejects_ambiguous_loan_calls(
     server: tuple[str, "queue.Queue[dict[str, Any]]"],
 ) -> None:
     """Leverage needs a value and crypto-loan borrow needs exactly one amount (sync + async)."""
@@ -3080,27 +2237,18 @@ def test_python_validation_rejects_ambiguous_leverage_and_loan_calls(
     _drain(received)
     client = Client(**_client_kwargs(base_url))
     loan = {"loan_coin": "USDT", "pledge_coin": "BTC", "daily": "SEVEN"}
-    with pytest.raises(ValueError, match="leverage, longLeverage, or shortLeverage"):
-        client.set_futures_leverage(product_symbol="BTC-USDT-SWAP")
     for amounts in ({}, {"pledge_amount": "1", "loan_amount": "1"}):
         with pytest.raises(ValueError, match="exactly one of pledgeAmount or loanAmount"):
             client.borrow_crypto_loan(**loan, **amounts)
 
     async def call_async() -> None:
         async with AsyncClient(**_client_kwargs(base_url)) as async_client:
-            with pytest.raises(ValueError, match="leverage, longLeverage, or shortLeverage"):
-                await async_client.set_futures_leverage(product_symbol="BTC-USDT-SWAP")
             for amounts in ({}, {"pledge_amount": "1", "loan_amount": "1"}):
                 with pytest.raises(ValueError, match="exactly one of pledgeAmount or loanAmount"):
                     await async_client.borrow_crypto_loan(**loan, **amounts)
 
     asyncio.run(call_async())
     assert received.empty()
-
-    client.set_futures_leverage(product_symbol="BTC-USDT-SWAP", long_leverage="3")
-    body = json.loads(received.get(timeout=10)["body"])
-    assert body["longLeverage"] == "3"
-    assert "leverage" not in body
 
 
 @pytest.mark.parametrize("asynchronous", [False, True])
@@ -3125,23 +2273,6 @@ def test_python_validation_rejects_ambiguous_leverage_and_loan_calls(
             "set_uta_account_mode",
             {"mode": "basic", "delta_switch": "yes", "confirm": True},
             "advanced mode",
-        ),
-        (
-            "borrow_cross_margin_asset",
-            {"coin": "USDT", "borrow_amount": "0.000000001"},
-            "8 decimal places",
-        ),
-        (
-            "place_cross_margin_order",
-            {
-                "product_symbol": "BTCUSDT",
-                "order_type": "market",
-                "loan_type": "normal",
-                "force": "gtc",
-                "side": "buy",
-                "base_size": "1",
-            },
-            "quoteSize",
         ),
         ("get_cross_margin_flash_repay_result", {"id_list": []}, "1 to 100"),
         (
@@ -3250,38 +2381,6 @@ def test_python_validation_rejects_ambiguous_leverage_and_loan_calls(
             "qty or price",
         ),
         (
-            "place_isolated_margin_batch_orders",
-            {
-                "product_symbol": "BTCUSDT",
-                "orders": [
-                    {
-                        "side": "buy",
-                        "orderType": "market",
-                        "loanType": "normal",
-                        "force": "gtc",
-                        "baseSize": "1",
-                    }
-                ],
-            },
-            "quoteSize",
-        ),
-        (
-            "cancel_cross_margin_batch_orders",
-            {"product_symbol": "BTCUSDT", "orders": [{}]},
-            "clientOid",
-        ),
-        (
-            "batch_cancel_replace_spot_orders",
-            {"orders": [{"symbol": "BTCUSDT", "orderId": "1", "price": "-1", "size": "1"}]},
-            "price",
-        ),
-        (
-            "cancel_futures_plan_orders",
-            {"product_type": "USDT-FUTURES", "product_symbol": "BTCUSDT", "order_id_list": []},
-            "must not be empty",
-        ),
-        ("cancel_spot_plan_orders", {"symbol_list": []}, "provide"),
-        (
             "modify_uta_order",
             {
                 "product_symbol": "BTCUSDT",
@@ -3293,18 +2392,6 @@ def test_python_validation_rejects_ambiguous_leverage_and_loan_calls(
             "18 digits",
         ),
         ("set_uta_cancel_countdown", {"countdown": "4"}, "5..=60"),
-        (
-            "adjust_futures_position_margin",
-            {
-                "product_symbol": "BTCUSDT",
-                "product_type": "USDT-FUTURES",
-                "margin_coin": "USDT",
-                "hold_side": "long",
-                "amount": "0",
-            },
-            "nonzero",
-        ),
-        ("cancel_spot_plan_order", {"order_id": ""}, "orderId or clientOid"),
     ],
 )
 def test_controls_reject_invalid_requests(

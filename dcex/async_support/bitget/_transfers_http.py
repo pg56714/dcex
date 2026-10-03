@@ -131,19 +131,6 @@ class TradeHTTPTransfersHTTP(HTTPManager):
             ),
         )
 
-    async def get_cross_margin_max_transferable(self, coin: str) -> dict[str, Any]:
-        """Call ``GET /api/v2/margin/crossed/account/max-transfer-out-amount``."""
-        return await self._native_private(
-            "get_cross_margin_max_transferable", self._native_params(coin=coin)
-        )
-
-    async def get_isolated_margin_max_transferable(self, product_symbol: str) -> dict[str, Any]:
-        """Call ``GET /api/v2/margin/isolated/account/max-transfer-out-amount``."""
-        return await self._native_private(
-            "get_isolated_margin_max_transferable",
-            self._native_params(product_symbol=product_symbol),
-        )
-
     async def get_uta_max_transferable(self, coin: str) -> dict[str, Any]:
         """Call ``GET /api/v3/account/max-transferable``."""
         return await self._native_private(

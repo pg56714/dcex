@@ -784,7 +784,13 @@ def _sample_value(case: EndpointCase, parameter: inspect.Parameter) -> Any:
         return "symbol"
     from dcex._input_validation import endpoint_schema
 
-    if endpoint_schema(case.exchange, case.method_name).get("properties", {}).get(name, {}).get("format") == "decimal":
+    if (
+        endpoint_schema(case.exchange, case.method_name)
+        .get("properties", {})
+        .get(name, {})
+        .get("format")
+        == "decimal"
+    ):
         return "1"
     return "test"
 
@@ -860,17 +866,8 @@ def _case_kwargs(case: EndpointCase, method: Any) -> dict[str, Any]:
         kwargs["txid"] = "test-order-id"
     if case.exchange == "kraken" and case.method_name == "cancel_futures_order":
         kwargs["order_id"] = "test-order-id"
-    if case.exchange == "bitget" and case.method_name in {
-        "cancel_spot_order",
-        "get_spot_order",
-        "cancel_futures_order",
-        "get_futures_order",
-        "cancel_uta_order",
-        "get_uta_order",
-    }:
+    if case.exchange == "bitget" and case.method_name in {"cancel_uta_order", "get_uta_order"}:
         kwargs["order_id"] = "test-order-id"
-    if case.exchange == "bitget" and case.method_name == "set_futures_leverage":
-        kwargs["leverage"] = "5"
     if case.exchange == "bitget" and case.method_name == "borrow_crypto_loan":
         kwargs["loan_amount"] = "1"
     if case.exchange == "backpack" and case.method_name in {"cancel_order", "get_open_order"}:
@@ -906,9 +903,20 @@ def _case_kwargs(case: EndpointCase, method: Any) -> dict[str, Any]:
             kwargs[name] = [{}] if "list[" in annotation else {}
         elif isinstance(value, str) and annotation.startswith("list["):
             kwargs[name] = ["fixture"] if annotation.startswith("list[str]") else [{}]
-    if case.exchange == "bingx" and case.method_name in {"place_spot_batch_order", "place_swap_batch_order"}:
+    if case.exchange == "bingx" and case.method_name in {
+        "place_spot_batch_order",
+        "place_swap_batch_order",
+    }:
         field = "batch_orders" if "batch_orders" in signature.parameters else "data"
-        kwargs[field] = [{"symbol": "BTC-USDT", "side": "BUY", "positionSide": "LONG", "type": "MARKET", "quantity": "1"}]
+        kwargs[field] = [
+            {
+                "symbol": "BTC-USDT",
+                "side": "BUY",
+                "positionSide": "LONG",
+                "type": "MARKET",
+                "quantity": "1",
+            }
+        ]
     return kwargs
 
 

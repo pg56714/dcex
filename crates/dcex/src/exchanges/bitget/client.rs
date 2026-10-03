@@ -9,9 +9,7 @@ use crate::product_table::ProductTable;
 use crate::{DcexError, Result};
 
 use super::endpoints::BASE_URL;
-use super::params::{
-    BitgetParams, exchange_symbol_fallback, insert_optional_string, is_canonical_product_symbol,
-};
+use super::params::{BitgetParams, exchange_symbol_fallback};
 use super::signing::{encode_params, sign, validate_response};
 
 #[derive(Clone)]
@@ -192,26 +190,72 @@ impl BitgetClient {
         }
     }
 
-    pub(super) fn exchange_symbol(&self, product_symbol: &str) -> Result<String> {
-        if is_canonical_product_symbol(product_symbol)
-            && let Some(table) = &self.product_table
-        {
-            return table.get_exchange_symbol("bitget", product_symbol);
+    pub(super) fn exchange_symbol_category(
+        &self,
+        product_symbol: &str,
+        category: Option<&str>,
+    ) -> Result<String> {
+        if let Some(table) = &self.product_table {
+            return Ok(table
+                .resolve_symbol_in("bitget", product_symbol, |row| {
+                    category.is_none_or(|category| row.exchange_type.eq_ignore_ascii_case(category))
+                })?
+                .exchange_symbol
+                .clone());
         }
-        Ok(exchange_symbol_fallback(product_symbol))
+        exchange_symbol_fallback(product_symbol)
+    }
+
+    pub(super) fn normalize_batch_symbols(&self, mut body: Value) -> Result<Value> {
+        if self.product_table.is_none() {
+            return Ok(body);
+        }
+        fn visit(client: &BitgetClient, value: &mut Value, inherited: Option<&str>) -> Result<()> {
+            if let Some(items) = value.as_array_mut() {
+                for item in items {
+                    visit(client, item, inherited)?;
+                }
+            } else if let Some(object) = value.as_object_mut() {
+                let category = object
+                    .get("category")
+                    .and_then(Value::as_str)
+                    .or(inherited)
+                    .map(str::to_string);
+                if let Some(symbol) = object.get("symbol").and_then(Value::as_str) {
+                    let native = client.exchange_symbol_category(symbol, category.as_deref())?;
+                    object.insert("symbol".into(), Value::String(native));
+                }
+                if let Some(items) = object.get_mut("orderList") {
+                    visit(client, items, category.as_deref())?;
+                }
+            }
+            Ok(())
+        }
+        visit(self, &mut body, None)?;
+        Ok(body)
     }
 
     pub(super) fn normalize_symbol_params(
         &self,
         params: Vec<(String, String)>,
     ) -> Result<Vec<(String, String)>> {
+        let category = params
+            .iter()
+            .find(|(key, _)| key == "category" || key == "productType")
+            .map(|(_, value)| value.clone());
         params
             .into_iter()
             .map(|(key, value)| {
                 if key == "product_symbol" {
-                    Ok(("symbol".to_string(), self.exchange_symbol(&value)?))
+                    Ok((
+                        "symbol".to_string(),
+                        self.exchange_symbol_category(&value, category.as_deref())?,
+                    ))
                 } else if key == "symbol" {
-                    Ok((key, self.exchange_symbol(&value)?))
+                    Ok((
+                        key,
+                        self.exchange_symbol_category(&value, category.as_deref())?,
+                    ))
                 } else {
                     Ok((key, value))
                 }
@@ -225,7 +269,13 @@ impl BitgetClient {
         params: &BitgetParams,
     ) -> Result<()> {
         if let Some(product_symbol) = params.get("product_symbol") {
-            query.push(("symbol".to_string(), self.exchange_symbol(product_symbol)?));
+            query.push((
+                "symbol".to_string(),
+                self.exchange_symbol_category(
+                    product_symbol,
+                    params.get("category").or(params.get("productType")),
+                )?,
+            ));
         }
         Ok(())
     }
@@ -237,7 +287,10 @@ impl BitgetClient {
     ) -> Result<()> {
         query.push((
             "symbol".to_string(),
-            self.exchange_symbol(params.required("product_symbol")?)?,
+            self.exchange_symbol_category(
+                params.required("product_symbol")?,
+                params.get("category").or(params.get("productType")),
+            )?,
         ));
         Ok(())
     }
@@ -248,7 +301,13 @@ impl BitgetClient {
         params: &BitgetParams,
     ) -> Result<()> {
         if let Some(symbol) = params.get("symbol") {
-            query.push(("symbol".to_string(), symbol.to_string()));
+            query.push((
+                "symbol".to_string(),
+                self.exchange_symbol_category(
+                    symbol,
+                    params.get("category").or(params.get("productType")),
+                )?,
+            ));
         } else {
             self.push_product_symbol(query, params)?;
         }
@@ -263,7 +322,10 @@ impl BitgetClient {
         if let Some(product_symbol) = params.get("product_symbol") {
             body.insert(
                 "symbol".to_string(),
-                Value::String(self.exchange_symbol(product_symbol)?),
+                Value::String(self.exchange_symbol_category(
+                    product_symbol,
+                    params.get("category").or(params.get("productType")),
+                )?),
             );
         }
         Ok(())
@@ -276,7 +338,10 @@ impl BitgetClient {
     ) -> Result<()> {
         body.insert(
             "symbol".to_string(),
-            Value::String(self.exchange_symbol(params.required("product_symbol")?)?),
+            Value::String(self.exchange_symbol_category(
+                params.required("product_symbol")?,
+                params.get("category").or(params.get("productType")),
+            )?),
         );
         Ok(())
     }
@@ -287,7 +352,13 @@ impl BitgetClient {
         params: &BitgetParams,
     ) -> Result<()> {
         if let Some(symbol) = params.get("symbol") {
-            insert_optional_string(body, "symbol", Some(symbol));
+            body.insert(
+                "symbol".into(),
+                Value::String(self.exchange_symbol_category(
+                    symbol,
+                    params.get("category").or(params.get("productType")),
+                )?),
+            );
         } else {
             self.insert_product_symbol(body, params)?;
         }

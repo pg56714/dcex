@@ -7,7 +7,6 @@ use crate::exchange::unix_timestamp_ms;
 use crate::ws::{WebSocketConfig, WebSocketConnection};
 use crate::{DcexError, Result};
 
-const PRIVATE_WS_URL: &str = "wss://ws.bitget.com/v2/ws/private";
 const UTA_PRIVATE_WS_URL: &str = "wss://ws.bitget.com/v3/ws/private";
 const LOGIN_METHOD: &str = "GET";
 const LOGIN_PATH: &str = "/user/verify";
@@ -59,13 +58,45 @@ impl BitgetPrivateWebSocketArg {
     ) -> Result<Self> {
         let inst_type = normalize_inst_type(&inst_type.into())?;
         let channel = normalize_channel(&channel.into())?;
-        let inst_id = inst_id.map(|value| normalize_inst_id(&value)).transpose()?;
+        let mut inst_id = inst_id.map(|value| normalize_inst_id(&value)).transpose()?;
         let coin = coin.map(|value| normalize_coin(&value)).transpose()?;
         if inst_type == UTA_INST_TYPE {
-            if inst_id.is_some() || coin.is_some() {
+            if !matches!(
+                channel.as_str(),
+                "order"
+                    | "fill"
+                    | "position"
+                    | "account"
+                    | "strategy-order"
+                    | "fast-fill"
+                    | "adl-notification"
+                    | "reality-orderbook"
+            ) {
+                return Err(DcexError::InvalidInput(
+                    "unsupported Bitget UTA private topic".into(),
+                ));
+            }
+            let supports_symbol = matches!(
+                channel.as_str(),
+                "strategy-order" | "reality-orderbook" | "fast-fill"
+            );
+            if (inst_id.is_some() && !supports_symbol) || coin.is_some() {
                 return Err(DcexError::InvalidInput(
                     "Bitget UTA private topics cover all products and do not support instId or coin filters."
                         .to_string(),
+                ));
+            }
+            if channel == "strategy-order" && inst_id.is_none() {
+                inst_id = Some("default".to_string());
+            }
+            if channel == "strategy-order" && inst_id.as_deref() != Some("default") {
+                return Err(DcexError::InvalidInput(
+                    "Bitget UTA strategy-order only supports symbol default.".into(),
+                ));
+            }
+            if channel == "reality-orderbook" && inst_id.is_none() {
+                return Err(DcexError::InvalidInput(
+                    "reality-orderbook requires a symbol".into(),
                 ));
             }
             return Ok(Self {
@@ -75,22 +106,14 @@ impl BitgetPrivateWebSocketArg {
                 coin,
             });
         }
-        if channel == "positions"
-            && (inst_type == "SPOT" || inst_id.as_deref() != Some("default") || coin.is_some())
-        {
+        let retained_margin = inst_type == "MARGIN"
+            && matches!(
+                channel.as_str(),
+                "orders-crossed" | "orders-isolated" | "account-crossed" | "account-isolated"
+            );
+        if !retained_margin && !matches!(channel.as_str(), "equity" | "positions-history") {
             return Err(DcexError::InvalidInput(
-                "Bitget futures positions channel requires instId=default and does not support a coin filter."
-                    .to_string(),
-            ));
-        }
-        if channel == "account" && coin.as_deref() != Some("default") {
-            return Err(DcexError::InvalidInput(
-                "Bitget classic account channel requires coin=default.".to_string(),
-            ));
-        }
-        if channel == "orders" && inst_type == "SPOT" && inst_id.is_none() {
-            return Err(DcexError::InvalidInput(
-                "Bitget spot orders channel requires an instId or default.".to_string(),
+                "Bitget classic subscription was replaced by UTA; use a V3 private topic.".into(),
             ));
         }
         if channel == "equity" && (inst_type == "SPOT" || inst_id.is_some() || coin.is_some()) {
@@ -118,7 +141,11 @@ impl BitgetPrivateWebSocketArg {
 
     fn to_json(&self) -> Value {
         if self.is_uta() {
-            return json!({"instType": UTA_INST_TYPE, "topic": self.channel});
+            let mut value = json!({"instType": UTA_INST_TYPE, "topic": self.channel});
+            if let Some(symbol) = &self.inst_id {
+                value["symbol"] = Value::String(symbol.clone());
+            }
+            return value;
         }
         let mut arg = serde_json::Map::new();
         arg.insert(
@@ -156,7 +183,7 @@ impl BitgetPrivateWebSocket {
             api_key,
             api_secret,
             passphrase,
-            PRIVATE_WS_URL.to_string(),
+            UTA_PRIVATE_WS_URL.to_string(),
             timeout,
         )
     }
@@ -260,24 +287,6 @@ impl BitgetPrivateWebSocket {
         self.connection.send_json(&payload).await
     }
 
-    /// Sends a classic V2 order operation using an exchange-native instrument ID.
-    pub async fn classic_trade_request(
-        &mut self,
-        id: &str,
-        inst_type: &str,
-        inst_id: &str,
-        channel: &str,
-        params: Value,
-    ) -> Result<()> {
-        let payload = super::trading::classic(id, inst_type, inst_id, channel, params)?;
-        if self.uta_v3 || !self.logged_in {
-            return Err(DcexError::InvalidInput(
-                "Bitget classic trading requires a logged-in V2 private connection.".into(),
-            ));
-        }
-        self.connection.send_json(&payload).await
-    }
-
     pub async fn subscribe(&mut self, args: Vec<BitgetPrivateWebSocketArg>) -> Result<()> {
         self.send_subscription("subscribe", args).await
     }
@@ -370,70 +379,22 @@ impl BitgetPrivateWebSocket {
         .await
     }
 
-    /// Subscribes to order updates. With `inst_type = "UTA"` this sends the V3
+    /// Subscribes to UTA order updates. This sends the V3
     /// `{"instType":"UTA","topic":"order"}` subscription covering every product.
-    pub async fn subscribe_orders(&mut self, inst_type: &str) -> Result<()> {
-        if is_uta_inst_type(inst_type) {
-            return self.subscribe_channel(inst_type, "order").await;
-        }
-        self.subscribe_channel_with_inst_id(inst_type, "orders", "default")
-            .await
+    pub async fn subscribe_orders(&mut self) -> Result<()> {
+        self.subscribe_channel("UTA", "order").await
     }
 
-    pub async fn subscribe_orders_for_inst_id(
-        &mut self,
-        inst_type: &str,
-        inst_id: &str,
-    ) -> Result<()> {
-        self.subscribe_channel_with_inst_id(inst_type, "orders", inst_id)
-            .await
+    pub async fn subscribe_fills(&mut self) -> Result<()> {
+        self.subscribe_channel("UTA", "fill").await
     }
 
-    pub async fn subscribe_fills(&mut self, inst_type: &str) -> Result<()> {
-        if is_uta_inst_type(inst_type) {
-            return self.subscribe_channel(inst_type, "fill").await;
-        }
-        self.subscribe_channel_with_inst_id(inst_type, "fill", "default")
-            .await
+    pub async fn subscribe_positions(&mut self) -> Result<()> {
+        self.subscribe_channel("UTA", "position").await
     }
 
-    pub async fn subscribe_fills_for_inst_id(
-        &mut self,
-        inst_type: &str,
-        inst_id: &str,
-    ) -> Result<()> {
-        self.subscribe_channel_with_inst_id(inst_type, "fill", inst_id)
-            .await
-    }
-
-    pub async fn subscribe_positions(&mut self, inst_type: &str) -> Result<()> {
-        if is_uta_inst_type(inst_type) {
-            return self.subscribe_channel(inst_type, "position").await;
-        }
-        self.subscribe_channel_with_inst_id(inst_type, "positions", "default")
-            .await
-    }
-
-    pub async fn subscribe_positions_for_inst_id(
-        &mut self,
-        inst_type: &str,
-        inst_id: &str,
-    ) -> Result<()> {
-        self.subscribe_channel_with_inst_id(inst_type, "positions", inst_id)
-            .await
-    }
-
-    pub async fn subscribe_account(&mut self, inst_type: &str) -> Result<()> {
-        if is_uta_inst_type(inst_type) {
-            return self.subscribe_channel(inst_type, "account").await;
-        }
-        self.subscribe_channel_with_coin(inst_type, "account", "default")
-            .await
-    }
-
-    pub async fn subscribe_account_for_coin(&mut self, inst_type: &str, coin: &str) -> Result<()> {
-        self.subscribe_channel_with_coin(inst_type, "account", coin)
-            .await
+    pub async fn subscribe_account(&mut self) -> Result<()> {
+        self.subscribe_channel("UTA", "account").await
     }
 
     pub async fn subscribe_equity(&mut self, inst_type: &str) -> Result<()> {
@@ -541,6 +502,12 @@ fn is_uta_inst_type(inst_type: &str) -> bool {
 
 fn validate_subscription_endpoint(uta_v3: bool, args: &[BitgetPrivateWebSocketArg]) -> Result<()> {
     for arg in args {
+        BitgetPrivateWebSocketArg::with_filters(
+            arg.inst_type.clone(),
+            arg.channel.clone(),
+            arg.inst_id.clone(),
+            arg.coin.clone(),
+        )?;
         if arg.is_uta() != uta_v3 {
             let message = if uta_v3 {
                 "Bitget UTA V3 private WebSocket only accepts instType=UTA topics."
@@ -663,10 +630,10 @@ mod tests {
 
     #[test]
     fn builds_private_channel_arg() {
-        let arg =
-            BitgetPrivateWebSocketArg::with_inst_id("swap", "orders", "default").expect("arg");
+        let arg = BitgetPrivateWebSocketArg::with_inst_id("swap", "positions-history", "default")
+            .expect("arg");
         assert_eq!(arg.inst_type, "USDT-FUTURES");
-        assert_eq!(arg.channel, "orders");
+        assert_eq!(arg.channel, "positions-history");
         assert_eq!(arg.inst_id.as_deref(), Some("default"));
         assert_eq!(arg.to_json()["instType"], "USDT-FUTURES");
         assert_eq!(arg.to_json()["instId"], "default");
@@ -675,7 +642,9 @@ mod tests {
     #[test]
     fn rejects_invalid_private_arg() {
         assert!(BitgetPrivateWebSocketArg::new("USDT-FUTURES", "account").is_err());
-        assert!(BitgetPrivateWebSocketArg::with_coin("USDT-FUTURES", "account", "default").is_ok());
+        assert!(
+            BitgetPrivateWebSocketArg::with_coin("USDT-FUTURES", "account", "default").is_err()
+        );
         assert!(BitgetPrivateWebSocketArg::new("bad", "orders").is_err());
         assert!(BitgetPrivateWebSocketArg::new("USDT-FUTURES", "orders/").is_err());
         assert!(BitgetPrivateWebSocketArg::new("USDT-FUTURES", "positions").is_err());
@@ -686,7 +655,8 @@ mod tests {
         assert!(BitgetPrivateWebSocketArg::with_inst_id("SPOT", "positions", "default").is_err());
         assert!(BitgetPrivateWebSocketArg::new("SPOT", "orders").is_err());
         assert!(
-            BitgetPrivateWebSocketArg::with_inst_id("USDT-FUTURES", "positions", "default").is_ok()
+            BitgetPrivateWebSocketArg::with_inst_id("USDT-FUTURES", "positions", "default")
+                .is_err()
         );
         assert!(
             BitgetPrivateWebSocketArg::with_inst_id_and_coin(
@@ -701,7 +671,14 @@ mod tests {
 
     #[test]
     fn builds_uta_private_topic_arg() {
-        for topic in ["order", "fill", "position", "account"] {
+        for topic in [
+            "order",
+            "fill",
+            "position",
+            "account",
+            "fast-fill",
+            "adl-notification",
+        ] {
             let arg = BitgetPrivateWebSocketArg::new("uta", topic).expect("uta arg");
             assert!(arg.is_uta());
             assert_eq!(arg.to_json(), json!({"instType": "UTA", "topic": topic}));
@@ -715,10 +692,48 @@ mod tests {
     }
 
     #[test]
+    fn strategy_topic_preserves_documented_symbol() {
+        let arg = BitgetPrivateWebSocketArg::with_inst_id("UTA", "strategy-order", "default")
+            .expect("strategy topic");
+        assert_eq!(
+            subscription_payload("subscribe", true, &[arg]).expect("frame"),
+            json!({"op":"subscribe","args":[{"instType":"UTA","topic":"strategy-order","symbol":"default"}]})
+        );
+        assert_eq!(
+            BitgetPrivateWebSocketArg::uta("strategy-order")
+                .expect("default")
+                .to_json(),
+            json!({"instType":"UTA","topic":"strategy-order","symbol":"default"})
+        );
+        assert!(BitgetPrivateWebSocketArg::uta("unknown-topic").is_err());
+        assert!(
+            BitgetPrivateWebSocketArg::with_inst_id("UTA", "strategy-order", "BTCUSDT").is_err()
+        );
+    }
+
+    #[test]
+    fn fast_fill_supports_optional_symbol() {
+        for symbol in ["default", "BTCUSDT"] {
+            let arg = BitgetPrivateWebSocketArg::with_inst_id("UTA", "fast-fill", symbol)
+                .expect("fast-fill");
+            assert_eq!(
+                arg.to_json(),
+                json!({"instType":"UTA","topic":"fast-fill","symbol":symbol})
+            );
+        }
+        assert_eq!(
+            BitgetPrivateWebSocketArg::uta("fast-fill")
+                .expect("all products")
+                .to_json(),
+            json!({"instType":"UTA","topic":"fast-fill"})
+        );
+    }
+
+    #[test]
     fn uta_topics_require_v3_endpoint_and_classic_requires_v2() {
         let uta = vec![BitgetPrivateWebSocketArg::uta("position").expect("uta")];
         let classic = vec![
-            BitgetPrivateWebSocketArg::with_inst_id("USDT-FUTURES", "orders", "default")
+            BitgetPrivateWebSocketArg::with_inst_id("USDT-FUTURES", "positions-history", "default")
                 .expect("classic"),
         ];
         assert_eq!(
@@ -728,7 +743,7 @@ mod tests {
         assert_eq!(
             subscription_payload("subscribe", false, &classic).expect("payload"),
             json!({"op": "subscribe", "args": [
-                {"instType": "USDT-FUTURES", "channel": "orders", "instId": "default"}
+                {"instType": "USDT-FUTURES", "channel": "positions-history", "instId": "default"}
             ]})
         );
         assert!(subscription_payload("subscribe", false, &uta).is_err());
@@ -743,7 +758,7 @@ mod tests {
         assert!(uta.is_uta_v3());
         let classic = BitgetPrivateWebSocket::new("k".into(), "s".into(), "p".into(), timeout)
             .expect("classic client");
-        assert!(!classic.is_uta_v3());
+        assert!(classic.is_uta_v3());
     }
 
     #[test]

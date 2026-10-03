@@ -47,8 +47,32 @@ def test_implemented_routes_are_unique():
 def test_superseded_rows_target_same_route_or_declared_replacement():
     from tests.unit.ledger_validation import validate_superseded
 
-    replacements = json.loads((ROOT / "docs/endpoint-replacements.json").read_text(encoding="utf-8"))
+    replacements = json.loads(
+        (ROOT / "docs/endpoint-replacements.json").read_text(encoding="utf-8")
+    )
     validate_superseded(LEDGER["rows"], replacements)
+
+
+def test_bitget_websocket_replacements_reject_unrelated_channels():
+    from copy import deepcopy
+    from tests.unit.ledger_validation import validate_superseded
+
+    replacements = json.loads(
+        (ROOT / "docs/endpoint-replacements.json").read_text(encoding="utf-8")
+    )
+    for number, wrong_target in [
+        (1800, 1817),
+        (1801, 1817),
+        (1805, 1814),
+        (1810, 1814),
+        (1812, 1814),
+        (1813, 1814),
+    ]:
+        rows = deepcopy(LEDGER["rows"])
+        row = next(row for row in rows if row["row"] == number)
+        row["superseded_by"] = [wrong_target]
+        with pytest.raises(AssertionError, match="undeclared replacement"):
+            validate_superseded(rows, replacements)
 
 
 def test_evidence_symbols_exist_and_numeric_anchors_are_forbidden():
@@ -151,6 +175,12 @@ def test_ledger_counts_and_row_ids_are_consistent() -> None:
     assert len({r["row"] for r in rows}) == len(rows)
     assert dict(Counter(r["status"] for r in rows)) == LEDGER["counts"]
     assert not any(r["status"] == "excluded" for r in rows)
+
+
+def test_bitget_classic_adl_channel_uses_official_wire_name() -> None:
+    """Source: bitget.com/api-doc/classic/contract/websocket/private/ADL-Notification-Channel."""
+    row = next(row for row in LEDGER["rows"] if row["row"] == 1812)
+    assert row["channel"] == "adl-noti"
 
 
 @pytest.mark.parametrize("exchange", EXCHANGES)

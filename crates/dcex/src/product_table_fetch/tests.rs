@@ -1,10 +1,10 @@
 use super::exchanges::{
     arcus_market_info, backpack_rfq_market_info, binance_coin_futures_market_info,
     binance_equity_market_info, binance_option_market_info, bitget_uta_futures_market_info,
-    bybit_option_expiry, bybit_option_market_info, disambiguate_bingx_products,
-    hyperliquid_perpetual_market_info, kucoin_futures_market_info, mexc_contract_market_info,
-    mexc_contract_pair, mexc_spot_market_info, okx_market_info, okx_option_market_info,
-    okx_unlisted_option_family, option_product_symbol,
+    bybit_option_expiry, bybit_option_market_info, hyperliquid_perpetual_market_info,
+    kucoin_futures_market_info, mexc_contract_market_info, mexc_contract_pair,
+    mexc_spot_market_info, okx_market_info, okx_option_market_info, okx_unlisted_option_family,
+    option_product_symbol, validate_bingx_products,
 };
 use super::*;
 use crate::product_table::MarketInfo;
@@ -97,6 +97,33 @@ fn normalizes_exchange_specific_currency_aliases() {
     assert_eq!(normalize_kraken_currency("XXBT"), "BTC");
     assert_eq!(normalize_kraken_currency("ZUSD"), "USD");
     assert_eq!(normalize_kraken_spot_currency("XOMx", true), "XOMx");
+    for asset in [
+        "XAUT", "ZETA", "ZORA", "ZEUS", "ZAMA", "ZBCN", "ZEREBRO", "XION", "XU3O8",
+    ] {
+        assert_eq!(normalize_kraken_currency(asset), asset);
+    }
+    for (legacy, asset) in [
+        ("XETH", "ETH"),
+        ("XLTC", "LTC"),
+        ("XXRP", "XRP"),
+        ("XXDG", "DOGE"),
+    ] {
+        assert_eq!(normalize_kraken_currency(legacy), asset);
+    }
+}
+
+#[test]
+fn bingx_swap_quantities_are_base_units_not_minimum_lots() {
+    for (symbol, minimum, precision) in [
+        ("BTC-USDT", "0.0001", 6),
+        ("ETH-USDT", "0.01", 4),
+        ("DOGE-USDT", "1", 0),
+    ] {
+        let market = serde_json::json!({"symbol":symbol, "size":minimum, "tradeMinQuantity":minimum, "quantityPrecision":precision, "pricePrecision":4});
+        let row = super::exchanges::bingx_swap_market_info(&market).expect("market");
+        assert_eq!(row.size_per_contract, "1");
+        assert_eq!(row.min_size, minimum);
+    }
 }
 
 #[test]
@@ -217,6 +244,16 @@ fn canonicalizes_exchange_display_symbols() {
 }
 
 #[test]
+fn extended_spot_table_matches_canonical_fallback_input() {
+    let row = super::exchanges::extended_market_info(&serde_json::json!({
+        "name": "BTCSPOT-USD", "uiName": "BTC/USDC", "type": "SPOT"
+    }))
+    .expect("spot row");
+    assert_eq!(row.product_symbol, "BTC-USD-SPOT");
+    assert_eq!(row.exchange_symbol, "BTCSPOT-USD");
+}
+
+#[test]
 fn maps_coin_m_contracts_without_usd_m_routing() {
     let market = serde_json::json!({
         "symbol": "BTCUSD_PERP", "baseAsset": "BTC", "quoteAsset": "USD",
@@ -280,30 +317,62 @@ fn distinguishes_kucoin_delivery_months_from_perpetuals() {
 }
 
 #[test]
-fn disambiguates_only_colliding_bingx_display_aliases() {
-    let make_row = |native: &str, display: &str| MarketInfo {
-        exchange: "bingx".into(),
-        exchange_symbol: native.into(),
-        product_symbol: display.into(),
-        product_type: "swap".into(),
-        exchange_type: "perpetual".into(),
-        price_precision: "0.01".into(),
-        size_precision: "1".into(),
-        min_size: "1".into(),
-        base_currency: display.split('-').next().unwrap().into(),
-        quote_currency: "USDT".into(),
-        min_notional: "0".into(),
-        size_per_contract: "1".into(),
-    };
-    let mut rows = vec![
-        make_row("ONE-USDT", "ONE-USDT-SWAP"),
-        make_row("CROSS-USDT", "ONE-USDT-SWAP"),
-        make_row("NCSKAAPL2USD-USDT", "AAPL-USDT-SWAP"),
+fn bingx_symbols_ignore_colliding_or_noncanonical_display_names() {
+    // Public contract-list samples, 2026-10-03: displayName is not a unique asset ID.
+    let samples = [
+        ("MASK-USDT", "MASK-USDT"),
+        ("NULLMASK-USDT", "MASK-USDT"),
+        ("ONE-USDT", "ONE-USDT"),
+        ("CROSS-USDT", "ONE-USDT"),
+        ("MEME-USDT", "MEME-USDT"),
+        ("AMEMECOIN-USDT", "MEME-USDT"),
+        ("GENSYN-USDT", "AI-USDT"),
+        ("AIINU-USDT", "AI-USDT"),
+        ("PAXG-USDT", "PAXG(GOLD)-USDT"),
+        ("NCSKAAPL2USD-USDT", "AAPL-USDT"),
+        ("TEST-USDT", "Display Name 非ASCII-USDT"),
     ];
-    disambiguate_bingx_products(&mut rows);
-    assert_eq!(rows[0].product_symbol, "ONE-USDT-SWAP");
-    assert_eq!(rows[1].product_symbol, "CROSS-USDT-SWAP");
-    assert_eq!(rows[2].product_symbol, "AAPL-USDT-SWAP");
+    let mut rows = Vec::new();
+    for (symbol, display) in samples {
+        let market = serde_json::json!({"symbol": symbol, "displayName": display});
+        let row = super::exchanges::bingx_swap_market_info(&market).expect("market");
+        assert_eq!(row.product_symbol, format!("{symbol}-SWAP"));
+        assert_eq!(row.exchange_symbol, symbol);
+        rows.push(row);
+    }
+    validate_bingx_products(&rows).expect("unique official symbols");
+    let table = crate::product_table::ProductTable::new(rows.clone());
+    for (symbol, _) in samples {
+        assert_eq!(
+            table
+                .get_exchange_symbol("bingx", &format!("{symbol}-SWAP"))
+                .unwrap(),
+            symbol
+        );
+    }
+    rows.push(rows[0].clone());
+    assert!(
+        validate_bingx_products(&rows)
+            .unwrap_err()
+            .to_string()
+            .contains("duplicate BingX product symbol")
+    );
+}
+
+#[test]
+fn bingx_duplicate_diagnostic_names_both_native_markets() {
+    let mut rows = vec![MarketInfo {
+        exchange: "bingx".into(),
+        product_symbol: "MASK-USDT-SWAP".into(),
+        exchange_symbol: "MASK-USDT".into(),
+        ..MarketInfo::default()
+    }];
+    let mut conflict = rows[0].clone();
+    conflict.exchange_symbol = "NULLMASK-USDT".into();
+    rows.push(conflict);
+    let error = validate_bingx_products(&rows).unwrap_err().to_string();
+    assert!(error.contains("MASK-USDT-SWAP"));
+    assert!(error.contains("MASK-USDT, NULLMASK-USDT"));
 }
 
 #[test]
@@ -422,13 +491,13 @@ fn builds_binance_equity_market_metadata() {
 #[test]
 fn builds_arcus_stock_perpetual_market_metadata() {
     let market = serde_json::json!({
-        "marketId": 17, "baseAsset": "AAPL", "quoteAsset": "USD",
+        "marketId": 17, "marketDisplayName": "AAPL-USD", "baseAsset": "AAPL", "quoteAsset": "USD",
         "type": "PERPETUAL", "tickSize": "0.01",
         "stepSize": "0.001", "minOrderSize": "0.01",
         "minOrderNotional": "5"
     });
     let row = arcus_market_info(&market).expect("Arcus market");
-    assert_eq!(row.exchange_symbol, "17");
+    assert_eq!(row.exchange_symbol, "AAPL-USD");
     assert_eq!(row.product_symbol, "AAPL-USD-SWAP");
     assert_eq!(row.min_notional, "5");
 }

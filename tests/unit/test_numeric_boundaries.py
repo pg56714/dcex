@@ -14,7 +14,7 @@ CASES = [
     ("okx", "amend_algo_order", "newSz"),
     ("bybit", "place_order", "tpLimitPrice"),
     ("bybit", "set_trading_stop", "tpLimitPrice"),
-    ("bitget", "place_futures_order", "presetStopLossPrice"),
+    ("bitget", "place_uta_order", "stopLoss"),
     ("mexc", "place_contract_trailing_order", "activePrice"),
     ("bingx", "transfer_subaccount_assets", "transferAmount"),
     ("backpack", "place_order", "takeProfitTriggerPrice"),
@@ -27,7 +27,9 @@ CASES = [
 @pytest.mark.parametrize("asynchronous", [False, True])
 @pytest.mark.parametrize("exchange,method,key", CASES)
 @pytest.mark.parametrize("value", [1e-7, "1e-7", "-3", "abc", "+5", "-5%"])
-async def test_reported_invalid_values_stop_before_adapter(exchange, method, key, value, asynchronous):
+async def test_reported_invalid_values_stop_before_adapter(
+    exchange, method, key, value, asynchronous
+):
     prefix = "dcex.async_support" if asynchronous else "dcex"
     cls = importlib.import_module(f"{prefix}.{exchange}.client").Client
     # No client/network state: validation must run before the adapter body.
@@ -43,6 +45,7 @@ async def test_reported_invalid_values_stop_before_adapter(exchange, method, key
 async def test_kraken_relative_price_reaches_native_unchanged(event, price):
     import json
     from dcex.ws.kraken import V1Client
+
     client = object.__new__(V1Client)
     client._native_client = AsyncMock()
     await client.send_message({"event": event, "price": price, "volume": "1"})

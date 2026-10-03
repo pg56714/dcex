@@ -23,379 +23,6 @@ impl BitgetClient {
     ) -> Result<Option<ValidatedResponse>> {
         let (path, method, is_public, fields, required, arrays, numbers): TradingRoute<'_> =
             match name {
-                "modify_futures_tpsl_order" => (
-                    "/api/v2/mix/order/modify-tpsl-order",
-                    "POST",
-                    false,
-                    &[
-                        "marginCoin",
-                        "productType",
-                        "symbol",
-                        "triggerPrice",
-                        "size",
-                        "orderId",
-                        "clientOid",
-                        "triggerType",
-                        "executePrice",
-                        "rangeRate",
-                    ],
-                    &[
-                        "marginCoin",
-                        "productType",
-                        "symbol",
-                        "triggerPrice",
-                        "size",
-                    ],
-                    &[],
-                    &[],
-                ),
-                "place_futures_plan_order" => (
-                    "/api/v2/mix/order/place-plan-order",
-                    "POST",
-                    false,
-                    &[
-                        "planType",
-                        "symbol",
-                        "productType",
-                        "marginMode",
-                        "marginCoin",
-                        "size",
-                        "triggerPrice",
-                        "triggerType",
-                        "side",
-                        "orderType",
-                        "price",
-                        "callbackRatio",
-                        "tradeSide",
-                        "clientOid",
-                        "reduceOnly",
-                        "stopSurplusTriggerPrice",
-                        "stopSurplusExecutePrice",
-                        "stopSurplusTriggerType",
-                        "stopLossTriggerPrice",
-                        "stopLossExecutePrice",
-                        "stopLossTriggerType",
-                        "stpMode",
-                    ],
-                    &[
-                        "planType",
-                        "symbol",
-                        "productType",
-                        "marginMode",
-                        "marginCoin",
-                        "size",
-                        "triggerPrice",
-                        "triggerType",
-                        "side",
-                        "orderType",
-                    ],
-                    &[],
-                    &[],
-                ),
-                "place_futures_position_tpsl" => (
-                    "/api/v2/mix/order/place-pos-tpsl",
-                    "POST",
-                    false,
-                    &[
-                        "marginCoin",
-                        "productType",
-                        "symbol",
-                        "holdSide",
-                        "stopSurplusTriggerPrice",
-                        "stopSurplusSize",
-                        "stopSurplusTriggerType",
-                        "stopSurplusExecutePrice",
-                        "stopLossTriggerPrice",
-                        "stopLossSize",
-                        "stopLossTriggerType",
-                        "stopLossExecutePrice",
-                        "stpMode",
-                        "stopSurplusClientOid",
-                        "stopLossClientOid",
-                    ],
-                    &["marginCoin", "productType", "symbol", "holdSide"],
-                    &[],
-                    &[],
-                ),
-                "place_futures_tpsl_order" => (
-                    "/api/v2/mix/order/place-tpsl-order",
-                    "POST",
-                    false,
-                    &[
-                        "marginCoin",
-                        "productType",
-                        "symbol",
-                        "planType",
-                        "triggerPrice",
-                        "holdSide",
-                        "size",
-                        "triggerType",
-                        "executePrice",
-                        "rangeRate",
-                        "clientOid",
-                        "stpMode",
-                    ],
-                    &[
-                        "marginCoin",
-                        "productType",
-                        "symbol",
-                        "planType",
-                        "triggerPrice",
-                        "holdSide",
-                    ],
-                    &[],
-                    &[],
-                ),
-                "get_futures_plan_sub_order" => (
-                    "/api/v2/mix/order/plan-sub-order",
-                    "GET",
-                    false,
-                    &["planType", "planOrderId", "productType"],
-                    &["planType", "planOrderId", "productType"],
-                    &[],
-                    &[],
-                ),
-                "modify_futures_plan_order" => (
-                    "/api/v2/mix/order/modify-plan-order",
-                    "POST",
-                    false,
-                    &[
-                        "productType",
-                        "orderId",
-                        "clientOid",
-                        "newSize",
-                        "newPrice",
-                        "newCallbackRatio",
-                        "newTriggerPrice",
-                        "newTriggerType",
-                        "newStopSurplusTriggerPrice",
-                        "newStopSurplusExecutePrice",
-                        "newStopSurplusTriggerType",
-                        "newStopLossTriggerPrice",
-                        "newStopLossExecutePrice",
-                        "newStopLossTriggerType",
-                    ],
-                    &["productType"],
-                    &[],
-                    &[],
-                ),
-                "cancel_futures_plan_orders" => (
-                    "/api/v2/mix/order/cancel-plan-order",
-                    "POST",
-                    false,
-                    &[
-                        "productType",
-                        "orderIdList",
-                        "symbol",
-                        "marginCoin",
-                        "planType",
-                    ],
-                    &["productType"],
-                    &["orderIdList"],
-                    &[],
-                ),
-                "get_pending_futures_plan_orders" => (
-                    "/api/v2/mix/order/orders-plan-pending",
-                    "GET",
-                    false,
-                    &[
-                        "planType",
-                        "productType",
-                        "orderId",
-                        "clientOid",
-                        "symbol",
-                        "idLessThan",
-                        "startTime",
-                        "endTime",
-                        "limit",
-                    ],
-                    &["planType", "productType"],
-                    &[],
-                    &[],
-                ),
-                "get_futures_plan_order_history" => (
-                    "/api/v2/mix/order/orders-plan-history",
-                    "GET",
-                    false,
-                    &[
-                        "planType",
-                        "productType",
-                        "orderId",
-                        "clientOid",
-                        "planStatus",
-                        "symbol",
-                        "idLessThan",
-                        "startTime",
-                        "endTime",
-                        "limit",
-                    ],
-                    &["planType", "productType"],
-                    &[],
-                    &[],
-                ),
-                "place_spot_plan_order" => (
-                    "/api/v2/spot/trade/place-plan-order",
-                    "POST",
-                    false,
-                    &[
-                        "symbol",
-                        "side",
-                        "triggerPrice",
-                        "orderType",
-                        "size",
-                        "triggerType",
-                        "executePrice",
-                        "planType",
-                        "clientOid",
-                        "stpMode",
-                    ],
-                    &[
-                        "symbol",
-                        "side",
-                        "triggerPrice",
-                        "orderType",
-                        "size",
-                        "triggerType",
-                    ],
-                    &[],
-                    &[],
-                ),
-                "modify_spot_plan_order" => (
-                    "/api/v2/spot/trade/modify-plan-order",
-                    "POST",
-                    false,
-                    &[
-                        "triggerPrice",
-                        "orderType",
-                        "size",
-                        "orderId",
-                        "clientOid",
-                        "executePrice",
-                    ],
-                    &["triggerPrice", "orderType", "size"],
-                    &[],
-                    &[],
-                ),
-                "cancel_spot_plan_order" => (
-                    "/api/v2/spot/trade/cancel-plan-order",
-                    "POST",
-                    false,
-                    &["orderId", "clientOid"],
-                    &[],
-                    &[],
-                    &[],
-                ),
-                "cancel_spot_plan_orders" => (
-                    "/api/v2/spot/trade/batch-cancel-plan-order",
-                    "POST",
-                    false,
-                    &["symbolList"],
-                    &[],
-                    &["symbolList"],
-                    &[],
-                ),
-                "get_pending_spot_plan_orders" => (
-                    "/api/v2/spot/trade/current-plan-order",
-                    "GET",
-                    false,
-                    &["symbol", "limit", "idLessThan", "startTime", "endTime"],
-                    &[],
-                    &[],
-                    &[],
-                ),
-                "get_spot_plan_order_history" => (
-                    "/api/v2/spot/trade/history-plan-order",
-                    "GET",
-                    false,
-                    &["symbol", "startTime", "endTime", "idLessThan", "limit"],
-                    &[],
-                    &[],
-                    &[],
-                ),
-                "get_spot_plan_sub_order" => (
-                    "/api/v2/spot/trade/plan-sub-order",
-                    "GET",
-                    false,
-                    &["planOrderId"],
-                    &["planOrderId"],
-                    &[],
-                    &[],
-                ),
-                "modify_futures_order" => (
-                    "/api/v2/mix/order/modify-order",
-                    "POST",
-                    false,
-                    &[
-                        "symbol",
-                        "productType",
-                        "newClientOid",
-                        "orderId",
-                        "clientOid",
-                        "newSize",
-                        "newPrice",
-                        "newPresetStopSurplusPrice",
-                        "newPresetStopLossPrice",
-                    ],
-                    &["symbol", "productType", "newClientOid"],
-                    &[],
-                    &[],
-                ),
-                "close_futures_positions" => (
-                    "/api/v2/mix/order/close-positions",
-                    "POST",
-                    false,
-                    &["productType", "symbol", "holdSide"],
-                    &["productType"],
-                    &[],
-                    &[],
-                ),
-                "cancel_all_futures_orders" => (
-                    "/api/v2/mix/order/cancel-all-orders",
-                    "POST",
-                    false,
-                    &["productType", "marginCoin", "requestTime", "receiveWindow"],
-                    &["productType"],
-                    &[],
-                    &[],
-                ),
-                "cancel_spot_orders_by_symbol" => (
-                    "/api/v2/spot/trade/cancel-symbol-order",
-                    "POST",
-                    false,
-                    &["symbol"],
-                    &["symbol"],
-                    &[],
-                    &[],
-                ),
-                "cancel_replace_spot_order" => (
-                    "/api/v2/spot/trade/cancel-replace-order",
-                    "POST",
-                    false,
-                    &[
-                        "symbol",
-                        "price",
-                        "size",
-                        "clientOid",
-                        "orderId",
-                        "newClientOid",
-                        "presetTakeProfitPrice",
-                        "executeTakeProfitPrice",
-                        "presetStopLossPrice",
-                        "executeStopLossPrice",
-                    ],
-                    &["symbol", "price", "size"],
-                    &[],
-                    &[],
-                ),
-                "adjust_futures_position_margin" => (
-                    "/api/v2/mix/account/set-margin",
-                    "POST",
-                    false,
-                    &["symbol", "productType", "marginCoin", "holdSide", "amount"],
-                    &["symbol", "productType", "marginCoin", "holdSide", "amount"],
-                    &[],
-                    &[],
-                ),
                 "get_futures_symbol_price" => (
                     "/api/v2/mix/market/symbol-price",
                     "GET",
@@ -531,8 +158,6 @@ impl BitgetClient {
                     .get("symbol")
                     .or_else(|| params.get("product_symbol"))
                     .ok_or_else(|| invalid("product_symbol or symbol is required"))?;
-            } else if name == "modify_futures_tpsl_order" && *key == "size" {
-                params.required(key)?;
             } else {
                 nonempty(params, key)?;
             }
@@ -540,9 +165,15 @@ impl BitgetClient {
         validate(name, params)?;
         if method == "GET" {
             let mut query = params.only(fields);
-            if let Some(symbol) = params.get("product_symbol") {
+            if let Some(symbol) = params.get("product_symbol").or(params.get("symbol")) {
                 query.retain(|(key, _)| key != "symbol");
-                query.push(("symbol".into(), self.exchange_symbol(symbol)?));
+                query.push((
+                    "symbol".into(),
+                    self.exchange_symbol_category(
+                        symbol,
+                        params.get("category").or(params.get("productType")),
+                    )?,
+                ));
             }
             return Ok(Some(if public {
                 self.public_get(path, query).await?
@@ -551,10 +182,13 @@ impl BitgetClient {
             }));
         }
         let mut body = params.body(fields);
-        if let Some(symbol) = params.get("product_symbol") {
+        if let Some(symbol) = params.get("product_symbol").or(params.get("symbol")) {
             body.insert(
                 "symbol".into(),
-                Value::String(self.exchange_symbol(symbol)?),
+                Value::String(self.exchange_symbol_category(
+                    symbol,
+                    params.get("category").or(params.get("productType")),
+                )?),
             );
         }
         for key in arrays {
@@ -574,7 +208,10 @@ impl BitgetClient {
                             .as_str()
                             .filter(|s| !s.trim().is_empty())
                             .ok_or_else(|| invalid("symbolList requires nonempty strings"))?;
-                        symbols.push(Value::String(self.exchange_symbol(symbol)?));
+                        symbols.push(Value::String(self.exchange_symbol_category(
+                            symbol,
+                            params.get("category").or(params.get("productType")),
+                        )?));
                     }
                     body.insert((*key).into(), Value::Array(symbols));
                 } else {
@@ -745,23 +382,8 @@ pub(super) fn validate(name: &str, params: &BitgetParams) -> Result<()> {
             return Err(invalid("invalid query time range"));
         }
     }
-    // https://www.bitget.com/docs/catalog/classic-contract-trade/classic-contract-trade#modify-order
-    if name == "modify_futures_order"
-        && params.get("newSize").is_some() != params.get("newPrice").is_some()
-    {
-        return Err(invalid("newSize and newPrice must be supplied together"));
-    }
-    match name {
-        "modify_futures_order"
-        | "modify_futures_plan_order"
-        | "modify_futures_tpsl_order"
-        | "modify_spot_plan_order"
-        | "cancel_spot_plan_order"
-        | "cancel_replace_spot_order"
-        | "modify_uta_order" => {
-            id(params)?;
-        }
-        _ => {}
+    if name == "modify_uta_order" {
+        id(params)?;
     }
     if [
         "close_uta_positions",
@@ -788,97 +410,12 @@ pub(super) fn validate(name: &str, params: &BitgetParams) -> Result<()> {
                 return Err(invalid("countdown must be 0 or 5..=60 seconds"));
             }
         }
-        "adjust_futures_position_margin" => {
-            if !params
-                .required("amount")?
-                .parse::<f64>()
-                .is_ok_and(|v| v.is_finite() && v != 0.0)
-            {
-                return Err(invalid("amount must be a nonzero signed margin amount"));
-            }
-            enum_value(params, "holdSide", &["long", "short"])?;
-        }
+
         "adjust_uta_position_margin" => {
             enum_value(params, "operation", &["add", "remove"])?;
             positive(params, "amount", false)?;
         }
-        "place_futures_plan_order" => {
-            enum_value(params, "planType", &["normal_plan", "track_plan"])?;
-            if params.get("planType") == Some("track_plan") {
-                if params.get("orderType") != Some("market")
-                    || params.get("price").is_some_and(|v| !v.is_empty())
-                {
-                    return Err(invalid("trailing plan requires market order and no price"));
-                }
-                params.required("callbackRatio")?;
-            } else if params.get("orderType") == Some("limit") {
-                nonempty(params, "price")?;
-            } else if params.get("price").is_some_and(|v| !v.is_empty()) {
-                return Err(invalid("market plan must not include price"));
-            }
-            for prefix in ["stopSurplus", "stopLoss"] {
-                let key = format!("{prefix}TriggerPrice");
-                if params.get(&key).is_some_and(|v| !v.is_empty() && v != "0") {
-                    let trigger = format!("{prefix}TriggerType");
-                    params.required(&trigger)?;
-                    if params.get("planType") == Some("track_plan") {
-                        enum_value(params, &trigger, &["fill_price"])?;
-                        let value = params
-                            .required(&key)?
-                            .parse::<f64>()
-                            .map_err(|_| invalid("invalid trailing TP/SL percentage"))?;
-                        if !(0.01..=999.99).contains(&value) {
-                            return Err(invalid("trailing TP/SL percentage must be 0.01..=999.99"));
-                        }
-                    }
-                }
-                if params.get("planType") == Some("track_plan")
-                    && params
-                        .get(&format!("{prefix}ExecutePrice"))
-                        .is_some_and(|v| !v.is_empty())
-                {
-                    return Err(invalid(
-                        "trailing plans must not include TP/SL execute prices",
-                    ));
-                }
-            }
-        }
-        "place_futures_tpsl_order" => {
-            enum_value(
-                params,
-                "planType",
-                &[
-                    "profit_plan",
-                    "loss_plan",
-                    "moving_plan",
-                    "pos_profit",
-                    "pos_loss",
-                ],
-            )?;
-            if ["profit_plan", "loss_plan", "moving_plan"].contains(&params.required("planType")?) {
-                nonempty(params, "size")?;
-            }
-            if params.get("planType") == Some("moving_plan") {
-                params.required("rangeRate")?;
-                if params.get("executePrice").is_some_and(|v| !v.is_empty()) {
-                    return Err(invalid("moving_plan uses market execution only"));
-                }
-            }
-        }
-        "place_futures_position_tpsl" => {
-            if params.get("stopSurplusTriggerPrice").is_none()
-                && params.get("stopLossTriggerPrice").is_none()
-            {
-                return Err(invalid("a TP or SL trigger is required"));
-            }
-        }
-        "place_spot_plan_order" | "modify_spot_plan_order" => {
-            enum_value(params, "planType", &["amount", "total"])?;
-            if params.get("orderType") == Some("limit") {
-                nonempty(params, "executePrice")?;
-                positive(params, "executePrice", false)?;
-            }
-        }
+
         "get_uta_current_funding_rate" => {
             if params.get("category").is_none()
                 && params

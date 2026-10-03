@@ -210,43 +210,11 @@
       ]
     }
   },
-  "bitget/adjust_futures_position_margin": {
-    "marginCoin": {
-      "reason": "margin settlement currency",
-      "values": [
-        "USDT"
-      ]
-    }
-  },
   "bitget/adjust_uta_position_margin": {
     "operation": {
       "reason": "operation kind selector",
       "values": [
         "add"
-      ]
-    }
-  },
-  "bitget/cancel_futures_batch_orders": {
-    "marginCoin": {
-      "reason": "margin settlement currency",
-      "values": [
-        "USDT"
-      ]
-    }
-  },
-  "bitget/cancel_futures_order": {
-    "marginCoin": {
-      "reason": "margin settlement currency",
-      "values": [
-        "USDT"
-      ]
-    }
-  },
-  "bitget/get_futures_account": {
-    "marginCoin": {
-      "reason": "margin settlement currency",
-      "values": [
-        "USDT"
       ]
     }
   },
@@ -266,233 +234,11 @@
       ]
     }
   },
-  "bitget/get_futures_max_open_quantity": {
-    "marginCoin": {
-      "reason": "margin settlement currency",
-      "values": [
-        "USDT"
-      ]
-    }
-  },
-  "bitget/get_futures_position": {
-    "marginCoin": {
-      "reason": "margin settlement currency",
-      "values": [
-        "USDT"
-      ]
-    }
-  },
   "bitget/get_uta_pre_set_leverage": {
     "marginMode": {
       "reason": "margin mode selector",
       "values": [
         "crossed"
-      ]
-    }
-  },
-  "bitget/modify_futures_tpsl_order": {
-    "marginCoin": {
-      "reason": "margin settlement currency",
-      "values": [
-        "USDT"
-      ]
-    }
-  },
-  "bitget/place_futures_batch_orders": {
-    "marginMode": {
-      "reason": "margin mode selector",
-      "values": [
-        "crossed"
-      ]
-    },
-    "marginCoin": {
-      "reason": "margin settlement currency",
-      "values": [
-        "USDT"
-      ]
-    }
-  },
-  "bitget/place_futures_limit_buy_order": {
-    "marginMode": {
-      "reason": "margin mode selector",
-      "values": [
-        "crossed"
-      ]
-    },
-    "marginCoin": {
-      "reason": "margin settlement currency",
-      "values": [
-        "USDT"
-      ]
-    }
-  },
-  "bitget/place_futures_limit_order": {
-    "marginMode": {
-      "reason": "margin mode selector",
-      "values": [
-        "crossed"
-      ]
-    },
-    "marginCoin": {
-      "reason": "margin settlement currency",
-      "values": [
-        "USDT"
-      ]
-    }
-  },
-  "bitget/place_futures_limit_sell_order": {
-    "marginMode": {
-      "reason": "margin mode selector",
-      "values": [
-        "crossed"
-      ]
-    },
-    "marginCoin": {
-      "reason": "margin settlement currency",
-      "values": [
-        "USDT"
-      ]
-    }
-  },
-  "bitget/place_futures_market_buy_order": {
-    "marginMode": {
-      "reason": "margin mode selector",
-      "values": [
-        "crossed"
-      ]
-    },
-    "marginCoin": {
-      "reason": "margin settlement currency",
-      "values": [
-        "USDT"
-      ]
-    }
-  },
-  "bitget/place_futures_market_order": {
-    "marginMode": {
-      "reason": "margin mode selector",
-      "values": [
-        "crossed"
-      ]
-    },
-    "marginCoin": {
-      "reason": "margin settlement currency",
-      "values": [
-        "USDT"
-      ]
-    }
-  },
-  "bitget/place_futures_market_sell_order": {
-    "marginMode": {
-      "reason": "margin mode selector",
-      "values": [
-        "crossed"
-      ]
-    },
-    "marginCoin": {
-      "reason": "margin settlement currency",
-      "values": [
-        "USDT"
-      ]
-    }
-  },
-  "bitget/place_futures_order": {
-    "marginMode": {
-      "reason": "margin mode selector",
-      "values": [
-        "crossed"
-      ]
-    },
-    "marginCoin": {
-      "reason": "margin settlement currency",
-      "values": [
-        "USDT"
-      ]
-    }
-  },
-  "bitget/place_futures_plan_order": {
-    "marginMode": {
-      "reason": "margin mode selector",
-      "values": [
-        "isolated"
-      ]
-    },
-    "marginCoin": {
-      "reason": "margin settlement currency",
-      "values": [
-        "USDT"
-      ]
-    },
-    "triggerType": {
-      "reason": "trigger direction or reference selector",
-      "values": [
-        "mark_price"
-      ]
-    }
-  },
-  "bitget/place_futures_position_tpsl": {
-    "marginCoin": {
-      "reason": "margin settlement currency",
-      "values": [
-        "USDT"
-      ]
-    }
-  },
-  "bitget/place_futures_post_only_limit_buy_order": {
-    "marginMode": {
-      "reason": "margin mode selector",
-      "values": [
-        "crossed"
-      ]
-    },
-    "marginCoin": {
-      "reason": "margin settlement currency",
-      "values": [
-        "USDT"
-      ]
-    }
-  },
-  "bitget/place_futures_post_only_limit_order": {
-    "marginMode": {
-      "reason": "margin mode selector",
-      "values": [
-        "crossed"
-      ]
-    },
-    "marginCoin": {
-      "reason": "margin settlement currency",
-      "values": [
-        "USDT"
-      ]
-    }
-  },
-  "bitget/place_futures_post_only_limit_sell_order": {
-    "marginMode": {
-      "reason": "margin mode selector",
-      "values": [
-        "crossed"
-      ]
-    },
-    "marginCoin": {
-      "reason": "margin settlement currency",
-      "values": [
-        "USDT"
-      ]
-    }
-  },
-  "bitget/place_futures_tpsl_order": {
-    "marginCoin": {
-      "reason": "margin settlement currency",
-      "values": [
-        "USDT"
-      ]
-    }
-  },
-  "bitget/place_spot_plan_order": {
-    "triggerType": {
-      "reason": "trigger direction or reference selector",
-      "values": [
-        "fill_price"
       ]
     }
   },
@@ -511,14 +257,6 @@
         "on"
       ]
     },
-    "marginCoin": {
-      "reason": "margin settlement currency",
-      "values": [
-        "USDT"
-      ]
-    }
-  },
-  "bitget/set_futures_leverage": {
     "marginCoin": {
       "reason": "margin settlement currency",
       "values": [

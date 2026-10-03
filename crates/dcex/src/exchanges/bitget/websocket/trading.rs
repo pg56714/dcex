@@ -256,74 +256,6 @@ pub(super) fn uta(
     Ok(payload)
 }
 
-pub(super) fn classic(
-    id: &str,
-    inst_type: &str,
-    inst_id: &str,
-    channel: &str,
-    params: Value,
-) -> Result<Value> {
-    identifier(id, 40)?;
-    if !["SPOT", "USDT-FUTURES", "COIN-FUTURES", "USDC-FUTURES"].contains(&inst_type)
-        || inst_id.trim().is_empty()
-    {
-        return Err(invalid("invalid instrument type or symbol"));
-    }
-    let arg = params
-        .as_object()
-        .ok_or_else(|| invalid("params must be an object"))?;
-    match channel {
-        "place-order" => {
-            let allowed = if inst_type == "SPOT" {
-                &[
-                    "orderType",
-                    "side",
-                    "size",
-                    "force",
-                    "price",
-                    "clientOid",
-                    "stpMode",
-                ][..]
-            } else {
-                &[
-                    "orderType",
-                    "side",
-                    "size",
-                    "force",
-                    "price",
-                    "clientOid",
-                    "stpMode",
-                    "marginCoin",
-                    "marginMode",
-                    "tradeSide",
-                    "reduceOnly",
-                    "presetStopSurplusPrice",
-                    "presetStopLossPrice",
-                ][..]
-            };
-            fields(arg, allowed)?;
-            for key in ["orderType", "side", "size", "force"] {
-                required(arg, key)?;
-            }
-            if arg.get("orderType").and_then(Value::as_str) == Some("limit") {
-                required(arg, "price")?;
-            }
-            if inst_type != "SPOT" {
-                required(arg, "marginCoin")?;
-                required(arg, "marginMode")?;
-            }
-        }
-        "cancel-order" => {
-            fields(arg, CANCEL)?;
-            order_id(arg)?;
-        }
-        _ => return Err(invalid("unsupported classic trading channel")),
-    }
-    Ok(
-        json!({"op":"trade","args":[{"id":id,"instType":inst_type,"instId":inst_id,"channel":channel,"params":params}]}),
-    )
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -335,7 +267,7 @@ mod tests {
         assert!(identifier("Aa09._:/-", 64).is_ok());
     }
     #[test]
-    fn uta_and_classic_have_distinct_wire_envelopes() {
+    fn uta_has_documented_wire_envelope() {
         let order = json!({"symbol":"BTCUSDT","orderType":"limit","qty":"0.001","side":"buy","price":"123.4500","receiveWindow":"5000"});
         assert_eq!(
             uta(
@@ -347,11 +279,6 @@ mod tests {
             )
             .unwrap(),
             json!({"op":"trade","id":"id","topic":"place-order","category":"spot","requestTime":"123","args":[order]})
-        );
-        let cancel = json!({"clientOid":"client-1"});
-        assert_eq!(
-            classic("id", "SPOT", "BTCUSDT", "cancel-order", cancel.clone()).unwrap(),
-            json!({"op":"trade","args":[{"id":"id","instType":"SPOT","instId":"BTCUSDT","channel":"cancel-order","params":cancel}]})
         );
     }
     #[test]

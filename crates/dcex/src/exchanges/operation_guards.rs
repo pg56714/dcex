@@ -9,8 +9,7 @@ pub(super) fn validate(
     let confirmed = match exchange {
         "bitget" => matches!(
             method,
-            "upgrade_to_uta"
-                | "upgrade_classic_account"
+            "switch_to_classic_account"
                 | "delete_uta_subaccount"
                 | "set_uta_account_mode"
                 | "set_futures_asset_mode"
@@ -33,10 +32,7 @@ pub(super) fn validate(
     let scoped = match exchange {
         "bitget" => matches!(
             method,
-            "close_futures_positions"
-                | "close_uta_positions"
-                | "cancel_futures_plan_orders"
-                | "cancel_spot_plan_orders"
+            "close_uta_positions"
                 | "close_copy_futures_follower_positions"
                 | "close_copy_futures_trader_positions"
         ),
@@ -136,12 +132,6 @@ mod tests {
             ("kucoin", "cancel_spot_stop_orders", "orderIds", "123,456"),
             ("kucoin", "cancel_spot_oco_orders", "orderIds", "123,456"),
             ("kucoin", "cancel_margin_oco_orders", "orderIds", "123,456"),
-            (
-                "bitget",
-                "cancel_futures_plan_orders",
-                "orderIdList",
-                r#"[{"orderId":"123"}]"#,
-            ),
         ] {
             for scope in [
                 vec![(key.into(), ids.into())],
@@ -188,22 +178,7 @@ mod tests {
     }
 
     #[test]
-    fn an_empty_symbol_list_does_not_authorize_account_wide_cancellation() {
-        for value in ["[]", "[\"\"]", "[\"   \"]", "null"] {
-            assert!(
-                validate(
-                    "bitget",
-                    "cancel_spot_plan_orders",
-                    vec![("symbolList".into(), value.into())]
-                )
-                .is_err()
-            );
-        }
-        let params = vec![("symbolList".into(), "[\"BTCUSDT\"]".into())];
-        assert_eq!(
-            validate("bitget", "cancel_spot_plan_orders", params.clone()).unwrap(),
-            params
-        );
+    fn vault_redemption_requires_explicit_all_flag() {
         assert!(validate("backpack", "vault_redeem", vec![]).is_err());
         assert!(
             validate(

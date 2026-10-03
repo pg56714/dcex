@@ -1,0 +1,989 @@
+{
+  "captured": "2026-10-02",
+  "audit_notes": [
+    {
+      "exchange": "backpack",
+      "market": "IPERP / DATED",
+      "source": "https://api.backpack.exchange/api/v1/markets?marketType=DATED",
+      "result": "Both explicit public filters returned no listings. No invented fixture; canonical names require the product table. Prediction symbols use the public listing identifier."
+    },
+    {
+      "exchange": "binance",
+      "market": "equity",
+      "source": "https://developers.binance.com/en/docs/catalog/advanced-trading-stocks-trading/api/rest-api/market-data",
+      "result": "The instrument endpoint requires an API key. No authenticated request made; the official AAPL symbol is covered by the existing equity tests."
+    },
+    {
+      "exchange": "ondo",
+      "market": "spot / perpetual",
+      "source": "https://docs.ondoperps.xyz/api-reference/market-data/get-symbol-info-tradingview",
+      "result": "Public API DNS and official documentation unavailable during this audit. Existing documented native naming tests retained; no newly guessed mapping. Spot remains public market data only."
+    },
+    {
+      "exchange": "arcus",
+      "market": "spot",
+      "source": "https://api.arcus.xyz/v1/spotAssets",
+      "result": "Spot RFQs take explicit asset IDs; no canonical product-symbol fallback. Asset identifiers must come from the public asset list."
+    },
+    {
+      "exchange": "bingx",
+      "market": "coin-margined swap",
+      "source": "https://open-api.bingx.com/openApi/cswap/v1/market/contracts",
+      "result": "Public endpoint returned an HTTP error during capture. Canonical swap aliases require metadata; native BTC-USD is covered by existing documented route/WS tests. No new guessed rule."
+    }
+  ],
+  "cases": [
+    {
+      "exchange": "aster",
+      "source": "https://sapi.asterdex.com/api/v1/exchangeInfo",
+      "sample": {
+        "status": "TRADING",
+        "baseAsset": "BTC",
+        "quoteAsset": "USDT",
+        "symbol": "BTCUSDT"
+      },
+      "input": "BTC-USDT-SPOT",
+      "native": "BTCUSDT",
+      "mode": "spot",
+      "requires_table": false
+    },
+    {
+      "exchange": "aster",
+      "source": "https://fapi.asterdex.com/fapi/v1/exchangeInfo",
+      "sample": {
+        "symbol": "BTCUSDT",
+        "pair": "BTCUSDT",
+        "contractType": "PERPETUAL",
+        "deliveryDate": 4133404800000,
+        "status": "TRADING",
+        "baseAsset": "BTC",
+        "quoteAsset": "USDT",
+        "name": ""
+      },
+      "input": "BTC-USDT-SWAP",
+      "native": "BTCUSDT",
+      "mode": "swap",
+      "requires_table": false
+    },
+    {
+      "exchange": "binance",
+      "source": "https://api.binance.com/api/v3/exchangeInfo",
+      "sample": {
+        "symbol": "BTCUSDT",
+        "status": "TRADING",
+        "baseAsset": "BTC",
+        "quoteAsset": "USDT"
+      },
+      "input": "BTC-USDT-SPOT",
+      "native": "BTCUSDT",
+      "mode": "spot",
+      "requires_table": false
+    },
+    {
+      "exchange": "binance",
+      "source": "https://fapi.binance.com/fapi/v1/exchangeInfo",
+      "sample": {
+        "symbol": "BTCUSDT",
+        "pair": "BTCUSDT",
+        "contractType": "PERPETUAL",
+        "deliveryDate": 4133404800000,
+        "status": "TRADING",
+        "baseAsset": "BTC",
+        "quoteAsset": "USDT"
+      },
+      "input": "BTC-USDT-SWAP",
+      "native": "BTCUSDT",
+      "mode": "swap",
+      "requires_table": false
+    },
+    {
+      "exchange": "mexc",
+      "source": "https://api.mexc.com/api/v3/exchangeInfo",
+      "sample": {
+        "symbol": "BTCUSDT",
+        "status": "1",
+        "baseAsset": "BTC",
+        "quoteAsset": "USDT"
+      },
+      "input": "BTC-USDT-SPOT",
+      "native": "BTCUSDT",
+      "mode": "spot",
+      "requires_table": false
+    },
+    {
+      "exchange": "mexc",
+      "source": "https://contract.mexc.com/api/v1/contract/detail",
+      "sample": {
+        "symbol": "BTC_USDT",
+        "baseCoin": "BTC",
+        "quoteCoin": "USDT",
+        "baseCoinName": "BTC",
+        "quoteCoinName": "USDT",
+        "contractSize": 0.0001
+      },
+      "input": "BTC-USDT-SWAP",
+      "native": "BTC_USDT",
+      "mode": "swap",
+      "requires_table": true
+    },
+    {
+      "exchange": "mexc",
+      "source": "https://contract.mexc.com/api/v1/contract/detail",
+      "sample": {
+        "symbol": "NVIDIA_USDT",
+        "baseCoin": "NVIDIA",
+        "quoteCoin": "USDT",
+        "baseCoinName": "NVDA",
+        "quoteCoinName": "USDT",
+        "contractSize": 0.01
+      },
+      "input": "NVDA-USDT-SWAP",
+      "native": "NVIDIA_USDT",
+      "mode": "swap",
+      "requires_table": true
+    },
+    {
+      "exchange": "binance",
+      "source": "https://dapi.binance.com/dapi/v1/exchangeInfo",
+      "sample": {
+        "symbol": "BTCUSD_PERP",
+        "pair": "BTCUSD",
+        "contractType": "PERPETUAL",
+        "deliveryDate": 4133404800000,
+        "baseAsset": "BTC",
+        "quoteAsset": "USD",
+        "contractSize": 100
+      },
+      "input": "BTC-USD-SWAP",
+      "native": "BTCUSD_PERP",
+      "mode": "coinm",
+      "requires_table": true
+    },
+    {
+      "exchange": "bybit",
+      "source": "https://api.bybit.com/v5/market/instruments-info?category=spot&limit=1000",
+      "sample": {
+        "symbol": "BTCUSDT",
+        "baseCoin": "BTC",
+        "quoteCoin": "USDT",
+        "status": "Trading"
+      },
+      "input": "BTC-USDT-SPOT",
+      "native": "BTCUSDT",
+      "mode": "spot",
+      "requires_table": false
+    },
+    {
+      "exchange": "bybit",
+      "source": "https://api.bybit.com/v5/market/instruments-info?category=linear&limit=1000",
+      "sample": {
+        "symbol": "BTCUSDT",
+        "contractType": "LinearPerpetual",
+        "status": "Trading",
+        "baseCoin": "BTC",
+        "quoteCoin": "USDT",
+        "deliveryTime": "0",
+        "displayName": "BTCUSDT"
+      },
+      "input": "BTC-USDT-SWAP",
+      "native": "BTCUSDT",
+      "mode": "linear",
+      "requires_table": false
+    },
+    {
+      "exchange": "bybit",
+      "source": "https://api.bybit.com/v5/market/instruments-info?category=linear&limit=1000",
+      "sample": {
+        "symbol": "BTCPERP",
+        "contractType": "LinearPerpetual",
+        "status": "Trading",
+        "baseCoin": "BTC",
+        "quoteCoin": "USDC",
+        "deliveryTime": "0",
+        "displayName": "BTCUSDC"
+      },
+      "input": "BTC-USDC-SWAP",
+      "native": "BTCPERP",
+      "mode": "usdc",
+      "requires_table": false
+    },
+    {
+      "exchange": "bitget",
+      "source": "https://api.bitget.com/api/v3/market/instruments?category=SPOT",
+      "sample": {
+        "symbol": "BTCUSDT",
+        "baseCoin": "BTC",
+        "quoteCoin": "USDT",
+        "status": "online"
+      },
+      "input": "BTC-USDT-SPOT",
+      "native": "BTCUSDT",
+      "mode": "spot",
+      "requires_table": false
+    },
+    {
+      "exchange": "bitget",
+      "source": "https://api.bitget.com/api/v3/market/instruments?category=USDT-FUTURES",
+      "sample": {
+        "symbol": "BTCUSDT",
+        "baseCoin": "BTC",
+        "quoteCoin": "USDT",
+        "type": "perpetual",
+        "status": "online",
+        "deliveryTime": ""
+      },
+      "input": "BTC-USDT-SWAP",
+      "native": "BTCUSDT",
+      "mode": "linear",
+      "requires_table": false
+    },
+    {
+      "exchange": "bitget",
+      "source": "https://api.bitget.com/api/v3/market/instruments?category=USDC-FUTURES",
+      "sample": {
+        "symbol": "BTCPERP",
+        "baseCoin": "BTC",
+        "quoteCoin": "USDC",
+        "type": "perpetual",
+        "status": "online",
+        "deliveryTime": ""
+      },
+      "input": "BTC-USDC-SWAP",
+      "native": "BTCPERP",
+      "mode": "usdc",
+      "requires_table": false
+    },
+    {
+      "exchange": "bybit",
+      "source": "https://api.bybit.com/v5/market/instruments-info?category=inverse&limit=1000",
+      "sample": {
+        "symbol": "BTCUSD",
+        "contractType": "InversePerpetual",
+        "status": "Trading",
+        "baseCoin": "BTC",
+        "quoteCoin": "USD",
+        "deliveryTime": "0",
+        "displayName": "BTCUSD"
+      },
+      "input": "BTC-USD-SWAP",
+      "native": "BTCUSD",
+      "mode": "inverse",
+      "requires_table": false
+    },
+    {
+      "exchange": "bitget",
+      "source": "https://api.bitget.com/api/v3/market/instruments?category=COIN-FUTURES",
+      "sample": {
+        "symbol": "BTCUSD_CM",
+        "baseCoin": "BTC",
+        "quoteCoin": "USD",
+        "type": "perpetual",
+        "status": "online",
+        "deliveryTime": ""
+      },
+      "input": "BTC-USD-SWAP",
+      "native": "BTCUSD_CM",
+      "mode": "inverse",
+      "requires_table": false
+    },
+    {
+      "exchange": "bitget",
+      "source": "https://api.bitget.com/api/v3/market/instruments?category=COIN-FUTURES",
+      "sample": {
+        "symbol": "BTCCMZ26",
+        "baseCoin": "BTC",
+        "quoteCoin": "USD",
+        "type": "delivery",
+        "status": "online",
+        "deliveryTime": "1798185600000"
+      },
+      "input": "BTC-USD-BTCCMZ26-FUTURES",
+      "native": "BTCCMZ26",
+      "mode": "delivery",
+      "requires_table": true
+    },
+    {
+      "exchange": "bybit",
+      "source": "https://api.bybit.com/v5/market/instruments-info?category=linear&limit=1000",
+      "sample": {
+        "symbol": "BTCUSDT-09OCT26",
+        "contractType": "LinearFutures",
+        "status": "Trading",
+        "baseCoin": "BTC",
+        "quoteCoin": "USDT",
+        "deliveryTime": "1791532800000",
+        "displayName": "BTCUSDT-09OCT26"
+      },
+      "input": "BTC-USDT-09OCT26-SWAP",
+      "native": "BTCUSDT-09OCT26",
+      "mode": "delivery",
+      "requires_table": true
+    },
+    {
+      "exchange": "backpack",
+      "source": "https://api.backpack.exchange/api/v1/markets",
+      "sample": {
+        "baseSymbol": "BTC",
+        "marketType": "SPOT",
+        "quoteSymbol": "USDC",
+        "symbol": "BTC_USDC"
+      },
+      "input": "BTC-USDC-SPOT",
+      "native": "BTC_USDC",
+      "mode": "spot",
+      "requires_table": false
+    },
+    {
+      "exchange": "backpack",
+      "source": "https://api.backpack.exchange/api/v1/markets",
+      "sample": {
+        "baseSymbol": "BTC",
+        "marketType": "PERP",
+        "quoteSymbol": "USDC",
+        "symbol": "BTC_USDC_PERP"
+      },
+      "input": "BTC-USDC-SWAP",
+      "native": "BTC_USDC_PERP",
+      "mode": "swap",
+      "requires_table": false
+    },
+    {
+      "exchange": "backpack",
+      "source": "https://api.backpack.exchange/api/v1/markets?marketType=PREDICTION",
+      "sample": {
+        "baseSymbol": "FOMC0126H0",
+        "marketType": "PREDICTION",
+        "quoteSymbol": "USDC",
+        "symbol": "FOMC0126H0_USDC_PREDICTION"
+      },
+      "input": "FOMC0126H0-USDC-PREDICTION",
+      "native": "FOMC0126H0_USDC_PREDICTION",
+      "mode": "prediction",
+      "requires_table": true
+    },
+    {
+      "exchange": "backpack",
+      "source": "https://api.backpack.exchange/api/v1/securities",
+      "sample": {
+        "asset": "AAPL.US",
+        "name": "Apple Inc."
+      },
+      "input": "AAPL.US-USDC-RFQ",
+      "native": "AAPL.US_USDC_RFQ",
+      "mode": "rfq",
+      "requires_table": false
+    },
+    {
+      "exchange": "bingx",
+      "source": "https://open-api.bingx.com/openApi/spot/v1/common/symbols",
+      "sample": {
+        "symbol": "BTC-USDT",
+        "status": 1,
+        "tickSize": 0.01,
+        "displayName": "BTC-USDT"
+      },
+      "input": "BTC-USDT-SPOT",
+      "native": "BTC-USDT",
+      "mode": "spot",
+      "requires_table": false
+    },
+    {
+      "exchange": "bingx",
+      "source": "https://open-api.bingx.com/openApi/swap/v2/quote/contracts",
+      "sample": {
+        "symbol": "BTC-USDT",
+        "status": 1,
+        "displayName": "BTC-USDT"
+      },
+      "input": "BTC-USDT-SWAP",
+      "native": "BTC-USDT",
+      "mode": "swap",
+      "requires_table": true
+    },
+    {
+      "exchange": "bingx",
+      "source": "https://open-api.bingx.com/openApi/swap/v2/quote/contracts",
+      "sample": {
+        "symbol": "NEIROCTO-USDT",
+        "status": 1,
+        "displayName": "NEIRO-USDT"
+      },
+      "input": "NEIRO-USDT-SWAP",
+      "native": "NEIROCTO-USDT",
+      "mode": "swap",
+      "requires_table": true
+    },
+    {
+      "exchange": "bingx",
+      "source": "https://open-api.bingx.com/openApi/swap/v2/quote/contracts",
+      "sample": {
+        "symbol": "TRUMPSOL-USDT",
+        "status": 1,
+        "displayName": "TRUMP-USDT"
+      },
+      "input": "TRUMP-USDT-SWAP",
+      "native": "TRUMPSOL-USDT",
+      "mode": "swap",
+      "requires_table": true
+    },
+    {
+      "exchange": "extended",
+      "source": "https://api.starknet.extended.exchange/api/v1/info/markets",
+      "sample": {
+        "name": "BTCSPOT-USD",
+        "type": "SPOT",
+        "uiName": "wBTC/USDC",
+        "status": "ACTIVE"
+      },
+      "input": "BTC-USD-SPOT",
+      "native": "BTCSPOT-USD",
+      "mode": "spot",
+      "requires_table": false
+    },
+    {
+      "exchange": "extended",
+      "source": "https://api.starknet.extended.exchange/api/v1/info/markets",
+      "sample": {
+        "name": "ETHSPOT-USD",
+        "type": "SPOT",
+        "uiName": "ETH/USDC",
+        "status": "ACTIVE"
+      },
+      "input": "ETH-USD-SPOT",
+      "native": "ETHSPOT-USD",
+      "mode": "spot",
+      "requires_table": false
+    },
+    {
+      "exchange": "extended",
+      "source": "https://api.starknet.extended.exchange/api/v1/info/markets",
+      "sample": {
+        "name": "USDTSPOT-USD",
+        "type": "SPOT",
+        "uiName": "USDT/USDC",
+        "status": "ACTIVE"
+      },
+      "input": "USDT-USD-SPOT",
+      "native": "USDTSPOT-USD",
+      "mode": "spot",
+      "requires_table": false
+    },
+    {
+      "exchange": "extended",
+      "source": "https://api.starknet.extended.exchange/api/v1/info/markets",
+      "sample": {
+        "name": "BTC-USD",
+        "type": "PERPETUAL",
+        "uiName": "BTC-USD",
+        "status": "ACTIVE"
+      },
+      "input": "BTC-USD-SWAP",
+      "native": "BTC-USD",
+      "mode": "swap",
+      "requires_table": true
+    },
+    {
+      "exchange": "extended",
+      "source": "https://api.starknet.extended.exchange/api/v1/info/markets",
+      "sample": {
+        "name": "AAPL_24_5-USD",
+        "type": "PERPETUAL",
+        "uiName": "AAPL-USD",
+        "status": "ACTIVE"
+      },
+      "input": "AAPL-USD-SWAP",
+      "native": "AAPL_24_5-USD",
+      "mode": "swap",
+      "requires_table": true
+    },
+    {
+      "exchange": "kucoin",
+      "source": "https://api.kucoin.com/api/v2/symbols",
+      "sample": {
+        "symbol": "BTC-USDT",
+        "name": "BTC-USDT",
+        "baseCurrency": "BTC",
+        "quoteCurrency": "USDT",
+        "minFunds": "0.1"
+      },
+      "input": "BTC-USDT-SPOT",
+      "native": "BTC-USDT",
+      "mode": "spot",
+      "requires_table": false
+    },
+    {
+      "exchange": "kucoin",
+      "source": "https://api-futures.kucoin.com/api/v1/contracts/active",
+      "sample": {
+        "symbol": "XBTUSDTM",
+        "type": "FFWCSX",
+        "expireDate": null,
+        "baseCurrency": "XBT",
+        "quoteCurrency": "USDT",
+        "lotSize": 1,
+        "tickSize": 0.1,
+        "multiplier": 0.001,
+        "status": "Open",
+        "marketStage": "NORMAL",
+        "marketType": "CRYPTO"
+      },
+      "input": "BTC-USDT-SWAP",
+      "native": "XBTUSDTM",
+      "mode": "swap",
+      "requires_table": false
+    },
+    {
+      "exchange": "kucoin",
+      "source": "https://api-futures.kucoin.com/api/v1/contracts/active",
+      "sample": {
+        "symbol": "XBTUSDM",
+        "type": "FFWCSX",
+        "expireDate": null,
+        "baseCurrency": "XBT",
+        "quoteCurrency": "USD",
+        "lotSize": 1,
+        "tickSize": 0.1,
+        "multiplier": -1.0,
+        "status": "Open",
+        "marketStage": "NORMAL",
+        "marketType": "CRYPTO"
+      },
+      "input": "BTC-USD-SWAP",
+      "native": "XBTUSDM",
+      "mode": "inverse",
+      "requires_table": false
+    },
+    {
+      "exchange": "kucoin",
+      "source": "https://api.kucoin.com/api/ua/v2/market/instrument?tradeType=SPOT",
+      "sample": {
+        "symbol": "BTC-USDT",
+        "name": "BTC-USDT",
+        "baseCurrency": "BTC",
+        "quoteCurrency": "USDT",
+        "baseOrderStep": "0.00000001",
+        "tickSize": "0.1",
+        "tradingStatus": "TradingEnabled",
+        "minFunds": "0.1"
+      },
+      "input": "BTC-USDT-SPOT",
+      "native": "BTC-USDT",
+      "mode": "spot",
+      "requires_table": false
+    },
+    {
+      "exchange": "kucoin",
+      "source": "https://api.kucoin.com/api/ua/v2/market/instrument?tradeType=FUTURES",
+      "sample": {
+        "baseCurrency": "XBT",
+        "name": "XBTUSDTM",
+        "expiryTime": null,
+        "quoteCurrency": "USDT",
+        "lotSize": "1",
+        "marketStage": "NORMAL",
+        "marketType": "CRYPTO",
+        "unitSize": "0.001",
+        "tradingStatus": "Open",
+        "symbol": "XBTUSDTM",
+        "tickSize": "0.1",
+        "contractType": "0"
+      },
+      "input": "BTC-USDT-SWAP",
+      "native": "XBTUSDTM",
+      "mode": "swap",
+      "requires_table": false
+    },
+    {
+      "exchange": "kucoin",
+      "source": "https://api.kucoin.com/api/ua/v2/market/instrument?tradeType=FUTURES",
+      "sample": {
+        "baseCurrency": "XBT",
+        "name": "XBTUSDM",
+        "expiryTime": null,
+        "quoteCurrency": "USD",
+        "lotSize": "1",
+        "marketStage": "NORMAL",
+        "marketType": "CRYPTO",
+        "unitSize": "1.0",
+        "tradingStatus": "Open",
+        "symbol": "XBTUSDM",
+        "tickSize": "0.1",
+        "contractType": "0"
+      },
+      "input": "BTC-USD-SWAP",
+      "native": "XBTUSDM",
+      "mode": "inverse",
+      "requires_table": false
+    },
+    {
+      "exchange": "kucoin",
+      "source": "https://api-futures.kucoin.com/api/v1/contracts/active",
+      "sample": {
+        "symbol": "XBTMZ26",
+        "type": "FFICSX",
+        "expireDate": 1798185600000,
+        "baseCurrency": "XBT",
+        "quoteCurrency": "USD",
+        "lotSize": 1,
+        "tickSize": 0.1,
+        "multiplier": -1.0,
+        "status": "Open",
+        "marketStage": "NORMAL",
+        "marketType": "CRYPTO"
+      },
+      "input": "BTC-USD-XBTMZ26-FUTURES",
+      "native": "XBTMZ26",
+      "mode": "delivery",
+      "requires_table": true
+    },
+    {
+      "exchange": "kraken",
+      "source": "https://api.kraken.com/0/public/AssetPairs",
+      "sample": {
+        "altname": "XBTUSD",
+        "wsname": "XBT/USD",
+        "aclass_base": "currency",
+        "base": "XXBT",
+        "quote": "ZUSD",
+        "status": "online"
+      },
+      "input": "BTC-USD-SPOT",
+      "native": "XBTUSD",
+      "mode": "spot",
+      "requires_table": false
+    },
+    {
+      "exchange": "kraken",
+      "source": "https://api.kraken.com/0/public/AssetPairs",
+      "sample": {
+        "altname": "XDGUSD",
+        "wsname": "XDG/USD",
+        "aclass_base": "currency",
+        "base": "XXDG",
+        "quote": "ZUSD",
+        "status": "online"
+      },
+      "input": "DOGE-USD-SPOT",
+      "native": "XDGUSD",
+      "mode": "spot",
+      "requires_table": false
+    },
+    {
+      "exchange": "kraken",
+      "source": "https://api.kraken.com/0/public/AssetPairs?aclass_base=tokenized_asset",
+      "sample": {
+        "altname": "AAPLxUSD",
+        "wsname": "AAPLx/USD",
+        "aclass_base": "tokenized_asset",
+        "base": "AAPLx",
+        "quote": "ZUSD",
+        "status": "online"
+      },
+      "input": "AAPLx-USD-SPOT",
+      "native": "AAPLxUSD",
+      "mode": "spot",
+      "requires_table": false
+    },
+    {
+      "exchange": "kraken",
+      "source": "https://futures.kraken.com/derivatives/api/v3/instruments",
+      "sample": {
+        "symbol": "PF_XBTUSD",
+        "type": "flexible_futures",
+        "tickSize": 1,
+        "contractSize": 1,
+        "base": "BTC",
+        "quote": "USD",
+        "pair": "BTC:USD"
+      },
+      "input": "BTC-USD-SWAP",
+      "native": "PF_XBTUSD",
+      "mode": "swap",
+      "requires_table": false
+    },
+    {
+      "exchange": "kraken",
+      "source": "https://futures.kraken.com/derivatives/api/v3/instruments",
+      "sample": {
+        "symbol": "PI_XBTUSD",
+        "type": "futures_inverse",
+        "tickSize": 0.5,
+        "contractSize": 1,
+        "base": "BTC",
+        "quote": "USD",
+        "pair": "BTC:USD"
+      },
+      "input": "BTC-USD-INVERSE-SWAP",
+      "native": "PI_XBTUSD",
+      "mode": "inverse",
+      "requires_table": true
+    },
+    {
+      "exchange": "okx",
+      "source": "https://www.okx.com/api/v5/public/instruments?instType=SPOT",
+      "sample": {
+        "baseCcy": "BTC",
+        "ctVal": "",
+        "ctValCcy": "",
+        "instFamily": "",
+        "instId": "BTC-PLN",
+        "instType": "SPOT",
+        "quoteCcy": "PLN",
+        "settleCcy": "",
+        "state": "live",
+        "uly": ""
+      },
+      "input": "BTC-PLN-SPOT",
+      "native": "BTC-PLN",
+      "mode": "spot",
+      "requires_table": false
+    },
+    {
+      "exchange": "okx",
+      "source": "https://www.okx.com/api/v5/public/instruments?instType=SWAP",
+      "sample": {
+        "baseCcy": "",
+        "ctVal": "100",
+        "ctValCcy": "USD",
+        "instFamily": "BTC-USD",
+        "instId": "BTC-USD-SWAP",
+        "instType": "SWAP",
+        "quoteCcy": "",
+        "settleCcy": "BTC",
+        "state": "live",
+        "uly": "BTC-USD"
+      },
+      "input": "BTC-USD-SWAP",
+      "native": "BTC-USD-SWAP",
+      "mode": "swap",
+      "requires_table": false
+    },
+    {
+      "exchange": "okx",
+      "source": "https://www.okx.com/api/v5/public/instruments?instType=FUTURES",
+      "sample": {
+        "baseCcy": "",
+        "ctVal": "100",
+        "ctValCcy": "USD",
+        "instFamily": "BTC-USD",
+        "instId": "BTC-USD-261030",
+        "instType": "FUTURES",
+        "quoteCcy": "",
+        "settleCcy": "BTC",
+        "state": "live",
+        "uly": "BTC-USD"
+      },
+      "input": "BTC-USD-261030",
+      "native": "BTC-USD-261030",
+      "mode": "futures",
+      "requires_table": false
+    },
+    {
+      "exchange": "okx",
+      "source": "https://www.okx.com/api/v5/public/instruments?instType=OPTION&uly=BTC-USD",
+      "sample": {
+        "baseCcy": "",
+        "ctVal": "1",
+        "ctValCcy": "BTC",
+        "instFamily": "BTC-USD",
+        "instId": "BTC-USD-261003-74000-C",
+        "instType": "OPTION",
+        "quoteCcy": "",
+        "settleCcy": "BTC",
+        "state": "live",
+        "uly": "BTC-USD"
+      },
+      "input": "BTC-USD-261003-74000-C",
+      "native": "BTC-USD-261003-74000-C",
+      "mode": "options",
+      "requires_table": false
+    },
+    {
+      "exchange": "binance",
+      "source": "https://eapi.binance.com/eapi/v1/exchangeInfo",
+      "sample": {
+        "symbol": "BTC-261225-85000-C",
+        "quoteAsset": "USDT",
+        "status": "TRADING",
+        "contractType": "CRYPTO_OPTIONS"
+      },
+      "input": "BTC-261225-85000-C",
+      "native": "BTC-261225-85000-C",
+      "mode": "option",
+      "requires_table": false
+    },
+    {
+      "exchange": "bybit",
+      "source": "https://api.bybit.com/v5/market/instruments-info?category=option&limit=1000",
+      "sample": {
+        "symbol": "BTC-25JUN27-106000-P-USDT",
+        "status": "Trading",
+        "baseCoin": "BTC",
+        "quoteCoin": "USDT",
+        "deliveryTime": "1813910400000",
+        "displayName": "BTCUSDT-25JUN27-106000-P"
+      },
+      "input": "BTC-25JUN27-106000-P-USDT",
+      "native": "BTC-25JUN27-106000-P-USDT",
+      "mode": "option",
+      "requires_table": false
+    },
+    {
+      "exchange": "binance",
+      "source": "https://eapi.binance.com/eapi/v1/exchangeInfo",
+      "sample": {
+        "symbol": "XRP-261030-2.2-C",
+        "quoteAsset": "USDT",
+        "status": "TRADING",
+        "contractType": "CRYPTO_OPTIONS"
+      },
+      "input": "XRP-261030-2.2-C",
+      "native": "XRP-261030-2.2-C",
+      "mode": "native",
+      "requires_table": false
+    },
+    {
+      "exchange": "bybit",
+      "source": "https://api.bybit.com/v5/market/instruments-info?category=option&baseCoin=All&limit=1000",
+      "sample": {
+        "symbol": "SOXL-30OCT26-207.5-P-USDT",
+        "status": "Trading",
+        "baseCoin": "SOXL",
+        "quoteCoin": "USDT",
+        "displayName": "SOXLUSDT-30OCT26-207.5-P"
+      },
+      "input": "SOXL-30OCT26-207.5-P-USDT",
+      "native": "SOXL-30OCT26-207.5-P-USDT",
+      "mode": "native",
+      "requires_table": false
+    },
+    {
+      "exchange": "bybit",
+      "source": "https://api.bybit.com/v5/spread/instrument",
+      "sample": {
+        "symbol": "SOLUSDT_SOL/USDT",
+        "contractType": "FundingRateArb",
+        "status": "Trading",
+        "baseCoin": "SOL",
+        "quoteCoin": "USDT"
+      },
+      "input": "SOLUSDT_SOL/USDT",
+      "native": "SOLUSDT_SOL/USDT",
+      "mode": "native",
+      "requires_table": false
+    },
+    {
+      "exchange": "binance",
+      "source": "https://www.binance.com/bapi/defi/v1/public/alpha-trade/get-exchange-info",
+      "sample": {
+        "symbol": "ALPHA_1134U",
+        "status": "TRADING",
+        "baseAsset": "ALPHA_1134",
+        "quoteAsset": "U"
+      },
+      "input": "ALPHA_1134U",
+      "native": "ALPHA_1134U",
+      "mode": "native",
+      "requires_table": false
+    },
+    {
+      "exchange": "aster",
+      "source": "https://papi.asterdex.com/api/v3/prediction/exchangeInfo",
+      "sample": {
+        "status": "SETTLED",
+        "baseAsset": "BTC_UP_DOWN_5M_1790869800_Y",
+        "quoteAsset": "USDT",
+        "symbol": "BTC_UP_DOWN_5M_1790869800_YUSDT"
+      },
+      "input": "BTC_UP_DOWN_5M_1790869800_YUSDT",
+      "native": "BTC_UP_DOWN_5M_1790869800_YUSDT",
+      "mode": "prediction",
+      "requires_table": false
+    },
+    {
+      "exchange": "lighter",
+      "source": "https://mainnet.zklighter.elliot.ai/api/v1/orderBookDetails",
+      "sample": {
+        "symbol": "BTC",
+        "market_id": 1,
+        "status": "active",
+        "multiplier": "1.000000000000000000"
+      },
+      "input": "BTC-USDC-SWAP",
+      "native": "BTC",
+      "mode": "mainnet",
+      "requires_table": true
+    },
+    {
+      "exchange": "lighter",
+      "source": "https://api.rh.lighter.xyz/api/v1/orderBookDetails",
+      "sample": {
+        "symbol": "BTC",
+        "market_id": 1,
+        "market_type": "perp"
+      },
+      "input": "BTC-USDC-SWAP",
+      "native": "BTC",
+      "mode": "robinhood",
+      "requires_table": true
+    },
+    {
+      "exchange": "hyperliquid",
+      "source": "https://api.hyperliquid.xyz/info",
+      "sample": {
+        "szDecimals": 5,
+        "name": "BTC"
+      },
+      "input": "BTC-USD-SWAP",
+      "native": "BTC",
+      "mode": "coin",
+      "requires_table": false
+    },
+    {
+      "exchange": "hyperliquid",
+      "source": "https://api.hyperliquid.xyz/info",
+      "sample": {
+        "szDecimals": 5,
+        "name": "BTC"
+      },
+      "input": "BTC-USD-SWAP",
+      "native": "BTC",
+      "mode": "asset_id",
+      "requires_table": true
+    },
+    {
+      "exchange": "hyperliquid",
+      "source": "https://api.hyperliquid.xyz/info",
+      "sample": {
+        "tokens": [
+          1,
+          0
+        ],
+        "name": "PURR/USDC",
+        "index": 0,
+        "isCanonical": true
+      },
+      "input": "PURR-USDC-SPOT",
+      "native": "PURR/USDC",
+      "mode": "spot",
+      "requires_table": true
+    },
+    {
+      "exchange": "arcus",
+      "source": "https://api.arcus.xyz/v1/markets",
+      "sample": {
+        "marketDisplayName": "BTC-USD",
+        "marketId": 1,
+        "status": "ONLINE",
+        "baseAsset": "BTC",
+        "quoteAsset": "USD",
+        "tickSize": "0.1",
+        "type": "PERPETUAL"
+      },
+      "input": "BTC-USD-SWAP",
+      "native": "BTC-USD",
+      "mode": "lookup",
+      "requires_table": false
+    }
+  ]
+}

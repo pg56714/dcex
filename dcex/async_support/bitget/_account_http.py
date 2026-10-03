@@ -34,45 +34,6 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
         """Retrieve Bitget funding account assets."""
         return await self._native_private("get_funding_assets", self._native_params(coin=coin))
 
-    async def get_spot_account_info(self) -> dict[str, Any]:
-        """Retrieve Bitget spot account information."""
-        return await self._native_private("get_spot_account_info", [])
-
-    async def get_spot_account_assets(
-        self,
-        coin: str | None = None,
-        asset_type: str | None = None,
-    ) -> dict[str, Any]:
-        """Retrieve Bitget spot account assets."""
-        return await self._native_private(
-            "get_spot_account_assets",
-            self._native_params(coin=coin, assetType=asset_type),
-        )
-
-    async def get_spot_account_bills(
-        self,
-        coin: str | None = None,
-        group_type: str | None = None,
-        business_type: str | None = None,
-        start_time: int | str | None = None,
-        end_time: int | str | None = None,
-        limit: int | None = None,
-        id_less_than: str | None = None,
-    ) -> dict[str, Any]:
-        """Retrieve Bitget spot account bills."""
-        return await self._native_private(
-            "get_spot_account_bills",
-            self._native_params(
-                coin=coin,
-                groupType=group_type,
-                businessType=business_type,
-                startTime=start_time,
-                endTime=end_time,
-                limit=limit,
-                idLessThan=id_less_than,
-            ),
-        )
-
     async def get_deposit_records(
         self,
         start_time: int | str,
@@ -152,88 +113,6 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
             self._native_params(holdMode=hold_mode),
         )
 
-    async def get_futures_account(
-        self,
-        product_symbol: str,
-        margin_coin: str = "USDT",
-        product_type: str = "USDT-FUTURES",
-    ) -> dict[str, Any]:
-        """Retrieve one Bitget futures account."""
-        return await self._native_private(
-            "get_futures_account",
-            self._native_params(
-                product_symbol=product_symbol,
-                productType=product_type,
-                marginCoin=margin_coin,
-            ),
-        )
-
-    async def get_futures_accounts(
-        self,
-        product_type: str = "USDT-FUTURES",
-    ) -> dict[str, Any]:
-        """Retrieve Bitget futures accounts."""
-        return await self._native_private(
-            "get_futures_accounts",
-            self._native_params(productType=product_type),
-        )
-
-    async def get_futures_account_bills(
-        self,
-        product_type: str = "USDT-FUTURES",
-        coin: str | None = None,
-        business_type: str | None = None,
-        only_funding: str | None = None,
-        id_less_than: str | None = None,
-        start_time: int | str | None = None,
-        end_time: int | str | None = None,
-        limit: int | None = None,
-    ) -> dict[str, Any]:
-        """Retrieve Bitget futures account bills."""
-        return await self._native_private(
-            "get_futures_account_bills",
-            self._native_params(
-                productType=product_type,
-                coin=coin,
-                businessType=business_type,
-                onlyFunding=only_funding,
-                idLessThan=id_less_than,
-                startTime=start_time,
-                endTime=end_time,
-                limit=limit,
-            ),
-        )
-
-    async def set_futures_leverage(
-        self,
-        product_symbol: str,
-        leverage: int | str | None = None,
-        margin_coin: str = "USDT",
-        product_type: str = "USDT-FUTURES",
-        hold_side: str | None = None,
-        long_leverage: int | str | None = None,
-        short_leverage: int | str | None = None,
-    ) -> dict[str, Any]:
-        """
-        Set Bitget futures leverage.
-
-        Pass ``leverage``, or ``longLeverage``/``shortLeverage`` to set each side separately.
-        """
-        if leverage is None and long_leverage is None and short_leverage is None:
-            raise ValueError("Specify leverage, longLeverage, or shortLeverage.")
-        return await self._native_private(
-            "set_futures_leverage",
-            self._native_params(
-                product_symbol=product_symbol,
-                productType=product_type,
-                marginCoin=margin_coin,
-                leverage=leverage,
-                holdSide=hold_side,
-                longLeverage=long_leverage,
-                shortLeverage=short_leverage,
-            ),
-        )
-
     async def set_futures_margin_mode(
         self,
         product_symbol: str,
@@ -249,44 +128,6 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
                 productType=product_type,
                 marginCoin=margin_coin,
                 marginMode=margin_mode,
-            ),
-        )
-
-    async def set_futures_position_mode(
-        self,
-        pos_mode: str,
-        product_type: str = "USDT-FUTURES",
-    ) -> dict[str, Any]:
-        """Set Bitget futures position mode."""
-        return await self._native_private(
-            "set_futures_position_mode",
-            self._native_params(productType=product_type, posMode=pos_mode),
-        )
-
-    async def get_futures_positions(
-        self,
-        product_type: str = "USDT-FUTURES",
-        margin_coin: str | None = None,
-    ) -> dict[str, Any]:
-        """Retrieve all Bitget futures positions."""
-        return await self._native_private(
-            "get_futures_positions",
-            self._native_params(productType=product_type, marginCoin=margin_coin),
-        )
-
-    async def get_futures_position(
-        self,
-        product_symbol: str,
-        product_type: str = "USDT-FUTURES",
-        margin_coin: str = "USDT",
-    ) -> dict[str, Any]:
-        """Retrieve one Bitget futures position."""
-        return await self._native_private(
-            "get_futures_position",
-            self._native_params(
-                product_symbol=product_symbol,
-                productType=product_type,
-                marginCoin=margin_coin,
             ),
         )
 

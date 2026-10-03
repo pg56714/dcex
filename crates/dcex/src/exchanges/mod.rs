@@ -1934,3 +1934,6 @@ fn every_client_has_a_catalog_identity() {
         assert!(catalog["exchanges"][identity].is_object(), "{identity}");
     }
 }
+
+#[cfg(test)]
+mod symbol_tests;

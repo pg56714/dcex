@@ -43,15 +43,6 @@ async def _assert_crypto_loan_debts_or_empty(client) -> None:
         assert "[40054]" in exc.message and "is empty" in exc.message, exc
 
 
-async def _is_uta(client) -> bool:
-    try:
-        data = _assert_ok(await client.get_uta_account_info()).get("data", {})
-    except FailedRequestError:
-        return False
-    permissions = data.get("permissions", []) if isinstance(data, dict) else []
-    return "uta_trade" in permissions or "uta_mgt" in permissions
-
-
 async def _assert_uta_account_read_endpoints(client) -> None:
     _assert_ok(await client.get_uta_account_info())
     _assert_ok(await client.get_uta_account_assets())
@@ -69,65 +60,25 @@ async def _assert_uta_trade_read_endpoints(client) -> None:
 
 @pytest.mark.asyncio
 async def test_common_account_read_endpoints(client):
-    if await _is_uta(client):
-        await _assert_uta_account_read_endpoints(client)
-        return
-    _assert_ok(await client.get_all_account_balance())
-    _assert_ok(await client.get_funding_assets(coin="USDT"))
+    await _assert_uta_account_read_endpoints(client)
 
 
 @pytest.mark.asyncio
 async def test_spot_account_read_endpoints(client):
-    end_time = int(time.time() * 1000)
-    start_time = end_time - 7 * 24 * 60 * 60 * 1000
-
-    if await _is_uta(client):
-        await _assert_uta_account_read_endpoints(client)
-        _assert_ok(await client.get_uta_open_orders("SPOT", "BTC-USDT-SPOT", limit=20))
-        _assert_ok(await client.get_uta_history_orders("SPOT", "BTC-USDT-SPOT", limit=20))
-        return
-
-    _assert_ok(await client.get_spot_account_info())
-    _assert_ok(await client.get_spot_account_assets(coin="USDT"))
-    _assert_ok(await client.get_spot_account_bills(coin="USDT", limit=20))
-    _assert_ok(await client.get_transferable_coins(from_type="spot", to_type="usdt_futures"))
-    _assert_ok(await client.get_transfer_records(coin="USDT", limit=20))
-    _assert_ok(
-        await client.get_deposit_records(
-            coin="USDT",
-            start_time=start_time,
-            end_time=end_time,
-            limit=20,
-        )
-    )
+    await _assert_uta_account_read_endpoints(client)
+    _assert_ok(await client.get_uta_open_orders("SPOT", "BTC-USDT-SPOT", limit=20))
+    _assert_ok(await client.get_uta_history_orders("SPOT", "BTC-USDT-SPOT", limit=20))
 
 
 @pytest.mark.asyncio
 async def test_futures_account_read_endpoints(client):
-    if await _is_uta(client):
-        await _assert_uta_account_read_endpoints(client)
-        _assert_ok(await client.get_uta_positions("USDT-FUTURES", "BTC-USDT-SWAP"))
-        return
-
-    _assert_ok(await client.get_futures_accounts())
-    _assert_ok(await client.get_futures_account(product_symbol="BTC-USDT-SWAP"))
-    _assert_ok(await client.get_futures_account_bills(limit=20))
-    _assert_ok(await client.get_futures_positions())
-    _assert_ok(await client.get_futures_position(product_symbol="BTC-USDT-SWAP"))
+    await _assert_uta_account_read_endpoints(client)
+    _assert_ok(await client.get_uta_positions("USDT-FUTURES", "BTC-USDT-SWAP"))
 
 
 @pytest.mark.asyncio
 async def test_private_trade_read_endpoints(client):
-    if await _is_uta(client):
-        await _assert_uta_trade_read_endpoints(client)
-        return
-
-    _assert_ok(await client.get_spot_open_orders(product_symbol="BTC-USDT-SPOT", limit=20))
-    _assert_ok(await client.get_spot_history_orders(product_symbol="BTC-USDT-SPOT", limit=20))
-    _assert_ok(await client.get_spot_fills(product_symbol="BTC-USDT-SPOT", limit=20))
-    _assert_ok(await client.get_futures_open_orders(product_symbol="BTC-USDT-SWAP", limit=20))
-    _assert_ok(await client.get_futures_history_orders(product_symbol="BTC-USDT-SWAP", limit=20))
-    _assert_ok(await client.get_futures_fills(product_symbol="BTC-USDT-SWAP", limit=20))
+    await _assert_uta_trade_read_endpoints(client)
 
 
 @pytest.mark.asyncio

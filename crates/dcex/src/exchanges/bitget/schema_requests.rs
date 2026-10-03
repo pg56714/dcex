@@ -156,9 +156,15 @@ impl BitgetClient {
             return self.post_private(endpoint.path, body).await.map(Some);
         }
         let mut pairs = params.only(endpoint.fields);
-        if let Some(value) = params.get("product_symbol") {
+        if let Some(value) = params.get("product_symbol").or(params.get("symbol")) {
             pairs.retain(|(key, _)| key != "symbol");
-            pairs.push(("symbol".into(), self.exchange_symbol(value)?));
+            pairs.push((
+                "symbol".into(),
+                self.exchange_symbol_category(
+                    value,
+                    params.get("category").or(params.get("productType")),
+                )?,
+            ));
         }
         if !endpoint.post {
             return Ok(Some(if public {
@@ -253,7 +259,10 @@ impl BitgetClient {
                             .filter(|text| !text.trim().is_empty())
                             .ok_or_else(|| invalid("list entries must be nonempty strings"))?;
                         Ok(Value::String(if key == "symbolList" {
-                            self.exchange_symbol(text)?
+                            self.exchange_symbol_category(
+                                text,
+                                params.get("category").or(params.get("productType")),
+                            )?
                         } else {
                             text.to_string()
                         }))
@@ -542,9 +551,7 @@ fn validate(name: &str, params: &BitgetParams, endpoint: &Endpoint) -> Result<()
     {
         return Err(invalid("time range exceeds the documented bounds"));
     }
-    if (name == "get_futures_liquidation_price" || name == "get_futures_max_open_quantity")
-        && params.get("orderType") == Some("limit")
-    {
+    if name == "get_futures_liquidation_price" && params.get("orderType") == Some("limit") {
         required(params, "openPrice")?;
     }
     if name == "get_uta_max_open_available" && params.get("orderType") == Some("limit") {
@@ -658,19 +665,6 @@ fn validate(name: &str, params: &BitgetParams, endpoint: &Endpoint) -> Result<()
         }
     }
     Ok(())
-}
-
-pub(super) fn validate_margin_order_fields(params: &BitgetParams) -> Result<()> {
-    let endpoint = endpoints::endpoint("place_cross_margin_order").expect("margin order metadata");
-    params.ensure_allowed(endpoint.fields, true)?;
-    for key in endpoint.required {
-        if *key == "symbol" {
-            symbol(params)?;
-        } else {
-            required(params, key)?;
-        }
-    }
-    validate("place_cross_margin_order", params, endpoint)
 }
 
 mod request_tables;

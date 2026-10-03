@@ -112,51 +112,6 @@
     }
   },
   {
-    "name": "get_futures_max_open_quantity",
-    "path": "/api/v2/mix/account/max-open",
-    "post": false,
-    "public": false,
-    "fields": [
-      "symbol",
-      "productType",
-      "marginCoin",
-      "posSide",
-      "orderType",
-      "openPrice"
-    ],
-    "required": [
-      "symbol",
-      "productType",
-      "marginCoin",
-      "posSide",
-      "orderType"
-    ],
-    "arrays": [],
-    "limit": null,
-    "days": null,
-    "input_schema": {
-      "type": "object",
-      "properties": {
-        "openPrice": {
-          "type": "string",
-          "format": "decimal"
-        },
-        "open_price": {
-          "type": "string",
-          "format": "decimal"
-        },
-        "margin_coin": {
-          "type": "string",
-          "description": "get_futures_max_open_quantity/margin_coin: selects the settlement currency for the margin account."
-        },
-        "marginCoin": {
-          "type": "string",
-          "description": "get_futures_max_open_quantity/marginCoin: selects the settlement currency for the margin account."
-        }
-      }
-    }
-  },
-  {
     "name": "get_futures_interest_history",
     "path": "/api/v2/mix/account/interest-history",
     "post": false,
@@ -419,7 +374,7 @@
     "days": null
   },
   {
-    "name": "upgrade_to_uta",
+    "name": "switch_to_classic_account",
     "path": "/api/v3/account/switch",
     "post": true,
     "public": false,
@@ -430,64 +385,12 @@
     "days": null
   },
   {
-    "name": "get_uta_upgrade_status",
+    "name": "get_account_switch_status",
     "path": "/api/v3/account/switch-status",
     "post": false,
     "public": false,
     "fields": [],
     "required": [],
-    "arrays": [],
-    "limit": null,
-    "days": null
-  },
-  {
-    "name": "get_classic_account_upgrade_status",
-    "path": "/api/v2/spot/account/upgrade-status",
-    "post": false,
-    "public": false,
-    "fields": [
-      "subUid"
-    ],
-    "required": [],
-    "arrays": [],
-    "limit": null,
-    "days": null
-  },
-  {
-    "name": "upgrade_classic_account",
-    "path": "/api/v2/spot/account/upgrade",
-    "post": true,
-    "public": false,
-    "fields": [
-      "subUid"
-    ],
-    "required": [],
-    "arrays": [],
-    "limit": null,
-    "days": null
-  },
-  {
-    "name": "get_spot_fee_deduction",
-    "path": "/api/v2/spot/account/deduct-info",
-    "post": false,
-    "public": false,
-    "fields": [],
-    "required": [],
-    "arrays": [],
-    "limit": null,
-    "days": null
-  },
-  {
-    "name": "set_spot_fee_deduction",
-    "path": "/api/v2/spot/account/switch-deduct",
-    "post": true,
-    "public": false,
-    "fields": [
-      "deduct"
-    ],
-    "required": [
-      "deduct"
-    ],
     "arrays": [],
     "limit": null,
     "days": null

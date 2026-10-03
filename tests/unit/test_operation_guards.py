@@ -13,8 +13,7 @@ from tests.unit.native_http_helpers import _http_server
 from tests.unit.test_binance_batch_orders import invoke
 
 CONFIRMED = [
-    ("bitget", "upgrade_to_uta", {}),
-    ("bitget", "upgrade_classic_account", {}),
+    ("bitget", "switch_to_classic_account", {}),
     ("bitget", "delete_uta_subaccount", {"sub_uid": "123"}),
     ("bitget", "set_uta_account_mode", {"mode": "basic"}),
     ("bitget", "set_futures_asset_mode", {"product_type": "USDT-FUTURES", "asset_mode": "single"}),
@@ -42,10 +41,7 @@ CONFIRMED = [
     ("aster", "trigger_futures_asset_exchange", {}),
 ]
 SCOPED = [
-    ("bitget", "close_futures_positions", {"product_type": "USDT-FUTURES"}),
     ("bitget", "close_uta_positions", {"category": "USDT-FUTURES"}),
-    ("bitget", "cancel_futures_plan_orders", {"product_type": "USDT-FUTURES"}),
-    ("bitget", "cancel_spot_plan_orders", {}),
     ("bingx", "close_coin_swap_all_positions", {}),
     ("bingx", "cancel_coin_swap_all_orders", {}),
     ("mexc", "cancel_spot_all_orders", {}),
@@ -150,14 +146,6 @@ async def test_vault_full_redemption_is_explicit(asynchronous):
             {"order_ids": "123,456"},
             "/api/v3/hf/margin/oco-order/cancel",
             "DELETE",
-        ),
-        (
-            "bitget",
-            "cancel_futures_plan_orders",
-            {"product_type": "USDT-FUTURES"},
-            {"order_id_list": [{"orderId": "123"}]},
-            "/api/v2/mix/order/cancel-plan-order",
-            "POST",
         ),
     ],
 )

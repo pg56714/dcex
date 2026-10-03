@@ -26,39 +26,6 @@
     }
   },
   {
-    "name": "get_futures_position_history",
-    "path": "/api/v2/mix/position/history-position",
-    "post": false,
-    "public": false,
-    "fields": [
-      "symbol",
-      "productType",
-      "idLessThan",
-      "startTime",
-      "endTime",
-      "limit"
-    ],
-    "required": [],
-    "arrays": [],
-    "limit": 100,
-    "days": null
-  },
-  {
-    "name": "get_futures_adl_rank",
-    "path": "/api/v2/mix/position/adlRank",
-    "post": false,
-    "public": false,
-    "fields": [
-      "productType"
-    ],
-    "required": [
-      "productType"
-    ],
-    "arrays": [],
-    "limit": null,
-    "days": null
-  },
-  {
     "name": "reverse_futures_position",
     "path": "/api/v2/mix/order/click-backhand",
     "post": true,
@@ -98,27 +65,6 @@
         }
       }
     }
-  },
-  {
-    "name": "get_futures_fill_history",
-    "path": "/api/v2/mix/order/fill-history",
-    "post": false,
-    "public": false,
-    "fields": [
-      "productType",
-      "orderId",
-      "symbol",
-      "startTime",
-      "endTime",
-      "idLessThan",
-      "limit"
-    ],
-    "required": [
-      "productType"
-    ],
-    "arrays": [],
-    "limit": 100,
-    "days": 7
   },
   {
     "name": "get_uta_adl_rank",

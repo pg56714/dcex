@@ -140,58 +140,10 @@ fn params_for(name: &str) -> Vec<(String, String)> {
 /// (dispatch name, HTTP method, documented path)
 const PUBLIC_ROUTES: &[(&str, &str, &str)] = &[
     ("get_spot_coins", "GET", "/api/v2/spot/public/coins"),
-    ("get_spot_symbols", "GET", "/api/v2/spot/public/symbols"),
-    ("get_spot_tickers", "GET", "/api/v2/spot/market/tickers"),
-    ("get_spot_orderbook", "GET", "/api/v2/spot/market/orderbook"),
-    ("get_spot_kline", "GET", "/api/v2/spot/market/candles"),
-    (
-        "get_spot_history_kline",
-        "GET",
-        "/api/v2/spot/market/history-candles",
-    ),
-    ("get_spot_recent_trades", "GET", "/api/v2/spot/market/fills"),
     (
         "get_spot_market_trades",
         "GET",
         "/api/v2/spot/market/fills-history",
-    ),
-    (
-        "get_futures_contracts",
-        "GET",
-        "/api/v2/mix/market/contracts",
-    ),
-    ("get_futures_ticker", "GET", "/api/v2/mix/market/ticker"),
-    ("get_futures_tickers", "GET", "/api/v2/mix/market/tickers"),
-    (
-        "get_futures_orderbook",
-        "GET",
-        "/api/v2/mix/market/merge-depth",
-    ),
-    ("get_futures_kline", "GET", "/api/v2/mix/market/candles"),
-    (
-        "get_futures_history_kline",
-        "GET",
-        "/api/v2/mix/market/history-candles",
-    ),
-    (
-        "get_futures_recent_trades",
-        "GET",
-        "/api/v2/mix/market/fills",
-    ),
-    (
-        "get_futures_current_funding_rate",
-        "GET",
-        "/api/v2/mix/market/current-fund-rate",
-    ),
-    (
-        "get_futures_history_funding_rate",
-        "GET",
-        "/api/v2/mix/market/history-fund-rate",
-    ),
-    (
-        "get_futures_open_interest",
-        "GET",
-        "/api/v2/mix/market/open-interest",
     ),
     ("get_uta_instruments", "GET", "/api/v3/market/instruments"),
     ("get_uta_tickers", "GET", "/api/v3/market/tickers"),
@@ -235,17 +187,6 @@ const PRIVATE_ROUTES: &[(&str, &str, &str)] = &[
         "get_funding_assets",
         "GET",
         "/api/v2/account/funding-assets",
-    ),
-    ("get_spot_account_info", "GET", "/api/v2/spot/account/info"),
-    (
-        "get_spot_account_assets",
-        "GET",
-        "/api/v2/spot/account/assets",
-    ),
-    (
-        "get_spot_account_bills",
-        "GET",
-        "/api/v2/spot/account/bills",
     ),
     ("transfer", "POST", "/api/v2/spot/wallet/transfer"),
     (
@@ -294,41 +235,10 @@ const PRIVATE_ROUTES: &[(&str, &str, &str)] = &[
     ),
     ("set_uta_leverage", "POST", "/api/v3/account/set-leverage"),
     ("set_uta_hold_mode", "POST", "/api/v3/account/set-hold-mode"),
-    ("get_futures_account", "GET", "/api/v2/mix/account/account"),
-    (
-        "get_futures_accounts",
-        "GET",
-        "/api/v2/mix/account/accounts",
-    ),
-    (
-        "get_futures_account_bills",
-        "GET",
-        "/api/v2/mix/account/bill",
-    ),
-    (
-        "set_futures_leverage",
-        "POST",
-        "/api/v2/mix/account/set-leverage",
-    ),
     (
         "set_futures_margin_mode",
         "POST",
         "/api/v2/mix/account/set-margin-mode",
-    ),
-    (
-        "set_futures_position_mode",
-        "POST",
-        "/api/v2/mix/account/set-position-mode",
-    ),
-    (
-        "get_futures_positions",
-        "GET",
-        "/api/v2/mix/position/all-position",
-    ),
-    (
-        "get_futures_position",
-        "GET",
-        "/api/v2/mix/position/single-position",
     ),
     // Earn.
     (
@@ -435,79 +345,7 @@ const PRIVATE_ROUTES: &[(&str, &str, &str)] = &[
     ("get_crypto_loan_debts", "GET", "/api/v3/loan/debts"),
     ("repay_uta_liability", "POST", "/api/v3/account/repay"),
     // Classic spot trading.
-    ("place_spot_order", "POST", "/api/v2/spot/trade/place-order"),
-    (
-        "place_spot_market_order",
-        "POST",
-        "/api/v2/spot/trade/place-order",
-    ),
-    (
-        "place_spot_market_buy_order",
-        "POST",
-        "/api/v2/spot/trade/place-order",
-    ),
-    (
-        "place_spot_market_sell_order",
-        "POST",
-        "/api/v2/spot/trade/place-order",
-    ),
-    (
-        "place_spot_limit_order",
-        "POST",
-        "/api/v2/spot/trade/place-order",
-    ),
-    (
-        "place_spot_limit_buy_order",
-        "POST",
-        "/api/v2/spot/trade/place-order",
-    ),
-    (
-        "place_spot_limit_sell_order",
-        "POST",
-        "/api/v2/spot/trade/place-order",
-    ),
-    (
-        "place_spot_post_only_limit_order",
-        "POST",
-        "/api/v2/spot/trade/place-order",
-    ),
-    (
-        "place_spot_post_only_limit_buy_order",
-        "POST",
-        "/api/v2/spot/trade/place-order",
-    ),
-    (
-        "place_spot_post_only_limit_sell_order",
-        "POST",
-        "/api/v2/spot/trade/place-order",
-    ),
-    (
-        "place_spot_batch_orders",
-        "POST",
-        "/api/v2/spot/trade/batch-orders",
-    ),
-    (
-        "cancel_spot_order",
-        "POST",
-        "/api/v2/spot/trade/cancel-order",
-    ),
-    (
-        "cancel_spot_batch_orders",
-        "POST",
-        "/api/v2/spot/trade/batch-cancel-order",
-    ),
-    ("get_spot_order", "GET", "/api/v2/spot/trade/orderInfo"),
-    (
-        "get_spot_open_orders",
-        "GET",
-        "/api/v2/spot/trade/unfilled-orders",
-    ),
-    (
-        "get_spot_history_orders",
-        "GET",
-        "/api/v2/spot/trade/history-orders",
-    ),
-    ("get_spot_fills", "GET", "/api/v2/spot/trade/fills"),
+
     // UTA trading.
     ("place_uta_order", "POST", "/api/v3/trade/place-order"),
     (
@@ -574,83 +412,6 @@ const PRIVATE_ROUTES: &[(&str, &str, &str)] = &[
         "/api/v3/trade/history-strategy-orders",
     ),
     // Classic futures trading.
-    (
-        "place_futures_order",
-        "POST",
-        "/api/v2/mix/order/place-order",
-    ),
-    (
-        "place_futures_market_order",
-        "POST",
-        "/api/v2/mix/order/place-order",
-    ),
-    (
-        "place_futures_market_buy_order",
-        "POST",
-        "/api/v2/mix/order/place-order",
-    ),
-    (
-        "place_futures_market_sell_order",
-        "POST",
-        "/api/v2/mix/order/place-order",
-    ),
-    (
-        "place_futures_limit_order",
-        "POST",
-        "/api/v2/mix/order/place-order",
-    ),
-    (
-        "place_futures_limit_buy_order",
-        "POST",
-        "/api/v2/mix/order/place-order",
-    ),
-    (
-        "place_futures_limit_sell_order",
-        "POST",
-        "/api/v2/mix/order/place-order",
-    ),
-    (
-        "place_futures_post_only_limit_order",
-        "POST",
-        "/api/v2/mix/order/place-order",
-    ),
-    (
-        "place_futures_post_only_limit_buy_order",
-        "POST",
-        "/api/v2/mix/order/place-order",
-    ),
-    (
-        "place_futures_post_only_limit_sell_order",
-        "POST",
-        "/api/v2/mix/order/place-order",
-    ),
-    (
-        "place_futures_batch_orders",
-        "POST",
-        "/api/v2/mix/order/batch-place-order",
-    ),
-    (
-        "cancel_futures_order",
-        "POST",
-        "/api/v2/mix/order/cancel-order",
-    ),
-    (
-        "cancel_futures_batch_orders",
-        "POST",
-        "/api/v2/mix/order/batch-cancel-orders",
-    ),
-    ("get_futures_order", "GET", "/api/v2/mix/order/detail"),
-    (
-        "get_futures_open_orders",
-        "GET",
-        "/api/v2/mix/order/orders-pending",
-    ),
-    (
-        "get_futures_history_orders",
-        "GET",
-        "/api/v2/mix/order/orders-history",
-    ),
-    ("get_futures_fills", "GET", "/api/v2/mix/order/fills"),
 ];
 
 fn signed_client(url: String) -> BitgetClient {
@@ -764,95 +525,9 @@ async fn fee_rate_routes_select_business_line() {
 }
 
 #[tokio::test]
-async fn order_helpers_force_side_type_and_time_in_force() {
+async fn uta_batch_order_body() {
     let (url, receiver) = recording_server();
     let client = signed_client(url);
-    let cases: &[(&str, &[(&str, &str)])] = &[
-        (
-            "place_spot_market_sell_order",
-            &[("side", "sell"), ("orderType", "market")],
-        ),
-        (
-            "place_spot_post_only_limit_buy_order",
-            &[
-                ("side", "buy"),
-                ("orderType", "limit"),
-                ("force", "post_only"),
-            ],
-        ),
-        (
-            "place_spot_limit_sell_order",
-            &[("side", "sell"), ("orderType", "limit"), ("force", "gtc")],
-        ),
-        (
-            "place_futures_limit_sell_order",
-            &[("side", "sell"), ("orderType", "limit"), ("force", "gtc")],
-        ),
-        (
-            "place_futures_post_only_limit_buy_order",
-            &[
-                ("side", "buy"),
-                ("orderType", "limit"),
-                ("force", "post_only"),
-            ],
-        ),
-        (
-            "place_futures_market_buy_order",
-            &[("side", "buy"), ("orderType", "market")],
-        ),
-    ];
-    for (name, expected) in cases {
-        let mut params = params_for(name);
-        params.retain(|(key, _)| !matches!(key.as_str(), "side" | "orderType" | "force"));
-        client
-            .private_request(name, params)
-            .await
-            .unwrap_or_else(|error| panic!("{name}: {error}"));
-        let body = json_body(&next(&receiver, name));
-        for (key, value) in *expected {
-            assert_eq!(body[*key], *value, "{name}: {key}");
-        }
-        assert_eq!(body["symbol"], "BTCUSDT", "{name}: symbol mapping");
-    }
-}
-
-#[tokio::test]
-async fn futures_order_defaults_and_batch_bodies() {
-    let (url, receiver) = recording_server();
-    let client = signed_client(url);
-    client
-        .private_request(
-            "place_futures_market_order",
-            vec![
-                ("product_symbol".into(), "ETH-USDT-SWAP".into()),
-                ("side".into(), "sell".into()),
-                ("size".into(), "2".into()),
-            ],
-        )
-        .await
-        .expect("futures order");
-    let body = json_body(&next(&receiver, "place_futures_market_order"));
-    assert_eq!(body["symbol"], "ETHUSDT");
-    assert_eq!(body["productType"], "USDT-FUTURES");
-    assert_eq!(body["marginMode"], "crossed");
-    assert_eq!(body["marginCoin"], "USDT");
-    assert_eq!(body["orderType"], "market");
-
-    client
-        .private_request(
-            "cancel_futures_batch_orders",
-            vec![
-                ("productType".into(), "USDT-FUTURES".into()),
-                ("product_symbol".into(), "BTC-USDT-SWAP".into()),
-                ("orderIdList".into(), r#"[{"orderId":"1"}]"#.into()),
-            ],
-        )
-        .await
-        .expect("batch cancel");
-    let body = json_body(&next(&receiver, "cancel_futures_batch_orders"));
-    assert_eq!(body["orderIdList"][0]["orderId"], "1");
-    assert_eq!(body["symbol"], "BTCUSDT");
-
     client
         .private_request(
             "place_uta_batch_orders",
@@ -868,21 +543,6 @@ async fn futures_order_defaults_and_batch_bodies() {
         body.is_array(),
         "UTA batch body must be the raw order array"
     );
-
-    client
-        .private_request(
-            "place_spot_batch_orders",
-            vec![
-                ("product_symbol".into(), "BTC-USDT-SPOT".into()),
-                ("batchMode".into(), "single".into()),
-                ("orderList".into(), r#"[{"side":"buy","size":"1"}]"#.into()),
-            ],
-        )
-        .await
-        .expect("spot batch");
-    let body = json_body(&next(&receiver, "place_spot_batch_orders"));
-    assert_eq!(body["batchMode"], "single");
-    assert_eq!(body["orderList"][0]["side"], "buy");
 }
 
 #[tokio::test]
@@ -931,19 +591,10 @@ async fn uta_routes_accept_native_symbol_and_forward_protection_fields() {
 async fn required_parameters_fail_before_transport() {
     let client = signed_client("http://127.0.0.1:9".to_string());
     for name in [
-        "get_futures_positions",
-        "get_futures_position",
-        "set_futures_leverage",
         "set_futures_margin_mode",
-        "set_futures_position_mode",
         "get_uta_positions",
         "get_uta_history_orders",
         "place_uta_order",
-        "place_futures_order",
-        "place_spot_order",
-        "place_futures_batch_orders",
-        "cancel_futures_order",
-        "get_futures_order",
         "get_deposit_records",
         "transfer",
         "get_transferable_coins",
@@ -953,11 +604,7 @@ async fn required_parameters_fail_before_transport() {
             "{name} must reject empty params"
         );
     }
-    for name in [
-        "get_futures_tickers",
-        "get_uta_tickers",
-        "get_spot_orderbook",
-    ] {
+    for name in ["get_uta_tickers"] {
         assert!(
             client.public_request(name, Vec::new()).await.is_err(),
             "{name} must reject empty params"
@@ -969,7 +616,7 @@ async fn required_parameters_fail_before_transport() {
 async fn signed_requests_require_all_credentials() {
     let client = BitgetClient::public(Duration::from_secs(10)).expect("client");
     let error = client
-        .private_request("get_spot_account_info", Vec::new())
+        .private_request("get_uta_account_info", Vec::new())
         .await
         .expect_err("missing credentials");
     assert!(
@@ -983,540 +630,6 @@ async fn signed_requests_require_all_credentials() {
 async fn additional_trading_controls_preserve_wire_types() {
     let (url, receiver) = recording_server();
     let client = signed_client(url);
-    client
-        .private_request(
-            "modify_futures_tpsl_order",
-            vec![
-                ("marginCoin".into(), "USDT".into()),
-                ("productType".into(), "USDT-FUTURES".into()),
-                ("product_symbol".into(), "BTC-USDT-SWAP".into()),
-                ("triggerPrice".into(), "59000".into()),
-                ("size".into(), "".into()),
-                ("orderId".into(), "123".into()),
-                ("executePrice".into(), "0".into()),
-            ],
-        )
-        .await
-        .expect("modify_futures_tpsl_order");
-    let request = next(&receiver, "modify_futures_tpsl_order");
-    assert_eq!(
-        (
-            request.method.as_str(),
-            request.path.as_str(),
-            request.signed
-        ),
-        ("POST", "/api/v2/mix/order/modify-tpsl-order", true)
-    );
-    assert_eq!(
-        json_body(&request),
-        serde_json::json!({"marginCoin": "USDT", "productType": "USDT-FUTURES", "symbol": "BTCUSDT", "triggerPrice": "59000", "size": "", "orderId": "123", "executePrice": "0"})
-    );
-    client
-        .private_request(
-            "place_futures_plan_order",
-            vec![
-                ("planType".into(), "normal_plan".into()),
-                ("product_symbol".into(), "BTC-USDT-SWAP".into()),
-                ("productType".into(), "USDT-FUTURES".into()),
-                ("marginMode".into(), "isolated".into()),
-                ("marginCoin".into(), "USDT".into()),
-                ("size".into(), "1".into()),
-                ("triggerPrice".into(), "59000".into()),
-                ("triggerType".into(), "mark_price".into()),
-                ("side".into(), "buy".into()),
-                ("orderType".into(), "market".into()),
-            ],
-        )
-        .await
-        .expect("place_futures_plan_order");
-    let request = next(&receiver, "place_futures_plan_order");
-    assert_eq!(
-        (
-            request.method.as_str(),
-            request.path.as_str(),
-            request.signed
-        ),
-        ("POST", "/api/v2/mix/order/place-plan-order", true)
-    );
-    assert_eq!(
-        json_body(&request),
-        serde_json::json!({"planType": "normal_plan", "symbol": "BTCUSDT", "productType": "USDT-FUTURES", "marginMode": "isolated", "marginCoin": "USDT", "size": "1", "triggerPrice": "59000", "triggerType": "mark_price", "side": "buy", "orderType": "market"})
-    );
-    client
-        .private_request(
-            "place_futures_position_tpsl",
-            vec![
-                ("marginCoin".into(), "USDT".into()),
-                ("productType".into(), "USDT-FUTURES".into()),
-                ("product_symbol".into(), "BTC-USDT-SWAP".into()),
-                ("holdSide".into(), "long".into()),
-                ("stopLossTriggerPrice".into(), "59000".into()),
-            ],
-        )
-        .await
-        .expect("place_futures_position_tpsl");
-    let request = next(&receiver, "place_futures_position_tpsl");
-    assert_eq!(
-        (
-            request.method.as_str(),
-            request.path.as_str(),
-            request.signed
-        ),
-        ("POST", "/api/v2/mix/order/place-pos-tpsl", true)
-    );
-    assert_eq!(
-        json_body(&request),
-        serde_json::json!({"marginCoin": "USDT", "productType": "USDT-FUTURES", "symbol": "BTCUSDT", "holdSide": "long", "stopLossTriggerPrice": "59000"})
-    );
-    client
-        .private_request(
-            "place_futures_tpsl_order",
-            vec![
-                ("marginCoin".into(), "USDT".into()),
-                ("productType".into(), "USDT-FUTURES".into()),
-                ("product_symbol".into(), "BTC-USDT-SWAP".into()),
-                ("planType".into(), "loss_plan".into()),
-                ("triggerPrice".into(), "59000".into()),
-                ("holdSide".into(), "long".into()),
-                ("size".into(), "1".into()),
-            ],
-        )
-        .await
-        .expect("place_futures_tpsl_order");
-    let request = next(&receiver, "place_futures_tpsl_order");
-    assert_eq!(
-        (
-            request.method.as_str(),
-            request.path.as_str(),
-            request.signed
-        ),
-        ("POST", "/api/v2/mix/order/place-tpsl-order", true)
-    );
-    assert_eq!(
-        json_body(&request),
-        serde_json::json!({"marginCoin": "USDT", "productType": "USDT-FUTURES", "symbol": "BTCUSDT", "planType": "loss_plan", "triggerPrice": "59000", "holdSide": "long", "size": "1"})
-    );
-    client
-        .private_request(
-            "get_futures_plan_sub_order",
-            vec![
-                ("planType".into(), "normal_plan".into()),
-                ("planOrderId".into(), "123".into()),
-                ("productType".into(), "USDT-FUTURES".into()),
-            ],
-        )
-        .await
-        .expect("get_futures_plan_sub_order");
-    let request = next(&receiver, "get_futures_plan_sub_order");
-    assert_eq!(
-        (
-            request.method.as_str(),
-            request.path.as_str(),
-            request.signed
-        ),
-        ("GET", "/api/v2/mix/order/plan-sub-order", true)
-    );
-    let actual: std::collections::BTreeMap<String, String> =
-        url::form_urlencoded::parse(request.query.as_bytes())
-            .into_owned()
-            .collect();
-    assert_eq!(
-        serde_json::to_value(actual).unwrap(),
-        serde_json::json!({"planType": "normal_plan", "planOrderId": "123", "productType": "USDT-FUTURES"})
-    );
-    client
-        .private_request(
-            "modify_futures_plan_order",
-            vec![
-                ("productType".into(), "USDT-FUTURES".into()),
-                ("orderId".into(), "123".into()),
-                ("newTriggerPrice".into(), "0.05".into()),
-                ("newStopLossTriggerPrice".into(), "0".into()),
-            ],
-        )
-        .await
-        .expect("modify_futures_plan_order");
-    let request = next(&receiver, "modify_futures_plan_order");
-    assert_eq!(
-        (
-            request.method.as_str(),
-            request.path.as_str(),
-            request.signed
-        ),
-        ("POST", "/api/v2/mix/order/modify-plan-order", true)
-    );
-    assert_eq!(
-        json_body(&request),
-        serde_json::json!({"productType": "USDT-FUTURES", "orderId": "123", "newTriggerPrice": "0.05", "newStopLossTriggerPrice": "0"})
-    );
-    client
-        .private_request(
-            "cancel_futures_plan_orders",
-            vec![
-                ("productType".into(), "USDT-FUTURES".into()),
-                ("product_symbol".into(), "BTC-USDT-SWAP".into()),
-                ("orderIdList".into(), "[{\"orderId\":\"123\"}]".into()),
-            ],
-        )
-        .await
-        .expect("cancel_futures_plan_orders");
-    let request = next(&receiver, "cancel_futures_plan_orders");
-    assert_eq!(
-        (
-            request.method.as_str(),
-            request.path.as_str(),
-            request.signed
-        ),
-        ("POST", "/api/v2/mix/order/cancel-plan-order", true)
-    );
-    assert_eq!(
-        json_body(&request),
-        serde_json::json!({"productType": "USDT-FUTURES", "symbol": "BTCUSDT", "orderIdList": [{"orderId": "123"}]})
-    );
-    client
-        .private_request(
-            "get_pending_futures_plan_orders",
-            vec![
-                ("planType".into(), "normal_plan".into()),
-                ("productType".into(), "USDT-FUTURES".into()),
-            ],
-        )
-        .await
-        .expect("get_pending_futures_plan_orders");
-    let request = next(&receiver, "get_pending_futures_plan_orders");
-    assert_eq!(
-        (
-            request.method.as_str(),
-            request.path.as_str(),
-            request.signed
-        ),
-        ("GET", "/api/v2/mix/order/orders-plan-pending", true)
-    );
-    let actual: std::collections::BTreeMap<String, String> =
-        url::form_urlencoded::parse(request.query.as_bytes())
-            .into_owned()
-            .collect();
-    assert_eq!(
-        serde_json::to_value(actual).unwrap(),
-        serde_json::json!({"planType": "normal_plan", "productType": "USDT-FUTURES"})
-    );
-    client
-        .private_request(
-            "get_futures_plan_order_history",
-            vec![
-                ("planType".into(), "normal_plan".into()),
-                ("productType".into(), "USDT-FUTURES".into()),
-            ],
-        )
-        .await
-        .expect("get_futures_plan_order_history");
-    let request = next(&receiver, "get_futures_plan_order_history");
-    assert_eq!(
-        (
-            request.method.as_str(),
-            request.path.as_str(),
-            request.signed
-        ),
-        ("GET", "/api/v2/mix/order/orders-plan-history", true)
-    );
-    let actual: std::collections::BTreeMap<String, String> =
-        url::form_urlencoded::parse(request.query.as_bytes())
-            .into_owned()
-            .collect();
-    assert_eq!(
-        serde_json::to_value(actual).unwrap(),
-        serde_json::json!({"planType": "normal_plan", "productType": "USDT-FUTURES"})
-    );
-    client
-        .private_request(
-            "place_spot_plan_order",
-            vec![
-                ("product_symbol".into(), "BTC-USDT-SPOT".into()),
-                ("side".into(), "buy".into()),
-                ("triggerPrice".into(), "59000".into()),
-                ("orderType".into(), "market".into()),
-                ("size".into(), "1".into()),
-                ("triggerType".into(), "fill_price".into()),
-            ],
-        )
-        .await
-        .expect("place_spot_plan_order");
-    let request = next(&receiver, "place_spot_plan_order");
-    assert_eq!(
-        (
-            request.method.as_str(),
-            request.path.as_str(),
-            request.signed
-        ),
-        ("POST", "/api/v2/spot/trade/place-plan-order", true)
-    );
-    assert_eq!(
-        json_body(&request),
-        serde_json::json!({"symbol": "BTCUSDT", "side": "buy", "triggerPrice": "59000", "orderType": "market", "size": "1", "triggerType": "fill_price"})
-    );
-    client
-        .private_request(
-            "modify_spot_plan_order",
-            vec![
-                ("triggerPrice".into(), "59000".into()),
-                ("orderType".into(), "market".into()),
-                ("size".into(), "1".into()),
-                ("orderId".into(), "123".into()),
-            ],
-        )
-        .await
-        .expect("modify_spot_plan_order");
-    let request = next(&receiver, "modify_spot_plan_order");
-    assert_eq!(
-        (
-            request.method.as_str(),
-            request.path.as_str(),
-            request.signed
-        ),
-        ("POST", "/api/v2/spot/trade/modify-plan-order", true)
-    );
-    assert_eq!(
-        json_body(&request),
-        serde_json::json!({"triggerPrice": "59000", "orderType": "market", "size": "1", "orderId": "123"})
-    );
-    client
-        .private_request(
-            "cancel_spot_plan_order",
-            vec![("orderId".into(), "123".into())],
-        )
-        .await
-        .expect("cancel_spot_plan_order");
-    let request = next(&receiver, "cancel_spot_plan_order");
-    assert_eq!(
-        (
-            request.method.as_str(),
-            request.path.as_str(),
-            request.signed
-        ),
-        ("POST", "/api/v2/spot/trade/cancel-plan-order", true)
-    );
-    assert_eq!(json_body(&request), serde_json::json!({"orderId": "123"}));
-    client
-        .private_request(
-            "cancel_spot_plan_orders",
-            vec![("symbolList".into(), "[\"BTC-USDT-SPOT\"]".into())],
-        )
-        .await
-        .expect("cancel_spot_plan_orders");
-    let request = next(&receiver, "cancel_spot_plan_orders");
-    assert_eq!(
-        (
-            request.method.as_str(),
-            request.path.as_str(),
-            request.signed
-        ),
-        ("POST", "/api/v2/spot/trade/batch-cancel-plan-order", true)
-    );
-    assert_eq!(
-        json_body(&request),
-        serde_json::json!({"symbolList": ["BTCUSDT"]})
-    );
-    client
-        .private_request("get_pending_spot_plan_orders", vec![])
-        .await
-        .expect("get_pending_spot_plan_orders");
-    let request = next(&receiver, "get_pending_spot_plan_orders");
-    assert_eq!(
-        (
-            request.method.as_str(),
-            request.path.as_str(),
-            request.signed
-        ),
-        ("GET", "/api/v2/spot/trade/current-plan-order", true)
-    );
-    let actual: std::collections::BTreeMap<String, String> =
-        url::form_urlencoded::parse(request.query.as_bytes())
-            .into_owned()
-            .collect();
-    assert_eq!(serde_json::to_value(actual).unwrap(), serde_json::json!({}));
-    client
-        .private_request("get_spot_plan_order_history", vec![])
-        .await
-        .expect("get_spot_plan_order_history");
-    let request = next(&receiver, "get_spot_plan_order_history");
-    assert_eq!(
-        (
-            request.method.as_str(),
-            request.path.as_str(),
-            request.signed
-        ),
-        ("GET", "/api/v2/spot/trade/history-plan-order", true)
-    );
-    let actual: std::collections::BTreeMap<String, String> =
-        url::form_urlencoded::parse(request.query.as_bytes())
-            .into_owned()
-            .collect();
-    assert_eq!(serde_json::to_value(actual).unwrap(), serde_json::json!({}));
-    client
-        .private_request(
-            "get_spot_plan_sub_order",
-            vec![("planOrderId".into(), "123".into())],
-        )
-        .await
-        .expect("get_spot_plan_sub_order");
-    let request = next(&receiver, "get_spot_plan_sub_order");
-    assert_eq!(
-        (
-            request.method.as_str(),
-            request.path.as_str(),
-            request.signed
-        ),
-        ("GET", "/api/v2/spot/trade/plan-sub-order", true)
-    );
-    let actual: std::collections::BTreeMap<String, String> =
-        url::form_urlencoded::parse(request.query.as_bytes())
-            .into_owned()
-            .collect();
-    assert_eq!(
-        serde_json::to_value(actual).unwrap(),
-        serde_json::json!({"planOrderId": "123"})
-    );
-    client
-        .private_request(
-            "modify_futures_order",
-            vec![
-                ("product_symbol".into(), "BTC-USDT-SWAP".into()),
-                ("productType".into(), "USDT-FUTURES".into()),
-                ("newClientOid".into(), "replacement".into()),
-                ("orderId".into(), "123".into()),
-                ("newPrice".into(), "61000".into()),
-                ("newSize".into(), "1".into()),
-            ],
-        )
-        .await
-        .expect("modify_futures_order");
-    let request = next(&receiver, "modify_futures_order");
-    assert_eq!(
-        (
-            request.method.as_str(),
-            request.path.as_str(),
-            request.signed
-        ),
-        ("POST", "/api/v2/mix/order/modify-order", true)
-    );
-    assert_eq!(
-        json_body(&request),
-        serde_json::json!({"symbol": "BTCUSDT", "productType": "USDT-FUTURES", "newClientOid": "replacement", "orderId": "123", "newPrice": "61000", "newSize": "1"})
-    );
-    client
-        .private_request(
-            "close_futures_positions",
-            vec![
-                ("all_symbols".into(), "true".into()),
-                ("productType".into(), "USDT-FUTURES".into()),
-            ],
-        )
-        .await
-        .expect("close_futures_positions");
-    let request = next(&receiver, "close_futures_positions");
-    assert_eq!(
-        (
-            request.method.as_str(),
-            request.path.as_str(),
-            request.signed
-        ),
-        ("POST", "/api/v2/mix/order/close-positions", true)
-    );
-    assert_eq!(
-        json_body(&request),
-        serde_json::json!({"productType": "USDT-FUTURES"})
-    );
-    client
-        .private_request(
-            "cancel_all_futures_orders",
-            vec![("productType".into(), "USDT-FUTURES".into())],
-        )
-        .await
-        .expect("cancel_all_futures_orders");
-    let request = next(&receiver, "cancel_all_futures_orders");
-    assert_eq!(
-        (
-            request.method.as_str(),
-            request.path.as_str(),
-            request.signed
-        ),
-        ("POST", "/api/v2/mix/order/cancel-all-orders", true)
-    );
-    assert_eq!(
-        json_body(&request),
-        serde_json::json!({"productType": "USDT-FUTURES"})
-    );
-    client
-        .private_request(
-            "cancel_spot_orders_by_symbol",
-            vec![("product_symbol".into(), "BTC-USDT-SPOT".into())],
-        )
-        .await
-        .expect("cancel_spot_orders_by_symbol");
-    let request = next(&receiver, "cancel_spot_orders_by_symbol");
-    assert_eq!(
-        (
-            request.method.as_str(),
-            request.path.as_str(),
-            request.signed
-        ),
-        ("POST", "/api/v2/spot/trade/cancel-symbol-order", true)
-    );
-    assert_eq!(
-        json_body(&request),
-        serde_json::json!({"symbol": "BTCUSDT"})
-    );
-    client
-        .private_request(
-            "cancel_replace_spot_order",
-            vec![
-                ("product_symbol".into(), "BTC-USDT-SPOT".into()),
-                ("price".into(), "60000".into()),
-                ("size".into(), "1".into()),
-                ("orderId".into(), "123".into()),
-            ],
-        )
-        .await
-        .expect("cancel_replace_spot_order");
-    let request = next(&receiver, "cancel_replace_spot_order");
-    assert_eq!(
-        (
-            request.method.as_str(),
-            request.path.as_str(),
-            request.signed
-        ),
-        ("POST", "/api/v2/spot/trade/cancel-replace-order", true)
-    );
-    assert_eq!(
-        json_body(&request),
-        serde_json::json!({"symbol": "BTCUSDT", "price": "60000", "size": "1", "orderId": "123"})
-    );
-    client
-        .private_request(
-            "adjust_futures_position_margin",
-            vec![
-                ("product_symbol".into(), "BTC-USDT-SWAP".into()),
-                ("productType".into(), "USDT-FUTURES".into()),
-                ("marginCoin".into(), "USDT".into()),
-                ("holdSide".into(), "long".into()),
-                ("amount".into(), "-1".into()),
-            ],
-        )
-        .await
-        .expect("adjust_futures_position_margin");
-    let request = next(&receiver, "adjust_futures_position_margin");
-    assert_eq!(
-        (
-            request.method.as_str(),
-            request.path.as_str(),
-            request.signed
-        ),
-        ("POST", "/api/v2/mix/account/set-margin", true)
-    );
-    assert_eq!(
-        json_body(&request),
-        serde_json::json!({"symbol": "BTCUSDT", "productType": "USDT-FUTURES", "marginCoin": "USDT", "holdSide": "long", "amount": "-1"})
-    );
     client
         .public_request(
             "get_futures_symbol_price",
@@ -1808,33 +921,6 @@ async fn ordinary_risk_routes_preserve_parameters_and_authentication() {
             "{\"symbol\":\"BTCUSDT\",\"productType\":\"USDT-FUTURES\"}",
         ),
         (
-            "get_futures_open_interest_limit",
-            "GET",
-            "/api/v2/mix/market/oi-limit",
-            true,
-            &[("productType", "USDT-FUTURES")],
-            "{\"productType\":\"USDT-FUTURES\"}",
-        ),
-        (
-            "get_futures_position_tiers",
-            "GET",
-            "/api/v2/mix/market/query-position-lever",
-            true,
-            &[
-                ("productType", "USDT-FUTURES"),
-                ("product_symbol", "BTC-USDT-SWAP"),
-            ],
-            "{\"productType\":\"USDT-FUTURES\",\"symbol\":\"BTCUSDT\"}",
-        ),
-        (
-            "get_futures_discount_rates",
-            "GET",
-            "/api/v2/mix/market/discount-rate",
-            true,
-            &[],
-            "{}",
-        ),
-        (
             "get_futures_interest_exchange_rates",
             "GET",
             "/api/v2/mix/market/exchange-rate",
@@ -1857,14 +943,6 @@ async fn ordinary_risk_routes_preserve_parameters_and_authentication() {
             true,
             &[],
             "{}",
-        ),
-        (
-            "get_futures_sub_account_assets",
-            "GET",
-            "/api/v2/mix/account/sub-account-assets",
-            false,
-            &[("productType", "USDT-FUTURES")],
-            "{\"productType\":\"USDT-FUTURES\"}",
         ),
         (
             "get_futures_estimated_open_count",
@@ -1895,21 +973,6 @@ async fn ordinary_risk_routes_preserve_parameters_and_authentication() {
                 ("openPrice", "100"),
             ],
             "{\"symbol\":\"BTCUSDT\",\"productType\":\"USDT-FUTURES\",\"marginCoin\":\"USDT\",\"posSide\":\"long\",\"orderType\":\"limit\",\"openAmount\":\"10\",\"openPrice\":\"100\"}",
-        ),
-        (
-            "get_futures_max_open_quantity",
-            "GET",
-            "/api/v2/mix/account/max-open",
-            false,
-            &[
-                ("product_symbol", "BTC-USDT-SWAP"),
-                ("productType", "USDT-FUTURES"),
-                ("marginCoin", "USDT"),
-                ("posSide", "long"),
-                ("orderType", "limit"),
-                ("openPrice", "100"),
-            ],
-            "{\"symbol\":\"BTCUSDT\",\"productType\":\"USDT-FUTURES\",\"marginCoin\":\"USDT\",\"posSide\":\"long\",\"orderType\":\"limit\",\"openPrice\":\"100\"}",
         ),
         (
             "get_futures_interest_history",
@@ -1989,22 +1052,6 @@ async fn ordinary_risk_routes_preserve_parameters_and_authentication() {
             "{\"productType\":\"USDT-FUTURES\"}",
         ),
         (
-            "get_futures_position_history",
-            "GET",
-            "/api/v2/mix/position/history-position",
-            false,
-            &[],
-            "{}",
-        ),
-        (
-            "get_futures_adl_rank",
-            "GET",
-            "/api/v2/mix/position/adlRank",
-            false,
-            &[("productType", "USDT-FUTURES")],
-            "{\"productType\":\"USDT-FUTURES\"}",
-        ),
-        (
             "reverse_futures_position",
             "POST",
             "/api/v2/mix/order/click-backhand",
@@ -2019,25 +1066,9 @@ async fn ordinary_risk_routes_preserve_parameters_and_authentication() {
             "{\"symbol\":\"BTCUSDT\",\"marginCoin\":\"USDT\",\"productType\":\"USDT-FUTURES\",\"side\":\"buy\"}",
         ),
         (
-            "get_futures_fill_history",
-            "GET",
-            "/api/v2/mix/order/fill-history",
-            false,
-            &[("productType", "USDT-FUTURES")],
-            "{\"productType\":\"USDT-FUTURES\"}",
-        ),
-        (
             "get_spot_sub_account_transfer_records",
             "GET",
             "/api/v2/spot/account/sub-main-trans-record",
-            false,
-            &[],
-            "{}",
-        ),
-        (
-            "get_spot_sub_account_assets",
-            "GET",
-            "/api/v2/spot/account/subaccount-assets",
             false,
             &[],
             "{}",
@@ -2058,52 +1089,12 @@ async fn ordinary_risk_routes_preserve_parameters_and_authentication() {
             "{\"fromType\":\"spot\",\"toType\":\"spot\",\"amount\":\"1\",\"coin\":\"USDT\",\"fromUserId\":\"1\",\"toUserId\":\"2\"}",
         ),
         (
-            "get_cross_margin_assets",
-            "GET",
-            "/api/v2/margin/crossed/account/assets",
-            false,
-            &[],
-            "{}",
-        ),
-        (
-            "borrow_cross_margin_asset",
-            "POST",
-            "/api/v2/margin/crossed/account/borrow",
-            false,
-            &[("coin", "USDT"), ("borrowAmount", "1")],
-            "{\"coin\":\"USDT\",\"borrowAmount\":\"1\"}",
-        ),
-        (
-            "repay_cross_margin_asset",
-            "POST",
-            "/api/v2/margin/crossed/account/repay",
-            false,
-            &[("coin", "USDT"), ("repayAmount", "1")],
-            "{\"coin\":\"USDT\",\"repayAmount\":\"1\"}",
-        ),
-        (
             "get_cross_margin_risk_rate",
             "GET",
             "/api/v2/margin/crossed/account/risk-rate",
             false,
             &[],
             "{}",
-        ),
-        (
-            "get_cross_margin_max_borrowable",
-            "GET",
-            "/api/v2/margin/crossed/account/max-borrowable-amount",
-            false,
-            &[("coin", "USDT")],
-            "{\"coin\":\"USDT\"}",
-        ),
-        (
-            "get_cross_margin_max_transferable",
-            "GET",
-            "/api/v2/margin/crossed/account/max-transfer-out-amount",
-            false,
-            &[("coin", "USDT")],
-            "{\"coin\":\"USDT\"}",
         ),
         (
             "flash_repay_cross_margin_assets",
@@ -2170,125 +1161,12 @@ async fn ordinary_risk_routes_preserve_parameters_and_authentication() {
             "{\"startTime\":\"1700000000000\"}",
         ),
         (
-            "get_cross_margin_financial_records",
-            "GET",
-            "/api/v2/margin/crossed/financial-records",
-            false,
-            &[("startTime", "1700000000000")],
-            "{\"startTime\":\"1700000000000\"}",
-        ),
-        (
-            "place_cross_margin_order",
-            "POST",
-            "/api/v2/margin/crossed/place-order",
-            false,
-            &[
-                ("product_symbol", "BTC-USDT-SWAP"),
-                ("orderType", "limit"),
-                ("loanType", "normal"),
-                ("force", "gtc"),
-                ("side", "buy"),
-                ("price", "100"),
-                ("baseSize", "1"),
-            ],
-            "{\"symbol\":\"BTCUSDT\",\"orderType\":\"limit\",\"loanType\":\"normal\",\"force\":\"gtc\",\"side\":\"buy\",\"price\":\"100\",\"baseSize\":\"1\"}",
-        ),
-        (
-            "cancel_cross_margin_order",
-            "POST",
-            "/api/v2/margin/crossed/cancel-order",
-            false,
-            &[("product_symbol", "BTC-USDT-SWAP"), ("orderId", "123")],
-            "{\"symbol\":\"BTCUSDT\",\"orderId\":\"123\"}",
-        ),
-        (
-            "get_cross_margin_open_orders",
-            "GET",
-            "/api/v2/margin/crossed/open-orders",
-            false,
-            &[
-                ("product_symbol", "BTC-USDT-SWAP"),
-                ("startTime", "1700000000000"),
-            ],
-            "{\"symbol\":\"BTCUSDT\",\"startTime\":\"1700000000000\"}",
-        ),
-        (
-            "get_cross_margin_order_history",
-            "GET",
-            "/api/v2/margin/crossed/history-orders",
-            false,
-            &[
-                ("product_symbol", "BTC-USDT-SWAP"),
-                ("startTime", "1700000000000"),
-            ],
-            "{\"symbol\":\"BTCUSDT\",\"startTime\":\"1700000000000\"}",
-        ),
-        (
-            "get_cross_margin_fills",
-            "GET",
-            "/api/v2/margin/crossed/fills",
-            false,
-            &[
-                ("product_symbol", "BTC-USDT-SWAP"),
-                ("startTime", "1700000000000"),
-            ],
-            "{\"symbol\":\"BTCUSDT\",\"startTime\":\"1700000000000\"}",
-        ),
-        (
-            "get_isolated_margin_assets",
-            "GET",
-            "/api/v2/margin/isolated/account/assets",
-            false,
-            &[],
-            "{}",
-        ),
-        (
-            "borrow_isolated_margin_asset",
-            "POST",
-            "/api/v2/margin/isolated/account/borrow",
-            false,
-            &[
-                ("product_symbol", "BTC-USDT-SWAP"),
-                ("coin", "USDT"),
-                ("borrowAmount", "1"),
-            ],
-            "{\"symbol\":\"BTCUSDT\",\"coin\":\"USDT\",\"borrowAmount\":\"1\"}",
-        ),
-        (
-            "repay_isolated_margin_asset",
-            "POST",
-            "/api/v2/margin/isolated/account/repay",
-            false,
-            &[
-                ("repayAmount", "1"),
-                ("coin", "USDT"),
-                ("product_symbol", "BTC-USDT-SWAP"),
-            ],
-            "{\"repayAmount\":\"1\",\"coin\":\"USDT\",\"symbol\":\"BTCUSDT\"}",
-        ),
-        (
             "get_isolated_margin_risk_rate",
             "GET",
             "/api/v2/margin/isolated/account/risk-rate",
             false,
             &[],
             "{}",
-        ),
-        (
-            "get_isolated_margin_max_borrowable",
-            "GET",
-            "/api/v2/margin/isolated/account/max-borrowable-amount",
-            false,
-            &[("product_symbol", "BTC-USDT-SWAP")],
-            "{\"symbol\":\"BTCUSDT\"}",
-        ),
-        (
-            "get_isolated_margin_max_transferable",
-            "GET",
-            "/api/v2/margin/isolated/account/max-transfer-out-amount",
-            false,
-            &[("product_symbol", "BTC-USDT-SWAP")],
-            "{\"symbol\":\"BTCUSDT\"}",
         ),
         (
             "flash_repay_isolated_margin_assets",
@@ -2359,74 +1237,6 @@ async fn ordinary_risk_routes_preserve_parameters_and_authentication() {
             "get_isolated_margin_liquidation_history",
             "GET",
             "/api/v2/margin/isolated/liquidation-history",
-            false,
-            &[
-                ("product_symbol", "BTC-USDT-SWAP"),
-                ("startTime", "1700000000000"),
-            ],
-            "{\"symbol\":\"BTCUSDT\",\"startTime\":\"1700000000000\"}",
-        ),
-        (
-            "get_isolated_margin_financial_records",
-            "GET",
-            "/api/v2/margin/isolated/financial-records",
-            false,
-            &[
-                ("product_symbol", "BTC-USDT-SWAP"),
-                ("startTime", "1700000000000"),
-            ],
-            "{\"symbol\":\"BTCUSDT\",\"startTime\":\"1700000000000\"}",
-        ),
-        (
-            "place_isolated_margin_order",
-            "POST",
-            "/api/v2/margin/isolated/place-order",
-            false,
-            &[
-                ("product_symbol", "BTC-USDT-SWAP"),
-                ("orderType", "limit"),
-                ("loanType", "normal"),
-                ("force", "gtc"),
-                ("side", "buy"),
-                ("price", "100"),
-                ("baseSize", "1"),
-            ],
-            "{\"symbol\":\"BTCUSDT\",\"orderType\":\"limit\",\"loanType\":\"normal\",\"force\":\"gtc\",\"side\":\"buy\",\"price\":\"100\",\"baseSize\":\"1\"}",
-        ),
-        (
-            "cancel_isolated_margin_order",
-            "POST",
-            "/api/v2/margin/isolated/cancel-order",
-            false,
-            &[("product_symbol", "BTC-USDT-SWAP"), ("orderId", "123")],
-            "{\"symbol\":\"BTCUSDT\",\"orderId\":\"123\"}",
-        ),
-        (
-            "get_isolated_margin_open_orders",
-            "GET",
-            "/api/v2/margin/isolated/open-orders",
-            false,
-            &[
-                ("product_symbol", "BTC-USDT-SWAP"),
-                ("startTime", "1700000000000"),
-            ],
-            "{\"symbol\":\"BTCUSDT\",\"startTime\":\"1700000000000\"}",
-        ),
-        (
-            "get_isolated_margin_order_history",
-            "GET",
-            "/api/v2/margin/isolated/history-orders",
-            false,
-            &[
-                ("product_symbol", "BTC-USDT-SWAP"),
-                ("startTime", "1700000000000"),
-            ],
-            "{\"symbol\":\"BTCUSDT\",\"startTime\":\"1700000000000\"}",
-        ),
-        (
-            "get_isolated_margin_fills",
-            "GET",
-            "/api/v2/margin/isolated/fills",
             false,
             &[
                 ("product_symbol", "BTC-USDT-SWAP"),
@@ -2741,80 +1551,6 @@ async fn ordinary_risk_routes_preserve_parameters_and_authentication() {
 async fn batch_controls_preserve_nested_and_root_array_bodies() {
     let (url, receiver) = recording_server();
     let client = signed_client(url);
-    client.private_request("place_cross_margin_batch_orders", vec![("orderList".into(), "[{\"orderType\":\"market\",\"side\":\"buy\",\"loanType\":\"normal\",\"force\":\"gtc\",\"quoteSize\":\"100\"}]".into()),("product_symbol".into(), "BTC-USDT-SPOT".into())]).await.expect("place_cross_margin_batch_orders");
-    let request = next(&receiver, "place_cross_margin_batch_orders");
-    assert_route(
-        &request,
-        "place_cross_margin_batch_orders",
-        "POST",
-        "/api/v2/margin/crossed/batch-place-order",
-    );
-    assert!(request.signed);
-    assert_eq!(serde_json::from_str::<serde_json::Value>(&request.body).expect("body"), serde_json::from_str::<serde_json::Value>("{\"symbol\": \"BTCUSDT\", \"orderList\": [{\"orderType\": \"market\", \"side\": \"buy\", \"loanType\": \"normal\", \"force\": \"gtc\", \"quoteSize\": \"100\"}]}").expect("fixture"));
-    client.private_request("place_isolated_margin_batch_orders", vec![("orderList".into(), "[{\"orderType\":\"market\",\"side\":\"buy\",\"loanType\":\"normal\",\"force\":\"gtc\",\"quoteSize\":\"100\"}]".into()),("product_symbol".into(), "BTC-USDT-SPOT".into())]).await.expect("place_isolated_margin_batch_orders");
-    let request = next(&receiver, "place_isolated_margin_batch_orders");
-    assert_route(
-        &request,
-        "place_isolated_margin_batch_orders",
-        "POST",
-        "/api/v2/margin/isolated/batch-place-order",
-    );
-    assert!(request.signed);
-    assert_eq!(serde_json::from_str::<serde_json::Value>(&request.body).expect("body"), serde_json::from_str::<serde_json::Value>("{\"symbol\": \"BTCUSDT\", \"orderList\": [{\"orderType\": \"market\", \"side\": \"buy\", \"loanType\": \"normal\", \"force\": \"gtc\", \"quoteSize\": \"100\"}]}").expect("fixture"));
-    client
-        .private_request(
-            "cancel_cross_margin_batch_orders",
-            vec![
-                (
-                    "orderIdList".into(),
-                    "[{\"orderId\":\"123\"},{\"clientOid\":\"order-2\"}]".into(),
-                ),
-                ("product_symbol".into(), "BTC-USDT-SPOT".into()),
-            ],
-        )
-        .await
-        .expect("cancel_cross_margin_batch_orders");
-    let request = next(&receiver, "cancel_cross_margin_batch_orders");
-    assert_route(
-        &request,
-        "cancel_cross_margin_batch_orders",
-        "POST",
-        "/api/v2/margin/crossed/batch-cancel-order",
-    );
-    assert!(request.signed);
-    assert_eq!(serde_json::from_str::<serde_json::Value>(&request.body).expect("body"), serde_json::from_str::<serde_json::Value>("{\"symbol\": \"BTCUSDT\", \"orderIdList\": [{\"orderId\": \"123\"}, {\"clientOid\": \"order-2\"}]}").expect("fixture"));
-    client
-        .private_request(
-            "cancel_isolated_margin_batch_orders",
-            vec![
-                (
-                    "orderIdList".into(),
-                    "[{\"orderId\":\"123\"},{\"clientOid\":\"order-2\"}]".into(),
-                ),
-                ("product_symbol".into(), "BTC-USDT-SPOT".into()),
-            ],
-        )
-        .await
-        .expect("cancel_isolated_margin_batch_orders");
-    let request = next(&receiver, "cancel_isolated_margin_batch_orders");
-    assert_route(
-        &request,
-        "cancel_isolated_margin_batch_orders",
-        "POST",
-        "/api/v2/margin/isolated/batch-cancel-order",
-    );
-    assert!(request.signed);
-    assert_eq!(serde_json::from_str::<serde_json::Value>(&request.body).expect("body"), serde_json::from_str::<serde_json::Value>("{\"symbol\": \"BTCUSDT\", \"orderIdList\": [{\"orderId\": \"123\"}, {\"clientOid\": \"order-2\"}]}").expect("fixture"));
-    client.private_request("batch_cancel_replace_spot_orders", vec![("orderList".into(), "[{\"product_symbol\":\"BTC-USDT-SPOT\",\"orderId\":\"123\",\"price\":\"100\",\"size\":\"1\"}]".into())]).await.expect("batch_cancel_replace_spot_orders");
-    let request = next(&receiver, "batch_cancel_replace_spot_orders");
-    assert_route(
-        &request,
-        "batch_cancel_replace_spot_orders",
-        "POST",
-        "/api/v2/spot/trade/batch-cancel-replace-order",
-    );
-    assert!(request.signed);
-    assert_eq!(serde_json::from_str::<serde_json::Value>(&request.body).expect("body"), serde_json::from_str::<serde_json::Value>("{\"orderList\": [{\"symbol\": \"BTCUSDT\", \"orderId\": \"123\", \"price\": \"100\", \"size\": \"1\"}]}").expect("fixture"));
     client.private_request("modify_uta_batch_orders", vec![("orders".into(), "[{\"product_symbol\":\"BTC-USDT-SWAP\",\"category\":\"USDT-FUTURES\",\"orderId\":\"123\",\"qty\":\"2\",\"requestId\":123456789012345678}]".into())]).await.expect("modify_uta_batch_orders");
     let request = next(&receiver, "modify_uta_batch_orders");
     assert_route(
@@ -3031,7 +1767,7 @@ async fn supplementary_routes_preserve_parameters_and_authentication() {
             "{}",
         ),
         (
-            "upgrade_to_uta",
+            "switch_to_classic_account",
             "POST",
             "/api/v3/account/switch",
             false,
@@ -3039,7 +1775,7 @@ async fn supplementary_routes_preserve_parameters_and_authentication() {
             "{}",
         ),
         (
-            "get_uta_upgrade_status",
+            "get_account_switch_status",
             "GET",
             "/api/v3/account/switch-status",
             false,
@@ -3069,38 +1805,6 @@ async fn supplementary_routes_preserve_parameters_and_authentication() {
             false,
             &[],
             "{}",
-        ),
-        (
-            "get_classic_account_upgrade_status",
-            "GET",
-            "/api/v2/spot/account/upgrade-status",
-            false,
-            &[],
-            "{}",
-        ),
-        (
-            "upgrade_classic_account",
-            "POST",
-            "/api/v2/spot/account/upgrade",
-            false,
-            &[("confirm", "true")],
-            "{}",
-        ),
-        (
-            "get_spot_fee_deduction",
-            "GET",
-            "/api/v2/spot/account/deduct-info",
-            false,
-            &[],
-            "{}",
-        ),
-        (
-            "set_spot_fee_deduction",
-            "POST",
-            "/api/v2/spot/account/switch-deduct",
-            false,
-            &[("deduct", "on")],
-            "{\"deduct\":\"on\"}",
         ),
         (
             "set_spot_deposit_account",
@@ -3497,14 +2201,6 @@ async fn remaining_routes_preserve_parameters_and_authentication() {
             false,
             &[("startTime", "1700000000000"), ("endTime", "1700000001000")],
             "{\"startTime\":\"1700000000000\",\"endTime\":\"1700000001000\"}",
-        ),
-        (
-            "get_classic_merge_depth",
-            "GET",
-            "/api/v2/spot/market/merge-depth",
-            true,
-            &[("product_symbol", "BTC-USDT-SWAP")],
-            "{\"symbol\":\"BTCUSDT\"}",
         ),
         (
             "get_classic_auction",

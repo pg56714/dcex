@@ -7,15 +7,14 @@ use crate::product_table::ProductTable;
 use crate::ws::{WebSocketConfig, WebSocketConnection};
 use crate::{DcexError, Result};
 
-use super::super::params::{exchange_symbol_fallback, is_canonical_product_symbol};
+use super::super::params::exchange_symbol_fallback;
 
-const PUBLIC_WS_URL: &str = "wss://ws.bitget.com/v2/ws/public";
 const UTA_PUBLIC_WS_URL: &str = "wss://ws.bitget.com/v3/ws/public";
 
 /// Bitget public subscription argument.
 ///
 /// Classic V2 args serialize as `{instType, channel, instId}`. UTA V3 args (built with
-/// [`BitgetWebSocketArg::uta`]) serialize as `{instType (lowercase), topic, symbol, interval?}`,
+/// [`BitgetWebSocketArg::uta`]) serialize as `{instType (lowercase), topic, symbol?, interval?}`,
 /// in which case `channel` holds the V3 topic and `inst_id` the symbol.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct BitgetWebSocketArg {
@@ -49,7 +48,7 @@ impl BitgetWebSocketArg {
     }
 
     /// Builds a UTA V3 public topic (`ticker`, `publicTrade`, `books1`/`books5`/`books50`,
-    /// or `kline` with an `interval`).
+    /// or `kline` with an `interval`). Use an empty symbol for the futures-only `liquidation` topic.
     pub fn uta(
         inst_type: impl Into<String>,
         topic: impl Into<String>,
@@ -58,6 +57,22 @@ impl BitgetWebSocketArg {
     ) -> Result<Self> {
         let inst_type = normalize_inst_type(&inst_type.into())?;
         let topic = normalize_uta_topic(&topic.into())?;
+        let symbol = symbol.into();
+        let inst_id = if topic == "liquidation" {
+            if !matches!(
+                inst_type.as_str(),
+                "USDT-FUTURES" | "COIN-FUTURES" | "USDC-FUTURES"
+            ) || !symbol.trim().is_empty()
+            {
+                return Err(DcexError::InvalidInput(
+                    "Bitget UTA liquidation requires a futures instrument type and no symbol."
+                        .into(),
+                ));
+            }
+            String::new()
+        } else {
+            normalize_inst_id(&symbol)?
+        };
         let interval = match (topic.as_str(), interval) {
             ("kline", Some(interval)) => Some(normalize_uta_interval(&interval)?),
             ("kline", None) => {
@@ -75,7 +90,7 @@ impl BitgetWebSocketArg {
         Ok(Self {
             inst_type,
             channel: topic,
-            inst_id: normalize_inst_id(&symbol.into())?,
+            inst_id,
             interval,
             uta_v3: true,
         })
@@ -86,8 +101,10 @@ impl BitgetWebSocketArg {
             let mut arg = json!({
                 "instType": self.inst_type.to_ascii_lowercase(),
                 "topic": self.channel,
-                "symbol": self.inst_id,
             });
+            if self.channel != "liquidation" {
+                arg["symbol"] = Value::String(self.inst_id.clone());
+            }
             if let Some(interval) = &self.interval {
                 arg["interval"] = Value::String(interval.clone());
             }
@@ -110,7 +127,7 @@ pub struct BitgetPublicWebSocket {
 
 impl BitgetPublicWebSocket {
     pub fn new(default_inst_type: impl Into<String>, timeout: Duration) -> Result<Self> {
-        Self::with_url(default_inst_type, PUBLIC_WS_URL.to_string(), timeout)
+        Self::with_url(default_inst_type, UTA_PUBLIC_WS_URL.to_string(), timeout)
     }
 
     pub fn with_url(
@@ -193,26 +210,18 @@ impl BitgetPublicWebSocket {
     }
 
     pub async fn subscribe_trades(&mut self, product_symbol: &str) -> Result<()> {
-        let channel = if self.uta_v3 { "publicTrade" } else { "trade" };
+        let channel = "publicTrade";
         self.subscribe_channel(channel, product_symbol).await
     }
 
     pub async fn subscribe_orderbook(&mut self, product_symbol: &str, depth: u32) -> Result<()> {
-        let channel = if self.uta_v3 {
-            uta_orderbook_topic(depth)?
-        } else {
-            orderbook_channel(depth)?
-        };
+        let channel = uta_orderbook_topic(depth)?;
         self.subscribe_channel(channel, product_symbol).await
     }
 
     pub async fn subscribe_klines(&mut self, product_symbol: &str, interval: &str) -> Result<()> {
-        if self.uta_v3 {
-            let arg = self.arg("kline", product_symbol, Some(interval.to_string()))?;
-            return self.subscribe(vec![arg]).await;
-        }
-        let channel = format!("candle{}", normalize_interval(interval)?);
-        self.subscribe_channel(&channel, product_symbol).await
+        let arg = self.arg("kline", product_symbol, Some(interval.to_string()))?;
+        self.subscribe(vec![arg]).await
     }
 
     fn arg(
@@ -221,12 +230,24 @@ impl BitgetPublicWebSocket {
         product_symbol: &str,
         interval: Option<String>,
     ) -> Result<BitgetWebSocketArg> {
-        let (inst_type, inst_id) = self.instrument(product_symbol)?;
-        if self.uta_v3 {
-            BitgetWebSocketArg::uta(inst_type, channel, inst_id, interval)
-        } else {
-            BitgetWebSocketArg::new(inst_type, channel, inst_id)
+        if self.uta_v3 && channel.trim() == "liquidation" {
+            return BitgetWebSocketArg::uta(
+                &self.default_inst_type,
+                channel,
+                product_symbol,
+                interval,
+            );
         }
+        let (inst_type, inst_id) = self.instrument(product_symbol)?;
+        let mut arg = if self.uta_v3 {
+            BitgetWebSocketArg::uta(inst_type, channel, &inst_id, interval)
+        } else {
+            BitgetWebSocketArg::new(inst_type, channel, &inst_id)
+        }?;
+        if self.product_table.is_some() {
+            arg.inst_id = inst_id;
+        }
+        Ok(arg)
     }
 
     pub async fn recv(&mut self) -> Result<Value> {
@@ -238,15 +259,23 @@ impl BitgetPublicWebSocket {
     }
 
     fn instrument(&self, product_symbol: &str) -> Result<(String, String)> {
-        let inst_id = if let Some(table) = &self.product_table {
-            if is_canonical_product_symbol(product_symbol) {
-                table.get_exchange_symbol("bitget", product_symbol)?
-            } else {
-                product_symbol.to_string()
-            }
-        } else {
-            exchange_symbol_fallback(product_symbol)
-        };
+        if let Some(table) = &self.product_table {
+            let canonical = table
+                .rows()
+                .iter()
+                .any(|row| row.exchange == "bitget" && row.product_symbol == product_symbol);
+            let row = table.resolve_symbol_in("bitget", product_symbol, |row| {
+                canonical
+                    || row
+                        .exchange_type
+                        .eq_ignore_ascii_case(&self.default_inst_type)
+            })?;
+            return Ok((
+                normalize_inst_type(&row.exchange_type)?,
+                row.exchange_symbol.clone(),
+            ));
+        }
+        let inst_id = exchange_symbol_fallback(product_symbol)?;
         Ok((
             self.inst_type_for(product_symbol)?,
             normalize_inst_id(&inst_id)?,
@@ -254,12 +283,6 @@ impl BitgetPublicWebSocket {
     }
 
     fn inst_type_for(&self, product_symbol: &str) -> Result<String> {
-        if let Some(table) = &self.product_table
-            && is_canonical_product_symbol(product_symbol)
-        {
-            let exchange_type = table.get_exchange_type("bitget", Some(product_symbol), None)?;
-            return normalize_inst_type(&exchange_type);
-        }
         if product_symbol.ends_with("-SPOT") {
             return Ok("SPOT".to_string());
         }
@@ -292,6 +315,11 @@ impl BitgetPublicWebSocket {
 }
 
 fn subscription_payload(op: &str, uta_v3: bool, args: &[BitgetWebSocketArg]) -> Result<Value> {
+    for arg in args {
+        if !arg.uta_v3 {
+            normalize_channel(&arg.channel)?;
+        }
+    }
     if args.iter().any(|arg| arg.uta_v3 != uta_v3) {
         let message = if uta_v3 {
             "Bitget UTA V3 public WebSocket requires topic args built with BitgetWebSocketArg::uta."
@@ -309,7 +337,8 @@ fn subscription_payload(op: &str, uta_v3: bool, args: &[BitgetWebSocketArg]) -> 
 fn normalize_uta_topic(topic: &str) -> Result<String> {
     let topic = topic.trim();
     match topic {
-        "ticker" | "publicTrade" | "kline" | "books1" | "books5" | "books50" => {
+        "ticker" | "publicTrade" | "kline" | "books" | "books1" | "books5" | "books50"
+        | "liquidation" | "rpi-books" | "rpi-books1" | "rpi-books5" | "rpi-books50" => {
             Ok(topic.to_string())
         }
         _ => Err(DcexError::InvalidInput(format!(
@@ -357,14 +386,7 @@ fn normalize_inst_type(inst_type: &str) -> Result<String> {
 fn normalize_channel(channel: &str) -> Result<String> {
     let channel = channel.trim();
     match channel {
-        "ticker" | "trade" | "books" | "books1" | "books5" | "books15" | "auction"
-        | "index-price" => Ok(channel.to_string()),
-        _ if channel
-            .strip_prefix("candle")
-            .is_some_and(|interval| normalize_interval(interval).is_ok()) =>
-        {
-            Ok(channel.to_string())
-        }
+        "auction" | "index-price" => Ok(channel.to_string()),
         _ => Err(DcexError::InvalidInput(format!(
             "unsupported Bitget WebSocket channel: {channel}"
         ))),
@@ -383,36 +405,13 @@ fn normalize_inst_id(inst_id: &str) -> Result<String> {
     }
     if !inst_id
         .chars()
-        .all(|character| character.is_ascii_alphanumeric())
+        .all(|character| character.is_ascii_alphanumeric() || character == '_')
     {
         return Err(DcexError::InvalidInput(format!(
             "unsupported Bitget instrument ID: {inst_id}"
         )));
     }
     Ok(inst_id.to_ascii_uppercase())
-}
-
-fn orderbook_channel(depth: u32) -> Result<&'static str> {
-    match depth {
-        0 => Err(DcexError::InvalidInput(
-            "Bitget orderbook depth must be greater than zero.".to_string(),
-        )),
-        1 => Ok("books1"),
-        5 => Ok("books5"),
-        15 => Ok("books15"),
-        _ => Ok("books"),
-    }
-}
-
-fn normalize_interval(interval: &str) -> Result<String> {
-    let interval = interval.trim();
-    match interval {
-        "1m" | "5m" | "15m" | "30m" | "1H" | "4H" | "6H" | "12H" | "1D" | "3D" | "1W" | "1M"
-        | "6Hutc" | "12Hutc" | "1Dutc" | "3Dutc" | "1Wutc" | "1Mutc" => Ok(interval.to_string()),
-        _ => Err(DcexError::InvalidInput(format!(
-            "unsupported Bitget kline interval: {interval}"
-        ))),
-    }
 }
 
 #[cfg(test)]
@@ -433,9 +432,9 @@ mod tests {
 
     #[test]
     fn builds_channel_arg() {
-        let arg = BitgetWebSocketArg::new("spot", "trade", "btcusdt").expect("arg");
+        let arg = BitgetWebSocketArg::new("spot", "auction", "btcusdt").expect("arg");
         assert_eq!(arg.inst_type, "SPOT");
-        assert_eq!(arg.channel, "trade");
+        assert_eq!(arg.channel, "auction");
         assert_eq!(arg.inst_id, "BTCUSDT");
         assert_eq!(arg.to_json()["instType"], "SPOT");
         assert!(BitgetWebSocketArg::new("spot", "bad", "btcusdt").is_err());
@@ -455,6 +454,20 @@ mod tests {
 
     #[test]
     fn builds_uta_v3_topic_args() {
+        for topic in [
+            "books",
+            "rpi-books",
+            "rpi-books1",
+            "rpi-books5",
+            "rpi-books50",
+        ] {
+            let arg = BitgetWebSocketArg::uta("USDT-FUTURES", topic, "BTCUSDT", None)
+                .expect("official topic");
+            assert_eq!(
+                arg.to_json(),
+                json!({"instType":"usdt-futures", "topic":topic, "symbol":"BTCUSDT"})
+            );
+        }
         let ticker =
             BitgetWebSocketArg::uta("USDT-FUTURES", "ticker", "btcusdt", None).expect("ticker");
         assert_eq!(
@@ -488,11 +501,11 @@ mod tests {
                 {"instType": "spot", "topic": "publicTrade", "symbol": "BTCUSDT"}
             ]})
         );
-        let classic = BitgetWebSocketArg::new("spot", "trade", "BTCUSDT").expect("classic");
+        let classic = BitgetWebSocketArg::new("spot", "auction", "BTCUSDT").expect("classic");
         assert!(subscription_payload("subscribe", true, std::slice::from_ref(&classic)).is_err());
         assert!(subscription_payload("subscribe", false, &[arg]).is_err());
         assert!(
-            !BitgetPublicWebSocket::new("SPOT", Duration::from_secs(1))
+            BitgetPublicWebSocket::new("SPOT", Duration::from_secs(1))
                 .expect("classic")
                 .is_uta_v3()
         );
@@ -502,10 +515,29 @@ mod tests {
 
     #[test]
     fn maps_orderbook_depth_to_channel() {
-        assert_eq!(orderbook_channel(1).expect("books1"), "books1");
-        assert_eq!(orderbook_channel(5).expect("books5"), "books5");
-        assert_eq!(orderbook_channel(15).expect("books15"), "books15");
-        assert_eq!(orderbook_channel(100).expect("books"), "books");
-        assert!(orderbook_channel(0).is_err());
+        assert_eq!(uta_orderbook_topic(1).expect("books1"), "books1");
+        assert_eq!(uta_orderbook_topic(5).expect("books5"), "books5");
+        assert!(uta_orderbook_topic(15).is_err());
+        assert!(uta_orderbook_topic(100).is_err());
+        assert!(uta_orderbook_topic(0).is_err());
+    }
+
+    #[test]
+    fn liquidation_uses_futures_scope_without_symbol() {
+        for inst_type in ["usdt-futures", "coin-futures", "usdc-futures"] {
+            let client =
+                BitgetPublicWebSocket::new_uta(inst_type, Duration::from_secs(1)).expect("client");
+            let arg = client.arg("liquidation", "", None).expect("liquidation");
+            for op in ["subscribe", "unsubscribe"] {
+                assert_eq!(
+                    subscription_payload(op, true, std::slice::from_ref(&arg)).expect("frame"),
+                    json!({"op":op,"args":[{"instType":inst_type,"topic":"liquidation"}]})
+                );
+            }
+            assert!(client.arg("liquidation", "BTCUSDT", None).is_err());
+        }
+        for inst_type in ["spot", "margin"] {
+            assert!(BitgetWebSocketArg::uta(inst_type, "liquidation", "", None).is_err());
+        }
     }
 }

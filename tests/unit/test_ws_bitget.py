@@ -111,33 +111,17 @@ class _FakeNativeBitgetPrivateWebSocketClient:
             return "UTA"
         return "USDT-FUTURES"
 
-    async def subscribe_orders(
-        self,
-        inst_type: str | None = None,
-        inst_id: str | None = None,
-    ) -> None:
-        await self.subscribe_channel(self._inst_type(inst_type), "orders", inst_id)
+    async def subscribe_orders(self) -> None:
+        await self.subscribe_channel("UTA", "order")
 
-    async def subscribe_fills(
-        self,
-        inst_type: str | None = None,
-        inst_id: str | None = None,
-    ) -> None:
-        await self.subscribe_channel(self._inst_type(inst_type), "fill", inst_id)
+    async def subscribe_fills(self) -> None:
+        await self.subscribe_channel("UTA", "fill")
 
-    async def subscribe_positions(
-        self,
-        inst_type: str | None = None,
-        inst_id: str | None = None,
-    ) -> None:
-        await self.subscribe_channel(self._inst_type(inst_type), "positions", inst_id)
+    async def subscribe_positions(self) -> None:
+        await self.subscribe_channel("UTA", "position")
 
-    async def subscribe_account(
-        self,
-        inst_type: str | None = None,
-        coin: str | None = None,
-    ) -> None:
-        await self.subscribe_channel(self._inst_type(inst_type), "account", coin=coin)
+    async def subscribe_account(self) -> None:
+        await self.subscribe_channel("UTA", "account")
 
     async def subscribe_equity(self, inst_type: str | None = None) -> None:
         await self.subscribe_channel(self._inst_type(inst_type), "equity")
@@ -146,10 +130,7 @@ class _FakeNativeBitgetPrivateWebSocketClient:
         return self.logged_in
 
     async def recv(self) -> bytes:
-        return (
-            b'{"event":"subscribe",'
-            b'"arg":{"instType":"USDT-FUTURES","channel":"account","coin":"default"}}'
-        )
+        return b'{"event":"subscribe","arg":{"instType":"UTA","topic":"account"}}'
 
 
 class _FakeNative:
@@ -225,7 +206,7 @@ async def test_bitget_private_ws_wrapper(monkeypatch: pytest.MonkeyPatch) -> Non
         api_secret="api-secret",
         passphrase="passphrase",
         timeout=2,
-        base_url="wss://example.test/private",
+        base_url="wss://example.test/v3/ws/private",
     ) as ws:
         native_client = ws._native_client
         assert native_client.connected is True
@@ -233,28 +214,26 @@ async def test_bitget_private_ws_wrapper(monkeypatch: pytest.MonkeyPatch) -> Non
         assert native_client.api_secret == "api-secret"
         assert native_client.passphrase == "passphrase"
         assert native_client.timeout == 2
-        assert native_client.base_url == "wss://example.test/private"
+        assert native_client.base_url == "wss://example.test/v3/ws/private"
         assert ws.is_logged_in() is True
 
         await ws.subscribe_orders()
-        await ws.subscribe_fills(inst_id="BTCUSDT")
-        await ws.subscribe_positions(inst_type="COIN-FUTURES")
-        await ws.subscribe_account(coin="default")
-        await ws.subscribe_equity()
+        await ws.subscribe_fills()
+        await ws.subscribe_positions()
+        await ws.subscribe_account()
         await ws.ping()
         event = await ws.recv()
 
     assert native_client.subscriptions == [
-        ("USDT-FUTURES", "orders", None, None),
-        ("USDT-FUTURES", "fill", "BTCUSDT", None),
-        ("COIN-FUTURES", "positions", None, None),
-        ("USDT-FUTURES", "account", None, "default"),
-        ("USDT-FUTURES", "equity", None, None),
+        ("UTA", "order", None, None),
+        ("UTA", "fill", None, None),
+        ("UTA", "position", None, None),
+        ("UTA", "account", None, None),
     ]
     assert native_client.ping_count == 1
     assert event == {
         "event": "subscribe",
-        "arg": {"instType": "USDT-FUTURES", "channel": "account", "coin": "default"},
+        "arg": {"instType": "UTA", "topic": "account"},
     }
     assert native_client.closed is True
     assert ws.is_logged_in() is False

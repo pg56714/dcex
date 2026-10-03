@@ -5,7 +5,7 @@ pub(in crate::exchanges::bitget) use crate::exchange::ValidatedResponse;
 
 pub(in crate::exchanges::bitget) use super::client::BitgetClient;
 pub(in crate::exchanges::bitget) use super::endpoints::*;
-pub(in crate::exchanges::bitget) use super::params::{BitgetParams, require_one_identifier};
+pub(in crate::exchanges::bitget) use super::params::BitgetParams;
 
 impl BitgetClient {
     pub(super) async fn account_private_request(
@@ -33,26 +33,7 @@ impl BitgetClient {
                 self.get_private(COMMON_FUNDING_ASSETS, params.only(&["coin"]))
                     .await
             }
-            "get_spot_account_info" => self.get_private(SPOT_ACCOUNT_INFO, Vec::new()).await,
-            "get_spot_account_assets" => {
-                self.get_private(SPOT_ACCOUNT_ASSETS, params.only(&["coin", "assetType"]))
-                    .await
-            }
-            "get_spot_account_bills" => {
-                self.get_private(
-                    SPOT_ACCOUNT_BILLS,
-                    params.only(&[
-                        "coin",
-                        "groupType",
-                        "businessType",
-                        "startTime",
-                        "endTime",
-                        "limit",
-                        "idLessThan",
-                    ]),
-                )
-                .await
-            }
+
             "transfer" => self.dispatch_transfer(method_name, params).await,
             "get_transfer_records" => {
                 self.dispatch_get_transfer_records(method_name, params)
@@ -146,51 +127,7 @@ impl BitgetClient {
                 self.post_private(UTA_SET_HOLD_MODE, Value::Object(params.body(&["holdMode"])))
                     .await
             }
-            "get_futures_account" => {
-                params.required("productType")?;
-                params.required("marginCoin")?;
-                let mut query = params.only(&["productType", "marginCoin"]);
-                self.push_required_product_symbol(&mut query, params)?;
-                self.get_private(FUTURES_ACCOUNT, query).await
-            }
-            "get_futures_accounts" => {
-                params.required("productType")?;
-                self.get_private(FUTURES_ACCOUNTS, params.only(&["productType"]))
-                    .await
-            }
-            "get_futures_account_bills" => {
-                params.required("productType")?;
-                self.get_private(
-                    FUTURES_ACCOUNT_BILLS,
-                    params.only(&[
-                        "productType",
-                        "coin",
-                        "businessType",
-                        "onlyFunding",
-                        "idLessThan",
-                        "startTime",
-                        "endTime",
-                        "limit",
-                    ]),
-                )
-                .await
-            }
-            "set_futures_leverage" => {
-                params.required("productType")?;
-                params.required("marginCoin")?;
-                require_one_identifier(params, &["leverage", "longLeverage", "shortLeverage"])?;
-                let mut body = params.body(&[
-                    "productType",
-                    "marginCoin",
-                    "leverage",
-                    "longLeverage",
-                    "shortLeverage",
-                    "holdSide",
-                ]);
-                self.insert_required_product_symbol(&mut body, params)?;
-                self.post_private(FUTURES_SET_LEVERAGE, Value::Object(body))
-                    .await
-            }
+
             "set_futures_margin_mode" => {
                 params.required("productType")?;
                 params.required("marginCoin")?;
@@ -200,30 +137,7 @@ impl BitgetClient {
                 self.post_private(FUTURES_SET_MARGIN_MODE, Value::Object(body))
                     .await
             }
-            "set_futures_position_mode" => {
-                params.required("productType")?;
-                params.required("posMode")?;
-                self.post_private(
-                    FUTURES_SET_POSITION_MODE,
-                    Value::Object(params.body(&["productType", "posMode"])),
-                )
-                .await
-            }
-            "get_futures_positions" => {
-                params.required("productType")?;
-                self.get_private(
-                    FUTURES_ALL_POSITIONS,
-                    params.only(&["productType", "marginCoin"]),
-                )
-                .await
-            }
-            "get_futures_position" => {
-                params.required("productType")?;
-                params.required("marginCoin")?;
-                let mut query = params.only(&["productType", "marginCoin"]);
-                self.push_required_product_symbol(&mut query, params)?;
-                self.get_private(FUTURES_SINGLE_POSITION, query).await
-            }
+
             _ => return Ok(None),
         };
         Ok(Some(result?))

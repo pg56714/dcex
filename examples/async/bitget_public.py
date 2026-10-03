@@ -6,10 +6,11 @@ import dcex.async_support as dcex
 async def main() -> None:
     client = await dcex.bitget()
     try:
-        spot_symbols = await client.get_spot_symbols(product_symbol="BTC-USDT-SPOT")
+        spot_symbols = await client.get_uta_instruments("SPOT", product_symbol="BTC-USDT-SPOT")
         print(spot_symbols)
 
-        orderbook = await client.get_futures_orderbook(
+        orderbook = await client.get_uta_orderbook(
+            "USDT-FUTURES",
             product_symbol="BTC-USDT-SWAP",
             limit=5,
         )

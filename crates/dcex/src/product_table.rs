@@ -124,6 +124,73 @@ impl ProductTable {
         }
     }
 
+    /// Resolve an exact canonical or native symbol within the method's market scope.
+    /// Canonical matches take precedence; unknown and ambiguous names never fall back.
+    pub fn resolve_symbol(
+        &self,
+        exchange: &str,
+        symbol: &str,
+        product_type: Option<&str>,
+        exchange_type: Option<&str>,
+    ) -> Result<&MarketInfo> {
+        self.resolve_symbol_in(exchange, symbol, |row| {
+            product_type.is_none_or(|kind| row.product_type == kind)
+                && exchange_type.is_none_or(|kind| row.exchange_type == kind)
+        })
+    }
+
+    /// Apply the endpoint's explicit market constraints to exact symbol matches.
+    pub fn resolve_symbol_in(
+        &self,
+        exchange: &str,
+        symbol: &str,
+        accepts: impl Fn(&MarketInfo) -> bool,
+    ) -> Result<&MarketInfo> {
+        let canonical = self
+            .rows
+            .iter()
+            .any(|row| row.exchange == exchange && row.product_symbol == symbol);
+        let candidates: Vec<_> = self
+            .rows
+            .iter()
+            .filter(|row| {
+                row.exchange == exchange
+                    && if canonical {
+                        row.product_symbol == symbol
+                    } else {
+                        row.exchange_symbol == symbol
+                            || (exchange == "kraken"
+                                && row.product_type == "spot"
+                                && !row.base_currency.is_empty()
+                                && !row.quote_currency.is_empty()
+                                && format!("{}/{}", row.base_currency, row.quote_currency)
+                                    == symbol)
+                            || (exchange == "hyperliquid"
+                                && serde_json::from_str::<(String, u64)>(&row.exchange_symbol)
+                                    .is_ok_and(|(coin, _)| coin == symbol))
+                    }
+            })
+            .collect();
+        let matches: Vec<_> = candidates
+            .iter()
+            .copied()
+            .filter(|row| accepts(row))
+            .collect();
+        match matches.as_slice() {
+            [row] => Ok(row),
+            _ => {
+                let names = candidates
+                    .iter()
+                    .map(|row| row.product_symbol.as_str())
+                    .collect::<Vec<_>>()
+                    .join(", ");
+                Err(product_table_error(format!(
+                    "Cannot resolve {exchange} symbol {symbol:?} within the requested market; candidates: [{names}]"
+                )))
+            }
+        }
+    }
+
     pub fn get_product_symbol(
         &self,
         exchange: &str,
@@ -520,6 +587,41 @@ mod tests {
                 .expect("product symbol"),
             "BTC-USDT-SWAP"
         );
+    }
+
+    #[test]
+    fn exact_resolver_requires_a_unique_market_and_preserves_case() {
+        let table = table();
+        assert_eq!(
+            table
+                .resolve_symbol("binance", "BTC-USDT-SPOT", Some("spot"), None)
+                .unwrap()
+                .exchange_symbol,
+            "BTCUSDT"
+        );
+        assert_eq!(
+            table
+                .resolve_symbol("binance", "BTCUSDT", Some("swap"), None)
+                .unwrap()
+                .product_symbol,
+            "BTC-USDT-SWAP"
+        );
+        let error = table
+            .resolve_symbol("binance", "BTCUSDT", None, None)
+            .unwrap_err()
+            .to_string();
+        assert!(error.contains("BTC-USDT-SPOT") && error.contains("BTC-USDT-SWAP"));
+        assert!(
+            table
+                .resolve_symbol("binance", "btcusdt", None, None)
+                .is_err()
+        );
+        assert!(
+            table
+                .resolve_symbol("binance", "BTC-USDT-SPOT", Some("swap"), None)
+                .is_err()
+        );
+        assert!(table.resolve_symbol("binance", "BTC", None, None).is_err());
     }
 
     #[test]

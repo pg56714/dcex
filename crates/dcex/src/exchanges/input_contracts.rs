@@ -418,7 +418,6 @@ mod tests {
         for (exchange, method, array, field) in [
             ("okx", "place_batch_orders", "orders", "sz"),
             ("bybit", "place_batch_order", "request", "qty"),
-            ("bitget", "place_futures_batch_orders", "orderList", "size"),
             ("bingx", "place_swap_batch_order", "batchOrders", "quantity"),
         ] {
             let schema = endpoint(exchange, method, false);
