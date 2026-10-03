@@ -10,7 +10,7 @@ class PositionHTTP(HTTPManager):
 
     def get_positions(
         self,
-        category: str = "linear",
+        category: str | None = None,
         product_symbol: str | None = None,
         baseCoin: str | None = None,
         settleCoin: str | None = None,
@@ -46,7 +46,7 @@ class PositionHTTP(HTTPManager):
         mode: int,
         product_symbol: str | None = None,
         coin: str | None = None,
-        category: str = "linear",
+        category: str | None = None,
     ) -> dict[str, Any]:
         """Switch position mode."""
         return self._native_private(
@@ -128,7 +128,7 @@ class PositionHTTP(HTTPManager):
 
     def get_closed_pnl(
         self,
-        category: str = "linear",
+        category: str | None = None,
         product_symbol: str | None = None,
         startTime: int | None = None,
         endTime: int | None = None,

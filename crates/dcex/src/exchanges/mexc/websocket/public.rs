@@ -9,17 +9,38 @@ use crate::{DcexError, Result};
 const PUBLIC_WS_URL: &str = "wss://wbs-api.mexc.com/ws";
 
 pub struct MexcPublicWebSocket {
+    product_table: Option<std::sync::Arc<crate::product_table::ProductTable>>,
     connection: WebSocketConnection,
     subscriptions: HashSet<String>,
 }
 
 impl MexcPublicWebSocket {
+    fn exchange_symbol(&self, symbol: &str) -> Result<String> {
+        if let Some(table) = &self.product_table {
+            return Ok(table
+                .resolve_symbol("mexc", symbol, Some("spot"), None)?
+                .exchange_symbol
+                .clone());
+        }
+        normalize_symbol(symbol)
+    }
+
+    pub fn set_product_table(&mut self, table: crate::product_table::ProductTable) {
+        self.product_table = Some(std::sync::Arc::new(table));
+    }
+
+    pub fn with_product_table(mut self, table: crate::product_table::ProductTable) -> Self {
+        self.set_product_table(table);
+        self
+    }
+
     pub fn new(timeout: Duration) -> Result<Self> {
         Self::with_url(PUBLIC_WS_URL.to_string(), timeout)
     }
 
     pub fn with_url(url: impl Into<String>, timeout: Duration) -> Result<Self> {
         Ok(Self {
+            product_table: None,
             connection: WebSocketConnection::new(WebSocketConfig::new(url, timeout)?),
             subscriptions: HashSet::new(),
         })
@@ -52,7 +73,7 @@ impl MexcPublicWebSocket {
     }
 
     pub async fn subscribe_trades(&mut self, product_symbol: &str, speed: &str) -> Result<()> {
-        let symbol = normalize_symbol(product_symbol)?;
+        let symbol = self.exchange_symbol(product_symbol)?;
         let speed = normalize_speed(speed)?;
         self.subscribe(vec![format!(
             "spot@public.aggre.deals.v3.api.pb@{speed}@{symbol}"
@@ -61,7 +82,7 @@ impl MexcPublicWebSocket {
     }
 
     pub async fn subscribe_orderbook(&mut self, product_symbol: &str, speed: &str) -> Result<()> {
-        let symbol = normalize_symbol(product_symbol)?;
+        let symbol = self.exchange_symbol(product_symbol)?;
         let speed = normalize_speed(speed)?;
         self.subscribe(vec![format!(
             "spot@public.aggre.depth.v3.api.pb@{speed}@{symbol}"
@@ -74,7 +95,7 @@ impl MexcPublicWebSocket {
         product_symbol: &str,
         levels: u32,
     ) -> Result<()> {
-        let symbol = normalize_symbol(product_symbol)?;
+        let symbol = self.exchange_symbol(product_symbol)?;
         let levels = normalize_levels(levels)?;
         self.subscribe(vec![format!(
             "spot@public.limit.depth.v3.api.pb@{symbol}@{levels}"
@@ -83,7 +104,7 @@ impl MexcPublicWebSocket {
     }
 
     pub async fn subscribe_book_ticker(&mut self, product_symbol: &str, speed: &str) -> Result<()> {
-        let symbol = normalize_symbol(product_symbol)?;
+        let symbol = self.exchange_symbol(product_symbol)?;
         let speed = normalize_speed(speed)?;
         self.subscribe(vec![format!(
             "spot@public.aggre.bookTicker.v3.api.pb@{speed}@{symbol}"
@@ -92,7 +113,7 @@ impl MexcPublicWebSocket {
     }
 
     pub async fn subscribe_klines(&mut self, product_symbol: &str, interval: &str) -> Result<()> {
-        let symbol = normalize_symbol(product_symbol)?;
+        let symbol = self.exchange_symbol(product_symbol)?;
         let interval = normalize_interval(interval)?;
         self.subscribe(vec![format!(
             "spot@public.kline.v3.api.pb@{symbol}@{interval}"

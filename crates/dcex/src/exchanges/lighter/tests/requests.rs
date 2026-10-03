@@ -40,6 +40,7 @@ fn robinhood_uses_its_own_market_ids() {
         quote_currency: "USDC".to_string(),
         min_notional: "1".to_string(),
         size_per_contract: "1".to_string(),
+        ..MarketInfo::default()
     };
     let mut robinhood = mainnet.clone();
     robinhood.exchange = "lighter_robinhood".to_string();
@@ -70,6 +71,7 @@ fn export_sends_resolved_market_id_with_configured_account_index() {
         quote_currency: "USDC".to_string(),
         min_notional: "1".to_string(),
         size_per_contract: "1".to_string(),
+        ..MarketInfo::default()
     }]);
     let client = LighterClient::with_base_url_and_credentials(
         Duration::from_secs(10),

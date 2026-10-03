@@ -79,8 +79,12 @@ impl BybitClient {
                 .filter(|k| *k != "product_symbol")
                 .collect::<Vec<_>>(),
         );
-        if let Some(product) = params.get("product_symbol") {
-            query.push(("symbol".into(), self.exchange_symbol(product)?));
+        if let Some(product) = params.get("product_symbol").or(params.get("symbol")) {
+            query.retain(|(key, _)| key != "symbol");
+            query.push((
+                "symbol".into(),
+                self.symbol_category(product, params.get("category"))?.0,
+            ));
         }
         for key in endpoint.integers {
             if let Some(v) = params.get(key) {

@@ -9593,27 +9593,6 @@
           }
         }
       },
-      "borrow_classic_earn_loan": {
-        "type": "object",
-        "properties": {
-          "loanAmount": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "loan_amount": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "pledgeAmount": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "pledge_amount": {
-            "type": "string",
-            "format": "decimal"
-          }
-        }
-      },
       "borrow_crypto_loan": {
         "type": "object",
         "properties": {
@@ -9721,218 +9700,6 @@
             "format": "decimal"
           },
           "take_profit": {
-            "type": "string",
-            "format": "decimal"
-          }
-        }
-      },
-      "classic_broker_subaccount_subaccount_withdraw": {
-        "type": "object",
-        "properties": {
-          "amount": {
-            "type": "string",
-            "format": "decimal"
-          }
-        }
-      },
-      "classic_copytrading_future_copytrade_follower_copy_settings": {
-        "type": "object",
-        "properties": {
-          "copyAmount": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "copy_amount": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "leverage": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "margin_mode": {
-            "type": "string",
-            "description": "selects cross or isolated margin using the documented integer enumeration."
-          }
-        }
-      },
-      "classic_copytrading_future_copytrade_follower_setting_tpsl": {
-        "type": "object",
-        "properties": {
-          "stopLossPrice": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "stopSurplusPrice": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "stop_loss_price": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "stop_surplus_price": {
-            "type": "string",
-            "format": "decimal"
-          }
-        }
-      },
-      "classic_copytrading_future_copytrade_follower_settings": {
-        "type": "object",
-        "properties": {
-          "settings": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "traceValue": {
-                  "type": "string",
-                  "format": "decimal"
-                },
-                "maxHoldSize": {
-                  "type": "string",
-                  "format": "decimal"
-                }
-              }
-            }
-          }
-        }
-      },
-      "classic_copytrading_future_copytrade_trader_trader_order_modify_tpsl": {
-        "type": "object",
-        "properties": {
-          "stopLossPrice": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "stopSurplusPrice": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "stop_loss_price": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "stop_surplus_price": {
-            "type": "string",
-            "format": "decimal"
-          }
-        }
-      },
-      "classic_copytrading_spot_copytrade_follower_setting_tpsl": {
-        "type": "object",
-        "properties": {
-          "stopLossPrice": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "stopSurplusPrice": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "stop_loss_price": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "stop_surplus_price": {
-            "type": "string",
-            "format": "decimal"
-          }
-        }
-      },
-      "classic_copytrading_spot_copytrade_follower_settings": {
-        "type": "object",
-        "properties": {
-          "settings": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "maxHoldSize": {
-                  "type": "string",
-                  "format": "decimal"
-                },
-                "traceValue": {
-                  "type": "string",
-                  "format": "decimal"
-                }
-              }
-            }
-          }
-        }
-      },
-      "classic_copytrading_spot_copytrade_trader_order_modify_tpsl": {
-        "type": "object",
-        "properties": {
-          "stopLossPrice": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "stopSurplusPrice": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "stop_loss_price": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "stop_surplus_price": {
-            "type": "string",
-            "format": "decimal"
-          }
-        }
-      },
-      "classic_earn_loan_revise_pledge": {
-        "type": "object",
-        "properties": {
-          "amount": {
-            "type": "string",
-            "format": "decimal"
-          }
-        }
-      },
-      "classic_earn_sharkfin_subscribe": {
-        "type": "object",
-        "properties": {
-          "amount": {
-            "type": "string",
-            "format": "decimal"
-          }
-        }
-      },
-      "convert_classic_asset": {
-        "type": "object",
-        "properties": {
-          "cnvtPrice": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "cnvt_price": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "fromCoinSize": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "from_coin_size": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "toCoinSize": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "to_coin_size": {
-            "type": "string",
-            "format": "decimal"
-          }
-        }
-      },
-      "convert_futures_union_asset": {
-        "type": "object",
-        "properties": {
-          "amount": {
             "type": "string",
             "format": "decimal"
           }
@@ -10107,15 +9874,6 @@
           }
         }
       },
-      "create_spot_withdrawal": {
-        "type": "object",
-        "properties": {
-          "size": {
-            "type": "string",
-            "format": "decimal"
-          }
-        }
-      },
       "create_uta_withdrawal": {
         "type": "object",
         "properties": {
@@ -10138,27 +9896,6 @@
           }
         }
       },
-      "get_classic_quoted_price": {
-        "type": "object",
-        "properties": {
-          "fromCoinSize": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "from_coin_size": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "toCoinSize": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "to_coin_size": {
-            "type": "string",
-            "format": "decimal"
-          }
-        }
-      },
       "get_crypto_loan_interest": {
         "type": "object",
         "properties": {
@@ -10167,86 +9904,6 @@
             "format": "decimal"
           },
           "pledge_amount": {
-            "type": "string",
-            "format": "decimal"
-          }
-        }
-      },
-      "get_deposit_address": {
-        "type": "object",
-        "properties": {
-          "size": {
-            "type": "string",
-            "format": "decimal"
-          }
-        }
-      },
-      "get_futures_estimated_open_count": {
-        "type": "object",
-        "properties": {
-          "openAmount": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "openPrice": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "open_amount": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "open_price": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "leverage": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "margin_coin": {
-            "type": "string",
-            "description": "get_futures_estimated_open_count/margin_coin: selects the settlement currency for the margin account."
-          },
-          "marginCoin": {
-            "type": "string",
-            "description": "get_futures_estimated_open_count/marginCoin: selects the settlement currency for the margin account."
-          }
-        }
-      },
-      "get_futures_liquidation_price": {
-        "type": "object",
-        "properties": {
-          "openAmount": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "openPrice": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "open_amount": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "open_price": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "margin_coin": {
-            "type": "string",
-            "description": "get_futures_liquidation_price/margin_coin: selects the settlement currency for the margin account."
-          },
-          "marginCoin": {
-            "type": "string",
-            "description": "get_futures_liquidation_price/marginCoin: selects the settlement currency for the margin account."
-          }
-        }
-      },
-      "get_sub_account_deposit_address": {
-        "type": "object",
-        "properties": {
-          "size": {
             "type": "string",
             "format": "decimal"
           }
@@ -10642,34 +10299,7 @@
           }
         }
       },
-      "redeem_classic_elite": {
-        "type": "object",
-        "properties": {
-          "amount": {
-            "type": "string",
-            "format": "decimal"
-          }
-        }
-      },
       "redeem_elite_earn": {
-        "type": "object",
-        "properties": {
-          "amount": {
-            "type": "string",
-            "format": "decimal"
-          }
-        }
-      },
-      "redeem_savings": {
-        "type": "object",
-        "properties": {
-          "amount": {
-            "type": "string",
-            "format": "decimal"
-          }
-        }
-      },
-      "repay_classic_earn_loan": {
         "type": "object",
         "properties": {
           "amount": {
@@ -10684,23 +10314,6 @@
           "amount": {
             "type": "string",
             "format": "decimal"
-          }
-        }
-      },
-      "reverse_futures_position": {
-        "type": "object",
-        "properties": {
-          "size": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "margin_coin": {
-            "type": "string",
-            "description": "reverse_futures_position/margin_coin: selects the settlement currency for the margin account."
-          },
-          "marginCoin": {
-            "type": "string",
-            "description": "reverse_futures_position/marginCoin: selects the settlement currency for the margin account."
           }
         }
       },
@@ -10838,50 +10451,12 @@
           }
         }
       },
-      "subscribe_classic_elite": {
-        "type": "object",
-        "properties": {
-          "amount": {
-            "type": "string",
-            "format": "decimal"
-          }
-        }
-      },
       "subscribe_elite_earn": {
         "type": "object",
         "properties": {
           "amount": {
             "type": "string",
             "format": "decimal"
-          }
-        }
-      },
-      "subscribe_savings": {
-        "type": "object",
-        "properties": {
-          "amount": {
-            "type": "string",
-            "format": "decimal"
-          }
-        }
-      },
-      "transfer": {
-        "type": "object",
-        "properties": {
-          "amount": {
-            "type": "string",
-            "format": "decimal",
-            "x-positive": true
-          }
-        }
-      },
-      "transfer_spot_sub_account": {
-        "type": "object",
-        "properties": {
-          "amount": {
-            "type": "string",
-            "format": "decimal",
-            "x-positive": true
           }
         }
       },
@@ -11785,18 +11360,6 @@
           }
         }
       },
-      "batch_create_classic_sub_accounts": {
-        "type": "object",
-        "properties": {
-          "accounts": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {}
-            }
-          }
-        }
-      },
       "get_uta_orderbook": {
         "type": "object",
         "properties": {}
@@ -11841,44 +11404,7 @@
         "type": "object",
         "properties": {}
       },
-      "set_futures_all_leverage": {
-        "type": "object",
-        "properties": {
-          "leverage": {
-            "type": "string",
-            "format": "decimal"
-          }
-        }
-      },
       "get_uta_strategy_sub_orders": {
-        "type": "object",
-        "properties": {}
-      },
-      "get_cross_margin_liquidation_orders": {
-        "type": "object",
-        "properties": {}
-      },
-      "get_isolated_margin_liquidation_orders": {
-        "type": "object",
-        "properties": {}
-      },
-      "get_classic_earn_loan_ongoing_orders": {
-        "type": "object",
-        "properties": {}
-      },
-      "get_transfer_records": {
-        "type": "object",
-        "properties": {}
-      },
-      "get_transferable_coins": {
-        "type": "object",
-        "properties": {}
-      },
-      "get_futures_union_transfer_limits": {
-        "type": "object",
-        "properties": {}
-      },
-      "get_spot_sub_account_transfer_records": {
         "type": "object",
         "properties": {}
       },
@@ -11902,10 +11428,6 @@
         "type": "object",
         "properties": {}
       },
-      "get_classic_spot_wallet_withdrawal_records": {
-        "type": "object",
-        "properties": {}
-      },
       "get_uta_account_withdrawal_records": {
         "type": "object",
         "properties": {}
@@ -11914,15 +11436,7 @@
         "type": "object",
         "properties": {}
       },
-      "cancel_spot_withdrawal": {
-        "type": "object",
-        "properties": {}
-      },
       "cancel_uta_withdrawal": {
-        "type": "object",
-        "properties": {}
-      },
-      "classic_broker_commission_get_order_commission": {
         "type": "object",
         "properties": {}
       },
@@ -11939,82 +11453,6 @@
         "properties": {}
       },
       "cfd_trade_get_order_history": {
-        "type": "object",
-        "properties": {}
-      },
-      "classic_copytrading_future_copytrade_follower_query_current_orders": {
-        "type": "object",
-        "properties": {}
-      },
-      "classic_copytrading_future_copytrade_follower_query_history_orders": {
-        "type": "object",
-        "properties": {}
-      },
-      "classic_copytrading_future_copytrade_trader_trader_order_current_track": {
-        "type": "object",
-        "properties": {}
-      },
-      "classic_copytrading_future_copytrade_trader_trader_order_history_track": {
-        "type": "object",
-        "properties": {}
-      },
-      "classic_copytrading_future_copytrade_trader_trader_order_total_detail": {
-        "type": "object",
-        "properties": {}
-      },
-      "classic_copytrading_spot_copytrade_follower_order_close_tracking": {
-        "type": "object",
-        "properties": {
-          "tracking_no_list": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "For classic copytrading spot copytrade follower order close tracking, identifies existing orders or requests to query or cancel; contains no order quantities."
-          }
-        }
-      },
-      "classic_copytrading_spot_copytrade_follower_query_current_orders": {
-        "type": "object",
-        "properties": {}
-      },
-      "classic_copytrading_spot_copytrade_follower_query_history_orders": {
-        "type": "object",
-        "properties": {}
-      },
-      "classic_copytrading_spot_copytrade_follower_stop_order": {
-        "type": "object",
-        "properties": {
-          "tracking_no_list": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "For classic copytrading spot copytrade follower stop order, identifies existing orders or requests to query or cancel; contains no order quantities."
-          }
-        }
-      },
-      "classic_copytrading_spot_copytrade_trader_order_close_tracking": {
-        "type": "object",
-        "properties": {
-          "tracking_no_list": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "For classic copytrading spot copytrade trader order close tracking, identifies existing orders or requests to query or cancel; contains no order quantities."
-          }
-        }
-      },
-      "classic_copytrading_spot_copytrade_trader_order_current_track": {
-        "type": "object",
-        "properties": {}
-      },
-      "classic_copytrading_spot_copytrade_trader_order_history_track": {
-        "type": "object",
-        "properties": {}
-      },
-      "classic_copytrading_spot_copytrade_trader_order_total_detail": {
         "type": "object",
         "properties": {}
       },
@@ -12039,10 +11477,6 @@
         "properties": {}
       },
       "institutional_loan_get_repayment_orders": {
-        "type": "object",
-        "properties": {}
-      },
-      "classic_p2p_get_p2_p_order_list": {
         "type": "object",
         "properties": {}
       },
@@ -12094,10 +11528,6 @@
         "type": "object",
         "properties": {}
       },
-      "classic_broker_subaccount_subaccount_deposit_auto_transfer": {
-        "type": "object",
-        "properties": {}
-      },
       "classic_instloan_account_get_transferred_amount_from_spot_account": {
         "type": "object",
         "properties": {}
@@ -12125,35 +11555,6 @@
       "broker_get_all_subaccount_deposit_withdrawal": {
         "type": "object",
         "properties": {}
-      },
-      "classic_broker_subaccount_subaccount_withdrawal_records": {
-        "type": "object",
-        "properties": {}
-      },
-      "classic_broker_subaccount_get_subaccount_all_deposit_withdrawal_records": {
-        "type": "object",
-        "properties": {}
-      },
-      "set_futures_margin_mode": {
-        "type": "object",
-        "properties": {
-          "margin_mode": {
-            "type": "string",
-            "description": "selects cross or isolated margin using the documented integer enumeration."
-          },
-          "margin_coin": {
-            "type": "string",
-            "description": "set_futures_margin_mode/margin_coin: selects the settlement currency for the margin account."
-          },
-          "marginCoin": {
-            "type": "string",
-            "description": "set_futures_margin_mode/marginCoin: selects the settlement currency for the margin account."
-          },
-          "marginMode": {
-            "type": "string",
-            "description": "selects cross or isolated margin using the documented integer enumeration."
-          }
-        }
       },
       "get_crypto_loan_borrow_history": {
         "type": "object",
@@ -12233,40 +11634,6 @@
           }
         }
       },
-      "set_futures_auto_margin": {
-        "type": "object",
-        "properties": {
-          "auto_margin": {
-            "type": "string",
-            "description": "set_futures_auto_margin/auto_margin: enables automatic replenishment of isolated position margin."
-          },
-          "margin_coin": {
-            "type": "string",
-            "description": "set_futures_auto_margin/margin_coin: selects the settlement currency for the margin account."
-          },
-          "autoMargin": {
-            "type": "string",
-            "description": "set_futures_auto_margin/autoMargin: enables automatic replenishment of isolated position margin."
-          },
-          "marginCoin": {
-            "type": "string",
-            "description": "set_futures_auto_margin/marginCoin: selects the settlement currency for the margin account."
-          }
-        }
-      },
-      "get_isolated_margin_risk_rate": {
-        "type": "object",
-        "properties": {
-          "page_size": {
-            "type": "integer",
-            "description": "limits the number of isolated margin risk rate records per response page; this integer counts records."
-          },
-          "pageSize": {
-            "type": "integer",
-            "description": "limits the number of isolated margin risk rate records per response page; this integer counts records."
-          }
-        }
-      },
       "set_uta_collateral_type": {
         "type": "object",
         "properties": {
@@ -12307,58 +11674,6 @@
           "operation": {
             "type": "string",
             "description": "uta_freeze_sub/operation: selects the requested account operation as an enum string."
-          }
-        }
-      },
-      "get_classic_earn_loan_repay_history": {
-        "type": "object",
-        "properties": {
-          "page_size": {
-            "type": "string",
-            "description": "get_classic_earn_loan_repay_history/page_size: limits the number of result records returned by pagination."
-          },
-          "pageSize": {
-            "type": "string",
-            "description": "get_classic_earn_loan_repay_history/pageSize: limits the number of result records returned by pagination."
-          }
-        }
-      },
-      "get_classic_earn_loan_revise_history": {
-        "type": "object",
-        "properties": {
-          "page_size": {
-            "type": "string",
-            "description": "get_classic_earn_loan_revise_history/page_size: limits the number of result records returned by pagination."
-          },
-          "pageSize": {
-            "type": "string",
-            "description": "get_classic_earn_loan_revise_history/pageSize: limits the number of result records returned by pagination."
-          }
-        }
-      },
-      "get_classic_earn_loan_borrow_history": {
-        "type": "object",
-        "properties": {
-          "page_size": {
-            "type": "string",
-            "description": "get_classic_earn_loan_borrow_history/page_size: limits the number of result records returned by pagination."
-          },
-          "pageSize": {
-            "type": "string",
-            "description": "get_classic_earn_loan_borrow_history/pageSize: limits the number of result records returned by pagination."
-          }
-        }
-      },
-      "get_classic_earn_loan_reduces": {
-        "type": "object",
-        "properties": {
-          "page_size": {
-            "type": "string",
-            "description": "get_classic_earn_loan_reduces/page_size: limits the number of result records returned by pagination."
-          },
-          "pageSize": {
-            "type": "string",
-            "description": "get_classic_earn_loan_reduces/pageSize: limits the number of result records returned by pagination."
           }
         }
       },
@@ -12404,96 +11719,6 @@
           "page_size": {
             "type": "string",
             "description": "classic_affiliate_customer_info_get_customer_trade_volume/page_size: limits the number of result records returned by pagination."
-          }
-        }
-      },
-      "classic_broker_subaccount_get_broker_subaccounts": {
-        "type": "object",
-        "properties": {
-          "page_size": {
-            "type": "string",
-            "description": "classic_broker_subaccount_get_broker_subaccounts/page_size: limits the number of result records returned by pagination."
-          }
-        }
-      },
-      "classic_broker_subaccount_get_broker_subaccounts_commissions": {
-        "type": "object",
-        "properties": {
-          "page_size": {
-            "type": "string",
-            "description": "classic_broker_subaccount_get_broker_subaccounts_commissions/page_size: limits the number of result records returned by pagination."
-          }
-        }
-      },
-      "classic_broker_subaccount_get_broker_trade_volume": {
-        "type": "object",
-        "properties": {
-          "page_size": {
-            "type": "string",
-            "description": "classic_broker_subaccount_get_broker_trade_volume/page_size: limits the number of result records returned by pagination."
-          }
-        }
-      },
-      "classic_copytrading_future_copytrade_follower_query_traders": {
-        "type": "object",
-        "properties": {
-          "page_size": {
-            "type": "string",
-            "description": "classic_copytrading_future_copytrade_follower_query_traders/page_size: limits the number of result records returned by pagination."
-          }
-        }
-      },
-      "classic_copytrading_future_copytrade_trader_trader_profit_details": {
-        "type": "object",
-        "properties": {
-          "page_size": {
-            "type": "string",
-            "description": "classic_copytrading_future_copytrade_trader_trader_profit_details/page_size: limits the number of result records returned by pagination."
-          }
-        }
-      },
-      "classic_copytrading_future_copytrade_trader_trader_get_profits_group_coin_date": {
-        "type": "object",
-        "properties": {
-          "page_size": {
-            "type": "string",
-            "description": "classic_copytrading_future_copytrade_trader_trader_get_profits_group_coin_date/page_size: limits the number of result records returned by pagination."
-          }
-        }
-      },
-      "classic_copytrading_future_copytrade_trader_config_query_followers": {
-        "type": "object",
-        "properties": {
-          "page_size": {
-            "type": "string",
-            "description": "classic_copytrading_future_copytrade_trader_config_query_followers/page_size: limits the number of result records returned by pagination."
-          }
-        }
-      },
-      "classic_copytrading_spot_copytrade_follower_query_traders": {
-        "type": "object",
-        "properties": {
-          "page_size": {
-            "type": "string",
-            "description": "classic_copytrading_spot_copytrade_follower_query_traders/page_size: limits the number of result records returned by pagination."
-          }
-        }
-      },
-      "classic_copytrading_spot_copytrade_trader_config_query_followers": {
-        "type": "object",
-        "properties": {
-          "page_size": {
-            "type": "string",
-            "description": "classic_copytrading_spot_copytrade_trader_config_query_followers/page_size: limits the number of result records returned by pagination."
-          }
-        }
-      },
-      "classic_copytrading_spot_copytrade_trader_profit_details": {
-        "type": "object",
-        "properties": {
-          "page_size": {
-            "type": "string",
-            "description": "classic_copytrading_spot_copytrade_trader_profit_details/page_size: limits the number of result records returned by pagination."
           }
         }
       },
@@ -12559,23 +11784,6 @@
             "description": "tax_get_tax_records/margin_type: selects the account margin mode or its enabled state."
           }
         }
-      },
-      "close_copy_futures_follower_positions": {
-        "type": "object",
-        "properties": {
-          "margin_coin": {
-            "type": "string",
-            "description": "classic_copytrading_future_copytrade_follower_close_positions/margin_coin: selects the settlement currency for the margin account."
-          },
-          "margin_mode": {
-            "type": "string",
-            "description": "selects cross or isolated margin using the documented integer enumeration."
-          }
-        }
-      },
-      "close_copy_futures_trader_positions": {
-        "type": "object",
-        "properties": {}
       },
       "move_uta_positions": {
         "type": "object",

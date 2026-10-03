@@ -40,7 +40,17 @@ const INTEGERS: &[&str] = &[
 const BOOLEANS: &[&str] = &["reduceOnly", "isRandom"];
 
 impl BybitClient {
+    fn strategy_exchange_symbol(&self, symbol: &str, category: Option<&str>) -> Result<String> {
+        if let Some((native, _)) = self.loaded_strategy_symbol(symbol, category)? {
+            return Ok(native);
+        }
+        self.exchange_symbol(symbol)
+    }
+
     fn strategy_category(&self, symbol: &str, requested: Option<&str>) -> Result<String> {
+        if let Some((_, category)) = self.loaded_strategy_symbol(symbol, requested)? {
+            return Ok(category);
+        }
         let parts: Vec<_> = symbol.split('-').collect();
         if parts.len() == 1 {
             let category =
@@ -260,7 +270,7 @@ impl BybitClient {
                     .ok_or_else(|| invalid("product_symbol or symbol is required"))?;
                 body.insert(
                     "symbol".into(),
-                    Value::String(self.exchange_symbol(symbol)?),
+                    Value::String(self.strategy_exchange_symbol(symbol, params.get("category"))?),
                 );
                 self.post_request("/v5/strategy/create", body).await
             }
@@ -325,7 +335,10 @@ impl BybitClient {
                     .get("product_symbol")
                     .or_else(|| params.get("symbol"))
                 {
-                    query.push(("symbol".into(), self.exchange_symbol(symbol)?));
+                    query.push((
+                        "symbol".into(),
+                        self.strategy_exchange_symbol(symbol, params.get("category"))?,
+                    ));
                 }
                 self.get_request(
                     if orders {

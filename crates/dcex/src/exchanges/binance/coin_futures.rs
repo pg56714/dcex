@@ -236,6 +236,10 @@ impl BinanceClient {
             _ => return Ok(None),
         };
         debug_assert!(path.starts_with(ROOT));
+        let normalized = PublicParams(
+            self.normalize_loaded_symbols(params.0.clone(), BinanceMarket::CoinFutures)?,
+        );
+        let params = &normalized;
         params.ensure_allowed(allowed)?;
         if matches!(
             name,
@@ -335,6 +339,10 @@ impl BinanceClient {
             ),
             _ => return Ok(None),
         };
+        let normalized = PublicParams(
+            self.normalize_loaded_symbols(params.0.clone(), BinanceMarket::CoinFutures)?,
+        );
+        let params = &normalized;
         params.ensure_allowed(allowed)?;
         params.optional_u64_range("recvWindow", 1, 60_000)?;
         match name {

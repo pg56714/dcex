@@ -19,32 +19,6 @@
     }
   },
   {
-    "name": "get_classic_spot_wallet_withdrawal_records",
-    "path": "/api/v2/spot/wallet/withdrawal-records",
-    "post": false,
-    "public": false,
-    "fields": [
-      "startTime",
-      "endTime",
-      "coin",
-      "clientOid",
-      "idLessThan",
-      "orderId",
-      "limit"
-    ],
-    "required": [
-      "startTime",
-      "endTime"
-    ],
-    "arrays": [],
-    "limit": null,
-    "days": null,
-    "input_schema": {
-      "type": "object",
-      "properties": {}
-    }
-  },
-  {
     "name": "get_uta_account_withdrawal_records",
     "path": "/api/v3/account/withdrawal-records",
     "post": false,

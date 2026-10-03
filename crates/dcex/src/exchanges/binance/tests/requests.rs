@@ -239,6 +239,7 @@ fn product_table_selects_equity_market() {
         quote_currency: "USDC".to_string(),
         min_notional: "1".to_string(),
         size_per_contract: "1".to_string(),
+        ..Default::default()
     }]);
     let client = BinanceClient::public(Duration::from_secs(10))
         .expect("client")
@@ -742,4 +743,81 @@ fn portfolio_margin_cm_trailing_callback_rate_uses_official_range() {
     })
     .expect_err("callback above official maximum");
     assert!(error.to_string().contains("callbackRate"));
+}
+
+#[test]
+fn all_open_orders_market_type_narrows_shared_native_symbol() {
+    let row = |product_symbol: &str, product_type: &str| crate::product_table::MarketInfo {
+        exchange: "binance".to_string(),
+        exchange_symbol: "BTCUSDT".to_string(),
+        product_symbol: product_symbol.to_string(),
+        product_type: product_type.to_string(),
+        ..Default::default()
+    };
+    let table = ProductTable::new(vec![
+        row("BTC-USDT-SPOT", "spot"),
+        row("BTC-USDT-SWAP", "swap"),
+    ]);
+    let (futures_base_url, handle) = recording_server_after_time_sync();
+    let client = BinanceClient::with_base_urls(
+        Some("api-key".to_string()),
+        Some("secret".to_string()),
+        Duration::from_secs(10),
+        "http://127.0.0.1:9".to_string(),
+        futures_base_url,
+    )
+    .expect("client")
+    .with_product_table(table);
+
+    let ambiguous = client.clone();
+    let error = block_on(async move {
+        ambiguous
+            .private_request(
+                "get_all_open_orders",
+                vec![("product_symbol".to_string(), "BTCUSDT".to_string())],
+            )
+            .await
+    })
+    .expect_err("native symbol without market_type is ambiguous");
+    assert!(error.to_string().contains("candidates"), "{error}");
+
+    block_on(async move {
+        client
+            .private_request(
+                "get_all_open_orders",
+                vec![
+                    ("product_symbol".to_string(), "BTCUSDT".to_string()),
+                    ("market_type".to_string(), "swap".to_string()),
+                ],
+            )
+            .await
+    })
+    .expect("response");
+    let request_line = handle.join().expect("server").expect("request line");
+    assert!(request_line.contains("/fapi/v1/openOrders?symbol=BTCUSDT"));
+}
+
+#[test]
+fn all_open_orders_rejects_unified_symbol_for_another_market() {
+    let client = BinanceClient::with_base_urls(
+        Some("api-key".to_string()),
+        Some("secret".to_string()),
+        Duration::from_secs(10),
+        "http://127.0.0.1:9".to_string(),
+        "http://127.0.0.1:9".to_string(),
+    )
+    .expect("client");
+    let error = block_on(async move {
+        client
+            .private_request(
+                "get_all_open_orders",
+                vec![
+                    ("product_symbol".to_string(), "BTC-USDT-SPOT".to_string()),
+                    ("market_type".to_string(), "swap".to_string()),
+                ],
+            )
+            .await
+    })
+    .expect_err("conflicting market_type");
+    assert!(error.to_string().contains("market_type"), "{error}");
 }

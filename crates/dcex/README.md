@@ -53,7 +53,7 @@ Available endpoints differ by exchange. Documented withdrawal, market-maker and 
 | Ondo | Yes | Yes | Yes |
 | Arcus | Yes | Yes | Yes |
 
-Bitget began migrating accounts to UTA on 2026-09-15. Classic endpoints with verified UTA replacements have been removed; use a UTA account for trading. Endpoints without a confirmed replacement remain documented in the endpoint ledger. See the [official UTA upgrade guide](https://www.bitget.com/docs/classic/uta-api-upgrade-guide) and [account settings](https://www.bitget.com/docs/catalog/account/account-settings).
+Bitget began migrating accounts to UTA on 2026-09-15. Classic-account private endpoints that Bitget rejects for UTA accounts (error 40085) have been removed; public market-data, tax and institutional-loan endpoints that still work remain. Use a UTA account for trading. See the [official UTA upgrade guide](https://www.bitget.com/docs/classic/uta-api-upgrade-guide) and [account settings](https://www.bitget.com/docs/catalog/account/account-settings).
 
 Private WebSocket support includes authenticated or address-scoped user-data streams. Binance, Bybit, Bitget, OKX, KuCoin and Kraken Spot also expose authenticated trading WebSockets.
 

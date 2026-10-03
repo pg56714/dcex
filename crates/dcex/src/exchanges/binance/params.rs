@@ -270,13 +270,25 @@ impl PublicParams {
     }
 }
 
-pub(super) fn exchange_symbol_fallback(product_symbol: &str) -> String {
+pub(super) fn exchange_symbol_fallback(product_symbol: &str) -> Result<String> {
     let parts = product_symbol.split('-').collect::<Vec<_>>();
-    match parts.as_slice() {
-        [base, _quote, "EQUITY"] => (*base).to_string(),
-        [base, quote, _kind] => format!("{base}{quote}"),
-        _ => product_symbol.to_string(),
+    if parts.len() < 3 || matches!(parts.last(), Some(&"C" | &"P")) {
+        return Ok(product_symbol.to_string());
     }
+    if parts.iter().any(|part| part.is_empty()) {
+        return Err(DcexError::InvalidInput(
+            "binance product symbol must not contain empty components".into(),
+        ));
+    }
+    let symbol = match parts.as_slice() {
+        [base, "USDC", "EQUITY"] => (*base).to_string(),
+        [base, quote, "SPOT"] => format!("{base}{quote}"),
+        [base, quote @ ("USDT" | "USDC"), "SWAP"] => format!("{base}{quote}"),
+        _ => return Err(DcexError::InvalidInput(
+            "cannot safely resolve binance product symbol; load the product table or pass the official exchange symbol".into(),
+        )),
+    };
+    Ok(symbol)
 }
 
 pub(super) fn is_canonical_product_symbol(product_symbol: &str) -> bool {
@@ -365,4 +377,12 @@ pub(in crate::exchanges::binance) fn invalid(message: impl std::fmt::Display) ->
 
 pub(in crate::exchanges::binance) fn invalid_ws(message: &str) -> crate::DcexError {
     crate::DcexError::InvalidInput(format!("Binance WebSocket API: {message}"))
+}
+
+#[cfg(test)]
+#[test]
+fn public_market_symbol_samples() {
+    crate::exchanges::symbol_tests::check("binance", |symbol, _mode| {
+        exchange_symbol_fallback(symbol)
+    });
 }

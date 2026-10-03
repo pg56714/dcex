@@ -5,7 +5,6 @@
     "path": "/api/v2/mix/market/account-long-short",
     "public": true,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "symbol",
@@ -33,7 +32,6 @@
     "path": "/api/v2/spot/market/fund-net-flow",
     "public": true,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "symbol",
@@ -53,7 +51,6 @@
     "path": "/api/v2/spot/market/support-symbols",
     "public": true,
     "confirm": false,
-    "scoped": false,
     "fields": [],
     "source": "https://www.bitget.com/docs/catalog/classic-common-apidata/classic-common-apidata#get-trade-data-support-symbols",
     "summary": "Get Trade data support symbols"
@@ -64,7 +61,6 @@
     "path": "/api/v2/spot/market/fund-flow",
     "public": true,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "symbol",
@@ -92,7 +88,6 @@
     "path": "/api/v2/mix/market/long-short",
     "public": true,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "symbol",
@@ -120,7 +115,6 @@
     "path": "/api/v2/mix/market/position-long-short",
     "public": true,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "symbol",
@@ -148,7 +142,6 @@
     "path": "/api/v2/mix/market/taker-buy-sell",
     "public": true,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "symbol",
@@ -176,7 +169,6 @@
     "path": "/api/v2/spot/market/whale-net-flow",
     "public": true,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "symbol",

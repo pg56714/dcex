@@ -5,22 +5,11 @@ import json
 from collections.abc import Mapping
 from typing import Any
 
-from ..utils.common import Common
 from ._http_manager import HTTPManager
 
 
 class MarketHTTP(HTTPManager):
     """HTTP client for Backpack public REST APIs."""
-
-    def _symbol(self, product_symbol: str) -> str:
-        if "_" in product_symbol:
-            return product_symbol
-        if hasattr(self, "ptm"):
-            return self.ptm.get_exchange_symbol(Common.BACKPACK, product_symbol)
-        parts = product_symbol.split("-")
-        if len(parts) >= 3:
-            return f"{parts[0]}_{parts[1]}" if parts[2] == "SPOT" else f"{parts[0]}_{parts[1]}_PERP"
-        return product_symbol
 
     def get_assets(self, country: str | None = None) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack asset metadata."""

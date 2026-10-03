@@ -17,6 +17,15 @@ struct PythonBingxPrivateWebSocketClient {
 
 #[pymethods]
 impl PythonBingxPublicWebSocketClient {
+    fn set_product_table(&self, table: PyRef<'_, PythonProductTable>) -> PyResult<()> {
+        let mut client = self
+            .client
+            .try_lock()
+            .map_err(|_| PyRuntimeError::new_err("WebSocket client is busy"))?;
+        client.set_product_table(table.table.clone());
+        Ok(())
+    }
+
     #[new]
     #[pyo3(signature = (timeout=10.0, base_url=None, market="spot"))]
     fn new(timeout: f64, base_url: Option<String>, market: &str) -> PyResult<Self> {

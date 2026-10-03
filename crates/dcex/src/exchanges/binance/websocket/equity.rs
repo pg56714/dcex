@@ -174,7 +174,7 @@ fn equity_symbol(product_symbol: &str) -> Result<String> {
             "Binance Equity WebSocket requires an Equity product symbol: {product_symbol}"
         )));
     }
-    validate_component(&exchange_symbol_fallback(product_symbol), "product_symbol")
+    validate_component(&exchange_symbol_fallback(product_symbol)?, "product_symbol")
 }
 
 fn required<'a>(value: Option<&'a str>, key: &str) -> Result<&'a str> {

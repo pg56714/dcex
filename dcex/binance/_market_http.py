@@ -235,7 +235,12 @@ class MarketHTTP(HTTPManager):
         time_zone: str | None = None,
         limit: int | None = None,
     ) -> dict[str, Any]:
-        """Get kline/candlestick data from Binance."""
+        """
+        Get kline/candlestick data from Binance.
+
+        With a loaded product table, a native symbol shared by Spot and USD-M (e.g. BTCUSDT) is
+        ambiguous; pass the unified product symbol (e.g. BTC-USDT-SWAP / BTC-USDT-SPOT).
+        """
         return self._native_public(
             "get_klines",
             self._params(

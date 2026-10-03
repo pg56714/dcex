@@ -8,9 +8,5 @@ crate::exchanges::impl_exchange_method_wrappers! {
         broker_get_all_subaccount_deposit_withdrawal(),
         /// API withdrawals have no second confirmation; they execute on submit.
         broker_subaccount_withdrawal(sub_uid => "subUid", coin => "coin", dest => "dest", address => "address", amount => "amount"),
-        /// API withdrawals have no second confirmation; they execute on submit.
-        classic_broker_subaccount_subaccount_withdraw(sub_uid => "subUid", coin => "coin", dest => "dest", address => "address", amount => "amount"),
-        classic_broker_subaccount_subaccount_withdrawal_records(),
-        classic_broker_subaccount_get_subaccount_all_deposit_withdrawal_records(),
     ];
 }

@@ -94,28 +94,17 @@ impl OkxParams {
     }
 }
 
-pub(super) fn normalize_inst_id_query(params: &mut [(String, String)]) {
-    for (key, value) in params.iter_mut() {
-        if key == "product_symbol" {
-            *key = "instId".to_string();
-            *value = exchange_symbol_fallback(value);
-        } else if key == "instId" {
-            *value = exchange_symbol_fallback(value);
-        }
+pub(super) fn exchange_symbol_fallback(product_symbol: &str) -> Result<String> {
+    if ["-FUTURES", "-OPTION", "-OPTIONS"]
+        .iter()
+        .any(|suffix| product_symbol.ends_with(suffix))
+    {
+        return Err(DcexError::InvalidInput("cannot safely resolve OKX instrument; load the product table or pass the official instId".into()));
     }
-}
-
-pub(super) fn is_canonical_product_symbol(product_symbol: &str) -> bool {
-    product_symbol.contains('-')
-}
-
-pub(super) fn exchange_symbol_fallback(product_symbol: &str) -> String {
-    let mut parts = product_symbol.split('-');
-    match (parts.next(), parts.next(), parts.next()) {
-        (Some(base), Some(quote), Some("SPOT")) => format!("{base}-{quote}"),
-        (Some(base), Some(quote), Some(kind)) => format!("{base}-{quote}-{kind}"),
-        _ => product_symbol.to_string(),
-    }
+    Ok(match product_symbol.strip_suffix("-SPOT") {
+        Some(pair) => pair.to_string(),
+        None => product_symbol.to_string(),
+    })
 }
 
 pub(super) fn push_optional(params: &mut Vec<(String, String)>, key: &str, value: Option<&str>) {
@@ -218,4 +207,10 @@ mod tests {
             OkxParams::from_pairs(vec![("clOrdId".to_string(), "client-order".to_string())]);
         assert!(require_one(&identified, &["ordId", "clOrdId"]).is_ok());
     }
+}
+
+#[cfg(test)]
+#[test]
+fn public_market_symbol_samples() {
+    crate::exchanges::symbol_tests::check("okx", |symbol, _mode| exchange_symbol_fallback(symbol));
 }

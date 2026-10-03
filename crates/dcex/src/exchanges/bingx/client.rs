@@ -1,6 +1,19 @@
 use std::sync::Arc;
 use std::time::Duration;
 
+#[cfg(test)]
+#[test]
+fn product_table_resolves_listing_alias() {
+    let table = crate::exchanges::symbol_tests::table("bingx", "NEIRO-USDT-SWAP", "NEIROCTO-USDT");
+    let client = BingxClient::public(Duration::from_secs(1))
+        .unwrap()
+        .with_product_table(table);
+    assert_eq!(
+        client.exchange_symbol("NEIRO-USDT-SWAP").unwrap(),
+        "NEIROCTO-USDT"
+    );
+}
+
 use serde_json::Value;
 
 use crate::exchange::{ExchangeHttpClient, ValidatedResponse};
@@ -9,7 +22,7 @@ use crate::product_table::ProductTable;
 use crate::{DcexError, Result};
 
 use super::endpoints::BASE_URL;
-use super::params::{exchange_symbol_fallback, is_canonical_product_symbol};
+use super::params::exchange_symbol_fallback;
 use super::signing::{BingxResponseValidator, BingxSigner};
 
 #[derive(Clone)]
@@ -18,6 +31,7 @@ pub struct BingxClient {
     base_url: String,
     api_key: Option<String>,
     product_table: Option<Arc<ProductTable>>,
+    pub(super) symbol_product_type: Option<&'static str>,
 }
 
 impl BingxClient {
@@ -54,6 +68,7 @@ impl BingxClient {
             base_url,
             api_key,
             product_table: None,
+            symbol_product_type: None,
         })
     }
 
@@ -225,12 +240,13 @@ impl BingxClient {
     }
 
     pub(super) fn exchange_symbol(&self, product_symbol: &str) -> Result<String> {
-        if is_canonical_product_symbol(product_symbol)
-            && let Some(table) = &self.product_table
-        {
-            return table.get_exchange_symbol("bingx", product_symbol);
+        if let Some(table) = &self.product_table {
+            return Ok(table
+                .resolve_symbol("bingx", product_symbol, self.symbol_product_type, None)?
+                .exchange_symbol
+                .clone());
         }
-        Ok(exchange_symbol_fallback(product_symbol))
+        exchange_symbol_fallback(product_symbol)
     }
 
     pub(super) fn push_required_symbol(

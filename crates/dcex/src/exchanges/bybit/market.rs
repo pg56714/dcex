@@ -1,6 +1,6 @@
 use super::client::BybitClient;
 use super::endpoints::*;
-use super::params::{BybitParams, bybit_timeframe, is_canonical_product_symbol};
+use super::params::{BybitParams, bybit_timeframe};
 use crate::exchange::ValidatedResponse;
 use crate::http::HttpMethod;
 use crate::{DcexError, Result};
@@ -154,7 +154,7 @@ impl BybitClient {
                 params.retain(|(key, _)| key != "category");
                 (ADL_ALERT, params)
             }
-            "get_risk_limit" => (RISK_LIMIT, self.normalize_symbol_params(params, false)?),
+            "get_risk_limit" => (RISK_LIMIT, self.normalize_risk_limit_params(params)?),
             _ => {
                 return Err(DcexError::InvalidInput(format!(
                     "unsupported Bybit public method: {method_name}"
@@ -170,35 +170,64 @@ impl BybitClient {
         params: Vec<(String, String)>,
         include_product_category: bool,
     ) -> Result<Vec<(String, String)>> {
-        let mut output = Vec::with_capacity(params.len() + 1);
-        let mut product_symbol = None;
-        let mut explicit_category = None;
-
-        for (key, value) in params {
-            match key.as_str() {
-                "product_symbol" => product_symbol = Some(value),
-                "category" => explicit_category = Some(value),
-                "symbol" if is_canonical_product_symbol(&value) => {
-                    output.push(("symbol".to_string(), self.exchange_symbol(&value)?));
-                    if include_product_category {
-                        explicit_category =
-                            Some(self.category_for_product_symbol(&value, "linear")?);
-                    }
-                }
-                _ => output.push((key, value)),
-            }
-        }
-
-        if let Some(product_symbol) = product_symbol {
-            output.push(("symbol".to_string(), self.exchange_symbol(&product_symbol)?));
+        let category = params
+            .iter()
+            .find(|(key, _)| key == "category")
+            .map(|(_, value)| value.as_str());
+        let input = params
+            .iter()
+            .find(|(key, _)| key == "product_symbol")
+            .or_else(|| params.iter().find(|(key, _)| key == "symbol"));
+        let resolved = input
+            .map(|(_, symbol)| self.symbol_category(symbol, category))
+            .transpose()?;
+        let mut output: Vec<_> = params
+            .into_iter()
+            .filter(|(key, _)| key != "symbol" && key != "product_symbol")
+            .collect();
+        if let Some((symbol, category)) = resolved {
+            output.push(("symbol".into(), symbol));
             if include_product_category {
-                explicit_category =
-                    Some(self.category_for_product_symbol(&product_symbol, "linear")?);
+                output.retain(|(key, _)| key != "category");
+                output.insert(0, ("category".into(), category));
             }
+        } else if include_product_category && !output.iter().any(|(key, _)| key == "category") {
+            output.insert(0, ("category".into(), "linear".into()));
         }
-        if let Some(category) = explicit_category {
-            output.retain(|(key, _)| key != "category");
-            output.insert(0, ("category".to_string(), category));
+        Ok(output)
+    }
+
+    /// `/v5/market/risk-limit` only serves `category=linear|inverse`.
+    fn normalize_risk_limit_params(
+        &self,
+        params: Vec<(String, String)>,
+    ) -> Result<Vec<(String, String)>> {
+        const ALLOWED: [&str; 2] = ["linear", "inverse"];
+        let explicit = params.iter().any(|(key, _)| key == "category");
+        let symbol = params
+            .iter()
+            .find(|(key, _)| key == "product_symbol")
+            .or_else(|| params.iter().find(|(key, _)| key == "symbol"))
+            .map(|(_, value)| value.clone());
+        let output = match symbol {
+            Some(symbol) if !explicit => {
+                let (native, category) = self.symbol_category_within(&symbol, &ALLOWED)?;
+                let mut output: Vec<_> = params
+                    .into_iter()
+                    .filter(|(key, _)| key != "symbol" && key != "product_symbol")
+                    .collect();
+                output.insert(0, ("category".into(), category));
+                output.push(("symbol".into(), native));
+                output
+            }
+            _ => self.normalize_symbol_params(params, true)?,
+        };
+        if let Some((_, category)) = output.iter().find(|(key, _)| key == "category")
+            && !ALLOWED.contains(&category.as_str())
+        {
+            return Err(DcexError::InvalidInput(format!(
+                "Bybit get_risk_limit supports category linear or inverse only, got {category}"
+            )));
         }
         Ok(output)
     }
@@ -233,6 +262,82 @@ mod tests {
 
     fn client() -> BybitClient {
         BybitClient::public(5_000, false, Duration::from_secs(1)).expect("client")
+    }
+
+    fn table_client() -> BybitClient {
+        let row = |product: &str, native: &str, kind: &str, exchange_type: &str| {
+            crate::product_table::MarketInfo {
+                exchange: "bybit".into(),
+                exchange_symbol: native.into(),
+                product_symbol: product.into(),
+                product_type: kind.into(),
+                exchange_type: exchange_type.into(),
+                ..Default::default()
+            }
+        };
+        client().with_product_table(crate::product_table::ProductTable::new(vec![
+            row("BTC-USDT-SPOT", "BTCUSDT", "spot", "spot"),
+            row("BTC-USDT-SWAP", "BTCUSDT", "swap", "linear"),
+            row("BTC-USD-SWAP", "BTCUSD", "swap", "inverse"),
+        ]))
+    }
+
+    fn pairs(items: &[(&str, &str)]) -> Vec<(String, String)> {
+        items
+            .iter()
+            .map(|(key, value)| ((*key).to_string(), (*value).to_string()))
+            .collect()
+    }
+
+    #[test]
+    fn risk_limit_category_is_limited_to_linear_and_inverse() {
+        let table = table_client();
+        for (input, expected) in [
+            (
+                vec![("symbol", "BTCUSDT")],
+                vec![("category", "linear"), ("symbol", "BTCUSDT")],
+            ),
+            (
+                vec![("product_symbol", "BTC-USD-SWAP")],
+                vec![("category", "inverse"), ("symbol", "BTCUSD")],
+            ),
+            (
+                vec![("cursor", "c")],
+                vec![("category", "linear"), ("cursor", "c")],
+            ),
+        ] {
+            assert_eq!(
+                table
+                    .normalize_risk_limit_params(pairs(&input))
+                    .expect("params"),
+                pairs(&expected)
+            );
+        }
+        for client in [&table, &client()] {
+            let error = client
+                .normalize_risk_limit_params(pairs(&[("product_symbol", "BTC-USDT-SPOT")]))
+                .expect_err("spot is unsupported");
+            assert!(error.to_string().contains("BTC-USDT-SPOT"), "{error}");
+            assert!(
+                client
+                    .normalize_risk_limit_params(pairs(&[("category", "spot")]))
+                    .is_err()
+            );
+        }
+    }
+
+    #[test]
+    fn ambiguity_hint_only_for_multiple_candidates() {
+        let table = table_client();
+        let ambiguous = table
+            .symbol_category("BTCUSDT", None)
+            .expect_err("ambiguous");
+        assert!(
+            ambiguous.to_string().contains("pass category="),
+            "{ambiguous}"
+        );
+        let missing = table.symbol_category("ETHUSDT", None).expect_err("missing");
+        assert!(!missing.to_string().contains("pass category="), "{missing}");
     }
 
     #[test]

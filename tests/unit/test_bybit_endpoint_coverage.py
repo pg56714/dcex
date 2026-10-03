@@ -1110,6 +1110,15 @@ CASES: tuple[RouteCase, ...] = (
         query={"symbol": "BTCUSDT", "category": "linear"},
     ),
     _get("get_tickers", "/v5/market/tickers", "spot", signed=False, query={"category": "spot"}),
+    # Without an explicit category, the unified symbol decides and "linear" is only a default.
+    _get("get_tickers", "/v5/market/tickers", signed=False, query={"category": "linear"}),
+    _get(
+        "get_tickers",
+        "/v5/market/tickers",
+        product_symbol=SPOT,
+        signed=False,
+        query={"category": "spot", "symbol": "BTCUSDT"},
+    ),
     _get("get_funding_rate_history", "/v5/market/funding/history", LINEAR, signed=False),
     _get(
         "get_public_trade_history",
@@ -1246,6 +1255,12 @@ CASES: tuple[RouteCase, ...] = (
         body={"orderId": "order-1", "symbol": "BTCUSDT"},
     ),
     _get("get_open_orders", "/v5/order/realtime", "linear", LINEAR, query={"symbol": "BTCUSDT"}),
+    _get(
+        "get_open_orders",
+        "/v5/order/realtime",
+        product_symbol=SPOT,
+        query={"category": "spot", "symbol": "BTCUSDT"},
+    ),
     _post(
         "cancel_all_orders",
         "/v5/order/cancel-all",

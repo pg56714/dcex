@@ -13,7 +13,6 @@ from ._batch_http import TradeHTTPBatchHTTP
 from ._http_manager import HTTPManager
 from ._transfers_http import TradeHTTPTransfersHTTP
 from ._withdrawals_http import TradeHTTPWithdrawalsHTTP
-from .enums import BinanceProductType
 
 
 class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawalsHTTP, HTTPManager):
@@ -460,6 +459,9 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         """
         Place an order (spot or futures).
 
+        With a loaded product table, a native symbol shared by Spot and USD-M (e.g. BTCUSDT) is
+        ambiguous; pass the unified product symbol (e.g. BTC-USDT-SWAP / BTC-USDT-SPOT).
+
         Args:
             product_symbol: Trading pair symbol (e.g., 'BTCUSDT')
             side: Order side ("BUY" or "SELL")
@@ -551,6 +553,9 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
     ) -> dict:
         """
         Validate order parameters without placing a live order.
+
+        With a loaded product table, a native symbol shared by Spot and USD-M (e.g. BTCUSDT) is
+        ambiguous; pass the unified product symbol (e.g. BTC-USDT-SWAP / BTC-USDT-SPOT).
 
         Returns:
             dict: Empty response or commission information, depending on Binance options.
@@ -764,6 +769,9 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         """
         Place a market order.
 
+        With a loaded product table, a native symbol shared by Spot and USD-M (e.g. BTCUSDT) is
+        ambiguous; pass the unified product symbol (e.g. BTC-USDT-SWAP / BTC-USDT-SPOT).
+
         Args:
             product_symbol: Trading pair symbol (e.g., 'BTCUSDT')
             side: Order side ("BUY" or "SELL")
@@ -798,6 +806,9 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         """
         Place a market buy order.
 
+        With a loaded product table, a native symbol shared by Spot and USD-M (e.g. BTCUSDT) is
+        ambiguous; pass the unified product symbol (e.g. BTC-USDT-SWAP / BTC-USDT-SPOT).
+
         Args:
             product_symbol: Trading pair symbol (e.g., 'BTCUSDT')
             quantity: Order quantity
@@ -828,6 +839,9 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
     ) -> dict:
         """
         Place a market sell order.
+
+        With a loaded product table, a native symbol shared by Spot and USD-M (e.g. BTCUSDT) is
+        ambiguous; pass the unified product symbol (e.g. BTC-USDT-SWAP / BTC-USDT-SPOT).
 
         Args:
             product_symbol: Trading pair symbol (e.g., 'BTCUSDT')
@@ -861,6 +875,9 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
     ) -> dict:
         """
         Place a limit order.
+
+        With a loaded product table, a native symbol shared by Spot and USD-M (e.g. BTCUSDT) is
+        ambiguous; pass the unified product symbol (e.g. BTC-USDT-SWAP / BTC-USDT-SPOT).
 
         Args:
             product_symbol: Trading pair symbol (e.g., 'BTCUSDT')
@@ -896,6 +913,10 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         positionSide: str | None = None,
         reduceOnly: str | None = None,
     ) -> dict:
+        """
+        With a loaded product table, a native symbol shared by Spot and USD-M (e.g. BTCUSDT) is
+        ambiguous; pass the unified product symbol (e.g. BTC-USDT-SWAP / BTC-USDT-SPOT).
+        """
         return await self._native_private(
             "place_limit_buy_order",
             self._params(
@@ -917,6 +938,10 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         positionSide: str | None = None,
         reduceOnly: str | None = None,
     ) -> dict:
+        """
+        With a loaded product table, a native symbol shared by Spot and USD-M (e.g. BTCUSDT) is
+        ambiguous; pass the unified product symbol (e.g. BTC-USDT-SWAP / BTC-USDT-SPOT).
+        """
         return await self._native_private(
             "place_limit_sell_order",
             self._params(
@@ -938,6 +963,10 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         positionSide: str | None = None,
         reduceOnly: str | None = None,
     ) -> dict:
+        """
+        With a loaded product table, a native symbol shared by Spot and USD-M (e.g. BTCUSDT) is
+        ambiguous; pass the unified product symbol (e.g. BTC-USDT-SWAP / BTC-USDT-SPOT).
+        """
         return await self._native_private(
             "place_post_only_limit_order",
             self._params(
@@ -958,6 +987,10 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         positionSide: str | None = None,
         reduceOnly: str | None = None,
     ) -> dict:
+        """
+        With a loaded product table, a native symbol shared by Spot and USD-M (e.g. BTCUSDT) is
+        ambiguous; pass the unified product symbol (e.g. BTC-USDT-SWAP / BTC-USDT-SPOT).
+        """
         return await self._native_private(
             "place_post_only_limit_buy_order",
             self._params(
@@ -977,6 +1010,10 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         positionSide: str | None = None,
         reduceOnly: str | None = None,
     ) -> dict:
+        """
+        With a loaded product table, a native symbol shared by Spot and USD-M (e.g. BTCUSDT) is
+        ambiguous; pass the unified product symbol (e.g. BTC-USDT-SWAP / BTC-USDT-SPOT).
+        """
         return await self._native_private(
             "place_post_only_limit_sell_order",
             self._params(
@@ -998,6 +1035,9 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
     ) -> dict:
         """
         Cancel an order.
+
+        With a loaded product table, a native symbol shared by Spot and USD-M (e.g. BTCUSDT) is
+        ambiguous; pass the unified product symbol (e.g. BTC-USDT-SWAP / BTC-USDT-SPOT).
 
         Args:
             product_symbol: Trading pair symbol (e.g., 'BTCUSDT')
@@ -1027,6 +1067,9 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         """
         Get order information.
 
+        With a loaded product table, a native symbol shared by Spot and USD-M (e.g. BTCUSDT) is
+        ambiguous; pass the unified product symbol (e.g. BTC-USDT-SWAP / BTC-USDT-SPOT).
+
         Args:
             product_symbol: Trading pair symbol (e.g., 'BTCUSDT')
             orderId: Order ID to query
@@ -1053,8 +1096,14 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         """
         Get open orders for a trading pair.
 
+        With a loaded product table, a native symbol shared by Spot and USD-M (e.g. BTCUSDT) is
+        ambiguous; pass the unified product symbol (e.g. BTC-USDT-SWAP / BTC-USDT-SPOT).
+
         Args:
             product_symbol: Trading pair symbol (e.g., 'BTCUSDT')
+            orderId: Spot and USD-M return that single open order. For Options, Binance treats
+                orderId as a starting point and returns that order and the ones after it.
+            origClientOrderId: Spot and USD-M only; Options rejects it.
 
         Returns:
             dict: List of open orders
@@ -1071,14 +1120,19 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
     async def get_all_open_orders(
         self,
         product_symbol: str | None = None,
-        market_type: str = BinanceProductType.SPOT,
+        market_type: str | None = None,
     ) -> dict:
         """
         Get all open orders for a product or for the selected market.
 
+        With a loaded product table, a native symbol shared by Spot and USD-M (e.g. BTCUSDT) is
+        ambiguous; pass the unified product symbol (e.g. BTC-USDT-SWAP / BTC-USDT-SPOT) or
+        market_type.
+
         Args:
             product_symbol: Optional product symbol. If omitted, Binance returns all open orders.
-            market_type: Market type used when product_symbol is omitted ("spot" or "swap").
+            market_type: Market type ("spot" or "swap"). Narrows product_symbol resolution;
+                defaults to "spot" when product_symbol is omitted.
 
         Returns:
             dict: Open order list.
@@ -1087,7 +1141,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             "get_all_open_orders",
             self._params(
                 product_symbol=product_symbol,
-                market_type=str(market_type),
+                market_type=None if market_type is None else str(market_type),
             ),
         )
 
@@ -1097,6 +1151,9 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
     ) -> dict:
         """
         Cancel all open orders for a trading pair.
+
+        With a loaded product table, a native symbol shared by Spot and USD-M (e.g. BTCUSDT) is
+        ambiguous; pass the unified product symbol (e.g. BTC-USDT-SWAP / BTC-USDT-SPOT).
 
         Args:
             product_symbol: Trading pair symbol (e.g., 'BTCUSDT')
@@ -1152,6 +1209,9 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         """
         Get historical orders for spot or futures.
 
+        With a loaded product table, a native symbol shared by Spot and USD-M (e.g. BTCUSDT) is
+        ambiguous; pass the unified product symbol (e.g. BTC-USDT-SWAP / BTC-USDT-SPOT).
+
         Args:
             product_symbol: Trading pair symbol.
             orderId: Order ID to start from.
@@ -1184,6 +1244,9 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
     ) -> dict:
         """
         Get account trade fills for spot or futures.
+
+        With a loaded product table, a native symbol shared by Spot and USD-M (e.g. BTCUSDT) is
+        ambiguous; pass the unified product symbol (e.g. BTC-USDT-SWAP / BTC-USDT-SPOT).
 
         Args:
             product_symbol: Trading pair symbol.

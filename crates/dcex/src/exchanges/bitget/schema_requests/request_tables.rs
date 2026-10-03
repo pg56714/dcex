@@ -113,9 +113,7 @@ fn load_schemas() -> Vec<Endpoint> {
         include_str!("../schemas/copy_trading.json"),
         include_str!("../schemas/institutional_loan.json"),
         include_str!("../schemas/p2p.json"),
-        include_str!("../schemas/convert.json"),
         include_str!("../schemas/tax.json"),
-        include_str!("../schemas/earn.json"),
         include_str!("../schemas/stocks.json"),
     ]
     .into_iter()

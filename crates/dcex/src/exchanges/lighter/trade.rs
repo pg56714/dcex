@@ -739,7 +739,9 @@ impl LighterClient {
                     DcexError::InvalidInput(format!("invalid Lighter market id: {error}"))
                 });
         }
-        params.required_i64("market_index")
+        let id = params.required_i64("market_index")?;
+        self.market_id(&id.to_string())?;
+        Ok(id)
     }
 
     fn validate_perps_market_index(&self, market_index: i64) -> Result<()> {

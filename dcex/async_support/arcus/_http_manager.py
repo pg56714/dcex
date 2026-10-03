@@ -1,6 +1,7 @@
 # ruff: noqa: ANN401
 """Arcus HTTP implementation mixins."""
 
+import logging
 import os
 from dataclasses import dataclass, field
 from typing import Any, Self
@@ -11,6 +12,7 @@ from ...base.http_manager import BaseHTTPManager
 from ...utils.common import Common
 from ...utils.errors import FailedRequestError
 from ...utils.helpers import generate_timestamp
+from ..product_table.manager import ProductTableManager
 
 
 @dataclass
@@ -33,10 +35,15 @@ class HTTPManager(BaseHTTPManager):
 
     base_url: str | None = None
 
+    preload_product_table: bool = False
+
+    logger: logging.Logger | None = None
+
     _native_client: Any = field(default=None, init=False, repr=False)  # noqa: ANN401
 
     async def async_init(self) -> Self:
         """Initialize the native client for the selected network."""
+        self._logger = self._setup_logger(self.logger)
         self.api_key = self.api_key or os.getenv("ARCUS_API_KEY") or None
         self.api_secret = self.api_secret or os.getenv("ARCUS_API_SIGNING_KEY") or None
         self.address = self.address or os.getenv("ARCUS_ADDRESS") or None
@@ -51,6 +58,10 @@ class HTTPManager(BaseHTTPManager):
             timeout=self.timeout,
             base_url=self.base_url,
         )
+        if self.preload_product_table:
+            self.ptm = await ProductTableManager.get_instance(Common.ARCUS)
+            self._native_client.set_product_table(self.ptm.product_table)
+
         return self
 
     async def _call(self, kind: str, method_name: str, params: list[tuple[str, str]]) -> Any:  # noqa: ANN401
@@ -101,10 +112,13 @@ class SpotHTTPManager(BaseHTTPManager):
 
     rpc_url: str | None = None
 
+    logger: logging.Logger | None = None
+
     _native_client: Any = field(default=None, init=False, repr=False)  # noqa: ANN401
 
     async def async_init(self) -> Self:
         """Initialize the native spot router client."""
+        self._logger = self._setup_logger(self.logger)
         self.wallet_address = self.wallet_address or os.getenv("ARCUS_ADDRESS")
         self._native_client = load_native().ArcusSpotHttpClient(
             api_key=self.api_key,

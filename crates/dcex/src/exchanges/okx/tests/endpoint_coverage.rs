@@ -2940,7 +2940,7 @@ const CASES: &[Case] = &[
 
 /// Accept one HTTP request, reply with an OKX success envelope and return the
 /// raw request text (request line, headers and body).
-fn server() -> (String, thread::JoinHandle<String>) {
+pub(super) fn server() -> (String, thread::JoinHandle<String>) {
     let listener = TcpListener::bind("127.0.0.1:0").expect("bind");
     let address = listener.local_addr().expect("address");
     let handle = thread::spawn(move || {
@@ -2981,7 +2981,7 @@ fn server() -> (String, thread::JoinHandle<String>) {
     (format!("http://{address}"), handle)
 }
 
-fn client(base_url: String) -> OkxClient {
+pub(super) fn client(base_url: String) -> OkxClient {
     OkxClient::with_base_url(
         Some("key".into()),
         Some("secret".into()),

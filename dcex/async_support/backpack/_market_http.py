@@ -5,17 +5,11 @@ import json
 from collections.abc import Mapping
 from typing import Any
 
-from ...utils.common import Common
 from ._http_manager import HTTPManager
 
 
 class MarketHTTP(HTTPManager):
     """Async HTTP client for Backpack public REST APIs."""
-
-    def _symbol(self, product_symbol: str) -> str:
-        if "_" in product_symbol:
-            return product_symbol
-        return self.ptm.get_exchange_symbol(Common.BACKPACK, product_symbol)
 
     async def get_assets(self, country: str | None = None) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack asset metadata."""

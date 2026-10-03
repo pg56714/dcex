@@ -228,7 +228,7 @@ const ROUTE_CASES: &[(bool, &str, &[(&str, &str)], &str, &str)] = &[
         "cancel_contract_batch_orders_by_external_id",
         &[(
             "orders",
-            "[{\"product_symbol\":\"BTC-USDT-SWAP\",\"externalOid\":\"1\"},{\"product_symbol\":\"ETH-USDT-SWAP\",\"externalOid\":\"2\"}]",
+            "[{\"product_symbol\":\"BTC_USDT\",\"externalOid\":\"1\"},{\"product_symbol\":\"ETH_USDT\",\"externalOid\":\"2\"}]",
         )],
         "POST",
         "/api/v1/private/order/batch_cancel_with_external",
@@ -238,7 +238,7 @@ const ROUTE_CASES: &[(bool, &str, &[(&str, &str)], &str, &str)] = &[
         "get_contract_batch_orders_by_external_id",
         &[(
             "orders",
-            "[{\"product_symbol\":\"BTC-USDT-SWAP\",\"externalOid\":\"1\"},{\"product_symbol\":\"ETH-USDT-SWAP\",\"externalOid\":\"2\"}]",
+            "[{\"product_symbol\":\"BTC_USDT\",\"externalOid\":\"1\"},{\"product_symbol\":\"ETH_USDT\",\"externalOid\":\"2\"}]",
         )],
         "POST",
         "/api/v1/private/order/batch_query_with_external",
@@ -246,7 +246,7 @@ const ROUTE_CASES: &[(bool, &str, &[(&str, &str)], &str, &str)] = &[
     (
         false,
         "get_contract_closed_orders",
-        &[("product_symbol", "BTC-USDT-SWAP"), ("page_size", "10")],
+        &[("product_symbol", "BTC_USDT"), ("page_size", "10")],
         "GET",
         "/api/v1/private/order/list/close_orders",
     ),
@@ -254,7 +254,7 @@ const ROUTE_CASES: &[(bool, &str, &[(&str, &str)], &str, &str)] = &[
         false,
         "get_contract_fee_details",
         &[
-            ("product_symbol", "BTC-USDT-SWAP"),
+            ("product_symbol", "BTC_USDT"),
             ("page_size", "10"),
             ("ids", "11,12"),
         ],
@@ -278,7 +278,7 @@ const ROUTE_CASES: &[(bool, &str, &[(&str, &str)], &str, &str)] = &[
     (
         false,
         "get_contract_open_stop_orders",
-        &[("product_symbol", "BTC-USDT-SWAP")],
+        &[("product_symbol", "BTC_USDT")],
         "GET",
         "/api/v1/private/stoporder/open_orders",
     ),
@@ -673,70 +673,70 @@ const ROUTE_CASES: &[(bool, &str, &[(&str, &str)], &str, &str)] = &[
     (
         true,
         "get_contract_depth",
-        &[("product_symbol", "BTC-USDT-SWAP")],
+        &[("product_symbol", "BTC_USDT")],
         "GET",
         "/api/v1/contract/depth/BTC_USDT",
     ),
     (
         true,
         "get_contract_depth_commits",
-        &[("product_symbol", "BTC-USDT-SWAP"), ("limit", "20")],
+        &[("product_symbol", "BTC_USDT"), ("limit", "20")],
         "GET",
         "/api/v1/contract/depth_commits/BTC_USDT/20",
     ),
     (
         true,
         "get_contract_index_price",
-        &[("product_symbol", "BTC-USDT-SWAP")],
+        &[("product_symbol", "BTC_USDT")],
         "GET",
         "/api/v1/contract/index_price/BTC_USDT",
     ),
     (
         true,
         "get_contract_fair_price",
-        &[("product_symbol", "BTC-USDT-SWAP")],
+        &[("product_symbol", "BTC_USDT")],
         "GET",
         "/api/v1/contract/fair_price/BTC_USDT",
     ),
     (
         true,
         "get_contract_funding_rate",
-        &[("product_symbol", "BTC-USDT-SWAP")],
+        &[("product_symbol", "BTC_USDT")],
         "GET",
         "/api/v1/contract/funding_rate/BTC_USDT",
     ),
     (
         true,
         "get_contract_kline",
-        &[("product_symbol", "BTC-USDT-SWAP"), ("interval", "Min1")],
+        &[("product_symbol", "BTC_USDT"), ("interval", "Min1")],
         "GET",
         "/api/v1/contract/kline/BTC_USDT",
     ),
     (
         true,
         "get_contract_index_price_kline",
-        &[("product_symbol", "BTC-USDT-SWAP"), ("interval", "Min1")],
+        &[("product_symbol", "BTC_USDT"), ("interval", "Min1")],
         "GET",
         "/api/v1/contract/kline/index_price/BTC_USDT",
     ),
     (
         true,
         "get_contract_fair_price_kline",
-        &[("product_symbol", "BTC-USDT-SWAP"), ("interval", "Min1")],
+        &[("product_symbol", "BTC_USDT"), ("interval", "Min1")],
         "GET",
         "/api/v1/contract/kline/fair_price/BTC_USDT",
     ),
     (
         true,
         "get_contract_deals",
-        &[("product_symbol", "BTC-USDT-SWAP")],
+        &[("product_symbol", "BTC_USDT")],
         "GET",
         "/api/v1/contract/deals/BTC_USDT",
     ),
     (
         true,
         "get_contract_risk_reverse",
-        &[("product_symbol", "BTC-USDT-SWAP")],
+        &[("product_symbol", "BTC_USDT")],
         "GET",
         "/api/v1/contract/risk_reverse/BTC_USDT",
     ),
@@ -744,7 +744,7 @@ const ROUTE_CASES: &[(bool, &str, &[(&str, &str)], &str, &str)] = &[
         true,
         "get_contract_risk_reverse_history",
         &[
-            ("product_symbol", "BTC-USDT-SWAP"),
+            ("product_symbol", "BTC_USDT"),
             ("page_num", "1"),
             ("page_size", "20"),
         ],
@@ -755,7 +755,7 @@ const ROUTE_CASES: &[(bool, &str, &[(&str, &str)], &str, &str)] = &[
         true,
         "get_contract_funding_rate_history",
         &[
-            ("product_symbol", "BTC-USDT-SWAP"),
+            ("product_symbol", "BTC_USDT"),
             ("page_num", "1"),
             ("page_size", "20"),
         ],
@@ -821,7 +821,7 @@ const ROUTE_CASES: &[(bool, &str, &[(&str, &str)], &str, &str)] = &[
     (
         false,
         "get_contract_leverage",
-        &[("product_symbol", "BTC-USDT-SWAP")],
+        &[("product_symbol", "BTC_USDT")],
         "GET",
         "/api/v1/private/position/leverage",
     ),
@@ -871,7 +871,7 @@ const ROUTE_CASES: &[(bool, &str, &[(&str, &str)], &str, &str)] = &[
         false,
         "place_contract_order",
         &[
-            ("product_symbol", "BTC-USDT-SWAP"),
+            ("product_symbol", "BTC_USDT"),
             ("side", "1"),
             ("type", "1"),
             ("openType", "1"),
@@ -886,7 +886,7 @@ const ROUTE_CASES: &[(bool, &str, &[(&str, &str)], &str, &str)] = &[
         false,
         "place_contract_limit_order",
         &[
-            ("product_symbol", "BTC-USDT-SWAP"),
+            ("product_symbol", "BTC_USDT"),
             ("side", "1"),
             ("price", "1"),
             ("vol", "1"),
@@ -900,7 +900,7 @@ const ROUTE_CASES: &[(bool, &str, &[(&str, &str)], &str, &str)] = &[
         false,
         "place_contract_limit_buy_order",
         &[
-            ("product_symbol", "BTC-USDT-SWAP"),
+            ("product_symbol", "BTC_USDT"),
             ("price", "1"),
             ("vol", "1"),
             ("leverage", "50"),
@@ -913,7 +913,7 @@ const ROUTE_CASES: &[(bool, &str, &[(&str, &str)], &str, &str)] = &[
         false,
         "place_contract_limit_sell_order",
         &[
-            ("product_symbol", "BTC-USDT-SWAP"),
+            ("product_symbol", "BTC_USDT"),
             ("price", "1"),
             ("vol", "1"),
             ("leverage", "50"),
@@ -926,7 +926,7 @@ const ROUTE_CASES: &[(bool, &str, &[(&str, &str)], &str, &str)] = &[
         false,
         "place_contract_post_only_order",
         &[
-            ("product_symbol", "BTC-USDT-SWAP"),
+            ("product_symbol", "BTC_USDT"),
             ("side", "3"),
             ("price", "1"),
             ("vol", "1"),
@@ -940,7 +940,7 @@ const ROUTE_CASES: &[(bool, &str, &[(&str, &str)], &str, &str)] = &[
         false,
         "place_contract_post_only_buy_order",
         &[
-            ("product_symbol", "BTC-USDT-SWAP"),
+            ("product_symbol", "BTC_USDT"),
             ("price", "1"),
             ("vol", "1"),
             ("leverage", "50"),
@@ -953,7 +953,7 @@ const ROUTE_CASES: &[(bool, &str, &[(&str, &str)], &str, &str)] = &[
         false,
         "place_contract_post_only_sell_order",
         &[
-            ("product_symbol", "BTC-USDT-SWAP"),
+            ("product_symbol", "BTC_USDT"),
             ("price", "1"),
             ("vol", "1"),
             ("leverage", "50"),
@@ -966,7 +966,7 @@ const ROUTE_CASES: &[(bool, &str, &[(&str, &str)], &str, &str)] = &[
         false,
         "place_contract_market_order",
         &[
-            ("product_symbol", "BTC-USDT-SWAP"),
+            ("product_symbol", "BTC_USDT"),
             ("side", "1"),
             ("vol", "1"),
             ("leverage", "50"),
@@ -979,7 +979,7 @@ const ROUTE_CASES: &[(bool, &str, &[(&str, &str)], &str, &str)] = &[
         false,
         "place_contract_market_buy_order",
         &[
-            ("product_symbol", "BTC-USDT-SWAP"),
+            ("product_symbol", "BTC_USDT"),
             ("vol", "1"),
             ("leverage", "50"),
             ("openType", "2"),
@@ -991,7 +991,7 @@ const ROUTE_CASES: &[(bool, &str, &[(&str, &str)], &str, &str)] = &[
         false,
         "place_contract_market_sell_order",
         &[
-            ("product_symbol", "BTC-USDT-SWAP"),
+            ("product_symbol", "BTC_USDT"),
             ("vol", "1"),
             ("leverage", "50"),
             ("openType", "2"),
@@ -1016,10 +1016,7 @@ const ROUTE_CASES: &[(bool, &str, &[(&str, &str)], &str, &str)] = &[
     (
         false,
         "cancel_contract_order_with_external_id",
-        &[
-            ("product_symbol", "BTC-USDT-SWAP"),
-            ("externalOid", "ext-1"),
-        ],
+        &[("product_symbol", "BTC_USDT"), ("externalOid", "ext-1")],
         "POST",
         "/api/v1/private/order/cancel_with_external",
     ),
@@ -1055,7 +1052,7 @@ const ROUTE_CASES: &[(bool, &str, &[(&str, &str)], &str, &str)] = &[
         false,
         "reverse_contract_position",
         &[
-            ("product_symbol", "BTC-USDT-SWAP"),
+            ("product_symbol", "BTC_USDT"),
             ("positionId", "7"),
             ("vol", "1"),
         ],
@@ -1086,10 +1083,7 @@ const ROUTE_CASES: &[(bool, &str, &[(&str, &str)], &str, &str)] = &[
     (
         false,
         "get_contract_order_by_external_id",
-        &[
-            ("product_symbol", "BTC-USDT-SWAP"),
-            ("external_oid", "ext-1"),
-        ],
+        &[("product_symbol", "BTC_USDT"), ("external_oid", "ext-1")],
         "GET",
         "/api/v1/private/order/external/BTC_USDT/ext-1",
     ),
@@ -1118,7 +1112,7 @@ const ROUTE_CASES: &[(bool, &str, &[(&str, &str)], &str, &str)] = &[
         false,
         "get_contract_order_deals",
         &[
-            ("product_symbol", "BTC-USDT-SWAP"),
+            ("product_symbol", "BTC_USDT"),
             ("page_num", "1"),
             ("page_size", "20"),
         ],
@@ -1136,7 +1130,7 @@ const ROUTE_CASES: &[(bool, &str, &[(&str, &str)], &str, &str)] = &[
         false,
         "place_contract_plan_order",
         &[
-            ("product_symbol", "BTC-USDT-SWAP"),
+            ("product_symbol", "BTC_USDT"),
             ("vol", "1"),
             ("side", "1"),
             ("openType", "1"),
@@ -1154,7 +1148,7 @@ const ROUTE_CASES: &[(bool, &str, &[(&str, &str)], &str, &str)] = &[
         false,
         "amend_contract_plan_order",
         &[
-            ("product_symbol", "BTC-USDT-SWAP"),
+            ("product_symbol", "BTC_USDT"),
             ("orderId", "1"),
             ("triggerPrice", "100"),
             ("price", "99"),
@@ -1233,7 +1227,7 @@ const ROUTE_CASES: &[(bool, &str, &[(&str, &str)], &str, &str)] = &[
         false,
         "amend_contract_plan_tpsl",
         &[
-            ("product_symbol", "BTC-USDT-SWAP"),
+            ("product_symbol", "BTC_USDT"),
             ("orderId", "1"),
             ("stopLossPrice", "90"),
         ],
@@ -1244,7 +1238,7 @@ const ROUTE_CASES: &[(bool, &str, &[(&str, &str)], &str, &str)] = &[
         false,
         "place_contract_trailing_order",
         &[
-            ("product_symbol", "BTC-USDT-SWAP"),
+            ("product_symbol", "BTC_USDT"),
             ("leverage", "5"),
             ("side", "1"),
             ("vol", "1"),
@@ -1268,7 +1262,7 @@ const ROUTE_CASES: &[(bool, &str, &[(&str, &str)], &str, &str)] = &[
         false,
         "amend_contract_trailing_order",
         &[
-            ("product_symbol", "BTC-USDT-SWAP"),
+            ("product_symbol", "BTC_USDT"),
             ("trackOrderId", "1"),
             ("trend", "1"),
             ("backType", "1"),
@@ -1540,7 +1534,7 @@ fn contract_limit_order_json_body_matches_docs() {
         false,
         "place_contract_limit_buy_order",
         &[
-            ("product_symbol", "ETH-USDT-SWAP"),
+            ("product_symbol", "ETH_USDT"),
             ("price", "2000"),
             ("vol", "3"),
             ("openType", "2"),
@@ -1664,7 +1658,7 @@ fn contract_opening_orders_require_explicit_leverage() {
         ("place_contract_market_sell_order", &[("openType", "1")]),
     ];
     for (method, extra) in cases {
-        let mut params = pairs(&[("product_symbol", "BTC-USDT-SWAP"), ("vol", "1")]);
+        let mut params = pairs(&[("product_symbol", "BTC_USDT"), ("vol", "1")]);
         params.extend(pairs(extra));
         let client = client_for("http://127.0.0.1:9".to_string());
         let method_name = method.to_string();
@@ -1683,7 +1677,7 @@ fn contract_closing_orders_do_not_require_leverage() {
         false,
         "place_contract_market_order",
         &[
-            ("product_symbol", "BTC-USDT-SWAP"),
+            ("product_symbol", "BTC_USDT"),
             ("side", "4"),
             ("vol", "1"),
             ("openType", "2"),

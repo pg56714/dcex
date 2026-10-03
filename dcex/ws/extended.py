@@ -25,6 +25,10 @@ class PublicClient(AsyncWebSocketMixin):
     this client instance.
     """
 
+    def set_product_table(self, table: Any) -> None:  # noqa: ANN401
+        """Use exact canonical/native symbols from a native ProductTable."""
+        self._native_client.set_product_table(table)
+
     def __init__(self, timeout: float = 10.0, base_url: str | None = None) -> None:
         self._native_client = _native.ExtendedPublicWebSocketClient(
             timeout=timeout,

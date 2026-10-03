@@ -522,7 +522,10 @@ impl AsterClient {
     ) -> Result<ValidatedResponse> {
         let mut params = Vec::new();
         if let Some(product_symbol) = request.product_symbol {
-            params.push(("symbol".to_string(), self.exchange_symbol(product_symbol)?));
+            params.push((
+                "symbol".to_string(),
+                self.exchange_symbol_for(product_symbol, AsterMarket::Futures)?,
+            ));
         }
         push_optional_display(&mut params, "startTime", request.start_time);
         push_optional_display(&mut params, "endTime", request.end_time);
@@ -561,7 +564,10 @@ impl AsterClient {
             HttpMethod::Get,
             AsterMarket::Futures,
             FUTURES_INDEX_REFERENCES,
-            vec![("symbol".to_string(), self.exchange_symbol(product_symbol)?)],
+            vec![(
+                "symbol".to_string(),
+                self.exchange_symbol_for(product_symbol, AsterMarket::Futures)?,
+            )],
             false,
         )
         .await
@@ -582,7 +588,10 @@ impl AsterClient {
             AsterMarket::Futures,
             FUTURES_REMAINING_OPENABLE_NOTIONAL,
             vec![
-                ("symbol".to_string(), self.exchange_symbol(product_symbol)?),
+                (
+                    "symbol".to_string(),
+                    self.exchange_symbol_for(product_symbol, AsterMarket::Futures)?,
+                ),
                 ("leverage".to_string(), leverage.to_string()),
             ],
             false,
@@ -596,6 +605,22 @@ impl AsterClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         crate::exchanges::input_contracts::pairs("aster", method_name, &params)?;
+        let mut scoped = self.clone();
+        scoped.symbol_product_type = Some(
+            if method_name.contains("_spot_") || method_name.ends_with("_spot") {
+                "spot"
+            } else {
+                "swap"
+            },
+        );
+        scoped.public_request_scoped(method_name, params).await
+    }
+
+    async fn public_request_scoped(
+        &self,
+        method_name: &str,
+        params: Vec<(String, String)>,
+    ) -> Result<ValidatedResponse> {
         // These ordinary public routes are documented without complete parameter tables.
         // Preserve caller-supplied wire parameters rather than inventing a schema.
         let incomplete = match method_name {
@@ -868,7 +893,10 @@ impl AsterClient {
     ) -> Result<ValidatedResponse> {
         let mut params = Vec::new();
         if let Some(product_symbol) = request.product_symbol {
-            params.push(("symbol".to_string(), self.exchange_symbol(product_symbol)?));
+            params.push((
+                "symbol".to_string(),
+                self.exchange_symbol_for(product_symbol, market)?,
+            ));
         }
         self.request(HttpMethod::Get, market, path, params, false)
             .await
@@ -881,7 +909,10 @@ impl AsterClient {
         product_symbol: &str,
         request: AsterLimitParams,
     ) -> Result<ValidatedResponse> {
-        let mut params = vec![("symbol".to_string(), self.exchange_symbol(product_symbol)?)];
+        let mut params = vec![(
+            "symbol".to_string(),
+            self.exchange_symbol_for(product_symbol, market)?,
+        )];
         push_optional_display(&mut params, "limit", request.limit);
         self.request(HttpMethod::Get, market, path, params, false)
             .await
@@ -894,7 +925,10 @@ impl AsterClient {
         product_symbol: &str,
         request: AsterHistoricalTradesParams,
     ) -> Result<ValidatedResponse> {
-        let mut params = vec![("symbol".to_string(), self.exchange_symbol(product_symbol)?)];
+        let mut params = vec![(
+            "symbol".to_string(),
+            self.exchange_symbol_for(product_symbol, market)?,
+        )];
         push_optional_display(&mut params, "limit", request.limit);
         push_optional_display(&mut params, "fromId", request.from_id);
         self.request(HttpMethod::Get, market, path, params, false)
@@ -908,7 +942,10 @@ impl AsterClient {
         product_symbol: &str,
         request: AsterAggTradesParams,
     ) -> Result<ValidatedResponse> {
-        let mut params = vec![("symbol".to_string(), self.exchange_symbol(product_symbol)?)];
+        let mut params = vec![(
+            "symbol".to_string(),
+            self.exchange_symbol_for(product_symbol, market)?,
+        )];
         push_optional_display(&mut params, "fromId", request.from_id);
         push_optional_display(&mut params, "startTime", request.start_time);
         push_optional_display(&mut params, "endTime", request.end_time);
@@ -926,7 +963,10 @@ impl AsterClient {
         request: AsterKlinesParams,
     ) -> Result<ValidatedResponse> {
         let mut params = vec![
-            ("symbol".to_string(), self.exchange_symbol(product_symbol)?),
+            (
+                "symbol".to_string(),
+                self.exchange_symbol_for(product_symbol, market)?,
+            ),
             ("interval".to_string(), interval.to_string()),
         ];
         push_optional_display(&mut params, "startTime", request.start_time);

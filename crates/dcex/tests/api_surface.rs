@@ -337,17 +337,10 @@ fn rust_direct_clients_expose_python_method_names() {
 
     assert_methods!(
         BitgetClient:
-        get_futures_fee_rates,
-        get_spot_fee_rates,
         cancel_uta_batch_orders,
         cancel_uta_order,
-        get_all_account_balance,
-        get_deposit_records,
-        get_funding_assets,
         get_spot_coins,
         get_spot_market_trades,
-        get_transfer_records,
-        get_transferable_coins,
         get_uta_account_assets,
         get_uta_account_info,
         get_uta_fills,
@@ -357,10 +350,8 @@ fn rust_direct_clients_expose_python_method_names() {
         get_uta_positions,
         place_uta_batch_orders,
         place_uta_order,
-        set_futures_margin_mode,
         set_uta_hold_mode,
         set_uta_leverage,
-        transfer,
     );
 
     assert_methods!(

@@ -101,60 +101,6 @@ impl BitgetClient {
             }
         }
         validate(name, params, endpoint)?;
-        if name == "batch_create_classic_sub_accounts" {
-            let body: Value = serde_json::from_str(required(params, "accounts")?)
-                .map_err(|_| invalid("invalid accounts JSON"))?;
-            let accounts = body
-                .as_array()
-                .ok_or_else(|| invalid("accounts must be an array"))?;
-            if accounts.is_empty() || accounts.len() > 5 {
-                return Err(invalid("accounts must contain 1..5 entries"));
-            }
-            let mut seen = std::collections::HashSet::new();
-            for account in accounts {
-                let object = account
-                    .as_object()
-                    .ok_or_else(|| invalid("account must be an object"))?;
-                if object.keys().any(|k| {
-                    ![
-                        "subAccountName",
-                        "passphrase",
-                        "label",
-                        "permList",
-                        "ipList",
-                    ]
-                    .contains(&k.as_str())
-                }) {
-                    return Err(invalid("unknown sub-account field"));
-                }
-                let name = account["subAccountName"].as_str().unwrap_or_default();
-                if name.len() != 8
-                    || !name.bytes().all(|c| c.is_ascii_alphabetic())
-                    || !seen.insert(name)
-                {
-                    return Err(invalid(
-                        "sub-account names must be unique eight-letter aliases",
-                    ));
-                }
-                validate_passphrase(account["passphrase"].as_str().unwrap_or_default())?;
-                let label = account["label"]
-                    .as_str()
-                    .ok_or_else(|| invalid("label is required"))?;
-                if label.is_empty() || label.chars().count() > 20 {
-                    return Err(invalid("label must contain 1..20 characters"));
-                }
-                validate_string_list(
-                    &account["permList"],
-                    "permList",
-                    4,
-                    &["read", "spot_trade", "margin_trade", "contract_trade"],
-                )?;
-                if let Some(ips) = account.get("ipList") {
-                    validate_string_list(ips, "ipList", 30, &[])?;
-                }
-            }
-            return self.post_private(endpoint.path, body).await.map(Some);
-        }
         let mut pairs = params.only(endpoint.fields);
         if let Some(value) = params.get("product_symbol").or(params.get("symbol")) {
             pairs.retain(|(key, _)| key != "symbol");
@@ -406,18 +352,6 @@ fn validate(name: &str, params: &BitgetParams, endpoint: &Endpoint) -> Result<()
             validate_string_list(&value, key, max, choices)?;
         }
     }
-    if name == "classic_create_virtual_subaccount" {
-        let names: Vec<String> = serde_json::from_str(required(params, "subAccountList")?)
-            .map_err(|_| invalid("subAccountList must be a string array"))?;
-        if names
-            .iter()
-            .any(|v| v.len() != 8 || !v.bytes().all(|c| c.is_ascii_alphabetic()))
-        {
-            return Err(invalid(
-                "virtual aliases must contain eight English letters",
-            ));
-        }
-    }
     choices(params, "deduct", &["on", "off"])?;
     if name == "create_uta_sub_account" {
         let username = required(params, "username")?;
@@ -431,19 +365,6 @@ fn validate(name: &str, params: &BitgetParams, endpoint: &Endpoint) -> Result<()
     }
     if name == "set_uta_deposit_account" {
         choices(params, "accountType", &["funding", "unified", "otc"])?;
-    }
-    if name == "set_spot_deposit_account" {
-        choices(
-            params,
-            "accountType",
-            &[
-                "spot",
-                "funding",
-                "coin-futures",
-                "usdt-futures",
-                "usdc-futures",
-            ],
-        )?;
     }
     if name == "get_uta_cash_dividend_records" {
         choices(params, "type", &["pending", "paid"])?;
@@ -468,15 +389,6 @@ fn validate(name: &str, params: &BitgetParams, endpoint: &Endpoint) -> Result<()
     }
     if name.ends_with("margin_liquidation_orders") {
         choices(params, "type", &["swap", "place_order"])?;
-    }
-    if matches!(
-        name,
-        "get_deposit_address" | "get_sub_account_deposit_address"
-    ) && params.get("size").is_some_and(|s| {
-        !s.parse::<f64>()
-            .is_ok_and(|n| n.is_finite() && (0.000001..=0.001).contains(&n))
-    }) {
-        return Err(invalid("Lightning size must be between 0.000001 and 0.001"));
     }
     for (key, values) in [
         (
@@ -551,9 +463,6 @@ fn validate(name: &str, params: &BitgetParams, endpoint: &Endpoint) -> Result<()
     {
         return Err(invalid("time range exceeds the documented bounds"));
     }
-    if name == "get_futures_liquidation_price" && params.get("orderType") == Some("limit") {
-        required(params, "openPrice")?;
-    }
     if name == "get_uta_max_open_available" && params.get("orderType") == Some("limit") {
         required(params, "price")?;
     }
@@ -565,29 +474,6 @@ fn validate(name: &str, params: &BitgetParams, endpoint: &Endpoint) -> Result<()
         choices(params, "deltaSwitch", &["yes", "no"])?;
         if params.get("deltaSwitch").is_some() && params.get("mode") != Some("advanced") {
             return Err(invalid("deltaSwitch requires advanced mode"));
-        }
-    }
-    if name == "get_all_trade_rates" {
-        choices(params, "businessType", &["mix", "spot", "margin"])?;
-    }
-    if name == "transfer_spot_sub_account" {
-        for key in ["fromType", "toType"] {
-            choices(
-                params,
-                key,
-                &[
-                    "spot",
-                    "p2p",
-                    "coin_futures",
-                    "usdt_futures",
-                    "usdc_futures",
-                    "crossed_margin",
-                    "isolated_margin",
-                ],
-            )?;
-            if params.get(key) == Some("isolated_margin") {
-                symbol(params)?;
-            }
         }
     }
     if name.starts_with("transfer_uta_") || name == "get_uta_transferable_coins" {

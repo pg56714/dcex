@@ -383,52 +383,6 @@
     "kwargs": {}
   },
   {
-    "exchange": "bitget",
-    "method": "classic_copytrading_spot_copytrade_follower_order_close_tracking",
-    "field": "tracking_no_list",
-    "official_source": "https://www.bitget.com/api-doc/classic/copytrading/spot-copytrade/follower/Order-Close-Tracking",
-    "argument": "tracking_no_list",
-    "wire_field": "trackingNoList",
-    "representation": "json",
-    "values": [
-      "1",
-      "2"
-    ],
-    "kwargs": {
-      "symbol": "BTCUSDT"
-    }
-  },
-  {
-    "exchange": "bitget",
-    "method": "classic_copytrading_spot_copytrade_follower_stop_order",
-    "field": "tracking_no_list",
-    "official_source": "https://www.bitget.com/api-doc/classic/copytrading/spot-copytrade/follower/Stop-Order",
-    "argument": "tracking_no_list",
-    "wire_field": "trackingNoList",
-    "representation": "json",
-    "values": [
-      "1",
-      "2"
-    ],
-    "kwargs": {}
-  },
-  {
-    "exchange": "bitget",
-    "method": "classic_copytrading_spot_copytrade_trader_order_close_tracking",
-    "field": "tracking_no_list",
-    "official_source": "https://www.bitget.com/docs/catalog/classic-copytrading-spot-trader/classic-copytrading-spot-copytrade-trader#sell-and-sell-in-batch",
-    "argument": "tracking_no_list",
-    "wire_field": "trackingNoList",
-    "representation": "json",
-    "values": [
-      "1",
-      "2"
-    ],
-    "kwargs": {
-      "symbol": "BTCUSDT"
-    }
-  },
-  {
     "exchange": "bybit",
     "method": "batch_set_collateral_coins",
     "field": "request",

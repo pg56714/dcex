@@ -171,20 +171,12 @@ async fn bitget_private_read_live_parity() -> dcex::Result<()> {
         Duration::from_secs(20),
     )?;
     let cases = vec![
-        Case::new("get_all_account_balance", &[]),
-        Case::new("get_funding_assets", &[("coin", "USDT")]),
         Case::new("get_spot_account_info", &[]),
         Case::new("get_spot_account_assets", &[("coin", "USDT")]),
         Case::new(
             "get_spot_account_bills",
             &[("coin", "USDT"), ("limit", "20")],
         ),
-        Case::new(
-            "get_transferable_coins",
-            &[("fromType", "spot"), ("toType", "usdt_futures")],
-        ),
-        Case::new("get_transfer_records", &[("coin", "USDT"), ("limit", "20")]),
-        Case::new("get_deposit_records", &[("coin", "USDT"), ("limit", "20")]),
         Case::new("get_futures_accounts", &[]),
         Case::new("get_futures_account", &[("product_symbol", BTC_USDT_SWAP)]),
         Case::new("get_futures_account_bills", &[("limit", "20")]),
@@ -221,9 +213,6 @@ async fn bitget_private_read_live_parity() -> dcex::Result<()> {
             client,
             case,
             [
-                get_all_account_balance,
-                get_deposit_records,
-                get_funding_assets,
                 get_futures_account,
                 get_futures_account_bills,
                 get_futures_accounts,
@@ -238,8 +227,6 @@ async fn bitget_private_read_live_parity() -> dcex::Result<()> {
                 get_spot_fills,
                 get_spot_history_orders,
                 get_spot_open_orders,
-                get_transfer_records,
-                get_transferable_coins,
             ]
         ) {
             Ok(response) => {

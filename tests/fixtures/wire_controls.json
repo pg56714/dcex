@@ -218,59 +218,7 @@
       ]
     }
   },
-  "bitget/get_futures_estimated_open_count": {
-    "marginCoin": {
-      "reason": "margin settlement currency",
-      "values": [
-        "USDT"
-      ]
-    }
-  },
-  "bitget/get_futures_liquidation_price": {
-    "marginCoin": {
-      "reason": "margin settlement currency",
-      "values": [
-        "USDT"
-      ]
-    }
-  },
   "bitget/get_uta_pre_set_leverage": {
-    "marginMode": {
-      "reason": "margin mode selector",
-      "values": [
-        "crossed"
-      ]
-    }
-  },
-  "bitget/reverse_futures_position": {
-    "marginCoin": {
-      "reason": "margin settlement currency",
-      "values": [
-        "USDT"
-      ]
-    }
-  },
-  "bitget/set_futures_auto_margin": {
-    "autoMargin": {
-      "reason": "automatic margin flag",
-      "values": [
-        "on"
-      ]
-    },
-    "marginCoin": {
-      "reason": "margin settlement currency",
-      "values": [
-        "USDT"
-      ]
-    }
-  },
-  "bitget/set_futures_margin_mode": {
-    "marginCoin": {
-      "reason": "margin settlement currency",
-      "values": [
-        "USDT"
-      ]
-    },
     "marginMode": {
       "reason": "margin mode selector",
       "values": [

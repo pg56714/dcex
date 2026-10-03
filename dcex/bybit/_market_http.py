@@ -41,7 +41,7 @@ class MarketHTTP(HTTPManager):
 
     def get_instruments_info(
         self,
-        category: str = "linear",
+        category: str | None = None,
         product_symbol: str | None = None,
         symbolType: str | None = None,
         status: str | None = None,
@@ -96,7 +96,7 @@ class MarketHTTP(HTTPManager):
 
     def get_tickers(
         self,
-        category: str = "linear",
+        category: str | None = None,
         product_symbol: str | None = None,
         baseCoin: str | None = None,
         expDate: str | None = None,
@@ -134,7 +134,7 @@ class MarketHTTP(HTTPManager):
         self,
         product_symbol: str | None = None,
         limit: int | None = None,
-        category: str = "linear",
+        category: str | None = None,
         baseCoin: str | None = None,
         optionType: str | None = None,
     ) -> dict[str, Any]:
@@ -222,7 +222,7 @@ class MarketHTTP(HTTPManager):
 
     def get_delivery_price(
         self,
-        category: str = "linear",
+        category: str | None = None,
         product_symbol: str | None = None,
         baseCoin: str | None = None,
         settleCoin: str | None = None,
@@ -245,7 +245,7 @@ class MarketHTTP(HTTPManager):
     def get_order_price_limit(
         self,
         product_symbol: str,
-        category: str = "linear",
+        category: str | None = None,
     ) -> dict[str, Any]:
         """Get order price limit data."""
         return self._native_public(
@@ -265,7 +265,7 @@ class MarketHTTP(HTTPManager):
 
     def get_risk_limit(
         self,
-        category: str = "linear",
+        category: str | None = None,
         product_symbol: str | None = None,
         cursor: str | None = None,
     ) -> dict[str, Any]:

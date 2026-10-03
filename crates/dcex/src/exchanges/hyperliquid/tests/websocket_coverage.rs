@@ -122,6 +122,7 @@ fn active_asset_data_resolves_canonical_symbols_through_product_table() {
         quote_currency: "USDC".to_string(),
         min_notional: "10".to_string(),
         size_per_contract: "1".to_string(),
+        ..MarketInfo::default()
     };
     let table = ProductTable::new(vec![
         row("[\"@107\",10107]", "HYPE-USDC-SPOT", "spot"),
@@ -136,7 +137,8 @@ fn active_asset_data_resolves_canonical_symbols_through_product_table() {
         resolve_coin(Some(&table), "BTC-USDC-SWAP").expect("swap"),
         "BTC"
     );
-    assert_eq!(resolve_coin(Some(&table), "ETH").expect("raw"), "ETH");
+    assert_eq!(resolve_coin(Some(&table), "BTC").expect("raw"), "BTC");
+    assert!(resolve_coin(Some(&table), "ETH").is_err());
     assert!(resolve_coin(Some(&table), "DOGE-USDC-SWAP").is_err());
     let coin = resolve_coin(Some(&table), "HYPE-USDC-SPOT").expect("spot");
     assert_eq!(

@@ -130,7 +130,8 @@ impl BinancePublicWebSocket {
     }
 
     fn stream_symbol(&self, product_symbol: &str) -> Result<String> {
-        if self.profile == "spot"
+        if self.product_table.is_none()
+            && self.profile == "spot"
             && is_canonical_product_symbol(product_symbol)
             && !is_spot_product_symbol(product_symbol)
         {
@@ -140,20 +141,32 @@ impl BinancePublicWebSocket {
         }
 
         let symbol = if let Some(table) = &self.product_table {
-            if is_canonical_product_symbol(product_symbol) {
-                table.get_exchange_symbol("binance", product_symbol)?
+            let market = if self.profile == "spot" {
+                super::super::BinanceMarket::Spot
+            } else if self.profile == "coin_futures" {
+                super::super::BinanceMarket::CoinFutures
+            } else if self.profile.starts_with("options_") {
+                super::super::BinanceMarket::Options
+            } else if self.profile == "equity" {
+                super::super::BinanceMarket::Equity
             } else {
-                product_symbol.to_string()
-            }
+                super::super::BinanceMarket::Futures
+            };
+            table
+                .resolve_symbol_in(market.table_exchange(), product_symbol, |row| {
+                    market.accepts(row)
+                })?
+                .exchange_symbol
+                .clone()
         } else {
-            exchange_symbol_fallback(product_symbol)
+            exchange_symbol_fallback(product_symbol)?
         };
         if self.profile.starts_with("options_") {
-            let symbol = product_symbol.trim();
+            let symbol = symbol.trim();
             if symbol.is_empty()
                 || !symbol
                     .chars()
-                    .all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_')
+                    .all(|c| c.is_ascii_alphanumeric() || matches!(c, '-' | '_' | '.'))
             {
                 return Err(DcexError::InvalidInput(
                     "invalid Binance option stream symbol".into(),
@@ -161,7 +174,10 @@ impl BinancePublicWebSocket {
             }
             return Ok(symbol.to_ascii_lowercase());
         }
-        if self.profile != "spot" && is_spot_product_symbol(product_symbol) {
+        if self.product_table.is_none()
+            && self.profile != "spot"
+            && is_spot_product_symbol(product_symbol)
+        {
             return Err(DcexError::InvalidInput(
                 "Spot product requires the spot WebSocket profile".into(),
             ));
@@ -304,6 +320,43 @@ fn validate_interval(interval: &str) -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn option_stream_preserves_fractional_strikes_and_resolved_names() {
+        let mut client =
+            BinancePublicWebSocket::with_profile("options_public", Duration::from_secs(1)).unwrap();
+        assert_eq!(
+            client.stream_symbol("XRP-261030-2.2-C").unwrap(),
+            "xrp-261030-2.2-c"
+        );
+        client.set_product_table(ProductTable::new(vec![crate::product_table::MarketInfo {
+            exchange: "binance".into(),
+            product_symbol: "XRP-USDT-261030-2.2-C-OPTION".into(),
+            exchange_symbol: "XRP-261030-2.2-C".into(),
+            product_type: "option".into(),
+            ..Default::default()
+        }]));
+        assert_eq!(
+            client
+                .stream_symbol("XRP-USDT-261030-2.2-C-OPTION")
+                .unwrap(),
+            "xrp-261030-2.2-c"
+        );
+    }
+
+    #[test]
+    fn coin_stream_uses_the_coin_margined_namespace() {
+        let client = BinancePublicWebSocket::with_profile("coin_futures", Duration::from_secs(1))
+            .unwrap()
+            .with_product_table(ProductTable::new(vec![crate::product_table::MarketInfo {
+                exchange: "binance_coinm".into(),
+                product_symbol: "BTC-USD-SWAP".into(),
+                exchange_symbol: "BTCUSD_PERP".into(),
+                product_type: "swap".into(),
+                ..Default::default()
+            }]));
+        assert_eq!(client.stream_symbol("BTC-USD-SWAP").unwrap(), "btcusd_perp");
+    }
 
     #[test]
     fn normalizes_spot_product_symbol_to_stream_symbol() {

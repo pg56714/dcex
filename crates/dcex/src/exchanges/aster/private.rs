@@ -7,6 +7,22 @@ impl AsterClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         crate::exchanges::input_contracts::pairs("aster", method_name, &params)?;
+        let mut scoped = self.clone();
+        scoped.symbol_product_type = Some(
+            if method_name.contains("_spot_") || method_name.ends_with("_spot") {
+                "spot"
+            } else {
+                "swap"
+            },
+        );
+        scoped.private_request_scoped(method_name, params).await
+    }
+
+    async fn private_request_scoped(
+        &self,
+        method_name: &str,
+        params: Vec<(String, String)>,
+    ) -> Result<ValidatedResponse> {
         let incomplete = match method_name {
             "place_spot_batch_orders_raw" => Some(HttpMethod::Post),
             "cancel_spot_batch_orders_raw" => Some(HttpMethod::Delete),

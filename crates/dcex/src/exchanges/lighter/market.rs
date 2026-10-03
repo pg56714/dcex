@@ -250,6 +250,9 @@ impl LighterClient {
         if let Some(product_symbol) = params.get("product_symbol") {
             upsert(&mut query, "market_id", self.market_id(product_symbol)?);
         }
+        if let Some(id) = params.get("market_id") {
+            upsert(&mut query, "market_id", self.market_id(id)?);
+        }
         Ok(query)
     }
 

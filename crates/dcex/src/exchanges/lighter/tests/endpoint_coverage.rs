@@ -1161,6 +1161,7 @@ fn lighter_row(market_id: &str, product_symbol: &str, product_type: &str) -> Mar
         quote_currency: "USDC".to_string(),
         min_notional: "1".to_string(),
         size_per_contract: "1".to_string(),
+        ..MarketInfo::default()
     }
 }
 

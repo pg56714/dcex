@@ -10,9 +10,7 @@ use crate::product_table::ProductTable;
 use crate::{DcexError, Result};
 
 use super::endpoints::{BASE_URL, CONTRACT_BASE_URL, SPOT_TIME};
-use super::params::{
-    MexcParams, exchange_symbol_fallback, insert_optional_string, is_canonical_product_symbol,
-};
+use super::params::{MexcParams, exchange_symbol_fallback, insert_optional_string};
 use super::signing::{encode_params, validate_response};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -297,12 +295,15 @@ impl MexcClient {
     }
 
     pub(super) fn exchange_symbol(&self, product_symbol: &str, separator: &str) -> Result<String> {
-        if is_canonical_product_symbol(product_symbol)
-            && let Some(table) = &self.product_table
-        {
-            return table.get_exchange_symbol("mexc", product_symbol);
+        if let Some(table) = &self.product_table {
+            return Ok(table
+                .resolve_symbol_in("mexc", product_symbol, |row| {
+                    row.product_type == if separator.is_empty() { "spot" } else { "swap" }
+                })?
+                .exchange_symbol
+                .clone());
         }
-        Ok(exchange_symbol_fallback(product_symbol, separator))
+        exchange_symbol_fallback(product_symbol, separator)
     }
 
     pub(super) fn take_symbol(

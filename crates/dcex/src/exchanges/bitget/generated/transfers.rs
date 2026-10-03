@@ -7,7 +7,6 @@ crate::exchanges::impl_exchange_method_wrappers! {
     private [
         cfd_account_transfer(coin => "coin", amount => "amount", account_type => "accountType", direction => "direction"),
         cfd_account_get_transfer_records(),
-        classic_broker_subaccount_subaccount_deposit_auto_transfer(sub_uid => "subUid", coin => "coin", to_account_type => "toAccountType"),
         classic_instloan_account_get_transferred_amount_from_spot_account(coin => "coin"),
         copy_trading_follower_copy_transfer(project_id => "projectId", type_ => "type", coin => "coin", amount => "amount"),
         copy_trading_follower_get_copy_transfer_record(project_id => "projectId"),

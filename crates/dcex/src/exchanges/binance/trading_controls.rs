@@ -127,7 +127,11 @@ impl BinanceClient {
                 ));
             }
             let product = params.required("product_symbol")?;
-            let symbol = if product.contains('-') {
+            let symbol = if let Some(native) =
+                self.loaded_symbol_for(product, BinanceMarket::CoinFutures)?
+            {
+                native
+            } else if product.contains('-') {
                 if self.market_for_product_symbol(product)? != BinanceMarket::CoinFutures {
                     return Err(DcexError::InvalidInput(
                         "product_symbol does not match COIN-M".into(),
@@ -589,14 +593,14 @@ impl BinanceClient {
         }
         let mut query = params.without(&["product_symbol"]);
         if let Some(symbol) = params.get("product_symbol") {
-            let actual = self.market_for_product_symbol(symbol)?;
-            if actual != market {
+            if !self.has_product_table() && self.market_for_product_symbol(symbol)? != market {
                 return Err(DcexError::InvalidInput(
                     "product_symbol does not match the endpoint market".into(),
                 ));
             }
-            query.push(("symbol".into(), self.exchange_symbol(symbol)?));
+            query.push(("symbol".into(), self.exchange_symbol_for(symbol, market)?));
         }
+        query = self.normalize_loaded_symbols(query, market)?;
         if matches!(market, BinanceMarket::CoinFutures)
             && let Some(symbol) = params.get("symbol")
             && !symbol

@@ -17,7 +17,7 @@ impl BybitClient {
             "set_leverage" => {
                 let product_symbol = params.required("product_symbol")?;
                 let mut body = Map::new();
-                self.insert_symbol_category(&mut body, product_symbol)?;
+                self.insert_symbol_category(&mut body, product_symbol, params.get("category"))?;
                 body.insert(
                     "buyLeverage".to_string(),
                     Value::String(params.required("leverage")?.to_string()),
@@ -70,7 +70,7 @@ impl BybitClient {
             Value::Number(params.i64_required("mode")?.into()),
         );
         if let Some(product_symbol) = params.get("product_symbol") {
-            self.insert_symbol_category(&mut body, product_symbol)?;
+            self.insert_symbol_category(&mut body, product_symbol, params.get("category"))?;
         }
         insert_optional_string(&mut body, "coin", params.get("coin"));
         Ok(body)
@@ -92,7 +92,11 @@ impl BybitClient {
 
     fn trading_stop_body_from_params(&self, params: &BybitParams) -> Result<Map<String, Value>> {
         let mut body = Map::new();
-        self.insert_symbol_category(&mut body, params.required("product_symbol")?)?;
+        self.insert_symbol_category(
+            &mut body,
+            params.required("product_symbol")?,
+            params.get("category"),
+        )?;
         let mode = params.required("tpslMode")?;
         if !matches!(mode, "Full" | "Partial") {
             return Err(DcexError::InvalidInput(
@@ -143,7 +147,11 @@ impl BybitClient {
 
     fn position_margin_body_from_params(&self, params: &BybitParams) -> Result<Map<String, Value>> {
         let mut body = Map::new();
-        self.insert_symbol_category(&mut body, params.required("product_symbol")?)?;
+        self.insert_symbol_category(
+            &mut body,
+            params.required("product_symbol")?,
+            params.get("category"),
+        )?;
         if !matches!(
             body.get("category").and_then(Value::as_str),
             Some("linear" | "inverse")
@@ -180,7 +188,11 @@ impl BybitClient {
 
     fn auto_add_margin_body_from_params(&self, params: &BybitParams) -> Result<Map<String, Value>> {
         let mut body = Map::new();
-        self.insert_symbol_category(&mut body, params.required("product_symbol")?)?;
+        self.insert_symbol_category(
+            &mut body,
+            params.required("product_symbol")?,
+            params.get("category"),
+        )?;
         if body.get("category").and_then(Value::as_str) != Some("linear") {
             return Err(DcexError::InvalidInput(
                 "Bybit auto-add margin supports linear contracts only".into(),
@@ -212,7 +224,7 @@ impl BybitClient {
             ),
         ];
         if let Some(product_symbol) = params.get("product_symbol") {
-            self.push_symbol_category(&mut query, product_symbol, true)?;
+            self.push_symbol_category(&mut query, product_symbol, params.get("category"), true)?;
         } else {
             push_optional(&mut query, "baseCoin", params.get("baseCoin"));
             if let Some(settle_coin) = params.get("settleCoin") {
@@ -237,7 +249,7 @@ impl BybitClient {
             ),
         ];
         if let Some(product_symbol) = params.get("product_symbol") {
-            self.push_symbol_category(&mut query, product_symbol, true)?;
+            self.push_symbol_category(&mut query, product_symbol, params.get("category"), true)?;
         }
         push_optional(&mut query, "startTime", params.get("startTime"));
         push_optional(&mut query, "endTime", params.get("endTime"));
@@ -300,7 +312,7 @@ mod tests {
         let body = client()
             .switch_position_mode_body_from_params(&BybitParams::from_pairs(vec![
                 ("mode".to_string(), "0".to_string()),
-                ("product_symbol".to_string(), "BTC-USD-H23-SWAP".to_string()),
+                ("product_symbol".to_string(), "BTC-USD-SWAP".to_string()),
             ]))
             .expect("body");
 
@@ -310,7 +322,7 @@ mod tests {
         );
         assert_eq!(
             body.get("symbol"),
-            Some(&Value::String("BTCUSDH23".to_string()))
+            Some(&Value::String("BTCUSD".to_string()))
         );
     }
 

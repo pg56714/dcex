@@ -130,6 +130,9 @@ struct PythonArcusHttpClient {
 
 #[pymethods]
 impl PythonArcusHttpClient {
+    fn set_product_table(&mut self, table: PyRef<'_, PythonProductTable>) {
+        self.client.set_product_table(table.table.clone());
+    }
     #[new]
     #[pyo3(signature = (api_key=None, api_secret=None, address=None, account_index=0, testnet=false, timeout=10.0, base_url=None))]
     fn new(

@@ -5,7 +5,6 @@
     "path": "/api/v2/margin/market/isolated-borrow-rate",
     "public": true,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "symbol",
@@ -33,7 +32,6 @@
     "path": "/api/v2/margin/market/loan-growth",
     "public": true,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "symbol",

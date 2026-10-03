@@ -15,8 +15,6 @@ from tests.unit.endpoint_wrapper_helpers import (
 FEE_RATE_CASES = (
     ("binance", "get_spot_fee_rates", {"product_symbol": "BTC-USDT-SPOT"}, "NATIVE_PRIVATE"),
     ("binance", "get_futures_fee_rates", {"product_symbol": "BTC-USDT-SWAP"}, "NATIVE_PRIVATE"),
-    ("bitget", "get_spot_fee_rates", {"product_symbol": "BTC-USDT-SPOT"}, "NATIVE_PRIVATE"),
-    ("bitget", "get_futures_fee_rates", {"product_symbol": "BTC-USDT-SWAP"}, "NATIVE_PRIVATE"),
     ("bybit", "get_spot_fee_rates", {}, "NATIVE_PRIVATE"),
     ("bybit", "get_linear_fee_rates", {}, "NATIVE_PRIVATE"),
     ("bybit", "get_inverse_fee_rates", {}, "NATIVE_PRIVATE"),

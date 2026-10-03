@@ -17,6 +17,15 @@ struct PythonKrakenPrivateWebSocketClient {
 
 #[pymethods]
 impl PythonKrakenPublicWebSocketClient {
+    fn set_product_table(&self, table: PyRef<'_, PythonProductTable>) -> PyResult<()> {
+        let mut client = self
+            .client
+            .try_lock()
+            .map_err(|_| PyRuntimeError::new_err("WebSocket client is busy"))?;
+        client.set_product_table(table.table.clone());
+        Ok(())
+    }
+
     #[new]
     #[pyo3(signature = (timeout=10.0, base_url=None))]
     fn new(timeout: f64, base_url: Option<String>) -> PyResult<Self> {
@@ -435,6 +444,15 @@ struct PythonKrakenFuturesWebSocketClient {
 
 #[pymethods]
 impl PythonKrakenFuturesWebSocketClient {
+    fn set_product_table(&self, table: PyRef<'_, PythonProductTable>) -> PyResult<()> {
+        let mut client = self
+            .client
+            .try_lock()
+            .map_err(|_| PyRuntimeError::new_err("WebSocket client is busy"))?;
+        client.set_product_table(table.table.clone());
+        Ok(())
+    }
+
     #[new]
     #[pyo3(signature=(timeout=10.0, base_url=None, api_key=None, api_secret=None))]
     fn new(

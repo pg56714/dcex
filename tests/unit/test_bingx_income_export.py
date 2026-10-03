@@ -49,7 +49,7 @@ async def test_income_export_preserves_bytes_and_checks_errors(
     if asynchronous:
         await client.async_init()
     kwargs = {
-        "product_symbol": "BTC-USDT-SWAP",
+        "product_symbol": "BTC-USDT",
         "income_type": "FUNDING_FEE",
         "start_time": 1700000000000,
         "end_time": 1700000010000,

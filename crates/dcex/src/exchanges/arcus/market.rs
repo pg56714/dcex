@@ -41,6 +41,9 @@ impl ArcusClient {
             }
         }
         let mut params = collected;
+        if let Some(market) = params.get_mut("market") {
+            *market = self.exchange_symbol(market)?;
+        }
         super::query_validation::validate(method_name, &params)?;
         let path = public_path(method_name)?;
         let path = if matches!(method_name, "get_bbo" | "get_l2_orderbook") {
@@ -94,6 +97,8 @@ impl ArcusClient {
     }
 
     pub(super) async fn market_info(&self, product_symbol: &str) -> Result<Value> {
+        let resolved = self.exchange_symbol(product_symbol)?;
+        let product_symbol = resolved.as_str();
         let response = self.public_request("get_markets", vec![]).await?;
         response.data["markets"]
             .as_array()
@@ -103,7 +108,9 @@ impl ArcusClient {
                         .as_u64()
                         .is_some_and(|id| id.to_string() == product_symbol);
                     let symbol_match = market["marketDisplayName"].as_str().is_some_and(|symbol| {
-                        symbol == product_symbol || format!("{symbol}-SWAP") == product_symbol
+                        symbol == product_symbol
+                            || (self.product_table.is_none()
+                                && format!("{symbol}-SWAP") == product_symbol)
                     });
                     id_match || symbol_match
                 })

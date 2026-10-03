@@ -1,4 +1,4 @@
-"""Regression coverage for Bitget Savings and Earn wrappers."""
+"""Regression coverage for Bitget Elite Earn wrappers."""
 
 import pytest
 
@@ -26,19 +26,13 @@ class _AsyncNative:
 
 
 def test_sync_bitget_earn_wrappers_forward_official_fields() -> None:
-    """Sync wrappers preserve Savings read and mutation parameters."""
+    """Sync wrappers preserve Elite Earn read and mutation parameters."""
     from dcex.bitget.client import Client
 
     client = object.__new__(Client)
     native = _SyncNative()
     client._native_client = native
 
-    client.get_earn_account_assets("USDT")
-    client.get_savings_products("USDT", filter="available_and_held")
-    client.get_savings_assets("flexible", limit=10)
-    client.get_savings_records("fixed", order_type="pay_interest", limit=20)
-    client.subscribe_savings("product", "flexible", "1")
-    client.redeem_savings("product", "fixed", "1", order_id="asset-order")
     client.get_elite_earn_products()
     client.subscribe_elite_earn("product-sub", "1", payment_account="unified")
     client.redeem_elite_earn(
@@ -47,14 +41,6 @@ def test_sync_bitget_earn_wrappers_forward_official_fields() -> None:
     client.get_elite_earn_records("interest", limit=20)
 
     assert native.calls[1] == (
-        "get_savings_products",
-        [("coin", "USDT"), ("filter", "available_and_held")],
-    )
-    assert native.calls[4] == (
-        "subscribe_savings",
-        [("productId", "product"), ("periodType", "flexible"), ("amount", "1")],
-    )
-    assert native.calls[7] == (
         "subscribe_elite_earn",
         [("productSubId", "product-sub"), ("amount", "1"), ("paymentAccount", "unified")],
     )
@@ -62,31 +48,19 @@ def test_sync_bitget_earn_wrappers_forward_official_fields() -> None:
 
 @pytest.mark.asyncio
 async def test_async_bitget_earn_wrappers_forward_official_fields() -> None:
-    """Async wrappers preserve Savings result and redemption fields."""
+    """Async wrappers preserve Elite Earn result and redemption fields."""
     from dcex.async_support.bitget.client import Client
 
     client = object.__new__(Client)
     native = _AsyncNative()
     client._native_client = native
 
-    await client.get_savings_account()
-    await client.get_savings_subscription_info("product", "flexible")
-    await client.get_savings_subscription_result("order", "flexible")
-    await client.get_savings_redemption_result("order", "fixed")
     await client.get_elite_earn_subscription_info("product")
     await client.get_elite_earn_subscription_result("order")
     await client.get_elite_earn_redemption_info("product")
     await client.get_elite_earn_assets()
 
-    assert native.calls[1] == (
-        "get_savings_subscription_info",
-        [("productId", "product"), ("periodType", "flexible")],
-    )
-    assert native.calls[3] == (
-        "get_savings_redemption_result",
-        [("orderId", "order"), ("periodType", "fixed")],
-    )
-    assert native.calls[4] == (
+    assert native.calls[0] == (
         "get_elite_earn_subscription_info",
         [("productId", "product")],
     )

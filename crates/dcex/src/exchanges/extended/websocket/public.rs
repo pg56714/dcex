@@ -5,16 +5,45 @@ use crate::{DcexError, Result};
 
 use super::{
     USER_AGENT, WS_URL, normalize_candle_interval, normalize_candle_type, normalize_market,
-    optional_market_path, stream_url,
+    stream_url,
 };
 
 pub struct ExtendedPublicWebSocket {
+    product_table: Option<std::sync::Arc<crate::product_table::ProductTable>>,
     base_url: String,
     timeout: Duration,
     connection: Option<WebSocketConnection>,
 }
 
 impl ExtendedPublicWebSocket {
+    fn exchange_symbol(&self, symbol: &str) -> Result<String> {
+        if let Some(table) = &self.product_table {
+            return Ok(table
+                .resolve_symbol("extended", symbol, None, None)?
+                .exchange_symbol
+                .clone());
+        }
+        normalize_market(symbol)
+    }
+    fn market_path(&self, prefix: &str, symbol: Option<&str>) -> Result<String> {
+        if self.product_table.is_none() {
+            return super::optional_market_path(prefix, symbol);
+        }
+        match symbol {
+            Some(symbol) => Ok(format!("{prefix}/{}", self.exchange_symbol(symbol)?)),
+            None => Ok(prefix.into()),
+        }
+    }
+
+    pub fn set_product_table(&mut self, table: crate::product_table::ProductTable) {
+        self.product_table = Some(std::sync::Arc::new(table));
+    }
+
+    pub fn with_product_table(mut self, table: crate::product_table::ProductTable) -> Self {
+        self.set_product_table(table);
+        self
+    }
+
     pub fn new(timeout: Duration) -> Result<Self> {
         Self::with_url(WS_URL.to_string(), timeout)
     }
@@ -23,6 +52,7 @@ impl ExtendedPublicWebSocket {
         let base_url = base_url.into();
         stream_url(&base_url, "orderbooks")?;
         Ok(Self {
+            product_table: None,
             base_url,
             timeout,
             connection: None,
@@ -51,7 +81,7 @@ impl ExtendedPublicWebSocket {
         market: Option<&str>,
         depth: Option<u8>,
     ) -> Result<()> {
-        let mut path = optional_market_path("orderbooks", market)?;
+        let mut path = self.market_path("orderbooks", market)?;
         if let Some(depth) = depth {
             if depth != 1 {
                 return Err(DcexError::InvalidInput(
@@ -64,7 +94,7 @@ impl ExtendedPublicWebSocket {
     }
 
     pub async fn subscribe_trades(&mut self, market: Option<&str>) -> Result<()> {
-        self.select_stream(optional_market_path("publicTrades", market)?)
+        self.select_stream(self.market_path("publicTrades", market)?)
             .await
     }
 
@@ -74,7 +104,7 @@ impl ExtendedPublicWebSocket {
         market: Option<&str>,
         depth: Option<u8>,
     ) -> Result<()> {
-        let mut path = optional_market_path("orderbooks/rfq", market)?;
+        let mut path = self.market_path("orderbooks/rfq", market)?;
         if let Some(depth) = depth {
             if depth != 1 {
                 return Err(DcexError::InvalidInput(
@@ -87,7 +117,7 @@ impl ExtendedPublicWebSocket {
     }
 
     pub async fn subscribe_funding(&mut self, market: Option<&str>) -> Result<()> {
-        self.select_stream(optional_market_path("funding", market)?)
+        self.select_stream(self.market_path("funding", market)?)
             .await
     }
 
@@ -97,7 +127,7 @@ impl ExtendedPublicWebSocket {
         candle_type: &str,
         interval: &str,
     ) -> Result<()> {
-        let market = normalize_market(market)?;
+        let market = self.exchange_symbol(market)?;
         let candle_type = normalize_candle_type(candle_type)?;
         let interval = normalize_candle_interval(interval)?;
         self.select_stream(format!(
@@ -107,12 +137,12 @@ impl ExtendedPublicWebSocket {
     }
 
     pub async fn subscribe_mark_price(&mut self, market: Option<&str>) -> Result<()> {
-        self.select_stream(optional_market_path("prices/mark", market)?)
+        self.select_stream(self.market_path("prices/mark", market)?)
             .await
     }
 
     pub async fn subscribe_index_price(&mut self, market: Option<&str>) -> Result<()> {
-        self.select_stream(optional_market_path("prices/index", market)?)
+        self.select_stream(self.market_path("prices/index", market)?)
             .await
     }
 

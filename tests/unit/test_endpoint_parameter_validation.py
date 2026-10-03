@@ -13,7 +13,6 @@ CASES = [
     ("Bybit", "set_api_rate_limits", {"list": [{"uids": "1", "bizType": "UTA", "rate": 10}]}),
     ("Bybit", "set_api_rate_limits", {"list": [{"uids": "1", "bizType": "SPOT", "rate": 1.5}]}),
     ("Bybit", "get_all_api_rate_limits", {"limit": 1001}),
-    ("Bitget", "batch_create_classic_sub_accounts", {"accounts": []}),
     (
         "Bitget",
         "move_uta_positions",

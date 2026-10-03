@@ -469,20 +469,19 @@ impl LighterClient {
         self.post_form(super::endpoints::SEND_TX, body).await
     }
 
-    const fn product_table_exchange(&self) -> &'static str {
-        match self.network {
-            Some(LighterNetwork::Robinhood | LighterNetwork::RobinhoodTestnet) => {
-                "lighter_robinhood"
-            }
-            _ => "lighter",
-        }
+    fn product_table_exchange(&self) -> &'static str {
+        self.network
+            .map_or("lighter", LighterNetwork::product_table_exchange)
     }
 
     pub(super) fn market_id(&self, product_symbol: &str) -> Result<String> {
         if let Some(table) = &self.product_table {
-            return table.get_exchange_symbol(self.product_table_exchange(), product_symbol);
+            return Ok(table
+                .resolve_symbol(self.product_table_exchange(), product_symbol, None, None)?
+                .exchange_symbol
+                .clone());
         }
-        if product_symbol.contains('-') {
+        if product_symbol.parse::<u64>().is_err() {
             return Err(DcexError::InvalidInput(
                 "Lighter product_symbol requires a product table.".to_string(),
             ));
@@ -622,4 +621,13 @@ mod explorer_product_tests {
         .unwrap();
         assert!(custom.explorer_base_url.is_none());
     }
+}
+
+#[cfg(test)]
+#[test]
+fn public_market_symbol_samples() {
+    let client = LighterClient::new(Duration::from_secs(1)).expect("client");
+    crate::exchanges::symbol_tests::check("lighter", |symbol, _mode| client.market_id(symbol));
+    assert!(client.market_id("BTC").is_err());
+    assert_eq!(client.market_id("1").expect("raw ID"), "1");
 }

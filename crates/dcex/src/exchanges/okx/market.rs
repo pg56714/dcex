@@ -4,9 +4,19 @@ use crate::{DcexError, Result};
 
 use super::client::OkxClient;
 use super::endpoints::*;
-use super::params::{OkxParams, normalize_inst_id_query};
+use super::params::OkxParams;
 
 impl OkxClient {
+    fn normalize_inst_id_query(&self, params: &mut [(String, String)]) -> Result<()> {
+        for (key, value) in params {
+            if key == "product_symbol" || key == "instId" {
+                *key = "instId".to_string();
+                *value = self.exchange_symbol(value)?;
+            }
+        }
+        Ok(())
+    }
+
     pub async fn public_request(
         &self,
         method_name: &str,
@@ -143,7 +153,7 @@ impl OkxClient {
         let mut params = raw.only(allowed);
         let path = match method_name {
             "get_price_limit" => {
-                normalize_inst_id_query(&mut params);
+                self.normalize_inst_id_query(&mut params)?;
                 "/api/v5/public/price-limit"
             }
             "get_mark_price" => {
@@ -154,65 +164,66 @@ impl OkxClient {
                         "unsupported mark-price instType".into(),
                     ));
                 }
-                normalize_inst_id_query(&mut params);
+                self.normalize_inst_id_query(&mut params)?;
                 "/api/v5/public/mark-price"
             }
             "get_candles_ticks" => {
-                normalize_inst_id_query(&mut params);
+                self.normalize_inst_id_query(&mut params)?;
                 MARKET_CANDLES
             }
             "get_orderbook" => {
-                normalize_inst_id_query(&mut params);
+                self.normalize_inst_id_query(&mut params)?;
                 MARKET_ORDERBOOK
             }
             "get_tickers" => MARKET_TICKERS,
             "get_public_trades" => {
-                normalize_inst_id_query(&mut params);
+                self.normalize_inst_id_query(&mut params)?;
                 MARKET_PUBLIC_TRADES
             }
             "get_public_instruments" => {
-                normalize_inst_id_query(&mut params);
+                self.normalize_inst_id_query(&mut params)?;
                 PUBLIC_INSTRUMENTS
             }
             "get_public_underlying" => PUBLIC_UNDERLYING,
             "get_funding_rate" => {
-                normalize_inst_id_query(&mut params);
+                self.normalize_inst_id_query(&mut params)?;
                 PUBLIC_FUNDING_RATE
             }
             "get_funding_rate_history" => {
-                normalize_inst_id_query(&mut params);
+                self.normalize_inst_id_query(&mut params)?;
                 PUBLIC_FUNDING_RATE_HISTORY
             }
             "get_open_interest" => {
-                normalize_inst_id_query(&mut params);
+                self.normalize_inst_id_query(&mut params)?;
                 PUBLIC_OPEN_INTEREST
             }
             "get_position_tiers" => {
-                normalize_position_tiers_query(&mut params);
+                self.normalize_inst_id_query(&mut params)?;
+                normalize_position_tiers_query(&mut params)?;
                 PUBLIC_POSITION_TIERS
             }
             "get_trading_data_support_coin" => PUBLIC_TRADING_DATA_SUPPORT_COIN,
             "get_taker_volume" => PUBLIC_TAKER_VOLUME,
             "get_contract_taker_volume" => {
-                normalize_inst_id_query(&mut params);
+                self.normalize_inst_id_query(&mut params)?;
                 PUBLIC_CONTRACT_TAKER_VOLUME
             }
             "get_long_short_ratio" => PUBLIC_LONG_SHORT_RATIO,
             "get_contract_long_short_ratio" => {
-                normalize_inst_id_query(&mut params);
+                self.normalize_inst_id_query(&mut params)?;
                 PUBLIC_CONTRACT_LONG_SHORT_RATIO
             }
             "get_top_trader_long_short_account_ratio" => {
-                normalize_inst_id_query(&mut params);
+                self.normalize_inst_id_query(&mut params)?;
                 PUBLIC_TOP_TRADER_LONG_SHORT_ACCOUNT_RATIO
             }
             "get_top_trader_long_short_position_ratio" => {
-                normalize_inst_id_query(&mut params);
+                self.normalize_inst_id_query(&mut params)?;
                 PUBLIC_TOP_TRADER_LONG_SHORT_POSITION_RATIO
             }
             "get_contracts_open_interest_and_volume" => PUBLIC_CONTRACTS_OPEN_INTEREST_VOLUME,
             "get_contract_open_interest_history" => {
-                normalize_inst_id_query(&mut params);
+                self.normalize_inst_id_query(&mut params)?;
                 PUBLIC_CONTRACT_OPEN_INTEREST_HISTORY
             }
             "get_delivery_exercise_history" => PUBLIC_DELIVERY_EXERCISE_HISTORY,
@@ -240,25 +251,25 @@ impl OkxClient {
     }
 }
 
-fn normalize_position_tiers_query(params: &mut Vec<(String, String)>) {
-    normalize_inst_id_query(params);
+fn normalize_position_tiers_query(params: &mut Vec<(String, String)>) -> Result<()> {
     if !params.iter().any(|(key, value)| {
         key == "instType" && matches!(value.as_str(), "SWAP" | "FUTURES" | "OPTION")
     }) {
-        return;
+        return Ok(());
     }
     if params.iter().any(|(key, _)| key == "instFamily") {
-        return;
+        return Ok(());
     }
     let Some(inst_id) = params
         .iter()
         .find(|(key, _)| key == "instId")
         .map(|(_, value)| value)
     else {
-        return;
+        return Ok(());
     };
     let mut parts = inst_id.split('-');
     if let (Some(base), Some(quote)) = (parts.next(), parts.next()) {
         params.push(("instFamily".to_string(), format!("{base}-{quote}")));
     }
+    Ok(())
 }

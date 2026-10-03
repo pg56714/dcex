@@ -56,5 +56,8 @@ pub mod address;
 pub mod decimal;
 pub mod order_side;
 pub mod sanitization;
+#[cfg(test)]
+#[path = "exchanges/symbol_resolution_tests.rs"]
+mod symbol_resolution_tests;
 pub mod time;
 pub mod timeframe;

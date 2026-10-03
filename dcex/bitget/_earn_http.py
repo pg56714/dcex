@@ -8,61 +8,6 @@ from ._http_manager import HTTPManager
 class EarnHTTP(HTTPManager):
     """HTTP client for Bitget Savings and On-chain Earn workflows."""
 
-    def get_earn_account_assets(self, coin: str | None = None) -> dict[str, Any]:
-        return self._native_private("get_earn_account_assets", self._native_params(coin=coin))
-
-    def get_savings_account(self) -> dict[str, Any]:
-        return self._native_private("get_savings_account", [])
-
-    def get_savings_products(
-        self, coin: str | None = None, filter: str | None = None
-    ) -> dict[str, Any]:
-        return self._native_private(
-            "get_savings_products", self._native_params(coin=coin, filter=filter)
-        )
-
-    def get_savings_assets(
-        self,
-        period_type: str,
-        *,
-        start_time: int | None = None,
-        end_time: int | None = None,
-        limit: int | None = None,
-        id_less_than: str | None = None,
-    ) -> dict[str, Any]:
-        return self._savings_history_query(
-            "get_savings_assets",
-            period_type,
-            None,
-            None,
-            start_time,
-            end_time,
-            limit,
-            id_less_than,
-        )
-
-    def get_savings_records(
-        self,
-        period_type: str,
-        *,
-        coin: str | None = None,
-        order_type: str | None = None,
-        start_time: int | None = None,
-        end_time: int | None = None,
-        limit: int | None = None,
-        id_less_than: str | None = None,
-    ) -> dict[str, Any]:
-        return self._savings_history_query(
-            "get_savings_records",
-            period_type,
-            coin,
-            order_type,
-            start_time,
-            end_time,
-            limit,
-            id_less_than,
-        )
-
     def _savings_history_query(
         self,
         method_name: str,
@@ -85,48 +30,6 @@ class EarnHTTP(HTTPManager):
                 limit=limit,
                 idLessThan=id_less_than,
             ),
-        )
-
-    def get_savings_subscription_info(self, product_id: str, period_type: str) -> dict[str, Any]:
-        return self._native_private(
-            "get_savings_subscription_info",
-            self._native_params(productId=product_id, periodType=period_type),
-        )
-
-    def subscribe_savings(self, product_id: str, period_type: str, amount: str) -> dict[str, Any]:
-        return self._native_private(
-            "subscribe_savings",
-            self._native_params(productId=product_id, periodType=period_type, amount=amount),
-        )
-
-    def get_savings_subscription_result(self, order_id: str, period_type: str) -> dict[str, Any]:
-        return self._native_private(
-            "get_savings_subscription_result",
-            self._native_params(orderId=order_id, periodType=period_type),
-        )
-
-    def redeem_savings(
-        self,
-        product_id: str,
-        period_type: str,
-        amount: str,
-        *,
-        order_id: str | None = None,
-    ) -> dict[str, Any]:
-        return self._native_private(
-            "redeem_savings",
-            self._native_params(
-                productId=product_id,
-                periodType=period_type,
-                amount=amount,
-                orderId=order_id,
-            ),
-        )
-
-    def get_savings_redemption_result(self, order_id: str, period_type: str) -> dict[str, Any]:
-        return self._native_private(
-            "get_savings_redemption_result",
-            self._native_params(orderId=order_id, periodType=period_type),
         )
 
     def get_elite_earn_products(self) -> dict[str, Any]:

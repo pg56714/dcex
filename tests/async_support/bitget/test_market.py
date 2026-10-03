@@ -40,4 +40,4 @@ async def test_uta_market_data(client, category, symbol):
     _assert_success(await client.get_uta_tickers(category, product_symbol=symbol))
     book = await client.get_uta_orderbook(category, symbol, limit=5)
     _assert_success(book)
-    assert book["data"]["bids"] and book["data"]["asks"]
+    assert book["data"]["b"] and book["data"]["a"]

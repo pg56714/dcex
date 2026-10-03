@@ -41,6 +41,15 @@ fn only_canonical_swap_symbols_map_to_ondo_perps() {
     );
 }
 
+#[test]
+fn a_loaded_ondo_table_never_falls_back_to_a_guessed_market() {
+    let client = OndoClient::public(Duration::from_secs(5))
+        .expect("client")
+        .with_product_table(crate::product_table::ProductTable::new(vec![]));
+    assert!(client.exchange_symbol("UNLISTED-USD-SWAP").is_err());
+    assert!(client.exchange_symbol("BTC-USD.P").is_err());
+}
+
 #[tokio::test]
 async fn raw_json_orders_cannot_bypass_validation() {
     let client = OndoClient::public(Duration::from_secs(5)).expect("client");

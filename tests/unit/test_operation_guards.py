@@ -16,21 +16,10 @@ CONFIRMED = [
     ("bitget", "switch_to_classic_account", {}),
     ("bitget", "delete_uta_subaccount", {"sub_uid": "123"}),
     ("bitget", "set_uta_account_mode", {"mode": "basic"}),
-    ("bitget", "set_futures_asset_mode", {"product_type": "USDT-FUTURES", "asset_mode": "single"}),
     (
         "bitget",
         "move_uta_positions",
         {"from_uid": "1", "to_uid": "2", "category": "USDT-FUTURES", "position_list": []},
-    ),
-    (
-        "bitget",
-        "reverse_futures_position",
-        {
-            "product_symbol": "BTC-USDT-SWAP",
-            "margin_coin": "USDT",
-            "product_type": "USDT-FUTURES",
-            "side": "buy",
-        },
     ),
     ("bingx", "reverse_swap_position", {"type_": "MARKET", "product_symbol": "BTC-USDT-SWAP"}),
     ("bingx", "set_swap_asset_mode", {"asset_mode": "singleAsset"}),

@@ -350,31 +350,35 @@ impl KrakenClient {
         product_symbol: &str,
         futures_prefix: &str,
     ) -> Result<String> {
-        if is_canonical_product_symbol(product_symbol)
-            && let Some(table) = &self.product_table
-        {
-            return table.get_exchange_symbol("kraken", product_symbol);
+        if let Some(table) = &self.product_table {
+            let row = table.resolve_symbol_in("kraken", product_symbol, |row| {
+                if futures_prefix.is_empty() {
+                    row.product_type == "spot"
+                } else {
+                    matches!(row.product_type.as_str(), "swap" | "futures")
+                }
+            })?;
+            // An official alternate pair name is already a valid wire symbol.
+            if row.exchange_symbol_alias == product_symbol {
+                return Ok(product_symbol.to_string());
+            }
+            return Ok(row.exchange_symbol.clone());
         }
-        Ok(exchange_symbol_fallback(product_symbol, futures_prefix))
+        exchange_symbol_fallback(product_symbol, futures_prefix)
     }
 
     pub(super) fn spot_asset_class(&self, product_symbol: &str) -> Result<Option<String>> {
-        if is_canonical_product_symbol(product_symbol) {
-            if let Some(table) = &self.product_table {
-                let exchange_type =
-                    table.get_exchange_type("kraken", Some(product_symbol), None)?;
-                if exchange_type == "tokenized_asset" {
-                    return Ok(Some(exchange_type));
-                }
-                return Ok(None);
-            }
-            if product_symbol
+        if let Some(table) = &self.product_table {
+            let row = table.resolve_symbol("kraken", product_symbol, Some("spot"), None)?;
+            return Ok((row.exchange_type == "tokenized_asset").then(|| row.exchange_type.clone()));
+        }
+        if is_canonical_product_symbol(product_symbol)
+            && product_symbol
                 .split('-')
                 .next()
                 .is_some_and(|base| base.ends_with('x'))
-            {
-                return Ok(Some("tokenized_asset".to_string()));
-            }
+        {
+            return Ok(Some("tokenized_asset".to_string()));
         }
         Ok(None)
     }

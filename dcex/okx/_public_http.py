@@ -5,7 +5,6 @@ from typing import Any
 from dcex._schema_codec import normalize_params
 
 from .._native_http import request_native_json
-from ..utils.common import Common
 from ._http_manager import HTTPManager
 
 
@@ -29,15 +28,6 @@ class PublicHTTP(HTTPManager):
         self._store_response_headers(response)
         return data
 
-    def _exchange_symbol(self, product_symbol: str) -> str:
-        """Map product symbol through PTM when available."""
-        if hasattr(self, "ptm"):
-            return self.ptm.get_exchange_symbol(Common.OKX, product_symbol)
-        parts = product_symbol.split("-")
-        if len(parts) >= 3:
-            return f"{parts[0]}-{parts[1]}" if parts[2] == "SPOT" else product_symbol
-        return product_symbol
-
     @staticmethod
     def _params(**kwargs: object) -> list[tuple[str, str]]:
         """Convert optional Python arguments into native string pairs."""
@@ -57,7 +47,7 @@ class PublicHTTP(HTTPManager):
         product_symbol: str | None = None,
     ) -> dict[str, Any]:
         """Get public instrument information."""
-        inst_id = self._exchange_symbol(product_symbol) if product_symbol is not None else None
+        inst_id = product_symbol if product_symbol is not None else None
         return self._native_public(
             "get_public_instruments",
             self._params(
@@ -76,7 +66,7 @@ class PublicHTTP(HTTPManager):
         """Get current funding rate for a trading pair."""
         return self._native_public(
             "get_funding_rate",
-            self._params(instId=self._exchange_symbol(product_symbol)),
+            self._params(instId=product_symbol),
         )
 
     def get_funding_rate_history(
@@ -90,7 +80,7 @@ class PublicHTTP(HTTPManager):
         return self._native_public(
             "get_funding_rate_history",
             self._params(
-                instId=self._exchange_symbol(product_symbol),
+                instId=product_symbol,
                 before=before,
                 after=after,
                 limit=limit,
@@ -104,7 +94,7 @@ class PublicHTTP(HTTPManager):
         product_symbol: str | None = None,
     ) -> dict[str, Any]:
         """Get public open interest data."""
-        inst_id = self._exchange_symbol(product_symbol) if product_symbol is not None else None
+        inst_id = product_symbol if product_symbol is not None else None
         return self._native_public(
             "get_open_interest",
             self._params(instType=instType, instFamily=instFamily, instId=inst_id),
@@ -120,7 +110,7 @@ class PublicHTTP(HTTPManager):
         tier: str | None = None,
     ) -> dict[str, Any]:
         """Get position tiers information."""
-        inst_id = self._exchange_symbol(product_symbol) if product_symbol is not None else None
+        inst_id = product_symbol if product_symbol is not None else None
         if (
             inst_id is not None
             and instFamily is None
@@ -172,7 +162,7 @@ class PublicHTTP(HTTPManager):
         return self._native_public(
             "get_contract_taker_volume",
             self._params(
-                instId=self._exchange_symbol(product_symbol),
+                instId=product_symbol,
                 period=period,
                 begin=begin,
                 end=end,
@@ -206,7 +196,7 @@ class PublicHTTP(HTTPManager):
         return self._native_public(
             "get_contract_long_short_ratio",
             self._params(
-                instId=self._exchange_symbol(product_symbol),
+                instId=product_symbol,
                 period=period,
                 begin=begin,
                 end=end,
@@ -226,7 +216,7 @@ class PublicHTTP(HTTPManager):
         return self._native_public(
             "get_top_trader_long_short_account_ratio",
             self._params(
-                instId=self._exchange_symbol(product_symbol),
+                instId=product_symbol,
                 period=period,
                 begin=begin,
                 end=end,
@@ -246,7 +236,7 @@ class PublicHTTP(HTTPManager):
         return self._native_public(
             "get_top_trader_long_short_position_ratio",
             self._params(
-                instId=self._exchange_symbol(product_symbol),
+                instId=product_symbol,
                 period=period,
                 begin=begin,
                 end=end,
@@ -279,7 +269,7 @@ class PublicHTTP(HTTPManager):
         return self._native_public(
             "get_contract_open_interest_history",
             self._params(
-                instId=self._exchange_symbol(product_symbol),
+                instId=product_symbol,
                 period=period,
                 begin=begin,
                 end=end,

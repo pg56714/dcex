@@ -186,7 +186,7 @@ def test_native_hyperliquid_normalizes_signed_addresses() -> None:
         client.private_request_json(
             "place_order",
             [
-                ("product_symbol", "BTC-USD-SWAP"),
+                ("product_symbol", '["BTC",0]'),
                 ("isBuy", "true"),
                 ("price", "100000"),
                 ("size", "0.001"),
@@ -236,7 +236,7 @@ def test_native_hyperliquid_normalizes_signed_addresses() -> None:
         (
             "place_order",
             [
-                ("product_symbol", "BTC-USD-SWAP"),
+                ("product_symbol", '["BTC",0]'),
                 ("isBuy", "true"),
                 ("price", "100"),
                 ("size", "1"),

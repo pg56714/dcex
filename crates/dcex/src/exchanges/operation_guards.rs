@@ -12,9 +12,7 @@ pub(super) fn validate(
             "switch_to_classic_account"
                 | "delete_uta_subaccount"
                 | "set_uta_account_mode"
-                | "set_futures_asset_mode"
                 | "move_uta_positions"
-                | "reverse_futures_position"
         ),
         "bingx" => matches!(method, "reverse_swap_position" | "set_swap_asset_mode"),
         "bybit" => matches!(method, "delete_api_key" | "modify_api_key"),
@@ -30,12 +28,7 @@ pub(super) fn validate(
         return Err(invalid(method, "at least one API key change is required"));
     }
     let scoped = match exchange {
-        "bitget" => matches!(
-            method,
-            "close_uta_positions"
-                | "close_copy_futures_follower_positions"
-                | "close_copy_futures_trader_positions"
-        ),
+        "bitget" => method == "close_uta_positions",
         "bingx" => matches!(
             method,
             "close_coin_swap_all_positions" | "cancel_coin_swap_all_orders"
@@ -65,7 +58,6 @@ pub(super) fn validate(
                 })
             });
         let ids = params.iter().any(|(k, v)| match k.as_str() {
-            "trackingNo" => !v.trim().is_empty(),
             "orderIds" => !v.trim().is_empty() && v.split(',').all(|id| !id.trim().is_empty()),
             "orderIdList" => {
                 serde_json::from_str::<Vec<serde_json::Value>>(v).is_ok_and(|values| {

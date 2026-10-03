@@ -123,6 +123,11 @@ impl BinanceClient {
         symbol: Option<&str>,
         market: BinanceMarket,
     ) -> Result<String> {
+        if let (Some(value), None) | (None, Some(value)) = (product, symbol)
+            && let Some(symbol) = self.loaded_symbol_for(value, market)?
+        {
+            return Ok(symbol);
+        }
         match (product, symbol) {
             (Some(product), None) if !product.contains('-') => {
                 self.batch_symbol(None, Some(product), market)

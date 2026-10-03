@@ -84,7 +84,7 @@ def test_sync_bybit_risk_limit_sends_cursor() -> None:
     manager.get_risk_limit(cursor="next-page")
 
     assert captured["method_name"] == "get_risk_limit"
-    assert captured["params"] == [("category", "linear"), ("cursor", "next-page")]
+    assert captured["params"] == [("cursor", "next-page")]  # Rust defaults category=linear
 
 
 @pytest.mark.asyncio
@@ -97,7 +97,7 @@ async def test_async_bybit_risk_limit_sends_cursor() -> None:
     await manager.get_risk_limit(cursor="next-page")
 
     assert captured["method_name"] == "get_risk_limit"
-    assert captured["params"] == [("category", "linear"), ("cursor", "next-page")]
+    assert captured["params"] == [("cursor", "next-page")]  # Rust defaults category=linear
 
 
 def test_sync_bybit_transferable_amount_validates_and_sends_coins() -> None:
@@ -419,3 +419,28 @@ def test_bybit_spot_asset_info_is_documented_as_deprecated() -> None:
         doc = inspect.getdoc(cls.get_spot_asset_info) or ""
         assert "deprecated" in doc
         assert "classic accounts only" in doc
+
+
+@pytest.mark.parametrize(
+    ("kwargs", "expected"),
+    [
+        ({}, {"category": ["linear"]}),
+        ({"product_symbol": "BTC-USD-SWAP"}, {"category": ["inverse"], "symbol": ["BTCUSD"]}),
+        ({"product_symbol": "BTC-USDT-SWAP"}, {"category": ["linear"], "symbol": ["BTCUSDT"]}),
+    ],
+)
+def test_bybit_risk_limit_derives_category_from_symbol(monkeypatch, kwargs, expected) -> None:
+    from urllib.parse import parse_qs, urlsplit
+
+    from dcex.bybit import _http_manager
+    from dcex.bybit.client import Client
+    from tests.unit.native_http_helpers import _http_server
+
+    with _http_server({"retCode": 0, "result": {}}) as (base, received):
+        monkeypatch.setattr(_http_manager, "HTTP_URL", base)
+        client = Client(sync_server_time=False, preload_product_table=False)
+        try:
+            client.get_risk_limit(**kwargs)
+            assert parse_qs(urlsplit(received.get(timeout=10)["path"]).query) == expected
+        finally:
+            client.close()

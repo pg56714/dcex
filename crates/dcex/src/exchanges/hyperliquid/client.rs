@@ -285,18 +285,12 @@ impl HyperliquidClient {
     }
 
     pub(super) fn symbol_parts(&self, product_symbol: &str) -> Result<(String, u64)> {
+        if let Some(table) = &self.product_table {
+            let row = table.resolve_symbol("hyperliquid", product_symbol, None, None)?;
+            return parse_exchange_symbol(&row.exchange_symbol);
+        }
         if let Ok(parts) = parse_exchange_symbol(product_symbol) {
             return Ok(parts);
-        }
-        if is_canonical_product_symbol(product_symbol)
-            && let Some(table) = &self.product_table
-            && let Ok(exchange_symbol) = table.get_exchange_symbol("hyperliquid", product_symbol)
-        {
-            return parse_exchange_symbol(&exchange_symbol);
-        }
-        let coin = fallback_coin(product_symbol);
-        if coin == "BTC" && !product_symbol.to_ascii_uppercase().ends_with("-SPOT") {
-            return Ok((coin, 0));
         }
         Err(DcexError::InvalidInput(format!(
             "cannot safely resolve Hyperliquid asset id for {product_symbol}; load the product table or pass an exchange symbol JSON pair"
@@ -304,23 +298,21 @@ impl HyperliquidClient {
     }
 
     pub(super) fn coin(&self, product_symbol: &str) -> Result<String> {
+        if let Some(table) = &self.product_table {
+            let row = table.resolve_symbol("hyperliquid", product_symbol, None, None)?;
+            return Ok(parse_exchange_symbol(&row.exchange_symbol)?.0);
+        }
         if let Ok((coin, _)) = parse_exchange_symbol(product_symbol) {
             return Ok(coin);
         }
-        if is_canonical_product_symbol(product_symbol) {
-            if let Some(table) = &self.product_table
-                && let Ok(exchange_symbol) =
-                    table.get_exchange_symbol("hyperliquid", product_symbol)
-            {
-                return Ok(parse_exchange_symbol(&exchange_symbol)?.0);
-            }
-            if product_symbol.to_ascii_uppercase().ends_with("-SPOT") {
-                return Err(DcexError::InvalidInput(format!(
-                    "cannot safely resolve Hyperliquid spot coin for {product_symbol}; load the product table or pass the official raw coin"
-                )));
-            }
+        if is_canonical_product_symbol(product_symbol)
+            && product_symbol.to_ascii_uppercase().ends_with("-SPOT")
+        {
+            return Err(DcexError::InvalidInput(format!(
+                "cannot safely resolve Hyperliquid spot coin for {product_symbol}; load the product table or pass the official raw coin"
+            )));
         }
-        let coin = fallback_coin(product_symbol);
+        let coin = fallback_coin(product_symbol)?;
         if coin.trim().is_empty() {
             return Err(DcexError::InvalidInput(
                 "Hyperliquid product_symbol must not be empty".to_string(),
@@ -357,4 +349,17 @@ fn parse_exchange_symbol(exchange_symbol: &str) -> Result<(String, u64)> {
         DcexError::InvalidInput("Hyperliquid asset id must be an integer.".to_string())
     })?;
     Ok((coin.to_string(), asset_id))
+}
+
+#[cfg(test)]
+#[test]
+fn public_market_symbol_samples() {
+    let client = HyperliquidClient::public(false, Duration::from_secs(1)).expect("client");
+    crate::exchanges::symbol_tests::check("hyperliquid", |symbol, mode| {
+        if mode == "asset_id" {
+            client.symbol_parts(symbol).map(|parts| parts.0)
+        } else {
+            client.coin(symbol)
+        }
+    });
 }

@@ -7,7 +7,7 @@ use crate::product_table::ProductTable;
 use crate::ws::{WebSocketConfig, WebSocketConnection};
 use crate::{DcexError, Result};
 
-use super::super::params::{exchange_symbol_fallback, is_canonical_product_symbol};
+use super::super::params::exchange_symbol_fallback;
 use super::is_business_channel;
 
 const PUBLIC_WS_URL: &str = "wss://ws.okx.com:8443/ws/v5/public";
@@ -308,12 +308,13 @@ impl OkxPublicWebSocket {
     }
 
     fn exchange_symbol(&self, product_symbol: &str) -> Result<String> {
-        if let Some(table) = &self.product_table
-            && is_canonical_product_symbol(product_symbol)
-        {
-            return table.get_exchange_symbol("okx", product_symbol);
+        if let Some(table) = &self.product_table {
+            return Ok(table
+                .resolve_symbol("okx", product_symbol, None, None)?
+                .exchange_symbol
+                .clone());
         }
-        Ok(exchange_symbol_fallback(product_symbol))
+        exchange_symbol_fallback(product_symbol)
     }
 
     async fn send_subscription(&mut self, op: &str, args: Vec<OkxWebSocketArg>) -> Result<()> {

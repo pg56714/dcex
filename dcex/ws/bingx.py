@@ -19,6 +19,10 @@ def _decode_event(body: bytes | bytearray | memoryview) -> dict[str, Any] | list
 class PublicClient(AsyncWebSocketMixin):
     """BingX streams for market="spot", "swap", or "coin_swap"."""
 
+    def set_product_table(self, table: Any) -> None:  # noqa: ANN401
+        """Use exact canonical/native symbols from a native ProductTable."""
+        self._native_client.set_product_table(table)
+
     def __init__(
         self,
         timeout: float = 10.0,

@@ -60,6 +60,9 @@ async fn fetch_exchange_rows(exchange: Exchange, timeout: Duration) -> Result<Ve
 mod exchanges;
 
 #[cfg(test)]
+pub(crate) use self::exchanges::kraken_spot_rows;
+
+#[cfg(test)]
 #[path = "product_table_fetch/tests.rs"]
 mod tests;
 
@@ -104,15 +107,16 @@ fn json_string(value: &Value) -> String {
 }
 
 fn value_i32(value: &Value, key: &str, default: i32) -> i32 {
-    value
-        .get(key)
-        .and_then(|value| {
-            value
-                .as_i64()
-                .and_then(|value| i32::try_from(value).ok())
-                .or_else(|| value.as_str()?.parse().ok())
-        })
-        .unwrap_or(default)
+    optional_i32(value, key).unwrap_or(default)
+}
+
+fn optional_i32(value: &Value, key: &str) -> Option<i32> {
+    value.get(key).and_then(|value| {
+        value
+            .as_i64()
+            .and_then(|value| i32::try_from(value).ok())
+            .or_else(|| value.as_str()?.parse().ok())
+    })
 }
 
 fn find_filter<'a>(filters: &'a [Value], filter_types: &[&str]) -> &'a Value {
@@ -151,11 +155,12 @@ fn decimal_precision(decimal_places: i32) -> String {
     }
 }
 
-fn decimal_precision_or_zero(decimal_places: i32) -> String {
-    if decimal_places > 0 {
-        decimal_precision(decimal_places)
-    } else {
-        "0".to_string()
+/// Step for a count of decimal places (`N` -> `10^-N`, so 0 -> "1"); "0" (unknown) when the
+/// count is absent or invalid.
+fn decimal_precision_or_zero(decimal_places: Option<i32>) -> String {
+    match decimal_places {
+        Some(places) if places >= 0 => decimal_precision(places),
+        _ => "0".to_string(),
     }
 }
 

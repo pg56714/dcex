@@ -325,7 +325,7 @@ CONTROL_CASES = [
     ),
     (
         "get_swap_open_order",
-        {"product_symbol": "BTC-USDT-SWAP", "orderId": 123},
+        {"product_symbol": "BTC-USDT", "orderId": 123},
         "GET",
         "/openApi/swap/v2/trade/openOrder",
     ),
@@ -338,20 +338,20 @@ CONTROL_CASES = [
     ),
     (
         "adjust_swap_position_margin",
-        {"product_symbol": "BTC-USDT-SWAP", "amount": "2", "type_": 2, "positionSide": "LONG"},
+        {"product_symbol": "BTC-USDT", "amount": "2", "type_": 2, "positionSide": "LONG"},
         "POST",
         "/openApi/swap/v2/trade/positionMargin",
     ),
     (
         "amend_swap_order",
-        {"product_symbol": "BTC-USDT-SWAP", "quantity": "1", "clientOrderId": "amend-me"},
+        {"product_symbol": "BTC-USDT", "quantity": "1", "clientOrderId": "amend-me"},
         "POST",
         "/openApi/swap/v1/trade/amend",
     ),
     (
         "place_swap_twap_order",
         {
-            "product_symbol": "BTC-USDT-SWAP",
+            "product_symbol": "BTC-USDT",
             "side": "BUY",
             "positionSide": "LONG",
             "priceType": "constant",
@@ -385,20 +385,20 @@ CONTROL_CASES = [
     ("get_swap_full_orders", {"limit": 20}, "GET", "/openApi/swap/v1/trade/fullOrder"),
     (
         "get_swap_fill_history",
-        {"product_symbol": "BTC-USDT-SWAP", "startTs": 1700000000000, "endTs": 1700000100000},
+        {"product_symbol": "BTC-USDT", "startTs": 1700000000000, "endTs": 1700000100000},
         "GET",
         "/openApi/swap/v2/trade/fillHistory",
     ),
     (
         "get_swap_position_history",
-        {"product_symbol": "BTC-USDT-SWAP", "startTs": 1700000000000, "endTs": 1700000100000},
+        {"product_symbol": "BTC-USDT", "startTs": 1700000000000, "endTs": 1700000100000},
         "GET",
         "/openApi/swap/v1/trade/positionHistory",
     ),
     (
         "get_swap_margin_history",
         {
-            "product_symbol": "BTC-USDT-SWAP",
+            "product_symbol": "BTC-USDT",
             "positionId": "123",
             "startTime": 1700000000000,
             "endTime": 1700000100000,
@@ -410,13 +410,13 @@ CONTROL_CASES = [
     ),
     (
         "get_swap_maintenance_margin_ratios",
-        {"product_symbol": "BTC-USDT-SWAP"},
+        {"product_symbol": "BTC-USDT"},
         "GET",
         "/openApi/swap/v1/maintMarginRatio",
     ),
     (
         "set_swap_auto_add_margin",
-        {"product_symbol": "BTC-USDT-SWAP", "positionId": "123", "functionSwitch": "true"},
+        {"product_symbol": "BTC-USDT", "positionId": "123", "functionSwitch": "true"},
         "POST",
         "/openApi/swap/v1/trade/autoAddMargin",
     ),
@@ -500,129 +500,129 @@ def _client_kwargs(base_url: str) -> dict[str, Any]:
 ADDITIONAL_CASES = [
     (
         "get_coin_swap_contracts",
-        {"product_symbol": "BTC-USD-SWAP"},
+        {"product_symbol": "BTC-USD"},
         "GET",
         "/openApi/cswap/v1/market/contracts",
     ),
     (
         "get_coin_swap_orderbook",
-        {"product_symbol": "BTC-USD-SWAP"},
+        {"product_symbol": "BTC-USD"},
         "GET",
         "/openApi/cswap/v1/market/depth",
     ),
     (
         "get_coin_swap_kline",
-        {"product_symbol": "BTC-USD-SWAP", "interval": "1m"},
+        {"product_symbol": "BTC-USD", "interval": "1m"},
         "GET",
         "/openApi/cswap/v1/market/klines",
     ),
     (
         "get_coin_swap_premium_index",
-        {"product_symbol": "BTC-USD-SWAP"},
+        {"product_symbol": "BTC-USD"},
         "GET",
         "/openApi/cswap/v1/market/premiumIndex",
     ),
     (
         "get_coin_swap_open_interest",
-        {"product_symbol": "BTC-USD-SWAP"},
+        {"product_symbol": "BTC-USD"},
         "GET",
         "/openApi/cswap/v1/market/openInterest",
     ),
     (
         "get_coin_swap_ticker",
-        {"product_symbol": "BTC-USD-SWAP"},
+        {"product_symbol": "BTC-USD"},
         "GET",
         "/openApi/cswap/v1/market/ticker",
     ),
     (
         "place_coin_swap_order",
-        {"product_symbol": "BTC-USD-SWAP", "side": "SELL", "type_": "MARKET", "quantity": "1"},
+        {"product_symbol": "BTC-USD", "side": "SELL", "type_": "MARKET", "quantity": "1"},
         "POST",
         "/openApi/cswap/v1/trade/order",
     ),
     (
         "cancel_coin_swap_order",
-        {"product_symbol": "BTC-USD-SWAP", "order_id": 1},
+        {"product_symbol": "BTC-USD", "order_id": 1},
         "DELETE",
         "/openApi/cswap/v1/trade/cancelOrder",
     ),
     (
         "cancel_coin_swap_all_orders",
-        {"product_symbol": "BTC-USD-SWAP"},
+        {"product_symbol": "BTC-USD"},
         "POST",
         "/openApi/cswap/v1/trade/allOpenOrders",
     ),
     (
         "close_coin_swap_all_positions",
-        {"product_symbol": "BTC-USD-SWAP"},
+        {"product_symbol": "BTC-USD"},
         "POST",
         "/openApi/cswap/v1/trade/closeAllPositions",
     ),
     (
         "get_coin_swap_open_orders",
-        {"product_symbol": "BTC-USD-SWAP"},
+        {"product_symbol": "BTC-USD"},
         "GET",
         "/openApi/cswap/v1/trade/openOrders",
     ),
     (
         "get_coin_swap_order",
-        {"product_symbol": "BTC-USD-SWAP", "order_id": 1},
+        {"product_symbol": "BTC-USD", "order_id": 1},
         "GET",
         "/openApi/cswap/v1/trade/orderDetail",
     ),
     (
         "get_coin_swap_order_history",
-        {"limit": 20, "product_symbol": "BTC-USD-SWAP"},
+        {"limit": 20, "product_symbol": "BTC-USD"},
         "GET",
         "/openApi/cswap/v1/trade/orderHistory",
     ),
     ("get_coin_swap_fills", {"order_id": "1"}, "GET", "/openApi/cswap/v1/trade/allFillOrders"),
     (
         "get_coin_swap_force_orders",
-        {"product_symbol": "BTC-USD-SWAP"},
+        {"product_symbol": "BTC-USD"},
         "GET",
         "/openApi/cswap/v1/trade/forceOrders",
     ),
     (
         "get_coin_swap_leverage",
-        {"product_symbol": "BTC-USD-SWAP"},
+        {"product_symbol": "BTC-USD"},
         "GET",
         "/openApi/cswap/v1/trade/leverage",
     ),
     (
         "set_coin_swap_leverage",
-        {"product_symbol": "BTC-USD-SWAP", "side": "LONG", "leverage": "5"},
+        {"product_symbol": "BTC-USD", "side": "LONG", "leverage": "5"},
         "POST",
         "/openApi/cswap/v1/trade/leverage",
     ),
     (
         "get_coin_swap_margin_type",
-        {"product_symbol": "BTC-USD-SWAP"},
+        {"product_symbol": "BTC-USD"},
         "GET",
         "/openApi/cswap/v1/trade/marginType",
     ),
     (
         "set_coin_swap_margin_type",
-        {"product_symbol": "BTC-USD-SWAP", "margin_type": "ISOLATED"},
+        {"product_symbol": "BTC-USD", "margin_type": "ISOLATED"},
         "POST",
         "/openApi/cswap/v1/trade/marginType",
     ),
     (
         "adjust_coin_swap_position_margin",
-        {"product_symbol": "BTC-USD-SWAP", "position_side": "LONG", "amount": "1", "type_": 1},
+        {"product_symbol": "BTC-USD", "position_side": "LONG", "amount": "1", "type_": 1},
         "POST",
         "/openApi/cswap/v1/trade/positionMargin",
     ),
     ("get_coin_swap_commission_rate", {}, "GET", "/openApi/cswap/v1/user/commissionRate"),
     (
         "get_coin_swap_balance",
-        {"product_symbol": "BTC-USD-SWAP"},
+        {"product_symbol": "BTC-USD"},
         "GET",
         "/openApi/cswap/v1/user/balance",
     ),
     (
         "get_coin_swap_positions",
-        {"product_symbol": "BTC-USD-SWAP"},
+        {"product_symbol": "BTC-USD"},
         "GET",
         "/openApi/cswap/v1/user/positions",
     ),
@@ -754,7 +754,7 @@ ADDITIONAL_CASES.extend(
         ("get_swap_server_time", {}, "GET", "/openApi/swap/v2/server/time"),
         (
             "get_swap_price_ticker",
-            {"product_symbol": "BTC-USDT-SWAP"},
+            {"product_symbol": "BTC-USDT"},
             "GET",
             "/openApi/swap/v1/ticker/price",
         ),
@@ -773,7 +773,7 @@ PUBLIC_METHODS.update(["get_swap_server_time", "get_swap_price_ticker"])
 
 BATCH_REPLACEMENT = [
     {
-        "product_symbol": "BTC-USDT-SWAP",
+        "product_symbol": "BTC-USDT",
         "cancelOrderId": "1",
         "side": "SELL",
         "positionSide": "BOTH",
@@ -802,13 +802,13 @@ ADDITIONAL_CASES.extend(
         ("get_deposit_risk_records", {}, "GET", "/openApi/wallets/v1/capital/deposit/riskRecords"),
         (
             "get_swap_historical_trades",
-            {"product_symbol": "BTC-USDT-SWAP"},
+            {"product_symbol": "BTC-USDT"},
             "GET",
             "/openApi/swap/v1/market/historicalTrades",
         ),
         (
             "reverse_swap_position",
-            {"type_": "Reverse", "product_symbol": "BTC-USDT-SWAP", "confirm": True},
+            {"type_": "Reverse", "product_symbol": "BTC-USDT", "confirm": True},
             "POST",
             "/openApi/swap/v1/trade/reverse",
         ),
@@ -816,7 +816,7 @@ ADDITIONAL_CASES.extend(
         ("get_standard_futures_positions", {}, "GET", "/openApi/contract/v1/allPosition"),
         (
             "get_standard_futures_orders",
-            {"product_symbol": "BTC-USDT-SWAP"},
+            {"product_symbol": "BTC-USDT"},
             "GET",
             "/openApi/contract/v1/allOrders",
         ),
@@ -1101,7 +1101,7 @@ def _kwargs(method: Any, name: str) -> dict[str, Any]:  # noqa: ANN401
         if parameter.default is not inspect.Parameter.empty:
             continue
         if parameter.name == "product_symbol":
-            kwargs[parameter.name] = "BTC-USDT-SPOT" if "spot" in name else "BTC-USDT-SWAP"
+            kwargs[parameter.name] = "BTC-USDT-SPOT" if "spot" in name else "BTC-USDT"
         elif parameter.name in samples:
             sample_name = parameter.name
             kwargs[sample_name] = samples[sample_name]
@@ -1261,13 +1261,13 @@ def test_sync_helpers_pin_side_type_and_time_in_force(
     _drain(received)
     client = Client(**_client_kwargs(base_url))
     client.place_swap_post_only_sell_order(
-        product_symbol="ETH-USDT-SWAP", quantity="1", price="100", position_side="SHORT"
+        product_symbol="ETH-USDT", quantity="1", price="100", position_side="SHORT"
     )
     query = received.get(timeout=10)["query"]
     assert query["symbol"] == "ETH-USDT"
     assert (query["side"], query["type"], query["timeInForce"]) == ("SELL", "LIMIT", "PostOnly")
 
-    client.cancel_swap_all_orders(product_symbol="BTC-USDT-SWAP", type_="LIMIT")
+    client.cancel_swap_all_orders(product_symbol="BTC-USDT", type_="LIMIT")
     query = received.get(timeout=10)["query"]
     assert query["type"] == "LIMIT"
 
@@ -1325,7 +1325,7 @@ def test_public_routes_send_documented_timestamp(
         (
             "place_swap_twap_order",
             {
-                "product_symbol": "BTC-USDT-SWAP",
+                "product_symbol": "BTC-USDT",
                 "side": "BUY",
                 "position_side": "LONG",
                 "price_type": "constant",
@@ -1339,7 +1339,7 @@ def test_public_routes_send_documented_timestamp(
         (
             "place_swap_twap_order",
             {
-                "product_symbol": "BTC-USDT-SWAP",
+                "product_symbol": "BTC-USDT",
                 "side": "BUY",
                 "position_side": "LONG",
                 "price_type": "constant",
@@ -1350,10 +1350,10 @@ def test_public_routes_send_documented_timestamp(
                 "total_amount": "10",
             },
         ),
-        ("amend_swap_order", {"product_symbol": "BTC-USDT-SWAP", "quantity": "1"}),
+        ("amend_swap_order", {"product_symbol": "BTC-USDT", "quantity": "1"}),
         (
             "get_swap_position_history",
-            {"product_symbol": "BTC-USDT-SWAP", "start_ts": 1, "end_ts": 8000000000},
+            {"product_symbol": "BTC-USDT", "start_ts": 1, "end_ts": 8000000000},
         ),
         ("set_swap_asset_mode", {"asset_mode": "invalid", "confirm": True}),
     ],

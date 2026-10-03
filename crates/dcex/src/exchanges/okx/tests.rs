@@ -2,3 +2,4 @@ mod endpoint_coverage;
 mod helpers;
 mod requests;
 mod signing;
+mod symbol_resolution;

@@ -22,12 +22,22 @@ enum BingxPublicMarket {
 }
 
 pub struct BingxPublicWebSocket {
+    product_table: Option<std::sync::Arc<crate::product_table::ProductTable>>,
     connection: WebSocketConnection,
     next_request_id: u64,
     market: BingxPublicMarket,
 }
 
 impl BingxPublicWebSocket {
+    pub fn set_product_table(&mut self, table: crate::product_table::ProductTable) {
+        self.product_table = Some(std::sync::Arc::new(table));
+    }
+
+    pub fn with_product_table(mut self, table: crate::product_table::ProductTable) -> Self {
+        self.set_product_table(table);
+        self
+    }
+
     pub fn new_coin_swap(timeout: Duration) -> Result<Self> {
         Self::with_coin_swap_url(COIN_SWAP_WS_URL, timeout)
     }
@@ -63,6 +73,7 @@ impl BingxPublicWebSocket {
         market: BingxPublicMarket,
     ) -> Result<Self> {
         Ok(Self {
+            product_table: None,
             connection: WebSocketConnection::new(WebSocketConfig::new(url, timeout)?),
             next_request_id: 1,
             market,
@@ -216,6 +227,20 @@ impl BingxPublicWebSocket {
     }
 
     fn symbol_for_connection(&self, product_symbol: &str) -> Result<String> {
+        // The product table has no Coin-M rows, so Coin-M connections use the native rules.
+        if let Some(table) = &self.product_table
+            && self.market != BingxPublicMarket::CoinSwap
+        {
+            let kind = if self.market == BingxPublicMarket::Spot {
+                "spot"
+            } else {
+                "swap"
+            };
+            return Ok(table
+                .resolve_symbol("bingx", product_symbol, Some(kind), None)?
+                .exchange_symbol
+                .clone());
+        }
         let (symbol, market) = normalize_product_symbol(product_symbol)?;
         if self.market == BingxPublicMarket::CoinSwap && !symbol.ends_with("-USD") {
             return Err(DcexError::InvalidInput(
@@ -288,28 +313,24 @@ fn normalize_interval(interval: &str, market: BingxPublicMarket) -> Result<Strin
 }
 
 fn normalize_product_symbol(product_symbol: &str) -> Result<(String, Option<BingxPublicMarket>)> {
-    let product_symbol = product_symbol.trim();
+    let product_symbol = product_symbol.trim().to_ascii_uppercase();
     if product_symbol.is_empty() {
         return Err(DcexError::InvalidInput(
             "BingX WebSocket symbol must not be empty.".to_string(),
         ));
     }
     let parts = product_symbol.split('-').collect::<Vec<_>>();
+    if product_symbol.ends_with("-SWAP") {
+        return Err(DcexError::InvalidInput(
+            "BingX swap display names require a product table; pass the official exchange symbol to WebSocket".into(),
+        ));
+    }
     let market = match parts.as_slice() {
         [base, quote] if !base.is_empty() && !quote.is_empty() => None,
         [base, quote, kind]
             if !base.is_empty() && !quote.is_empty() && kind.eq_ignore_ascii_case("SPOT") =>
         {
             Some(BingxPublicMarket::Spot)
-        }
-        [base, quote, kind]
-            if !base.is_empty() && !quote.is_empty() && kind.eq_ignore_ascii_case("SWAP") =>
-        {
-            Some(if quote.eq_ignore_ascii_case("USD") {
-                BingxPublicMarket::CoinSwap
-            } else {
-                BingxPublicMarket::Swap
-            })
         }
         _ => {
             return Err(DcexError::InvalidInput(format!(
@@ -356,6 +377,8 @@ mod tests {
 
     #[test]
     fn maps_public_data_types() {
+        assert!(normalize_product_symbol("neiro-usdt-swap").is_err());
+        assert!(normalize_product_symbol("NEIRO-USDT-SWAP").is_err());
         assert_eq!(normalize_orderbook_depth(5).expect("depth"), 5);
         assert_eq!(normalize_orderbook_depth(100).expect("depth"), 100);
         assert_eq!(normalize_orderbook_speed("500ms").expect("speed"), "500ms");
@@ -372,10 +395,36 @@ mod tests {
         assert!(normalize_interval("1 m", BingxPublicMarket::Spot).is_err());
         assert!(normalize_interval("2m", BingxPublicMarket::Swap).is_err());
         assert!(normalize_product_symbol("BTCUSDT").is_err());
+        assert!(normalize_product_symbol("NEIRO-USDT-SWAP").is_err());
         assert_eq!(
-            normalize_product_symbol("BTC-USDT-SWAP").expect("symbol"),
-            ("BTC-USDT".to_string(), Some(BingxPublicMarket::Swap))
+            normalize_product_symbol("BTC-USDT").expect("symbol"),
+            ("BTC-USDT".to_string(), None)
         );
+    }
+
+    #[test]
+    fn coin_swap_symbols_skip_the_usdt_margined_table() {
+        let row = |product: &str, kind: &str| crate::product_table::MarketInfo {
+            exchange: "bingx".into(),
+            product_symbol: product.into(),
+            exchange_symbol: "BTC-USDT".into(),
+            product_type: kind.into(),
+            exchange_type: kind.into(),
+            ..Default::default()
+        };
+        let table = crate::product_table::ProductTable::new(vec![
+            row("BTC-USDT-SPOT", "spot"),
+            row("BTC-USDT-SWAP", "swap"),
+        ]);
+        let coin = BingxPublicWebSocket::new_coin_swap(Duration::from_secs(1))
+            .expect("client")
+            .with_product_table(table.clone());
+        assert_eq!(coin.symbol_for_connection("BTC-USD").unwrap(), "BTC-USD");
+        assert!(coin.symbol_for_connection("BTC-USDT").is_err());
+        let swap = BingxPublicWebSocket::new(Duration::from_secs(1))
+            .expect("client")
+            .with_product_table(table);
+        assert!(swap.symbol_for_connection("BTC-USD").is_err());
     }
 
     #[test]
@@ -385,12 +434,9 @@ mod tests {
             Duration::from_secs(1),
         )
         .expect("client");
-        let error = block_on(async move {
-            websocket
-                .subscribe_orderbook("SOL-USDT-SWAP", 20, "200ms")
-                .await
-        })
-        .expect_err("SOL swap should reject the BTC/ETH-only 200ms speed");
+        let error =
+            block_on(async move { websocket.subscribe_orderbook("SOL-USDT", 20, "200ms").await })
+                .expect_err("SOL swap should reject the BTC/ETH-only 200ms speed");
         assert_eq!(
             error.to_string(),
             "BingX 200ms swap depth is only available for BTC-USDT and ETH-USDT"

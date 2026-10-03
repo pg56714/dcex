@@ -13,6 +13,7 @@ use crate::{DcexError, Result};
 
 #[derive(Clone)]
 pub struct ArcusClient {
+    pub(super) product_table: Option<std::sync::Arc<crate::product_table::ProductTable>>,
     pub(super) transport: AsyncHttpClient,
     pub(super) base_url: String,
     pub(super) address: Option<String>,
@@ -75,6 +76,7 @@ impl ArcusClient {
             })
             .transpose()?;
         Ok(Self {
+            product_table: None,
             transport: AsyncHttpClient::new(timeout)?,
             base_url: if testnet { TESTNET_URL } else { MAINNET_URL }.into(),
             address,
@@ -86,6 +88,25 @@ impl ArcusClient {
 
     pub fn public(timeout: Duration) -> Result<Self> {
         Self::new(None, None, None, 0, false, timeout)
+    }
+
+    pub fn with_product_table(mut self, table: crate::product_table::ProductTable) -> Self {
+        self.set_product_table(table);
+        self
+    }
+
+    pub fn set_product_table(&mut self, table: crate::product_table::ProductTable) {
+        self.product_table = Some(std::sync::Arc::new(table));
+    }
+
+    pub(super) fn exchange_symbol(&self, symbol: &str) -> Result<String> {
+        if let Some(table) = &self.product_table {
+            return Ok(table
+                .resolve_symbol("arcus", symbol, Some("swap"), None)?
+                .exchange_symbol
+                .clone());
+        }
+        Ok(symbol.to_string())
     }
 
     pub fn with_base_url(mut self, base_url: String) -> Result<Self> {

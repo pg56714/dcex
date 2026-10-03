@@ -12,6 +12,14 @@ struct PythonArcusWebSocketClient {
 
 #[pymethods]
 impl PythonArcusWebSocketClient {
+    fn set_product_table(&self, table: PyRef<'_, PythonProductTable>) -> PyResult<()> {
+        self.client
+            .try_lock()
+            .map_err(|_| PyRuntimeError::new_err("WebSocket client is busy"))?
+            .set_product_table(table.table.clone());
+        Ok(())
+    }
+
     #[new]
     #[pyo3(signature = (testnet=false, timeout=10.0, base_url=None))]
     fn new(testnet: bool, timeout: f64, base_url: Option<String>) -> PyResult<Self> {

@@ -103,7 +103,7 @@ def test_extended_current_public_queries_match_wire_format() -> None:
         )
         client.public_request_json(
             "get_market_statistics",
-            [("product_symbol", "BTC-USDC-SPOT")],
+            [("product_symbol", "BTC-USD-SPOT")],
         )
 
     markets = urlsplit(received.get_nowait()["path"])
@@ -115,7 +115,7 @@ def test_extended_current_public_queries_match_wire_format() -> None:
     assert dict(parse_qsl(candles.query)) == {"interval": "PT1M", "limit": "100"}
     assert open_interest.path == "/api/v1/info/BTC-USD/open-interests"
     assert dict(parse_qsl(open_interest.query))["interval"] == "P1H"
-    assert spot_stats["path"] == "/api/v1/info/markets/BTCSPOT/stats"
+    assert spot_stats["path"] == "/api/v1/info/markets/BTCSPOT-USD/stats"
 
 
 def test_extended_current_private_queries_match_wire_format() -> None:

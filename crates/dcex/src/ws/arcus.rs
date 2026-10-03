@@ -9,10 +9,15 @@ use crate::ws::{WebSocketConfig, WebSocketConnection};
 use crate::{DcexError, Result};
 
 pub struct ArcusWebSocket {
+    product_table: Option<std::sync::Arc<crate::product_table::ProductTable>>,
     connection: WebSocketConnection,
 }
 
 impl ArcusWebSocket {
+    pub fn set_product_table(&mut self, table: crate::product_table::ProductTable) {
+        self.product_table = Some(std::sync::Arc::new(table));
+    }
+
     pub fn new(testnet: bool, timeout: Duration) -> Result<Self> {
         let url = if testnet {
             "wss://api.testnet.arcus.xyz/v1/ws"
@@ -24,6 +29,7 @@ impl ArcusWebSocket {
 
     pub fn with_url(url: String, timeout: Duration) -> Result<Self> {
         Ok(Self {
+            product_table: None,
             connection: WebSocketConnection::new(WebSocketConfig::new(url, timeout)?),
         })
     }
@@ -134,6 +140,22 @@ impl ArcusWebSocket {
                 "Arcus {channel} does not use an id"
             )));
         }
+        let resolved = if matches!(channel, "l2Orderbook" | "bbo" | "trades") {
+            id.map(|symbol| {
+                self.product_table.as_ref().map_or_else(
+                    || Ok(symbol.to_string()),
+                    |table| {
+                        table
+                            .resolve_symbol("arcus", symbol, Some("swap"), None)
+                            .map(|row| row.exchange_symbol.clone())
+                    },
+                )
+            })
+            .transpose()?
+        } else {
+            id.map(str::to_string)
+        };
+        let id = resolved.as_deref();
         let mut payload = json!({"type": action, "channel": channel});
         if let Some(id) = id {
             payload["id"] = Value::String(id.to_string());

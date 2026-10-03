@@ -98,7 +98,7 @@ async def test_async_bingx_forwards_current_swap_fields() -> None:
     calls = _wire_async(client)
 
     await client.replace_swap_order(
-        "BTC-USDT-SWAP",
+        "BTC-USDT",
         cancel_replace_mode="STOP_ON_FAILURE",
         type_="MARKET",
         side="BUY",
@@ -186,7 +186,7 @@ def test_native_bingx_accepts_current_swap_trigger_order_type() -> None:
         client.private_request_json(
             "test_swap_order",
             [
-                ("product_symbol", "BTC-USDT-SWAP"),
+                ("product_symbol", "BTC-USDT"),
                 ("side", "BUY"),
                 ("positionSide", "BOTH"),
                 ("type_", "TRIGGER_MARKET"),
@@ -210,7 +210,7 @@ def test_native_bingx_accepts_current_swap_trigger_order_type() -> None:
         ),
         (
             "cancel_swap_order",
-            [("product_symbol", "BTC-USDT-SWAP")],
+            [("product_symbol", "BTC-USDT")],
             "one of orderId, clientOrderId is required",
         ),
         (

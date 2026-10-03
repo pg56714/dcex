@@ -23,6 +23,7 @@ class MarketInfo:
     quote_currency: str = ""
     min_notional: str = "0"
     size_per_contract: str = "1"
+    exchange_symbol_alias: str = ""
 
     def to_dict(self) -> dict[str, str]:
         """Return the market metadata as a dictionary."""

@@ -55,43 +55,39 @@ impl BybitParams {
     }
 }
 
-pub(super) fn exchange_symbol_fallback(product_symbol: &str) -> String {
+pub(super) fn exchange_symbol_fallback(product_symbol: &str) -> Result<String> {
     let parts = product_symbol.split('-').collect::<Vec<_>>();
-    match parts.as_slice() {
-        [base, quote, kind]
-            if kind.eq_ignore_ascii_case("SPOT") || kind.eq_ignore_ascii_case("SWAP") =>
-        {
-            format!("{base}{quote}")
-        }
-        [base, quote, expiry, kind] if kind.eq_ignore_ascii_case("SWAP") => {
-            if quote.eq_ignore_ascii_case("USD") {
-                format!("{base}{quote}{expiry}")
-            } else {
-                format!("{base}{quote}-{expiry}")
-            }
-        }
-        _ => product_symbol.to_string(),
+    if parts.len() < 3
+        || matches!(
+            parts.as_slice(),
+            [_, _, _, "C" | "P"] | [_, _, _, "C" | "P", "USDT" | "USDC"]
+        )
+    {
+        return Ok(product_symbol.to_string());
     }
+    if parts.iter().any(|part| part.is_empty()) {
+        return Err(DcexError::InvalidInput(
+            "bybit product symbol must not contain empty components".into(),
+        ));
+    }
+    let symbol = match parts.as_slice() {
+        [base, "USDC", "SWAP"] => format!("{base}PERP"),
+        [base, quote, "SPOT" | "SWAP"] => format!("{base}{quote}"),
+        _ => return Err(DcexError::InvalidInput(
+            "cannot safely resolve bybit product symbol; load the product table or pass the official exchange symbol".into(),
+        )),
+    };
+    Ok(symbol)
 }
 
-pub(super) fn category_for_product_symbol_fallback(
-    product_symbol: &str,
-    default_category: &str,
-) -> String {
-    let parts = product_symbol.split('-').collect::<Vec<_>>();
-    if parts.len() >= 3 {
-        if parts[2].eq_ignore_ascii_case("SPOT") {
-            return "spot".to_string();
-        }
-        if parts[1].eq_ignore_ascii_case("USD") {
-            return "inverse".to_string();
-        }
+/// Category implied by a unified product symbol that the no-table fallback can map.
+pub(super) fn canonical_category_fallback(product_symbol: &str) -> Option<&'static str> {
+    match product_symbol.split('-').collect::<Vec<_>>().as_slice() {
+        [_, _, "SPOT"] => Some("spot"),
+        [_, "USD", "SWAP"] => Some("inverse"),
+        [_, _, "SWAP"] => Some("linear"),
+        _ => None,
     }
-    default_category.to_string()
-}
-
-pub(super) fn is_canonical_product_symbol(product_symbol: &str) -> bool {
-    product_symbol.contains('-')
 }
 
 pub(super) fn bybit_timeframe(timeframe: &str) -> Result<&'static str> {
@@ -218,12 +214,20 @@ mod tests {
     }
 
     #[test]
-    fn exchange_symbol_fallback_preserves_dated_futures() {
-        assert_eq!(exchange_symbol_fallback("BTC-USDT-SWAP"), "BTCUSDT");
+    fn exchange_symbol_fallback_requires_metadata_for_dated_futures() {
         assert_eq!(
-            exchange_symbol_fallback("BTC-USDT-21FEB25-SWAP"),
-            "BTCUSDT-21FEB25"
+            exchange_symbol_fallback("BTC-USDT-SWAP").expect("symbol"),
+            "BTCUSDT"
         );
-        assert_eq!(exchange_symbol_fallback("BTC-USD-H23-SWAP"), "BTCUSDH23");
+        assert!(exchange_symbol_fallback("BTC-USDT-21FEB25-SWAP").is_err());
+        assert!(exchange_symbol_fallback("BTC-USD-H23-SWAP").is_err());
     }
+}
+
+#[cfg(test)]
+#[test]
+fn public_market_symbol_samples() {
+    crate::exchanges::symbol_tests::check("bybit", |symbol, _mode| {
+        exchange_symbol_fallback(symbol)
+    });
 }

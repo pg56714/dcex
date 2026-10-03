@@ -1,18 +1,5 @@
 [
   {
-    "name": "get_classic_account_bot_assets",
-    "path": "/api/v2/account/bot-assets",
-    "post": false,
-    "public": false,
-    "fields": [
-      "accountType"
-    ],
-    "required": [],
-    "arrays": [],
-    "limit": null,
-    "days": null
-  },
-  {
     "name": "uta_trade_grid_add_investment",
     "path": "/api/v3/trade/grid/add-investment",
     "post": true,

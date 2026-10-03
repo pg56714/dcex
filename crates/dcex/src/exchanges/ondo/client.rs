@@ -284,7 +284,23 @@ impl OndoClient {
         Ok(request)
     }
 
+    pub(super) fn spot_exchange_symbol(&self, symbol: &str) -> Result<String> {
+        if let Some(table) = &self.product_table {
+            return Ok(table
+                .resolve_symbol("ondo", symbol, Some("spot"), None)?
+                .exchange_symbol
+                .clone());
+        }
+        Ok(symbol.strip_suffix("-SPOT").unwrap_or(symbol).to_string())
+    }
+
     pub(super) fn exchange_symbol(&self, product_symbol: &str) -> Result<String> {
+        if let Some(table) = &self.product_table {
+            return Ok(table
+                .resolve_symbol("ondo", product_symbol, Some("swap"), None)?
+                .exchange_symbol
+                .clone());
+        }
         if product_symbol.ends_with("-SPOT") {
             return Err(DcexError::InvalidInput(
                 "Ondo -SPOT symbols are only valid for get_spot_* endpoints".into(),
@@ -292,11 +308,6 @@ impl OndoClient {
         }
         if product_symbol.ends_with(".P") {
             return Ok(product_symbol.to_string());
-        }
-        if let Some(table) = &self.product_table
-            && let Ok(symbol) = table.get_exchange_symbol("ondo", product_symbol)
-        {
-            return Ok(symbol);
         }
         let parts = product_symbol.split('-').collect::<Vec<_>>();
         match parts.as_slice() {

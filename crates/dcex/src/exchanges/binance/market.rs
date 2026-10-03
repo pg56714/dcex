@@ -49,12 +49,15 @@ impl BinanceClient {
 
         let mut params = Vec::new();
         if let Some(product_symbol) = request.product_symbol {
-            params.push(("symbol".to_string(), self.exchange_symbol(product_symbol)?));
+            params.push((
+                "symbol".to_string(),
+                self.exchange_symbol_for(product_symbol, super::client::BinanceMarket::Spot)?,
+            ));
         }
         if let Some(product_symbols) = request.product_symbols {
             let symbols = product_symbols
                 .iter()
-                .map(|symbol| self.exchange_symbol(symbol))
+                .map(|symbol| self.exchange_symbol_for(symbol, super::client::BinanceMarket::Spot))
                 .collect::<Result<Vec<_>>>()?;
             params.push((
                 "symbols".to_string(),
@@ -101,7 +104,10 @@ impl BinanceClient {
         product_symbol: &str,
         request: BinanceLimitParams,
     ) -> Result<ValidatedResponse> {
-        let mut params = vec![("symbol".to_string(), self.exchange_symbol(product_symbol)?)];
+        let mut params = vec![(
+            "symbol".to_string(),
+            self.exchange_symbol_for(product_symbol, super::client::BinanceMarket::Spot)?,
+        )];
         push_optional_display(&mut params, "limit", request.limit);
         push_optional(
             &mut params,
@@ -134,7 +140,10 @@ impl BinanceClient {
         product_symbol: &str,
         request: BinanceLimitParams,
     ) -> Result<ValidatedResponse> {
-        let mut params = vec![("symbol".to_string(), self.exchange_symbol(product_symbol)?)];
+        let mut params = vec![(
+            "symbol".to_string(),
+            self.exchange_symbol_for(product_symbol, super::client::BinanceMarket::Spot)?,
+        )];
         push_optional_display(&mut params, "limit", request.limit);
         push_optional(
             &mut params,
@@ -167,12 +176,15 @@ impl BinanceClient {
 
         let mut params = Vec::new();
         if let Some(product_symbol) = request.product_symbol {
-            params.push(("symbol".to_string(), self.exchange_symbol(product_symbol)?));
+            params.push((
+                "symbol".to_string(),
+                self.exchange_symbol_for(product_symbol, super::client::BinanceMarket::Spot)?,
+            ));
         }
         if let Some(product_symbols) = request.product_symbols {
             let symbols = product_symbols
                 .iter()
-                .map(|symbol| self.exchange_symbol(symbol))
+                .map(|symbol| self.exchange_symbol_for(symbol, super::client::BinanceMarket::Spot))
                 .collect::<Result<Vec<_>>>()?;
             params.push((
                 "symbols".to_string(),
@@ -219,7 +231,7 @@ impl BinanceClient {
         push_optional_display(&mut params, "startTime", request.start_time);
         push_optional_display(&mut params, "endTime", request.end_time);
         push_optional_display(&mut params, "limit", request.limit);
-        let market = self.market_for_product_symbol(product_symbol)?;
+        let market = self.generic_market(product_symbol)?;
         if market == BinanceMarket::Equity {
             return Err(DcexError::InvalidInput(
                 "Binance Equity klines are available through the Equity WebSocket streams, not the Spot or Futures REST kline endpoints."
@@ -265,7 +277,10 @@ impl BinanceClient {
         product_symbol: &str,
         limit: Option<u64>,
     ) -> Result<ValidatedResponse> {
-        let mut params = vec![("symbol".to_string(), self.exchange_symbol(product_symbol)?)];
+        let mut params = vec![(
+            "symbol".to_string(),
+            self.exchange_symbol_for(product_symbol, super::client::BinanceMarket::Futures)?,
+        )];
         push_optional_display(&mut params, "limit", limit);
         self.request(
             HttpMethod::Get,
@@ -287,7 +302,10 @@ impl BinanceClient {
     ) -> Result<ValidatedResponse> {
         let mut params = Vec::new();
         if let Some(product_symbol) = request.product_symbol {
-            params.push(("symbol".to_string(), self.exchange_symbol(product_symbol)?));
+            params.push((
+                "symbol".to_string(),
+                self.exchange_symbol_for(product_symbol, super::client::BinanceMarket::Futures)?,
+            ));
         }
         self.request(
             HttpMethod::Get,
@@ -313,7 +331,10 @@ impl BinanceClient {
     ) -> Result<ValidatedResponse> {
         let mut params = Vec::new();
         if let Some(product_symbol) = request.product_symbol {
-            params.push(("symbol".to_string(), self.exchange_symbol(product_symbol)?));
+            params.push((
+                "symbol".to_string(),
+                self.exchange_symbol_for(product_symbol, super::client::BinanceMarket::Futures)?,
+            ));
         }
         self.request(
             HttpMethod::Get,
@@ -339,7 +360,10 @@ impl BinanceClient {
     ) -> Result<ValidatedResponse> {
         let mut params = Vec::new();
         if let Some(product_symbol) = request.product_symbol {
-            params.push(("symbol".to_string(), self.exchange_symbol(product_symbol)?));
+            params.push((
+                "symbol".to_string(),
+                self.exchange_symbol_for(product_symbol, super::client::BinanceMarket::Futures)?,
+            ));
         }
         push_optional_display(&mut params, "startTime", request.start_time);
         push_optional_display(&mut params, "endTime", request.end_time);
@@ -537,7 +561,10 @@ impl BinanceClient {
         request: BinanceFuturesBasisParams,
     ) -> Result<ValidatedResponse> {
         let mut params = vec![
-            ("pair".to_string(), self.exchange_symbol(product_symbol)?),
+            (
+                "pair".to_string(),
+                self.exchange_symbol_for(product_symbol, super::client::BinanceMarket::Futures)?,
+            ),
             ("contractType".to_string(), contract_type.to_string()),
             ("period".to_string(), period.to_string()),
         ];
@@ -562,7 +589,10 @@ impl BinanceClient {
     ) -> Result<ValidatedResponse> {
         params.insert(
             0,
-            ("symbol".to_string(), self.exchange_symbol(product_symbol)?),
+            (
+                "symbol".to_string(),
+                self.exchange_symbol_for(product_symbol, super::client::BinanceMarket::Futures)?,
+            ),
         );
         self.request(HttpMethod::Get, BinanceMarket::Futures, path, params, false)
             .await

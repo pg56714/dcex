@@ -15,6 +15,10 @@ _native = load_native()
 class PublicClient(AsyncWebSocketMixin):
     """Async Bybit public market WebSocket client."""
 
+    def set_product_table(self, table: Any) -> None:  # noqa: ANN401
+        """Use exact canonical/native symbols from a native ProductTable."""
+        self._native_client.set_product_table(table)
+
     def __init__(
         self,
         category: str = "linear",

@@ -51,16 +51,34 @@ pub(super) fn is_canonical_product_symbol(product_symbol: &str) -> bool {
     product_symbol.contains('-')
 }
 
-pub(super) fn exchange_symbol_fallback(product_symbol: &str, futures_prefix: &str) -> String {
-    let mut parts = product_symbol.split('-');
-    match (parts.next(), parts.next(), parts.next()) {
-        (Some(base), Some(quote), Some(_kind)) => {
-            let base = kraken_asset(base);
-            let quote = kraken_asset(quote);
-            format!("{futures_prefix}{base}{quote}")
-        }
-        _ => product_symbol.to_string(),
+pub(super) fn exchange_symbol_fallback(
+    product_symbol: &str,
+    futures_prefix: &str,
+) -> Result<String> {
+    let parts = product_symbol.split('-').collect::<Vec<_>>();
+    if parts.len() < 3 {
+        return Ok(product_symbol.to_string());
     }
+    if parts.iter().any(|part| part.is_empty()) {
+        return Err(DcexError::InvalidInput(
+            "kraken product symbol must not contain empty components".into(),
+        ));
+    }
+    let symbol = match parts.as_slice() {
+        [base, quote, "SPOT"] if futures_prefix.is_empty() => {
+            let base = if *base == "DOGE" { "XDG" } else { kraken_asset(base) };
+            format!("{base}{}", kraken_asset(quote))
+        },
+        [base, quote, "SWAP"] if futures_prefix == "PF_" => format!("PF_{}{}", kraken_asset(base), kraken_asset(quote)),
+        _ => return Err(DcexError::InvalidInput(
+            "cannot safely resolve kraken product symbol; load the product table or pass the official exchange symbol".into(),
+        )),
+    };
+    Ok(if futures_prefix.is_empty() {
+        symbol
+    } else {
+        symbol.to_ascii_uppercase()
+    })
 }
 
 pub(super) fn kraken_asset(asset: &str) -> &str {
@@ -89,4 +107,28 @@ pub(super) fn require_one_identifier(params: &KrakenParams, keys: &[&str]) -> Re
 
 pub(in crate::exchanges::kraken) fn invalid(message: impl std::fmt::Display) -> crate::DcexError {
     crate::DcexError::InvalidInput(format!("Kraken: {message}"))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn canonical_kraken_futures_use_exchange_uppercase() {
+        assert_eq!(
+            exchange_symbol_fallback("AAPLx-USD-SWAP", "PF_").unwrap(),
+            "PF_AAPLXUSD"
+        );
+        assert_eq!(
+            exchange_symbol_fallback("AAPLx-USD-SPOT", "").unwrap(),
+            "AAPLxUSD"
+        );
+    }
+
+    #[test]
+    fn public_market_symbol_samples() {
+        crate::exchanges::symbol_tests::check("kraken", |symbol, mode| {
+            exchange_symbol_fallback(symbol, if mode == "spot" { "" } else { "PF_" })
+        });
+    }
 }

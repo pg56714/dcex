@@ -165,7 +165,7 @@ def test_sync_bingx_public_wrapper_uses_native_dispatcher() -> None:
 
     with _http_server({"code": 0, "data": []}) as (base_url, received):
         client = Client(base_url=base_url, preload_product_table=False)
-        result = client.get_orderbook("BTC-USDT-SWAP", limit=5)
+        result = client.get_orderbook("BTC-USDT", limit=5)
 
     client.close()
     assert result == {"code": 0, "data": []}

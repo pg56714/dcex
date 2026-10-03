@@ -20,7 +20,7 @@ impl OndoClient {
                     .get("market")
                     .or_else(|| params.get("product_symbol"))
                     .ok_or_else(|| DcexError::InvalidInput("missing Ondo spot market".into()))?;
-                let market = raw.strip_suffix("-SPOT").unwrap_or(raw);
+                let market = self.spot_exchange_symbol(raw)?;
                 let parts: Vec<_> = market.split('-').collect();
                 if parts.len() != 2
                     || parts.iter().any(|part| {
@@ -37,7 +37,7 @@ impl OndoClient {
                 } else {
                     SPOT_TRADES
                 };
-                self.spot_public_get(path, vec![("market".into(), market.into())])
+                self.spot_public_get(path, vec![("market".into(), market)])
                     .await
             }
             "get_spot_symbol_info" => {

@@ -191,7 +191,13 @@ impl BinanceClient {
                 params.ensure_allowed(&["product_symbol"])?;
                 let mut query = Vec::new();
                 if let Some(product_symbol) = params.get("product_symbol") {
-                    query.push(("symbol".to_string(), self.exchange_symbol(product_symbol)?));
+                    query.push((
+                        "symbol".to_string(),
+                        self.exchange_symbol_for(
+                            product_symbol,
+                            super::client::BinanceMarket::Equity,
+                        )?,
+                    ));
                 }
                 self.api_key_request(
                     HttpMethod::Get,
@@ -215,7 +221,10 @@ impl BinanceClient {
                 params.ensure_allowed(&["product_symbol"])?;
                 let query = vec![(
                     "symbol".to_string(),
-                    self.exchange_symbol(params.required("product_symbol")?)?,
+                    self.exchange_symbol_for(
+                        params.required("product_symbol")?,
+                        super::client::BinanceMarket::Equity,
+                    )?,
                 )];
                 self.api_key_request(HttpMethod::Get, BinanceMarket::Equity, EQUITY_QUOTE, query)
                     .await
@@ -358,7 +367,10 @@ impl BinanceClient {
         let mut query = params.without(&["product_symbol", "side", "orderType"]);
         query.push((
             "symbol".to_string(),
-            self.exchange_symbol(params.required("product_symbol")?)?,
+            self.exchange_symbol_for(
+                params.required("product_symbol")?,
+                super::client::BinanceMarket::Equity,
+            )?,
         ));
         query.push((
             "side".to_string(),
@@ -394,7 +406,10 @@ impl BinanceClient {
         if symbol_aliases.contains(&"product_symbol")
             && let Some(product_symbol) = params.get("product_symbol")
         {
-            query.push(("symbol".to_string(), self.exchange_symbol(product_symbol)?));
+            query.push((
+                "symbol".to_string(),
+                self.exchange_symbol_for(product_symbol, super::client::BinanceMarket::Equity)?,
+            ));
         }
         self.request(method, BinanceMarket::Equity, path, query, true)
             .await

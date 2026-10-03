@@ -47,6 +47,14 @@ impl LighterNetwork {
         self.profile().name
     }
 
+    /// Product-table namespace whose market ids belong to this network.
+    pub const fn product_table_exchange(self) -> &'static str {
+        match self {
+            Self::Robinhood | Self::RobinhoodTestnet => "lighter_robinhood",
+            Self::Mainnet | Self::Testnet => "lighter",
+        }
+    }
+
     pub fn from_api_url(api_url: &str) -> Option<Self> {
         let api_url = api_url.trim_end_matches('/');
         Self::ALL

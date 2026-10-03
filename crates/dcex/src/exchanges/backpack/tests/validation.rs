@@ -15,6 +15,7 @@ fn product_table_resolves_canonical_symbol() {
         quote_currency: "USDC".to_string(),
         min_notional: "0".to_string(),
         size_per_contract: "1".to_string(),
+        ..MarketInfo::default()
     }]);
     let client = BackpackClient::public(5_000, Duration::from_secs(1))
         .expect("client")

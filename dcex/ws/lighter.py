@@ -14,6 +14,10 @@ _native = load_native()
 class PublicClient(AsyncWebSocketMixin):
     """Async Lighter public market WebSocket client."""
 
+    def set_product_table(self, table: Any) -> None:  # noqa: ANN401
+        """Use exact canonical/native symbols from a native ProductTable."""
+        self._native_client.set_product_table(table)
+
     def __init__(
         self,
         testnet: bool = False,
@@ -49,15 +53,15 @@ class PublicClient(AsyncWebSocketMixin):
         """Unsubscribe from a raw Lighter channel."""
         await self._native_client.unsubscribe(channel)
 
-    async def subscribe_orderbook(self, market_id: int) -> None:
+    async def subscribe_orderbook(self, market_id: int | str) -> None:
         """Subscribe to order book updates for a market."""
         await self._native_client.subscribe_orderbook(market_id)
 
-    async def subscribe_ticker(self, market_id: int) -> None:
+    async def subscribe_ticker(self, market_id: int | str) -> None:
         """Subscribe to best bid/offer updates for a market."""
         await self._native_client.subscribe_ticker(market_id)
 
-    async def subscribe_market_stats(self, market_id: int) -> None:
+    async def subscribe_market_stats(self, market_id: int | str) -> None:
         """Subscribe to market stats updates for a market."""
         await self._native_client.subscribe_market_stats(market_id)
 
@@ -65,19 +69,19 @@ class PublicClient(AsyncWebSocketMixin):
         """Subscribe to market stats updates for all perpetual markets."""
         await self._native_client.subscribe_all_market_stats()
 
-    async def subscribe_trades(self, market_id: int) -> None:
+    async def subscribe_trades(self, market_id: int | str) -> None:
         """Subscribe to trade updates for a market."""
         await self._native_client.subscribe_trades(market_id)
 
-    async def subscribe_klines(self, market_id: int, resolution: str) -> None:
+    async def subscribe_klines(self, market_id: int | str, resolution: str) -> None:
         """Subscribe to candlestick updates for a market."""
         await self._native_client.subscribe_klines(market_id, resolution)
 
-    async def subscribe_mark_price_klines(self, market_id: int, resolution: str) -> None:
+    async def subscribe_mark_price_klines(self, market_id: int | str, resolution: str) -> None:
         """Subscribe to mark price candlestick updates for a market."""
         await self._native_client.subscribe_mark_price_klines(market_id, resolution)
 
-    async def subscribe_spot_market_stats(self, market_id: int) -> None:
+    async def subscribe_spot_market_stats(self, market_id: int | str) -> None:
         """Subscribe to spot market stats updates for a market."""
         await self._native_client.subscribe_spot_market_stats(market_id)
 

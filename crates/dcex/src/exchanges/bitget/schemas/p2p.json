@@ -1,278 +1,10 @@
 [
   {
-    "name": "classic_p2p_get_p2_p_merchant_list",
-    "method": "GET",
-    "path": "/api/v2/p2p/merchantList",
-    "public": false,
-    "confirm": false,
-    "scoped": false,
-    "fields": [
-      {
-        "wire": "online",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "idLessThan",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "limit",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      }
-    ],
-    "source": "https://www.bitget.com/docs/catalog/classic-p2p-p2p/classic-p2p#get-p2p-merchant-list",
-    "summary": "Get P2P Merchant List"
-  },
-  {
-    "name": "classic_p2p_get_merchant_information",
-    "method": "GET",
-    "path": "/api/v2/p2p/merchantInfo",
-    "public": false,
-    "confirm": false,
-    "scoped": false,
-    "fields": [],
-    "source": "https://www.bitget.com/docs/catalog/classic-p2p-p2p/classic-p2p#get-merchant-information",
-    "summary": "Get Merchant Information"
-  },
-  {
-    "name": "classic_p2p_get_p2_p_adv_list",
-    "method": "GET",
-    "path": "/api/v2/p2p/advList",
-    "public": false,
-    "confirm": false,
-    "scoped": false,
-    "fields": [
-      {
-        "wire": "startTime",
-        "required": true,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "endTime",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "idLessThan",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "limit",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "status",
-        "required": true,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "advNo",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "side",
-        "required": true,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "coin",
-        "required": true,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "language",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "fiat",
-        "required": true,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "orderBy",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "payMethodId",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "sourceType",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      }
-    ],
-    "source": "https://www.bitget.com/docs/catalog/classic-p2p-p2p/classic-p2p#get-merchant-advertisement-list",
-    "summary": "Get Merchant Advertisement List"
-  },
-  {
-    "name": "classic_p2p_get_p2_p_order_list",
-    "method": "GET",
-    "path": "/api/v2/p2p/orderList",
-    "public": false,
-    "confirm": false,
-    "scoped": false,
-    "fields": [
-      {
-        "wire": "startTime",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "endTime",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "idLessThan",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "limit",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "status",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "advNo",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "side",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "coin",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "language",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "fiat",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "orderNo",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      }
-    ],
-    "source": "https://www.bitget.com/docs/catalog/classic-p2p-p2p/classic-p2p#get-merchant-p2p-orders",
-    "summary": "Get Merchant P2P Orders",
-    "input_schema": {
-      "type": "object",
-      "properties": {}
-    }
-  },
-  {
     "name": "classic_tax_get_p2_p_account_record",
     "method": "GET",
     "path": "/api/v2/tax/p2p-record",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "coin",
@@ -324,7 +56,6 @@
     "path": "/api/v3/p2p/ad-list",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "token",
@@ -393,7 +124,6 @@
     "path": "/api/v3/p2p/exchange-rate",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "token",
@@ -421,7 +151,6 @@
     "path": "/api/v3/p2p/fee-simulate",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "token",
@@ -482,7 +211,6 @@
     "path": "/api/v3/p2p/ad-limit",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "token",
@@ -518,7 +246,6 @@
     "path": "/api/v3/p2p/ad-create",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "token",
@@ -685,7 +412,6 @@
     "path": "/api/v3/p2p/ad-update",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "advId",
@@ -836,7 +562,6 @@
     "path": "/api/v3/p2p/ad-operate",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "advId",
@@ -873,7 +598,6 @@
     "path": "/api/v3/p2p/ad-info",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "advId",
@@ -893,7 +617,6 @@
     "path": "/api/v3/p2p/my-ads",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "startTime",
@@ -969,7 +692,6 @@
     "path": "/api/v3/p2p/balance",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "token",
@@ -989,7 +711,6 @@
     "path": "/api/v3/p2p/pending-orders",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "orderId",
@@ -1053,7 +774,6 @@
     "path": "/api/v3/p2p/all-orders",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "startTime",
@@ -1125,7 +845,6 @@
     "path": "/api/v3/p2p/order-info",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "orderId",
@@ -1149,7 +868,6 @@
     "path": "/api/v3/p2p/order-pay",
     "public": false,
     "confirm": true,
-    "scoped": false,
     "fields": [
       {
         "wire": "orderId",
@@ -1173,7 +891,6 @@
     "path": "/api/v3/p2p/order-release",
     "public": false,
     "confirm": true,
-    "scoped": false,
     "fields": [
       {
         "wire": "orderId",
@@ -1197,7 +914,6 @@
     "path": "/api/v3/p2p/user-info",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [],
     "source": "https://www.bitget.com/docs/catalog/p2p/user-info#get-user-info",
     "summary": "Get User Info"
@@ -1208,7 +924,6 @@
     "path": "/api/v3/p2p/currencies",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [],
     "source": "https://www.bitget.com/docs/catalog/p2p/user-info#get-currencies",
     "summary": "Get Currencies"
@@ -1219,7 +934,6 @@
     "path": "/api/v3/p2p/pay-method",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [],
     "source": "https://www.bitget.com/docs/catalog/p2p/user-info#get-pay-methods",
     "summary": "Get Pay Methods"

@@ -308,8 +308,17 @@ impl BingxClient {
         }
         query.retain(|(k, _)| k != "product_symbol");
         if let Some(product) = params.get("product_symbol") {
-            let symbol = self.exchange_symbol(product)?;
-            if e.path.contains("/cswap/") && !symbol.ends_with("-USD") {
+            // The product table only lists USDT-M and spot rows; Coin-M uses the native rules.
+            let coin_m = e.path.contains("/cswap/");
+            if coin_m && product.to_ascii_uppercase().ends_with("-SPOT") {
+                return Err(invalid("Coin-M does not accept a Spot product symbol"));
+            }
+            let symbol = if coin_m {
+                exchange_symbol_fallback(product)?
+            } else {
+                self.exchange_symbol(product)?
+            };
+            if coin_m && !symbol.ends_with("-USD") {
                 return Err(invalid("Coin-M requires a BASE-USD symbol"));
             }
             query.push(("symbol".into(), symbol));

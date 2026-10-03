@@ -539,7 +539,10 @@ impl BinanceClient {
 
         let mut query = params.without(&["product_symbol"]);
         if let Some(product_symbol) = product_symbol {
-            query.push(("symbol".to_string(), self.exchange_symbol(product_symbol)?));
+            query.push((
+                "symbol".to_string(),
+                self.exchange_symbol_for(product_symbol, super::client::BinanceMarket::Spot)?,
+            ));
         }
         self.request(
             method,

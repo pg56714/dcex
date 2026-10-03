@@ -418,13 +418,16 @@ impl BinanceClient {
         }
         let mut query = params.without(&["product_symbol"]);
         if let Some(symbol) = product_symbol {
-            query.push(("symbol".to_string(), self.exchange_symbol(symbol)?));
+            query.push((
+                "symbol".to_string(),
+                self.exchange_symbol_for(symbol, super::client::BinanceMarket::Spot)?,
+            ));
         }
         if let Some(isolated_symbol) = params.get("isolatedSymbol") {
             set_param(
                 &mut query,
                 "isolatedSymbol",
-                self.exchange_symbol(isolated_symbol)?,
+                self.exchange_symbol_for(isolated_symbol, super::client::BinanceMarket::Spot)?,
             );
         }
         if params.get("isIsolated").is_some() {
@@ -440,7 +443,9 @@ impl BinanceClient {
     fn margin_symbols(&self, symbols: &str) -> Result<String> {
         symbols
             .split(',')
-            .map(|symbol| self.exchange_symbol(symbol.trim()))
+            .map(|symbol| {
+                self.exchange_symbol_for(symbol.trim(), super::client::BinanceMarket::Spot)
+            })
             .collect::<Result<Vec<_>>>()
             .map(|items| items.join(","))
     }

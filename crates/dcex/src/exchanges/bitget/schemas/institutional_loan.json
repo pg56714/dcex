@@ -5,7 +5,6 @@
     "path": "/api/v2/spot/ins-loan/ltv-convert",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "riskUnitId",
@@ -25,7 +24,6 @@
     "path": "/api/v2/spot/ins-loan/bind-uid",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "riskUnitId",
@@ -73,7 +71,6 @@
     "path": "/api/v2/spot/ins-loan/risk-unit",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [],
     "source": "https://www.bitget.com/docs/catalog/classic-instloan-account/classic-instloan-account#get-risk-unit",
     "summary": "Get Risk Unit"
@@ -84,7 +81,6 @@
     "path": "/api/v2/spot/ins-loan/transfered",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "userId",
@@ -116,7 +112,6 @@
     "path": "/api/v2/spot/ins-loan/loan-order",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "orderId",
@@ -156,7 +151,6 @@
     "path": "/api/v2/spot/ins-loan/repaid-history",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "startTime",
@@ -196,7 +190,6 @@
     "path": "/api/v2/spot/ins-loan/product-infos",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "productId",
@@ -216,7 +209,6 @@
     "path": "/api/v2/spot/ins-loan/ensure-coins-convert",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "productId",
@@ -236,7 +228,6 @@
     "path": "/api/v2/spot/ins-loan/symbols",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "productId",
@@ -256,7 +247,6 @@
     "path": "/api/v3/ins-loan/bind-uid",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "riskUnitId",
@@ -304,7 +294,6 @@
     "path": "/api/v3/ins-loan/ensure-coins-convert",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "productId",
@@ -324,7 +313,6 @@
     "path": "/api/v3/ins-loan/ltv-convert",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "riskUnitId",
@@ -344,7 +332,6 @@
     "path": "/api/v3/ins-loan/loan-order",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "orderId",
@@ -384,7 +371,6 @@
     "path": "/api/v3/ins-loan/product-infos",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "productId",
@@ -404,7 +390,6 @@
     "path": "/api/v3/ins-loan/repaid-history",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "startTime",
@@ -444,7 +429,6 @@
     "path": "/api/v3/ins-loan/risk-unit",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [],
     "source": "https://www.bitget.com/docs/catalog/institutional-loan/loan#get-risk-unit",
     "summary": "Get Risk Unit"
@@ -455,7 +439,6 @@
     "path": "/api/v3/ins-loan/symbols",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "productId",
@@ -475,7 +458,6 @@
     "path": "/api/v3/ins-loan/transfered",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "userId",

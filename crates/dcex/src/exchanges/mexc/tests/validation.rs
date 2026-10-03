@@ -36,22 +36,25 @@ async fn multi_asset_mode_rejects_non_boolean_path_value() {
 fn exchange_symbol_uses_product_table_when_available() {
     let table = ProductTable::new(vec![MarketInfo {
         exchange: "mexc".to_string(),
-        exchange_symbol: "BTC_USDT".to_string(),
-        product_symbol: "BTC-USDT-SWAP".to_string(),
+        exchange_symbol: "NVIDIA_USDT".to_string(),
+        product_symbol: "NVDA-USDT-SWAP".to_string(),
         product_type: "swap".to_string(),
         exchange_type: "linear".to_string(),
         price_precision: "0.1".to_string(),
         size_precision: "1".to_string(),
         min_size: "1".to_string(),
-        base_currency: "BTC".to_string(),
+        base_currency: "NVDA".to_string(),
         quote_currency: "USDT".to_string(),
         min_notional: "0".to_string(),
         size_per_contract: "1".to_string(),
+        ..MarketInfo::default()
     }]);
     let client = client().with_product_table(table);
 
     assert_eq!(
-        client.exchange_symbol("BTC-USDT-SWAP", "").expect("symbol"),
-        "BTC_USDT"
+        client
+            .exchange_symbol("NVDA-USDT-SWAP", "_")
+            .expect("symbol"),
+        "NVIDIA_USDT"
     );
 }

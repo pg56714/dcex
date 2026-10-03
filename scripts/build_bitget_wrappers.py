@@ -25,10 +25,6 @@ def snake(value: str) -> str:
 
 def operation_name(op: dict[str, str]) -> str:
     """Choose the canonical public name for a documented operation."""
-    if op["path"] == "/api/v2/copy/mix-follower/close-positions":
-        return "close_copy_futures_follower_positions"
-    if op["path"] == "/api/v2/copy/mix-trader/order-close-positions":
-        return "close_copy_futures_trader_positions"
     return snake(op["operationId"])
 
 
@@ -97,11 +93,6 @@ def main() -> None:
                 "path": op["path"],
                 "public": public,
                 "confirm": confirm,
-                "scoped": op["path"]
-                in {
-                    "/api/v2/copy/mix-follower/close-positions",
-                    "/api/v2/copy/mix-trader/order-close-positions",
-                },
                 "fields": fields,
                 "source": op["official_source"],
                 "summary": op["summary"],
@@ -135,7 +126,7 @@ def main() -> None:
         lines = [
             '"""Typed wrappers generated from the official Bitget operation schemas."""',
             "from typing import Any",
-            "from dcex._operation_guards import require_confirmation, require_scope",
+            "from dcex._operation_guards import require_confirmation",
             "from ._market_http import MarketHTTP",
             "",
             "class GeneratedMethods(MarketHTTP):",
@@ -162,8 +153,6 @@ def main() -> None:
                 )
             if spec["confirm"]:
                 args.append("confirm: bool = False")
-            if spec["scoped"]:
-                args.append("all_symbols: bool = False")
             signature = "self" + (", *, " + ", ".join(args) if args else "")
             lines += [
                 "",
@@ -182,22 +171,12 @@ def main() -> None:
                     "",
                     "        API withdrawals have no second confirmation; they execute on submit.",
                 ]
-            if spec["scoped"]:
-                lines += [
-                    "        Supply symbol or tracking_no, or explicitly set all_symbols=True.",
-                    "        The official documentation does not define "
-                    "unfiltered scope precisely.",
-                ]
             lines += ['        """']
-            if spec["scoped"]:
-                lines.append("        require_scope(symbol or tracking_no, all_symbols)")
             if spec["confirm"]:
                 lines.append("        require_confirmation(confirm)")
             values = ", ".join(json.dumps(f["wire"]) + ": " + snake(f["wire"]) for f in fields)
             if spec["confirm"]:
                 values += (", " if values else "") + '"confirm": confirm'
-            if spec["scoped"]:
-                values += ', "all_symbols": all_symbols'
             lines += [
                 "        return "
                 + ("await " if asynchronous else "")

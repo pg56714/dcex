@@ -8,17 +8,41 @@ use crate::{DcexError, Result};
 const PUBLIC_WS_URL: &str = "wss://ws.kraken.com/v2";
 
 pub struct KrakenPublicWebSocket {
+    product_table: Option<std::sync::Arc<crate::product_table::ProductTable>>,
     connection: WebSocketConnection,
     next_request_id: u64,
 }
 
 impl KrakenPublicWebSocket {
+    fn exchange_symbol(&self, symbol: &str) -> Result<String> {
+        if let Some(table) = &self.product_table {
+            let row = table.resolve_symbol("kraken", symbol, Some("spot"), None)?;
+            if row.base_currency.is_empty() || row.quote_currency.is_empty() {
+                return Err(DcexError::InvalidInput(
+                    "Kraken WS requires base/quote metadata".into(),
+                ));
+            }
+            return Ok(format!("{}/{}", row.base_currency, row.quote_currency));
+        }
+        normalize_symbol(symbol)
+    }
+
+    pub fn set_product_table(&mut self, table: crate::product_table::ProductTable) {
+        self.product_table = Some(std::sync::Arc::new(table));
+    }
+
+    pub fn with_product_table(mut self, table: crate::product_table::ProductTable) -> Self {
+        self.set_product_table(table);
+        self
+    }
+
     pub fn new(timeout: Duration) -> Result<Self> {
         Self::with_url(PUBLIC_WS_URL.to_string(), timeout)
     }
 
     pub fn with_url(url: impl Into<String>, timeout: Duration) -> Result<Self> {
         Ok(Self {
+            product_table: None,
             connection: WebSocketConnection::new(WebSocketConfig::new(url, timeout)?),
             next_request_id: 1,
         })
@@ -184,7 +208,7 @@ impl KrakenPublicWebSocket {
         let channel = normalize_channel(channel)?;
         let symbols = product_symbols
             .into_iter()
-            .map(|symbol| normalize_symbol(&symbol))
+            .map(|symbol| self.exchange_symbol(&symbol))
             .collect::<Result<Vec<_>>>()?;
         let request_id = self.next_request_id();
         let payload = subscription_payload(method, channel, symbols, extra_params, request_id);
@@ -249,7 +273,7 @@ pub(super) fn normalize_symbol(symbol: &str) -> Result<String> {
         ));
     }
     if symbol.contains('/') {
-        return validate_symbol(symbol).map(|_| symbol.to_ascii_uppercase());
+        return validate_symbol(symbol).map(|_| normalize_pair_case(symbol));
     }
     let mut parts = symbol.split('-');
     match (parts.next(), parts.next(), parts.next(), parts.next()) {
@@ -261,14 +285,33 @@ pub(super) fn normalize_symbol(symbol: &str) -> Result<String> {
             }
             let normalized = format!(
                 "{}/{}",
-                base.to_ascii_uppercase(),
+                normalize_asset_case(base),
                 quote.to_ascii_uppercase()
             );
             validate_symbol(&normalized)?;
             Ok(normalized)
         }
-        _ => validate_symbol(symbol).map(|_| symbol.to_ascii_uppercase()),
+        _ => Err(DcexError::InvalidInput(format!(
+            "Kraken WebSocket v2 needs a BASE/QUOTE pair; load the Kraken product table to \
+             resolve native symbol {symbol}, or pass a unified product symbol or BASE/QUOTE."
+        ))),
     }
+}
+
+fn normalize_asset_case(asset: &str) -> String {
+    if let Some(base) = asset.strip_suffix('x') {
+        format!("{}x", base.to_ascii_uppercase())
+    } else {
+        asset.to_ascii_uppercase()
+    }
+}
+
+fn normalize_pair_case(symbol: &str) -> String {
+    symbol
+        .split('/')
+        .map(normalize_asset_case)
+        .collect::<Vec<_>>()
+        .join("/")
 }
 
 fn validate_symbol(symbol: &str) -> Result<()> {
@@ -321,6 +364,44 @@ mod tests {
         assert_eq!(normalize_symbol("eth/usd").expect("symbol"), "ETH/USD");
         assert!(normalize_symbol("bad symbol").is_err());
         assert!(normalize_symbol("BTC-USD-SWAP").is_err());
+        let error = normalize_symbol("XBTUSD").expect_err("native symbol without a table");
+        assert!(error.to_string().contains("product table"), "{error}");
+    }
+
+    #[test]
+    fn tokenized_spv_pair_key_is_not_an_alias_and_rest_ws_agree() {
+        let tokenized: Value = serde_json::from_str(include_str!(
+            "../../../../tests/fixtures/kraken_tokenized_asset_pairs.json"
+        ))
+        .expect("fixture");
+        let spot = json!({"result": {"XXBTZUSD": {
+            "altname": "XBTUSD", "wsname": "XBT/USD", "aclass_base": "currency",
+            "base": "XXBT", "quote": "ZUSD", "status": "online"
+        }}});
+        let rows = crate::product_table::kraken_spot_rows(&spot, &tokenized);
+        let xstock: Vec<_> = rows
+            .iter()
+            .filter(|row| row.base_currency == "AAPLx")
+            .collect();
+        assert_eq!(xstock.len(), 1);
+        assert_eq!(xstock[0].exchange_symbol, "AAPLxUSD");
+        assert_eq!(xstock[0].exchange_symbol_alias, "");
+        let table = crate::product_table::ProductTable::new(rows);
+        let rest = crate::exchanges::kraken::KrakenClient::public(Duration::from_secs(10))
+            .expect("client")
+            .with_product_table(table.clone());
+        let ws = KrakenPublicWebSocket::new(Duration::from_secs(10))
+            .expect("ws")
+            .with_product_table(table);
+
+        for symbol in ["AAPLx-USD-SPOT", "AAPLxUSD"] {
+            assert_eq!(rest.exchange_symbol(symbol, "").expect("rest"), "AAPLxUSD");
+            assert_eq!(ws.exchange_symbol(symbol).expect("ws"), "AAPLx/USD");
+        }
+        assert!(rest.exchange_symbol("AAPLSPVUSD", "").is_err());
+        assert!(ws.exchange_symbol("AAPLSPVUSD").is_err());
+        assert_eq!(rest.exchange_symbol("XBTUSD", "").expect("alias"), "XBTUSD");
+        assert_eq!(ws.exchange_symbol("XBTUSD").expect("alias"), "BTC/USD");
     }
 
     #[test]

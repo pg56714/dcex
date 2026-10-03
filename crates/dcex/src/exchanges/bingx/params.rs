@@ -74,16 +74,23 @@ pub(super) fn normalize_key(key: &str) -> &str {
     }
 }
 
-pub(super) fn is_canonical_product_symbol(product_symbol: &str) -> bool {
-    product_symbol.split('-').count() >= 3
-}
-
-pub(super) fn exchange_symbol_fallback(product_symbol: &str) -> String {
-    let mut parts = product_symbol.split('-');
-    match (parts.next(), parts.next(), parts.next()) {
-        (Some(base), Some(quote), Some(_kind)) => format!("{base}-{quote}"),
-        _ => product_symbol.to_string(),
+pub(super) fn exchange_symbol_fallback(product_symbol: &str) -> Result<String> {
+    let parts = product_symbol.split('-').collect::<Vec<_>>();
+    if parts.len() < 3 {
+        return Ok(product_symbol.to_string());
     }
+    if parts.iter().any(|part| part.is_empty()) {
+        return Err(DcexError::InvalidInput(
+            "bingx product symbol must not contain empty components".into(),
+        ));
+    }
+    let symbol = match parts.as_slice() {
+        [base, quote, "SPOT"] => format!("{base}-{quote}"),
+        _ => return Err(DcexError::InvalidInput(
+            "cannot safely resolve bingx product symbol; load the product table or pass the official exchange symbol".into(),
+        )),
+    };
+    Ok(symbol)
 }
 
 pub(super) fn push_optional(query: &mut Vec<(String, String)>, key: &str, value: Option<&str>) {
@@ -448,4 +455,12 @@ mod optional_attached_tests {
             assert_eq!(orders, serde_json::json!([{"quantity": 1}]));
         }
     }
+}
+
+#[cfg(test)]
+#[test]
+fn public_market_symbol_samples() {
+    crate::exchanges::symbol_tests::check("bingx", |symbol, _mode| {
+        exchange_symbol_fallback(symbol)
+    });
 }

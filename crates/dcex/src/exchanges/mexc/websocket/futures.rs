@@ -9,6 +9,7 @@ use std::collections::VecDeque;
 use std::time::Duration;
 
 pub struct MexcFuturesWebSocket {
+    product_table: Option<std::sync::Arc<crate::product_table::ProductTable>>,
     connection: WebSocketConnection,
     credentials: Option<(String, String)>,
     timeout: Duration,
@@ -17,11 +18,31 @@ pub struct MexcFuturesWebSocket {
 }
 
 impl MexcFuturesWebSocket {
+    fn exchange_symbol(&self, symbol: &str) -> Result<String> {
+        if let Some(table) = &self.product_table {
+            return Ok(table
+                .resolve_symbol("mexc", symbol, Some("swap"), None)?
+                .exchange_symbol
+                .clone());
+        }
+        normalize_symbol(symbol)
+    }
+
+    pub fn set_product_table(&mut self, table: crate::product_table::ProductTable) {
+        self.product_table = Some(std::sync::Arc::new(table));
+    }
+
+    pub fn with_product_table(mut self, table: crate::product_table::ProductTable) -> Self {
+        self.set_product_table(table);
+        self
+    }
+
     pub fn new(timeout: Duration) -> Result<Self> {
         Self::with_url("wss://contract.mexc.com/edge", timeout)
     }
     pub fn with_url(url: impl Into<String>, timeout: Duration) -> Result<Self> {
         Ok(Self {
+            product_table: None,
             connection: WebSocketConnection::new(WebSocketConfig::new(url, timeout)?),
             credentials: None,
             timeout,
@@ -143,8 +164,9 @@ impl MexcFuturesWebSocket {
                 return Err(invalid("this channel does not accept a symbol"));
             }
         } else {
-            param["symbol"] =
-                normalize_symbol(symbol.ok_or_else(|| invalid("symbol is required"))?)?.into();
+            param["symbol"] = self
+                .exchange_symbol(symbol.ok_or_else(|| invalid("symbol is required"))?)?
+                .into();
         }
         if channel == "kline" {
             if let Some(interval) = interval {
@@ -237,12 +259,13 @@ impl MexcFuturesWebSocket {
                     return Err(invalid("asset and adl.level cannot be filtered by symbol"));
                 }
                 for symbol in rules {
-                    *symbol = normalize_symbol(
-                        symbol
-                            .as_str()
-                            .ok_or_else(|| invalid("symbol must be a string"))?,
-                    )?
-                    .into();
+                    *symbol = self
+                        .exchange_symbol(
+                            symbol
+                                .as_str()
+                                .ok_or_else(|| invalid("symbol must be a string"))?,
+                        )?
+                        .into();
                 }
             }
         }
@@ -284,11 +307,12 @@ impl MexcFuturesWebSocket {
 }
 
 fn normalize_symbol(symbol: &str) -> Result<String> {
-    let symbol = if symbol.ends_with("-SWAP") {
-        symbol.trim_end_matches("-SWAP").replace('-', "_")
-    } else {
-        symbol.to_owned()
-    };
+    if symbol.ends_with("-SWAP") {
+        return Err(invalid(
+            "MEXC contract display names require a product table; pass the official exchange symbol to WebSocket",
+        ));
+    }
+    let symbol = symbol.to_owned();
     if !symbol.contains('_')
         || !symbol
             .bytes()
@@ -344,11 +368,11 @@ mod tests {
             .with_credentials("key".into(), "secret".into())
             .unwrap();
         client.connect().await.unwrap();
-        client.subscribe_orderbook("BTC-USDT-SWAP").await.unwrap();
+        client.subscribe_orderbook("BTC_USDT").await.unwrap();
         client.subscribe_klines("BTC_USDT", "1h").await.unwrap();
         client
             .set_private_filters(
-                json!([{"filter":"order","rules":["BTC-USDT-SWAP"]},{"filter":"asset"}]),
+                json!([{"filter":"order","rules":["BTC_USDT"]},{"filter":"asset"}]),
             )
             .await
             .unwrap();

@@ -1459,7 +1459,19 @@ impl BinanceClient {
             _ => return Ok(None),
         };
         if let Some(product_symbol) = params.get("product_symbol") {
-            query.push(("symbol".into(), self.exchange_symbol(product_symbol)?));
+            query.push((
+                "symbol".into(),
+                self.exchange_symbol_for(
+                    product_symbol,
+                    if path.contains("/cm/") {
+                        BinanceMarket::CoinFutures
+                    } else if path.contains("/margin/") {
+                        BinanceMarket::Spot
+                    } else {
+                        BinanceMarket::Futures
+                    },
+                )?,
+            ));
         } else if matches!(
             method_name,
             "get_pm_um_order"

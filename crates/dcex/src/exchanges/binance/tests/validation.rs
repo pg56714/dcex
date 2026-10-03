@@ -14,7 +14,10 @@ fn product_symbol_selects_expected_market() {
         market_for_product_symbol_fallback("AAPL-USDC-EQUITY"),
         BinanceMarket::Equity
     );
-    assert_eq!(exchange_symbol_fallback("AAPL-USDC-EQUITY"), "AAPL");
+    assert_eq!(
+        exchange_symbol_fallback("AAPL-USDC-EQUITY").expect("symbol"),
+        "AAPL"
+    );
 }
 
 #[test]
@@ -51,6 +54,7 @@ fn product_table_overrides_symbol_fallback() {
         quote_currency: "USDT".to_string(),
         min_notional: "0".to_string(),
         size_per_contract: "1".to_string(),
+        ..Default::default()
     }]);
     let client = BinanceClient::public(Duration::from_secs(1))
         .expect("client")

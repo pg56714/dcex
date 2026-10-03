@@ -14,51 +14,6 @@ impl BitgetClient {
         params: &BitgetParams,
     ) -> Result<Option<ValidatedResponse>> {
         let result = match method_name {
-            "get_spot_fee_rates" | "get_futures_fee_rates" => {
-                let mut query = Vec::new();
-                self.push_required_product_symbol(&mut query, params)?;
-                let business_type = match method_name {
-                    "get_spot_fee_rates" => "spot",
-                    "get_futures_fee_rates" => "mix",
-                    _ => unreachable!(),
-                };
-                query.push(("businessType".to_string(), business_type.to_string()));
-                self.get_private(COMMON_TRADE_RATE, query).await
-            }
-            "get_all_account_balance" => {
-                self.get_private(COMMON_ALL_ACCOUNT_BALANCE, Vec::new())
-                    .await
-            }
-            "get_funding_assets" => {
-                self.get_private(COMMON_FUNDING_ASSETS, params.only(&["coin"]))
-                    .await
-            }
-
-            "transfer" => self.dispatch_transfer(method_name, params).await,
-            "get_transfer_records" => {
-                self.dispatch_get_transfer_records(method_name, params)
-                    .await
-            }
-            "get_transferable_coins" => {
-                self.dispatch_get_transferable_coins(method_name, params)
-                    .await
-            }
-            "get_deposit_records" => {
-                params.required("startTime")?;
-                params.required("endTime")?;
-                self.get_private(
-                    SPOT_ACCOUNT_DEPOSIT_RECORDS,
-                    params.only(&[
-                        "coin",
-                        "orderId",
-                        "startTime",
-                        "endTime",
-                        "idLessThan",
-                        "limit",
-                    ]),
-                )
-                .await
-            }
             "get_uta_account_assets" => self.get_private(UTA_ACCOUNT_ASSETS, Vec::new()).await,
             "get_reality_orderbook" => {
                 let mut query = Vec::new();
@@ -125,16 +80,6 @@ impl BitgetClient {
             "set_uta_hold_mode" => {
                 params.required("holdMode")?;
                 self.post_private(UTA_SET_HOLD_MODE, Value::Object(params.body(&["holdMode"])))
-                    .await
-            }
-
-            "set_futures_margin_mode" => {
-                params.required("productType")?;
-                params.required("marginCoin")?;
-                params.required("marginMode")?;
-                let mut body = params.body(&["productType", "marginCoin", "marginMode"]);
-                self.insert_required_product_symbol(&mut body, params)?;
-                self.post_private(FUTURES_SET_MARGIN_MODE, Value::Object(body))
                     .await
             }
 

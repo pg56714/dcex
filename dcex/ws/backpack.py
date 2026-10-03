@@ -12,6 +12,10 @@ _native = load_native()
 class PublicClient(AsyncWebSocketMixin):
     """Async Backpack public market WebSocket client."""
 
+    def set_product_table(self, table: Any) -> None:  # noqa: ANN401
+        """Use exact canonical/native symbols from a native ProductTable."""
+        self._native_client.set_product_table(table)
+
     def __init__(self, timeout: float = 10.0, base_url: str | None = None) -> None:
         """Create a Backpack public WebSocket client."""
         self._native_client = _native.BackpackPublicWebSocketClient(

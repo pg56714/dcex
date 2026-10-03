@@ -38,6 +38,7 @@ _ROWS = [
         "min_size": "0.0001",
         "min_notional": "10",
         "size_per_contract": "1",
+        "exchange_symbol_alias": "",
     },
     {
         "exchange": "binance",
@@ -52,6 +53,7 @@ _ROWS = [
         "min_size": "0.001",
         "min_notional": "5",
         "size_per_contract": "1",
+        "exchange_symbol_alias": "",
     },
     {
         "exchange": "okx",
@@ -66,6 +68,7 @@ _ROWS = [
         "min_size": "0.01",
         "min_notional": "1",
         "size_per_contract": "0.1",
+        "exchange_symbol_alias": "",
     },
 ]
 

@@ -146,7 +146,7 @@ def test_native_mexc_public_dispatcher_normalizes_product_symbol() -> None:
         )
         status, _headers, body = client.public_request_json(
             "get_contract_depth",
-            [("product_symbol", "BTC-USDT-SWAP"), ("limit", "5")],
+            [("product_symbol", "BTC_USDT"), ("limit", "5")],
         )
 
     request = received.get_nowait()
@@ -214,7 +214,7 @@ def test_native_mexc_private_contract_order_builds_json_body() -> None:
         status, _headers, body = client.private_request_json(
             "place_contract_order",
             [
-                ("product_symbol", "BTC-USDT-SWAP"),
+                ("product_symbol", "BTC_USDT"),
                 ("side", "1"),
                 ("type", "2"),
                 ("openType", "2"),

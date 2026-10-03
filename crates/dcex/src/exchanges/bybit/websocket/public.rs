@@ -8,9 +8,7 @@ use crate::product_table::ProductTable;
 use crate::ws::{WebSocketConfig, WebSocketConnection};
 use crate::{DcexError, Result};
 
-use super::super::params::{
-    bybit_timeframe, exchange_symbol_fallback, is_canonical_product_symbol,
-};
+use super::super::params::{bybit_timeframe, exchange_symbol_fallback};
 
 const PUBLIC_SPOT_WS_URL: &str = "wss://stream.bybit.com/v5/public/spot";
 const PUBLIC_LINEAR_WS_URL: &str = "wss://stream.bybit.com/v5/public/linear";
@@ -146,16 +144,43 @@ impl BybitPublicWebSocket {
     }
 
     fn exchange_symbol(&self, product_symbol: &str) -> Result<String> {
+        if let Some(table) = &self.product_table {
+            return Ok(table
+                .resolve_symbol("bybit", product_symbol, None, Some(&self.category))?
+                .exchange_symbol
+                .clone());
+        }
+        let canonical = product_symbol.to_ascii_uppercase();
+        let canonical_type = canonical.rsplit('-').next().unwrap_or("");
+        let type_matches = match canonical_type {
+            "SPOT" => self.category == "spot",
+            "SWAP" | "FUTURES" => matches!(self.category.as_str(), "linear" | "inverse"),
+            "OPTION" | "OPTIONS" => self.category == "option",
+            _ => true,
+        };
+        if !type_matches {
+            return Err(DcexError::InvalidInput(
+                "Bybit product type does not match WebSocket category".into(),
+            ));
+        }
         if self.category == "spread" {
             return normalize_spread_symbol(product_symbol);
         }
-        if let Some(table) = &self.product_table
-            && is_canonical_product_symbol(product_symbol)
-        {
-            return table.get_exchange_symbol("bybit", product_symbol);
+        if matches!(canonical_type, "SWAP" | "FUTURES") {
+            let quote = canonical.split('-').nth(1).unwrap_or("");
+            let matches = match self.category.as_str() {
+                "linear" => matches!(quote, "USDT" | "USDC"),
+                "inverse" => quote == "USD",
+                _ => false,
+            };
+            if !matches {
+                return Err(DcexError::InvalidInput(
+                    "Bybit settlement currency does not match WebSocket category; load the product table for other currencies".into(),
+                ));
+            }
         }
-        let symbol = exchange_symbol_fallback(product_symbol);
-        if self.category == "option" {
+        let symbol = exchange_symbol_fallback(&canonical)?;
+        if matches!(self.category.as_str(), "option" | "linear") {
             normalize_option_symbol(&symbol)
         } else {
             normalize_symbol(&symbol)
@@ -277,7 +302,7 @@ fn normalize_option_symbol(symbol: &str) -> Result<String> {
     if symbol.is_empty()
         || !symbol
             .chars()
-            .all(|character| character.is_ascii_alphanumeric() || character == '-')
+            .all(|character| character.is_ascii_alphanumeric() || matches!(character, '-' | '.'))
     {
         return Err(DcexError::InvalidInput(format!(
             "unsupported Bybit option symbol: {symbol}"
@@ -342,6 +367,14 @@ mod tests {
     use super::*;
 
     #[test]
+    fn option_symbols_preserve_fractional_strikes() {
+        assert_eq!(
+            normalize_option_symbol("SOXL-30OCT26-207.5-P-USDT").unwrap(),
+            "SOXL-30OCT26-207.5-P-USDT"
+        );
+    }
+
+    #[test]
     fn normalizes_category() {
         assert_eq!(normalize_category("LINEAR").expect("category"), "linear");
         assert_eq!(normalize_category("RFQ").expect("rfq"), "rfq");
@@ -381,6 +414,80 @@ mod tests {
                 .expect("trade symbol"),
             "BTC"
         );
+    }
+
+    #[test]
+    fn canonical_product_type_must_match_websocket_category() {
+        let spot = BybitPublicWebSocket::new("spot", Duration::from_secs(1)).expect("spot");
+        assert!(spot.exchange_symbol("BTC-USDT-SWAP").is_err());
+        for category in ["linear", "inverse", "option", "spread"] {
+            let client =
+                BybitPublicWebSocket::new(category, Duration::from_secs(1)).expect("client");
+            assert!(client.exchange_symbol("BTC-USDT-SPOT").is_err());
+            assert!(client.exchange_symbol("btc-usdt-spot").is_err());
+        }
+    }
+
+    #[test]
+    fn rejects_canonical_derivatives_in_wrong_category() {
+        for (category, symbol) in [
+            ("option", "BTC-USDT-SWAP"),
+            ("spot", "BTC-USD-260327-FUTURES"),
+            ("linear", "BTC-USD-SWAP"),
+            ("inverse", "BTC-USDT-SWAP"),
+            ("linear", "BTC-USD-260327-80000-C-OPTION"),
+        ] {
+            let client = BybitPublicWebSocket::new(category, Duration::from_secs(1)).unwrap();
+            assert!(client.exchange_symbol(symbol).is_err());
+            assert!(
+                client
+                    .exchange_symbol(&symbol.to_ascii_lowercase())
+                    .is_err()
+            );
+        }
+        for (category, symbol, native) in [
+            ("linear", "BTC-USDT-SWAP", "BTCUSDT"),
+            ("linear", "BTC-USDC-SWAP", "BTCPERP"),
+            ("inverse", "BTC-USD-SWAP", "BTCUSD"),
+        ] {
+            let client = BybitPublicWebSocket::new(category, Duration::from_secs(1)).unwrap();
+            assert_eq!(client.exchange_symbol(symbol).unwrap(), native);
+        }
+    }
+
+    #[test]
+    fn loaded_products_must_match_exchange_category() {
+        let make = |product: &str, category: &str| crate::product_table::MarketInfo {
+            exchange: "bybit".into(),
+            exchange_symbol: "BTCUSDT".into(),
+            product_symbol: product.into(),
+            product_type: "swap".into(),
+            exchange_type: category.into(),
+            base_currency: "BTC".into(),
+            quote_currency: "USDT".into(),
+            price_precision: "0.1".into(),
+            size_precision: "0.001".into(),
+            min_size: "0.001".into(),
+            min_notional: "5".into(),
+            size_per_contract: "1".into(),
+            ..Default::default()
+        };
+        let table = ProductTable::new(vec![
+            make("BTC-USDT-SPOT", "spot"),
+            make("BTC-USDT-SWAP", "linear"),
+        ]);
+        for category in ["spot", "linear"] {
+            let client = BybitPublicWebSocket::new(category, Duration::from_secs(1))
+                .unwrap()
+                .with_product_table(table.clone());
+            assert_eq!(client.exchange_symbol("BTCUSDT").unwrap(), "BTCUSDT");
+        }
+        let wrong = ProductTable::new(vec![make("BTC-USDT-SWAP", "inverse")]);
+        let client = BybitPublicWebSocket::new("linear", Duration::from_secs(1))
+            .unwrap()
+            .with_product_table(wrong);
+        assert!(client.exchange_symbol("BTC-USDT-SWAP").is_err());
+        assert!(client.exchange_symbol("BTCUSDT").is_err());
     }
 
     #[test]

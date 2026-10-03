@@ -14,7 +14,10 @@ impl BinanceClient {
             HttpMethod::Get,
             BinanceMarket::Spot,
             SPOT_COMMISSION_RATE,
-            vec![("symbol".to_string(), self.exchange_symbol(product_symbol)?)],
+            vec![(
+                "symbol".to_string(),
+                self.exchange_symbol_for(product_symbol, super::client::BinanceMarket::Spot)?,
+            )],
             true,
         )
         .await
@@ -25,7 +28,10 @@ impl BinanceClient {
             HttpMethod::Get,
             BinanceMarket::Futures,
             FUTURES_COMMISSION_RATE,
-            vec![("symbol".to_string(), self.exchange_symbol(product_symbol)?)],
+            vec![(
+                "symbol".to_string(),
+                self.exchange_symbol_for(product_symbol, super::client::BinanceMarket::Futures)?,
+            )],
             true,
         )
         .await
@@ -58,7 +64,10 @@ impl BinanceClient {
     ) -> Result<ValidatedResponse> {
         let mut params = Vec::new();
         if let Some(product_symbol) = request.product_symbol {
-            params.push(("symbol".to_string(), self.exchange_symbol(product_symbol)?));
+            params.push((
+                "symbol".to_string(),
+                self.exchange_symbol_for(product_symbol, super::client::BinanceMarket::Futures)?,
+            ));
         }
         push_optional(&mut params, "incomeType", request.income_type);
         push_optional_display(&mut params, "startTime", request.start_time);

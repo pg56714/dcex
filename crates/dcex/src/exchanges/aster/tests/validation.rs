@@ -25,6 +25,7 @@ fn product_table_resolves_canonical_symbol() {
         quote_currency: "USDT".to_string(),
         min_notional: "5".to_string(),
         size_per_contract: "1".to_string(),
+        ..MarketInfo::default()
     }]);
     let client = AsterClient::public(Duration::from_secs(1))
         .expect("client")

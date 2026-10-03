@@ -5,7 +5,6 @@
     "path": "/api/v3/broker/create-sub",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "subaccountName",
@@ -35,7 +34,6 @@
     "path": "/api/v3/broker/create-sub-apikey",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "subUid",
@@ -107,7 +105,6 @@
     "path": "/api/v3/broker/delete-sub-apikey",
     "public": false,
     "confirm": true,
-    "scoped": false,
     "fields": [
       {
         "wire": "subUid",
@@ -137,7 +134,6 @@
     "path": "/api/v3/broker/all-sub-deposit-withdrawal",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "startTime",
@@ -193,7 +189,6 @@
     "path": "/api/v3/broker/commission",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "startTime",
@@ -262,7 +257,6 @@
     "path": "/api/v3/broker/query-sub-apikey",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "subUid",
@@ -282,7 +276,6 @@
     "path": "/api/v3/broker/sub-list",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "limit",
@@ -318,7 +311,6 @@
     "path": "/api/v3/broker/modify-sub-apikey",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "subUid",
@@ -399,7 +391,6 @@
     "path": "/api/v3/broker/modify-sub",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "subUid",
@@ -438,7 +429,6 @@
     "path": "/api/v3/broker/sub-deposit-address",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "subUid",
@@ -477,7 +467,6 @@
     "path": "/api/v3/broker/sub-withdrawal",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "subUid",
@@ -570,7 +559,6 @@
     "path": "/api/v2/broker/agent-commission",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "startTime",
@@ -614,7 +602,6 @@
     "path": "/api/v2/broker/customer-asset",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "pageNo",
@@ -671,7 +658,6 @@
     "path": "/api/v2/broker/customer-deposit",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "startTime",
@@ -746,7 +732,6 @@
     "path": "/api/v2/broker/customer-kyc-result",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "startTime",
@@ -806,7 +791,6 @@
     "path": "/api/v2/broker/customer-list",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "startTime",
@@ -881,7 +865,6 @@
     "path": "/api/v2/broker/customer-trade-volume",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "startTime",
@@ -956,7 +939,6 @@
     "path": "/api/v2/broker/customer-commissions",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "startTime",
@@ -1032,7 +1014,6 @@
     "path": "/api/v2/broker/sub-customer-list",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "startTime",
@@ -1085,1168 +1066,5 @@
     ],
     "source": "https://www.bitget.com/docs/catalog/classic-affiliate-customer-info/classic-affiliate-customerinfo#get-agent-subcustomer-list",
     "summary": "Get Agent SubCustomer List"
-  },
-  {
-    "name": "classic_broker_apikey_create_subaccount_api_key",
-    "method": "POST",
-    "path": "/api/v2/broker/manage/create-subaccount-apikey",
-    "public": false,
-    "confirm": false,
-    "scoped": false,
-    "fields": [
-      {
-        "wire": "subUid",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "description": "Sub account UID"
-        },
-        "location": "body"
-      },
-      {
-        "wire": "passphrase",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "description": "Passphrase, length between 6 and 32"
-        },
-        "location": "body"
-      },
-      {
-        "wire": "label",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "description": "remark, length < 20"
-        },
-        "location": "body"
-      },
-      {
-        "wire": "ipList",
-        "required": true,
-        "schema": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "IP whitelist, max 30 IP entries\n\nit's optional when `permType` is `readonly`"
-        },
-        "location": "body"
-      },
-      {
-        "wire": "permType",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "description": "Permission type\n\n`read_and_write`\n\n`readonly`"
-        },
-        "location": "body"
-      },
-      {
-        "wire": "permList",
-        "required": true,
-        "schema": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Permission list\n\ncontract_order\n\ncontract_position\n\nspot_trade\n\nmargin_trade: spot margin trade\n\ncopytrading_trade\n\nwallet_transfer: `permType` should be `read_and_write`"
-        },
-        "location": "body"
-      }
-    ],
-    "source": "https://www.bitget.com/docs/catalog/classic-broker-apikey/classic-broker-apikey#create-subaccount-apikey",
-    "summary": "Create Subaccount ApiKey"
-  },
-  {
-    "name": "classic_broker_apikey_delete_subaccount_api_key",
-    "method": "POST",
-    "path": "/api/v2/broker/manage/delete-subaccount-apikey",
-    "public": false,
-    "confirm": true,
-    "scoped": false,
-    "fields": [
-      {
-        "wire": "subUid",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "description": "Sub account UID"
-        },
-        "location": "body"
-      },
-      {
-        "wire": "apiKey",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "description": "API Key"
-        },
-        "location": "body"
-      }
-    ],
-    "source": "https://www.bitget.com/docs/catalog/classic-broker-apikey/classic-broker-apikey#delete-subaccount-apikey",
-    "summary": "Delete Subaccount ApiKey"
-  },
-  {
-    "name": "classic_broker_apikey_subaccount_apikey_list",
-    "method": "GET",
-    "path": "/api/v2/broker/manage/subaccount-apikey-list",
-    "public": false,
-    "confirm": false,
-    "scoped": false,
-    "fields": [
-      {
-        "wire": "subUid",
-        "required": true,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      }
-    ],
-    "source": "https://www.bitget.com/docs/catalog/classic-broker-apikey/classic-broker-apikey#get-subaccount-apikey",
-    "summary": "Get Subaccount Apikey"
-  },
-  {
-    "name": "classic_broker_apikey_modify_subaccount_api_key",
-    "method": "POST",
-    "path": "/api/v2/broker/manage/modify-subaccount-apikey",
-    "public": false,
-    "confirm": false,
-    "scoped": false,
-    "fields": [
-      {
-        "wire": "subUid",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "description": "Sub account UID"
-        },
-        "location": "body"
-      },
-      {
-        "wire": "apiKey",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "description": "Sub account API Key"
-        },
-        "location": "body"
-      },
-      {
-        "wire": "label",
-        "required": false,
-        "schema": {
-          "type": "string",
-          "description": "remark, length < 20"
-        },
-        "location": "body"
-      },
-      {
-        "wire": "passphrase",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "description": "Passphrase, please recreate if forgot"
-        },
-        "location": "body"
-      },
-      {
-        "wire": "ipList",
-        "required": false,
-        "schema": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "IP whitelist, override, max 30 IP entries. Empty means no change"
-        },
-        "location": "body"
-      },
-      {
-        "wire": "permType",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "description": "Permission type, override. Empty means no change\n\n`read_and_write`: read and write\n\n`readonly`: read only"
-        },
-        "location": "body"
-      },
-      {
-        "wire": "permList",
-        "required": true,
-        "schema": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Permission list, override. Empty means not change\n\n`contract_order`: contract orders\n\n`contract_position`: contract positions\n\n`spot_trade`: spot trade\n\n`margin_trade`: spot margin trade\n\n`copytrading_trade`: copy trading trade\n\n`wallet_transfer`: wallet transfer(available when `permType` is `read_and_write`)"
-        },
-        "location": "body"
-      }
-    ],
-    "source": "https://www.bitget.com/docs/catalog/classic-broker-apikey/classic-broker-apikey#modify-subaccount-apikey",
-    "summary": "Modify Subaccount ApiKey"
-  },
-  {
-    "name": "classic_broker_commission_get_total_commission",
-    "method": "GET",
-    "path": "/api/v2/broker/total-commission",
-    "public": false,
-    "confirm": false,
-    "scoped": false,
-    "fields": [
-      {
-        "wire": "startTime",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "endTime",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      }
-    ],
-    "source": "https://www.bitget.com/docs/catalog/classic-broker-commission/classic-broker-commission#get-total-commission",
-    "summary": "Get Total Commission"
-  },
-  {
-    "name": "classic_broker_commission_get_order_commission",
-    "method": "GET",
-    "path": "/api/v2/broker/order-commission",
-    "public": false,
-    "confirm": false,
-    "scoped": false,
-    "fields": [
-      {
-        "wire": "startTime",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "endTime",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "limit",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "uid",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "orderid",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "idLessThan",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      }
-    ],
-    "source": "https://www.bitget.com/docs/catalog/classic-broker-commission/classic-broker-commission#get-order-commission",
-    "summary": "Get Order Commission",
-    "input_schema": {
-      "type": "object",
-      "properties": {}
-    }
-  },
-  {
-    "name": "classic_broker_commission_get_rebate_info",
-    "method": "GET",
-    "path": "/api/v2/broker/rebate-info",
-    "public": false,
-    "confirm": false,
-    "scoped": false,
-    "fields": [
-      {
-        "wire": "uid",
-        "required": true,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      }
-    ],
-    "source": "https://www.bitget.com/docs/catalog/classic-broker-commission/classic-broker-commission#get-rebate-info",
-    "summary": "Get Rebate Info"
-  },
-  {
-    "name": "classic_broker_commission_get_sub_affiliate_info",
-    "method": "GET",
-    "path": "/api/v2/broker/sub-affiliate-info",
-    "public": false,
-    "confirm": false,
-    "scoped": false,
-    "fields": [
-      {
-        "wire": "uid",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "startTime",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "endTime",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "idLessThan",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "limit",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "includeDownLine",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      }
-    ],
-    "source": "https://www.bitget.com/docs/catalog/classic-broker-commission/classic-broker-commission#get-sub-affiliate-info",
-    "summary": "Get Sub-affiliate Info"
-  },
-  {
-    "name": "classic_broker_subaccount_get_broker_account_info",
-    "method": "GET",
-    "path": "/api/v2/broker/account/info",
-    "public": false,
-    "confirm": false,
-    "scoped": false,
-    "fields": [],
-    "source": "https://www.bitget.com/docs/catalog/classic-broker-subaccount/classic-broker-subaccount#get-broker-info",
-    "summary": "Get Broker Info"
-  },
-  {
-    "name": "classic_broker_subaccount_modify_subaccount_email",
-    "method": "POST",
-    "path": "/api/v2/broker/account/modify-subaccount-email",
-    "public": false,
-    "confirm": false,
-    "scoped": false,
-    "fields": [
-      {
-        "wire": "subUid",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "description": "Subaccount user id"
-        },
-        "location": "body"
-      },
-      {
-        "wire": "subaccountEmail",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "description": "Subaccount email"
-        },
-        "location": "body"
-      }
-    ],
-    "source": "https://www.bitget.com/docs/catalog/classic-broker-subaccount/classic-broker-subaccount#modify-subaccount-email",
-    "summary": "Modify Subaccount Email"
-  },
-  {
-    "name": "classic_broker_subaccount_create_subaccount",
-    "method": "POST",
-    "path": "/api/v2/broker/account/create-subaccount",
-    "public": false,
-    "confirm": false,
-    "scoped": false,
-    "fields": [
-      {
-        "wire": "subaccountName",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "description": "Subaccount name, i.e. email address"
-        },
-        "location": "body"
-      },
-      {
-        "wire": "label",
-        "required": false,
-        "schema": {
-          "type": "string",
-          "description": "Remark, length < 20"
-        },
-        "location": "body"
-      }
-    ],
-    "source": "https://www.bitget.com/docs/catalog/classic-broker-subaccount/classic-broker-subaccount#create-subaccount",
-    "summary": "Create Subaccount"
-  },
-  {
-    "name": "classic_broker_subaccount_get_subaccount_list",
-    "method": "GET",
-    "path": "/api/v2/broker/account/subaccount-list",
-    "public": false,
-    "confirm": false,
-    "scoped": false,
-    "fields": [
-      {
-        "wire": "limit",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "idLessThan",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "status",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "startTime",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "endTime",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      }
-    ],
-    "source": "https://www.bitget.com/docs/catalog/classic-broker-subaccount/classic-broker-subaccount#get-subaccount-list",
-    "summary": "Get Subaccount List"
-  },
-  {
-    "name": "classic_broker_subaccount_modify_suaccount",
-    "method": "POST",
-    "path": "/api/v2/broker/account/modify-subaccount",
-    "public": false,
-    "confirm": false,
-    "scoped": false,
-    "fields": [
-      {
-        "wire": "subUid",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "description": "Subaccount user id"
-        },
-        "location": "body"
-      },
-      {
-        "wire": "permList",
-        "required": true,
-        "schema": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Permissions\n\nwithdraw\n\ntransfer\n\nspot_trade\n\ncontract_trade\n\nread\n\ndeposit\n\nmargin_trade: spot margin"
-        },
-        "location": "body"
-      },
-      {
-        "wire": "status",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "description": "Subaccount Status\n\n`normal`: normal status \n\n`freeze`:freeze status"
-        },
-        "location": "body"
-      },
-      {
-        "wire": "language",
-        "required": false,
-        "schema": {
-          "type": "string",
-          "description": "Subaccount language\n\nen_US\n\nzh_CN\n\nja_JP\n\nvi_VN\n\nzh_TW\n\nru_RU\n\nes_ES\n\ntr_TR\n\nfr_FR\n\nde_DE\n\npt_PT\n\nth_TH\n\nNote: When modifying `language`, `permList` must also be passed, otherwise the modification will not take effect."
-        },
-        "location": "body"
-      }
-    ],
-    "source": "https://www.bitget.com/docs/catalog/classic-broker-subaccount/classic-broker-subaccount#modify-subaccount",
-    "summary": "Modify Subaccount"
-  },
-  {
-    "name": "classic_broker_subaccount_get_subaccount_email",
-    "method": "GET",
-    "path": "/api/v2/broker/account/subaccount-email",
-    "public": false,
-    "confirm": false,
-    "scoped": false,
-    "fields": [
-      {
-        "wire": "subUid",
-        "required": true,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      }
-    ],
-    "source": "https://www.bitget.com/docs/catalog/classic-broker-subaccount/classic-broker-subaccount#get-subaccount-email",
-    "summary": "Get Subaccount Email"
-  },
-  {
-    "name": "classic_broker_subaccount_get_subaccount_spot_assets",
-    "method": "GET",
-    "path": "/api/v2/broker/account/subaccount-spot-assets",
-    "public": false,
-    "confirm": false,
-    "scoped": false,
-    "fields": [
-      {
-        "wire": "subUid",
-        "required": true,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "coin",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "assetType",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      }
-    ],
-    "source": "https://www.bitget.com/docs/catalog/classic-broker-subaccount/classic-broker-subaccount#get-subaccount-spot-assets",
-    "summary": "Get Subaccount Spot Assets"
-  },
-  {
-    "name": "classic_broker_subaccount_get_subaccount_future_assets",
-    "method": "GET",
-    "path": "/api/v2/broker/account/subaccount-future-assets",
-    "public": false,
-    "confirm": false,
-    "scoped": false,
-    "fields": [
-      {
-        "wire": "subUid",
-        "required": true,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "productType",
-        "required": true,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      }
-    ],
-    "source": "https://www.bitget.com/docs/catalog/classic-broker-subaccount/classic-broker-subaccount#get-subaccount-future-assets",
-    "summary": "Get Subaccount Future Assets"
-  },
-  {
-    "name": "classic_broker_subaccount_create_subaccount_deposit_address",
-    "method": "POST",
-    "path": "/api/v2/broker/account/subaccount-address",
-    "public": false,
-    "confirm": false,
-    "scoped": false,
-    "fields": [
-      {
-        "wire": "subUid",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "description": "Sub account UID"
-        },
-        "location": "body"
-      },
-      {
-        "wire": "coin",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "description": "Coin, e.g: BTC"
-        },
-        "location": "body"
-      },
-      {
-        "wire": "chain",
-        "required": false,
-        "schema": {
-          "type": "string",
-          "description": "Chain name, default will use the main-chain of the 'coin'"
-        },
-        "location": "body"
-      }
-    ],
-    "source": "https://www.bitget.com/docs/catalog/classic-broker-subaccount/classic-broker-subaccount#create-subaccount-deposit-address",
-    "summary": "Create Subaccount Deposit Address"
-  },
-  {
-    "name": "classic_broker_subaccount_subaccount_withdraw",
-    "method": "POST",
-    "path": "/api/v2/broker/account/subaccount-withdrawal",
-    "public": false,
-    "confirm": false,
-    "scoped": false,
-    "fields": [
-      {
-        "wire": "subUid",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "description": "Sub account UID"
-        },
-        "location": "body"
-      },
-      {
-        "wire": "coin",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "description": "Coin, e.g. BTC\n\nOnly accept BTC/ETH/USDT/USDC/TRX/XRP/LTC/SOL/BNB/FTM/DOGE/ADA/SHIB/UNI/SEI/SUI/POL/FIL/LINK/GRAM/ARB/OP/DOT/AVAX/BGB"
-        },
-        "location": "body"
-      },
-      {
-        "wire": "dest",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "description": "Withdraw type. \n\n`on_chain`: on chain withdraw\n\n`internal_transfer`: internal withdraw"
-        },
-        "location": "body"
-      },
-      {
-        "wire": "chain",
-        "required": false,
-        "schema": {
-          "type": "string",
-          "description": "Chain name\n\nIt will use the main-chain of the 'coin' by default"
-        },
-        "location": "body"
-      },
-      {
-        "wire": "address",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "description": "Address\n\nWhen `dest`==`on_chain`, it should be the chain address\n\nWhen `dest`==`internal_transfer`, it should be UID"
-        },
-        "location": "body"
-      },
-      {
-        "wire": "amount",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "description": "Withdraw amount"
-        },
-        "location": "body"
-      },
-      {
-        "wire": "tag",
-        "required": false,
-        "schema": {
-          "type": "string",
-          "description": "Tag value for on chain withdraw, i.e. 'memo' of 'EOS', 'comment' of 'GRAM'"
-        },
-        "location": "body"
-      },
-      {
-        "wire": "clientOid",
-        "required": false,
-        "schema": {
-          "type": "string",
-          "description": "Client Order ID"
-        },
-        "location": "body"
-      }
-    ],
-    "source": "https://www.bitget.com/docs/catalog/classic-broker-subaccount/classic-broker-subaccount#subaccount-withdrawal",
-    "summary": "Subaccount Withdrawal",
-    "input_schema": {
-      "type": "object",
-      "properties": {
-        "amount": {
-          "type": "string",
-          "format": "decimal"
-        }
-      }
-    }
-  },
-  {
-    "name": "classic_broker_subaccount_subaccount_deposit_auto_transfer",
-    "method": "POST",
-    "path": "/api/v2/broker/account/set-subaccount-autotransfer",
-    "public": false,
-    "confirm": false,
-    "scoped": false,
-    "fields": [
-      {
-        "wire": "subUid",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "description": "Sub account UID"
-        },
-        "location": "body"
-      },
-      {
-        "wire": "coin",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "description": "Coin"
-        },
-        "location": "body"
-      },
-      {
-        "wire": "toAccountType",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "description": "To account type：\n\nspot default\n\nusdt-futures  USDT professional futures（corresponding to mix_usdt）\n\ncoin-futures  Mixed futures（corresponding to mix_usd）\n\nusdc-futures  USDC professional futures（corresponding to mix_usdc）"
-        },
-        "location": "body"
-      }
-    ],
-    "source": "https://www.bitget.com/docs/catalog/classic-broker-subaccount/classic-broker-subaccount#sub-deposit-auto-transfer",
-    "summary": "Sub Deposit Auto Transfer",
-    "input_schema": {
-      "type": "object",
-      "properties": {}
-    }
-  },
-  {
-    "name": "classic_broker_subaccount_subaccount_deposit_records",
-    "method": "GET",
-    "path": "/api/v2/broker/subaccount-deposit",
-    "public": false,
-    "confirm": false,
-    "scoped": false,
-    "fields": [
-      {
-        "wire": "orderId",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "userId",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "startTime",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "endTime",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "limit",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "idLessThan",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      }
-    ],
-    "source": "https://www.bitget.com/docs/catalog/classic-broker-subaccount/classic-broker-subaccount#sub-deposit-records",
-    "summary": "Sub Deposit Records"
-  },
-  {
-    "name": "classic_broker_subaccount_subaccount_withdrawal_records",
-    "method": "GET",
-    "path": "/api/v2/broker/subaccount-withdrawal",
-    "public": false,
-    "confirm": false,
-    "scoped": false,
-    "fields": [
-      {
-        "wire": "orderId",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "userId",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "startTime",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "endTime",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "limit",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "idLessThan",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      }
-    ],
-    "source": "https://www.bitget.com/docs/catalog/classic-broker-subaccount/classic-broker-subaccount#sub-withdrawal-records",
-    "summary": "Sub Withdrawal Records",
-    "input_schema": {
-      "type": "object",
-      "properties": {}
-    }
-  },
-  {
-    "name": "classic_broker_subaccount_get_subaccount_all_deposit_withdrawal_records",
-    "method": "GET",
-    "path": "/api/v2/broker/all-sub-deposit-withdrawal",
-    "public": false,
-    "confirm": false,
-    "scoped": false,
-    "fields": [
-      {
-        "wire": "startTime",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "endTime",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "limit",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "idLessThan",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "type",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      }
-    ],
-    "source": "https://www.bitget.com/docs/catalog/classic-broker-subaccount/classic-broker-subaccount#get-sub-accounts-deposit-and-withdrawal-records",
-    "summary": "Get Sub-accounts Deposit and Withdrawal Records",
-    "input_schema": {
-      "type": "object",
-      "properties": {}
-    }
-  },
-  {
-    "name": "classic_broker_subaccount_get_broker_subaccounts",
-    "method": "GET",
-    "path": "/api/v2/broker/subaccounts",
-    "public": false,
-    "confirm": false,
-    "scoped": false,
-    "fields": [
-      {
-        "wire": "startTime",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "endTime",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "pageSize",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "pageNo",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      }
-    ],
-    "source": "https://www.bitget.com/docs/catalog/classic-broker-subaccount/classic-broker-subaccount#get-broker-subaccounts",
-    "summary": "Get Broker Subaccounts",
-    "input_schema": {
-      "type": "object",
-      "properties": {
-        "page_size": {
-          "type": "string",
-          "description": "classic_broker_subaccount_get_broker_subaccounts/page_size: limits the number of result records returned by pagination."
-        }
-      }
-    }
-  },
-  {
-    "name": "classic_broker_subaccount_get_broker_subaccounts_commissions",
-    "method": "GET",
-    "path": "/api/v2/broker/commissions",
-    "public": false,
-    "confirm": false,
-    "scoped": false,
-    "fields": [
-      {
-        "wire": "startTime",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "endTime",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "pageSize",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "pageNo",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "bizType",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "subBizType",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      }
-    ],
-    "source": "https://www.bitget.com/docs/catalog/classic-broker-subaccount/classic-broker-subaccount#get-broker-subaccounts-commissions",
-    "summary": "Get Broker Subaccounts Commissions",
-    "input_schema": {
-      "type": "object",
-      "properties": {
-        "page_size": {
-          "type": "string",
-          "description": "classic_broker_subaccount_get_broker_subaccounts_commissions/page_size: limits the number of result records returned by pagination."
-        }
-      }
-    }
-  },
-  {
-    "name": "classic_broker_subaccount_get_broker_trade_volume",
-    "method": "GET",
-    "path": "/api/v2/broker/trade-volume",
-    "public": false,
-    "confirm": false,
-    "scoped": false,
-    "fields": [
-      {
-        "wire": "startTime",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "endTime",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "pageSize",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      },
-      {
-        "wire": "pageNo",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "location": "query"
-      }
-    ],
-    "source": "https://www.bitget.com/docs/catalog/classic-broker-subaccount/classic-broker-subaccount#get-broker-trade-volume",
-    "summary": "Get Broker Trade Volume",
-    "input_schema": {
-      "type": "object",
-      "properties": {
-        "page_size": {
-          "type": "string",
-          "description": "classic_broker_subaccount_get_broker_trade_volume/page_size: limits the number of result records returned by pagination."
-        }
-      }
-    }
   }
 ]

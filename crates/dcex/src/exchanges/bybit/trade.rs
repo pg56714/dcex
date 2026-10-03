@@ -104,7 +104,10 @@ impl BybitClient {
                 let product_symbol = params.required("product_symbol")?;
                 let query = vec![
                     ("category".to_string(), "spot".to_string()),
-                    ("symbol".to_string(), self.exchange_symbol(product_symbol)?),
+                    (
+                        "symbol".to_string(),
+                        self.symbol_category(product_symbol, Some("spot"))?.0,
+                    ),
                     (
                         "side".to_string(),
                         OrderSide::parse(params.required("side")?)?
@@ -301,7 +304,7 @@ impl BybitClient {
     ) -> Result<Map<String, Value>> {
         let product_symbol = params.required("product_symbol")?;
         let mut body = Map::new();
-        self.insert_symbol_category(&mut body, product_symbol)?;
+        self.insert_symbol_category(&mut body, product_symbol, params.get("category"))?;
         body.insert(
             "side".to_string(),
             Value::String(
@@ -359,7 +362,7 @@ impl BybitClient {
         require_one_identifier(params, &["orderId", "orderLinkId"])?;
         let product_symbol = params.required("product_symbol")?;
         let mut body = Map::new();
-        self.insert_symbol_category(&mut body, product_symbol)?;
+        self.insert_symbol_category(&mut body, product_symbol, params.get("category"))?;
         for key in [
             "orderId",
             "orderLinkId",
@@ -388,7 +391,7 @@ impl BybitClient {
         require_one_identifier(params, &["orderId", "orderLinkId"])?;
         let product_symbol = params.required("product_symbol")?;
         let mut body = Map::new();
-        self.insert_symbol_category(&mut body, product_symbol)?;
+        self.insert_symbol_category(&mut body, product_symbol, params.get("category"))?;
         for key in ["orderId", "orderLinkId", "orderFilter"] {
             insert_optional_string(&mut body, key, params.get(key));
         }
@@ -408,7 +411,7 @@ impl BybitClient {
             ),
         ];
         if let Some(product_symbol) = params.get("product_symbol") {
-            self.push_symbol_category(&mut query, product_symbol, true)?;
+            self.push_symbol_category(&mut query, product_symbol, params.get("category"), true)?;
         } else {
             push_optional(&mut query, "baseCoin", params.get("baseCoin"));
             if let Some(settle_coin) = params.get("settleCoin") {
@@ -447,7 +450,7 @@ impl BybitClient {
             Value::String(params.get("category").unwrap_or("linear").to_string()),
         );
         if let Some(product_symbol) = params.get("product_symbol") {
-            self.insert_symbol_category(&mut body, product_symbol)?;
+            self.insert_symbol_category(&mut body, product_symbol, params.get("category"))?;
         }
         for key in ["baseCoin", "settleCoin", "orderFilter", "stopOrderType"] {
             insert_optional_string(&mut body, key, params.get(key));
@@ -480,7 +483,7 @@ impl BybitClient {
             params.get("category").unwrap_or("linear").to_string(),
         )];
         if let Some(product_symbol) = params.get("product_symbol") {
-            self.push_symbol_category(&mut query, product_symbol, true)?;
+            self.push_symbol_category(&mut query, product_symbol, params.get("category"), true)?;
         }
         for key in [
             "baseCoin",
@@ -514,7 +517,7 @@ impl BybitClient {
             ),
         ];
         if let Some(product_symbol) = params.get("product_symbol") {
-            self.push_symbol_category(&mut query, product_symbol, true)?;
+            self.push_symbol_category(&mut query, product_symbol, params.get("category"), true)?;
         }
         for key in [
             "orderId",

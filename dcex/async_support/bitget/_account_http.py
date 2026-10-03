@@ -9,53 +9,6 @@ from ._transfers_http import AccountHTTPTransfersHTTP
 class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
     """Async HTTP client for Bitget private account operations."""
 
-    async def get_spot_fee_rates(self, product_symbol: str) -> dict[str, Any]:
-        """Retrieve current Bitget Spot maker and taker fee rates."""
-        return await self._native_private(
-            "get_spot_fee_rates",
-            self._native_params(product_symbol=product_symbol),
-        )
-
-    async def get_futures_fee_rates(self, product_symbol: str) -> dict[str, Any]:
-        """Retrieve current Bitget Futures maker and taker fee rates."""
-        return await self._native_private(
-            "get_futures_fee_rates",
-            self._native_params(product_symbol=product_symbol),
-        )
-
-    async def get_all_account_balance(self) -> dict[str, Any]:
-        """Retrieve Bitget all-account balance overview."""
-        return await self._native_private("get_all_account_balance", [])
-
-    async def get_funding_assets(
-        self,
-        coin: str | None = None,
-    ) -> dict[str, Any]:
-        """Retrieve Bitget funding account assets."""
-        return await self._native_private("get_funding_assets", self._native_params(coin=coin))
-
-    async def get_deposit_records(
-        self,
-        start_time: int | str,
-        end_time: int | str,
-        coin: str | None = None,
-        order_id: str | None = None,
-        id_less_than: str | None = None,
-        limit: int | None = None,
-    ) -> dict[str, Any]:
-        """Retrieve Bitget deposit records."""
-        return await self._native_private(
-            "get_deposit_records",
-            self._native_params(
-                coin=coin,
-                orderId=order_id,
-                startTime=start_time,
-                endTime=end_time,
-                idLessThan=id_less_than,
-                limit=limit,
-            ),
-        )
-
     async def get_uta_account_assets(self) -> dict[str, Any]:
         """Retrieve Bitget UTA account assets."""
         return await self._native_private("get_uta_account_assets", [])
@@ -111,24 +64,6 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
         return await self._native_private(
             "set_uta_hold_mode",
             self._native_params(holdMode=hold_mode),
-        )
-
-    async def set_futures_margin_mode(
-        self,
-        product_symbol: str,
-        margin_mode: str,
-        margin_coin: str = "USDT",
-        product_type: str = "USDT-FUTURES",
-    ) -> dict[str, Any]:
-        """Set Bitget futures margin mode."""
-        return await self._native_private(
-            "set_futures_margin_mode",
-            self._native_params(
-                product_symbol=product_symbol,
-                productType=product_type,
-                marginCoin=margin_coin,
-                marginMode=margin_mode,
-            ),
         )
 
     async def get_uta_all_fee_rates(

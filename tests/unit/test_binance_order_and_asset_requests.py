@@ -52,6 +52,9 @@ async def test_binance_partial_cancel_replace_has_structured_outcomes(asynchrono
             "/api/v3/sor/order",
         ),
         ("sign_futures_tradfi_perps_contract", {}, "/fapi/v1/stock/contract"),
+        # market_type defaults to spot only without a product_symbol; the symbol decides otherwise.
+        ("get_all_open_orders", {}, "/api/v3/openOrders"),
+        ("get_all_open_orders", {"product_symbol": "BTC-USDT-SWAP"}, "/fapi/v1/openOrders"),
         ("liquidate_margin_account", {"kind_type": "MARGIN"}, "/sapi/v1/margin/manual-liquidation"),
         (
             "set_coin_futures_leverage",

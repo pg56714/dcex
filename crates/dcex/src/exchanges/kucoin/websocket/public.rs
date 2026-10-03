@@ -8,9 +8,10 @@ use crate::{DcexError, Result};
 
 use super::super::client::{KucoinClient, KucoinMarket};
 use super::super::endpoints::{FUTURES_BASE_URL, SPOT_BASE_URL, WS_PUBLIC_TOKEN};
-use super::{extract_bullet_token, normalize_symbol, normalize_topic, websocket_url};
+use super::{extract_bullet_token, normalize_topic, websocket_url};
 
 pub struct KucoinPublicWebSocket {
+    product_table: Option<std::sync::Arc<crate::product_table::ProductTable>>,
     http_client: KucoinClient,
     market: KucoinMarket,
     timeout: Duration,
@@ -19,6 +20,26 @@ pub struct KucoinPublicWebSocket {
 }
 
 impl KucoinPublicWebSocket {
+    pub fn set_product_table(&mut self, table: crate::product_table::ProductTable) {
+        self.product_table = Some(std::sync::Arc::new(table));
+    }
+
+    fn exchange_symbol(&self, symbol: &str, futures: bool) -> Result<String> {
+        if let Some(table) = &self.product_table {
+            return Ok(table
+                .resolve_symbol_in("kucoin", symbol, |row| {
+                    if futures {
+                        matches!(row.product_type.as_str(), "swap" | "futures")
+                    } else {
+                        row.product_type == "spot"
+                    }
+                })?
+                .exchange_symbol
+                .clone());
+        }
+        super::normalize_symbol(symbol, futures)
+    }
+
     pub fn new(timeout: Duration) -> Result<Self> {
         Self::with_market_base_urls(
             timeout,
@@ -62,6 +83,7 @@ impl KucoinPublicWebSocket {
             ));
         }
         Ok(Self {
+            product_table: None,
             http_client: KucoinClient::with_base_urls(
                 None,
                 None,
@@ -140,7 +162,7 @@ impl KucoinPublicWebSocket {
 
     pub async fn subscribe_ticker(&mut self, product_symbol: &str) -> Result<String> {
         let futures = matches!(self.market, KucoinMarket::Futures);
-        let symbol = normalize_symbol(product_symbol, futures)?;
+        let symbol = self.exchange_symbol(product_symbol, futures)?;
         let topic = if futures {
             format!("/contractMarket/tickerV2:{symbol}")
         } else {
@@ -151,7 +173,7 @@ impl KucoinPublicWebSocket {
 
     pub async fn subscribe_trades(&mut self, product_symbol: &str) -> Result<String> {
         let futures = matches!(self.market, KucoinMarket::Futures);
-        let symbol = normalize_symbol(product_symbol, futures)?;
+        let symbol = self.exchange_symbol(product_symbol, futures)?;
         let topic = if futures {
             format!("/contractMarket/execution:{symbol}")
         } else {
@@ -162,7 +184,7 @@ impl KucoinPublicWebSocket {
 
     pub async fn subscribe_orderbook(&mut self, product_symbol: &str) -> Result<String> {
         let futures = matches!(self.market, KucoinMarket::Futures);
-        let symbol = normalize_symbol(product_symbol, futures)?;
+        let symbol = self.exchange_symbol(product_symbol, futures)?;
         let topic = if futures {
             format!("/contractMarket/level2:{symbol}")
         } else {
@@ -177,7 +199,7 @@ impl KucoinPublicWebSocket {
         interval: &str,
     ) -> Result<String> {
         let futures = matches!(self.market, KucoinMarket::Futures);
-        let symbol = normalize_symbol(product_symbol, futures)?;
+        let symbol = self.exchange_symbol(product_symbol, futures)?;
         let interval = normalize_interval(interval, futures)?;
         let topic = if futures {
             format!("/contractMarket/limitCandle:{symbol}_{interval}")

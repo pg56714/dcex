@@ -17,10 +17,10 @@ def test_sync_swap_market_and_commission_wrappers() -> None:
     """Synchronous BingX methods pass market and fee parameters to Rust."""
     market = object.__new__(MarketHTTP)
     market._native_public = Mock(return_value={"code": 0})
-    market.get_swap_premium_index("BTC-USDT-SWAP")
-    market.get_swap_funding_rate("BTC-USDT-SWAP", 1000, 2000, 10)
-    market.get_swap_book_ticker("BTC-USDT-SWAP")
-    market.get_swap_trading_rules("BTC-USDT-SWAP")
+    market.get_swap_premium_index("BTC-USDT")
+    market.get_swap_funding_rate("BTC-USDT", 1000, 2000, 10)
+    market.get_swap_book_ticker("BTC-USDT")
+    market.get_swap_trading_rules("BTC-USDT")
     calls = market._native_public.call_args_list
     assert [call.args[0] for call in calls] == [
         "get_swap_premium_index",
@@ -29,7 +29,7 @@ def test_sync_swap_market_and_commission_wrappers() -> None:
         "get_swap_trading_rules",
     ]
     assert calls[1].args[1] == [
-        ("product_symbol", "BTC-USDT-SWAP"),
+        ("product_symbol", "BTC-USDT"),
         ("start_time", "1000"),
         ("end_time", "2000"),
         ("limit", "10"),
@@ -51,8 +51,8 @@ def test_async_swap_market_and_commission_wrappers() -> None:
         market._native_public = AsyncMock(return_value={"code": 0})
         await market.get_swap_premium_index()
         await market.get_swap_funding_rate()
-        await market.get_swap_book_ticker("BTC-USDT-SWAP")
-        await market.get_swap_trading_rules("BTC-USDT-SWAP")
+        await market.get_swap_book_ticker("BTC-USDT")
+        await market.get_swap_trading_rules("BTC-USDT")
         assert [call.args[0] for call in market._native_public.call_args_list] == [
             "get_swap_premium_index",
             "get_swap_funding_rate",
@@ -78,7 +78,7 @@ def test_bingx_native_swap_queries_reach_http() -> None:
             "get_swap_book_ticker",
             "get_swap_trading_rules",
         ):
-            public.public_request_json(method, [("product_symbol", "BTC-USDT-SWAP")])
+            public.public_request_json(method, [("product_symbol", "BTC-USDT")])
         private = native.BingxHttpClient(
             api_key="api-key", api_secret="secret", timeout=10, base_url=base_url
         )

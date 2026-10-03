@@ -5,10 +5,6 @@ crate::exchanges::impl_exchange_method_wrappers! {
     public [
     ];
     private [
-        classic_p2p_get_p2_p_merchant_list(),
-        classic_p2p_get_merchant_information(),
-        classic_p2p_get_p2_p_adv_list(start_time => "startTime", status => "status", side => "side", coin => "coin", fiat => "fiat"),
-        classic_p2p_get_p2_p_order_list(),
         classic_tax_get_p2_p_account_record(start_time => "startTime", end_time => "endTime"),
         p2p_ad_management_get_ad_list(token => "token", fiat => "fiat", side => "side", page_num => "pageNum", limit => "limit"),
         p2p_ad_management_get_exchange_rate(token => "token", fiat => "fiat"),

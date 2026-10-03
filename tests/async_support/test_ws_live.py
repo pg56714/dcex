@@ -140,7 +140,8 @@ PUBLIC_WS_SPECS = (
     WebSocketSpec(
         name="bingx-swap",
         factory=lambda: bingx.public(market="swap", timeout=LIVE_WS_TIMEOUT),
-        subscribe=lambda ws: ws.subscribe_trades("BTC-USDT-SWAP"),
+        # BingX swap display names need a product table; use the official symbol.
+        subscribe=lambda ws: ws.subscribe_trades("BTC-USDT"),
     ),
     WebSocketSpec(
         name="bitget",

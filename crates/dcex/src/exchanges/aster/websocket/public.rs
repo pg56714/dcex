@@ -135,7 +135,9 @@ impl AsterPublicWebSocket {
     }
 
     fn stream_symbol(&self, product_symbol: &str) -> Result<String> {
-        let symbol = self.client.exchange_symbol(product_symbol)?;
+        let symbol = self
+            .client
+            .exchange_symbol_for(product_symbol, self.market)?;
         normalize_stream_symbol(&symbol)
     }
 

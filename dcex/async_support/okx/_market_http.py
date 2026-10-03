@@ -5,7 +5,6 @@ from typing import Any
 from dcex._schema_codec import normalize_params
 
 from ..._native_http import request_native_json_async
-from ...utils.common import Common
 from ._http_manager import HTTPManager
 
 
@@ -73,15 +72,6 @@ class MarketHTTP(HTTPManager):
         self._store_response_headers(response)
         return data
 
-    def _exchange_symbol(self, product_symbol: str) -> str:
-        """Map product symbol through PTM when available."""
-        if hasattr(self, "ptm"):
-            return self.ptm.get_exchange_symbol(Common.OKX, product_symbol)
-        parts = product_symbol.split("-")
-        if len(parts) >= 3:
-            return f"{parts[0]}-{parts[1]}" if parts[2] == "SPOT" else product_symbol
-        return product_symbol
-
     @staticmethod
     def _params(**kwargs: object) -> list[tuple[str, str]]:
         """Convert optional Python arguments into native string pairs."""
@@ -106,7 +96,7 @@ class MarketHTTP(HTTPManager):
         return await self._native_public(
             "get_candles_ticks",
             self._params(
-                instId=self._exchange_symbol(product_symbol),
+                instId=product_symbol,
                 bar=bar,
                 after=after,
                 before=before,
@@ -123,7 +113,7 @@ class MarketHTTP(HTTPManager):
         """Get order book data."""
         return await self._native_public(
             "get_orderbook",
-            self._params(instId=self._exchange_symbol(product_symbol), sz=sz),
+            self._params(instId=product_symbol, sz=sz),
         )
 
     async def get_tickers(
@@ -145,7 +135,7 @@ class MarketHTTP(HTTPManager):
         """Get public trades data."""
         return await self._native_public(
             "get_public_trades",
-            self._params(instId=self._exchange_symbol(product_symbol), limit=limit),
+            self._params(instId=product_symbol, limit=limit),
         )
 
     async def get_option_family_trades(self, instFamily: str) -> dict[str, Any]:

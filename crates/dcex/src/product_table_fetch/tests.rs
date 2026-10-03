@@ -1,10 +1,10 @@
 use super::exchanges::{
-    arcus_market_info, backpack_rfq_market_info, binance_coin_futures_market_info,
-    binance_equity_market_info, binance_option_market_info, bitget_uta_futures_market_info,
-    bybit_option_expiry, bybit_option_market_info, hyperliquid_perpetual_market_info,
-    kucoin_futures_market_info, mexc_contract_market_info, mexc_contract_pair,
-    mexc_spot_market_info, okx_market_info, okx_option_market_info, okx_unlisted_option_family,
-    option_product_symbol, validate_bingx_products,
+    append_hyperliquid_spot_rows, arcus_market_info, backpack_rfq_market_info,
+    binance_coin_futures_market_info, binance_equity_market_info, binance_option_market_info,
+    bitget_uta_futures_market_info, bybit_option_expiry, bybit_option_market_info,
+    hyperliquid_perpetual_market_info, kucoin_futures_market_info, mexc_contract_market_info,
+    mexc_contract_pair, mexc_spot_market_info, okx_market_info, okx_option_market_info,
+    okx_unlisted_option_family, option_product_symbol, validate_bingx_products,
 };
 use super::*;
 use crate::product_table::MarketInfo;
@@ -123,7 +123,21 @@ fn bingx_swap_quantities_are_base_units_not_minimum_lots() {
         let row = super::exchanges::bingx_swap_market_info(&market).expect("market");
         assert_eq!(row.size_per_contract, "1");
         assert_eq!(row.min_size, minimum);
+        assert_eq!(row.size_precision, decimal_precision(precision));
+        assert_eq!(row.price_precision, "0.0001");
     }
+}
+
+#[test]
+fn decimal_place_counts_map_to_steps() {
+    assert_eq!(decimal_precision_or_zero(Some(0)), "1");
+    assert_eq!(decimal_precision_or_zero(Some(2)), "0.01");
+    assert_eq!(decimal_precision_or_zero(None), "0");
+    let doge =
+        serde_json::json!({"symbol": "DOGE-USDT", "quantityPrecision": 0, "pricePrecision": 5});
+    let row = super::exchanges::bingx_swap_market_info(&doge).expect("market");
+    assert_eq!(row.size_precision, "1");
+    assert_eq!(row.price_precision, "1e-05");
 }
 
 #[test]
@@ -196,6 +210,7 @@ fn product_table_indexes_non_text_exchange_symbols() {
             quote_currency: "USD".to_string(),
             min_notional: "0".to_string(),
             size_per_contract: "1".to_string(),
+            ..MarketInfo::default()
         },
         MarketInfo {
             exchange: "lighter".to_string(),
@@ -210,6 +225,7 @@ fn product_table_indexes_non_text_exchange_symbols() {
             quote_currency: "USDC".to_string(),
             min_notional: "0".to_string(),
             size_per_contract: "1".to_string(),
+            ..MarketInfo::default()
         },
     ]);
 
@@ -457,6 +473,37 @@ fn okx_xperp_keeps_futures_api_type_and_contract_value() {
     assert_eq!(row.exchange_type, "FUTURES");
     assert_eq!(row.min_size, "0.01");
     assert_eq!(row.size_per_contract, "0.1");
+}
+
+#[test]
+fn hyperliquid_price_precision_uses_max_decimals_minus_size_decimals() {
+    let btc =
+        hyperliquid_perpetual_market_info(&serde_json::json!({"name": "BTC", "szDecimals": 5}), 0)
+            .expect("BTC perpetual");
+    assert_eq!(btc.price_precision, "0.1");
+    assert_eq!(btc.size_precision, "1e-05");
+    assert_eq!(btc.min_size, "1e-05");
+
+    let spot = crate::exchange::ValidatedResponse {
+        status: 200,
+        headers: Default::default(),
+        data: serde_json::json!({
+            "tokens": [
+                {"name": "PURR", "index": 1, "szDecimals": 0},
+                {"name": "USDC", "index": 0, "szDecimals": 8}
+            ],
+            "universe": [{"name": "PURR/USDC", "tokens": [1, 0], "index": 0}]
+        }),
+    };
+    let mut rows = Vec::new();
+    append_hyperliquid_spot_rows(&mut rows, &spot).expect("spot rows");
+    let [purr] = rows.as_slice() else {
+        panic!("one spot row")
+    };
+    assert_eq!(purr.product_symbol, "PURR-USDC-SPOT");
+    assert_eq!(purr.price_precision, "1e-08");
+    assert_eq!(purr.size_precision, "1");
+    assert_eq!(purr.min_size, "1");
 }
 
 #[test]

@@ -102,7 +102,7 @@ type Case = (
     &'static str,
 );
 
-const SWAP: (&str, &str) = ("product_symbol", "BTC-USDT-SWAP");
+const SWAP: (&str, &str) = ("product_symbol", "BTC-USDT");
 const SPOT: (&str, &str) = ("product_symbol", "BTC-USDT-SPOT");
 
 /// (dispatch name, params, HTTP method, documented path)
@@ -1099,7 +1099,7 @@ async fn swap_trading_controls_use_documented_parameters() {
         .private_request(
             "get_swap_open_order",
             vec![
-                ("product_symbol".into(), "BTC-USDT-SWAP".into()),
+                ("product_symbol".into(), "BTC-USDT".into()),
                 ("orderId".into(), "123".into()),
             ],
         )
@@ -1172,7 +1172,7 @@ async fn swap_trading_controls_use_documented_parameters() {
         .private_request(
             "adjust_swap_position_margin",
             vec![
-                ("product_symbol".into(), "BTC-USDT-SWAP".into()),
+                ("product_symbol".into(), "BTC-USDT".into()),
                 ("amount".into(), "2".into()),
                 ("type_".into(), "2".into()),
                 ("positionSide".into(), "LONG".into()),
@@ -1205,7 +1205,7 @@ async fn swap_trading_controls_use_documented_parameters() {
         .private_request(
             "amend_swap_order",
             vec![
-                ("product_symbol".into(), "BTC-USDT-SWAP".into()),
+                ("product_symbol".into(), "BTC-USDT".into()),
                 ("quantity".into(), "1".into()),
                 ("clientOrderId".into(), "amend-me".into()),
             ],
@@ -1236,7 +1236,7 @@ async fn swap_trading_controls_use_documented_parameters() {
         .private_request(
             "place_swap_twap_order",
             vec![
-                ("product_symbol".into(), "BTC-USDT-SWAP".into()),
+                ("product_symbol".into(), "BTC-USDT".into()),
                 ("side".into(), "BUY".into()),
                 ("positionSide".into(), "LONG".into()),
                 ("priceType".into(), "constant".into()),
@@ -1460,7 +1460,7 @@ async fn swap_trading_controls_use_documented_parameters() {
         .private_request(
             "get_swap_fill_history",
             vec![
-                ("product_symbol".into(), "BTC-USDT-SWAP".into()),
+                ("product_symbol".into(), "BTC-USDT".into()),
                 ("startTs".into(), "1700000000000".into()),
                 ("endTs".into(), "1700000100000".into()),
             ],
@@ -1495,7 +1495,7 @@ async fn swap_trading_controls_use_documented_parameters() {
         .private_request(
             "get_swap_position_history",
             vec![
-                ("product_symbol".into(), "BTC-USDT-SWAP".into()),
+                ("product_symbol".into(), "BTC-USDT".into()),
                 ("startTs".into(), "1700000000000".into()),
                 ("endTs".into(), "1700000100000".into()),
             ],
@@ -1530,7 +1530,7 @@ async fn swap_trading_controls_use_documented_parameters() {
         .private_request(
             "get_swap_margin_history",
             vec![
-                ("product_symbol".into(), "BTC-USDT-SWAP".into()),
+                ("product_symbol".into(), "BTC-USDT".into()),
                 ("positionId".into(), "123".into()),
                 ("startTime".into(), "1700000000000".into()),
                 ("endTime".into(), "1700000100000".into()),
@@ -1570,7 +1570,7 @@ async fn swap_trading_controls_use_documented_parameters() {
     client
         .private_request(
             "get_swap_maintenance_margin_ratios",
-            vec![("product_symbol".into(), "BTC-USDT-SWAP".into())],
+            vec![("product_symbol".into(), "BTC-USDT".into())],
         )
         .await
         .expect("get_swap_maintenance_margin_ratios");
@@ -1592,7 +1592,7 @@ async fn swap_trading_controls_use_documented_parameters() {
         .private_request(
             "set_swap_auto_add_margin",
             vec![
-                ("product_symbol".into(), "BTC-USDT-SWAP".into()),
+                ("product_symbol".into(), "BTC-USDT".into()),
                 ("positionId".into(), "123".into()),
                 ("functionSwitch".into(), "true".into()),
             ],
@@ -1663,7 +1663,7 @@ fn coin_swap_and_oco_routes_match_official_paths() {
         (
             true,
             "get_swap_historical_trades",
-            &[("product_symbol", "BTC-USDT-SWAP")],
+            &[("product_symbol", "BTC-USDT")],
             "GET",
             "/openApi/swap/v1/market/historicalTrades",
         ),
@@ -1673,7 +1673,7 @@ fn coin_swap_and_oco_routes_match_official_paths() {
             &[
                 ("confirm", "true"),
                 ("type_", "Reverse"),
-                ("product_symbol", "BTC-USDT-SWAP"),
+                ("product_symbol", "BTC-USDT"),
             ],
             "POST",
             "/openApi/swap/v1/trade/reverse",
@@ -1695,7 +1695,7 @@ fn coin_swap_and_oco_routes_match_official_paths() {
         (
             false,
             "get_standard_futures_orders",
-            &[("product_symbol", "BTC-USDT-SWAP")],
+            &[("product_symbol", "BTC-USDT")],
             "GET",
             "/openApi/contract/v1/allOrders",
         ),
@@ -1807,49 +1807,49 @@ fn coin_swap_and_oco_routes_match_official_paths() {
         (
             true,
             "get_swap_price_ticker",
-            &[("product_symbol", "BTC-USDT-SWAP")],
+            &[("product_symbol", "BTC-USDT")],
             "GET",
             "/openApi/swap/v1/ticker/price",
         ),
         (
             true,
             "get_coin_swap_contracts",
-            &[("product_symbol", "BTC-USD-SWAP")],
+            &[("product_symbol", "BTC-USD")],
             "GET",
             "/openApi/cswap/v1/market/contracts",
         ),
         (
             true,
             "get_coin_swap_orderbook",
-            &[("product_symbol", "BTC-USD-SWAP")],
+            &[("product_symbol", "BTC-USD")],
             "GET",
             "/openApi/cswap/v1/market/depth",
         ),
         (
             true,
             "get_coin_swap_kline",
-            &[("product_symbol", "BTC-USD-SWAP"), ("interval", "1m")],
+            &[("product_symbol", "BTC-USD"), ("interval", "1m")],
             "GET",
             "/openApi/cswap/v1/market/klines",
         ),
         (
             true,
             "get_coin_swap_premium_index",
-            &[("product_symbol", "BTC-USD-SWAP")],
+            &[("product_symbol", "BTC-USD")],
             "GET",
             "/openApi/cswap/v1/market/premiumIndex",
         ),
         (
             true,
             "get_coin_swap_open_interest",
-            &[("product_symbol", "BTC-USD-SWAP")],
+            &[("product_symbol", "BTC-USD")],
             "GET",
             "/openApi/cswap/v1/market/openInterest",
         ),
         (
             true,
             "get_coin_swap_ticker",
-            &[("product_symbol", "BTC-USD-SWAP")],
+            &[("product_symbol", "BTC-USD")],
             "GET",
             "/openApi/cswap/v1/market/ticker",
         ),
@@ -1857,7 +1857,7 @@ fn coin_swap_and_oco_routes_match_official_paths() {
             false,
             "place_coin_swap_order",
             &[
-                ("product_symbol", "BTC-USD-SWAP"),
+                ("product_symbol", "BTC-USD"),
                 ("side", "SELL"),
                 ("type_", "MARKET"),
                 ("quantity", "1"),
@@ -1868,42 +1868,42 @@ fn coin_swap_and_oco_routes_match_official_paths() {
         (
             false,
             "cancel_coin_swap_order",
-            &[("product_symbol", "BTC-USD-SWAP"), ("orderId", "1")],
+            &[("product_symbol", "BTC-USD"), ("orderId", "1")],
             "DELETE",
             "/openApi/cswap/v1/trade/cancelOrder",
         ),
         (
             false,
             "cancel_coin_swap_all_orders",
-            &[("product_symbol", "BTC-USD-SWAP")],
+            &[("product_symbol", "BTC-USD")],
             "POST",
             "/openApi/cswap/v1/trade/allOpenOrders",
         ),
         (
             false,
             "close_coin_swap_all_positions",
-            &[("product_symbol", "BTC-USD-SWAP")],
+            &[("product_symbol", "BTC-USD")],
             "POST",
             "/openApi/cswap/v1/trade/closeAllPositions",
         ),
         (
             false,
             "get_coin_swap_open_orders",
-            &[("product_symbol", "BTC-USD-SWAP")],
+            &[("product_symbol", "BTC-USD")],
             "GET",
             "/openApi/cswap/v1/trade/openOrders",
         ),
         (
             false,
             "get_coin_swap_order",
-            &[("product_symbol", "BTC-USD-SWAP"), ("orderId", "1")],
+            &[("product_symbol", "BTC-USD"), ("orderId", "1")],
             "GET",
             "/openApi/cswap/v1/trade/orderDetail",
         ),
         (
             false,
             "get_coin_swap_order_history",
-            &[("limit", "20"), ("product_symbol", "BTC-USD-SWAP")],
+            &[("limit", "20"), ("product_symbol", "BTC-USD")],
             "GET",
             "/openApi/cswap/v1/trade/orderHistory",
         ),
@@ -1917,14 +1917,14 @@ fn coin_swap_and_oco_routes_match_official_paths() {
         (
             false,
             "get_coin_swap_force_orders",
-            &[("product_symbol", "BTC-USD-SWAP")],
+            &[("product_symbol", "BTC-USD")],
             "GET",
             "/openApi/cswap/v1/trade/forceOrders",
         ),
         (
             false,
             "get_coin_swap_leverage",
-            &[("product_symbol", "BTC-USD-SWAP")],
+            &[("product_symbol", "BTC-USD")],
             "GET",
             "/openApi/cswap/v1/trade/leverage",
         ),
@@ -1932,7 +1932,7 @@ fn coin_swap_and_oco_routes_match_official_paths() {
             false,
             "set_coin_swap_leverage",
             &[
-                ("product_symbol", "BTC-USD-SWAP"),
+                ("product_symbol", "BTC-USD"),
                 ("side", "LONG"),
                 ("leverage", "5"),
             ],
@@ -1942,17 +1942,14 @@ fn coin_swap_and_oco_routes_match_official_paths() {
         (
             false,
             "get_coin_swap_margin_type",
-            &[("product_symbol", "BTC-USD-SWAP")],
+            &[("product_symbol", "BTC-USD")],
             "GET",
             "/openApi/cswap/v1/trade/marginType",
         ),
         (
             false,
             "set_coin_swap_margin_type",
-            &[
-                ("product_symbol", "BTC-USD-SWAP"),
-                ("marginType", "ISOLATED"),
-            ],
+            &[("product_symbol", "BTC-USD"), ("marginType", "ISOLATED")],
             "POST",
             "/openApi/cswap/v1/trade/marginType",
         ),
@@ -1960,7 +1957,7 @@ fn coin_swap_and_oco_routes_match_official_paths() {
             false,
             "adjust_coin_swap_position_margin",
             &[
-                ("product_symbol", "BTC-USD-SWAP"),
+                ("product_symbol", "BTC-USD"),
                 ("positionSide", "LONG"),
                 ("amount", "1"),
                 ("type_", "1"),
@@ -1978,14 +1975,14 @@ fn coin_swap_and_oco_routes_match_official_paths() {
         (
             false,
             "get_coin_swap_balance",
-            &[("product_symbol", "BTC-USD-SWAP")],
+            &[("product_symbol", "BTC-USD")],
             "GET",
             "/openApi/cswap/v1/user/balance",
         ),
         (
             false,
             "get_coin_swap_positions",
-            &[("product_symbol", "BTC-USD-SWAP")],
+            &[("product_symbol", "BTC-USD")],
             "GET",
             "/openApi/cswap/v1/user/positions",
         ),
@@ -2088,7 +2085,7 @@ fn batch_replacement_keeps_json_number_quantity_for_conditional_order() {
         url,
     )
     .unwrap();
-    let orders = r#"[{"product_symbol":"BTC-USDT-SWAP","cancelOrderId":"1","side":"SELL","positionSide":"BOTH","type":"STOP_MARKET","stopPrice":90,"quantity":1,"cancelReplaceMode":"STOP_ON_FAILURE"}]"#;
+    let orders = r#"[{"product_symbol":"BTC-USDT","cancelOrderId":"1","side":"SELL","positionSide":"BOTH","type":"STOP_MARKET","stopPrice":90,"quantity":1,"cancelReplaceMode":"STOP_ON_FAILURE"}]"#;
     block_on(async move {
         client
             .private_request(
@@ -2145,7 +2142,7 @@ fn coin_swap_attached_tpsl_preserves_fractional_json_numbers() {
         &client,
         "place_coin_swap_order",
         &[
-            ("product_symbol", "BTC-USD-SWAP"),
+            ("product_symbol", "BTC-USD"),
             ("side", "BUY"),
             ("type_", "MARKET"),
             ("quantity", "1"),

@@ -5,7 +5,6 @@
     "path": "/api/v2/tax/spot-record",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "coin",
@@ -57,7 +56,6 @@
     "path": "/api/v2/tax/future-record",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "productType",
@@ -126,7 +124,6 @@
     "path": "/api/v2/tax/margin-record",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "marginType",
@@ -195,7 +192,6 @@
     "path": "/api/v3/tax/records",
     "public": false,
     "confirm": false,
-    "scoped": false,
     "fields": [
       {
         "wire": "bizType",

@@ -39,6 +39,22 @@ impl BingxClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         crate::exchanges::input_contracts::pairs("bingx", method_name, &params)?;
+        let mut scoped = self.clone();
+        scoped.symbol_product_type = Some(
+            if method_name.contains("_spot_") || method_name.ends_with("_spot") {
+                "spot"
+            } else {
+                "swap"
+            },
+        );
+        scoped.public_request_scoped(method_name, params).await
+    }
+
+    async fn public_request_scoped(
+        &self,
+        method_name: &str,
+        params: Vec<(String, String)>,
+    ) -> Result<ValidatedResponse> {
         let params = BingxParams::from_pairs(params);
         if let Some(response) = self.catalog_request(method_name, &params, true).await? {
             return Ok(response);

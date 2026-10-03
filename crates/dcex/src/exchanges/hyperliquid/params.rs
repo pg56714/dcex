@@ -182,15 +182,16 @@ pub(super) fn is_canonical_product_symbol(product_symbol: &str) -> bool {
         .any(|suffix| normalized.ends_with(suffix))
 }
 
-pub(super) fn fallback_coin(product_symbol: &str) -> String {
+pub(super) fn fallback_coin(product_symbol: &str) -> Result<String> {
     if !is_canonical_product_symbol(product_symbol) {
-        return product_symbol.to_string();
+        return Ok(product_symbol.to_string());
     }
-    product_symbol
-        .split('-')
-        .next()
-        .unwrap_or(product_symbol)
-        .to_ascii_uppercase()
+    match product_symbol.split('-').collect::<Vec<_>>().as_slice() {
+        [coin, "USD" | "USDC", "SWAP"] if !coin.is_empty() => Ok((*coin).to_string()),
+        _ => Err(DcexError::InvalidInput(
+            "cannot safely resolve Hyperliquid coin; load the product table or pass the official raw coin".into(),
+        )),
+    }
 }
 
 pub(in crate::exchanges::hyperliquid) fn invalid(

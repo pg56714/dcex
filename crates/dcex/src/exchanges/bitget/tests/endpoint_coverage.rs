@@ -129,14 +129,6 @@ fn base_params() -> Vec<(String, String)> {
     .collect()
 }
 
-fn params_for(name: &str) -> Vec<(String, String)> {
-    let mut params = base_params();
-    if name == "get_savings_records" {
-        params.retain(|(key, _)| key != "orderType");
-    }
-    params
-}
-
 /// (dispatch name, HTTP method, documented path)
 const PUBLIC_ROUTES: &[(&str, &str, &str)] = &[
     ("get_spot_coins", "GET", "/api/v2/spot/public/coins"),
@@ -176,34 +168,6 @@ const PUBLIC_ROUTES: &[(&str, &str, &str)] = &[
 /// (dispatch name, HTTP method, documented path)
 const PRIVATE_ROUTES: &[(&str, &str, &str)] = &[
     // Account / fees / transfers.
-    ("get_spot_fee_rates", "GET", "/api/v2/common/trade-rate"),
-    ("get_futures_fee_rates", "GET", "/api/v2/common/trade-rate"),
-    (
-        "get_all_account_balance",
-        "GET",
-        "/api/v2/account/all-account-balance",
-    ),
-    (
-        "get_funding_assets",
-        "GET",
-        "/api/v2/account/funding-assets",
-    ),
-    ("transfer", "POST", "/api/v2/spot/wallet/transfer"),
-    (
-        "get_transfer_records",
-        "GET",
-        "/api/v2/spot/account/transferRecords",
-    ),
-    (
-        "get_transferable_coins",
-        "GET",
-        "/api/v2/spot/wallet/transfer-coin-info",
-    ),
-    (
-        "get_deposit_records",
-        "GET",
-        "/api/v2/spot/wallet/deposit-records",
-    ),
     ("get_uta_account_assets", "GET", "/api/v3/account/assets"),
     (
         "get_reality_orderbook",
@@ -235,46 +199,7 @@ const PRIVATE_ROUTES: &[(&str, &str, &str)] = &[
     ),
     ("set_uta_leverage", "POST", "/api/v3/account/set-leverage"),
     ("set_uta_hold_mode", "POST", "/api/v3/account/set-hold-mode"),
-    (
-        "set_futures_margin_mode",
-        "POST",
-        "/api/v2/mix/account/set-margin-mode",
-    ),
     // Earn.
-    (
-        "get_earn_account_assets",
-        "GET",
-        "/api/v2/earn/account/assets",
-    ),
-    ("get_savings_account", "GET", "/api/v2/earn/savings/account"),
-    (
-        "get_savings_products",
-        "GET",
-        "/api/v2/earn/savings/product",
-    ),
-    ("get_savings_assets", "GET", "/api/v2/earn/savings/assets"),
-    ("get_savings_records", "GET", "/api/v2/earn/savings/records"),
-    (
-        "get_savings_subscription_info",
-        "GET",
-        "/api/v2/earn/savings/subscribe-info",
-    ),
-    (
-        "subscribe_savings",
-        "POST",
-        "/api/v2/earn/savings/subscribe",
-    ),
-    (
-        "get_savings_subscription_result",
-        "GET",
-        "/api/v2/earn/savings/subscribe-result",
-    ),
-    ("redeem_savings", "POST", "/api/v2/earn/savings/redeem"),
-    (
-        "get_savings_redemption_result",
-        "GET",
-        "/api/v2/earn/savings/redeem-result",
-    ),
     (
         "get_elite_earn_products",
         "GET",
@@ -455,7 +380,7 @@ async fn public_dispatch_names_reach_documented_routes() {
     let client = signed_client(url);
     for (name, method, path) in PUBLIC_ROUTES {
         client
-            .public_request(name, params_for(name))
+            .public_request(name, base_params())
             .await
             .unwrap_or_else(|error| panic!("{name}: {error}"));
         let recorded = next(&receiver, name);
@@ -470,7 +395,7 @@ async fn private_dispatch_names_reach_documented_routes() {
     let client = signed_client(url);
     for (name, method, path) in PRIVATE_ROUTES {
         client
-            .private_request(name, params_for(name))
+            .private_request(name, base_params())
             .await
             .unwrap_or_else(|error| panic!("{name}: {error}"));
         let recorded = next(&receiver, name);
@@ -500,28 +425,6 @@ async fn unknown_dispatch_names_are_rejected_before_transport() {
             .to_string()
             .contains("unsupported Bitget private method")
     );
-}
-
-#[tokio::test]
-async fn fee_rate_routes_select_business_line() {
-    let (url, receiver) = recording_server();
-    let client = signed_client(url);
-    for (name, business) in [
-        ("get_spot_fee_rates", "businessType=spot"),
-        ("get_futures_fee_rates", "businessType=mix"),
-    ] {
-        client
-            .private_request(name, params_for(name))
-            .await
-            .expect("fee rate");
-        let recorded = next(&receiver, name);
-        assert!(recorded.query.contains(business), "{}", recorded.query);
-        assert!(
-            recorded.query.contains("symbol=BTCUSDT"),
-            "{}",
-            recorded.query
-        );
-    }
 }
 
 #[tokio::test]
@@ -591,13 +494,9 @@ async fn uta_routes_accept_native_symbol_and_forward_protection_fields() {
 async fn required_parameters_fail_before_transport() {
     let client = signed_client("http://127.0.0.1:9".to_string());
     for name in [
-        "set_futures_margin_mode",
         "get_uta_positions",
         "get_uta_history_orders",
         "place_uta_order",
-        "get_deposit_records",
-        "transfer",
-        "get_transferable_coins",
     ] {
         assert!(
             client.private_request(name, Vec::new()).await.is_err(),
@@ -943,306 +842,6 @@ async fn ordinary_risk_routes_preserve_parameters_and_authentication() {
             true,
             &[],
             "{}",
-        ),
-        (
-            "get_futures_estimated_open_count",
-            "GET",
-            "/api/v2/mix/account/open-count",
-            false,
-            &[
-                ("product_symbol", "BTC-USDT-SWAP"),
-                ("productType", "USDT-FUTURES"),
-                ("marginCoin", "USDT"),
-                ("openAmount", "10"),
-                ("openPrice", "100"),
-            ],
-            "{\"symbol\":\"BTCUSDT\",\"productType\":\"USDT-FUTURES\",\"marginCoin\":\"USDT\",\"openAmount\":\"10\",\"openPrice\":\"100\"}",
-        ),
-        (
-            "get_futures_liquidation_price",
-            "GET",
-            "/api/v2/mix/account/liq-price",
-            false,
-            &[
-                ("product_symbol", "BTC-USDT-SWAP"),
-                ("productType", "USDT-FUTURES"),
-                ("marginCoin", "USDT"),
-                ("posSide", "long"),
-                ("orderType", "limit"),
-                ("openAmount", "10"),
-                ("openPrice", "100"),
-            ],
-            "{\"symbol\":\"BTCUSDT\",\"productType\":\"USDT-FUTURES\",\"marginCoin\":\"USDT\",\"posSide\":\"long\",\"orderType\":\"limit\",\"openAmount\":\"10\",\"openPrice\":\"100\"}",
-        ),
-        (
-            "get_futures_interest_history",
-            "GET",
-            "/api/v2/mix/account/interest-history",
-            false,
-            &[
-                ("productType", "USDT-FUTURES"),
-                ("startTime", "1700000000000"),
-                ("endTime", "1700000001000"),
-            ],
-            "{\"productType\":\"USDT-FUTURES\",\"startTime\":\"1700000000000\",\"endTime\":\"1700000001000\"}",
-        ),
-        (
-            "set_futures_all_leverage",
-            "POST",
-            "/api/v2/mix/account/set-all-leverage",
-            false,
-            &[("productType", "USDT-FUTURES"), ("leverage", "5")],
-            "{\"productType\":\"USDT-FUTURES\",\"leverage\":\"5\"}",
-        ),
-        (
-            "set_futures_auto_margin",
-            "POST",
-            "/api/v2/mix/account/set-auto-margin",
-            false,
-            &[
-                ("product_symbol", "BTC-USDT-SWAP"),
-                ("autoMargin", "on"),
-                ("marginCoin", "USDT"),
-                ("holdSide", "long"),
-            ],
-            "{\"symbol\":\"BTCUSDT\",\"autoMargin\":\"on\",\"marginCoin\":\"USDT\",\"holdSide\":\"long\"}",
-        ),
-        (
-            "set_futures_asset_mode",
-            "POST",
-            "/api/v2/mix/account/set-asset-mode",
-            false,
-            &[
-                ("confirm", "true"),
-                ("productType", "USDT-FUTURES"),
-                ("assetMode", "single"),
-            ],
-            "{\"productType\":\"USDT-FUTURES\",\"assetMode\":\"single\"}",
-        ),
-        (
-            "convert_futures_union_asset",
-            "POST",
-            "/api/v2/mix/account/union-convert",
-            false,
-            &[("coin", "USDT"), ("amount", "1")],
-            "{\"coin\":\"USDT\",\"amount\":\"1\"}",
-        ),
-        (
-            "get_futures_union_transfer_limits",
-            "GET",
-            "/api/v2/mix/account/transfer-limits",
-            false,
-            &[("coin", "USDT")],
-            "{\"coin\":\"USDT\"}",
-        ),
-        (
-            "get_futures_union_config",
-            "GET",
-            "/api/v2/mix/account/union-config",
-            false,
-            &[],
-            "{}",
-        ),
-        (
-            "get_futures_isolated_symbols",
-            "GET",
-            "/api/v2/mix/account/isolated-symbols",
-            false,
-            &[("productType", "USDT-FUTURES")],
-            "{\"productType\":\"USDT-FUTURES\"}",
-        ),
-        (
-            "reverse_futures_position",
-            "POST",
-            "/api/v2/mix/order/click-backhand",
-            false,
-            &[
-                ("confirm", "true"),
-                ("product_symbol", "BTC-USDT-SWAP"),
-                ("marginCoin", "USDT"),
-                ("productType", "USDT-FUTURES"),
-                ("side", "buy"),
-            ],
-            "{\"symbol\":\"BTCUSDT\",\"marginCoin\":\"USDT\",\"productType\":\"USDT-FUTURES\",\"side\":\"buy\"}",
-        ),
-        (
-            "get_spot_sub_account_transfer_records",
-            "GET",
-            "/api/v2/spot/account/sub-main-trans-record",
-            false,
-            &[],
-            "{}",
-        ),
-        (
-            "transfer_spot_sub_account",
-            "POST",
-            "/api/v2/spot/wallet/subaccount-transfer",
-            false,
-            &[
-                ("fromType", "spot"),
-                ("toType", "spot"),
-                ("amount", "1"),
-                ("coin", "USDT"),
-                ("fromUserId", "1"),
-                ("toUserId", "2"),
-            ],
-            "{\"fromType\":\"spot\",\"toType\":\"spot\",\"amount\":\"1\",\"coin\":\"USDT\",\"fromUserId\":\"1\",\"toUserId\":\"2\"}",
-        ),
-        (
-            "get_cross_margin_risk_rate",
-            "GET",
-            "/api/v2/margin/crossed/account/risk-rate",
-            false,
-            &[],
-            "{}",
-        ),
-        (
-            "flash_repay_cross_margin_assets",
-            "POST",
-            "/api/v2/margin/crossed/account/flash-repay",
-            false,
-            &[],
-            "{}",
-        ),
-        (
-            "get_cross_margin_flash_repay_result",
-            "POST",
-            "/api/v2/margin/crossed/account/query-flash-repay-status",
-            false,
-            &[("idList", "[\"123\"]")],
-            "{\"idList\":[\"123\"]}",
-        ),
-        (
-            "get_cross_margin_interest_rate_limits",
-            "GET",
-            "/api/v2/margin/crossed/interest-rate-and-limit",
-            false,
-            &[("coin", "USDT")],
-            "{\"coin\":\"USDT\"}",
-        ),
-        (
-            "get_cross_margin_tiers",
-            "GET",
-            "/api/v2/margin/crossed/tier-data",
-            false,
-            &[("coin", "USDT")],
-            "{\"coin\":\"USDT\"}",
-        ),
-        (
-            "get_cross_margin_borrow_history",
-            "GET",
-            "/api/v2/margin/crossed/borrow-history",
-            false,
-            &[("startTime", "1700000000000")],
-            "{\"startTime\":\"1700000000000\"}",
-        ),
-        (
-            "get_cross_margin_repay_history",
-            "GET",
-            "/api/v2/margin/crossed/repay-history",
-            false,
-            &[("startTime", "1700000000000")],
-            "{\"startTime\":\"1700000000000\"}",
-        ),
-        (
-            "get_cross_margin_interest_history",
-            "GET",
-            "/api/v2/margin/crossed/interest-history",
-            false,
-            &[("startTime", "1700000000000")],
-            "{\"startTime\":\"1700000000000\"}",
-        ),
-        (
-            "get_cross_margin_liquidation_history",
-            "GET",
-            "/api/v2/margin/crossed/liquidation-history",
-            false,
-            &[("startTime", "1700000000000")],
-            "{\"startTime\":\"1700000000000\"}",
-        ),
-        (
-            "get_isolated_margin_risk_rate",
-            "GET",
-            "/api/v2/margin/isolated/account/risk-rate",
-            false,
-            &[],
-            "{}",
-        ),
-        (
-            "flash_repay_isolated_margin_assets",
-            "POST",
-            "/api/v2/margin/isolated/account/flash-repay",
-            false,
-            &[],
-            "{}",
-        ),
-        (
-            "get_isolated_margin_flash_repay_result",
-            "POST",
-            "/api/v2/margin/isolated/account/query-flash-repay-status",
-            false,
-            &[("idList", "[\"123\"]")],
-            "{\"idList\":[\"123\"]}",
-        ),
-        (
-            "get_isolated_margin_interest_rate_limits",
-            "GET",
-            "/api/v2/margin/isolated/interest-rate-and-limit",
-            false,
-            &[("product_symbol", "BTC-USDT-SWAP")],
-            "{\"symbol\":\"BTCUSDT\"}",
-        ),
-        (
-            "get_isolated_margin_tiers",
-            "GET",
-            "/api/v2/margin/isolated/tier-data",
-            false,
-            &[("product_symbol", "BTC-USDT-SWAP")],
-            "{\"symbol\":\"BTCUSDT\"}",
-        ),
-        (
-            "get_isolated_margin_borrow_history",
-            "GET",
-            "/api/v2/margin/isolated/borrow-history",
-            false,
-            &[
-                ("product_symbol", "BTC-USDT-SWAP"),
-                ("startTime", "1700000000000"),
-            ],
-            "{\"symbol\":\"BTCUSDT\",\"startTime\":\"1700000000000\"}",
-        ),
-        (
-            "get_isolated_margin_repay_history",
-            "GET",
-            "/api/v2/margin/isolated/repay-history",
-            false,
-            &[
-                ("product_symbol", "BTC-USDT-SWAP"),
-                ("startTime", "1700000000000"),
-            ],
-            "{\"symbol\":\"BTCUSDT\",\"startTime\":\"1700000000000\"}",
-        ),
-        (
-            "get_isolated_margin_interest_history",
-            "GET",
-            "/api/v2/margin/isolated/interest-history",
-            false,
-            &[
-                ("product_symbol", "BTC-USDT-SWAP"),
-                ("startTime", "1700000000000"),
-            ],
-            "{\"symbol\":\"BTCUSDT\",\"startTime\":\"1700000000000\"}",
-        ),
-        (
-            "get_isolated_margin_liquidation_history",
-            "GET",
-            "/api/v2/margin/isolated/liquidation-history",
-            false,
-            &[
-                ("product_symbol", "BTC-USDT-SWAP"),
-                ("startTime", "1700000000000"),
-            ],
-            "{\"symbol\":\"BTCUSDT\",\"startTime\":\"1700000000000\"}",
         ),
         (
             "get_uta_funding_rate_history",
@@ -1700,14 +1299,6 @@ async fn remaining_query_routes_preserve_parameters_and_authentication() {
             &[],
             "{}",
         ),
-        (
-            "get_all_trade_rates",
-            "GET",
-            "/api/v2/common/all-trade-rate",
-            false,
-            &[("businessType", "mix")],
-            "{\"businessType\":\"mix\"}",
-        ),
     ];
     for (name, method, path, public, params, expected) in cases {
         let params = params
@@ -1781,62 +1372,6 @@ async fn supplementary_routes_preserve_parameters_and_authentication() {
             false,
             &[],
             "{}",
-        ),
-        (
-            "get_futures_margin_mode_switch_quota",
-            "GET",
-            "/api/v2/mix/account/switch-union-usdt",
-            false,
-            &[],
-            "{}",
-        ),
-        (
-            "get_cross_margin_liquidation_orders",
-            "GET",
-            "/api/v2/margin/crossed/liquidation-order",
-            false,
-            &[],
-            "{}",
-        ),
-        (
-            "get_isolated_margin_liquidation_orders",
-            "GET",
-            "/api/v2/margin/isolated/liquidation-order",
-            false,
-            &[],
-            "{}",
-        ),
-        (
-            "set_spot_deposit_account",
-            "POST",
-            "/api/v2/spot/wallet/modify-deposit-account",
-            false,
-            &[("accountType", "spot"), ("coin", "USDT")],
-            "{\"accountType\":\"spot\",\"coin\":\"USDT\"}",
-        ),
-        (
-            "get_deposit_address",
-            "GET",
-            "/api/v2/spot/wallet/deposit-address",
-            false,
-            &[("coin", "USDT")],
-            "{\"coin\":\"USDT\"}",
-        ),
-        (
-            "get_sub_account_deposit_address",
-            "GET",
-            "/api/v2/spot/wallet/subaccount-deposit-address",
-            false,
-            &[("subUid", "2"), ("coin", "USDT")],
-            "{\"subUid\":\"2\",\"coin\":\"USDT\"}",
-        ),
-        (
-            "get_sub_account_deposit_records",
-            "GET",
-            "/api/v2/spot/wallet/subaccount-deposit-records",
-            false,
-            &[("subUid", "2")],
-            "{\"subUid\":\"2\"}",
         ),
         (
             "set_uta_deposit_account",
@@ -2082,68 +1617,6 @@ async fn remaining_routes_preserve_parameters_and_authentication() {
             "{\"subUid\":\"2\"}",
         ),
         (
-            "classic_create_virtual_subaccount",
-            "POST",
-            "/api/v2/user/create-virtual-subaccount",
-            false,
-            &[("subAccountList", "[\"traderab\"]")],
-            "{\"subAccountList\":[\"traderab\"]}",
-        ),
-        (
-            "classic_create_virtual_subaccount_apikey",
-            "POST",
-            "/api/v2/user/create-virtual-subaccount-apikey",
-            false,
-            &[
-                ("subAccountUid", "2"),
-                ("passphrase", "Trading123"),
-                ("label", "trading"),
-                ("permList", "[\"read\"]"),
-            ],
-            "{\"subAccountUid\":\"2\",\"passphrase\":\"Trading123\",\"label\":\"trading\",\"permList\":[\"read\"]}",
-        ),
-        (
-            "classic_modify_virtual_subaccount",
-            "POST",
-            "/api/v2/user/modify-virtual-subaccount",
-            false,
-            &[
-                ("subAccountUid", "2"),
-                ("permList", "[\"read\"]"),
-                ("status", "normal"),
-            ],
-            "{\"subAccountUid\":\"2\",\"permList\":[\"read\"],\"status\":\"normal\"}",
-        ),
-        (
-            "classic_modify_virtual_subaccount_apikey",
-            "POST",
-            "/api/v2/user/modify-virtual-subaccount-apikey",
-            false,
-            &[
-                ("subAccountUid", "2"),
-                ("passphrase", "Trading123"),
-                ("label", "trading"),
-                ("subAccountApiKey", "api-key"),
-            ],
-            "{\"subAccountUid\":\"2\",\"passphrase\":\"Trading123\",\"label\":\"trading\",\"subAccountApiKey\":\"api-key\"}",
-        ),
-        (
-            "get_classic_virtual_subaccount_list",
-            "GET",
-            "/api/v2/user/virtual-subaccount-list",
-            false,
-            &[],
-            "{}",
-        ),
-        (
-            "get_classic_virtual_subaccount_apikey_list",
-            "GET",
-            "/api/v2/user/virtual-subaccount-apikey-list",
-            false,
-            &[("subAccountUid", "2")],
-            "{\"subAccountUid\":\"2\"}",
-        ),
-        (
             "get_classic_interest_rate_record",
             "GET",
             "/api/v2/margin/interest-rate-record",
@@ -2166,41 +1639,6 @@ async fn remaining_routes_preserve_parameters_and_authentication() {
             true,
             &[],
             "{}",
-        ),
-        (
-            "get_classic_quoted_price",
-            "GET",
-            "/api/v2/convert/quoted-price",
-            false,
-            &[
-                ("fromCoin", "BTC"),
-                ("toCoin", "USDT"),
-                ("fromCoinSize", "0.1"),
-            ],
-            "{\"fromCoin\":\"BTC\",\"toCoin\":\"USDT\",\"fromCoinSize\":\"0.1\"}",
-        ),
-        (
-            "convert_classic_asset",
-            "POST",
-            "/api/v2/convert/trade",
-            false,
-            &[
-                ("fromCoin", "BTC"),
-                ("fromCoinSize", "0.1"),
-                ("cnvtPrice", "100000"),
-                ("toCoin", "USDT"),
-                ("toCoinSize", "10000"),
-                ("traceId", "quote-1"),
-            ],
-            "{\"fromCoin\":\"BTC\",\"fromCoinSize\":\"0.1\",\"cnvtPrice\":\"100000\",\"toCoin\":\"USDT\",\"toCoinSize\":\"10000\",\"traceId\":\"quote-1\"}",
-        ),
-        (
-            "get_classic_convert_record",
-            "GET",
-            "/api/v2/convert/convert-record",
-            false,
-            &[("startTime", "1700000000000"), ("endTime", "1700000001000")],
-            "{\"startTime\":\"1700000000000\",\"endTime\":\"1700000001000\"}",
         ),
         (
             "get_classic_auction",
@@ -2347,32 +1785,22 @@ async fn remaining_routes_preserve_parameters_and_authentication() {
 async fn nested_sub_account_and_position_requests() {
     let (url, receiver) = recording_server();
     let client = signed_client(url);
-    let cases: &[(&str, &str, &[(&str, &str)], &str)] = &[
-        (
-            "batch_create_classic_sub_accounts",
-            "/api/v2/user/batch-create-subaccount-and-apikey",
-            &[(
-                "accounts",
-                "[{\"subAccountName\":\"traderab\",\"passphrase\":\"Trader123\",\"label\":\"trading\",\"permList\":[\"read\"],\"ipList\":[\"127.0.0.1\"]}]",
-            )],
-            "[{\"subAccountName\":\"traderab\",\"passphrase\":\"Trader123\",\"label\":\"trading\",\"permList\":[\"read\"],\"ipList\":[\"127.0.0.1\"]}]",
-        ),
-        (
-            "move_uta_positions",
-            "/api/v3/account/move-positions",
-            &[
-                ("confirm", "true"),
-                ("fromUid", "1"),
-                ("toUid", "2"),
-                ("category", "USDT-FUTURES"),
-                (
-                    "positionList",
-                    "[{\"symbol\":\"BTCUSDT\",\"side\":\"sell\",\"qty\":\"0.01\"}]",
-                ),
-            ],
-            "{\"fromUid\":\"1\",\"toUid\":\"2\",\"category\":\"USDT-FUTURES\",\"positionList\":[{\"symbol\":\"BTCUSDT\",\"side\":\"sell\",\"qty\":\"0.01\"}]}",
-        ),
-    ];
+    type Case<'a> = (&'a str, &'a str, &'a [(&'a str, &'a str)], &'a str);
+    let cases: &[Case] = &[(
+        "move_uta_positions",
+        "/api/v3/account/move-positions",
+        &[
+            ("confirm", "true"),
+            ("fromUid", "1"),
+            ("toUid", "2"),
+            ("category", "USDT-FUTURES"),
+            (
+                "positionList",
+                "[{\"symbol\":\"BTCUSDT\",\"side\":\"sell\",\"qty\":\"0.01\"}]",
+            ),
+        ],
+        "{\"fromUid\":\"1\",\"toUid\":\"2\",\"category\":\"USDT-FUTURES\",\"positionList\":[{\"symbol\":\"BTCUSDT\",\"side\":\"sell\",\"qty\":\"0.01\"}]}",
+    )];
     for (name, path, params, body) in cases {
         client
             .private_request(

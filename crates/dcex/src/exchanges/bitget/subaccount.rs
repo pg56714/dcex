@@ -13,11 +13,6 @@ impl BitgetClient {
         params: &BitgetParams,
     ) -> Result<Option<ValidatedResponse>> {
         let (path, fields, required) = match name {
-            "create_classic_agent_sub_account" => (
-                "/api/v2/user/create-agent-subaccount",
-                &["username", "passphrase", "note"][..],
-                &["username", "passphrase"][..],
-            ),
             "create_uta_agent_sub_account" => (
                 "/api/v3/user/sub-account/agent-create",
                 &["username", "passphrase", "note"][..],

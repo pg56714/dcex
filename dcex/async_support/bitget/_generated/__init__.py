@@ -4,9 +4,7 @@ from .._market_http import MarketHTTP
 from .announcements_http import GeneratedAnnouncementsHTTP
 from .broker_http import GeneratedBrokerHTTP
 from .cfd_http import GeneratedCfdHTTP
-from .convert_http import GeneratedConvertHTTP
 from .copy_trading_http import GeneratedCopyTradingHTTP
-from .earn_http import GeneratedEarnHTTP
 from .institutional_loan_http import GeneratedInstitutionalLoanHTTP
 from .loan_http import GeneratedLoanHTTP
 from .margin_http import GeneratedMarginHTTP
@@ -22,9 +20,7 @@ class GeneratedHTTP(
     GeneratedAnnouncementsHTTP,
     GeneratedBrokerHTTP,
     GeneratedCfdHTTP,
-    GeneratedConvertHTTP,
     GeneratedCopyTradingHTTP,
-    GeneratedEarnHTTP,
     GeneratedInstitutionalLoanHTTP,
     GeneratedLoanHTTP,
     GeneratedMarginHTTP,

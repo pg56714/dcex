@@ -60,21 +60,21 @@ async def test_coin_swap_channels_and_automatic_private_events() -> None:
     try:
         await public.connect()
         for method, args, channel in [
-            ("subscribe_trades", ("BTC-USD-SWAP",), "BTC-USD@trade"),
-            ("subscribe_ticker", ("BTC-USD-SWAP",), "BTC-USD@ticker"),
-            ("subscribe_orderbook", ("BTC-USD-SWAP", 20), "BTC-USD@depth20"),
-            ("subscribe_klines", ("BTC-USD-SWAP", "1m"), "BTC-USD@kline_1m"),
-            ("subscribe_last_price", ("BTC-USD-SWAP",), "BTC-USD@lastPrice"),
-            ("subscribe_mark_price", ("BTC-USD-SWAP",), "BTC-USD@markPrice"),
-            ("subscribe_book_ticker", ("BTC-USD-SWAP",), "BTC-USD@bookTicker"),
+            ("subscribe_trades", ("BTC-USD",), "BTC-USD@trade"),
+            ("subscribe_ticker", ("BTC-USD",), "BTC-USD@ticker"),
+            ("subscribe_orderbook", ("BTC-USD", 20), "BTC-USD@depth20"),
+            ("subscribe_klines", ("BTC-USD", "1m"), "BTC-USD@kline_1m"),
+            ("subscribe_last_price", ("BTC-USD",), "BTC-USD@lastPrice"),
+            ("subscribe_mark_price", ("BTC-USD",), "BTC-USD@markPrice"),
+            ("subscribe_book_ticker", ("BTC-USD",), "BTC-USD@bookTicker"),
         ]:
             await getattr(public, method)(*args)
             event = await public.recv()
             assert isinstance(event, dict) and event["dataType"] == channel
         with pytest.raises((ValueError, RuntimeError), match="BASE-USD"):
-            await public.subscribe_trades("BTC-USDT-SWAP")
+            await public.subscribe_trades("BTC-USDT")
         with pytest.raises((ValueError, RuntimeError), match="speed"):
-            await public.subscribe_orderbook("BTC-USD-SWAP", 20, "200ms")
+            await public.subscribe_orderbook("BTC-USD", 20, "200ms")
         assert await private.connect() == "coin-token"
         assert await private.recv() == private_event
         await private.keep_alive()

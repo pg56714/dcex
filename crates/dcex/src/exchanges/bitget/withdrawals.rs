@@ -13,20 +13,10 @@ impl BitgetClient {
         params: &BitgetParams,
     ) -> Result<Option<ValidatedResponse>> {
         let (path, fields, required) = match name {
-            "create_spot_withdrawal" => (
-                "/api/v2/spot/wallet/withdrawal",
-                WITHDRAWAL_FIELDS,
-                &WITHDRAWAL_REQUIRED[..],
-            ),
             "create_uta_withdrawal" => (
                 "/api/v3/account/withdrawal",
                 UTA_WITHDRAWAL_FIELDS,
                 &WITHDRAWAL_REQUIRED[..],
-            ),
-            "cancel_spot_withdrawal" => (
-                "/api/v2/spot/wallet/cancel-withdrawal",
-                &["orderId"][..],
-                &["orderId"][..],
             ),
             "cancel_uta_withdrawal" => (
                 "/api/v3/account/cancel-withdrawal",
@@ -106,23 +96,6 @@ impl BitgetClient {
 }
 
 const WITHDRAWAL_REQUIRED: [&str; 4] = ["coin", "transferType", "address", "size"];
-const WITHDRAWAL_FIELDS: &[&str] = &[
-    "coin",
-    "transferType",
-    "address",
-    "size",
-    "chain",
-    "innerToType",
-    "areaCode",
-    "tag",
-    "remark",
-    "clientOid",
-    "memberCode",
-    "identityType",
-    "companyName",
-    "firstName",
-    "lastName",
-];
 const UTA_WITHDRAWAL_FIELDS: &[&str] = &[
     "coin",
     "transferType",

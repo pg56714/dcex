@@ -336,6 +336,7 @@ impl BinanceClient {
             }
             _ => return Ok(None),
         };
+        let query = self.normalize_loaded_symbols(query, BinanceMarket::Options)?;
         Ok(Some(
             self.request(HttpMethod::Get, BinanceMarket::Options, path, query, false)
                 .await?,
@@ -593,7 +594,29 @@ impl BinanceClient {
         params: &PublicParams,
         symbol_aliases: &[&str],
     ) -> Result<ValidatedResponse> {
-        let mut query = options_symbol_query(params, symbol_aliases);
+        let mut query = self.normalize_loaded_symbols(
+            options_symbol_query(params, symbol_aliases),
+            BinanceMarket::Options,
+        )?;
+        if self.has_product_table() {
+            for (key, value) in &mut query {
+                if key == "orders" {
+                    let mut orders: Vec<serde_json::Value> = serde_json::from_str(value)
+                        .map_err(|error| DcexError::InvalidInput(error.to_string()))?;
+                    for order in &mut orders {
+                        if let Some(symbol) =
+                            order.get("symbol").and_then(serde_json::Value::as_str)
+                        {
+                            let native =
+                                self.exchange_symbol_for(symbol, BinanceMarket::Options)?;
+                            order["symbol"] = native.into();
+                        }
+                    }
+                    *value = serde_json::to_string(&orders)
+                        .map_err(|error| DcexError::InvalidInput(error.to_string()))?;
+                }
+            }
+        }
         for (key, value) in &mut query {
             if matches!(
                 key.as_str(),

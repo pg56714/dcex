@@ -10,7 +10,7 @@ use crate::product_table::ProductTable;
 use crate::{DcexError, Result};
 
 use super::endpoints::BASE_URL;
-use super::params::{OkxParams, exchange_symbol_fallback, is_canonical_product_symbol};
+use super::params::{OkxParams, exchange_symbol_fallback};
 use super::signing::{http_method_name, iso_timestamp, validate_response};
 
 #[derive(Clone)]
@@ -218,12 +218,13 @@ impl OkxClient {
     }
 
     pub(super) fn exchange_symbol(&self, product_symbol: &str) -> Result<String> {
-        if is_canonical_product_symbol(product_symbol)
-            && let Some(table) = &self.product_table
-        {
-            return table.get_exchange_symbol("okx", product_symbol);
+        if let Some(table) = &self.product_table {
+            return Ok(table
+                .resolve_symbol("okx", product_symbol, None, None)?
+                .exchange_symbol
+                .clone());
         }
-        Ok(exchange_symbol_fallback(product_symbol))
+        exchange_symbol_fallback(product_symbol)
     }
 
     pub(super) fn push_inst_id(

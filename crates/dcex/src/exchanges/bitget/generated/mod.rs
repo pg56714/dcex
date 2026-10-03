@@ -2,9 +2,7 @@
 mod announcements;
 mod broker;
 mod cfd;
-mod convert;
 mod copy_trading;
-mod earn;
 mod institutional_loan;
 mod loan;
 mod margin;

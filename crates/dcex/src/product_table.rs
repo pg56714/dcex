@@ -7,6 +7,9 @@ use crate::{DcexError, Result};
 #[path = "product_table_fetch.rs"]
 mod fetch;
 
+#[cfg(test)]
+pub(crate) use fetch::kraken_spot_rows;
+
 type UniqueIndex = HashMap<String, HashMap<String, Option<usize>>>;
 type MultiIndex = HashMap<String, HashMap<String, Vec<usize>>>;
 type TypedUniqueIndex = HashMap<String, HashMap<String, HashMap<String, Option<usize>>>>;
@@ -25,6 +28,10 @@ pub struct MarketInfo {
     pub quote_currency: String,
     pub min_notional: String,
     pub size_per_contract: String,
+    /// Another official native name for the same market (Kraken AssetPairs `altname`
+    /// or pair key); empty when the exchange publishes only one.
+    #[serde(default)]
+    pub exchange_symbol_alias: String,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -146,19 +153,32 @@ impl ProductTable {
         symbol: &str,
         accepts: impl Fn(&MarketInfo) -> bool,
     ) -> Result<&MarketInfo> {
+        self.resolve_symbol_across(&[exchange], symbol, accepts)
+    }
+
+    /// Resolve across several table namespaces of one venue (e.g. `binance` and `binance_coinm`).
+    pub fn resolve_symbol_across(
+        &self,
+        exchanges: &[&str],
+        symbol: &str,
+        accepts: impl Fn(&MarketInfo) -> bool,
+    ) -> Result<&MarketInfo> {
         let canonical = self
             .rows
             .iter()
-            .any(|row| row.exchange == exchange && row.product_symbol == symbol);
+            .any(|row| exchanges.contains(&row.exchange.as_str()) && row.product_symbol == symbol);
         let candidates: Vec<_> = self
             .rows
             .iter()
             .filter(|row| {
-                row.exchange == exchange
+                let exchange = row.exchange.as_str();
+                exchanges.contains(&exchange)
                     && if canonical {
                         row.product_symbol == symbol
                     } else {
                         row.exchange_symbol == symbol
+                            || (!row.exchange_symbol_alias.is_empty()
+                                && row.exchange_symbol_alias == symbol)
                             || (exchange == "kraken"
                                 && row.product_type == "spot"
                                 && !row.base_currency.is_empty()
@@ -166,8 +186,7 @@ impl ProductTable {
                                 && format!("{}/{}", row.base_currency, row.quote_currency)
                                     == symbol)
                             || (exchange == "hyperliquid"
-                                && serde_json::from_str::<(String, u64)>(&row.exchange_symbol)
-                                    .is_ok_and(|(coin, _)| coin == symbol))
+                                && hyperliquid_symbol_matches(&row.exchange_symbol, symbol))
                     }
             })
             .collect();
@@ -184,6 +203,7 @@ impl ProductTable {
                     .map(|row| row.product_symbol.as_str())
                     .collect::<Vec<_>>()
                     .join(", ");
+                let exchange = exchanges.join("/");
                 Err(product_table_error(format!(
                     "Cannot resolve {exchange} symbol {symbol:?} within the requested market; candidates: [{names}]"
                 )))
@@ -519,7 +539,19 @@ fn row_value<'a>(row: &'a MarketInfo, key: &str) -> Option<&'a str> {
         "quote_currency" => Some(&row.quote_currency),
         "min_notional" => Some(&row.min_notional),
         "size_per_contract" => Some(&row.size_per_contract),
+        "exchange_symbol_alias" => Some(&row.exchange_symbol_alias),
         _ => None,
+    }
+}
+
+/// Hyperliquid rows store `[coin, asset_id]` JSON; compare parsed pairs, or the coin alone.
+fn hyperliquid_symbol_matches(exchange_symbol: &str, symbol: &str) -> bool {
+    let Ok(row) = serde_json::from_str::<(String, u64)>(exchange_symbol) else {
+        return false;
+    };
+    match serde_json::from_str::<(String, u64)>(symbol) {
+        Ok(input) => input == row,
+        Err(_) => row.0 == symbol,
     }
 }
 
@@ -555,6 +587,7 @@ mod tests {
             min_size: "0.001".to_string(),
             min_notional: "5".to_string(),
             size_per_contract: "1".to_string(),
+            ..MarketInfo::default()
         }
     }
 

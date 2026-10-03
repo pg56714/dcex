@@ -101,19 +101,24 @@ pub(super) fn take_param(params: &mut Vec<(String, String)>, key: &str) -> Optio
         .map(|index| params.remove(index).1)
 }
 
-pub(super) fn is_canonical_product_symbol(product_symbol: &str) -> bool {
-    product_symbol.contains('-')
-}
-
-pub(super) fn exchange_symbol_fallback(product_symbol: &str, futures: bool) -> String {
-    let mut parts = product_symbol.split('-');
-    match (parts.next(), parts.next(), parts.next()) {
-        (Some(base), Some(quote), Some(_kind)) if futures => {
-            format!("{}{}M", kucoin_contract_asset(base), quote)
-        }
-        (Some(base), Some(quote), Some(_kind)) => format!("{base}-{quote}"),
-        _ => product_symbol.to_string(),
+pub(super) fn exchange_symbol_fallback(product_symbol: &str, futures: bool) -> Result<String> {
+    let parts = product_symbol.split('-').collect::<Vec<_>>();
+    if parts.len() < 3 {
+        return Ok(product_symbol.to_string());
     }
+    if parts.iter().any(|part| part.is_empty()) {
+        return Err(DcexError::InvalidInput(
+            "kucoin product symbol must not contain empty components".into(),
+        ));
+    }
+    let symbol = match parts.as_slice() {
+        [base, quote, "SWAP"] if futures => format!("{}{}M", kucoin_contract_asset(base), quote),
+        [base, quote, "SPOT"] if !futures => format!("{base}-{quote}"),
+        _ => return Err(DcexError::InvalidInput(
+            "cannot safely resolve kucoin product symbol; load the product table or pass the official exchange symbol".into(),
+        )),
+    };
+    Ok(symbol)
 }
 
 fn kucoin_contract_asset(asset: &str) -> &str {
@@ -422,4 +427,12 @@ pub(super) fn json_value_string(value: &Value) -> String {
 
 pub(in crate::exchanges::kucoin) fn invalid(message: impl std::fmt::Display) -> crate::DcexError {
     crate::DcexError::InvalidInput(format!("KuCoin: {message}"))
+}
+
+#[cfg(test)]
+#[test]
+fn public_market_symbol_samples() {
+    crate::exchanges::symbol_tests::check("kucoin", |symbol, mode| {
+        exchange_symbol_fallback(symbol, mode != "spot")
+    });
 }

@@ -179,10 +179,9 @@ impl BinanceClient {
                 _ => {}
             }
             let value = if let Some(canonical) = canonical {
-                if self.market_for_product_symbol(canonical)? != endpoint.symbol_market {
-                    return Err(invalid("product_symbol has the wrong market type"));
-                }
-                self.exchange_symbol(canonical)?
+                self.exchange_symbol_for(canonical, endpoint.symbol_market)?
+            } else if field.key == "symbol" {
+                self.exchange_symbol_for(value, endpoint.symbol_market)?
             } else {
                 value.to_string()
             };

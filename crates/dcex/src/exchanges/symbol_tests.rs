@@ -23,6 +23,7 @@ pub(super) fn table(
         quote_currency: "USD".into(),
         min_notional: "0".into(),
         size_per_contract: "1".into(),
+        ..MarketInfo::default()
     }])
 }
 

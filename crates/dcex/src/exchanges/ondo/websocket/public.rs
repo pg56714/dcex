@@ -8,16 +8,42 @@ use crate::{DcexError, Result};
 use super::super::endpoints::WS_URL;
 
 pub struct OndoPublicWebSocket {
+    product_table: Option<std::sync::Arc<crate::product_table::ProductTable>>,
     connection: WebSocketConnection,
 }
 
 impl OndoPublicWebSocket {
+    fn exchange_symbol(&self, symbol: &str, spot: bool) -> Result<String> {
+        if let Some(table) = &self.product_table {
+            return Ok(table
+                .resolve_symbol(
+                    "ondo",
+                    symbol,
+                    Some(if spot { "spot" } else { "swap" }),
+                    None,
+                )?
+                .exchange_symbol
+                .clone());
+        }
+        Ok(if spot {
+            symbol.strip_suffix("-SPOT").unwrap_or(symbol)
+        } else {
+            symbol
+        }
+        .to_string())
+    }
+
+    pub fn set_product_table(&mut self, table: crate::product_table::ProductTable) {
+        self.product_table = Some(std::sync::Arc::new(table));
+    }
+
     pub fn new(timeout: Duration) -> Result<Self> {
         Self::with_url(WS_URL, timeout)
     }
 
     pub fn with_url(url: impl Into<String>, timeout: Duration) -> Result<Self> {
         Ok(Self {
+            product_table: None,
             connection: WebSocketConnection::new(WebSocketConfig::new(url, timeout)?),
         })
     }
@@ -79,6 +105,7 @@ impl OndoPublicWebSocket {
     }
 
     pub async fn subscribe_klines(&mut self, market: String, resolution: &str) -> Result<()> {
+        let market = self.exchange_symbol(&market, false)?;
         if !matches!(resolution, "1" | "5" | "15" | "1H" | "4H" | "1D" | "1W") {
             return Err(DcexError::InvalidInput(format!(
                 "unsupported Ondo kline resolution: {resolution}"
@@ -118,14 +145,10 @@ impl OndoPublicWebSocket {
                 "unsupported Ondo public channel: {channel}"
             )));
         }
-        let markets: Vec<String> = if channel.ends_with("Spot") {
-            markets
-                .into_iter()
-                .map(|market| market.strip_suffix("-SPOT").unwrap_or(&market).to_owned())
-                .collect()
-        } else {
-            markets
-        };
+        let markets = markets
+            .into_iter()
+            .map(|market| self.exchange_symbol(&market, channel.ends_with("Spot")))
+            .collect::<Result<Vec<_>>>()?;
         if markets.is_empty() {
             self.connection
                 .send_json(&json!({"op": op, "channel": channel}))

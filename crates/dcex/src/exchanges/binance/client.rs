@@ -8,9 +8,7 @@ use crate::product_table::ProductTable;
 use crate::{DcexError, Result};
 
 use super::endpoints::*;
-use super::params::{
-    exchange_symbol_fallback, is_canonical_product_symbol, market_for_product_symbol_fallback,
-};
+use super::params::{exchange_symbol_fallback, market_for_product_symbol_fallback};
 use super::signing::{BinanceResponseValidator, BinanceSigner, extract_server_time_ms};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -24,6 +22,26 @@ pub enum BinanceMarket {
 }
 
 impl BinanceMarket {
+    pub(super) fn table_exchange(self) -> &'static str {
+        if self == Self::CoinFutures {
+            "binance_coinm"
+        } else {
+            "binance"
+        }
+    }
+
+    pub(super) fn accepts(self, row: &crate::product_table::MarketInfo) -> bool {
+        match self {
+            Self::Spot => row.product_type == "spot",
+            Self::Equity => matches!(row.product_type.as_str(), "equity" | "stock"),
+            Self::Options => matches!(row.product_type.as_str(), "option" | "options"),
+            Self::Futures | Self::CoinFutures => {
+                matches!(row.product_type.as_str(), "swap" | "futures")
+            }
+            Self::PortfolioMargin => false,
+        }
+    }
+
     pub const fn base_url(self) -> &'static str {
         match self {
             Self::CoinFutures => COIN_FUTURES_BASE_URL,
@@ -71,10 +89,13 @@ pub struct BinanceClient {
     alpha_base_url: String,
     api_key: Option<String>,
     timestamp_offset_ms: Arc<Mutex<Option<i64>>>,
-    product_table: Option<Arc<ProductTable>>,
+    pub(super) product_table: Option<Arc<ProductTable>>,
 }
 
 impl BinanceClient {
+    pub(super) fn has_product_table(&self) -> bool {
+        self.product_table.is_some()
+    }
     pub(crate) const INPUT_EXCHANGE: &'static str = "binance";
 
     pub fn new(
@@ -416,21 +437,75 @@ impl BinanceClient {
         block_on(async move { client.request_raw_auto(method, path, params, signed).await })
     }
 
-    pub(super) fn exchange_symbol(&self, product_symbol: &str) -> Result<String> {
-        if let Some(table) = &self.product_table
-            && is_canonical_product_symbol(product_symbol)
-        {
-            return table.get_exchange_symbol("binance", product_symbol);
+    pub(super) fn loaded_symbol_for(
+        &self,
+        symbol: &str,
+        market: BinanceMarket,
+    ) -> Result<Option<String>> {
+        self.product_table
+            .as_ref()
+            .map(|table| {
+                table
+                    .resolve_symbol_in(market.table_exchange(), symbol, |row| market.accepts(row))
+                    .map(|row| row.exchange_symbol.clone())
+            })
+            .transpose()
+    }
+
+    pub(super) fn normalize_loaded_symbols(
+        &self,
+        params: Vec<(String, String)>,
+        market: BinanceMarket,
+    ) -> Result<Vec<(String, String)>> {
+        params
+            .into_iter()
+            .map(|(key, value)| {
+                let value = if key == "symbol" {
+                    self.loaded_symbol_for(&value, market)?.unwrap_or(value)
+                } else {
+                    value
+                };
+                Ok((key, value))
+            })
+            .collect()
+    }
+
+    pub(super) fn exchange_symbol_for(
+        &self,
+        symbol: &str,
+        market: BinanceMarket,
+    ) -> Result<String> {
+        if let Some(table) = &self.product_table {
+            return Ok(table
+                .resolve_symbol_in(market.table_exchange(), symbol, |row| market.accepts(row))?
+                .exchange_symbol
+                .clone());
         }
-        Ok(exchange_symbol_fallback(product_symbol))
+        exchange_symbol_fallback(symbol)
+    }
+
+    pub(super) fn exchange_symbol(&self, product_symbol: &str) -> Result<String> {
+        self.exchange_symbol_for(
+            product_symbol,
+            self.market_for_product_symbol(product_symbol)?,
+        )
     }
 
     pub(super) fn market_for_product_symbol(&self, product_symbol: &str) -> Result<BinanceMarket> {
-        if let Some(table) = &self.product_table
-            && is_canonical_product_symbol(product_symbol)
-        {
-            let product_type = table.get_product_type("binance", Some(product_symbol), None)?;
-            return Ok(match product_type.as_str() {
+        if let Some(table) = &self.product_table {
+            // Without an explicit market, a symbol must be unique across every Binance market.
+            let row = table
+                .resolve_symbol_across(&["binance", "binance_coinm"], product_symbol, |_| true)
+                .map_err(|error| match error {
+                    DcexError::InvalidInput(message) => DcexError::InvalidInput(format!(
+                        "{message}; pass the unified product symbol (e.g. BTC-USDT-SWAP or BTC-USDT-SPOT) to select the market"
+                    )),
+                    error => error,
+                })?;
+            if row.exchange == "binance_coinm" {
+                return Ok(BinanceMarket::CoinFutures);
+            }
+            return Ok(match row.product_type.as_str() {
                 "equity" | "stock" => BinanceMarket::Equity,
                 "option" | "options" => BinanceMarket::Options,
                 "spot" => BinanceMarket::Spot,
@@ -438,5 +513,16 @@ impl BinanceClient {
             });
         }
         Ok(market_for_product_symbol_fallback(product_symbol))
+    }
+
+    /// Market for the generic order and kline helpers, which cover Spot, USD-M, Options and
+    /// Equity; COIN-M products must use the dedicated coin-futures methods.
+    pub(super) fn generic_market(&self, product_symbol: &str) -> Result<BinanceMarket> {
+        match self.market_for_product_symbol(product_symbol)? {
+            BinanceMarket::CoinFutures => Err(DcexError::InvalidInput(format!(
+                "Binance COIN-M product {product_symbol:?} requires the coin-futures methods (get_coin_futures_order, cancel_coin_futures_order, get_coin_futures_open_orders, cancel_all_coin_futures_orders)"
+            ))),
+            market => Ok(market),
+        }
     }
 }

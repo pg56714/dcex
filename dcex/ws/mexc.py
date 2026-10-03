@@ -78,6 +78,10 @@ class PublicClient(AsyncWebSocketMixin):
 class PrivateClient(AsyncWebSocketMixin):
     """Async MEXC private WebSocket client."""
 
+    def set_product_table(self, table: Any) -> None:  # noqa: ANN401
+        """Use exact canonical/native symbols from a native ProductTable."""
+        self._native_client.set_product_table(table)
+
     def __init__(
         self,
         api_key: str,
@@ -254,6 +258,10 @@ class FuturesPublicClient(AsyncWebSocketMixin):
 
 class FuturesPrivateClient(FuturesPublicClient):
     """Authenticated contract streams; all account events are pushed after login."""
+
+    def set_product_table(self, table: Any) -> None:  # noqa: ANN401
+        """Use exact canonical/native symbols from a native ProductTable."""
+        self._native_client.set_product_table(table)
 
     def __init__(
         self, api_key: str, api_secret: str, timeout: float = 10.0, base_url: str | None = None

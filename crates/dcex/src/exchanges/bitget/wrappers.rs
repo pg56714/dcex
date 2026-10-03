@@ -75,31 +75,14 @@ crate::exchanges::impl_exchange_method_wrappers! {
         uta_update_sub_api(api_key => "apiKey", passphrase => "passphrase"),
         uta_delete_sub_api(api_key => "apiKey"),
         get_uta_sub_api_list(sub_uid => "subUid"),
-        classic_create_virtual_subaccount(sub_account_list => "subAccountList"),
-        classic_create_virtual_subaccount_apikey(sub_account_uid => "subAccountUid", passphrase => "passphrase", label => "label", perm_list => "permList"),
-        classic_modify_virtual_subaccount(sub_account_uid => "subAccountUid", perm_list => "permList", status => "status"),
-        classic_modify_virtual_subaccount_apikey(sub_account_uid => "subAccountUid", passphrase => "passphrase", label => "label", sub_account_api_key => "subAccountApiKey"),
-        get_classic_virtual_subaccount_list(),
-        get_classic_virtual_subaccount_apikey_list(sub_account_uid => "subAccountUid"),
-        get_classic_quoted_price(from_coin => "fromCoin", to_coin => "toCoin"),
-        convert_classic_asset(from_coin => "fromCoin", from_coin_size => "fromCoinSize", cnvt_price => "cnvtPrice", to_coin => "toCoin", to_coin_size => "toCoinSize", trace_id => "traceId"),
-        get_classic_convert_record(start_time => "startTime", end_time => "endTime"),
         set_uta_fee_deduction(deduct => "deduct"),
         get_uta_fee_deduction(),
         switch_to_classic_account(),
         get_account_switch_status(),
-        get_futures_margin_mode_switch_quota(),
-        get_cross_margin_liquidation_orders(),
-        get_isolated_margin_liquidation_orders(),
-        set_spot_deposit_account(account_type => "accountType", coin => "coin"),
-        get_deposit_address(coin => "coin"),
-        get_sub_account_deposit_address(sub_uid => "subUid", coin => "coin"),
-        get_sub_account_deposit_records(sub_uid => "subUid"),
         set_uta_deposit_account(coin => "coin", account_type => "accountType"),
         create_uta_sub_account(username => "username"),
         get_uta_strategy_sub_orders(order_id => "orderId"),
         get_uta_deposit_records(start_time => "startTime", end_time => "endTime"),
-        get_all_trade_rates(business_type => "businessType"),
 
 
 
@@ -112,39 +95,11 @@ crate::exchanges::impl_exchange_method_wrappers! {
 
 
 
-        get_futures_estimated_open_count(product_symbol => "product_symbol", product_type => "productType", margin_coin => "marginCoin", open_amount => "openAmount", open_price => "openPrice"),
-        get_futures_liquidation_price(product_symbol => "product_symbol", product_type => "productType", margin_coin => "marginCoin", pos_side => "posSide", order_type => "orderType", open_amount => "openAmount"),
-        get_futures_interest_history(product_type => "productType", start_time => "startTime", end_time => "endTime"),
-        set_futures_all_leverage(product_type => "productType", leverage => "leverage"),
-        set_futures_auto_margin(product_symbol => "product_symbol", auto_margin => "autoMargin", margin_coin => "marginCoin", hold_side => "holdSide"),
-        set_futures_asset_mode(product_type => "productType", asset_mode => "assetMode"),
-        convert_futures_union_asset(coin => "coin", amount => "amount"),
-
-        get_futures_union_config(),
-        get_futures_isolated_symbols(product_type => "productType"),
-        reverse_futures_position(product_symbol => "product_symbol", margin_coin => "marginCoin", product_type => "productType", side => "side"),
 
 
-        get_cross_margin_risk_rate(),
 
-        flash_repay_cross_margin_assets(),
-        get_cross_margin_flash_repay_result(id_list => "idList"),
-        get_cross_margin_interest_rate_limits(coin => "coin"),
-        get_cross_margin_tiers(coin => "coin"),
-        get_cross_margin_borrow_history(start_time => "startTime"),
-        get_cross_margin_repay_history(start_time => "startTime"),
-        get_cross_margin_interest_history(start_time => "startTime"),
-        get_cross_margin_liquidation_history(start_time => "startTime"),
-        get_isolated_margin_risk_rate(),
 
-        flash_repay_isolated_margin_assets(),
-        get_isolated_margin_flash_repay_result(id_list => "idList"),
-        get_isolated_margin_interest_rate_limits(product_symbol => "product_symbol"),
-        get_isolated_margin_tiers(product_symbol => "product_symbol"),
-        get_isolated_margin_borrow_history(product_symbol => "product_symbol", start_time => "startTime"),
-        get_isolated_margin_repay_history(product_symbol => "product_symbol", start_time => "startTime"),
-        get_isolated_margin_interest_history(product_symbol => "product_symbol", start_time => "startTime"),
-        get_isolated_margin_liquidation_history(product_symbol => "product_symbol", start_time => "startTime"),
+
         get_uta_funding_assets(),
         get_uta_funding_records(),
         get_uta_fee_rate(product_symbol => "product_symbol", category => "category"),
@@ -176,15 +131,10 @@ crate::exchanges::impl_exchange_method_wrappers! {
         adjust_uta_position_margin(category => "category", product_symbol => "product_symbol", pos_side => "posSide", operation => "operation", amount => "amount"),
         get_uta_financial_records(category => "category"),
 
-        get_futures_fee_rates(product_symbol => "product_symbol"),
-        get_spot_fee_rates(product_symbol => "product_symbol"),
 
 
 
         cancel_uta_order(),
-        get_all_account_balance(),
-        get_deposit_records(),
-        get_funding_assets(),
 
 
         get_uta_account_assets(),
@@ -204,16 +154,6 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_crypto_loan_pledge_history(start_time => "startTime", end_time => "endTime"),
         get_crypto_loan_liquidations(start_time => "startTime", end_time => "endTime"),
         get_crypto_loan_debts(),
-        get_earn_account_assets(),
-        get_savings_account(),
-        get_savings_products(),
-        get_savings_assets(period_type => "periodType"),
-        get_savings_records(period_type => "periodType"),
-        get_savings_subscription_info(product_id => "productId", period_type => "periodType"),
-        subscribe_savings(product_id => "productId", period_type => "periodType", amount => "amount"),
-        get_savings_subscription_result(order_id => "orderId", period_type => "periodType"),
-        redeem_savings(product_id => "productId", period_type => "periodType", amount => "amount"),
-        get_savings_redemption_result(order_id => "orderId", period_type => "periodType"),
         get_elite_earn_products(),
         get_elite_earn_subscription_info(product_id => "productId"),
         subscribe_elite_earn(product_sub_id => "productSubId", amount => "amount"),
@@ -242,41 +182,21 @@ crate::exchanges::impl_exchange_method_wrappers! {
         place_uta_order(category => "category", product_symbol => "product_symbol", side => "side", order_type => "orderType", qty => "qty"),
         place_reality_order(product_symbol => "product_symbol", side => "side", order_type => "orderType", qty => "qty"),
         cancel_reality_order(product_symbol => "product_symbol"),
-        set_futures_margin_mode(product_symbol => "product_symbol", margin_mode => "marginMode"),
         set_uta_hold_mode(hold_mode => "holdMode"),
         set_uta_leverage(category => "category", leverage => "leverage"),
 
     ];
 }
 
-crate::exchanges::impl_exchange_method_wrappers! { @extend; BitgetClient; public []; private [batch_create_classic_sub_accounts(accounts => "accounts"), move_uta_positions(from_uid => "fromUid", to_uid => "toUid", category => "category", position_list => "positionList")]; }
+crate::exchanges::impl_exchange_method_wrappers! { @extend; BitgetClient; public []; private [move_uta_positions(from_uid => "fromUid", to_uid => "toUid", category => "category", position_list => "positionList")]; }
 
 crate::exchanges::impl_exchange_method_wrappers! { @extend; BitgetClient; public [
 get_classic_earn_loan_public_coin_infos(),
 get_classic_earn_loan_public_hour_interest(loan_coin => "loanCoin",pledge_coin => "pledgeCoin",daily => "daily",pledge_amount => "pledgeAmount"),
 ]; private [
 get_uta_account_max_withdrawal(coin => "coin"),
-get_classic_account_bot_assets(),
-get_classic_spot_wallet_withdrawal_records(start_time => "startTime",end_time => "endTime"),
 get_uta_account_withdrawal_records(start_time => "startTime",end_time => "endTime"),
 get_uta_account_withdraw_address(),
-get_classic_earn_elite_product(),
-subscribe_classic_elite(product_sub_id => "productSubId",amount => "amount"),
-get_classic_earn_elite_subscribe_result(order_id => "orderId"),
-get_classic_earn_elite_subscribe_info(product_id => "productId"),
-redeem_classic_elite(product_id => "productId",product_sub_id => "productSubId",redeem_type => "redeemType",amount => "amount",receive_account => "receiveAccount"),
-get_classic_earn_elite_redeem_info(product_id => "productId"),
-get_classic_earn_elite_assets(),
-get_classic_earn_elite_records(type_ => "type"),
-borrow_classic_earn_loan(loan_coin => "loanCoin",pledge_coin => "pledgeCoin",daily => "daily"),
-get_classic_earn_loan_ongoing_orders(),
-repay_classic_earn_loan(order_id => "orderId",repay_all => "repayAll"),
-get_classic_earn_loan_repay_history(start_time => "startTime",end_time => "endTime"),
-classic_earn_loan_revise_pledge(order_id => "orderId",amount => "amount",pledge_coin => "pledgeCoin",revise_type => "reviseType"),
-get_classic_earn_loan_revise_history(start_time => "startTime",end_time => "endTime"),
-get_classic_earn_loan_borrow_history(start_time => "startTime",end_time => "endTime"),
-get_classic_earn_loan_debts(),
-get_classic_earn_loan_reduces(start_time => "startTime",end_time => "endTime"),
 uta_trade_grid_add_investment(category => "category",bot_id => "botId",coin => "coin",size => "size",funds_source => "fundsSource"),
 get_uta_trade_grid_bot_detail(bot_id => "botId"),
 uta_trade_grid_close_bot(bot_id => "botId"),
@@ -312,11 +232,7 @@ mod business_methods {
 
     crate::exchanges::impl_exchange_method_wrappers! {
         @extend; BitgetClient; public []; private [
-            /// API withdrawals and external transfers have no second confirmation; they execute on submit.
-            create_spot_withdrawal(coin => "coin", transfer_type => "transferType", address => "address", size => "size"),
-            cancel_spot_withdrawal(order_id => "orderId"),
             create_uta_agent_sub_account(username => "username", passphrase => "passphrase"),
-            create_classic_agent_sub_account(username => "username", passphrase => "passphrase"),
             /// API withdrawals and external transfers have no second confirmation; they execute on submit.
             create_uta_withdrawal(coin => "coin", transfer_type => "transferType", address => "address", size => "size"),
             cancel_uta_withdrawal(),

@@ -23,6 +23,7 @@ fn product_table_asset_class_drives_xstock_orders() {
         quote_currency: "USD".to_string(),
         min_notional: "0.5".to_string(),
         size_per_contract: "1".to_string(),
+        ..MarketInfo::default()
     }]);
     let client = KrakenClient::public(Duration::from_secs(10))
         .expect("client")

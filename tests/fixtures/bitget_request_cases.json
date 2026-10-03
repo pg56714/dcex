@@ -1,55 +1,5 @@
 [
   {
-    "method": "create_spot_withdrawal",
-    "path": "/api/v2/spot/wallet/withdrawal",
-    "kwargs": {
-      "coin": "USDT",
-      "transfer_type": "on_chain",
-      "address": "0x1212121212121212121212121212121212121212",
-      "chain": "erc20",
-      "inner_to_type": "uid",
-      "area_code": "886",
-      "tag": "memo",
-      "size": "0.000000000000000123",
-      "remark": "desk",
-      "client_oid": "client-1",
-      "member_code": "bithumb",
-      "identity_type": "user",
-      "company_name": "Example",
-      "first_name": "Test",
-      "last_name": "User"
-    },
-    "body": {
-      "coin": "USDT",
-      "transferType": "on_chain",
-      "address": "0x1212121212121212121212121212121212121212",
-      "chain": "erc20",
-      "innerToType": "uid",
-      "areaCode": "886",
-      "tag": "memo",
-      "size": "0.000000000000000123",
-      "remark": "desk",
-      "clientOid": "client-1",
-      "memberCode": "bithumb",
-      "identityType": "user",
-      "companyName": "Example",
-      "firstName": "Test",
-      "lastName": "User"
-    },
-    "official_source": "https://www.bitget.com/docs/catalog/classic-spot-account/classic-spot-account#withdraw"
-  },
-  {
-    "method": "cancel_spot_withdrawal",
-    "path": "/api/v2/spot/wallet/cancel-withdrawal",
-    "kwargs": {
-      "order_id": "withdraw-1"
-    },
-    "body": {
-      "orderId": "withdraw-1"
-    },
-    "official_source": "https://www.bitget.com/docs/catalog/classic-spot-account/classic-spot-account#cancel-withdrawal"
-  },
-  {
     "method": "create_uta_agent_sub_account",
     "path": "/api/v3/user/sub-account/agent-create",
     "kwargs": {
@@ -63,21 +13,6 @@
       "note": "agent desk"
     },
     "official_source": "https://www.bitget.com/docs/catalog/account/sub-accounts#create-agent-sub-account"
-  },
-  {
-    "method": "create_classic_agent_sub_account",
-    "path": "/api/v2/user/create-agent-subaccount",
-    "kwargs": {
-      "username": "desk",
-      "passphrase": "TestKey123",
-      "note": "agent desk"
-    },
-    "body": {
-      "username": "desk",
-      "passphrase": "TestKey123",
-      "note": "agent desk"
-    },
-    "official_source": "https://www.bitget.com/docs/catalog/classic-common-vsubaccount/classic-common-vsubaccount#create-agent-subaccount"
   },
   {
     "method": "create_uta_withdrawal",

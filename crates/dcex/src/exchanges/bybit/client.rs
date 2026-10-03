@@ -5,9 +5,7 @@ use serde_json::{Map, Value};
 use tokio::sync::Mutex;
 
 use super::endpoints::{BASE_URL, TIME_ENDPOINT};
-use super::params::{
-    category_for_product_symbol_fallback, exchange_symbol_fallback, is_canonical_product_symbol,
-};
+use super::params::{canonical_category_fallback, exchange_symbol_fallback};
 use super::signing::{encode_params, extract_server_time_ms, validate_response};
 use crate::crypto::hmac_sha256_hex;
 use crate::exchange::{ValidatedResponse, unix_timestamp_ms};
@@ -137,55 +135,184 @@ impl BybitClient {
     pub(super) async fn post_request(
         &self,
         path: &str,
-        body: Map<String, Value>,
+        mut body: Map<String, Value>,
     ) -> Result<ValidatedResponse> {
+        if self.product_table.is_some() {
+            let category = body
+                .get("category")
+                .and_then(Value::as_str)
+                .map(str::to_string);
+            if let Some(items) = body.get_mut("request").and_then(Value::as_array_mut) {
+                for item in items {
+                    if let Some(symbol) = item.get("symbol").and_then(Value::as_str) {
+                        let native = self.symbol_category(symbol, category.as_deref())?.0;
+                        item["symbol"] = Value::String(native);
+                    }
+                }
+            }
+        }
         let body = serde_json::to_vec(&Value::Object(body))
             .map_err(|error| DcexError::Decode(error.to_string()))?;
         self.request(HttpMethod::Post, path, Vec::new(), Some(body), true)
             .await
     }
 
-    pub(super) fn exchange_symbol(&self, product_symbol: &str) -> Result<String> {
-        if is_canonical_product_symbol(product_symbol)
-            && let Some(table) = &self.product_table
-        {
-            return table.get_exchange_symbol("bybit", product_symbol);
+    pub(super) fn loaded_strategy_symbol(
+        &self,
+        symbol: &str,
+        requested: Option<&str>,
+    ) -> Result<Option<(String, String)>> {
+        fn category(row: &crate::product_table::MarketInfo) -> Option<&'static str> {
+            match (
+                row.exchange_type.as_str(),
+                row.product_type.as_str(),
+                row.quote_currency.as_str(),
+            ) {
+                ("spot", "spot", _) => Some("UTA_SPOT"),
+                ("inverse", "swap", _) => Some("UTA_INVERSE"),
+                ("inverse", "futures", _) => Some("UTA_INVERSE_FUTURE"),
+                ("linear", "swap", "USDT") => Some("UTA_USDT"),
+                ("linear", "swap", "USDC") => Some("UTA_USDC"),
+                ("linear", "futures", "USDT") => Some("UTA_USDT_FUTURE"),
+                _ => None,
+            }
         }
-        Ok(exchange_symbol_fallback(product_symbol))
+        let Some(table) = &self.product_table else {
+            return Ok(None);
+        };
+        let row = table.resolve_symbol_in("bybit", symbol, |row| {
+            category(row).is_some_and(|value| requested.is_none_or(|requested| requested == value))
+        })?;
+        Ok(Some((
+            row.exchange_symbol.clone(),
+            category(row).expect("filtered category").into(),
+        )))
     }
 
+    /// Resolve a product symbol and its category. `category` is the caller's explicit
+    /// category: it narrows native symbols and must agree with a unified symbol's market.
+    pub(super) fn symbol_category(
+        &self,
+        symbol: &str,
+        category: Option<&str>,
+    ) -> Result<(String, String)> {
+        self.resolve_symbol_category(symbol, category, true)
+    }
+
+    fn resolve_symbol_category(
+        &self,
+        symbol: &str,
+        category: Option<&str>,
+        explicit: bool,
+    ) -> Result<(String, String)> {
+        let check = |derived: &str| match category {
+            Some(category) if explicit && category != derived => {
+                Err(DcexError::InvalidInput(format!(
+                    "Bybit product_symbol {symbol} is a {derived} market but category={category} was given; omit category or pass the matching one."
+                )))
+            }
+            _ => Ok(()),
+        };
+        if let Some(table) = &self.product_table {
+            let canonical = table
+                .rows()
+                .iter()
+                .any(|row| row.exchange == "bybit" && row.product_symbol == symbol);
+            // Canonical symbols determine the category; native symbols are narrowed only by
+            // the category and otherwise must be unique across all Bybit markets.
+            let row = if canonical {
+                let row = table.resolve_symbol("bybit", symbol, None, None)?;
+                check(&row.exchange_type)?;
+                row
+            } else {
+                table
+                    .resolve_symbol("bybit", symbol, None, category)
+                    .map_err(|error| {
+                        let ambiguous = category.is_none()
+                            && table
+                                .rows()
+                                .iter()
+                                .filter(|row| {
+                                    row.exchange == "bybit" && row.exchange_symbol == symbol
+                                })
+                                .count()
+                                > 1;
+                        if ambiguous {
+                            DcexError::InvalidInput(format!(
+                                "{error}; pass category= or the unified product symbol (e.g. BTC-USDT-SPOT / BTC-USDT-SWAP)"
+                            ))
+                        } else {
+                            error
+                        }
+                    })?
+            };
+            return Ok((row.exchange_symbol.clone(), row.exchange_type.clone()));
+        }
+        let native = exchange_symbol_fallback(symbol)?;
+        let category = match canonical_category_fallback(symbol) {
+            Some(derived) => {
+                check(derived)?;
+                derived
+            }
+            None => category.unwrap_or("linear"),
+        };
+        Ok((native, category.to_string()))
+    }
+
+    /// Resolve a symbol for an endpoint that only serves `allowed` categories and was called
+    /// without an explicit category. Native symbols are narrowed to those categories; unified
+    /// symbols keep their own category, which must be one of them.
+    pub(super) fn symbol_category_within(
+        &self,
+        symbol: &str,
+        allowed: &[&str],
+    ) -> Result<(String, String)> {
+        let resolved = match &self.product_table {
+            Some(table) => {
+                let row = table.resolve_symbol_in("bybit", symbol, |row| {
+                    allowed.contains(&row.exchange_type.as_str())
+                })?;
+                (row.exchange_symbol.clone(), row.exchange_type.clone())
+            }
+            None => self.symbol_category(symbol, None)?,
+        };
+        if !allowed.contains(&resolved.1.as_str()) {
+            return Err(DcexError::InvalidInput(format!(
+                "Bybit product_symbol {symbol} is a {} market; this endpoint supports category {} only",
+                resolved.1,
+                allowed.join("/")
+            )));
+        }
+        Ok(resolved)
+    }
+
+    pub(super) fn exchange_symbol(&self, product_symbol: &str) -> Result<String> {
+        Ok(self.symbol_category(product_symbol, None)?.0)
+    }
+
+    /// Category of a product symbol; `default_category` only applies to native symbols.
     pub(super) fn category_for_product_symbol(
         &self,
         product_symbol: &str,
         default_category: &str,
     ) -> Result<String> {
-        if is_canonical_product_symbol(product_symbol)
-            && let Some(table) = &self.product_table
-        {
-            return table.get_exchange_type("bybit", Some(product_symbol), None);
-        }
-        Ok(category_for_product_symbol_fallback(
-            product_symbol,
-            default_category,
-        ))
+        Ok(self
+            .resolve_symbol_category(product_symbol, Some(default_category), false)?
+            .1)
     }
 
     pub(super) fn push_symbol_category(
         &self,
         params: &mut Vec<(String, String)>,
         product_symbol: &str,
+        category: Option<&str>,
         include_category: bool,
     ) -> Result<()> {
-        params.push(("symbol".to_string(), self.exchange_symbol(product_symbol)?));
+        let (symbol, category) = self.symbol_category(product_symbol, category)?;
+        params.push(("symbol".into(), symbol));
         if include_category {
-            let default_category = params
-                .iter()
-                .find(|(key, _)| key == "category")
-                .map(|(_, value)| value.clone())
-                .unwrap_or_else(|| "linear".to_string());
-            let category = self.category_for_product_symbol(product_symbol, &default_category)?;
             params.retain(|(key, _)| key != "category");
-            params.push(("category".to_string(), category));
+            params.push(("category".into(), category));
         }
         Ok(())
     }
@@ -194,20 +321,11 @@ impl BybitClient {
         &self,
         body: &mut Map<String, Value>,
         product_symbol: &str,
+        category: Option<&str>,
     ) -> Result<()> {
-        let default_category = body
-            .get("category")
-            .and_then(Value::as_str)
-            .unwrap_or("linear")
-            .to_string();
-        body.insert(
-            "category".to_string(),
-            Value::String(self.category_for_product_symbol(product_symbol, &default_category)?),
-        );
-        body.insert(
-            "symbol".to_string(),
-            Value::String(self.exchange_symbol(product_symbol)?),
-        );
+        let (symbol, category) = self.symbol_category(product_symbol, category)?;
+        body.insert("category".into(), Value::String(category));
+        body.insert("symbol".into(), Value::String(symbol));
         Ok(())
     }
 
@@ -372,12 +490,12 @@ mod tests {
     }
 
     #[test]
-    fn symbol_category_replaces_existing_query_category() {
+    fn symbol_category_replaces_default_query_category() {
         let client = BybitClient::public(5_000, false, Duration::from_secs(1)).expect("client");
         let mut params = vec![("category".to_string(), "linear".to_string())];
 
         client
-            .push_symbol_category(&mut params, "BTC-USD-SWAP", true)
+            .push_symbol_category(&mut params, "BTC-USD-SWAP", None, true)
             .expect("symbol category");
 
         assert_eq!(
@@ -396,13 +514,60 @@ mod tests {
         let mut params = vec![("category".to_string(), "spot".to_string())];
 
         client
-            .push_symbol_category(&mut params, "BTCUSDT", true)
+            .push_symbol_category(&mut params, "BTCUSDT", Some("spot"), true)
             .expect("symbol category");
 
         assert!(params.contains(&("category".to_string(), "spot".to_string())));
         assert_eq!(
             params.iter().filter(|(key, _)| key == "category").count(),
             1
+        );
+    }
+
+    #[test]
+    fn unified_symbol_rejects_conflicting_explicit_category() {
+        let row =
+            |product: &str, kind: &str, exchange_type: &str| crate::product_table::MarketInfo {
+                exchange: "bybit".into(),
+                exchange_symbol: "BTCUSDT".into(),
+                product_symbol: product.into(),
+                product_type: kind.into(),
+                exchange_type: exchange_type.into(),
+                ..Default::default()
+            };
+        let fallback = BybitClient::public(5_000, false, Duration::from_secs(1)).expect("client");
+        let table = fallback
+            .clone()
+            .with_product_table(crate::product_table::ProductTable::new(vec![
+                row("BTC-USDT-SPOT", "spot", "spot"),
+                row("BTC-USDT-SWAP", "swap", "linear"),
+            ]));
+        for client in [&fallback, &table] {
+            for (symbol, category) in [("BTC-USDT-SPOT", "linear"), ("BTC-USDT-SWAP", "spot")] {
+                let error = client
+                    .symbol_category(symbol, Some(category))
+                    .expect_err("conflicting category");
+                assert!(error.to_string().contains("category="), "{error}");
+            }
+            assert_eq!(
+                client
+                    .symbol_category("BTC-USDT-SWAP", Some("linear"))
+                    .expect("match"),
+                ("BTCUSDT".to_string(), "linear".to_string())
+            );
+            // Method defaults never filter a unified symbol.
+            assert_eq!(
+                client
+                    .category_for_product_symbol("BTC-USDT-SWAP", "spot")
+                    .expect("default"),
+                "linear"
+            );
+        }
+        assert_eq!(
+            table
+                .symbol_category("BTCUSDT", Some("spot"))
+                .expect("native"),
+            ("BTCUSDT".to_string(), "spot".to_string())
         );
     }
 }

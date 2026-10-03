@@ -50,6 +50,7 @@ pub struct AsterClient {
     pub(super) private_key: Option<[u8; 32]>,
     last_nonce: Arc<AtomicU64>,
     product_table: Option<Arc<ProductTable>>,
+    pub(super) symbol_product_type: Option<&'static str>,
 }
 
 impl AsterClient {
@@ -130,6 +131,7 @@ impl AsterClient {
             private_key: private_key.map(|key| parse_private_key(&key)).transpose()?,
             last_nonce: Arc::new(AtomicU64::new(0)),
             product_table: None,
+            symbol_product_type: None,
         })
     }
 
@@ -482,14 +484,42 @@ impl AsterClient {
         Ok(nonce)
     }
 
-    pub(super) fn exchange_symbol(&self, product_symbol: &str) -> Result<String> {
-        if !product_symbol.contains('-') {
-            return Ok(product_symbol.to_string());
-        }
+    pub(super) fn exchange_symbol_for(
+        &self,
+        product_symbol: &str,
+        market: AsterMarket,
+    ) -> Result<String> {
         if let Some(table) = &self.product_table {
-            return table.get_exchange_symbol("aster", product_symbol);
+            return Ok(table
+                .resolve_symbol_in("aster", product_symbol, |row| {
+                    if market == AsterMarket::Spot {
+                        row.product_type == "spot"
+                    } else {
+                        matches!(row.product_type.as_str(), "swap" | "futures")
+                    }
+                })?
+                .exchange_symbol
+                .clone());
         }
-        Ok(exchange_symbol_fallback(product_symbol))
+        exchange_symbol_fallback(product_symbol)
+    }
+
+    pub(super) fn exchange_symbol(&self, product_symbol: &str) -> Result<String> {
+        if let Some(table) = &self.product_table {
+            return Ok(table
+                .resolve_symbol_in("aster", product_symbol, |row| {
+                    self.symbol_product_type.is_none_or(|kind| {
+                        if kind == "spot" {
+                            row.product_type == "spot"
+                        } else {
+                            matches!(row.product_type.as_str(), "swap" | "futures")
+                        }
+                    })
+                })?
+                .exchange_symbol
+                .clone());
+        }
+        exchange_symbol_fallback(product_symbol)
     }
 }
 
@@ -508,12 +538,25 @@ pub(super) fn validate_wallet_address(label: &str, value: &str) -> Result<()> {
     Ok(())
 }
 
-pub(in crate::exchanges::aster) fn exchange_symbol_fallback(product_symbol: &str) -> String {
-    let mut parts = product_symbol.split('-');
-    match (parts.next(), parts.next(), parts.next()) {
-        (Some(base), Some(quote), Some(_kind)) => format!("{base}{quote}"),
-        _ => product_symbol.to_string(),
+pub(in crate::exchanges::aster) fn exchange_symbol_fallback(
+    product_symbol: &str,
+) -> Result<String> {
+    let parts = product_symbol.split('-').collect::<Vec<_>>();
+    if parts.len() < 3 {
+        return Ok(product_symbol.to_string());
     }
+    if parts.iter().any(|part| part.is_empty()) {
+        return Err(DcexError::InvalidInput(
+            "aster product symbol must not contain empty components".into(),
+        ));
+    }
+    let symbol = match parts.as_slice() {
+        [base, quote, "SPOT" | "SWAP"] => format!("{base}{quote}"),
+        _ => return Err(DcexError::InvalidInput(
+            "cannot safely resolve aster product symbol; load the product table or pass the official exchange symbol".into(),
+        )),
+    };
+    Ok(symbol)
 }
 
 pub(super) fn validate_response(response: &HttpResponse) -> Result<Value> {
@@ -643,4 +686,12 @@ mod nonce_uniqueness_tests {
                 .contains("within 60 seconds")
         );
     }
+}
+
+#[cfg(test)]
+#[test]
+fn public_market_symbol_samples() {
+    crate::exchanges::symbol_tests::check("aster", |symbol, _mode| {
+        exchange_symbol_fallback(symbol)
+    });
 }

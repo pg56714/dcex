@@ -9,7 +9,7 @@ use crate::product_table::ProductTable;
 use crate::{DcexError, Result};
 
 use super::endpoints::{FUTURES_BASE_URL, SPOT_BASE_URL};
-use super::params::{KucoinParams, exchange_symbol_fallback, is_canonical_product_symbol};
+use super::params::{KucoinParams, exchange_symbol_fallback};
 use super::signing::{
     encrypted_passphrase, http_method_name, request_signature, validate_response,
 };
@@ -336,12 +336,19 @@ impl KucoinClient {
     }
 
     pub(super) fn exchange_symbol(&self, product_symbol: &str, futures: bool) -> Result<String> {
-        if is_canonical_product_symbol(product_symbol)
-            && let Some(table) = &self.product_table
-        {
-            return table.get_exchange_symbol("kucoin", product_symbol);
+        if let Some(table) = &self.product_table {
+            return Ok(table
+                .resolve_symbol_in("kucoin", product_symbol, |row| {
+                    if futures {
+                        matches!(row.product_type.as_str(), "swap" | "futures")
+                    } else {
+                        row.product_type == "spot"
+                    }
+                })?
+                .exchange_symbol
+                .clone());
         }
-        Ok(exchange_symbol_fallback(product_symbol, futures))
+        exchange_symbol_fallback(product_symbol, futures)
     }
 
     pub(super) fn push_required_symbol(

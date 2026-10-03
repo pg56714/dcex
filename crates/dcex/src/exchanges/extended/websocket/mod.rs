@@ -30,7 +30,7 @@ pub(super) fn optional_market_path(prefix: &str, market: Option<&str>) -> Result
     }
 }
 
-pub(super) fn normalize_market(market: &str) -> Result<&str> {
+pub(super) fn normalize_market(market: &str) -> Result<String> {
     let market = market.trim();
     if market.is_empty()
         || !market.chars().all(|character| {
@@ -41,7 +41,7 @@ pub(super) fn normalize_market(market: &str) -> Result<&str> {
             "invalid Extended WebSocket market: {market}"
         )));
     }
-    Ok(market)
+    super::client::exchange_symbol_fallback(market)
 }
 
 pub(super) fn normalize_candle_type(candle_type: &str) -> Result<&str> {

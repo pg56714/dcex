@@ -39,7 +39,7 @@ async def test_decimal_contract_regression_wire(asynchronous, case, monkeypatch)
         try:
             if case == "attached":
                 attached = '{"type":"TAKE_PROFIT_MARKET","stopPrice":61000.5}'
-                await call("place_swap_order", product_symbol="BTC-USDT-SWAP", type_="MARKET", side="BUY", position_side="LONG", quantity="1", take_profit=attached)
+                await call("place_swap_order", product_symbol="BTC-USDT", type_="MARKET", side="BUY", position_side="LONG", quantity="1", take_profit=attached)
                 request = received.get(timeout=10)
                 assert urlsplit(request["path"]).path == "/openApi/swap/v2/trade/order"
                 params = parse_qs(urlsplit(request["path"]).query or request["body"])

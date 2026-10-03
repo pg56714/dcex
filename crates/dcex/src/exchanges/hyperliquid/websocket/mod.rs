@@ -66,11 +66,11 @@ pub(crate) fn resolve_coin(
     product_table: Option<&crate::product_table::ProductTable>,
     product_symbol: &str,
 ) -> Result<String> {
-    if is_canonical_product_symbol(product_symbol)
-        && let Some(table) = product_table
-    {
-        let exchange_symbol = table.get_exchange_symbol("hyperliquid", product_symbol)?;
-        let value: Value = serde_json::from_str(&exchange_symbol).map_err(|error| {
+    if let Some(table) = product_table {
+        let exchange_symbol = &table
+            .resolve_symbol("hyperliquid", product_symbol, None, None)?
+            .exchange_symbol;
+        let value: Value = serde_json::from_str(exchange_symbol).map_err(|error| {
             DcexError::InvalidInput(format!("invalid Hyperliquid exchange symbol: {error}"))
         })?;
         return value
@@ -184,7 +184,7 @@ fn validate_l2_book_precision(n_sig_figs: Option<u64>, mantissa: Option<u64>) ->
 
 pub(crate) fn normalize_coin(product_symbol: &str) -> Result<String> {
     let is_canonical_product_symbol = is_canonical_product_symbol(product_symbol);
-    let coin = fallback_coin(product_symbol);
+    let coin = fallback_coin(product_symbol)?;
     let coin = coin.trim();
     if coin.is_empty() {
         return Err(DcexError::InvalidInput(
@@ -204,7 +204,7 @@ pub(crate) fn normalize_coin(product_symbol: &str) -> Result<String> {
                 "cannot safely resolve Hyperliquid spot coin for {product_symbol}; load a product table or pass the official raw coin"
             )));
         }
-        Ok(coin.to_ascii_uppercase())
+        Ok(coin.to_string())
     } else {
         Ok(coin.to_string())
     }
@@ -307,7 +307,11 @@ mod tests {
 
     #[test]
     fn normalizes_coin_from_canonical_symbol() {
-        assert_eq!(normalize_coin("btc-usdc-swap").expect("coin"), "BTC");
+        assert_eq!(normalize_coin("BTC-USDC-SWAP").expect("coin"), "BTC");
+        assert_eq!(
+            normalize_coin("xyz:TSLA-USD-SWAP").expect("coin"),
+            "xyz:TSLA"
+        );
         assert_eq!(normalize_coin("ETH").expect("coin"), "ETH");
     }
 

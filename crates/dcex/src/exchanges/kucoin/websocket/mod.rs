@@ -53,66 +53,22 @@ pub(super) fn websocket_url(endpoint: &str, token: &str, connect_id: &str) -> Re
 }
 
 pub(super) fn normalize_symbol(product_symbol: &str, futures: bool) -> Result<String> {
-    let product_symbol = product_symbol.trim();
-    if product_symbol.is_empty() {
+    let product_symbol = product_symbol.trim().to_ascii_uppercase();
+    if product_symbol.is_empty()
+        || !product_symbol
+            .chars()
+            .all(|c| c.is_ascii_alphanumeric() || c == '-')
+    {
         return Err(DcexError::InvalidInput(
-            "KuCoin WebSocket symbol must not be empty.".to_string(),
+            "unsupported KuCoin WebSocket symbol".into(),
         ));
     }
-    if product_symbol.contains('-') {
-        let parts = product_symbol.split('-').collect::<Vec<_>>();
-        let valid_pair = parts.len() >= 2 && !parts[0].is_empty() && !parts[1].is_empty();
-        if !valid_pair {
-            return Err(DcexError::InvalidInput(format!(
-                "unsupported KuCoin WebSocket symbol: {product_symbol}"
-            )));
-        }
-        match parts.as_slice() {
-            [base, quote] if !futures => {
-                return Ok(format!(
-                    "{}-{}",
-                    base.to_ascii_uppercase(),
-                    quote.to_ascii_uppercase()
-                ));
-            }
-            [base, quote, kind, ..] if futures && !kind.eq_ignore_ascii_case("SPOT") => {
-                return Ok(format!(
-                    "{}{}M",
-                    kucoin_contract_asset(base).to_ascii_uppercase(),
-                    quote.to_ascii_uppercase()
-                ));
-            }
-            [base, quote, kind, ..] if !futures && kind.eq_ignore_ascii_case("SPOT") => {
-                return Ok(format!(
-                    "{}-{}",
-                    base.to_ascii_uppercase(),
-                    quote.to_ascii_uppercase()
-                ));
-            }
-            _ => {
-                let market = if futures { "Futures" } else { "Spot" };
-                return Err(DcexError::InvalidInput(format!(
-                    "KuCoin {market} WebSocket does not support product: {product_symbol}"
-                )));
-            }
-        }
+    if futures && product_symbol.split('-').count() == 2 {
+        return Err(DcexError::InvalidInput(
+            "KuCoin futures symbol requires a product table or an official contract symbol".into(),
+        ));
     }
-    if !product_symbol
-        .chars()
-        .all(|character| character.is_ascii_alphanumeric() || character == '-')
-    {
-        return Err(DcexError::InvalidInput(format!(
-            "unsupported KuCoin WebSocket symbol: {product_symbol}"
-        )));
-    }
-    Ok(product_symbol.to_ascii_uppercase())
-}
-
-fn kucoin_contract_asset(asset: &str) -> &str {
-    match asset {
-        "BTC" | "btc" => "XBT",
-        other => other,
-    }
+    super::params::exchange_symbol_fallback(&product_symbol, futures)
 }
 
 pub(super) fn normalize_topic(topic: &str) -> Result<String> {

@@ -15,6 +15,7 @@ fn product_table_resolves_canonical_symbol_to_market_id() {
         quote_currency: "USDC".to_string(),
         min_notional: "1".to_string(),
         size_per_contract: "1".to_string(),
+        ..MarketInfo::default()
     }]);
     let client = LighterClient::new(Duration::from_secs(1))
         .expect("client")

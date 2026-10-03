@@ -198,7 +198,7 @@ impl BitgetClient {
         if let Some(table) = &self.product_table {
             return Ok(table
                 .resolve_symbol_in("bitget", product_symbol, |row| {
-                    category.is_none_or(|category| row.exchange_type.eq_ignore_ascii_case(category))
+                    category_accepts_row(category, &row.exchange_type)
                 })?
                 .exchange_symbol
                 .clone());
@@ -363,5 +363,45 @@ impl BitgetClient {
             self.insert_product_symbol(body, params)?;
         }
         Ok(())
+    }
+}
+
+/// Narrow table rows by a Bitget category: SPOT and MARGIN trade spot pairs,
+/// futures categories select their own rows, and any other value does not narrow.
+fn category_accepts_row(category: Option<&str>, exchange_type: &str) -> bool {
+    match category {
+        Some(category)
+            if category.eq_ignore_ascii_case("SPOT") || category.eq_ignore_ascii_case("MARGIN") =>
+        {
+            exchange_type == "spot"
+        }
+        Some(category)
+            if ["USDT-FUTURES", "COIN-FUTURES", "USDC-FUTURES"]
+                .iter()
+                .any(|futures| category.eq_ignore_ascii_case(futures)) =>
+        {
+            exchange_type.eq_ignore_ascii_case(category)
+        }
+        _ => true,
+    }
+}
+
+#[cfg(test)]
+mod category_tests {
+    use super::category_accepts_row;
+
+    #[test]
+    fn margin_selects_spot_rows_and_unknown_categories_do_not_narrow() {
+        for category in ["SPOT", "MARGIN", "margin"] {
+            assert!(category_accepts_row(Some(category), "spot"));
+            assert!(!category_accepts_row(Some(category), "USDT-FUTURES"));
+        }
+        assert!(category_accepts_row(Some("usdt-futures"), "USDT-FUTURES"));
+        assert!(!category_accepts_row(Some("USDT-FUTURES"), "COIN-FUTURES"));
+        assert!(!category_accepts_row(Some("USDT-FUTURES"), "spot"));
+        for category in [None, Some("OTHER")] {
+            assert!(category_accepts_row(category, "spot"));
+            assert!(category_accepts_row(category, "USDC-FUTURES"));
+        }
     }
 }

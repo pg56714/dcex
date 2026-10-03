@@ -116,6 +116,10 @@ class PublicClient(AsyncWebSocketMixin):
 class PrivateClient(AsyncWebSocketMixin):
     """Async OKX private WebSocket client."""
 
+    def set_product_table(self, table: Any) -> None:  # noqa: ANN401
+        """Use exact canonical/native symbols from a native ProductTable."""
+        self._native_client.set_product_table(table)
+
     def __init__(
         self,
         api_key: str,

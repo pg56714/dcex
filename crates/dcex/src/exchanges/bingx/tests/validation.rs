@@ -84,3 +84,24 @@ fn spot_cancel_all_after_validates_timeout_and_uses_signed_route() {
         .is_err()
     );
 }
+
+#[test]
+fn coin_swap_rest_rejects_spot_product_symbol_before_request() {
+    let client = BingxClient::with_base_url(
+        None,
+        None,
+        Duration::from_secs(10),
+        "http://127.0.0.1:9".into(),
+    )
+    .expect("client");
+    let error = block_on(async move {
+        client
+            .public_request(
+                "get_coin_swap_ticker",
+                vec![("product_symbol".into(), "BTC-USD-SPOT".into())],
+            )
+            .await
+    })
+    .expect_err("Spot symbol on Coin-M");
+    assert!(error.to_string().contains("Spot"), "{error}");
+}

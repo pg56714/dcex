@@ -92,25 +92,6 @@ def test_crypto_loan_read_endpoints(client):
     _assert_crypto_loan_debts_or_empty(client)
 
 
-def test_savings_read_endpoints(client):
-    try:
-        _assert_ok(client.get_earn_account_assets())
-        _assert_ok(client.get_savings_account())
-        products = _assert_ok(client.get_savings_products(filter="available_and_held"))["data"]
-        _assert_ok(client.get_savings_assets("flexible", limit=20))
-        _assert_ok(client.get_savings_records("flexible", limit=20))
-        if products:
-            _assert_ok(
-                client.get_savings_subscription_info(
-                    products[0]["productId"], products[0]["periodType"]
-                )
-            )
-    except FailedRequestError as exc:
-        if "[40085]" in exc.message and "Unified Account mode" in exc.message:
-            pytest.skip("Bitget Classic Savings API is unavailable in Unified Account mode")
-        raise
-
-
 def test_elite_earn_read_endpoints(client):
     products_response = _assert_ok(client.get_elite_earn_products())
     _assert_ok(client.get_elite_earn_assets())

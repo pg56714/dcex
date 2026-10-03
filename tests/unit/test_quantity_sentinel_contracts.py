@@ -8,7 +8,7 @@ from dcex._input_codec import CATALOG, normalize
 @pytest.mark.parametrize(
     "exchange,method,field",
     [
-        ("bitget", "transfer", "amount"),
+        ("bitget", "transfer_uta_account", "amount"),
         ("okx", "funds_transfer", "amt"),
         ("okx", "amend_order", "newSz"),
         ("okx", "set_leverage", "lever"),

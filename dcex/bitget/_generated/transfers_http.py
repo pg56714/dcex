@@ -61,22 +61,6 @@ class GeneratedTransfersHTTP(MarketHTTP):
             ),
         )
 
-    def classic_broker_subaccount_subaccount_deposit_auto_transfer(
-        self, *, sub_uid: str, coin: str, to_account_type: str
-    ) -> dict[str, Any]:
-        """
-        Sub Deposit Auto Transfer.
-
-        Use native exchange symbols. Optional fields retain their documented types.
-        Source: https://www.bitget.com/docs/catalog/classic-broker-subaccount/classic-broker-subaccount#sub-deposit-auto-transfer
-        """
-        return self._native_private(
-            "classic_broker_subaccount_subaccount_deposit_auto_transfer",
-            self._native_params(
-                **{"subUid": sub_uid, "coin": coin, "toAccountType": to_account_type}
-            ),
-        )
-
     def classic_instloan_account_get_transferred_amount_from_spot_account(
         self, *, coin: str, user_id: str | None = None
     ) -> dict[str, Any]:

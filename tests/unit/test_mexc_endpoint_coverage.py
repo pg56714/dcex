@@ -31,7 +31,7 @@ pytest.importorskip("dcex._native")
 
 ROOT = Path(__file__).resolve().parents[2]
 SYMBOL = "BTC-USDT-SPOT"
-SWAP = "BTC-USDT-SWAP"
+SWAP = "BTC_USDT"
 
 # method name -> (kwargs, HTTP method, official path, signed?)
 CASES: dict[str, tuple[dict[str, Any], str, str, bool]] = {
@@ -162,8 +162,8 @@ CASES: dict[str, tuple[dict[str, Any], str, str, bool]] = {
     "cancel_contract_batch_orders_by_external_id": (
         {
             "orders": [
-                {"product_symbol": "BTC-USDT-SWAP", "externalOid": "1"},
-                {"product_symbol": "ETH-USDT-SWAP", "externalOid": "2"},
+                {"product_symbol": "BTC_USDT", "externalOid": "1"},
+                {"product_symbol": "ETH_USDT", "externalOid": "2"},
             ]
         },
         "POST",
@@ -173,8 +173,8 @@ CASES: dict[str, tuple[dict[str, Any], str, str, bool]] = {
     "get_contract_batch_orders_by_external_id": (
         {
             "orders": [
-                {"product_symbol": "BTC-USDT-SWAP", "externalOid": "1"},
-                {"product_symbol": "ETH-USDT-SWAP", "externalOid": "2"},
+                {"product_symbol": "BTC_USDT", "externalOid": "1"},
+                {"product_symbol": "ETH_USDT", "externalOid": "2"},
             ]
         },
         "POST",
@@ -182,13 +182,13 @@ CASES: dict[str, tuple[dict[str, Any], str, str, bool]] = {
         True,
     ),
     "get_contract_closed_orders": (
-        {"product_symbol": "BTC-USDT-SWAP", "page_size": 10},
+        {"product_symbol": "BTC_USDT", "page_size": 10},
         "GET",
         "/api/v1/private/order/list/close_orders",
         True,
     ),
     "get_contract_fee_details": (
-        {"product_symbol": "BTC-USDT-SWAP", "page_size": 10, "ids": [11, 12]},
+        {"product_symbol": "BTC_USDT", "page_size": 10, "ids": [11, 12]},
         "GET",
         "/api/v1/private/order/fee_details",
         True,
@@ -201,7 +201,7 @@ CASES: dict[str, tuple[dict[str, Any], str, str, bool]] = {
     ),
     "cancel_spot_all_orders": ({"all_symbols": True}, "DELETE", "/api/v3/order/all", True),
     "get_contract_open_stop_orders": (
-        {"product_symbol": "BTC-USDT-SWAP"},
+        {"product_symbol": "BTC_USDT"},
         "GET",
         "/api/v1/private/stoporder/open_orders",
         True,
@@ -1071,8 +1071,8 @@ def test_external_order_batches_keep_root_array_and_each_symbol(method: str) -> 
     request = _single_request(
         method,
         orders=[
-            {"product_symbol": "BTC-USDT-SWAP", "externalOid": "001"},
-            {"product_symbol": "ETH-USDT-SWAP", "externalOid": "002"},
+            {"product_symbol": "BTC_USDT", "externalOid": "001"},
+            {"product_symbol": "ETH_USDT", "externalOid": "002"},
         ],
     )
     assert json.loads(request["body"]) == [

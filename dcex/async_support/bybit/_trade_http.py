@@ -352,7 +352,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, HTTPManager):
 
     async def get_open_orders(
         self,
-        category: str = "linear",
+        category: str | None = None,
         product_symbol: str | None = None,
         settleCoin: str | None = None,
         baseCoin: str | None = None,
@@ -382,7 +382,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, HTTPManager):
 
     async def cancel_all_orders(
         self,
-        category: str = "linear",
+        category: str | None = None,
         product_symbol: str | None = None,
         baseCoin: str | None = None,
         settleCoin: str | None = None,
@@ -404,7 +404,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, HTTPManager):
 
     async def get_order_history(
         self,
-        category: str = "linear",
+        category: str | None = None,
         product_symbol: str | None = None,
         baseCoin: str | None = None,
         settleCoin: str | None = None,
@@ -438,7 +438,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, HTTPManager):
 
     async def get_execution_list(
         self,
-        category: str = "linear",
+        category: str | None = None,
         product_symbol: str | None = None,
         orderId: str | None = None,
         orderLinkId: str | None = None,

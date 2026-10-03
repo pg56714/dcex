@@ -11,6 +11,10 @@ from ._base import AsyncWebSocketMixin
 class PublicClient(AsyncWebSocketMixin):
     """Read-only Arcus WebSocket channels on one multiplexed connection."""
 
+    def set_product_table(self, table: Any) -> None:  # noqa: ANN401
+        """Use exact canonical/native symbols from a native ProductTable."""
+        self._native_client.set_product_table(table)
+
     def __init__(
         self, *, testnet: bool = False, timeout: float = 10.0, base_url: str | None = None
     ) -> None:

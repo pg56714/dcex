@@ -283,13 +283,16 @@ impl ExtendedClient {
     }
 
     pub(super) fn exchange_symbol(&self, product_symbol: &str) -> Result<String> {
+        if let Some(table) = &self.product_table {
+            return Ok(table
+                .resolve_symbol("extended", product_symbol, None, None)?
+                .exchange_symbol
+                .clone());
+        }
         if !product_symbol.contains('-') || product_symbol.ends_with("-USD") {
             return Ok(product_symbol.to_string());
         }
-        if let Some(table) = &self.product_table {
-            return table.get_exchange_symbol("extended", product_symbol);
-        }
-        Ok(exchange_symbol_fallback(product_symbol))
+        exchange_symbol_fallback(product_symbol)
     }
 
     pub(super) fn signing_credentials(&self) -> Result<&ExtendedSigningCredentials> {
@@ -313,13 +316,23 @@ pub(super) fn signing_domain_for_base_url(base_url: &str) -> StarknetDomain {
     }
 }
 
-fn exchange_symbol_fallback(product_symbol: &str) -> String {
+pub(super) fn exchange_symbol_fallback(product_symbol: &str) -> Result<String> {
     let parts = product_symbol.split('-').collect::<Vec<_>>();
-    match parts.as_slice() {
-        [base, _, "SPOT"] => format!("{base}SPOT"),
-        [base, quote, ..] => format!("{base}-{quote}"),
-        _ => product_symbol.to_string(),
+    if parts.len() < 3 {
+        return Ok(product_symbol.to_string());
     }
+    if parts.iter().any(|part| part.is_empty()) {
+        return Err(DcexError::InvalidInput(
+            "extended product symbol must not contain empty components".into(),
+        ));
+    }
+    let symbol = match parts.as_slice() {
+        [base, "USD", "SPOT"] => format!("{base}SPOT-USD"),
+        _ => return Err(DcexError::InvalidInput(
+            "cannot safely resolve extended product symbol; load the product table or pass the official exchange symbol".into(),
+        )),
+    };
+    Ok(symbol)
 }
 
 fn validate_client_config(
@@ -352,4 +365,25 @@ fn validate_client_config(
         ));
     }
     Ok((api_key, base_url, user_agent))
+}
+
+#[cfg(test)]
+#[test]
+fn public_market_symbol_samples() {
+    crate::exchanges::symbol_tests::check("extended", |symbol, _mode| {
+        exchange_symbol_fallback(symbol)
+    });
+}
+
+#[cfg(test)]
+#[test]
+fn product_table_resolves_listing_alias() {
+    let table = crate::exchanges::symbol_tests::table("extended", "AAPL-USD-SWAP", "AAPL_24_5-USD");
+    let client = ExtendedClient::new(None, Duration::from_secs(1))
+        .unwrap()
+        .with_product_table(table);
+    assert_eq!(
+        client.exchange_symbol("AAPL-USD-SWAP").unwrap(),
+        "AAPL_24_5-USD"
+    );
 }

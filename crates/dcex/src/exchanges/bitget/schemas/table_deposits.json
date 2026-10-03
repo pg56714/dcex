@@ -21,49 +21,6 @@
     "days": null
   },
   {
-    "name": "set_spot_deposit_account",
-    "path": "/api/v2/spot/wallet/modify-deposit-account",
-    "post": true,
-    "public": false,
-    "fields": [
-      "accountType",
-      "coin"
-    ],
-    "required": [
-      "accountType",
-      "coin"
-    ],
-    "arrays": [],
-    "limit": null,
-    "days": null
-  },
-  {
-    "name": "get_deposit_address",
-    "path": "/api/v2/spot/wallet/deposit-address",
-    "post": false,
-    "public": false,
-    "fields": [
-      "coin",
-      "chain",
-      "size"
-    ],
-    "required": [
-      "coin"
-    ],
-    "arrays": [],
-    "limit": null,
-    "days": null,
-    "input_schema": {
-      "type": "object",
-      "properties": {
-        "size": {
-          "type": "string",
-          "format": "decimal"
-        }
-      }
-    }
-  },
-  {
     "name": "set_uta_deposit_account",
     "path": "/api/v3/account/deposit-account",
     "post": true,

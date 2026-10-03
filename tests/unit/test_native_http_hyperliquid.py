@@ -54,7 +54,7 @@ def test_native_hyperliquid_private_order_builder_fee_payload_matches_docs() -> 
         status, _headers, body = client.private_request_json(
             "place_order",
             [
-                ("product_symbol", "BTC-USD-SWAP"),
+                ("product_symbol", '["BTC",0]'),
                 ("isBuy", "true"),
                 ("price", "100"),
                 ("size", "1"),
@@ -92,7 +92,7 @@ def test_native_hyperliquid_market_order_uses_ioc_limit_payload() -> None:
         )
         client.private_request_json(
             "place_future_market_buy_order",
-            [("product_symbol", "BTC-USD-SWAP"), ("size", "1")],
+            [("product_symbol", '["BTC",0]'), ("size", "1")],
         )
 
     assert received.get_nowait()["path"] == "/info"

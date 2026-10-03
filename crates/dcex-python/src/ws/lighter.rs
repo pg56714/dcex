@@ -17,6 +17,23 @@ struct PythonLighterPrivateWebSocketClient {
 
 #[pymethods]
 impl PythonLighterPublicWebSocketClient {
+    fn resolve_market_symbol(&self, symbol: &str) -> PyResult<u64> {
+        self.client
+            .try_lock()
+            .map_err(|_| PyRuntimeError::new_err("WebSocket client is busy"))?
+            .resolve_market_symbol(symbol)
+            .map_err(to_py_runtime_error)
+    }
+
+    fn set_product_table(&self, table: PyRef<'_, PythonProductTable>) -> PyResult<()> {
+        let mut client = self
+            .client
+            .try_lock()
+            .map_err(|_| PyRuntimeError::new_err("WebSocket client is busy"))?;
+        client.set_product_table(table.table.clone());
+        Ok(())
+    }
+
     #[new]
     #[pyo3(signature = (testnet=false, timeout=10.0, base_url=None, network=None))]
     fn new(
@@ -26,17 +43,19 @@ impl PythonLighterPublicWebSocketClient {
         network: Option<&str>,
     ) -> PyResult<Self> {
         let timeout = websocket_timeout(timeout)?;
-        let client = if let Some(base_url) = base_url {
-            LighterPublicWebSocket::with_url(base_url, timeout)
-        } else if let Some(network) = network {
-            if testnet {
-                return Err(PyValueError::new_err(
-                    "Lighter network and testnet cannot be specified together.",
-                ));
+        if testnet && network.is_some() {
+            return Err(PyValueError::new_err(
+                "Lighter network and testnet cannot be specified together.",
+            ));
+        }
+        let network = network.map(lighter_network).transpose()?;
+        let client = match (base_url, network) {
+            (Some(base_url), Some(network)) => {
+                LighterPublicWebSocket::with_network_and_url(network, base_url, timeout)
             }
-            LighterPublicWebSocket::with_network(lighter_network(network)?, timeout)
-        } else {
-            LighterPublicWebSocket::new(testnet, timeout)
+            (Some(base_url), None) => LighterPublicWebSocket::with_url(base_url, timeout),
+            (None, Some(network)) => LighterPublicWebSocket::with_network(network, timeout),
+            (None, None) => LighterPublicWebSocket::new(testnet, timeout),
         }
         .map_err(to_py_runtime_error)?;
         Ok(Self {
@@ -107,8 +126,9 @@ impl PythonLighterPublicWebSocketClient {
     fn subscribe_orderbook<'py>(
         &self,
         py: Python<'py>,
-        market_id: u64,
+        market_id: &Bound<'_, PyAny>,
     ) -> PyResult<Bound<'py, PyAny>> {
+        let market_id = market_id.str()?.to_str()?.to_string();
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             client
@@ -123,8 +143,9 @@ impl PythonLighterPublicWebSocketClient {
     fn subscribe_ticker<'py>(
         &self,
         py: Python<'py>,
-        market_id: u64,
+        market_id: &Bound<'_, PyAny>,
     ) -> PyResult<Bound<'py, PyAny>> {
+        let market_id = market_id.str()?.to_str()?.to_string();
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             client
@@ -139,8 +160,9 @@ impl PythonLighterPublicWebSocketClient {
     fn subscribe_market_stats<'py>(
         &self,
         py: Python<'py>,
-        market_id: u64,
+        market_id: &Bound<'_, PyAny>,
     ) -> PyResult<Bound<'py, PyAny>> {
+        let market_id = market_id.str()?.to_str()?.to_string();
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             client
@@ -167,8 +189,9 @@ impl PythonLighterPublicWebSocketClient {
     fn subscribe_trades<'py>(
         &self,
         py: Python<'py>,
-        market_id: u64,
+        market_id: &Bound<'_, PyAny>,
     ) -> PyResult<Bound<'py, PyAny>> {
+        let market_id = market_id.str()?.to_str()?.to_string();
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             client
@@ -183,9 +206,10 @@ impl PythonLighterPublicWebSocketClient {
     fn subscribe_klines<'py>(
         &self,
         py: Python<'py>,
-        market_id: u64,
+        market_id: &Bound<'_, PyAny>,
         resolution: String,
     ) -> PyResult<Bound<'py, PyAny>> {
+        let market_id = market_id.str()?.to_str()?.to_string();
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             client
@@ -200,9 +224,10 @@ impl PythonLighterPublicWebSocketClient {
     fn subscribe_mark_price_klines<'py>(
         &self,
         py: Python<'py>,
-        market_id: u64,
+        market_id: &Bound<'_, PyAny>,
         resolution: String,
     ) -> PyResult<Bound<'py, PyAny>> {
+        let market_id = market_id.str()?.to_str()?.to_string();
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             client
@@ -217,8 +242,9 @@ impl PythonLighterPublicWebSocketClient {
     fn subscribe_spot_market_stats<'py>(
         &self,
         py: Python<'py>,
-        market_id: u64,
+        market_id: &Bound<'_, PyAny>,
     ) -> PyResult<Bound<'py, PyAny>> {
+        let market_id = market_id.str()?.to_str()?.to_string();
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             client

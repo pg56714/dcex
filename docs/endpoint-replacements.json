@@ -3183,5 +3183,730 @@
       }
     ],
     "official_source": "https://www.bitget.com/docs/classic/uta-api-upgrade-guide"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/spot/account/sub-main-trans-record",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/account/sub-transfer-record",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/catalog/account/deposit-withdrawal#get-main-sub-account-transfer-records"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/spot/wallet/subaccount-transfer",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/account/sub-transfer",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/catalog/account/deposit-withdrawal#main-sub-account-transfer"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/spot/wallet/transfer",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/account/transfer",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/catalog/account/deposit-withdrawal#transfer"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/spot/wallet/transfer-coin-info",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/account/transferable-coins",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/catalog/account/deposit-withdrawal#get-transferable-coins"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/spot/wallet/deposit-address",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/account/deposit-address",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/catalog/account/deposit-withdrawal#get-deposit-address"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/spot/wallet/subaccount-deposit-address",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/account/sub-deposit-address",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/catalog/account/deposit-withdrawal#get-sub-deposit-address"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/spot/wallet/deposit-records",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/account/deposit-records",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/catalog/account/deposit-withdrawal#get-deposit-records"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/spot/wallet/subaccount-deposit-records",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/account/sub-deposit-records",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/catalog/account/deposit-withdrawal#get-sub-deposit-records"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/spot/wallet/withdrawal-records",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/account/withdrawal-records",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/catalog/account/deposit-withdrawal#get-withdrawal-records"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/spot/wallet/withdrawal",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/account/withdrawal",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/catalog/account/deposit-withdrawal#withdrawal"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/spot/wallet/cancel-withdrawal",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/account/cancel-withdrawal",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/catalog/account/deposit-withdrawal#cancel-withdrawal"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/account/funding-assets",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/account/funding-assets",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/catalog/account/assets-balance#get-account-funding-assets"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/common/trade-rate",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/account/fee-rate",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/catalog/account/assets-balance#get-account-fee-rate"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/common/all-trade-rate",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/account/all-fee-rate",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/catalog/account/risk-position#get-all-symbol-fee-rates"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/user/create-virtual-subaccount",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/user/create-sub",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/catalog/account/sub-accounts#create-sub-account"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/user/create-virtual-subaccount-apikey",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/user/create-sub-api",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/catalog/account/sub-accounts#create-sub-account-api-key"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/user/modify-virtual-subaccount-apikey",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/user/update-sub-api",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/catalog/account/sub-accounts#modify-sub-account-api-key"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/user/virtual-subaccount-list",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/user/sub-list",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/catalog/account/sub-accounts#get-sub-account-list"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/user/virtual-subaccount-apikey-list",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/user/sub-api-list",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/catalog/account/sub-accounts#get-sub-account-api-keys"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/user/create-agent-subaccount",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/user/sub-account/agent-create",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/catalog/account/sub-accounts#create-agent-sub-account"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/spot/wallet/modify-deposit-account",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/account/deposit-account",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/catalog/account/deposit-withdrawal#set-up-deposit-account"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/earn/elite/product",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/earn/elite-product",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/catalog/earn/onchain-earn#get-elite-product"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/earn/elite/subscribe",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/earn/elite-subscribe",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/catalog/earn/onchain-earn#elite-subscribe"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/earn/elite/subscribe-result",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/earn/elite-subscribe-result",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/catalog/earn/onchain-earn#get-elite-subscribe-result"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/earn/elite/subscribe-info",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/earn/elite-subscribe-info",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/catalog/earn/onchain-earn#get-elite-subscribe-info"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "POST",
+      "path": "/api/v2/earn/elite/redeem",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "POST",
+        "path": "/api/v3/earn/elite-redeem",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/catalog/earn/onchain-earn#elite-redeem"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/earn/elite/redeem-info",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/earn/elite-redeem-info",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/catalog/earn/onchain-earn#get-redeem-info"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/earn/elite/assets",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/earn/elite-assets",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/catalog/earn/onchain-earn#get-elite-assets"
+  },
+  {
+    "source": {
+      "exchange": "bitget",
+      "http_method": "GET",
+      "path": "/api/v2/earn/elite/records",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bitget",
+        "http_method": "GET",
+        "path": "/api/v3/earn/elite-records",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://www.bitget.com/docs/catalog/earn/onchain-earn#get-elite-records"
   }
 ]

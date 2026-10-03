@@ -266,7 +266,7 @@ fn public_info_routes_match_official_paths() {
         ),
         public(
             "get_markets",
-            &[("product_symbol", "BTC-USD-SWAP")],
+            &[("product_symbol", "BTC-USD")],
             "GET",
             "/api/v1/info/markets?market=BTC-USD",
         ),
@@ -284,7 +284,7 @@ fn public_info_routes_match_official_paths() {
         ),
         public(
             "get_market_stats",
-            &[("product_symbol", "BTC-USD-SWAP")],
+            &[("product_symbol", "BTC-USD")],
             "GET",
             "/api/v1/info/markets/BTC-USD/stats",
         ),
@@ -618,7 +618,7 @@ fn auto_signed_limit_order_fetches_market_and_fee_then_posts() {
 #[test]
 fn sign_create_order_returns_signature_without_posting() {
     let params = pairs(&[
-        ("product_symbol", "BTC-USD-SWAP"),
+        ("product_symbol", "BTC-USD"),
         ("side", "SELL"),
         ("qty", "0.001"),
         ("price", "10000"),
@@ -676,7 +676,7 @@ fn unsafe_requests_are_rejected_before_any_request() {
         "place_limit_order",
         pairs(&[
             ("market", "BTC-USD"),
-            ("product_symbol", "BTC-USD-SWAP"),
+            ("product_symbol", "BTC-USD"),
             ("side", "BUY"),
             ("qty", "1"),
             ("price", "1"),

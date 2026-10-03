@@ -155,7 +155,10 @@ impl BybitClient {
                             "{method_name} does not support product_symbol: {product_symbol}"
                         )));
                     }
-                    query.push(("symbol".to_string(), self.exchange_symbol(product_symbol)?));
+                    query.push((
+                        "symbol".to_string(),
+                        self.symbol_category(product_symbol, Some(category))?.0,
+                    ));
                     query.push(("category".to_string(), category.to_string()));
                 } else {
                     let category = match method_name {

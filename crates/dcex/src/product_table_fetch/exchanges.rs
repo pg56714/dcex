@@ -1,4 +1,4 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 use std::time::Duration;
 
 use serde_json::Value;
@@ -48,6 +48,7 @@ pub(super) fn arcus_market_info(market: &Value) -> Result<MarketInfo> {
         quote_currency: quote,
         min_notional: value_string(market, "minOrderNotional", "0"),
         size_per_contract: "1".into(),
+        ..MarketInfo::default()
     })
 }
 
@@ -111,6 +112,7 @@ fn aster_market_info(market: &Value, product_type: &str) -> Result<MarketInfo> {
             value_string(notional, "notional", "0"),
         ),
         size_per_contract: "1".to_string(),
+        ..MarketInfo::default()
     })
 }
 
@@ -175,6 +177,7 @@ pub(super) async fn fetch_backpack(timeout: Duration) -> Result<Vec<MarketInfo>>
             quote_currency: quote,
             min_notional: "0".to_string(),
             size_per_contract: "1".to_string(),
+            ..MarketInfo::default()
         });
     }
     for security in value_array(Some(&securities.data)) {
@@ -199,6 +202,7 @@ pub(super) fn backpack_rfq_market_info(security: &Value) -> Result<MarketInfo> {
         quote_currency: "USDC".to_string(),
         min_notional: "0".to_string(),
         size_per_contract: "1".to_string(),
+        ..MarketInfo::default()
     })
 }
 
@@ -243,6 +247,7 @@ pub(super) async fn fetch_binance(timeout: Duration) -> Result<Vec<MarketInfo>> 
             quote_currency: quote,
             min_notional: python_float_string(&value_string(notional, "minNotional", "0")),
             size_per_contract: "1".to_string(),
+            ..MarketInfo::default()
         });
     }
     for market in response_array(&futures, &["symbols"]) {
@@ -268,6 +273,7 @@ pub(super) async fn fetch_binance(timeout: Duration) -> Result<Vec<MarketInfo>> 
             quote_currency: quote,
             min_notional: value_string(notional, "notional", "0"),
             size_per_contract: "1".to_string(),
+            ..MarketInfo::default()
         });
     }
     let coin_futures = client
@@ -340,6 +346,7 @@ pub(super) fn binance_coin_futures_market_info(market: &Value) -> Result<MarketI
         quote_currency: quote,
         min_notional: "0".to_string(),
         size_per_contract: value_string(market, "contractSize", "1"),
+        ..MarketInfo::default()
     })
 }
 
@@ -358,6 +365,7 @@ pub(super) fn binance_equity_market_info(market: &Value) -> Result<MarketInfo> {
         quote_currency: "USDC".to_string(),
         min_notional: value_string(market, "minNotional", "0"),
         size_per_contract: "1".to_string(),
+        ..MarketInfo::default()
     })
 }
 
@@ -444,6 +452,7 @@ pub(super) fn binance_option_market_info(market: &Value) -> Option<MarketInfo> {
         quote_currency: quote,
         min_notional: "0".into(),
         size_per_contract: value_string(market, "unit", "1"),
+        ..MarketInfo::default()
     })
 }
 
@@ -472,6 +481,7 @@ pub(super) fn bybit_option_market_info(market: &Value) -> Option<MarketInfo> {
         quote_currency: quote,
         min_notional: "0".into(),
         size_per_contract: "1".into(),
+        ..MarketInfo::default()
     })
 }
 
@@ -497,6 +507,7 @@ pub(super) fn okx_option_market_info(market: &Value) -> Option<MarketInfo> {
         quote_currency: quote,
         min_notional: "0".into(),
         size_per_contract: value_string(market, "ctVal", "1"),
+        ..MarketInfo::default()
     })
 }
 
@@ -511,8 +522,8 @@ pub(super) fn okx_unlisted_option_family(error: &DcexError) -> bool {
 pub(super) fn bingx_swap_market_info(market: &Value) -> Result<MarketInfo> {
     let symbol = required_string(market, "symbol")?;
     let (base, quote) = split_last(&symbol, '-')?;
-    let price_places = value_i32(market, "pricePrecision", 0);
-    let quantity_places = value_i32(market, "quantityPrecision", 0);
+    let price_places = optional_i32(market, "pricePrecision");
+    let quantity_places = optional_i32(market, "quantityPrecision");
     Ok(MarketInfo {
         exchange: "bingx".to_string(),
         exchange_symbol: symbol,
@@ -530,6 +541,7 @@ pub(super) fn bingx_swap_market_info(market: &Value) -> Result<MarketInfo> {
         quote_currency: quote,
         min_notional: value_string(market, "tradeMinUSDT", "0"),
         size_per_contract: "1".to_string(),
+        ..MarketInfo::default()
     })
 }
 
@@ -563,6 +575,7 @@ pub(super) async fn fetch_bingx(timeout: Duration) -> Result<Vec<MarketInfo>> {
             quote_currency: quote,
             min_notional: value_string(market, "minNotional", "0"),
             size_per_contract: "1".to_string(),
+            ..MarketInfo::default()
         });
     }
     validate_bingx_products(&rows)?;
@@ -611,6 +624,7 @@ pub(super) async fn fetch_bitget(timeout: Duration) -> Result<Vec<MarketInfo>> {
             quote_currency: quote,
             min_notional: value_string(market, "minOrderAmount", "0"),
             size_per_contract: "1".to_string(),
+            ..MarketInfo::default()
         });
     }
     for category in ["USDT-FUTURES", "COIN-FUTURES", "USDC-FUTURES"] {
@@ -657,6 +671,7 @@ pub(super) fn bitget_uta_futures_market_info(market: &Value, category: &str) -> 
         quote_currency: quote,
         min_notional: value_string(market, "minOrderAmount", "0"),
         size_per_contract: "1".to_string(),
+        ..MarketInfo::default()
     })
 }
 
@@ -710,6 +725,7 @@ pub(super) async fn fetch_bybit(timeout: Duration) -> Result<Vec<MarketInfo>> {
                     value_string(lot, "minNotionalValue", "0")
                 },
                 size_per_contract: "1".to_string(),
+                ..MarketInfo::default()
             });
         }
     }
@@ -793,6 +809,7 @@ pub(super) fn extended_market_info(market: &Value) -> Result<MarketInfo> {
         quote_currency: quote,
         min_notional: "0".to_string(),
         size_per_contract: "1".to_string(),
+        ..MarketInfo::default()
     })
 }
 
@@ -843,24 +860,36 @@ pub(super) fn hyperliquid_perpetual_market_info(
     let base = coin
         .rsplit_once(':')
         .map_or_else(|| coin.clone(), |(_, base)| base.to_string());
-    let precision = decimal_precision(value_i32(market, "szDecimals", 0));
+    let sz_decimals = value_i32(market, "szDecimals", 0);
+    let precision = decimal_precision(sz_decimals);
     Ok(MarketInfo {
         exchange: "hyperliquid".to_string(),
         exchange_symbol: format!("[\"{coin}\", {asset_id}]"),
         product_symbol: format!("{coin}-USD-SWAP"),
         product_type: "swap".to_string(),
         exchange_type: "perpetual".to_string(),
-        price_precision: precision.clone(),
+        price_precision: hyperliquid_price_precision(HYPERLIQUID_PERP_MAX_DECIMALS, sz_decimals),
         size_precision: precision.clone(),
         min_size: precision,
         base_currency: base,
         quote_currency: "USD".to_string(),
         min_notional: "10".to_string(),
         size_per_contract: "1".to_string(),
+        ..MarketInfo::default()
     })
 }
 
-fn append_hyperliquid_spot_rows(
+const HYPERLIQUID_PERP_MAX_DECIMALS: i32 = 6;
+const HYPERLIQUID_SPOT_MAX_DECIMALS: i32 = 8;
+
+/// Smallest price increment Hyperliquid accepts: at most `MAX_DECIMALS - szDecimals` decimal
+/// places (6 for perps, 8 for spot). Prices are additionally limited to five significant
+/// figures, which depends on the price itself and is applied when an order price is chosen.
+fn hyperliquid_price_precision(max_decimals: i32, sz_decimals: i32) -> String {
+    decimal_precision((max_decimals - sz_decimals).max(0))
+}
+
+pub(super) fn append_hyperliquid_spot_rows(
     rows: &mut Vec<MarketInfo>,
     spot: &crate::exchange::ValidatedResponse,
 ) -> Result<()> {
@@ -889,7 +918,8 @@ fn append_hyperliquid_spot_rows(
         };
         let base = required_string(base_token, "name")?;
         let quote = required_string(quote_token, "name")?;
-        let precision = decimal_precision(value_i32(base_token, "szDecimals", 0));
+        let sz_decimals = value_i32(base_token, "szDecimals", 0);
+        let precision = decimal_precision(sz_decimals);
         let asset_index = market
             .get("index")
             .and_then(Value::as_u64)
@@ -904,13 +934,17 @@ fn append_hyperliquid_spot_rows(
             product_symbol: format!("{base}-{quote}-SPOT"),
             product_type: "spot".to_string(),
             exchange_type: "spot".to_string(),
-            price_precision: precision.clone(),
+            price_precision: hyperliquid_price_precision(
+                HYPERLIQUID_SPOT_MAX_DECIMALS,
+                sz_decimals,
+            ),
             size_precision: precision.clone(),
             min_size: precision,
             base_currency: base,
             quote_currency: quote,
             min_notional: "10".to_string(),
             size_per_contract: "1".to_string(),
+            ..MarketInfo::default()
         });
     }
     Ok(())
@@ -941,6 +975,7 @@ pub(super) async fn fetch_kucoin(timeout: Duration) -> Result<Vec<MarketInfo>> {
             quote_currency: quote,
             min_notional: non_empty_string(market, "minFunds").unwrap_or_else(|| "0".to_string()),
             size_per_contract: "1".to_string(),
+            ..MarketInfo::default()
         });
     }
     for market in response_array(&futures, &["data"]) {
@@ -979,6 +1014,7 @@ pub(super) fn kucoin_futures_market_info(market: &Value) -> Result<MarketInfo> {
         quote_currency: quote,
         min_notional: "0".to_string(),
         size_per_contract: value_string(market, "multiplier", "1"),
+        ..MarketInfo::default()
     })
 }
 
@@ -1003,70 +1039,7 @@ pub(super) async fn fetch_kraken(timeout: Duration) -> Result<Vec<MarketInfo>> {
             ],
         )
         .await?;
-    let mut rows = Vec::new();
-    let mut seen_tokenized_symbols = HashSet::new();
-    for (response, requested_asset_class) in [(&spot, None), (&tokenized, Some("tokenized_asset"))]
-    {
-        if let Some(result) = response.data.get("result").and_then(Value::as_object) {
-            for (symbol, market) in result {
-                let asset_class = non_empty_string(market, "aclass_base")
-                    .or_else(|| requested_asset_class.map(str::to_string))
-                    .unwrap_or_else(|| "spot".to_string());
-                let is_tokenized = asset_class == "tokenized_asset";
-                let status = value_string(market, "status", "");
-                if !status.is_empty()
-                    && status != "online"
-                    && !(is_tokenized && status == "post_only")
-                {
-                    continue;
-                }
-                let wsname = value_string(market, "wsname", "");
-                let (base, quote) = if let Some((base, quote)) = wsname.split_once('/') {
-                    (
-                        normalize_kraken_spot_currency(base, is_tokenized),
-                        normalize_kraken_currency(quote),
-                    )
-                } else {
-                    (
-                        normalize_kraken_spot_currency(
-                            &value_string(market, "base", ""),
-                            is_tokenized,
-                        ),
-                        normalize_kraken_currency(&value_string(market, "quote", "")),
-                    )
-                };
-                let exchange_symbol = if is_tokenized {
-                    non_empty_string(market, "altname").unwrap_or_else(|| symbol.clone())
-                } else {
-                    symbol.clone()
-                };
-                if is_tokenized && !seen_tokenized_symbols.insert(exchange_symbol.clone()) {
-                    continue;
-                }
-                rows.push(MarketInfo {
-                    exchange: "kraken".to_string(),
-                    exchange_symbol,
-                    product_symbol: format!("{base}-{quote}-SPOT"),
-                    product_type: "spot".to_string(),
-                    exchange_type: if is_tokenized {
-                        asset_class
-                    } else {
-                        "spot".to_string()
-                    },
-                    price_precision: market.get("tick_size").map_or_else(
-                        || decimal_precision(value_i32(market, "pair_decimals", 0)),
-                        json_string,
-                    ),
-                    size_precision: decimal_precision(value_i32(market, "lot_decimals", 0)),
-                    min_size: value_string(market, "ordermin", "0"),
-                    base_currency: base,
-                    quote_currency: quote,
-                    min_notional: value_string(market, "costmin", "0"),
-                    size_per_contract: "1".to_string(),
-                });
-            }
-        }
-    }
+    let mut rows = kraken_spot_rows(&spot.data, &tokenized.data);
     for market in response_array(&futures, &["instruments"]) {
         let instrument_type = value_string(market, "type", "");
         if instrument_type == "options"
@@ -1097,9 +1070,79 @@ pub(super) async fn fetch_kraken(timeout: Duration) -> Result<Vec<MarketInfo>> {
             quote_currency: quote,
             min_notional: "0".to_string(),
             size_per_contract: value_string(market, "contractSize", "1"),
+            ..MarketInfo::default()
         });
     }
     Ok(rows)
+}
+
+pub(crate) fn kraken_spot_rows(spot: &Value, tokenized: &Value) -> Vec<MarketInfo> {
+    let mut rows = Vec::new();
+    for (response, requested_asset_class) in [(spot, None), (tokenized, Some("tokenized_asset"))] {
+        if let Some(result) = response.get("result").and_then(Value::as_object) {
+            for (symbol, market) in result {
+                let asset_class = non_empty_string(market, "aclass_base")
+                    .or_else(|| requested_asset_class.map(str::to_string))
+                    .unwrap_or_else(|| "spot".to_string());
+                let is_tokenized = asset_class == "tokenized_asset";
+                let status = value_string(market, "status", "");
+                if !status.is_empty()
+                    && status != "online"
+                    && !(is_tokenized && status == "post_only")
+                {
+                    continue;
+                }
+                let wsname = value_string(market, "wsname", "");
+                let (base, quote) = if let Some((base, quote)) = wsname.split_once('/') {
+                    (
+                        normalize_kraken_spot_currency(base, is_tokenized),
+                        normalize_kraken_currency(quote),
+                    )
+                } else {
+                    (
+                        normalize_kraken_spot_currency(
+                            &value_string(market, "base", ""),
+                            is_tokenized,
+                        ),
+                        normalize_kraken_currency(&value_string(market, "quote", "")),
+                    )
+                };
+                // Tokenized `...SPV...` pair keys are separate books that share the `altname` of
+                // the xStock pair; only the pair whose key is its own `altname` gets a row.
+                if is_tokenized && non_empty_string(market, "altname").as_ref() != Some(symbol) {
+                    continue;
+                }
+                let exchange_symbol = symbol.clone();
+                // For regular spot pairs the official `altname` names the same book as the pair key.
+                let exchange_symbol_alias = non_empty_string(market, "altname")
+                    .filter(|altname| *altname != exchange_symbol)
+                    .unwrap_or_default();
+                rows.push(MarketInfo {
+                    exchange: "kraken".to_string(),
+                    exchange_symbol,
+                    exchange_symbol_alias,
+                    product_symbol: format!("{base}-{quote}-SPOT"),
+                    product_type: "spot".to_string(),
+                    exchange_type: if is_tokenized {
+                        asset_class
+                    } else {
+                        "spot".to_string()
+                    },
+                    price_precision: market.get("tick_size").map_or_else(
+                        || decimal_precision(value_i32(market, "pair_decimals", 0)),
+                        json_string,
+                    ),
+                    size_precision: decimal_precision(value_i32(market, "lot_decimals", 0)),
+                    min_size: value_string(market, "ordermin", "0"),
+                    base_currency: base,
+                    quote_currency: quote,
+                    min_notional: value_string(market, "costmin", "0"),
+                    size_per_contract: "1".to_string(),
+                });
+            }
+        }
+    }
+    rows
 }
 
 pub(super) async fn fetch_ondo(timeout: Duration) -> Result<Vec<MarketInfo>> {
@@ -1137,6 +1180,7 @@ pub(super) fn ondo_market_rows(data: &Value) -> Result<Vec<MarketInfo>> {
                     quote_currency: quote,
                     min_notional: "0".to_string(),
                     size_per_contract: "1".to_string(),
+                    ..MarketInfo::default()
                 })
             };
             match parse() {
@@ -1215,6 +1259,7 @@ fn lighter_market_info(market: &Value, product_type: &str) -> Result<MarketInfo>
         quote_currency: quote,
         min_notional: value_string(market, "min_quote_amount", "0"),
         size_per_contract: "1".to_string(),
+        ..MarketInfo::default()
     })
 }
 
@@ -1279,6 +1324,7 @@ pub(super) fn mexc_spot_market_info(market: &Value) -> Result<MarketInfo> {
         quote_currency: quote,
         min_notional: value_string(market, "quoteAmountPrecision", "0"),
         size_per_contract: "1".to_string(),
+        ..MarketInfo::default()
     })
 }
 
@@ -1302,6 +1348,7 @@ pub(super) fn mexc_contract_market_info(market: &Value) -> Result<MarketInfo> {
         quote_currency: quote,
         min_notional: "0".to_string(),
         size_per_contract: value_string(market, "contractSize", "1"),
+        ..MarketInfo::default()
     })
 }
 
@@ -1414,5 +1461,6 @@ pub(super) fn okx_market_info(market: &Value, product_type: &str) -> Result<Mark
         } else {
             "1".to_string()
         },
+        ..MarketInfo::default()
     })
 }

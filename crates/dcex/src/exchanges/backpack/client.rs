@@ -398,14 +398,17 @@ impl BackpackClient {
     }
 
     pub(super) fn exchange_symbol(&self, product_symbol: &str) -> Result<String> {
+        if let Some(table) = &self.product_table {
+            return Ok(table
+                .resolve_symbol("backpack", product_symbol, None, None)?
+                .exchange_symbol
+                .clone());
+        }
         if product_symbol.contains('_') {
             return Ok(product_symbol.to_string());
         }
         if product_symbol.contains('-') {
-            if let Some(table) = &self.product_table {
-                return table.get_exchange_symbol("backpack", product_symbol);
-            }
-            return Ok(exchange_symbol_fallback(product_symbol));
+            return exchange_symbol_fallback(product_symbol);
         }
         Ok(product_symbol.to_string())
     }
@@ -438,12 +441,31 @@ impl BackpackClient {
     }
 }
 
-fn exchange_symbol_fallback(product_symbol: &str) -> String {
+fn exchange_symbol_fallback(product_symbol: &str) -> Result<String> {
     let parts = product_symbol.split('-').collect::<Vec<_>>();
-    match parts.as_slice() {
-        [base, quote, "SPOT"] => format!("{base}_{quote}"),
-        [base, quote, "RFQ"] => format!("{base}_{quote}_RFQ"),
-        [base, quote, ..] => format!("{base}_{quote}_PERP"),
-        _ => product_symbol.to_string(),
+    if parts.len() < 3 {
+        return Ok(product_symbol.to_string());
     }
+    if parts.iter().any(|part| part.is_empty()) {
+        return Err(DcexError::InvalidInput(
+            "backpack product symbol must not contain empty components".into(),
+        ));
+    }
+    let symbol = match parts.as_slice() {
+        [base, quote, "SPOT"] => format!("{base}_{quote}"),
+        [base, "USDC", "RFQ"] => format!("{base}_USDC_RFQ"),
+        [base, quote, "SWAP"] => format!("{base}_{quote}_PERP"),
+        _ => return Err(DcexError::InvalidInput(
+            "cannot safely resolve backpack product symbol; load the product table or pass the official exchange symbol".into(),
+        )),
+    };
+    Ok(symbol)
+}
+
+#[cfg(test)]
+#[test]
+fn public_market_symbol_samples() {
+    crate::exchanges::symbol_tests::check("backpack", |symbol, _mode| {
+        exchange_symbol_fallback(symbol)
+    });
 }

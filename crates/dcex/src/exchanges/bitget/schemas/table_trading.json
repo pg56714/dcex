@@ -1,72 +1,5 @@
 [
   {
-    "name": "set_futures_all_leverage",
-    "path": "/api/v2/mix/account/set-all-leverage",
-    "post": true,
-    "public": false,
-    "fields": [
-      "productType",
-      "leverage"
-    ],
-    "required": [
-      "productType",
-      "leverage"
-    ],
-    "arrays": [],
-    "limit": null,
-    "days": null,
-    "input_schema": {
-      "type": "object",
-      "properties": {
-        "leverage": {
-          "type": "string",
-          "format": "decimal"
-        }
-      }
-    }
-  },
-  {
-    "name": "reverse_futures_position",
-    "path": "/api/v2/mix/order/click-backhand",
-    "post": true,
-    "public": false,
-    "fields": [
-      "symbol",
-      "marginCoin",
-      "productType",
-      "side",
-      "size",
-      "tradeSide",
-      "clientOid"
-    ],
-    "required": [
-      "symbol",
-      "marginCoin",
-      "productType",
-      "side"
-    ],
-    "arrays": [],
-    "limit": null,
-    "days": null,
-    "input_schema": {
-      "type": "object",
-      "properties": {
-        "size": {
-          "type": "string",
-          "format": "decimal"
-        },
-        "margin_coin": {
-          "type": "string",
-          "description": "reverse_futures_position/margin_coin: selects the settlement currency for the margin account."
-        },
-        "marginCoin": {
-          "type": "string",
-          "description": "reverse_futures_position/marginCoin: selects the settlement currency for the margin account."
-        }
-      }
-    }
-  },
-  {
     "name": "get_uta_adl_rank",
     "path": "/api/v3/position/adlRank",
     "post": false,
@@ -97,21 +30,6 @@
       "type": "object",
       "properties": {}
     }
-  },
-  {
-    "name": "get_all_trade_rates",
-    "path": "/api/v2/common/all-trade-rate",
-    "post": false,
-    "public": false,
-    "fields": [
-      "businessType"
-    ],
-    "required": [
-      "businessType"
-    ],
-    "arrays": [],
-    "limit": 100,
-    "days": null
   },
   {
     "name": "move_uta_positions",

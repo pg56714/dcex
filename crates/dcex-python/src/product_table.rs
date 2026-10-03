@@ -4,7 +4,7 @@ use std::io::{BufWriter, Write};
 use pyo3::exceptions::{PyIndexError, PyTypeError};
 use pyo3::types::{PyAny, PyDict};
 
-const PRODUCT_TABLE_COLUMNS: [&str; 12] = [
+const PRODUCT_TABLE_COLUMNS: [&str; 13] = [
     "exchange",
     "exchange_symbol",
     "product_symbol",
@@ -17,6 +17,7 @@ const PRODUCT_TABLE_COLUMNS: [&str; 12] = [
     "quote_currency",
     "min_notional",
     "size_per_contract",
+    "exchange_symbol_alias",
 ];
 
 fn exchange_from_name(name: &str) -> PyResult<dcex::exchange::Exchange> {
@@ -48,6 +49,7 @@ fn market_info_from_map(mut row: BTreeMap<String, String>) -> PyResult<MarketInf
         size_per_contract: row
             .remove("size_per_contract")
             .unwrap_or_else(|| "1".to_string()),
+        exchange_symbol_alias: row.remove("exchange_symbol_alias").unwrap_or_default(),
     })
 }
 
@@ -67,6 +69,10 @@ fn market_info_to_map(row: &MarketInfo) -> BTreeMap<String, String> {
         (
             "size_per_contract".to_string(),
             row.size_per_contract.clone(),
+        ),
+        (
+            "exchange_symbol_alias".to_string(),
+            row.exchange_symbol_alias.clone(),
         ),
     ])
 }
@@ -89,6 +95,7 @@ fn market_info_field<'a>(row: &'a MarketInfo, key: &str) -> Option<&'a str> {
         "quote_currency" => Some(&row.quote_currency),
         "min_notional" => Some(&row.min_notional),
         "size_per_contract" => Some(&row.size_per_contract),
+        "exchange_symbol_alias" => Some(&row.exchange_symbol_alias),
         _ => None,
     }
 }

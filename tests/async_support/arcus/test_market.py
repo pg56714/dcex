@@ -9,11 +9,17 @@ pytestmark = [pytest.mark.live, pytest.mark.asyncio]
 
 
 async def test_perpetual_reference_data():
-    async with Client(timeout=20) as client:
+    client = Client(timeout=20)
+    try:
         assert isinstance(await client.get_markets(), dict | list)
         assert isinstance(await client.get_spot_assets(), dict | list)
+    finally:
+        await client.close()
 
 
 async def test_spot_reference_data():
-    async with SpotClient(timeout=20) as client:
+    client = SpotClient(timeout=20)
+    try:
         assert isinstance(await client.get_tokens(), dict | list)
+    finally:
+        await client.close()

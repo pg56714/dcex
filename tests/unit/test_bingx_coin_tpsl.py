@@ -23,7 +23,7 @@ async def test_coin_swap_tpsl_exact_number_wire(asynchronous):
             await client.async_init()
         try:
             response = client.place_coin_swap_order(
-                product_symbol="BTC-USD-SWAP", side="BUY", type_="MARKET", quantity="1",
+                product_symbol="BTC-USD", side="BUY", type_="MARKET", quantity="1",
                 take_profit={"type": "TAKE_PROFIT", "stopPrice": "61000.5", "price": Decimal("61000.125000000000000001")},
                 stop_loss={"type": "STOP_MARKET", "stopPrice": Decimal("59000.75")},
             )

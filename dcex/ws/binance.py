@@ -14,6 +14,10 @@ _native = load_native()
 class PublicClient(AsyncWebSocketMixin):
     """Binance market streams; select a market/routing profile for each connection."""
 
+    def set_product_table(self, table: Any) -> None:  # noqa: ANN401
+        """Use exact canonical/native symbols from a native ProductTable."""
+        self._native_client.set_product_table(table)
+
     def __init__(
         self, timeout: float = 10.0, base_url: str | None = None, profile: str = "spot"
     ) -> None:
