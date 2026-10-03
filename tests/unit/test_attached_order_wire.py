@@ -9,10 +9,9 @@ from urllib.parse import parse_qs, urlsplit
 
 import pytest
 
-from tests.unit.native_http_helpers import _http_server
-from tests.unit.input_contract_coverage import missing_wire_declarations
 from dcex._input_codec import CATALOG
-
+from tests.unit.input_contract_coverage import missing_wire_declarations
+from tests.unit.native_http_helpers import _http_server
 
 ATTACHED_AMEND = dict(attachAlgoId="2", sz="0.125", newTpTriggerPx="61000.125", newTpOrdPx="-1", newSlTriggerPx="50000.125", newSlOrdPx="-1")
 OKX_CASES = [

@@ -137,18 +137,3 @@ async def test_get_open_positions(client):
 async def test_get_fund_flow(client):
     res = await client.get_fund_flow(limit=5)
     assert res is not None
-
-
-@pytest.mark.asyncio
-@pytest.mark.private
-async def test_get_listen_key(client):
-    res = await client.get_listen_key()
-    assert res is not None
-
-
-@pytest.mark.asyncio
-@pytest.mark.private
-async def test_keep_alive_listen_key(client):
-    listen_key = await client.get_listen_key()
-    res = await client.keep_alive_listen_key(listen_key)
-    assert res is not None

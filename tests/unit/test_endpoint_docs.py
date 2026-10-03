@@ -6,9 +6,8 @@ import json
 import subprocess
 import sys
 
-from scripts.build_endpoint_markdown import ROOT, build_markdown
-
 from scripts.build_endpoint_docs import LEDGER, OUTPUT, build_html
+from scripts.build_endpoint_markdown import ROOT, build_markdown
 
 
 def test_endpoint_markdown_matches_current_sources() -> None:

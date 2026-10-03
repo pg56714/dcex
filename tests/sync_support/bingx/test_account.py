@@ -122,16 +122,3 @@ def test_get_open_positions(client):
 def test_get_fund_flow(client):
     res = client.get_fund_flow(limit=5)
     assert res is not None
-
-
-@pytest.mark.private
-def test_get_listen_key(client):
-    res = client.get_listen_key()
-    assert res is not None
-
-
-@pytest.mark.private
-def test_keep_alive_listen_key(client):
-    listen_key = client.get_listen_key()
-    res = client.keep_alive_listen_key(listen_key)
-    assert res is not None

@@ -86,21 +86,3 @@ async def test_missing_strategy_query_returns_documented_error(client, history):
                 strategyType="OTO",
                 clientStrategyId="dcex-missing-strategy",
             )
-
-
-@pytest.mark.asyncio
-async def test_spot_listen_key_lifecycle(client):
-    created = _assert_response(await client.create_spot_listen_key())
-    assert isinstance(created, dict)
-    listen_key = str(created["listenKey"])
-    _assert_response(await client.keep_alive_spot_listen_key(listen_key))
-    _assert_response(await client.close_spot_listen_key(listen_key))
-
-
-@pytest.mark.asyncio
-async def test_futures_listen_key_lifecycle(client):
-    created = _assert_response(await client.create_futures_listen_key())
-    assert isinstance(created, dict)
-    assert created.get("listenKey")
-    _assert_response(await client.keep_alive_futures_listen_key())
-    _assert_response(await client.close_futures_listen_key())

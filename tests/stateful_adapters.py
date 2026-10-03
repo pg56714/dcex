@@ -214,8 +214,13 @@ class CexAdapter:
             data = next(iter(data.values())) if self.spot else data["orderBook"]
         else:
             raise LifecycleError("unsupported book adapter")
-        bids, asks = (data["b"], data["a"]) if ex == "bybit" else (data["bids"], data["asks"])
-        return decimal(bids[0][0]), decimal(asks[0][0])
+        bids, asks = (
+            (data["b"], data["a"]) if ex in {"bybit", "bitget"} else (data["bids"], data["asks"])
+        )
+        if not bids or not asks:
+            raise LifecycleError("order book has an empty side")
+        # Level order differs by venue (Backpack and Kraken Futures list bids ascending).
+        return max(decimal(row[0]) for row in bids), min(decimal(row[0]) for row in asks)
 
     async def available(self):
         ex, coin = self.exchange, self.currency
@@ -279,8 +284,14 @@ class CexAdapter:
                 (await self.call("get_futures_account", currency=coin))["availableBalance"]
             )
         if ex == "backpack":
-            data = await self.call("get_balances")
-            return decimal(data[coin]["available"]) if coin in data else Decimal(0)
+            # Orders use autoLendRedeem, so lent USDC counts; any existing debt stops the test.
+            data = await self.call("get_private_collateral")
+            if decimal(data["borrowLiability"]) != 0:
+                raise LifecycleError("backpack: existing borrow liability; no order was submitted")
+            row = next((r for r in rows(data["collateral"]) if r["symbol"] == coin), None)
+            if row is None:
+                return Decimal(0)
+            return decimal(row["availableQuantity"]) + decimal(row["lendQuantity"])
         if ex == "kraken":
             if self.spot:
                 data = await self.call("get_spot_account_balance")
@@ -309,22 +320,36 @@ class CexAdapter:
             lower, upper = Decimal(0), None
             if percent:
                 if self.exchange == "aster" and self.spot:
-                    # The spot spec defines index-price bands but exposes no
-                    # index-price endpoint. Last trade/VWAP are not substitutes.
-                    raise MarketUnavailable(
-                        "aster spot: documented index-price source for percentage bands is unavailable"
+                    # Aster spot bands use an index price (PERCENT_PRICE) and a 5-minute
+                    # average (PERCENT_PRICE_BY_SIDE) but expose neither. The best bid is the
+                    # reference; take the tighter band. A wrong reference can only cause a
+                    # rejection, never a fill, because the price stays below the bid.
+                    bands = [
+                        filters[name]
+                        for name in ("PERCENT_PRICE", "PERCENT_PRICE_BY_SIDE")
+                        if name in filters
+                    ]
+                    down = max(
+                        decimal(band.get("bidMultiplierDown", band.get("multiplierDown")))
+                        for band in bands
                     )
-                reference = await self.call(
-                    "get_spot_average_price" if self.spot else "get_futures_premium_index",
-                    product_symbol=self.symbol,
-                )
-                reference = decimal(reference["price"] if self.spot else reference["markPrice"])
-                lower = reference * decimal(
-                    percent.get("bidMultiplierDown", percent.get("multiplierDown"))
-                )
-                upper = reference * decimal(
-                    percent.get("bidMultiplierUp", percent.get("multiplierUp"))
-                )
+                    up = min(
+                        decimal(band.get("bidMultiplierUp", band.get("multiplierUp")))
+                        for band in bands
+                    )
+                    lower, upper = bid * down, bid * up
+                else:
+                    reference = await self.call(
+                        "get_spot_average_price" if self.spot else "get_futures_premium_index",
+                        product_symbol=self.symbol,
+                    )
+                    reference = decimal(reference["price"] if self.spot else reference["markPrice"])
+                    lower = reference * decimal(
+                        percent.get("bidMultiplierDown", percent.get("multiplierDown"))
+                    )
+                    upper = reference * decimal(
+                        percent.get("bidMultiplierUp", percent.get("multiplierUp"))
+                    )
             price_filter = filters.get("PRICE_FILTER", {})
             if price_filter.get("minPrice") and decimal(price_filter["minPrice"]) > 0:
                 lower = max(lower, decimal(price_filter["minPrice"]))
@@ -341,6 +366,39 @@ class CexAdapter:
                 "get_order_price_limit", product_symbol=self.symbol, category="linear"
             )
             rules = replace(rules, upper_price=decimal(data["buyLmt"]))
+        elif self.exchange == "bitget":
+            kw = {"category": self.category, "product_symbol": self.symbol}
+
+            def matching(data):
+                found = [row for row in rows(data) if row.get("symbol") == self.native]
+                if len(found) != 1:
+                    raise LifecycleError(f"bitget {self.native}: instrument not found exactly once")
+                return found[0]
+
+            ratio = decimal(
+                matching(await self.call("get_uta_instruments", **kw))["buyLimitPriceRatio"]
+            )
+            ticker = matching(await self.call("get_uta_tickers", **kw))
+            reference = decimal(ticker["lastPrice" if self.spot else "markPrice"])
+            # Official UTA docs: buyLimitPriceRatio caps the highest buy price relative to the
+            # market price; there is no documented lower bound for buys.
+            rules = replace(rules, upper_price=reference * (1 + ratio))
+        elif self.exchange == "backpack":
+            market = await self.call("get_market", product_symbol=self.symbol)
+            band = market["filters"]["price"].get("meanMarkPriceBand")
+            if band:
+                # Spot has no public mark price; the last price is the closest public reference.
+                if self.spot:
+                    data = await self.call("get_ticker", product_symbol=self.symbol)
+                    reference = decimal(data["lastPrice"])
+                else:
+                    data = rows(await self.call("get_mark_prices", product_symbol=self.symbol))
+                    reference = decimal(data[0]["markPrice"])
+                rules = replace(
+                    rules,
+                    lower_price=reference * decimal(band["minMultiplier"]),
+                    upper_price=reference * decimal(band["maxMultiplier"]),
+                )
         return plan_order(self.native, bid, ask, rules), await self.available()
 
     async def positions(self):
@@ -370,7 +428,8 @@ class CexAdapter:
             data, key = await self.call("get_positions"), "pos"
         elif ex == "bitget":
             data, key = (
-                (await self.call("get_uta_positions", category=self.category))["list"],
+                # Bitget returns "list": null when there are no positions.
+                (await self.call("get_uta_positions", category=self.category))["list"] or [],
                 "total",
             )
             mode = (await self.call("get_uta_settings"))["holdMode"]
@@ -540,19 +599,45 @@ class CexAdapter:
                     newClientOrderId=self.client_order_id,
                 )
                 return checked_id(data["orderId"])
-            return checked_id(
-                await self.call(
-                    "place_contract_order",
-                    **kw,
-                    side=1,
-                    type_=2,
-                    openType=2,
-                    vol=size,
-                    price=price,
-                    externalOid=self.client_order_id,
+            # Opening orders must carry the account's current long-side margin type and
+            # leverage (read-only GET /api/v1/private/position/leverage); never change them.
+            longs = [
+                row
+                for row in rows(await self.call("get_contract_leverage", **kw))
+                if str(row.get("positionType")) == "1"
+            ]
+            if len(longs) != 1 or str(longs[0].get("openType")) not in {"1", "2"}:
+                raise LifecycleError(
+                    "mexc: current long openType/leverage unavailable; no order was submitted"
                 )
+            data = await self.call(
+                "place_contract_order",
+                **kw,
+                side=1,
+                type_=2,
+                openType=int(longs[0]["openType"]),
+                leverage=int(decimal(longs[0]["leverage"])),
+                vol=size,
+                price=price,
+                externalOid=self.client_order_id,
             )
+            # MEXC returns either the order ID or {"orderId": ..., "ts": ...}.
+            return checked_id(data["orderId"] if isinstance(data, dict) else data)
         if ex == "kucoin":
+            margin = {}
+            if not self.spot:
+                # Orders must match the symbol's current margin mode (else 330005); KuCoin
+                # defaults to ISOLATED. Read the mode and its leverage; never change them.
+                mode = (await self.call("get_futures_margin_mode", **kw))["marginMode"]
+                if mode not in {"ISOLATED", "CROSS"}:
+                    raise LifecycleError(
+                        "kucoin: unknown futures margin mode; no order was submitted"
+                    )
+                leverage = Decimal(1)
+                if mode == "CROSS":
+                    cross = await self.call("get_futures_cross_margin_leverage", **kw)
+                    leverage = decimal(cross["leverage"])
+                margin = {"marginMode": mode, "leverage": str(int(leverage))}
             data = await self.call(
                 "place_spot_order" if self.spot else "place_futures_order",
                 **kw,
@@ -563,7 +648,7 @@ class CexAdapter:
                 timeInForce="GTC",
                 postOnly=True,
                 clientOid=self.client_order_id,
-                **({} if self.spot else {"leverage": "1"}),
+                **margin,
             )
             return checked_id(data["orderId"])
         if ex == "backpack":
@@ -576,9 +661,10 @@ class CexAdapter:
                 price=price,
                 timeInForce="GTC",
                 postOnly=True,
+                # Lent USDC may fund the order (Backpack redeems it); never borrow.
                 autoBorrow=False,
                 autoLend=False,
-                autoLendRedeem=False,
+                autoLendRedeem=True,
             )
             return checked_id(data["id"])
         if ex == "kraken":
@@ -704,10 +790,19 @@ class CexAdapter:
                 **({**kw, "orderId": identifier} if self.spot else {"order_id": identifier}),
             )
         elif ex == "kucoin":
-            data = await self.call(
-                "get_spot_order" if self.spot else "get_futures_order",
-                **({**kw, "order_id": identifier} if self.spot else {"orderId": identifier}),
-            )
+            try:
+                data = await self.call(
+                    "get_spot_order" if self.spot else "get_futures_order",
+                    **({**kw, "order_id": identifier} if self.spot else {"orderId": identifier}),
+                )
+            except LifecycleError as error:
+                # Futures orders can be invisible for a moment right after placement.
+                if "orderNotExist" in str(error):
+                    return None
+                raise
+            # KuCoin briefly returns "data": null while an order changes state; poll again.
+            if data is None:
+                return None
         elif ex == "backpack":
             data = rows(await self.call("get_open_orders", **kw))
             data = [row for row in data if str(row["id"]) == identifier]
@@ -826,7 +921,7 @@ def normalize_order(exchange, spot, data, identifier):
     state = str(state).lower()
     state = (
         "open"
-        if state in ({"live"} if exchange == "bitget" else {"new", "live", "open"})
+        if state in {"new", "live", "open", "pending"}
         else "cancelled"
         if state in {"canceled", "cancelled"}
         else state

@@ -1,10 +1,10 @@
 """Every declared decimal is checked, including nested and websocket inputs."""
 
 import ast
-from decimal import Decimal
 import json
-from pathlib import Path
 import re
+from decimal import Decimal
+from pathlib import Path
 
 import pytest
 

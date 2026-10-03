@@ -2,8 +2,10 @@
 
 import json
 from typing import Any
+
 import pytest
 from aiohttp import WSMsgType, web
+
 from dcex.ws.bitget import PrivateClient
 
 
@@ -84,7 +86,7 @@ async def test_trading_wire_protocol_and_partial_results() -> None:
         await client.close()
         await runner.cleanup()
     assert len(frames) == 6
-    assert all(("apiCode" not in json.dumps(frame) for frame in frames))
+    assert all("apiCode" not in json.dumps(frame) for frame in frames)
 
 
 @pytest.mark.asyncio

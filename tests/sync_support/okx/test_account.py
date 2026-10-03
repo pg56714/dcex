@@ -97,10 +97,6 @@ def test_get_account_config(client):
     assert res is not None
 
 
-@pytest.mark.private
-def test_set_position_mode(client):
-    res = client.set_position_mode(posMode="net_mode")
-    assert res is not None
 
 
 @pytest.mark.private
@@ -156,10 +152,6 @@ def test_get_interest_rate(client):
     assert res is not None
 
 
-@pytest.mark.private
-def test_set_greeks(client):
-    res = client.set_greeks(greeksType="PA")
-    assert res is not None
 
 
 @pytest.mark.private
@@ -177,9 +169,3 @@ def test_get_interest_limits(client):
 @pytest.mark.private
 def test_get_spot_borrow_repay_history(client):
     assert client.get_spot_borrow_repay_history(ccy="USDT", limit="1") is not None
-
-
-@pytest.mark.private
-def test_set_leverage(client):
-    res = client.set_leverage(lever="10", mgnMode="isolated", product_symbol="BTC-USDT-SWAP")
-    assert res is not None

@@ -6,9 +6,9 @@ from decimal import Decimal
 
 import pytest
 
-from dcex._schema_codec import encode_json, normalize
-from dcex._input_validation import normalize_endpoint
 from dcex._input_codec import CATALOG
+from dcex._input_validation import normalize_endpoint
+from dcex._schema_codec import encode_json, normalize
 
 EXCHANGES = [
     "arcus",

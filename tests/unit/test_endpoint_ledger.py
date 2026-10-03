@@ -55,6 +55,7 @@ def test_superseded_rows_target_same_route_or_declared_replacement():
 
 def test_bitget_websocket_replacements_reject_unrelated_channels():
     from copy import deepcopy
+
     from tests.unit.ledger_validation import validate_superseded
 
     replacements = json.loads(

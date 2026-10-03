@@ -120,17 +120,3 @@ def test_get_subaccount_read_endpoints(client):
     assert client.get_subaccount_spot_summary(size=1) is not None
     assert client.get_subaccount_margin_summary() is not None
     assert client.get_subaccount_futures_summary(limit=1) is not None
-
-
-@pytest.mark.private
-def test_spot_rest_listen_key_is_unavailable(client):
-    with pytest.raises(NotImplementedError):
-        client.get_listen_key(market_type="spot")
-
-
-@pytest.mark.private
-def test_futures_listen_key_lifecycle(client):
-    listen_key = client.get_listen_key(market_type="swap")
-    assert listen_key
-    assert client.keep_alive_listen_key(listen_key, market_type="swap") is not None
-    assert client.close_listen_key(listen_key, market_type="swap") is not None

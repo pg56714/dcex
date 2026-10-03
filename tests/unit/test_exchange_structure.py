@@ -1,10 +1,10 @@
 """Enforce the shared layout documented in docs/schema-conventions.md."""
 
-import re
 import ast
 import importlib
 import inspect
 import json
+import re
 from pathlib import Path
 
 import pytest

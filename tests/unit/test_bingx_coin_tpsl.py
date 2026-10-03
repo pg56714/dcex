@@ -1,9 +1,9 @@
 """BingX coin-M attached prices retain exact fractional JSON-number values."""
 
-from decimal import Decimal
 import importlib
 import inspect
 import json
+from decimal import Decimal
 from urllib.parse import parse_qs, urlsplit
 
 import pytest

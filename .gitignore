@@ -214,3 +214,6 @@ __marimo__/
 .DS_Store
 *.csv
 .claude
+
+# Local, redacted stateful-test summaries.
+live-results/

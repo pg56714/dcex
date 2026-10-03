@@ -937,7 +937,6 @@ def _fail_if_native_is_stale(case: WireCase, error: ValueError) -> None:
 
 
 def _fresh_nonce_case(case: WireCase) -> WireCase:
-    from dataclasses import replace
     from time import time_ns
 
     if "nonce" in case.kwargs and not case.method.endswith("_signed"):
@@ -982,7 +981,6 @@ def _assert_request(case: WireCase, requests: list[dict[str, Any]]) -> None:
         assert all(order.get("side", "SELL") in {"BUY", "SELL"} for order in orders)
 
 
-from dataclasses import replace
 
 CASES += [
     WireCase(c["name"], c["kwargs"], c["path"], c["wire"], True, c["verb"])

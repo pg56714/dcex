@@ -52,8 +52,11 @@ class ArcusAdapter(CexAdapter):
         return rows(await self.call("get_open_orders"), "orders")
 
     async def recover_order(self):
+        return await self.recover_client_order(self.client_order_id)
+
+    async def recover_client_order(self, client_order_id):
         matching = [
-            row for row in await self.open_orders() if row.get("clientId") == self.client_order_id
+            row for row in await self.open_orders() if row.get("clientId") == client_order_id
         ]
         if len(matching) > 1:
             raise LifecycleError("arcus: ambiguous client ID; manual reconciliation required")
@@ -104,8 +107,10 @@ class ArcusAdapter(CexAdapter):
             raise LifecycleError("arcus: no valid price in the documented tick tiers")
         if plan.size > decimal(info["maxOrderSize"]):
             raise MarketUnavailable("arcus: minimum notional exceeds maxOrderSize")
-        account = await self.call("get_account")
-        return plan, decimal(account["freeCollateral"])
+        return plan, await self.available()
+
+    async def available(self):
+        return decimal((await self.call("get_account"))["freeCollateral"])
 
     async def place(self, plan):
         data = await self.call(

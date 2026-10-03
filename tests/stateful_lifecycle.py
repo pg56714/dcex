@@ -75,16 +75,26 @@ def plan_order(
         raise LifecycleError("invalid book, tick, step, or contract multiplier")
     if any(not value.is_finite() or value < 0 for value in (rules.min_size, rules.min_notional)):
         raise LifecycleError("invalid minimum order rule")
-    target = bid * Decimal("0.90") if target_price is None else decimal(target_price)
-    if rules.lower_price is not None:
-        if not rules.lower_price.is_finite() or rules.lower_price < 0:
-            raise LifecycleError("invalid lower price band")
-        target = max(
-            rules.tick,
-            rules.lower_price + rules.tick,
-            target if target_price is not None else rules.tick,
-        )
-    price = (target / rules.tick).to_integral_value(rounding=ROUND_CEILING) * rules.tick
+    lower = rules.lower_price
+    if lower is not None and (not lower.is_finite() or lower < 0):
+        raise LifecycleError("invalid lower price band")
+    margin = None
+    if target_price is not None:
+        # Caller-chosen ladder (Arcus); only kept one tick above any floor.
+        target = decimal(target_price)
+        if lower is not None:
+            target = max(rules.tick, lower + rules.tick, target)
+        price = (target / rules.tick).to_integral_value(rounding=ROUND_CEILING) * rules.tick
+    else:
+        # Rest far below the bid, but a quarter of the way into any band so a small
+        # reference move cannot push the order below the exchange floor.
+        target = bid * Decimal("0.90")
+        if lower is not None:
+            margin = lower + (bid - lower) * Decimal("0.25")
+            target = max(target, margin)
+        price = (target / rules.tick).to_integral_value(rounding=ROUND_FLOOR) * rules.tick
+        if margin is not None and price < margin:
+            price = (margin / rules.tick).to_integral_value(rounding=ROUND_CEILING) * rules.tick
     if rules.upper_price is not None:
         if not rules.upper_price.is_finite() or rules.upper_price <= 0:
             raise LifecycleError("invalid upper price band")
@@ -92,9 +102,11 @@ def plan_order(
             price,
             (rules.upper_price / rules.tick).to_integral_value(rounding=ROUND_FLOOR) * rules.tick,
         )
+    if margin is not None and (price < margin or price >= bid):
+        raise LifecycleError("price band too tight: no buy price safely inside it below the bid")
     if price <= 0 or price >= bid or price >= ask:
         raise LifecycleError("no valid non-crossing buy price inside the permitted band")
-    if rules.lower_price is not None and price < rules.lower_price:
+    if lower is not None and price < lower:
         raise LifecycleError("price bands do not contain a valid limit price")
     minimum = max(rules.min_size, rules.step, rules.min_notional / (price * rules.multiplier))
     size = (minimum / rules.step).to_integral_value(rounding=ROUND_CEILING) * rules.step
@@ -134,6 +146,8 @@ async def run_lifecycle(
     identifier = None
     cancelled = False
     placement_started = False
+    client_ids: list[str] = []
+    rejected_ids: list[str] = []
     try:
         result["stage"] = "preflight"
         if await adapter.positions():
@@ -156,16 +170,28 @@ async def run_lifecycle(
                 )
             result["stage"] = "place"
             result["client_order_id"] = adapter.client_order_id
+            if adapter.client_order_id not in client_ids:
+                client_ids.append(adapter.client_order_id)
+            result["prior_client_order_ids"] = ",".join(client_ids)
             result["price"] = str(plan.price)
             placement_started = True
             try:
                 identifier = await adapter.place(plan)
                 break
+            except MarketUnavailable:
+                # An explicit exchange rejection: no order was created, nothing to recover.
+                placement_started = False
+                raise
             except PriceBandRejected:
                 placement_started = False
+                rejected_ids.append(adapter.client_order_id)
                 next_plan = getattr(adapter, "next_price_plan", None)
                 if next_plan is None:
                     raise
+                if await adapter.open_orders():
+                    raise LifecycleError(
+                        "open order present after rejected placement; stopped without retry"
+                    ) from None
                 plan, available = await next_plan()
         if not identifier:
             raise LifecycleError("exchange acknowledged no order ID; do not retry placement")
@@ -242,6 +268,9 @@ async def run_lifecycle(
                 result["cleanup"] = (
                     "cleanup cancellation unconfirmed; inspect test order ID and client ID manually"
                 )
+        if rejected_ids and result.get("stage") != "complete":
+            # Only this run's explicitly rejected client IDs; never other open orders.
+            await cleanup_client_ids(adapter, rejected_ids, result, poll_delay)
         if placement_started and not cancelled:
             try:
                 remaining_positions = await adapter.positions()
@@ -253,3 +282,32 @@ async def run_lifecycle(
                     result["cleanup"] += "; " + warning
                     result["error_message"] = result.get("error_message", "") + "; " + warning
                     raise LifecycleError(result["error_message"])
+
+
+async def cleanup_client_ids(
+    adapter: Adapter, client_ids: list[str], result: dict[str, str], poll_delay: float
+) -> None:
+    """Cancel any still-open order carrying one of this run's rejected client IDs."""
+    recover = getattr(adapter, "recover_client_order", None)
+    notes = []
+    for client_id in client_ids:
+        try:
+            if recover is None:
+                raise LifecycleError("client-ID recovery unavailable")
+            found = await recover(client_id)
+            if not found:
+                continue
+            await adapter.cancel(found)
+            for attempt in range(20):
+                if not await recover(client_id):
+                    break
+                if attempt == 19:
+                    raise LifecycleError("order remains open after cleanup cancellation")
+                await asyncio.sleep(poll_delay)
+            notes.append("rejected-attempt client ID " + client_id + " cancelled")
+        except Exception:
+            notes.append(
+                "rejected-attempt client ID " + client_id + " unconfirmed; inspect manually"
+            )
+    if notes:
+        result["cleanup"] = "; ".join(filter(None, (result.get("cleanup", ""), *notes)))

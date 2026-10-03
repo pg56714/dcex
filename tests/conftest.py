@@ -57,7 +57,8 @@ def pytest_terminal_summary(
         return
     terminalreporter.write_sep("=", "Stateful results")
     terminalreporter.write_line(
-        "exchange | mode | market | stage | status | client_order_id | cleanup"
+        "exchange | mode | market | stage | status | client_order_id | "
+        "prior_client_order_ids | cleanup"
     )
     for row in results.values():
         terminalreporter.write_line(
@@ -70,6 +71,7 @@ def pytest_terminal_summary(
                     "stage",
                     "status",
                     "client_order_id",
+                    "prior_client_order_ids",
                     "cleanup",
                 )
             )
@@ -154,7 +156,7 @@ def _private_env_vars(item: pytest.Item, relative_path: Path | None) -> tuple[st
     if relative_path is None or len(relative_path.parts) < 2:
         return ()
     exchange = relative_path.parts[1]
-    if exchange == "extended" and _calls_stateful_client_method(item):
+    if exchange == "extended" and _is_stateful_path(relative_path):
         return (
             "EXTENDED_API_KEY",
             "EXTENDED_STARK_PRIVATE_KEY",

@@ -19,6 +19,7 @@ RESULT_FIELDS = (
     "error_message",
     "order_id",
     "client_order_id",
+    "prior_client_order_ids",
     "price",
     "cleanup",
     "skip_reason",
@@ -77,7 +78,8 @@ def sanitize_result(result: dict[str, str]) -> dict[str, str]:
     """Preserve order identifiers even when they match an environment value."""
     return {
         key: redact(
-            result.get(key, ""), mask_environment=key not in {"order_id", "client_order_id"}
+            result.get(key, ""),
+            mask_environment=key not in {"order_id", "client_order_id", "prior_client_order_ids"},
         )
         for key in RESULT_FIELDS
     }

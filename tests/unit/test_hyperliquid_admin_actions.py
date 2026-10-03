@@ -6,8 +6,8 @@ import json
 from pathlib import Path
 
 import pytest
-from tests.unit.endpoint_wrapper_helpers import generated_method_members
 
+from tests.unit.endpoint_wrapper_helpers import generated_method_members
 from tests.unit.native_http_helpers import _http_server
 
 ROOT = Path(__file__).resolve().parents[2]

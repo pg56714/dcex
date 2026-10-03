@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+import re
 import time
 from decimal import Decimal
 from uuid import uuid4
@@ -17,10 +18,17 @@ from tests.stateful_lifecycle import (
 )
 
 
+def best(bids, asks, price):
+    """Return the best bid and ask whatever order the venue lists its levels in."""
+    if not bids or not asks:
+        raise LifecycleError("order book has an empty side")
+    return max(decimal(price(row)) for row in bids), min(decimal(price(row)) for row in asks)
+
+
 class ExtendedAdapter(CexAdapter):
     async def book(self):
         data = await self.call("get_order_book", market=self.native)
-        return decimal(data["bid"][0]["price"]), decimal(data["ask"][0]["price"])
+        return best(data["bid"], data["ask"], lambda row: row["price"])
 
     async def positions(self):
         return [row for row in rows(await self.call("get_positions")) if decimal(row["size"]) != 0]
@@ -65,24 +73,39 @@ class ExtendedAdapter(CexAdapter):
         return plan_order(self.native, bid, ask, rules), await self.available()
 
     async def place(self, plan):
-        data = await self.call(
-            "place_limit_order",
-            market=self.native,
-            side="BUY",
-            qty=str(plan.size),
-            price=str(plan.price),
-            post_only=True,
-            time_in_force="GTT",
-            expiry_epoch_millis=int(time.time() * 1000) + 300000,
-            external_id=self.client_order_id,
-        )
+        try:
+            data = await self.call(
+                "place_limit_order",
+                market=self.native,
+                side="BUY",
+                qty=str(plan.size),
+                price=str(plan.price),
+                post_only=True,
+                time_in_force="GTT",
+                expiry_epoch_millis=int(time.time() * 1000) + 300000,
+                external_id=self.client_order_id,
+            )
+        except LifecycleError as error:
+            # Extended 1153 "Market is not allowed for clients": an explicit rejection,
+            # so no order exists. Spot markets are not open to clients yet.
+            if self.spot and "1153" in str(error):
+                raise MarketUnavailable(
+                    "extended spot: market is not open to clients (code 1153)"
+                ) from None
+            raise
         return checked_id(data["id"])
 
     async def cancel(self, identifier):
         await self.call("cancel_order", id=identifier)
 
     async def order(self, identifier):
-        data = await self.call("get_order", id=identifier)
+        try:
+            data = await self.call("get_order", id=identifier)
+        except LifecycleError as error:
+            # Extended briefly answers 404 Not Found right after a cancel: not yet visible.
+            if str(getattr(error, "code", "")) == "404" or re.search(r"\b404\b", str(error)):
+                return None
+            raise
         return Order(
             checked_id(data["id"]),
             data["market"],
@@ -98,7 +121,7 @@ class ExtendedAdapter(CexAdapter):
 class OndoAdapter(CexAdapter):
     async def book(self):
         data = await self.call("get_depth", market=self.native, depth=5)
-        return decimal(data["bids"][0][0]), decimal(data["asks"][0][0])
+        return best(data["bids"], data["asks"], lambda row: row[0])
 
     async def positions(self):
         return [
@@ -144,6 +167,11 @@ class OndoAdapter(CexAdapter):
         )
 
 
+# userAbstraction modes whose USDC perp collateral is the spot balance (official docs:
+# trading/account-abstraction-modes); "disabled"/"default" keep separate perp balances.
+UNIFIED_ABSTRACTIONS = frozenset({"unifiedAccount", "portfolioMargin"})
+
+
 class HyperliquidAdapter(CexAdapter):
     def __init__(self, client, exchange, market, symbol):
         super().__init__(client, exchange, market, symbol)
@@ -152,11 +180,20 @@ class HyperliquidAdapter(CexAdapter):
         self.client_order_id = "0x" + uuid4().hex
         self.started = int(time.time() * 1000)
 
-    async def positions(self):
+    async def owner(self):
+        """Resolve an API agent wallet to the account owner that holds the balances."""
         role = await self.call("user_role", user=self.user)
         if role["role"] == "agent":
             self.user = role["data"]["user"]
-        data = await self.call("clearinghouse_state", user=self.user)
+        return self.user
+
+    async def unified(self):
+        """Unified/portfolio-margin accounts keep perp collateral in the spot clearinghouse."""
+        mode = await self.call("get_user_abstraction", user=await self.owner())
+        return mode in UNIFIED_ABSTRACTIONS
+
+    async def positions(self):
+        data = await self.call("clearinghouse_state", user=await self.owner())
         return [row for row in rows(data["assetPositions"]) if decimal(row["position"]["szi"]) != 0]
 
     async def open_orders(self):
@@ -164,12 +201,12 @@ class HyperliquidAdapter(CexAdapter):
 
     async def book(self):
         data = await self.call("get_l2book", product_symbol=self.symbol)
-        return decimal(data["levels"][0][0]["px"]), decimal(data["levels"][1][0]["px"])
+        return best(data["levels"][0], data["levels"][1], lambda row: row["px"])
 
     async def available(self):
-        if not self.spot:
+        if not self.spot and not await self.unified():
             return decimal((await self.call("clearinghouse_state", user=self.user))["withdrawable"])
-        data = await self.call("spot_clearinghouse_state", user=self.user)
+        data = await self.call("spot_clearinghouse_state", user=await self.owner())
         return sum(
             (
                 decimal(row["total"]) - decimal(row["hold"])
@@ -182,7 +219,8 @@ class HyperliquidAdapter(CexAdapter):
     async def prepare(self):
         bid, ask = await self.book()
         d = self.details
-        # Hyperliquid also limits non-integer prices to five significant figures.
+        # price_precision is the MAX_DECIMALS - szDecimals cap; prices are also limited to five
+        # significant figures. The coarser of both at the bid's magnitude stays valid below it.
         tick = max(decimal(d["price_precision"]), Decimal(1).scaleb(bid.adjusted() - 4))
         rules = Rules(
             tick,
@@ -293,7 +331,7 @@ class LighterAdapter(CexAdapter):
 
     async def book(self):
         data = await self.call("get_order_book_orders", market_id=self.market_id, limit=5)
-        return decimal(data["bids"][0]["price"]), decimal(data["asks"][0]["price"])
+        return best(data["bids"], data["asks"], lambda row: row["price"])
 
     async def available(self):
         return decimal((await self.account())["available_balance"])

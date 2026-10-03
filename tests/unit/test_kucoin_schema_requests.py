@@ -11,10 +11,10 @@ from pathlib import Path
 from urllib.parse import parse_qsl, unquote, urlsplit
 
 import pytest
-from tests.unit.endpoint_wrapper_helpers import generated_method_members
 
 from scripts.build_bitget_wrappers import snake
 from scripts.build_kucoin_wrappers import operation_name
+from tests.unit.endpoint_wrapper_helpers import generated_method_members
 from tests.unit.native_http_helpers import _http_server
 from tests.unit.test_bitget_schema_requests import sample
 

@@ -1,10 +1,10 @@
 """Verify the new codec's call compatibility before switching existing users."""
 
 import ast
-from decimal import Decimal
-from enum import Enum
 import importlib
 import inspect
+from decimal import Decimal
+from enum import Enum
 from pathlib import Path
 
 import pytest

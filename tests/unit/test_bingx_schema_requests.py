@@ -9,10 +9,10 @@ from pathlib import Path
 from urllib.parse import parse_qsl, urlsplit
 
 import pytest
-from tests.unit.endpoint_wrapper_helpers import generated_method_members
 
 from scripts.build_bingx_wrappers import field_kind, operation_name
 from scripts.build_bitget_wrappers import snake
+from tests.unit.endpoint_wrapper_helpers import generated_method_members
 from tests.unit.native_http_helpers import _http_server
 
 ROOT = Path(__file__).resolve().parents[2]

@@ -44,6 +44,7 @@ async def test_reported_invalid_values_stop_before_adapter(
 @pytest.mark.parametrize("price", ["+5", "-5", "#5", "-5%", "+5.25%", "#5.5%"])
 async def test_kraken_relative_price_reaches_native_unchanged(event, price):
     import json
+
     from dcex.ws.kraken import V1Client
 
     client = object.__new__(V1Client)

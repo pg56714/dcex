@@ -87,19 +87,3 @@ def test_futures_trade_read_endpoints(client):
 def test_missing_strategy_query_returns_documented_error(client, call):
     with pytest.raises(FailedRequestError, match="Order does not exist"):
         call(client)
-
-
-def test_spot_listen_key_lifecycle(client):
-    created = _assert_response(client.create_spot_listen_key())
-    assert isinstance(created, dict)
-    listen_key = str(created["listenKey"])
-    _assert_response(client.keep_alive_spot_listen_key(listen_key))
-    _assert_response(client.close_spot_listen_key(listen_key))
-
-
-def test_futures_listen_key_lifecycle(client):
-    created = _assert_response(client.create_futures_listen_key())
-    assert isinstance(created, dict)
-    assert created.get("listenKey")
-    _assert_response(client.keep_alive_futures_listen_key())
-    _assert_response(client.close_futures_listen_key())
