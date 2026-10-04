@@ -1,3 +1,16 @@
+## 0.36.0 (2026-10-04)
+
+### BREAKING CHANGE
+
+- resolve market and native symbols from official data and drop Bitget classic APIs rejected for UTA
+- make Bitget UTA-only
+
+### Fix
+
+- accept only IOC or POC for BingX spot cancel-replace and treat Kraken FOK precheck as unfilled
+- report every exchange error as '{Exchange} API Error: [code] message (HTTP status)'
+- reject unsupported order flags and validate amend and batch params
+
 ## 0.35.0 (2026-09-30)
 
 ### BREAKING CHANGE
