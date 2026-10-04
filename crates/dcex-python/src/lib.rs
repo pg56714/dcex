@@ -56,6 +56,19 @@ fn to_py_runtime_error(error: dcex::DcexError) -> PyErr {
             });
             exception
         }
+        dcex::DcexError::HttpStatus {
+            status,
+            ref headers,
+            ..
+        } => {
+            let exception = PyRuntimeError::new_err(error.to_string());
+            Python::with_gil(|py| {
+                let value = exception.value(py);
+                let _ = value.setattr("status_code", status);
+                let _ = value.setattr("resp_headers", headers.clone());
+            });
+            exception
+        }
         _ => PyRuntimeError::new_err(error.to_string()),
     }
 }

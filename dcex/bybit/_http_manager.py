@@ -16,7 +16,7 @@ from .._native_http import NativeResponse, load_native, native_body_text, reques
 from ..base.http_manager import BaseHTTPManager
 from ..product_table.manager import ProductTableManager
 from ..utils.common import Common
-from ..utils.errors import FailedRequestError
+from ..utils.errors import FailedRequestError, api_error_from_body, api_error_message
 from ..utils.helpers import generate_timestamp
 
 HTTP_URL = "https://{SUBDOMAIN}.{DOMAIN}.{TLD}"
@@ -117,7 +117,7 @@ class HTTPManager(BaseHTTPManager):
             raise FailedRequestError(
                 request=f"BYBIT {method_name} | Params: {params}",
                 message=str(exc),
-                status_code="Unknown",
+                status_code=getattr(exc, "status_code", None),
                 time=str(generate_timestamp(iso_format=True)),
             ) from exc
         self._store_response_headers(response)
@@ -209,12 +209,14 @@ class HTTPManager(BaseHTTPManager):
             self._store_response_headers(response)
             data = response_body
             if data.get("retCode", 0) != 0:
-                code = data.get("retCode", "Unknown")
-                error_message = data.get("retMsg", "Unknown error")
-                self._log_failed_request(f"Bybit API Error: [{code}] {error_message}", code)
+                code = data.get("retCode")
+                error_message = data.get("retMsg", "")
+                self._log_failed_request(
+                    api_error_message("Bybit", response.status_code, code, error_message), code
+                )
                 raise FailedRequestError(
                     request=f"{method.upper()} {url} | Body: {query}",
-                    message=f"Bybit API Error: [{code}] {error_message}",
+                    message=api_error_message("Bybit", response.status_code, code, error_message),
                     status_code=response.status_code,
                     time=str(timestamp),
                     resp_headers=dict(response.headers),
@@ -223,7 +225,9 @@ class HTTPManager(BaseHTTPManager):
                 # If http status is not 2xx (like 403, 404)
                 raise FailedRequestError(
                     request=f"{method.upper()} {url} | Body: {query}",
-                    message=f"HTTP Error {response.status_code}: {native_body_text(data)}",
+                    message=api_error_from_body(
+                        "Bybit", response.status_code, native_body_text(data)
+                    ),
                     status_code=response.status_code,
                     time=str(timestamp),
                     resp_headers=dict(response.headers),
@@ -235,7 +239,7 @@ class HTTPManager(BaseHTTPManager):
             status_code, resp_headers = self._exception_response_details(e)
             raise FailedRequestError(
                 request=f"{method.upper()} {url} | Body: {payload}",
-                message=f"Request failed: {str(e)}",
+                message=str(e),
                 status_code=status_code,
                 time=str(timestamp),
                 resp_headers=resp_headers,

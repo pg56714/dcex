@@ -73,16 +73,6 @@ pub trait ResponseValidator: Send + Sync {
     fn validate(&self, response: &HttpResponse) -> Result<Value>;
 }
 
-#[derive(Default)]
-pub struct JsonResponseValidator;
-
-impl ResponseValidator for JsonResponseValidator {
-    fn validate(&self, response: &HttpResponse) -> Result<Value> {
-        response.ensure_success()?;
-        response.json()
-    }
-}
-
 #[derive(Clone)]
 pub struct ExchangeHttpClient {
     transport: AsyncHttpClient,
@@ -91,21 +81,16 @@ pub struct ExchangeHttpClient {
 }
 
 impl ExchangeHttpClient {
-    pub fn new(timeout: Duration) -> Result<Self> {
+    pub fn new(timeout: Duration, validator: Arc<dyn ResponseValidator>) -> Result<Self> {
         Ok(Self {
             transport: AsyncHttpClient::new(timeout)?,
             signer: None,
-            validator: Arc::new(JsonResponseValidator),
+            validator,
         })
     }
 
     pub fn with_signer(mut self, signer: Arc<dyn RequestSigner>) -> Self {
         self.signer = Some(signer);
-        self
-    }
-
-    pub fn with_validator(mut self, validator: Arc<dyn ResponseValidator>) -> Self {
-        self.validator = validator;
         self
     }
 

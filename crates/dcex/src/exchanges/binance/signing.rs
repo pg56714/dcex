@@ -80,16 +80,11 @@ impl ResponseValidator for BinanceResponseValidator {
             && let Some(code) = object.get("code")
             && json_value_string(code) != "200"
         {
-            let message = object
-                .get("msg")
-                .and_then(Value::as_str)
-                .unwrap_or("Unknown error");
-            let message = format!("BINANCE API Error: [{}] {message}", json_value_string(code));
-            let headers = response
-                .headers
-                .iter()
-                .map(|(k, v)| (k.clone(), v.clone()))
-                .collect();
+            let message = object.get("msg").and_then(Value::as_str).unwrap_or("");
+            let code = json_value_string(code);
+            let message =
+                crate::http::api_error_message("Binance", response.status, Some(&code), message);
+            let headers = response.header_pairs();
             if let Some(outcomes) = object
                 .get("data")
                 .filter(|v| v.get("cancelResult").is_some() || v.get("newOrderResult").is_some())
@@ -107,7 +102,7 @@ impl ResponseValidator for BinanceResponseValidator {
                 headers,
             });
         }
-        response.ensure_success()?;
+        response.ensure_success("Binance")?;
         Ok(data)
     }
 }

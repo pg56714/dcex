@@ -143,8 +143,7 @@ impl BinanceClient {
         options_base_url: String,
     ) -> Result<Self> {
         let timestamp_offset_ms = Arc::new(Mutex::new(None));
-        let mut inner =
-            ExchangeHttpClient::new(timeout)?.with_validator(Arc::new(BinanceResponseValidator));
+        let mut inner = ExchangeHttpClient::new(timeout, Arc::new(BinanceResponseValidator))?;
         let api_key_header = api_key.clone();
         if let (Some(api_key), Some(api_secret)) = (api_key, api_secret) {
             inner = inner.with_signer(Arc::new(BinanceSigner {
@@ -197,7 +196,7 @@ impl BinanceClient {
             request.query = query;
         }
         let response = self.inner.execute_raw(request, signed).await?;
-        response.ensure_success()?;
+        response.ensure_success("Binance")?;
         let data = response.json()?;
         let failed = data.get("success") == Some(&Value::Bool(false))
             || data.get("code").is_some_and(|code| {
@@ -207,9 +206,15 @@ impl BinanceClient {
                 )
             });
         if failed {
+            let (code, message) = crate::http::error_parts(&response.body);
             return Err(DcexError::ExchangeResponse {
                 status: response.status,
-                message: format!("BINANCE API Error: {data}"),
+                message: crate::http::api_error_message(
+                    "Binance",
+                    response.status,
+                    code.as_deref(),
+                    &message,
+                ),
                 headers: response.headers.into_iter().collect(),
                 data,
             });

@@ -162,6 +162,20 @@ fn sanitize_message(message: &str) -> String {
     common::sanitize_message(message)
 }
 
+/// The shared exchange error text; Python-built errors use the same format as Rust.
+#[pyfunction]
+#[pyo3(signature = (exchange, status, code, message))]
+fn api_error_message(exchange: &str, status: u16, code: Option<&str>, message: &str) -> String {
+    dcex::http::api_error_message(exchange, status, code, message)
+}
+
+/// The shared exchange error text for a raw error body (code and message parsed from it).
+#[pyfunction]
+fn api_error_from_body(exchange: &str, status: u16, body: &str) -> String {
+    let (code, message) = dcex::http::error_parts(body.as_bytes());
+    dcex::http::api_error_message(exchange, status, code.as_deref(), &message)
+}
+
 #[pyfunction]
 fn sanitize_request(request: &str) -> String {
     common::sanitize_request(request)
@@ -187,6 +201,8 @@ pub(super) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(address_to_bytes, m)?)?;
     m.add_function(wrap_pyfunction!(sanitize_url, m)?)?;
     m.add_function(wrap_pyfunction!(sanitize_message, m)?)?;
+    m.add_function(wrap_pyfunction!(api_error_message, m)?)?;
+    m.add_function(wrap_pyfunction!(api_error_from_body, m)?)?;
     m.add_function(wrap_pyfunction!(sanitize_request, m)?)?;
     Ok(())
 }

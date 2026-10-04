@@ -6,7 +6,7 @@ from .._native_http import load_native, native_body_text
 from ..base.http_manager import BaseHTTPManager
 from ..product_table.manager import ProductTableManager
 from ..utils.common import Common
-from ..utils.errors import FailedRequestError
+from ..utils.errors import FailedRequestError, api_error_from_body, api_error_message
 from ..utils.helpers import generate_timestamp
 
 _native = load_native()
@@ -98,21 +98,23 @@ class HTTPManager(BaseHTTPManager):
             status_code, resp_headers = self._exception_response_details(exc)
             raise FailedRequestError(
                 request=f"{method.upper()} {url} | Params: {query}",
-                message=f"Request failed: {str(exc)}",
+                message=str(exc),
                 status_code=status_code,
-                time=query.get("timestamp", "Unknown"),
+                time=str(query["timestamp"]) if "timestamp" in query else None,
                 resp_headers=resp_headers,
                 response_data=getattr(exc, "response_data", None),
             ) from exc
 
         timestamp = generate_timestamp(iso_format=True)
         if isinstance(data, dict) and "code" in data and str(data["code"]) != "200":
-            code = data.get("code", "Unknown")
-            error_message = data.get("msg", "Unknown error")
-            self._log_failed_request(f"BINANCE API Error: [{code}] {error_message}", code)
+            code = data.get("code")
+            error_message = data.get("msg", "")
+            self._log_failed_request(
+                api_error_message("Binance", status_code, code, error_message), code
+            )
             raise FailedRequestError(
                 request=f"{method} {url} | Body: {query}",
-                message=f"BINANCE API Error: [{code}] {error_message}",
+                message=api_error_message("Binance", status_code, code, error_message),
                 status_code=status_code,
                 time=str(timestamp),
                 resp_headers=response_headers,
@@ -122,12 +124,12 @@ class HTTPManager(BaseHTTPManager):
         if not status_code // 100 == 2:
             response_text = native_body_text(data)
             self._log_failed_request(
-                f"HTTP Error {status_code}: {response_text}",
+                api_error_from_body("Binance", status_code, response_text),
                 status_code,
             )
             raise FailedRequestError(
                 request=f"{method.upper()} {url} | Body: {query}",
-                message=f"HTTP Error {status_code}: {response_text}",
+                message=api_error_from_body("Binance", status_code, response_text),
                 status_code=status_code,
                 time=str(timestamp),
                 resp_headers=response_headers,

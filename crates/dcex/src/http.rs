@@ -115,19 +115,88 @@ impl HttpResponse {
         serde_json::from_slice(&self.body).map_err(|error| DcexError::Decode(error.to_string()))
     }
 
-    pub fn ensure_success(&self) -> Result<()> {
+    pub fn header_pairs(&self) -> Vec<(String, String)> {
+        self.headers
+            .iter()
+            .map(|(key, value)| (key.clone(), value.clone()))
+            .collect()
+    }
+
+    /// An exchange error in the one shared format (see [`api_error_message`]).
+    pub fn api_error(&self, exchange: &str, code: Option<&str>, message: &str) -> DcexError {
+        DcexError::HttpStatus {
+            status: self.status,
+            message: api_error_message(exchange, self.status, code, message),
+            headers: self.header_pairs(),
+        }
+    }
+
+    /// A non-2xx status becomes an exchange error with the body's code and message.
+    pub fn ensure_success(&self, exchange: &str) -> Result<()> {
         if (200..300).contains(&self.status) {
             return Ok(());
         }
-        Err(DcexError::HttpStatus {
-            status: self.status,
-            message: String::from_utf8_lossy(&self.body).into_owned(),
-            headers: self
-                .headers
+        let (code, message) = error_parts(&self.body);
+        Err(self.api_error(exchange, code.as_deref(), &message))
+    }
+}
+
+/// The one error text for every exchange: `{Exchange} API Error: [{code}] {message} (HTTP {status})`.
+/// Without an exchange code the HTTP status stands in, so the code is never "Unknown".
+pub fn api_error_message(exchange: &str, status: u16, code: Option<&str>, message: &str) -> String {
+    let code = code
+        .map(str::trim)
+        .filter(|code| !code.is_empty() && *code != "null")
+        .map_or_else(|| format!("HTTP {status}"), ToString::to_string);
+    let message = message.trim();
+    let message = if message.is_empty() {
+        "no error message"
+    } else {
+        message
+    };
+    format!("{exchange} API Error: [{code}] {message} (HTTP {status})")
+}
+
+const CODE_KEYS: &[&str] = &["retCode", "code", "error_code", "errorCode", "ret_code"];
+const MESSAGE_KEYS: &[&str] = &[
+    "retMsg",
+    "msg",
+    "message",
+    "error",
+    "errorMessage",
+    "error_description",
+    "detail",
+];
+
+/// The code and message of an error body: a nested `error` object is read first, then
+/// the top level; a non-JSON body is the message itself.
+pub fn error_parts(body: &[u8]) -> (Option<String>, String) {
+    let text = String::from_utf8_lossy(body).trim().to_string();
+    let Ok(Value::Object(object)) = serde_json::from_slice::<Value>(body) else {
+        return (None, text);
+    };
+    let nested = object.get("error").and_then(Value::as_object);
+    let scopes = nested.into_iter().chain(std::iter::once(&object));
+    let (mut code, mut message) = (None, None);
+    for scope in scopes {
+        code = code.or_else(|| CODE_KEYS.iter().find_map(|key| scalar(scope.get(*key)?)));
+        message = message.or_else(|| MESSAGE_KEYS.iter().find_map(|key| scalar(scope.get(*key)?)));
+    }
+    (code, message.unwrap_or(text))
+}
+
+fn scalar(value: &Value) -> Option<String> {
+    match value {
+        Value::String(text) if !text.trim().is_empty() => Some(text.clone()),
+        Value::Number(number) => Some(number.to_string()),
+        Value::Array(items) if !items.is_empty() => Some(
+            items
                 .iter()
-                .map(|(key, value)| (key.clone(), value.clone()))
-                .collect(),
-        })
+                .filter_map(scalar)
+                .collect::<Vec<_>>()
+                .join(", "),
+        ),
+        _ => None,
     }
 }
 
@@ -306,5 +375,54 @@ X-Test: yes\r\nContent-Length: 11\r\nConnection: close\r\n\r\n{\"ok\":true}",
                 .expect("server")
                 .starts_with("GET /health HTTP/1.1")
         );
+    }
+
+    #[test]
+    fn exchange_errors_share_one_format() {
+        let cases: [(&[u8], &str); 6] = [
+            (
+                br#"{"status":"ERROR","error":{"code":1137,"message":"Position is missing for reduce-only order"}}"#,
+                "Extended API Error: [1137] Position is missing for reduce-only order (HTTP 400)",
+            ),
+            (
+                br#"{"success":false,"error":"reduce only order can only be IOC","error_code":"reduce_only_invalid_tif"}"#,
+                "Extended API Error: [reduce_only_invalid_tif] reduce only order can only be IOC (HTTP 400)",
+            ),
+            (
+                br#"{"code":"INVALID_ORDER","message":"Fill or kill order would not complete fill immediately"}"#,
+                "Extended API Error: [INVALID_ORDER] Fill or kill order would not complete fill immediately (HTTP 400)",
+            ),
+            (
+                br#"{"code":-5021,"msg":"FOK order rejected"}"#,
+                "Extended API Error: [-5021] FOK order rejected (HTTP 400)",
+            ),
+            (
+                b"Bad Gateway",
+                "Extended API Error: [HTTP 400] Bad Gateway (HTTP 400)",
+            ),
+            (b"", "Extended API Error: [HTTP 400] no error message (HTTP 400)"),
+        ];
+        for (body, expected) in cases {
+            let response = HttpResponse {
+                status: 400,
+                headers: BTreeMap::new(),
+                body: body.to_vec(),
+            };
+            let error = response.ensure_success("Extended").unwrap_err();
+            assert_eq!(error.to_string(), expected);
+            assert!(matches!(error, DcexError::HttpStatus { status: 400, .. }));
+        }
+    }
+
+    #[test]
+    fn missing_or_null_code_falls_back_to_http_status_never_unknown() {
+        for code in [None, Some(""), Some("null")] {
+            let text = api_error_message("Bybit", 200, code, "");
+            assert_eq!(
+                text,
+                "Bybit API Error: [HTTP 200] no error message (HTTP 200)"
+            );
+            assert!(!text.contains("Unknown"));
+        }
     }
 }

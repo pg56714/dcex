@@ -13,7 +13,7 @@ from .._native_http import NativeResponse, load_native, request_native_json
 from ..base.http_manager import BaseHTTPManager
 from ..product_table.manager import ProductTableManager
 from ..utils.common import Common
-from ..utils.errors import FailedRequestError
+from ..utils.errors import FailedRequestError, api_error_message
 from ..utils.helpers import generate_timestamp
 
 _native = load_native()
@@ -211,7 +211,7 @@ class HTTPManager(BaseHTTPManager):
             status_code, resp_headers = self._exception_response_details(exc)
             raise FailedRequestError(
                 request=f"{method_upper} {url} | Body: {params}",
-                message=f"Request failed: {exc}",
+                message=str(exc),
                 status_code=status_code,
                 time=str(generate_timestamp(iso_format=True)),
                 resp_headers=resp_headers,
@@ -226,7 +226,7 @@ class HTTPManager(BaseHTTPManager):
             message = data.get("msg") or data.get("message") if isinstance(data, dict) else data
             raise FailedRequestError(
                 request=f"{method_upper} {url} | Body: {params}",
-                message=f"Aster API error [{error_code}]: {message}",
+                message=api_error_message("Aster", response.status_code, error_code, message),
                 status_code=response.status_code,
                 time=str(generate_timestamp(iso_format=True)),
                 resp_headers=dict(response.headers),

@@ -12,7 +12,7 @@ from .._native_http import NativeResponse, load_native, native_body_text, reques
 from ..base.http_manager import BaseHTTPManager
 from ..product_table.manager import ProductTableManager
 from ..utils.common import Common
-from ..utils.errors import FailedRequestError
+from ..utils.errors import FailedRequestError, api_error_from_body, api_error_message
 from ..utils.helpers import generate_timestamp
 
 RequestPayload = dict[str, Any] | list[Any]
@@ -113,7 +113,7 @@ class HTTPManager(BaseHTTPManager):
             raise FailedRequestError(
                 request=f"MEXC {method_name} | Params: {params}",
                 message=str(exc),
-                status_code="Unknown",
+                status_code=getattr(exc, "status_code", None),
                 time=str(generate_timestamp(iso_format=True)),
             ) from exc
         self._store_response_headers(response)
@@ -184,7 +184,7 @@ class HTTPManager(BaseHTTPManager):
             status_code, resp_headers = self._exception_response_details(exc)
             raise FailedRequestError(
                 request=f"{method.upper()} {url} | Body: {query}",
-                message=f"Request failed: {exc}",
+                message=str(exc),
                 status_code=status_code,
                 time=str(generate_timestamp(iso_format=True)),
                 resp_headers=resp_headers,
@@ -195,7 +195,7 @@ class HTTPManager(BaseHTTPManager):
         if response.status_code // 100 != 2:
             raise FailedRequestError(
                 request=f"{method.upper()} {url} | Body: {query}",
-                message=f"HTTP Error {response.status_code}: {native_body_text(data)}",
+                message=api_error_from_body("MEXC", response.status_code, native_body_text(data)),
                 status_code=response.status_code,
                 time=str(generate_timestamp(iso_format=True)),
                 resp_headers=dict(response.headers),
@@ -205,10 +205,10 @@ class HTTPManager(BaseHTTPManager):
             code = data.get("code")
             success = data.get("success")
             if success is False or (code is not None and code not in {0, "0", 200, "200"}):
-                message = data.get("msg") or data.get("message") or "Unknown error"
+                message = data.get("msg") or data.get("message") or ""
                 raise FailedRequestError(
                     request=f"{method.upper()} {url} | Body: {query}",
-                    message=f"MEXC API Error: [{code}] {message}",
+                    message=api_error_message("MEXC", response.status_code, code, message),
                     status_code=response.status_code,
                     time=str(generate_timestamp(iso_format=True)),
                     resp_headers=dict(response.headers),

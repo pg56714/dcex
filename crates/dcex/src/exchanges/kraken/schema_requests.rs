@@ -218,7 +218,7 @@ impl KrakenClient {
             let response = self
                 .request_raw(endpoint.method, endpoint.auth, path, query, None, true)
                 .await?;
-            response.ensure_success()?;
+            response.ensure_success("Kraken")?;
             // Preserve CSV verbatim, while exposing the usual status/header envelope.
             let text = response.text()?;
             if text.trim_start().starts_with('{') {
@@ -255,7 +255,7 @@ impl KrakenClient {
                 true,
             )
             .await?;
-        response.ensure_success()?;
+        response.ensure_success("Kraken")?;
         if response
             .headers
             .iter()

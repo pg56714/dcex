@@ -55,8 +55,7 @@ impl BingxClient {
         timeout: Duration,
         base_url: String,
     ) -> Result<Self> {
-        let mut inner =
-            ExchangeHttpClient::new(timeout)?.with_validator(Arc::new(BingxResponseValidator));
+        let mut inner = ExchangeHttpClient::new(timeout, Arc::new(BingxResponseValidator))?;
         if let (Some(api_key), Some(api_secret)) = (api_key.clone(), api_secret) {
             inner = inner.with_signer(Arc::new(BingxSigner {
                 api_key,

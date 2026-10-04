@@ -561,7 +561,7 @@ pub(in crate::exchanges::aster) fn exchange_symbol_fallback(
 
 pub(super) fn validate_response(response: &HttpResponse) -> Result<Value> {
     let data = response.json()?;
-    response.ensure_success()?;
+    response.ensure_success("Aster")?;
     if let Some(object) = data.as_object() {
         let code = object.get("code");
         if object.get("success") == Some(&Value::Bool(false))
@@ -573,20 +573,12 @@ pub(super) fn validate_response(response: &HttpResponse) -> Result<Value> {
                 .get("msg")
                 .or_else(|| object.get("message"))
                 .and_then(Value::as_str)
-                .unwrap_or("Unknown error");
-            return Err(DcexError::HttpStatus {
-                status: response.status,
-                message: format!(
-                    "Aster API error [{}]: {message}",
-                    code.map(json_value_string)
-                        .unwrap_or_else(|| "null".to_string())
-                ),
-                headers: response
-                    .headers
-                    .iter()
-                    .map(|(key, value)| (key.clone(), value.clone()))
-                    .collect(),
-            });
+                .unwrap_or("");
+            return Err(response.api_error(
+                "Aster",
+                code.map(json_value_string).as_deref(),
+                message,
+            ));
         }
     }
     Ok(data)

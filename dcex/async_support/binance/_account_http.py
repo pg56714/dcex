@@ -32,7 +32,7 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
             raise FailedRequestError(
                 request=f"BINANCE {method_name} | Params: {params}",
                 message=str(exc),
-                status_code=getattr(exc, "status_code", "Unknown"),
+                status_code=getattr(exc, "status_code", None),
                 response_data=getattr(exc, "response_data", None),
                 resp_headers=dict(getattr(exc, "resp_headers", [])),
                 time=str(generate_timestamp(iso_format=True)),

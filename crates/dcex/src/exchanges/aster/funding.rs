@@ -44,7 +44,7 @@ impl AsterClient {
             let response = self
                 .request_raw_auto(method, path, p.only(fields), true)
                 .await?;
-            response.ensure_success()?;
+            response.ensure_success("Aster")?;
             let data = if response.body.is_empty() {
                 serde_json::json!({})
             } else {

@@ -124,7 +124,7 @@ def explicit_rejection(error: Exception, exchange: str = "") -> bool:
     ):
         return True
     # A bare HTTP status or a transport failure is not a business rejection by itself.
-    business_code = bool(code) and not re.fullmatch(r"[1-5]\d\d", code)
+    business_code = bool(code) and not re.fullmatch(r"(HTTP )?[1-5]\d\d", code)
     business_code = business_code or bool(re.search(EXCHANGE_CODE + r"-?\d{4,}", message))
     if not isinstance(error, OrderRejected) and not business_code:
         return False

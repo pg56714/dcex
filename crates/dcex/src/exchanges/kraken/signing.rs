@@ -22,18 +22,15 @@ use crate::http::{HttpMethod, HttpResponse};
 use crate::{DcexError, Result};
 
 pub(super) fn validate_response(response: &HttpResponse) -> Result<Value> {
-    response.ensure_success()?;
+    response.ensure_success("Kraken")?;
     let data = response.json()?;
     if let Some(message) = kraken_error_message(&data) {
-        return Err(DcexError::HttpStatus {
-            status: response.status,
-            message,
-            headers: response
-                .headers
-                .iter()
-                .map(|(key, value)| (key.clone(), value.clone()))
-                .collect(),
-        });
+        // Spot errors are "ECategory:Reason"; futures errors are a bare camelCase code.
+        let (code, detail) = match message.split_once(':') {
+            Some((category, reason)) if category.starts_with('E') => (category, reason),
+            _ => (message.as_str(), message.as_str()),
+        };
+        return Err(response.api_error("Kraken", Some(code), detail));
     }
     Ok(data)
 }

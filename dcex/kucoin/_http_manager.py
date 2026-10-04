@@ -10,7 +10,7 @@ from .._native_http import NativeResponse, load_native, native_body_text, reques
 from ..base.http_manager import BaseHTTPManager
 from ..product_table.manager import ProductTableManager
 from ..utils.common import Common
-from ..utils.errors import FailedRequestError
+from ..utils.errors import FailedRequestError, api_error_from_body, api_error_message
 from ..utils.helpers import generate_timestamp
 
 _native = load_native()
@@ -97,7 +97,7 @@ class HTTPManager(BaseHTTPManager):
             raise FailedRequestError(
                 request=f"KUCOIN {method_name} | Params: {params}",
                 message=str(exc),
-                status_code="Unknown",
+                status_code=getattr(exc, "status_code", None),
                 time=str(generate_timestamp(iso_format=True)),
             ) from exc
         self._store_response_headers(response)
@@ -177,7 +177,7 @@ class HTTPManager(BaseHTTPManager):
             status_code, resp_headers = self._exception_response_details(e)
             raise FailedRequestError(
                 request=f"{method.upper()} {url} | Body: {query}",
-                message=f"Request failed: {e}",
+                message=str(e),
                 status_code=status_code,
                 time=str(timestamp),
                 resp_headers=resp_headers,
@@ -188,11 +188,11 @@ class HTTPManager(BaseHTTPManager):
             timestamp_str = str(generate_timestamp(iso_format=True))
 
             if isinstance(data, dict) and data.get("code") != "200000":
-                code = data.get("code", "Unknown")
-                error_message = data.get("msg", "Unknown error")
+                code = data.get("code")
+                error_message = data.get("msg", "")
                 raise FailedRequestError(
                     request=f"{method} {url} | Body: {query}",
-                    message=f"KUCOIN API Error: [{code}] {error_message}",
+                    message=api_error_message("KuCoin", response.status_code, code, error_message),
                     status_code=response.status_code,
                     time=timestamp_str,
                     resp_headers=dict(response.headers),
@@ -201,7 +201,9 @@ class HTTPManager(BaseHTTPManager):
             if not response.status_code // 100 == 2:
                 raise FailedRequestError(
                     request=f"{method.upper()} {url} | Body: {query}",
-                    message=f"HTTP Error {response.status_code}: {native_body_text(data)}",
+                    message=api_error_from_body(
+                        "KuCoin", response.status_code, native_body_text(data)
+                    ),
                     status_code=response.status_code,
                     time=timestamp_str,
                     resp_headers=dict(response.headers),

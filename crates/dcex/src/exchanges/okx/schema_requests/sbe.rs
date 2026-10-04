@@ -20,7 +20,7 @@ impl OkxClient {
                 false,
             )
             .await?;
-        response.ensure_success()?;
+        response.ensure_success("OKX")?;
         let content_type = response
             .headers
             .iter()

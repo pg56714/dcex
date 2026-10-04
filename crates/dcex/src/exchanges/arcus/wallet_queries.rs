@@ -268,7 +268,7 @@ impl ArcusSpotClient {
         let request = HttpRequest::new(HttpMethod::Post, &self.rpc_url, "")
             .json(json!({"jsonrpc": "2.0", "id": 1, "method": method, "params": params}));
         let response = self.transport.execute(request).await?;
-        response.ensure_success()?;
+        response.ensure_success("Arcus")?;
         let body = response.json()?;
         if let Some(error) = body.get("error") {
             return Err(DcexError::Runtime(format!(
@@ -284,7 +284,7 @@ impl ArcusSpotClient {
         let request =
             HttpRequest::new(HttpMethod::Post, &self.rpc_url, "").json(Value::Array(calls.clone()));
         let response = self.transport.execute(request).await?;
-        response.ensure_success()?;
+        response.ensure_success("Arcus")?;
         let body = response.json()?;
         let replies = body.as_array().ok_or_else(|| {
             DcexError::Decode("Arcus wallet RPC batch must return an array".into())

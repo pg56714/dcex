@@ -112,18 +112,10 @@ impl ResponseValidator for BingxResponseValidator {
                 .as_object()
                 .and_then(|object| object.get("msg"))
                 .and_then(Value::as_str)
-                .unwrap_or("Unknown error");
-            return Err(DcexError::HttpStatus {
-                status: response.status,
-                message: format!("BingX API Error: [{code}] {message}"),
-                headers: response
-                    .headers
-                    .iter()
-                    .map(|(key, value)| (key.clone(), value.clone()))
-                    .collect(),
-            });
+                .unwrap_or("");
+            return Err(response.api_error("BingX", Some(&code), message));
         }
-        response.ensure_success()?;
+        response.ensure_success("BingX")?;
         Ok(data)
     }
 }

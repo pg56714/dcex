@@ -27,6 +27,25 @@ def _sanitize_request(request: str) -> str:
     return _native.sanitize_request(request)
 
 
+def api_error_message(exchange: str, status: object, code: object, message: object) -> str:
+    """Format ``{Exchange} API Error: [{code}] {message} (HTTP {status})`` like Rust does."""
+    return _native.api_error_message(
+        exchange, _status(status), None if code is None else str(code), str(message)
+    )
+
+
+def api_error_from_body(exchange: str, status: object, body: object) -> str:
+    """Format the shared error text from a raw error body (code and message parsed)."""
+    return _native.api_error_from_body(exchange, _status(status), str(body))
+
+
+def _status(status: object) -> int:
+    try:
+        return int(str(status))
+    except ValueError:
+        return 0
+
+
 class APIRequestError(Exception):
     """Base exception for API request errors."""
 
@@ -41,14 +60,13 @@ class APIRequestError(Exception):
     ) -> None:
         self.request = _sanitize_request(request)
         self.message = sanitize_message(message)
-        self.status_code = status_code if status_code is not None else "Unknown"
-        self.time = time if time is not None else "Unknown"
+        # The HTTP status; the message already names the exchange, its code and the status.
+        self.status_code = status_code
+        self.time = time
         self.resp_headers = resp_headers
         self.response_data = response_data
-        super().__init__(
-            f"{self.message} (ErrCode: {self.status_code}) (ErrTime: {self.time}).\n"
-            f"Request: {self.request}."
-        )
+        when = f" (ErrTime: {time})" if time is not None else ""
+        super().__init__(f"{self.message}{when}.\nRequest: {self.request}.")
 
 
 class FailedRequestError(APIRequestError):

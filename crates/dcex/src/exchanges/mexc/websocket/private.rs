@@ -107,7 +107,7 @@ impl MexcPrivateWebSocket {
     pub async fn create_listen_key(&mut self) -> Result<String> {
         let request = self.listen_key_request(HttpMethod::Post, None)?;
         let response = self.transport.execute(request).await?;
-        response.ensure_success()?;
+        response.ensure_success("MEXC")?;
         let data = response.json()?;
         let listen_key = extract_listen_key(&data)?;
         self.listen_key = Some(listen_key.clone());
@@ -121,7 +121,7 @@ impl MexcPrivateWebSocket {
             .ok_or_else(|| DcexError::InvalidInput("MEXC listen key is missing.".to_string()))?;
         let request = self.listen_key_request(HttpMethod::Put, Some(&listen_key))?;
         let response = self.transport.execute(request).await?;
-        response.ensure_success()?;
+        response.ensure_success("MEXC")?;
         let data = response.json()?;
         Ok(extract_listen_key(&data).unwrap_or(listen_key))
     }
@@ -130,7 +130,7 @@ impl MexcPrivateWebSocket {
         if let Some(listen_key) = self.listen_key.take() {
             let request = self.listen_key_request(HttpMethod::Delete, Some(&listen_key))?;
             let response = self.transport.execute(request).await?;
-            response.ensure_success()?;
+            response.ensure_success("MEXC")?;
         }
         Ok(())
     }

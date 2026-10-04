@@ -81,7 +81,7 @@ impl OndoClient {
         let response = self
             .request_raw(method, path, params, body, signed, extra_headers)
             .await?;
-        response.ensure_success()?;
+        response.ensure_success("Ondo")?;
         let data = if response
             .headers
             .get("content-type")

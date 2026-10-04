@@ -552,7 +552,7 @@ impl LighterClient {
 }
 
 pub(super) fn validate_response(response: &HttpResponse) -> Result<Value> {
-    response.ensure_success()?;
+    response.ensure_success("Lighter")?;
     let data = response.json()?;
     if let Some(object) = data.as_object() {
         let code = object.get("code");
@@ -561,20 +561,12 @@ pub(super) fn validate_response(response: &HttpResponse) -> Result<Value> {
                 .get("message")
                 .or_else(|| object.get("msg"))
                 .map(json_value_string)
-                .unwrap_or_else(|| "Unknown error".to_string());
-            return Err(DcexError::HttpStatus {
-                status: response.status,
-                message: format!(
-                    "Lighter API Error: [{}] {message}",
-                    code.map(json_value_string)
-                        .unwrap_or_else(|| "Unknown".to_string())
-                ),
-                headers: response
-                    .headers
-                    .iter()
-                    .map(|(key, value)| (key.clone(), value.clone()))
-                    .collect(),
-            });
+                .unwrap_or_else(|| "".to_string());
+            return Err(response.api_error(
+                "Lighter",
+                code.map(json_value_string).as_deref(),
+                &message,
+            ));
         }
     }
     Ok(data)

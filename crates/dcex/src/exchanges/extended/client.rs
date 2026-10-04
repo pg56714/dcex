@@ -131,7 +131,7 @@ impl ExtendedClient {
         let response = self
             .request_raw(method, path, params, body, signed, extra_headers)
             .await?;
-        response.ensure_success()?;
+        response.ensure_success("Extended")?;
         let data = match response.json() {
             Ok(data) => data,
             Err(DcexError::Decode(_)) => Value::String(response.text()?),

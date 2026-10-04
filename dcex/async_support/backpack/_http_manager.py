@@ -12,7 +12,7 @@ from dcex._schema_codec import normalize_params
 from ..._native_http import NativeResponse, load_native, native_body_text, request_native_json_async
 from ...base.http_manager import BaseHTTPManager
 from ...utils.common import Common
-from ...utils.errors import FailedRequestError
+from ...utils.errors import FailedRequestError, api_error_from_body
 from ...utils.helpers import generate_timestamp
 from ..product_table.manager import ProductTableManager
 
@@ -134,7 +134,7 @@ class HTTPManager(BaseHTTPManager):
             raise FailedRequestError(
                 request=f"BACKPACK {method_name} | Params: {params}",
                 message=str(exc),
-                status_code="Unknown",
+                status_code=getattr(exc, "status_code", None),
                 time=str(generate_timestamp(iso_format=True)),
             ) from exc
         self._store_response_headers(response)
@@ -163,7 +163,7 @@ class HTTPManager(BaseHTTPManager):
             raise FailedRequestError(
                 request=f"BACKPACK {method_name} | Params: {params}",
                 message=str(exc),
-                status_code="Unknown",
+                status_code=getattr(exc, "status_code", None),
                 time=str(generate_timestamp(iso_format=True)),
             ) from exc
         self._store_response_headers(response)
@@ -251,7 +251,7 @@ class HTTPManager(BaseHTTPManager):
             status_code, resp_headers = self._exception_response_details(exc)
             raise FailedRequestError(
                 request=f"{method_upper} {url} | Body: {query}",
-                message=f"Request failed: {exc}",
+                message=str(exc),
                 status_code=status_code,
                 time=str(generate_timestamp(iso_format=True)),
                 resp_headers=resp_headers,
@@ -265,7 +265,7 @@ class HTTPManager(BaseHTTPManager):
                 message = str(data.get("message") or data.get("code") or native_body_text(data))
             raise FailedRequestError(
                 request=f"{method_upper} {url} | Body: {query}",
-                message=f"HTTP Error {response.status_code}: {message}",
+                message=api_error_from_body("Backpack", response.status_code, message),
                 status_code=response.status_code,
                 time=str(generate_timestamp(iso_format=True)),
                 resp_headers=dict(response.headers),

@@ -1,20 +1,16 @@
 use serde_json::Value;
 
+use crate::Result;
 use crate::http::{HttpMethod, HttpResponse};
-use crate::{DcexError, Result};
 
 pub(super) fn validate_response(response: &HttpResponse) -> Result<Value> {
     let data = response.json()?;
     if !data.is_object() {
-        return Err(DcexError::HttpStatus {
-            status: response.status,
-            message: format!("Unexpected response type: {}", data_type_name(&data)),
-            headers: response
-                .headers
-                .iter()
-                .map(|(key, value)| (key.clone(), value.clone()))
-                .collect(),
-        });
+        return Err(response.api_error(
+            "OKX",
+            None,
+            &format!("Unexpected response type: {}", data_type_name(&data)),
+        ));
     }
     if data
         .as_object()
@@ -24,32 +20,24 @@ pub(super) fn validate_response(response: &HttpResponse) -> Result<Value> {
         != "0"
     {
         let (code, message) = okx_error_details(&data);
-        return Err(DcexError::HttpStatus {
-            status: response.status,
-            message: format!("OKX API Error: [{code}] {message}"),
-            headers: response
-                .headers
-                .iter()
-                .map(|(key, value)| (key.clone(), value.clone()))
-                .collect(),
-        });
+        return Err(response.api_error("OKX", Some(&code), &message));
     }
-    response.ensure_success()?;
+    response.ensure_success("OKX")?;
     Ok(data)
 }
 
 fn okx_error_details(data: &Value) -> (String, String) {
     let Some(object) = data.as_object() else {
-        return ("Unknown".to_string(), "Unknown error".to_string());
+        return (String::new(), String::new());
     };
     let mut api_code = object
         .get("code")
         .map(json_value_string)
-        .unwrap_or_else(|| "Unknown".to_string());
+        .unwrap_or_default();
     let mut error_message = object
         .get("msg")
         .map(json_value_string)
-        .unwrap_or_else(|| "Unknown error".to_string());
+        .unwrap_or_else(|| "".to_string());
     if let Some(row) = object
         .get("data")
         .and_then(Value::as_array)

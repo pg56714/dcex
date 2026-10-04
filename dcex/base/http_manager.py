@@ -93,7 +93,7 @@ class BaseHTTPManager:
     @staticmethod
     def _exception_response_details(
         exception: BaseException,
-    ) -> tuple[str | int, dict[str, str] | None]:
+    ) -> tuple[str | int | None, dict[str, str] | None]:
         """Extract response metadata carried by a transport exception."""
         raw_status = getattr(exception, "status_code", None)
         if raw_status is not None:
@@ -103,12 +103,13 @@ class BaseHTTPManager:
 
         response = getattr(exception, "response", None)
         if response is None:
-            match = re.search(r"HTTP request failed with status (\d+)", str(exception))
+            # Native exchange errors end with "(HTTP {status})".
+            match = re.search(r"\(HTTP (\d{3})\)$", str(exception))
             if match is not None:
                 return int(match.group(1)), None
-            return "Unknown", None
+            return None, None
 
-        raw_status = getattr(response, "status_code", "Unknown")
+        raw_status = getattr(response, "status_code", None)
         status_code = raw_status if isinstance(raw_status, (str, int)) else str(raw_status)
         headers = dict(getattr(response, "headers", {}) or {})
         return status_code, headers

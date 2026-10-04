@@ -123,7 +123,7 @@ impl ArcusClient {
 
     pub(super) async fn execute(&self, request: HttpRequest) -> Result<ValidatedResponse> {
         let response = self.transport.execute(request).await?;
-        response.ensure_success()?;
+        response.ensure_success("Arcus")?;
         let data = response.json()?;
         Ok(ValidatedResponse {
             status: response.status,
@@ -488,7 +488,7 @@ pub(super) mod spot {
                 request = request.header("X-Api-Key", api_key);
             }
             let response = self.transport.execute(request).await?;
-            response.ensure_success()?;
+            response.ensure_success("Arcus")?;
             let data = response.json()?;
             Ok(ValidatedResponse {
                 status: response.status,

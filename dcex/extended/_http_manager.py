@@ -13,7 +13,7 @@ from .._native_http import NativeResponse, load_native, native_body_text, reques
 from ..base.http_manager import BaseHTTPManager
 from ..product_table.manager import ProductTableManager
 from ..utils.common import Common
-from ..utils.errors import FailedRequestError
+from ..utils.errors import FailedRequestError, api_error_from_body
 from ..utils.helpers import generate_timestamp
 
 _native = load_native()
@@ -133,7 +133,7 @@ class HTTPManager(BaseHTTPManager):
             raise FailedRequestError(
                 request=f"Extended {method_name} | Params: {params}",
                 message=str(exc),
-                status_code="Unknown",
+                status_code=getattr(exc, "status_code", None),
                 time=str(generate_timestamp(iso_format=True)),
             ) from exc
         self._store_response_headers(response)
@@ -152,7 +152,7 @@ class HTTPManager(BaseHTTPManager):
             raise FailedRequestError(
                 request=f"Extended {method_name} | Params: {params}",
                 message=str(exc),
-                status_code="Unknown",
+                status_code=getattr(exc, "status_code", None),
                 time=str(generate_timestamp(iso_format=True)),
             ) from exc
         self._store_response_headers(response)
@@ -182,7 +182,7 @@ class HTTPManager(BaseHTTPManager):
             status_code, resp_headers = self._exception_response_details(exc)
             raise FailedRequestError(
                 request=f"{method.upper()} {self.base_url}{path} | Body: {query}",
-                message=f"Request failed: {exc}",
+                message=str(exc),
                 status_code=status_code,
                 time=str(generate_timestamp(iso_format=True)),
                 resp_headers=resp_headers,
@@ -191,7 +191,9 @@ class HTTPManager(BaseHTTPManager):
         if response.status_code // 100 != 2:
             raise FailedRequestError(
                 request=f"{method.upper()} {self.base_url}{path} | Body: {query}",
-                message=f"HTTP Error {response.status_code}: {native_body_text(data)}",
+                message=api_error_from_body(
+                    "Extended", response.status_code, native_body_text(data)
+                ),
                 status_code=response.status_code,
                 time=str(generate_timestamp(iso_format=True)),
                 resp_headers=dict(response.headers),

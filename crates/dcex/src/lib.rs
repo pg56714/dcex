@@ -35,12 +35,10 @@ impl Display for DcexError {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Decode(message) => write!(f, "failed to decode response: {message}"),
-            Self::HttpStatus {
-                status, message, ..
+            // Built by `http::api_error_message`: exchange, code, message and HTTP status.
+            Self::HttpStatus { message, .. } | Self::ExchangeResponse { message, .. } => {
+                f.write_str(message)
             }
-            | Self::ExchangeResponse {
-                status, message, ..
-            } => write!(f, "HTTP request failed with status {status}: {message}"),
             Self::InvalidInput(message) => f.write_str(message),
             Self::Runtime(message) => write!(f, "runtime error: {message}"),
             Self::Transport(message) => write!(f, "request transport failed: {message}"),

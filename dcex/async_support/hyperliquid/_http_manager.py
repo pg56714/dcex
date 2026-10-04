@@ -10,7 +10,7 @@ from dcex._schema_codec import normalize_params
 from ..._native_http import NativeResponse, load_native, native_body_text, request_native_json_async
 from ...base.http_manager import BaseHTTPManager
 from ...utils.common import Common
-from ...utils.errors import FailedRequestError
+from ...utils.errors import FailedRequestError, api_error_from_body
 from ...utils.helpers import generate_timestamp
 from ..product_table.manager import ProductTableManager
 
@@ -122,7 +122,7 @@ class HTTPManager(BaseHTTPManager):
             raise FailedRequestError(
                 request=f"HYPERLIQUID {method_name} | Params: {params}",
                 message=str(exc),
-                status_code="Unknown",
+                status_code=getattr(exc, "status_code", None),
                 time=str(generate_timestamp(iso_format=True)),
             ) from exc
         self._store_response_headers(response)
@@ -151,7 +151,7 @@ class HTTPManager(BaseHTTPManager):
             raise FailedRequestError(
                 request=f"HYPERLIQUID {method_name} | Params: {params}",
                 message=str(exc),
-                status_code="Unknown",
+                status_code=getattr(exc, "status_code", None),
                 time=str(generate_timestamp(iso_format=True)),
             ) from exc
         self._store_response_headers(response)
@@ -231,7 +231,7 @@ class HTTPManager(BaseHTTPManager):
             status_code, resp_headers = self._exception_response_details(e)
             raise FailedRequestError(
                 request=f"{method.upper()} {url} | Body: {query}",
-                message=f"Request failed: {str(e)}",
+                message=str(e),
                 status_code=status_code,
                 time=str(timestamp),
                 resp_headers=resp_headers,
@@ -241,12 +241,16 @@ class HTTPManager(BaseHTTPManager):
             data = response_body
             if not response.status_code // 100 == 2:
                 self._log_failed_request(
-                    f"HTTP Error {response.status_code}: {native_body_text(data)}",
+                    api_error_from_body(
+                        "Hyperliquid", response.status_code, native_body_text(data)
+                    ),
                     response.status_code,
                 )
                 raise FailedRequestError(
                     request=f"{method.upper()} {url} | Body: {query}",
-                    message=f"HTTP Error {response.status_code}: {native_body_text(data)}",
+                    message=api_error_from_body(
+                        "Hyperliquid", response.status_code, native_body_text(data)
+                    ),
                     status_code=response.status_code,
                     time=str(timestamp),
                     resp_headers=dict(response.headers),

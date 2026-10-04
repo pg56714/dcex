@@ -97,7 +97,7 @@ impl HyperliquidClient {
         let response = self
             .request_raw(method, path, query_json, action_msgpack, signed)
             .await?;
-        response.ensure_success()?;
+        response.ensure_success("Hyperliquid")?;
         let data = response.json()?;
         Ok(ValidatedResponse {
             status: response.status,
@@ -182,7 +182,7 @@ impl HyperliquidClient {
             nonce,
         )?;
         let response = self.transport.execute(request).await?;
-        response.ensure_success()?;
+        response.ensure_success("Hyperliquid")?;
         let data = response.json()?;
         Ok(ValidatedResponse {
             status: response.status,

@@ -68,7 +68,7 @@ class HTTPManager(BaseHTTPManager):
             raise FailedRequestError(
                 request=f"Arcus {method_name}",
                 message=str(exc),
-                status_code="Unknown",
+                status_code=getattr(exc, "status_code", None),
                 time=str(generate_timestamp(iso_format=True)),
             ) from exc
         self._store_response_headers(response)
@@ -128,7 +128,7 @@ class SpotHTTPManager(BaseHTTPManager):
             raise FailedRequestError(
                 request=f"Arcus Spot {method_name}",
                 message=str(exc),
-                status_code="Unknown",
+                status_code=getattr(exc, "status_code", None),
                 time=str(generate_timestamp(iso_format=True)),
             ) from exc
         self._store_response_headers(response)

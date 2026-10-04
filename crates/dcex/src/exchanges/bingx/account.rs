@@ -284,7 +284,7 @@ impl BingxClient {
                 None,
             )
             .await?;
-        response.ensure_success()?;
+        response.ensure_success("BingX")?;
         if response
             .headers
             .iter()

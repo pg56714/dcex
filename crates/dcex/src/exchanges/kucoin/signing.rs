@@ -1,8 +1,8 @@
 use serde_json::Value;
 
+use crate::Result;
 use crate::crypto::hmac_sha256_base64;
 use crate::http::{HttpMethod, HttpResponse};
-use crate::{DcexError, Result};
 
 pub(super) fn encrypted_passphrase(
     api_secret: Option<&str>,
@@ -42,24 +42,15 @@ pub(super) fn validate_response(response: &HttpResponse) -> Result<Value> {
         let code = data
             .as_object()
             .and_then(|object| object.get("code"))
-            .map(json_value_string)
-            .unwrap_or_else(|| "Unknown".to_string());
+            .map(json_value_string);
         let message = data
             .as_object()
             .and_then(|object| object.get("msg"))
             .and_then(Value::as_str)
-            .unwrap_or("Unknown error");
-        return Err(DcexError::HttpStatus {
-            status: response.status,
-            message: format!("KUCOIN API Error: [{code}] {message}"),
-            headers: response
-                .headers
-                .iter()
-                .map(|(key, value)| (key.clone(), value.clone()))
-                .collect(),
-        });
+            .unwrap_or("");
+        return Err(response.api_error("KuCoin", code.as_deref(), message));
     }
-    response.ensure_success()?;
+    response.ensure_success("KuCoin")?;
     Ok(data)
 }
 

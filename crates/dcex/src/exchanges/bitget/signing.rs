@@ -1,9 +1,9 @@
 use serde_json::Value;
 use url::form_urlencoded;
 
+use crate::Result;
 use crate::crypto::hmac_sha256_base64;
 use crate::http::{HttpMethod, HttpResponse};
-use crate::{DcexError, Result};
 
 pub(super) fn validate_response(response: &HttpResponse) -> Result<Value> {
     let data = response.json()?;
@@ -17,18 +17,10 @@ pub(super) fn validate_response(response: &HttpResponse) -> Result<Value> {
             .as_object()
             .and_then(|object| object.get("msg").or_else(|| object.get("message")))
             .and_then(Value::as_str)
-            .unwrap_or("Unknown error");
-        return Err(DcexError::HttpStatus {
-            status: response.status,
-            message: format!("Bitget API Error: [{code}] {message}"),
-            headers: response
-                .headers
-                .iter()
-                .map(|(key, value)| (key.clone(), value.clone()))
-                .collect(),
-        });
+            .unwrap_or("");
+        return Err(response.api_error("Bitget", Some(&code), message));
     }
-    response.ensure_success()?;
+    response.ensure_success("Bitget")?;
     Ok(data)
 }
 

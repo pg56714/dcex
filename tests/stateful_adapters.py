@@ -2,6 +2,7 @@
 
 import asyncio
 import inspect
+import re
 from dataclasses import replace
 from decimal import Decimal
 from uuid import uuid4
@@ -18,6 +19,29 @@ from tests.stateful_lifecycle import (
     order_state,
     plan_order,
 )
+
+DISPLAY_NAMES = {
+    "binance": "Binance",
+    "aster": "Aster",
+    "bybit": "Bybit",
+    "okx": "OKX",
+    "bitget": "Bitget",
+    "bingx": "BingX",
+    "mexc": "MEXC",
+    "kucoin": "KuCoin",
+    "lighter": "Lighter",
+    "extended": "Extended",
+    "ondo": "Ondo",
+}
+
+
+def body_error(exchange: str, code: object, message: object) -> LifecycleError:
+    """A business rejection inside a 2xx body, in the library's shared error format."""
+    name = DISPLAY_NAMES.get(exchange, exchange)
+    error = LifecycleError(f"{name} API Error: [{redact(code)}] {redact(message)}")
+    error.code = str(code)
+    return error
+
 
 # Documented refusals of an IOC/FOK that cannot fill immediately (never recorded).
 TAKER_KILLED_AT_PLACEMENT = {
@@ -71,22 +95,20 @@ def response_data(exchange, value):
     if exchange in codes:
         field, expected = codes[exchange]
         if not isinstance(value, dict) or str(value.get(field)) != expected:
-            code = value.get(field, "missing") if isinstance(value, dict) else "missing"
-            message = (
-                value.get("msg", value.get("retMsg", value.get("message", "rejected")))
-                if isinstance(value, dict)
-                else "invalid response"
+            if not isinstance(value, dict):
+                raise body_error(exchange, "missing", "invalid response")
+            # Extended nests {"error": {"code", "message"}}; Ondo uses error_code/error.
+            nested = value["error"] if isinstance(value.get("error"), dict) else {}
+            code = nested.get("code", value.get("error_code", value.get(field, "missing")))
+            message = nested.get("message") or next(
+                (value[k] for k in ("msg", "retMsg", "message", "error") if value.get(k)),
+                "rejected",
             )
-            error = LifecycleError(f"{exchange}: code={redact(code)} {redact(message)}")
-            error.code = str(code)
-            raise error
+            raise body_error(exchange, code, message)
     if isinstance(value, dict) and exchange in {"binance", "aster", "mexc"}:
         if ("code" in value and str(value["code"]) != "0") or value.get("success") is False:
-            error = LifecycleError(
-                f"{exchange}: code={redact(value.get('code'))} {redact(value.get('msg', value.get('message', 'rejected')))}"
-            )
-            error.code = str(value.get("code", "missing"))
-            raise error
+            message = value.get("msg", value.get("message", "rejected"))
+            raise body_error(exchange, value.get("code", "missing"), message)
     if exchange == "kraken":
         if not isinstance(value, dict) or (
             value.get("error") != [] and value.get("result") != "success"
@@ -102,11 +124,7 @@ def response_data(exchange, value):
     if exchange == "okx":
         for row in rows(value["data"]):
             if "sCode" in row and str(row["sCode"]) != "0":
-                error = LifecycleError(
-                    f"okx: code={redact(row['sCode'])} {redact(row.get('sMsg', 'rejected'))}"
-                )
-                error.code = str(row["sCode"])
-                raise error
+                raise body_error(exchange, row["sCode"], row.get("sMsg", "rejected"))
         return value["data"]
     if exchange == "mexc" and isinstance(value, dict) and "success" in value:
         if value["success"] is not True or str(value.get("code")) != "0":
@@ -217,7 +235,9 @@ class CexAdapter:
             return response_data(self.exchange, value)
         except Exception as error:
             message = redact(getattr(error, "message", str(error)))
-            code = redact(getattr(error, "code", getattr(error, "status_code", "")))
+            # Every exchange error reads "{Exchange} API Error: [{code}] {message} (HTTP n)".
+            shared = re.search(r"API Error: \[([^\]]+)\]", message)
+            code = shared.group(1) if shared else redact(getattr(error, "code", ""))
             label = ""
             if (
                 self.exchange == "mexc"
@@ -247,7 +267,7 @@ class CexAdapter:
             if self.tif and method.startswith("place") and any(k in message for k in killed):
                 # The venue refused an IOC/FOK that could not fill at once: nothing rests.
                 raise OrderClosed(f"{self.exchange} {method}: {message}") from None
-            reported = LifecycleError(f"{self.exchange} {method}: {label}code={code} {message}")
+            reported = LifecycleError(f"{self.exchange} {method}: {label}{message}")
             reported.code = code
             raise reported from None
 

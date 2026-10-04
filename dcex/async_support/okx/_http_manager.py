@@ -10,7 +10,7 @@ from dcex._schema_codec import normalize_params
 from ..._native_http import NativeResponse, load_native, native_body_text, request_native_json_async
 from ...base.http_manager import BaseHTTPManager
 from ...utils.common import Common
-from ...utils.errors import FailedRequestError
+from ...utils.errors import FailedRequestError, api_error_from_body, api_error_message
 from ...utils.helpers import generate_timestamp
 from ..product_table.manager import ProductTableManager
 
@@ -34,8 +34,8 @@ def parse_params_to_str(query: dict[str, Any]) -> str:
 
 
 def _okx_error_details(data: dict[str, Any]) -> tuple[str, str]:
-    api_code = str(data.get("code", "Unknown"))
-    error_message = str(data.get("msg") or "Unknown error")
+    api_code = str(data.get("code"))
+    error_message = str(data.get("msg") or "")
     rows = data.get("data")
     if isinstance(rows, list) and rows and isinstance(rows[0], dict):
         api_code = str(rows[0].get("sCode") or api_code)
@@ -112,7 +112,7 @@ class HTTPManager(BaseHTTPManager):
             raise FailedRequestError(
                 request=f"OKX {method_name} | Params: {params}",
                 message=str(exc),
-                status_code="Unknown",
+                status_code=getattr(exc, "status_code", None),
                 time=str(generate_timestamp(iso_format=True)),
             ) from exc
         self._store_response_headers(response)
@@ -207,7 +207,7 @@ class HTTPManager(BaseHTTPManager):
             status_code, resp_headers = self._exception_response_details(e)
             raise FailedRequestError(
                 request=f"{method_upper} {url} | Body: {query}",
-                message=f"Request failed: {str(e)}",
+                message=str(e),
                 status_code=status_code,
                 time=str(timestamp),
                 resp_headers=resp_headers,
@@ -218,7 +218,12 @@ class HTTPManager(BaseHTTPManager):
             if not isinstance(data, dict):
                 raise FailedRequestError(
                     request=f"{method_upper} {url} | Body: {query}",
-                    message=f"Unexpected response type: {type(data).__name__}",
+                    message=api_error_message(
+                        "OKX",
+                        response.status_code,
+                        None,
+                        f"Unexpected response type: {type(data).__name__}",
+                    ),
                     status_code=response.status_code,
                     time=str(timestamp),
                     resp_headers=dict(response.headers),
@@ -226,10 +231,13 @@ class HTTPManager(BaseHTTPManager):
 
             if data.get("code", "0") != "0":
                 api_code, error_message = _okx_error_details(data)
-                self._log_failed_request(f"OKX API Error: [{api_code}] {error_message}", api_code)
+                self._log_failed_request(
+                    api_error_message("OKX", response.status_code, api_code, error_message),
+                    api_code,
+                )
                 raise FailedRequestError(
                     request=f"{method_upper} {url} | Body: {query}",
-                    message=f"OKX API Error: [{api_code}] {error_message}",
+                    message=api_error_message("OKX", response.status_code, api_code, error_message),
                     status_code=response.status_code,
                     time=str(timestamp),
                     resp_headers=dict(response.headers),
@@ -238,7 +246,9 @@ class HTTPManager(BaseHTTPManager):
             if not response.status_code // 100 == 2:
                 raise FailedRequestError(
                     request=f"{method_upper} {url} | Body: {query}",
-                    message=f"HTTP Error {response.status_code}: {native_body_text(data)}",
+                    message=api_error_from_body(
+                        "OKX", response.status_code, native_body_text(data)
+                    ),
                     status_code=response.status_code,
                     time=str(timestamp),
                     resp_headers=dict(response.headers),
