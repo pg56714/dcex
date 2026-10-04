@@ -48,6 +48,7 @@ TAKER_KILLED_AT_PLACEMENT = {
     "binance": ("[-5021]",),  # FOK order rejected: could not be filled immediately.
     "aster": ("[-5021]",),
     "backpack": ("Fill or kill order would not complete fill immediately",),
+    "kraken": ("[EOrder] Unfilled FOK precheck",),  # Spot FOK refused before booking.
 }
 
 # Documented executed-quantity fields of placement acknowledgements.
@@ -924,7 +925,8 @@ class CexAdapter:
                 type_="LIMIT",
                 quantity=size,
                 price=price,
-                time_in_force="PostOnly",
+                # Live: spot cancelReplace accepts only IOC/POC; swap uses PostOnly.
+                time_in_force="POC" if self.spot else "PostOnly",
             )
             if self.spot:
                 data = await self.call(

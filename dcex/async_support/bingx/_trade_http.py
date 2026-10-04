@@ -268,7 +268,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         new_client_order_id: str | None = None,  # noqa: N803
         recv_window: int | None = None,  # noqa: N803
     ) -> dict[str, Any]:
-        """Atomically request spot order cancellation and replacement."""
+        """Cancel and replace a spot order atomically; time_in_force is IOC or POC."""
         return await self._native_private(
             "replace_spot_order",
             self._native_call_params(

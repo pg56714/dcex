@@ -157,7 +157,8 @@ impl BingxClient {
                     "cancelReplaceMode",
                     &["STOP_ON_FAILURE", "ALLOW_FAILURE"],
                 )?;
-                validate_spot_order(params, params.required("type_")?)?;
+                // Live cancelReplace rejects anything but an empty, IOC or POC timeInForce.
+                validate_spot_order(params, params.required("type_")?, &["IOC", "POC"])?;
                 let mut query = params.only(&[
                     "cancelOrderId",
                     "cancelClientOrderID",
@@ -660,7 +661,7 @@ impl BingxClient {
             Some(order_type) => order_type,
             None => params.required("type_")?,
         };
-        validate_spot_order(params, order_type)?;
+        validate_spot_order(params, order_type, TIME_IN_FORCE_VALUES)?;
         query.push(("side".to_string(), side));
         query.push(("type".to_string(), order_type.to_string()));
         if let Some(time_in_force) = time_in_force_override
@@ -831,13 +832,14 @@ pub(in crate::exchanges::bingx) fn normalize_bool_fields(query: &mut [(String, S
 pub(in crate::exchanges::bingx) fn validate_spot_order(
     params: &BingxParams,
     order_type: &str,
+    time_in_force: &[&str],
 ) -> Result<()> {
     if !SPOT_ORDER_TYPES.contains(&order_type) {
         return Err(crate::DcexError::InvalidInput(format!(
             "unsupported BingX type: {order_type}"
         )));
     }
-    validate_enum(params, "timeInForce", TIME_IN_FORCE_VALUES)?;
+    validate_enum(params, "timeInForce", time_in_force)?;
     validate_client_id(params, "newClientOrderId", true)?;
     validate_client_id(params, "clientOrderId", true)?;
     validate_u64_range(params, "recvWindow", 1, 5000)?;

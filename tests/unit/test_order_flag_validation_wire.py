@@ -53,6 +53,10 @@ def _okx(base: str) -> Any:
     )
 
 
+def _bingx(base: str) -> Any:
+    return native.BingxHttpClient(api_key="api-key", api_secret="secret", timeout=10, base_url=base)
+
+
 def _kraken(base: str) -> Any:
     secret = base64.b64encode(b"secret").decode()
     return native.KrakenHttpClient(
@@ -147,8 +151,24 @@ MEXC = [
     ("price", "100"),
 ]
 BACKPACK_SPOT = [("product_symbol", "BTC-USDC-SPOT"), ("side", "Ask"), ("quantity", "1")]
+BINGX_REPLACE = [
+    ("symbol", "BTC-USDT"),
+    ("cancelOrderId", "123"),
+    ("cancelReplaceMode", "STOP_ON_FAILURE"),
+    ("side", "BUY"),
+    ("type_", "LIMIT"),
+    ("quantity", "1"),
+    ("price", "100"),
+]
 
 VALID = [
+    (
+        "bingx-replace-poc",
+        _bingx,
+        "replace_spot_order",
+        [*BINGX_REPLACE, ("timeInForce", "POC")],
+        {"timeInForce": "POC"},
+    ),
     (
         "binance-spot",
         _binance,
@@ -240,6 +260,14 @@ VALID = [
 ]
 
 INVALID = [
+    # Live: spot cancelReplace accepts only an empty, IOC or POC timeInForce.
+    (
+        "bingx-replace-postonly",
+        _bingx,
+        "replace_spot_order",
+        [*BINGX_REPLACE, ("timeInForce", "PostOnly")],
+    ),
+    ("bingx-replace-gtc", _bingx, "replace_spot_order", [*BINGX_REPLACE, ("timeInForce", "GTC")]),
     (
         "binance-spot-gtx",
         _binance,

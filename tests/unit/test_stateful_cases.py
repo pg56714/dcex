@@ -208,7 +208,7 @@ AMEND_CALLS = {
     ("okx", False): ("amend_order", {"ordId": "123"}),
     ("bitget", True): ("modify_uta_order", {"order_id": "123", "category": "SPOT"}),
     ("bitget", False): ("modify_uta_order", {"order_id": "123", "category": "USDT-FUTURES"}),
-    ("bingx", True): ("replace_spot_order", {"cancel_order_id": 123, "time_in_force": "PostOnly"}),
+    ("bingx", True): ("replace_spot_order", {"cancel_order_id": 123, "time_in_force": "POC"}),
     ("bingx", False): (
         "replace_swap_order",
         {"cancel_order_id": "123", "time_in_force": "PostOnly", "position_side": "BOTH"},
@@ -1212,8 +1212,8 @@ async def test_unconfirmed_sweep_still_reports_unexpected_position():
 
 
 class KilledAtPlacementMock(CaseMock):
-    def __init__(self, exchange, message):
-        super().__init__(exchange, False, "sync", "fok")
+    def __init__(self, exchange, message, spot=False):
+        super().__init__(exchange, spot, "sync", "fok")
         self.message = message
 
     def payload(self, method, kw):
@@ -1228,15 +1228,15 @@ class KilledAtPlacementMock(CaseMock):
         ("binance", "BINANCE API Error: [-5021] Due to the order could not be filled", True),
         ("backpack", '{"message":"Fill or kill order would not complete fill immediately"}', True),
         ("binance", "BINANCE API Error: [-2019] Margin is insufficient.", False),
+        ("kraken", "Kraken API Error: [EOrder] Unfilled FOK precheck (HTTP 200)", True),
     ],
 )
 @pytest.mark.asyncio
 async def test_documented_fok_refusal_ends_unfilled(exchange, message, passes):
-    client = KilledAtPlacementMock(exchange, message)
+    spot = exchange == "kraken"
+    client = KilledAtPlacementMock(exchange, message, spot)
     result = {}
-    lifecycle = run_lifecycle(
-        cex_adapter(client, exchange, False), result, poll_delay=0, case="fok"
-    )
+    lifecycle = run_lifecycle(cex_adapter(client, exchange, spot), result, poll_delay=0, case="fok")
     if not passes:
         with pytest.raises(LifecycleError, match="-2019"):
             await lifecycle
