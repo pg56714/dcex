@@ -214,13 +214,6 @@ jobs:
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Cache Cargo dependencies
-        uses: Swatinem/rust-cache@v2
-        with:
-          # Avoid restoring old package directories or traversing target/package during cleanup.
-          prefix-key: v1-rust-publish
-          cache-targets: false
-
       - name: Download release metadata
         uses: actions/download-artifact@v8.0.1
         with:
