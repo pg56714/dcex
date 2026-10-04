@@ -13,6 +13,7 @@ RESULT_FIELDS = (
     "exchange",
     "mode",
     "market",
+    "case",
     "stage",
     "status",
     "error_code",
@@ -28,6 +29,16 @@ RESULTS = pytest.StashKey[dict[str, dict[str, str]]]()
 DETAILS = pytest.StashKey[dict[str, str]]()
 
 
+# Stateful test functions and the order-test case each one runs.
+CASE_BY_TEST = {
+    "test_limit_order_lifecycle": "lifecycle",
+    "test_ioc_never_fills": "ioc",
+    "test_fok_never_fills": "fok",
+    "test_reduce_only_cannot_open": "reduce_only",
+    "test_amend_price": "amend",
+}
+
+
 def initial_result(nodeid: str) -> dict[str, str]:
     """Extract only non-sensitive identity fields from the test path."""
     parts = nodeid.replace("\\", "/").split("/")
@@ -38,6 +49,7 @@ def initial_result(nodeid: str) -> dict[str, str]:
         exchange=parts[index + 1] if index >= 0 else "unknown",
         mode=mode.removesuffix("_support"),
         market="unknown",
+        case=CASE_BY_TEST.get(nodeid.split("::")[-1].split("[")[0], ""),
         stage="setup",
         status="running",
     )

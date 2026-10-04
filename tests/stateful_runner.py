@@ -13,7 +13,13 @@ from tests.live_gate import stateful_tests_enabled
 from tests.stateful_adapters import CexAdapter
 from tests.stateful_arcus import ARCUS_SPOT_NA, ArcusAdapter
 from tests.stateful_dex import ExtendedAdapter, HyperliquidAdapter, LighterAdapter, OndoAdapter
-from tests.stateful_lifecycle import InsufficientBalance, MarketUnavailable, run_lifecycle
+from tests.stateful_lifecycle import (
+    InsufficientBalance,
+    MarketUnavailable,
+    NotApplicable,
+    not_applicable,
+    run_lifecycle,
+)
 
 MARKETS = {
     "binance": [("spot", "BTC-USDC-SPOT"), ("swap", "DOGE-USDT-SWAP")],
@@ -97,14 +103,19 @@ def client_options(exchange):
     )
 
 
-async def run_case(exchange, mode, market, symbol, result):
+async def run_case(exchange, mode, market, symbol, result, case="lifecycle"):
     """Create a client only after opt-in; report sanitized errors without traceback locals."""
-    result.update(exchange=exchange, mode=mode, market=market, stage="setup")
+    result.update(exchange=exchange, mode=mode, market=market, case=case, stage="setup")
     if not stateful_tests_enabled():
         pytest.skip("Set RUN_LIVE_TRADING_TESTS=1 to run stateful tests.")
     if exchange == "arcus" and market == "spot":
         result.update(stage="not_applicable", status="N/A", skip_reason=ARCUS_SPOT_NA)
         pytest.skip(ARCUS_SPOT_NA)
+    reason = not_applicable(exchange, market, case)
+    if reason:
+        # Decided before any credential is read or client constructed.
+        result.update(stage="not_applicable", status="N/A", skip_reason=reason)
+        pytest.skip(reason)
     load_dotenv()
     client = None
     try:
@@ -123,7 +134,10 @@ async def run_case(exchange, mode, market, symbol, result):
         if mode == "async":
             await client.async_init()
         adapter = ADAPTERS.get(exchange, CexAdapter)(client, exchange, market, symbol)
-        await run_lifecycle(adapter, result)
+        await run_lifecycle(adapter, result, case=case)
+    except NotApplicable as error:
+        result.update(stage="not_applicable", status="N/A", skip_reason=redact(error))
+        pytest.skip(redact(error))
     except (InsufficientBalance, MarketUnavailable) as error:
         pytest.skip(redact(error))
     except Exception as error:

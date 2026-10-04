@@ -7,13 +7,17 @@ import time
 from decimal import Decimal
 from uuid import uuid4
 
+from scripts.live.redaction import redact
 from tests.stateful_adapters import CexAdapter, checked_id, rows
 from tests.stateful_lifecycle import (
     LifecycleError,
     MarketUnavailable,
     Order,
+    OrderClosed,
+    OrderRejected,
     Rules,
     decimal,
+    order_state,
     plan_order,
 )
 
@@ -80,8 +84,10 @@ class ExtendedAdapter(CexAdapter):
                 side="BUY",
                 qty=str(plan.size),
                 price=str(plan.price),
-                post_only=True,
-                time_in_force="GTT",
+                # Extended supports GTT and IOC only; IOC cannot be post-only.
+                post_only=self.tif is None,
+                time_in_force=self.tif or "GTT",
+                **({"reduce_only": True} if self.reduce else {}),
                 expiry_epoch_millis=int(time.time() * 1000) + 300000,
                 external_id=self.client_order_id,
             )
@@ -114,7 +120,7 @@ class ExtendedAdapter(CexAdapter):
             decimal(data["price"]),
             decimal(data["qty"]),
             decimal(data["filledQty"]),
-            {"NEW": "open", "CANCELLED": "cancelled"}.get(data["status"], data["status"]),
+            order_state(data["status"]),
         )
 
 
@@ -144,10 +150,11 @@ class OndoAdapter(CexAdapter):
             type="limit",
             price=str(plan.price),
             size=str(plan.size),
-            timeInForce="GTC",
-            postOnly=True,
+            **({"timeInForce": self.tif} if self.tif else {"timeInForce": "GTC", "postOnly": True}),
+            **({"reduceOnly": True} if self.reduce else {}),
             clientOrderId=self.client_order_id,
         )
+        self.record_fill(data)
         return checked_id(data["orderId"])
 
     async def cancel(self, identifier):
@@ -163,7 +170,7 @@ class OndoAdapter(CexAdapter):
             decimal(data["price"]),
             decimal(data["size"]),
             decimal(data["filledSize"]),
-            "cancelled" if data["status"] == "canceled" else data["status"],
+            order_state(data["status"]),
         )
 
 
@@ -240,8 +247,37 @@ class HyperliquidAdapter(CexAdapter):
         return statuses[0]
 
     async def place(self, plan):
+        if self.tif == "FOK":
+            raise self.unsupported("FOK orders")
         data = await self.call(
             "place_order",
+            product_symbol=self.symbol,
+            isBuy=True,
+            price=str(plan.price),
+            size=str(plan.size),
+            reduceOnly=self.reduce,
+            tif="Ioc" if self.tif == "IOC" else "Alo",
+            cloid=self.client_order_id,
+        )
+        status = self.acknowledgement(data, "order")
+        if isinstance(status, dict) and "filled" in status:
+            raise LifecycleError("UNEXPECTED FILL: stop; position was not automatically closed")
+        if isinstance(status, dict) and isinstance(status.get("error"), str):
+            message = "hyperliquid: " + redact(status["error"])
+            if self.tif and "could not immediately match" in status["error"].lower():
+                raise OrderClosed(message)
+            raise OrderRejected(message)
+        if not isinstance(status, dict) or "resting" not in status:
+            raise LifecycleError(
+                "hyperliquid: order did not rest; unexpected fill or rejection; inspect account"
+            )
+        return checked_id(status["resting"]["oid"])
+
+    async def amend(self, identifier, plan):
+        """Modify keeps the client ID; the order may get a new oid, so resolve it by cloid."""
+        data = await self.call(
+            "modify_order",
+            oid=int(identifier),
             product_symbol=self.symbol,
             isBuy=True,
             price=str(plan.price),
@@ -250,12 +286,25 @@ class HyperliquidAdapter(CexAdapter):
             tif="Alo",
             cloid=self.client_order_id,
         )
-        status = self.acknowledgement(data, "order")
-        if not isinstance(status, dict) or "resting" not in status:
-            raise LifecycleError(
-                "hyperliquid: order did not rest; unexpected fill or rejection; inspect account"
-            )
-        return checked_id(status["resting"]["oid"])
+        if data.get("status") != "ok":
+            raise LifecycleError("hyperliquid: modification was rejected")
+        for _ in range(20):
+            matching = [
+                row for row in await self.open_orders() if row.get("cloid") == self.client_order_id
+            ]
+            if len(matching) > 1:
+                raise LifecycleError("hyperliquid: ambiguous client ID after modification")
+            if matching:
+                return checked_id(matching[0]["oid"])
+            await asyncio.sleep(0.25)
+        raise LifecycleError("hyperliquid: modified order not found by client ID")
+
+    async def recover_client_order(self, client_order_id):
+        """Only an open order with this cloid; cleanup polls until none remains."""
+        matching = [row for row in await self.open_orders() if row.get("cloid") == client_order_id]
+        if len(matching) > 1:
+            raise LifecycleError("hyperliquid: ambiguous client ID")
+        return checked_id(matching[0]["oid"]) if matching else None
 
     async def recover_order(self):
         data = await self.call("order_status", user=self.user, oid=self.client_order_id)
@@ -298,7 +347,7 @@ class HyperliquidAdapter(CexAdapter):
             decimal(row["limitPx"]),
             decimal(row["origSz"]),
             filled,
-            "cancelled" if details["status"] == "canceled" else details["status"],
+            order_state(details["status"]),
         )
 
 
@@ -308,6 +357,9 @@ class LighterAdapter(CexAdapter):
         self.market_id = None
         self.client_index = uuid4().int & ((1 << 48) - 1)
         self.client_order_id = str(self.client_index)
+        self.spot = False
+        self.case = "lifecycle"
+        self.placed_fill = None
 
     async def account(self):
         accounts = rows(
@@ -368,6 +420,8 @@ class LighterAdapter(CexAdapter):
         return matching[0] if matching else None
 
     async def place(self, plan):
+        if self.tif == "FOK":
+            raise self.unsupported("FOK orders")
         await self.call(
             "create_order",
             market_index=self.market_id,
@@ -376,8 +430,10 @@ class LighterAdapter(CexAdapter):
             price=int(plan.price * self.price_scale),
             is_ask=False,
             order_type=0,
-            time_in_force=2,
-            order_expiry=int(time.time() * 1000) + 28 * 24 * 60 * 60 * 1000,
+            # Official time-in-force: 0 IOC (expiry must be 0), 2 post-only.
+            time_in_force=0 if self.tif == "IOC" else 2,
+            reduce_only=self.reduce,
+            order_expiry=0 if self.tif else int(time.time() * 1000) + 28 * 24 * 60 * 60 * 1000,
         )
         for _ in range(20):
             row = await self.query()
@@ -392,8 +448,30 @@ class LighterAdapter(CexAdapter):
         row = await self.query()
         return checked_id(row["order_index"]) if row is not None else None
 
+    async def recover_client_order(self, client_order_id):
+        """Only an active order with this client index."""
+        matching = [
+            row
+            for row in await self.open_orders()
+            if str(row.get("client_order_index")) == str(client_order_id)
+        ]
+        if len(matching) > 1:
+            raise LifecycleError("lighter: ambiguous client order index")
+        return checked_id(matching[0]["order_index"]) if matching else None
+
     async def cancel(self, identifier):
         await self.call("cancel_order", market_index=self.market_id, order_index=int(identifier))
+
+    async def amend(self, identifier, plan):
+        """Modify in place: the order index and client index are unchanged."""
+        await self.call(
+            "modify_order",
+            market_index=self.market_id,
+            order_index=int(identifier),
+            base_amount=int(plan.size * self.size_scale),
+            price=int(plan.price * self.price_scale),
+        )
+        return identifier
 
     async def order(self, identifier):
         row = await self.query()
@@ -407,5 +485,5 @@ class LighterAdapter(CexAdapter):
             decimal(row["price"]),
             decimal(row["initial_base_amount"]),
             decimal(row["filled_base_amount"]),
-            "cancelled" if row["status"] == "canceled" else row["status"],
+            order_state(row["status"]),
         )

@@ -14,7 +14,7 @@ from __future__ import annotations
 import json
 import queue
 from collections.abc import Iterator
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any
 from urllib.parse import parse_qsl
@@ -955,6 +955,7 @@ def _assert_request(case: WireCase, requests: list[dict[str, Any]]) -> None:
     assert len(requests) == 1, requests
     request = requests[0]
     from tests.unit.wire_contracts import assert_wire_contract
+
     assert_wire_contract("aster", case.method, request)
     assert request["method"] == (case.verb or EXPECTED_VERBS[case.method])
     path, _, query = request["path"].partition("?")
@@ -979,7 +980,6 @@ def _assert_request(case: WireCase, requests: list[dict[str, Any]]) -> None:
         assert all(order["symbol"] == "BTCUSDT" for order in orders)
         assert all("product_symbol" not in order for order in orders)
         assert all(order.get("side", "SELL") in {"BUY", "SELL"} for order in orders)
-
 
 
 CASES += [

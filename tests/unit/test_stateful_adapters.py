@@ -293,6 +293,8 @@ class ExchangeMock:
                 {"positionType": 1, "openType": 1, "leverage": 20},
                 {"positionType": 2, "openType": 1, "leverage": 15},
             ]
+        if method == "get_contract_position_mode":
+            return getattr(self, "position_mode", 1)
         if method == "get_account_config":
             return [{"posMode": "net_mode"}]
         if method == "get_uta_settings":

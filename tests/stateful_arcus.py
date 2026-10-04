@@ -14,9 +14,12 @@ from tests.stateful_lifecycle import (
     LifecycleError,
     MarketUnavailable,
     Order,
+    OrderRejected,
     PriceBandRejected,
     Rules,
+    TAKER_MAX_BID_FRACTION,
     decimal,
+    order_state,
     plan_order,
 )
 
@@ -32,8 +35,13 @@ class ArcusAdapter(CexAdapter):
         self.spot = False
         self.client_order_id = "0" + uuid4().hex[:31]
         self.price_step = 0
+        self.case = "lifecycle"
+        self.placed_fill = None
+        self.good_til_time = 0
 
     async def next_price_plan(self):
+        if self.tif:
+            raise LifecycleError("arcus: IOC/FOK never ladder toward the bid")
         if self.price_step == 3:
             raise LifecycleError("arcus: price range rejected (OracleDeviation) at 0.5%; stopped")
         self.price_step += 1
@@ -91,10 +99,12 @@ class ArcusAdapter(CexAdapter):
                     lower_price=None if lower is None else decimal(lower),
                     upper_price=None if upper is None else decimal(upper),
                 ),
-                # Move inward only after a definitive rejection, retaining ALO.
+                # Move inward only after a definitive rejection, retaining ALO. IOC/FOK
+                # never ladder and stay at or below 95% of the bid (no maker protection).
                 target_price=min(
                     reference * Decimal(("0.95", "0.98", "0.99", "0.995")[self.price_step]),
                     bid - decimal(tier["tick"]),
+                    *([bid * TAKER_MAX_BID_FRACTION - decimal(tier["tick"])] if self.tif else []),
                 ),
             )
             if candidate.price >= band_start and (band_end is None or candidate.price < band_end):
@@ -113,6 +123,7 @@ class ArcusAdapter(CexAdapter):
         return decimal((await self.call("get_account"))["freeCollateral"])
 
     async def place(self, plan):
+        self.good_til_time = int(time.time() * 1_000_000) + 32 * 86400 * 1_000_000
         data = await self.call(
             "place_order",
             product_symbol=self.native,
@@ -120,15 +131,28 @@ class ArcusAdapter(CexAdapter):
             price=str(plan.price),
             quantity=str(plan.size),
             order_type="LIMIT",
-            time_in_force="ALO",
-            good_til_time=int(time.time() * 1_000_000) + 32 * 86400 * 1_000_000,
+            # Official time in force: ALO (post-only), IOC, FOK.
+            time_in_force=self.tif or "ALO",
+            good_til_time=self.good_til_time,
+            **({"reduce_only": True} if self.reduce else {}),
             client_order_id=self.client_order_id,
         )
+        return self.acknowledged(data, ("CANCELED", "EXPIRED") if self.tif else ())
+
+    def acknowledged(self, data, terminal=()):
+        """Validate a place/modify acknowledgement; IOC/FOK may already be terminal."""
         if decimal(data.get("filledSize", "0")) != 0:
             raise LifecycleError("UNEXPECTED FILL: stop; no automatic close")
+        if "filledSize" in data:
+            # A zero fill in the acknowledgement lets an unqueryable IOC/FOK still pass.
+            self.placed_fill = decimal(data["filledSize"])
         if data.get("rejectionReason") == "OracleDeviation" and data.get("status") == "REJECTED":
             raise PriceBandRejected("arcus: price range rejected (OracleDeviation)")
-        if data["status"] not in {"ACK", "PENDING", "OPEN"}:
+        if data.get("status") == "REJECTED":
+            raise OrderRejected(
+                "arcus: order acknowledgement rejected (" + str(data.get("rejectionReason")) + ")"
+            )
+        if data["status"] not in {"ACK", "PENDING", "OPEN", *terminal}:
             raise LifecycleError("arcus: order acknowledgement rejected")
         if data["marketDisplayName"] != self.native or data["clientId"] != self.client_order_id:
             raise LifecycleError("arcus: acknowledgement identity mismatch")
@@ -164,8 +188,27 @@ class ArcusAdapter(CexAdapter):
             decimal(data["price"]),
             original,
             filled,
-            {"OPEN": "open", "CANCELED": "cancelled"}.get(data["status"], data["status"]),
+            order_state(data["status"]),
         )
+
+    async def amend(self, identifier, plan):
+        """Modify keeps ALO and the client ID; the acknowledgement names the order ID."""
+        data = await self.call(
+            "modify_order",
+            product_symbol=self.native,
+            side="BUY",
+            price=str(plan.price),
+            quantity=str(plan.size),
+            good_til_time=self.good_til_time,
+            time_in_force="ALO",
+            reduce_only=False,
+            order_id=identifier,
+        )
+        # The subsequent order query re-validates the market, side, price and size.
+        defaults = dict(
+            orderId=identifier, clientId=self.client_order_id, marketDisplayName=self.native
+        )
+        return self.acknowledged({**defaults, **data})
 
     async def cancel(self, identifier):
         data = await self.call("cancel_order", product_symbol=self.native, order_id=identifier)

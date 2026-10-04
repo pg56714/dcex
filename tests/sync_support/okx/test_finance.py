@@ -79,3 +79,13 @@ def test_okusd_read_endpoints(client):
     _assert_ok(client.get_okusd_subscribe_history(limit=20))
     _assert_ok(client.get_okusd_redeem_history(limit=20))
     _assert_ok(client.get_okusd_rewards_history(limit=20))
+
+
+def test_dual_investment_order_status(client):
+    history = _assert_ok(client.get_dual_investment_order_history(limit=1))
+    if not history["data"]:
+        pytest.skip("No OKX dual investment order is available to query.")
+    order_id = history["data"][0]["ordId"]
+    status = _assert_ok(client.get_dual_investment_order_status(order_id))
+    assert status["data"]
+    assert status["data"][0]["ordId"] == order_id

@@ -122,7 +122,9 @@ def _is_live_path(relative_path: Path | None) -> bool:
 
 
 def _is_stateful_path(relative_path: Path | None) -> bool:
-    return bool(relative_path and relative_path.name == "test_stateful_trade.py")
+    return bool(
+        relative_path and relative_path.name in {"test_stateful_trade.py", "test_stateful_ws.py"}
+    )
 
 
 def _calls_client_method(item: pytest.Item, names: set[str]) -> bool:

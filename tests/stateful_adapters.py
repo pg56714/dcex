@@ -1,5 +1,6 @@
 """Explicit exchange adapters for the existing opt-in order tests."""
 
+import asyncio
 import inspect
 from dataclasses import replace
 from decimal import Decimal
@@ -8,12 +9,18 @@ from uuid import uuid4
 from scripts.live.redaction import redact
 from tests.stateful_lifecycle import (
     LifecycleError,
-    MarketUnavailable,
+    NotApplicable,
     Order,
+    OrderClosed,
+    OrderRejected,
     Rules,
     decimal,
+    order_state,
     plan_order,
 )
+
+# Documented executed-quantity fields of placement acknowledgements.
+FILL_FIELDS = ("executedQty", "executedQuantity", "cumExecQty", "accFillSz", "filledSize")
 
 
 def rows(value, key=None):
@@ -88,9 +95,11 @@ def response_data(exchange, value):
     if exchange == "okx":
         for row in rows(value["data"]):
             if "sCode" in row and str(row["sCode"]) != "0":
-                raise LifecycleError(
+                error = LifecycleError(
                     f"okx: code={redact(row['sCode'])} {redact(row.get('sMsg', 'rejected'))}"
                 )
+                error.code = str(row["sCode"])
+                raise error
         return value["data"]
     if exchange == "mexc" and isinstance(value, dict) and "success" in value:
         if value["success"] is not True or str(value.get("code")) != "0":
@@ -114,16 +123,62 @@ class CexAdapter:
         self.category = "SPOT" if self.spot else "USDT-FUTURES"
         self.position_side = None
         self.position_index = 0
-        self.client_order_id = (
+        self.client_order_id = self.fresh_client_id()
+        # Order-test case (see run_lifecycle) and any fill quantity the placement reported.
+        self.case = "lifecycle"
+        self.placed_fill = None
+        # Client IDs created for cancel-replace amendments, recorded before sending.
+        self.held_client_ids = []
+
+    def fresh_client_id(self):
+        return (
             str(uuid4().int & 0xFFFFFFFF)
-            if exchange == "backpack"
+            if self.exchange == "backpack"
             else str(uuid4())
-            if exchange == "kraken"
+            if self.exchange == "kraken"
             else "0" + uuid4().hex[:31]
         )
 
+    @property
+    def tif(self):
+        """IOC/FOK for those cases; None means the post-only (maker) default."""
+        return {"ioc": "IOC", "fok": "FOK"}.get(self.case)
+
+    @property
+    def reduce(self):
+        return self.case == "reduce_only"
+
+    def hedge_reduce(self, short_side, field, value):
+        """Reduce-only buy: in hedge mode close the short side (the reduce flag is one-way
+        only there); in one-way mode send the documented reduce-only flag."""
+        position_field = {
+            "binance": "positionSide",
+            "aster": "positionSide",
+            "okx": "posSide",
+            "bitget": "pos_side",
+            "bingx": "position_side",
+        }[self.exchange]
+        hedged = self.position_side in {"LONG", "long"}
+        return {position_field: short_side} if hedged else {field: value}
+
+    def unsupported(self, feature):
+        label = self.exchange + (" spot" if self.spot else " futures")
+        return NotApplicable(f"N/A: {label} has no {feature}")
+
+    def record_fill(self, data):
+        """Keep a fill quantity the placement response reports; absent stays unknown."""
+        if isinstance(data, dict):
+            for key in FILL_FIELDS:
+                if key in data and data[key] not in (None, ""):
+                    self.placed_fill = decimal(data[key])
+                    return
+
     async def recover_order(self):
         """Find only this test's client ID after an uncertain placement response."""
+        return await self.recover_client_order(self.client_order_id)
+
+    async def recover_client_order(self, client_order_id):
+        """Return the open order carrying exactly this client ID, if any."""
         client_field, order_field = {
             "binance": ("clientOrderId", "orderId"),
             "aster": ("clientOrderId", "orderId"),
@@ -141,7 +196,7 @@ class CexAdapter:
         matching = [
             row
             for row in await self.open_orders()
-            if str(row.get(client_field, "")) == self.client_order_id
+            if str(row.get(client_field, "")) == client_order_id
         ]
         if len(matching) > 1:
             raise LifecycleError("ambiguous client order ID; manual reconciliation required")
@@ -505,17 +560,29 @@ class CexAdapter:
     async def place(self, plan):
         ex, kw = self.exchange, {"product_symbol": self.symbol}
         price, size = format(plan.price, "f"), format(plan.size, "f")
+        tif, reduce = self.tif, self.reduce
+        if reduce and self.spot:
+            raise self.unsupported("reduce-only orders")
         if ex == "binance":
+            if self.spot:
+                kind = {"type_": "LIMIT", "timeInForce": tif} if tif else {"type_": "LIMIT_MAKER"}
+            else:
+                kind = {
+                    "type_": "LIMIT",
+                    "timeInForce": tif or "GTX",
+                    "positionSide": self.position_side,
+                    **(self.hedge_reduce("SHORT", "reduceOnly", "true") if reduce else {}),
+                }
             data = await self.call(
                 "place_order",
                 **kw,
-                type_="LIMIT_MAKER" if self.spot else "LIMIT",
+                **kind,
                 newClientOrderId=self.client_order_id,
                 side="BUY",
                 quantity=size,
                 price=price,
-                **({} if self.spot else {"timeInForce": "GTX", "positionSide": self.position_side}),
             )
+            self.record_fill(data)
             return checked_id(data["orderId"])
         if ex == "aster":
             data = await self.call(
@@ -526,9 +593,13 @@ class CexAdapter:
                 type_="LIMIT",
                 quantity=size,
                 price=price,
-                timeInForce="GTX",
-                **({} if self.spot else {"positionSide": self.position_side}),
+                timeInForce=tif or "GTX",
+                **{
+                    **({} if self.spot else {"positionSide": self.position_side}),
+                    **(self.hedge_reduce("SHORT", "reduceOnly", True) if reduce else {}),
+                },
             )
+            self.record_fill(data)
             return checked_id(data["orderId"])
         if ex == "bybit":
             data = await self.call(
@@ -539,8 +610,18 @@ class CexAdapter:
                 orderType="Limit",
                 qty=size,
                 price=price,
-                timeInForce="PostOnly",
-                **({} if self.spot else {"positionIdx": self.position_index}),
+                timeInForce=tif or "PostOnly",
+                # Hedge mode: positionIdx 2 is the short side a reduce-only buy closes.
+                **(
+                    {}
+                    if self.spot
+                    else {
+                        "positionIdx": 2
+                        if reduce and self.position_index == 1
+                        else self.position_index
+                    }
+                ),
+                **({"reduceOnly": True} if reduce else {}),
             )
             return checked_id(data["orderId"])
         if ex == "okx":
@@ -550,10 +631,13 @@ class CexAdapter:
                 tdMode="cash" if self.spot else "cross",
                 clOrdId=self.client_order_id,
                 side="buy",
-                ordType="post_only",
+                ordType={"IOC": "ioc", "FOK": "fok"}.get(tif or "", "post_only"),
                 sz=size,
                 px=price,
-                **({} if self.spot else {"posSide": self.position_side}),
+                **{
+                    **({} if self.spot else {"posSide": self.position_side}),
+                    **(self.hedge_reduce("short", "reduceOnly", True) if reduce else {}),
+                },
             )
             return checked_id(rows(data)[0]["ordId"])
         if ex == "bitget":
@@ -566,8 +650,11 @@ class CexAdapter:
                 order_type="limit",
                 qty=size,
                 price=price,
-                time_in_force="post_only",
-                **({} if self.position_side is None else {"pos_side": self.position_side}),
+                time_in_force=tif.lower() if tif else "post_only",
+                **{
+                    **({} if self.position_side is None else {"pos_side": self.position_side}),
+                    **(self.hedge_reduce("short", "reduce_only", "yes") if reduce else {}),
+                },
             )
             return checked_id(data["orderId"])
         if ex == "bingx":
@@ -583,17 +670,24 @@ class CexAdapter:
                 type_="LIMIT",
                 quantity=size,
                 price=price,
-                time_in_force="PostOnly",
-                **({} if self.spot else {"position_side": self.position_side}),
+                time_in_force=tif or "PostOnly",
+                **{
+                    **({} if self.spot else {"position_side": self.position_side}),
+                    **(self.hedge_reduce("SHORT", "reduce_only", "true") if reduce else {}),
+                },
             )
-            return checked_id(data["orderId"] if self.spot else data["order"]["orderId"])
+            record = data if self.spot else data["order"]
+            self.record_fill(record)
+            return checked_id(record["orderId"])
         if ex == "mexc":
             if self.spot:
                 data = await self.call(
                     "place_spot_order",
                     **kw,
                     side="BUY",
-                    type_="LIMIT_MAKER",
+                    type_={"IOC": "IMMEDIATE_OR_CANCEL", "FOK": "FILL_OR_KILL"}.get(
+                        tif or "", "LIMIT_MAKER"
+                    ),
                     quantity=size,
                     price=price,
                     newClientOrderId=self.client_order_id,
@@ -601,20 +695,35 @@ class CexAdapter:
                 return checked_id(data["orderId"])
             # Opening orders must carry the account's current long-side margin type and
             # leverage (read-only GET /api/v1/private/position/leverage); never change them.
+            # A reduce-only test closes the (absent) short: side 2 with the short row.
             longs = [
                 row
                 for row in rows(await self.call("get_contract_leverage", **kw))
-                if str(row.get("positionType")) == "1"
+                if str(row.get("positionType")) == ("2" if reduce else "1")
             ]
             if len(longs) != 1 or str(longs[0].get("openType")) not in {"1", "2"}:
                 raise LifecycleError(
                     "mexc: current long openType/leverage unavailable; no order was submitted"
                 )
+            closing = {}
+            if reduce:
+                # Official GET /api/v1/private/position/position_mode: 1 hedge, 2 one-way.
+                # Hedge: side 2 closes the short. One-way: reduceOnly applies (one-way only).
+                mode = str(await self.call("get_contract_position_mode"))
+                if mode not in {"1", "2"}:
+                    raise LifecycleError(
+                        "mexc: unknown contract position mode; no order was submitted"
+                    )
+                if mode == "2":
+                    closing = {"reduceOnly": True, "positionMode": 2}
             data = await self.call(
                 "place_contract_order",
                 **kw,
-                side=1,
-                type_=2,
+                # Official sides: 1 open long, 2 close short (a reduce-only buy).
+                side=2 if reduce else 1,
+                **closing,
+                # Official order types: 2 post-only maker, 3 IOC, 4 FOK.
+                type_={"IOC": 3, "FOK": 4}.get(tif or "", 2),
                 openType=int(longs[0]["openType"]),
                 leverage=int(decimal(longs[0]["leverage"])),
                 vol=size,
@@ -645,10 +754,10 @@ class CexAdapter:
                 type_="limit",
                 size=size,
                 price=price,
-                timeInForce="GTC",
-                postOnly=True,
+                **({"timeInForce": tif} if tif else {"timeInForce": "GTC", "postOnly": True}),
                 clientOid=self.client_order_id,
                 **margin,
+                **({"reduceOnly": True} if reduce else {}),
             )
             return checked_id(data["orderId"])
         if ex == "backpack":
@@ -659,13 +768,14 @@ class CexAdapter:
                 clientId=int(self.client_order_id),
                 quantity=size,
                 price=price,
-                timeInForce="GTC",
-                postOnly=True,
+                **({"timeInForce": tif} if tif else {"timeInForce": "GTC", "postOnly": True}),
+                **({"reduceOnly": True} if reduce else {}),
                 # Lent USDC may fund the order (Backpack redeems it); never borrow.
                 autoBorrow=False,
                 autoLend=False,
                 autoLendRedeem=True,
             )
+            self.record_fill(data)
             return checked_id(data["id"])
         if ex == "kraken":
             if self.spot:
@@ -676,8 +786,7 @@ class CexAdapter:
                     ordertype="limit",
                     volume=size,
                     price=price,
-                    timeinforce="GTC",
-                    oflags="post",
+                    **({"timeinforce": tif} if tif else {"timeinforce": "GTC", "oflags": "post"}),
                     cl_ord_id=self.client_order_id,
                 )
                 return checked_id(data["txid"][0])
@@ -685,15 +794,150 @@ class CexAdapter:
                 "place_futures_order",
                 **kw,
                 side="buy",
-                orderType="post",
+                orderType={"IOC": "ioc", "FOK": "fok"}.get(tif or "", "post"),
                 cliOrdId=self.client_order_id,
                 size=size,
                 limitPrice=price,
+                **({"reduceOnly": True} if reduce else {}),
             )
-            if data["sendStatus"]["status"] != "placed":
-                raise LifecycleError("kraken: futures order was not placed")
+            status = data["sendStatus"]["status"]
+            if status in {"iocWouldNotExecute", "fokWouldNotExecute"} and tif:
+                raise OrderClosed("kraken: " + status)
+            if status == "wouldNotReducePosition":
+                raise OrderRejected("kraken: " + status)
+            if status in {"filled", "partiallyFilled"}:
+                raise LifecycleError("UNEXPECTED FILL: stop; position was not automatically closed")
+            if status != "placed":
+                raise LifecycleError(
+                    "kraken: futures order was not placed (" + redact(status) + ")"
+                )
             return checked_id(data["sendStatus"]["order_id"])
         raise LifecycleError("unsupported placement adapter")
+
+    async def amended_id(self, data, *paths):
+        """Resolve a cancel-replace's new order ID from the response or this client ID."""
+        for path in paths:
+            value = data
+            for key in path:
+                value = value.get(key) if isinstance(value, dict) else None
+            if value not in (None, ""):
+                return checked_id(value)
+        for attempt in range(20):
+            found = await self.recover_order()
+            if found:
+                return found
+            await asyncio.sleep(0.25 if attempt else 0)
+        raise LifecycleError("replacement order ID unresolved; inspect client order ID manually")
+
+    async def amend(self, identifier, plan):
+        """Amend the resting order's price; return the order ID now holding it."""
+        ex, kw = self.exchange, {"product_symbol": self.symbol}
+        price, size = format(plan.price, "f"), format(plan.size, "f")
+        if ex == "binance" and self.spot:
+            # Cancel-replace: the new order gets a new ID and a fresh client ID.
+            self.client_order_id = self.fresh_client_id()
+            self.held_client_ids.append(self.client_order_id)
+            data = await self.call(
+                "cancel_replace_spot_order",
+                **kw,
+                side="BUY",
+                order_type="LIMIT_MAKER",
+                cancel_replace_mode="STOP_ON_FAILURE",
+                quantity=size,
+                price=price,
+                cancel_order_id=int(identifier),
+                new_client_order_id=self.client_order_id,
+            )
+            if data.get("cancelResult") != "SUCCESS" or data.get("newOrderResult") != "SUCCESS":
+                raise LifecycleError("binance: cancel-replace did not succeed")
+            return checked_id(data["newOrderResponse"]["orderId"])
+        if ex == "binance":
+            data = await self.call(
+                "amend_futures_order",
+                **kw,
+                side="BUY",
+                quantity=size,
+                price=price,
+                order_id=int(identifier),
+            )
+            return checked_id(data["orderId"])
+        if ex == "aster" and not self.spot:
+            data = await self.call(
+                "modify_futures_order", **kw, quantity=size, price=price, orderId=int(identifier)
+            )
+            return checked_id(data["orderId"])
+        if ex == "bybit":
+            data = await self.call("amend_order", **kw, orderId=identifier, price=price)
+            return checked_id(data["orderId"])
+        if ex == "okx":
+            data = await self.call("amend_order", **kw, ordId=identifier, newPx=price)
+            return checked_id(rows(data)[0]["ordId"])
+        if ex == "bitget":
+            data = await self.call(
+                "modify_uta_order",
+                **kw,
+                category=self.category,
+                order_id=identifier,
+                qty=size,
+                price=price,
+            )
+            return checked_id(data.get("orderId") or identifier)
+        if ex == "bingx":
+            # Swap amend_swap_order changes quantity only; both markets use cancel-replace.
+            self.client_order_id = self.fresh_client_id()
+            self.held_client_ids.append(self.client_order_id)
+            common = dict(
+                kw,
+                cancel_replace_mode="STOP_ON_FAILURE",
+                side="BUY",
+                type_="LIMIT",
+                quantity=size,
+                price=price,
+                time_in_force="PostOnly",
+            )
+            if self.spot:
+                data = await self.call(
+                    "replace_spot_order",
+                    **common,
+                    cancel_order_id=int(identifier),
+                    new_client_order_id=self.client_order_id,
+                )
+                return await self.amended_id(data, ("orderOpenResponse", "orderId"))
+            data = await self.call(
+                "replace_swap_order",
+                **common,
+                position_side=self.position_side,
+                cancel_order_id=identifier,
+                client_order_id=self.client_order_id,
+            )
+            return await self.amended_id(data, ("newOrderResponse", "orderId"))
+        if ex == "mexc" and not self.spot:
+            data = await self.call(
+                "amend_contract_limit_order", orderId=identifier, price=price, vol=size
+            )
+            if isinstance(data, dict):
+                data = data.get("orderId")
+            return checked_id(data if data not in (None, "", True) else identifier)
+        if ex == "kucoin" and self.spot:
+            data = await self.call(
+                "alter_spot_order", **kw, orderId=identifier, newPrice=price, newSize=size
+            )
+            return checked_id(data["newOrderId"])
+        if ex == "kraken" and self.spot:
+            data = await self.call(
+                "amend_spot_order", txid=identifier, limit_price=price, post_only=True
+            )
+            if not data.get("amend_id"):
+                raise LifecycleError("kraken: amendment was not acknowledged")
+            return identifier
+        if ex == "kraken":
+            data = await self.call(
+                "edit_futures_order", orderId=identifier, size=size, limitPrice=price
+            )
+            if data["editStatus"]["status"] != "edited":
+                raise LifecycleError("kraken: futures edit rejected")
+            return identifier
+        raise self.unsupported("order amendment")
 
     async def cancel(self, identifier):
         ex, kw = self.exchange, {"product_symbol": self.symbol}
@@ -826,6 +1070,12 @@ class CexAdapter:
         return normalize_order(ex, self.spot, data, identifier)
 
 
+# Limit orders whose venue type name carries their time-in-force.
+LIMIT_KINDS = frozenset(
+    {"limit_maker", "post_only", "ioc", "fok", "immediate_or_cancel", "fill_or_kill"}
+)
+
+
 def normalize_order(exchange, spot, data, identifier):
     """Read documented fields explicitly; absent fill/identity fields fail closed."""
     if exchange in {"binance", "aster", "bingx"} or (exchange == "mexc" and spot):
@@ -895,7 +1145,7 @@ def normalize_order(exchange, spot, data, identifier):
             decimal(data["descr"]["price"]),
             decimal(data["vol"]),
             decimal(data["vol_exec"]),
-            "cancelled" if data["status"] == "canceled" else data["status"],
+            order_state(data["status"]),
         )
     elif exchange == "kraken":
         row = data["order"]
@@ -907,34 +1157,24 @@ def normalize_order(exchange, spot, data, identifier):
             decimal(row["limitPrice"]),
             decimal(row["quantity"]),
             decimal(row["filled"]),
-            "cancelled"
-            if data["status"] == "CANCELLED"
-            else "open"
-            if data["status"] == "ENTERED_BOOK"
-            else data["status"],
+            order_state(data["status"]),
         )
     else:
         raise LifecycleError("unsupported order response")
     if exchange != "kucoin":
         values = [data[key] for key in fields]
     oid, symbol, side, kind, price, size, filled, state = values
-    state = str(state).lower()
-    state = (
-        "open"
-        if state in {"new", "live", "open", "pending"}
-        else "cancelled"
-        if state in {"canceled", "cancelled"}
-        else state
-    )
+    state = order_state(state)
     side, kind = str(side).lower(), str(kind).lower()
-    if kind in {"limit_maker", "post_only"}:
+    if kind in LIMIT_KINDS:
         kind = "limit"
     if exchange == "backpack":
         side = "buy" if side == "bid" else "sell" if side == "ask" else side
     if exchange == "mexc" and not spot:
-        side = "buy" if side == "1" else side
-        kind = "limit" if kind in {"1", "2"} else kind
-        state = {"2": "open", "4": "cancelled"}.get(state, state)
+        side = "buy" if side in {"1", "2"} else side  # open long or close short
+        # Order types 1 limit, 2 post-only, 3 IOC, 4 FOK; states 2 open, 4 cancelled, 5 invalid.
+        kind = "limit" if kind in {"1", "2", "3", "4"} else kind
+        state = {"2": "open", "4": "cancelled", "5": "rejected"}.get(state, state)
     return Order(
         str(oid), symbol, side, kind, decimal(price), decimal(size), decimal(filled), state
     )
