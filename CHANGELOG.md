@@ -1,3 +1,9 @@
+## 0.36.1 (2026-10-04)
+
+### Fix
+
+- send keys for Binance market-data routes, sign authenticated KuCoin, OKX and Bybit reads, drop UTA-rejected Bitget classic routes and validate Bitget UTA intervals
+
 ## 0.36.0 (2026-10-04)
 
 ### BREAKING CHANGE
