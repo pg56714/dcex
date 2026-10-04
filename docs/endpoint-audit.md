@@ -16,9 +16,9 @@ Historical, grouped and overlapping rows prevent converting these counts into an
 
 | Status | Rows | Definition |
 | --- | ---: | --- |
-| `implemented` | 3,420 | Exact offline HTTP route and public Rust/Python wrappers |
+| `implemented` | 3,418 | Exact offline HTTP route and public Rust/Python wrappers |
 | `protocol` | 395 | Asynchronous WebSocket protocol support with cited offline evidence; no live certification |
-| `superseded` | 977 | Historical or grouped row replaced by explicit current rows |
+| `superseded` | 979 | Historical or grouped row replaced by explicit current rows |
 | `unavailable` | 19 | Retired/unavailable operation, or documentation-only section with no endpoint |
 | `unverified` | 11 | Wrapper exists, but part of the official specification is incomplete |
 | `blocked` | 37 | Required signing or authorization specification is missing |
@@ -34,7 +34,7 @@ Method counts include aliases and signing helpers, not endpoints.
 | [binance](official-endpoint-inventory/binance.json) | 753 | 748 | 0 |
 | [bybit](official-endpoint-inventory/bybit.json) | 448 | 434 | 0 |
 | [okx](official-endpoint-inventory/okx.json) | 404 | 388 | 0 |
-| [bitget](official-endpoint-inventory/bitget.json) | 330 | 330 | 0 |
+| [bitget](official-endpoint-inventory/bitget.json) | 328 | 328 | 0 |
 | [bingx](official-endpoint-inventory/bingx.json) | 210 | 191 | 0 |
 | [kraken](official-endpoint-inventory/kraken.json) | 164 | 148 | 0 |
 | [mexc](official-endpoint-inventory/mexc.json) | 176 | 157 | 0 |

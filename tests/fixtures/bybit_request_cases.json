@@ -1349,7 +1349,7 @@
       "name": "get_broker_whitelist_ip",
       "method": "GET",
       "path": "/v5/broker/whitelist/ip",
-      "signed": false,
+      "signed": true,
       "kwargs": {},
       "wire": {},
       "source": "https://bybit-exchange.github.io/docs/v5/broker/api-broker/whitelist-ip",

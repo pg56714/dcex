@@ -1041,7 +1041,7 @@
     "path": "/api/v1/trade-statistics",
     "method": "HttpMethod::Get",
     "market": "KucoinMarket::Futures",
-    "public": true,
+    "public": false,
     "fields": []
   },
   {

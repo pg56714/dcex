@@ -4,6 +4,7 @@
     "method": "GET",
     "path": "/sapi/v1/w3w/wallet/prediction/market/detail",
     "public": true,
+    "api_key": true,
     "fields": [
       {
         "name": "market_topic_id",
@@ -22,6 +23,7 @@
     "method": "GET",
     "path": "/sapi/v1/w3w/wallet/prediction/category/list",
     "public": true,
+    "api_key": true,
     "fields": [],
     "json_body": false,
     "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/market-data#list-prediction-categories",
@@ -32,6 +34,7 @@
     "method": "GET",
     "path": "/sapi/v1/w3w/wallet/prediction/market/list",
     "public": true,
+    "api_key": true,
     "fields": [
       {
         "name": "l1_category",
@@ -94,6 +97,7 @@
     "method": "GET",
     "path": "/sapi/v1/w3w/wallet/prediction/market/search",
     "public": true,
+    "api_key": true,
     "fields": [
       {
         "name": "query",
@@ -119,6 +123,7 @@
     "method": "GET",
     "path": "/sapi/v1/w3w/wallet/prediction/order-book/last-trade-price",
     "public": true,
+    "api_key": true,
     "fields": [
       {
         "name": "market_id",
@@ -137,6 +142,7 @@
     "method": "GET",
     "path": "/sapi/v1/w3w/wallet/prediction/order-book",
     "public": true,
+    "api_key": true,
     "fields": [
       {
         "name": "vendor",

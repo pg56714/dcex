@@ -7,8 +7,8 @@
   "counts": {
     "protocol": 395,
     "partial": 1,
-    "implemented": 3420,
-    "superseded": 977,
+    "implemented": 3418,
+    "superseded": 979,
     "unavailable": 19,
     "unverified": 11,
     "blocked": 37
@@ -36421,20 +36421,19 @@
       "category": "Convert",
       "endpoint": "GET /api/v2/convert/currencies",
       "source_status": "missing",
-      "status": "implemented",
-      "rust": true,
-      "python_sync": true,
-      "python_async": true,
-      "methods": [
-        "get_classic_convert_currencies"
-      ],
-      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter. Retained: no exact UTA replacement or explicit classic-only restriction has been verified; API version and navigation category alone do not justify removal.",
+      "status": "superseded",
+      "rust": false,
+      "python_sync": false,
+      "python_async": false,
+      "methods": [],
+      "note": "Removed: classic-account endpoint rejected for Unified Trading Accounts (Bitget code 40085). See the Bitget UTA v3 docs for the current equivalent.",
       "evidence": [
-        "tests/unit/test_bitget_endpoint_coverage.py"
+        "https://www.bitget.com/docs/catalog/classic-spot-convert/classic-spot-convert#get-convert-coins"
       ],
       "official_source": "https://www.bitget.com/docs/catalog/classic-spot-convert/classic-spot-convert#get-convert-coins",
       "path": "/api/v2/convert/currencies",
-      "http_method": "GET"
+      "http_method": "GET",
+      "superseded_reason": "Bitget classic-account API; returns 40085 for UTA accounts (read-only check 2026-10-04). See the Bitget UTA v3 docs for the current equivalent."
     },
     {
       "row": 1546,
@@ -36510,20 +36509,19 @@
       "category": "Margin (classic cross/isolated)",
       "endpoint": "GET /api/v2/margin/interest-rate-record",
       "source_status": "missing",
-      "status": "implemented",
-      "rust": true,
-      "python_sync": true,
-      "python_async": true,
-      "methods": [
-        "get_classic_interest_rate_record"
-      ],
-      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter. Retained: no exact UTA replacement or explicit classic-only restriction has been verified; API version and navigation category alone do not justify removal.",
+      "status": "superseded",
+      "rust": false,
+      "python_sync": false,
+      "python_async": false,
+      "methods": [],
+      "note": "Removed: classic-account endpoint rejected for Unified Trading Accounts (Bitget code 40085). See the Bitget UTA v3 docs for the current equivalent.",
       "evidence": [
-        "tests/unit/test_bitget_endpoint_coverage.py"
+        "https://www.bitget.com/docs/catalog/classic-margin-common/classic-margin-common#get-the-leverage-interest-rate"
       ],
       "official_source": "https://www.bitget.com/docs/catalog/classic-margin-common/classic-margin-common#get-the-leverage-interest-rate",
       "path": "/api/v2/margin/interest-rate-record",
-      "http_method": "GET"
+      "http_method": "GET",
+      "superseded_reason": "Bitget classic-account API; returns 40085 for UTA accounts (read-only check 2026-10-04). See the Bitget UTA v3 docs for the current equivalent."
     },
     {
       "row": 1550,

@@ -49,7 +49,7 @@
     "title": "Get Broker Whitelist IP",
     "official_source": "https://bybit-exchange.github.io/docs/v5/broker/api-broker/whitelist-ip",
     "name": "get_broker_whitelist_ip",
-    "public": true,
+    "public": false,
     "fields": [],
     "example": {},
     "has_example": true,

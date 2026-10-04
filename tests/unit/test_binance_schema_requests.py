@@ -101,7 +101,8 @@ async def test_inventory_wire(asynchronous, op):
         assert "%5B" not in raw and "%5D" not in raw
     pairs = parse_qsl(raw, keep_blank_values=True)
     if public:
-        assert request["api_key"] is None
+        # MARKET_DATA catalog routes carry the API key header but are never signed.
+        assert request["api_key"] == (None if op["path"].startswith("/bapi/") else "key")
         assert all(key not in {"signature", "timestamp"} for key, _ in pairs)
         assert len(requests) == 1
     else:

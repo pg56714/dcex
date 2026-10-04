@@ -3,10 +3,10 @@ use super::super::BybitClient;
 crate::exchanges::impl_exchange_method_wrappers! {
     @extend; BybitClient;
     public [
-        get_broker_whitelist_ip(),
     ];
     private [
         get_broker_ip_changelog(),
+        get_broker_whitelist_ip(),
         get_broker_account_info(),
         get_broker_earnings_info(),
         get_broker_apilimit_query_all(),

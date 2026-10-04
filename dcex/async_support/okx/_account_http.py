@@ -695,3 +695,24 @@ class AccountHTTP(AccountHTTPWithdrawalsHTTP, HTTPManager):
                 limit=limit,
             ),
         )
+
+    async def get_economic_calendar(
+        self,
+        *,
+        region: str | None = None,
+        importance: str | None = None,
+        before: str | None = None,
+        after: str | None = None,
+        limit: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        GET /api/v5/public/economic-calendar. Use native instrument IDs.
+
+        Source: https://www.okx.com/docs-v5/en/#public-data-rest-api-get-economic-calendar-data
+        """
+        return await self._native_private(
+            "get_economic_calendar",
+            self._native_params(
+                region=region, importance=importance, before=before, after=after, limit=limit
+            ),
+        )

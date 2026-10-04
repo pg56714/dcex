@@ -13,21 +13,6 @@
     "days": null
   },
   {
-    "name": "get_classic_interest_rate_record",
-    "path": "/api/v2/margin/interest-rate-record",
-    "post": false,
-    "public": true,
-    "fields": [
-      "coin"
-    ],
-    "required": [
-      "coin"
-    ],
-    "arrays": [],
-    "limit": null,
-    "days": null
-  },
-  {
     "name": "get_classic_margin_currencies",
     "path": "/api/v2/margin/currencies",
     "post": false,

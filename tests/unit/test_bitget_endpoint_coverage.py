@@ -896,16 +896,7 @@ CONTROL_CASES.extend(
             False,
             {"subUid": "2"},
         ),
-        (
-            "get_classic_interest_rate_record",
-            {"coin": "USDT"},
-            "GET",
-            "/api/v2/margin/interest-rate-record",
-            True,
-            {"coin": "USDT"},
-        ),
         ("get_classic_margin_currencies", {}, "GET", "/api/v2/margin/currencies", True, {}),
-        ("get_classic_convert_currencies", {}, "GET", "/api/v2/convert/currencies", True, {}),
         (
             "get_classic_auction",
             {"product_symbol": "BTC-USDT-SWAP"},

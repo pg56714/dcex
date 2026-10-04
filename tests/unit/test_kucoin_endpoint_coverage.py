@@ -309,7 +309,7 @@ CASES: tuple[Case, ...] = (
         host="futures",
         query={},
         body={},
-        signed=False,
+        signed=True,
     ),
     Case(
         "get_apikey_info",

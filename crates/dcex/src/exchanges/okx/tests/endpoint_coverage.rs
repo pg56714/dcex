@@ -1372,7 +1372,7 @@ const CASES: &[Case] = &[
     },
     Case {
         name: "get_economic_calendar",
-        public: true,
+        public: false,
         params: &[],
         method: "GET",
         path: "/api/v5/public/economic-calendar",

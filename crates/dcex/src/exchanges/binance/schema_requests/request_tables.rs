@@ -11,6 +11,9 @@ struct Endpoint {
     method: String,
     path: String,
     public: bool,
+    /// MARKET_DATA: unsigned, but the X-MBX-APIKEY header is required.
+    #[serde(default)]
+    api_key: bool,
     json_body: bool,
     fields: Vec<Field>,
 }
@@ -106,7 +109,7 @@ impl BinanceClient {
             }
             None
         };
-        self.inventory_transport(method, &e.path, query, body, !public)
+        self.inventory_transport(method, &e.path, query, body, !public, e.api_key)
             .await
             .map(Some)
     }

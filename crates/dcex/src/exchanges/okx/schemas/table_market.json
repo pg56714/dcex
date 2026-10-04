@@ -401,7 +401,7 @@
     "name": "get_economic_calendar",
     "path": "/api/v5/public/economic-calendar",
     "post": false,
-    "public": true,
+    "public": false,
     "keys": [
       "region",
       "importance",

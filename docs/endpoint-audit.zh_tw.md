@@ -16,9 +16,9 @@ API 提款沒有第二次確認，送出即執行。建議交易用 API 金鑰�
 
 | 狀態 | 列數 | 定義 |
 | --- | ---: | --- |
-| `implemented` | 3,420 | 具備精確離線 HTTP 路由證據及 Rust／Python 公開方法 |
+| `implemented` | 3,418 | 具備精確離線 HTTP 路由證據及 Rust／Python 公開方法 |
 | `protocol` | 395 | 非同步 WebSocket 協定支援，附離線驗證證據；不代表線上認證 |
-| `superseded` | 977 | 歷史端點或群組列，已由目前的明確列取代 |
+| `superseded` | 979 | 歷史端點或群組列，已由目前的明確列取代 |
 | `unavailable` | 19 | 官方停用、目前不可用的操作，或沒有獨立端點的文件章節 |
 | `unverified` | 11 | 已有包裝，但部分官方規格不完整 |
 | `blocked` | 37 | 缺少必要簽章或授權規格 |
@@ -34,7 +34,7 @@ API 提款沒有第二次確認，送出即執行。建議交易用 API 金鑰�
 | [binance](official-endpoint-inventory/binance.json) | 753 | 748 | 0 |
 | [bybit](official-endpoint-inventory/bybit.json) | 448 | 434 | 0 |
 | [okx](official-endpoint-inventory/okx.json) | 404 | 388 | 0 |
-| [bitget](official-endpoint-inventory/bitget.json) | 330 | 330 | 0 |
+| [bitget](official-endpoint-inventory/bitget.json) | 328 | 328 | 0 |
 | [bingx](official-endpoint-inventory/bingx.json) | 210 | 191 | 0 |
 | [kraken](official-endpoint-inventory/kraken.json) | 164 | 148 | 0 |
 | [mexc](official-endpoint-inventory/mexc.json) | 176 | 157 | 0 |

@@ -189,3 +189,14 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
     def get_uta_account_overview(self) -> dict[str, Any]:
         """Get KuCoin UTA account-level margin and risk summary (V1 route)."""
         return self._native_private("get_uta_account_overview", [])
+
+    def get_futures_24h_statistics(self) -> dict[str, Any]:
+        """
+
+        GET /api/v1/trade-statistics.
+
+        Use native exchange symbols and decimal strings. Source:
+        https://www.kucoin.com/docs-new/rest/futures-trading/market-data/get-24hr-stats
+
+        """
+        return self._native_private("get_futures_24h_statistics", self._native_params())

@@ -3,9 +3,7 @@ use super::client::BitgetClient;
 crate::exchanges::impl_exchange_method_wrappers! {
     BitgetClient;
     public [
-        get_classic_interest_rate_record(coin => "coin"),
         get_classic_margin_currencies(),
-        get_classic_convert_currencies(),
         get_classic_auction(product_symbol => "product_symbol"),
         get_classic_vip_fee_rate(),
         get_uta_proof_of_reserves(),

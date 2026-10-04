@@ -102,12 +102,6 @@ const PUBLIC_CASES: &[Case] = &[
         "GET /api/v1/index/query?symbol=BTC-USDT",
     ),
     public(
-        "get_futures_24h_statistics",
-        Host::Futures,
-        &[],
-        "GET /api/v1/trade-statistics",
-    ),
-    public(
         "get_convert_currencies",
         Host::Spot,
         &[],
@@ -484,6 +478,12 @@ const PUBLIC_CASES: &[Case] = &[
 ];
 
 const PRIVATE_CASES: &[Case] = &[
+    private(
+        "get_futures_24h_statistics",
+        Host::Futures,
+        &[],
+        "GET /api/v1/trade-statistics",
+    ),
     // Cases retained from the independent Python endpoint wire suite.
     private(
         "create_withdrawal",

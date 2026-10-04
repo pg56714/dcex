@@ -40,7 +40,7 @@ class GeneratedBrokerHTTP(MarketHTTP):
 
         Source: https://bybit-exchange.github.io/docs/v5/broker/api-broker/whitelist-ip
         """
-        return self._native_public("get_broker_whitelist_ip", [])
+        return self._native_private("get_broker_whitelist_ip", [])
 
     def get_broker_account_info(self) -> dict[str, Any]:
         """

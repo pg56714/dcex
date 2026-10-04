@@ -760,17 +760,6 @@ class MarketHTTP(HTTPManager):
             ),
         )
 
-    async def get_futures_24h_statistics(self) -> dict[str, Any]:
-        """
-
-        GET /api/v1/trade-statistics.
-
-        Use native exchange symbols and decimal strings. Source:
-        https://www.kucoin.com/docs-new/rest/futures-trading/market-data/get-24hr-stats
-
-        """
-        return await self._native_public("get_futures_24h_statistics", self._native_params())
-
     async def get_uta_oes_currency(
         self, *, custodian: str | None = None, currency: str | None = None
     ) -> dict[str, Any]:

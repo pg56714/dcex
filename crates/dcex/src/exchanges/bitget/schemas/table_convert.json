@@ -61,16 +61,5 @@
     ],
     "limit": null,
     "days": null
-  },
-  {
-    "name": "get_classic_convert_currencies",
-    "path": "/api/v2/convert/currencies",
-    "post": false,
-    "public": true,
-    "fields": [],
-    "required": [],
-    "arrays": [],
-    "limit": null,
-    "days": null
   }
 ]

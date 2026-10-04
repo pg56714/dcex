@@ -508,27 +508,6 @@ class MarketHTTP(HTTPManager):
         """
         return await self._native_public("get_index_components", self._native_params(index=index))
 
-    async def get_economic_calendar(
-        self,
-        *,
-        region: str | None = None,
-        importance: str | None = None,
-        before: str | None = None,
-        after: str | None = None,
-        limit: str | None = None,
-    ) -> dict[str, Any]:
-        """
-        GET /api/v5/public/economic-calendar. Use native instrument IDs.
-
-        Source: https://www.okx.com/docs-v5/en/#public-data-rest-api-get-economic-calendar-data
-        """
-        return await self._native_public(
-            "get_economic_calendar",
-            self._native_params(
-                region=region, importance=importance, before=before, after=after, limit=limit
-            ),
-        )
-
     async def get_market_data_history(
         self,
         *,

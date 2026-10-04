@@ -5,6 +5,11 @@ use super::client::BitgetClient;
 use super::endpoints::*;
 use super::params::BitgetParams;
 
+/// UTA candle intervals the exchange accepts (official list plus 2H/3D/1W/1M, verified live).
+const UTA_KLINE_INTERVALS: &[&str] = &[
+    "1m", "3m", "5m", "15m", "30m", "1H", "2H", "4H", "6H", "12H", "1D", "3D", "1W", "1M",
+];
+
 impl BitgetClient {
     pub async fn public_request(
         &self,
@@ -86,6 +91,14 @@ impl BitgetClient {
             }
             "get_uta_kline" | "get_uta_history_kline" => {
                 require_all(&params, &["category", "product_symbol", "interval"])?;
+                // Case-sensitive: "1h"/"1d" are rejected by the exchange (verified live).
+                let interval = params.required("interval")?;
+                if !UTA_KLINE_INTERVALS.contains(&interval) {
+                    return Err(DcexError::InvalidInput(format!(
+                        "invalid Bitget UTA interval: {interval}; expected one of {}",
+                        UTA_KLINE_INTERVALS.join(", ")
+                    )));
+                }
                 let endpoint = if method_name == "get_uta_kline" {
                     UTA_CANDLES
                 } else {

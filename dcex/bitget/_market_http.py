@@ -451,19 +451,9 @@ class MarketHTTP(HTTPManager):
             "get_uta_spot_whale_flow", self._native_params(product_symbol=product_symbol)
         )
 
-    def get_classic_interest_rate_record(self, coin: str) -> dict[str, Any]:
-        """Call ``GET /api/v2/margin/interest-rate-record``."""
-        return self._native_public(
-            "get_classic_interest_rate_record", self._native_params(coin=coin)
-        )
-
     def get_classic_margin_currencies(self) -> dict[str, Any]:
         """Call ``GET /api/v2/margin/currencies``."""
         return self._native_public("get_classic_margin_currencies", self._native_params())
-
-    def get_classic_convert_currencies(self) -> dict[str, Any]:
-        """Call ``GET /api/v2/convert/currencies``."""
-        return self._native_public("get_classic_convert_currencies", self._native_params())
 
     def get_classic_auction(self, product_symbol: str) -> dict[str, Any]:
         """Call ``GET /api/v2/spot/market/auction``."""

@@ -183,11 +183,20 @@ impl BinanceClient {
         query: Vec<(String, String)>,
         body: Option<Value>,
         signed: bool,
+        api_key: bool,
     ) -> Result<ValidatedResponse> {
         if signed {
             self.sync_server_time(BinanceMarket::Spot).await?;
         }
         let mut request = self.build_request(method, BinanceMarket::Spot, path, query.clone());
+        if api_key && !signed {
+            let key = self.api_key.as_deref().ok_or_else(|| {
+                DcexError::InvalidInput("Binance API key is required for this request.".to_string())
+            })?;
+            request
+                .headers
+                .insert("X-MBX-APIKEY".to_string(), key.to_string());
+        }
         if path.starts_with("/bapi/") {
             request.base_url = self.alpha_base_url.clone();
         }

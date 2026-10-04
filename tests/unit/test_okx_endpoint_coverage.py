@@ -1351,7 +1351,7 @@ CASES: tuple[Case, ...] = (
         "GET",
         "/api/v5/public/economic-calendar",
         kwargs={},
-        signed=False,
+        signed=True,
         query={},
     ),
     Case(
