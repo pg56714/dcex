@@ -1531,31 +1531,3 @@ class MarketHTTP(HTTPManager):
         return self._native_public(
             "query_pm_pro_portfolio_margin_asset_index_price", self._params(asset=asset)
         )
-
-    def get_dual_investment_product_list(
-        self,
-        *,
-        option_type: str,
-        exercised_coin: str,
-        invest_coin: str,
-        page_size: int | None = None,
-        page_index: int | None = None,
-        recv_window: int | None = None,
-    ) -> Any:  # noqa: ANN401
-        """
-        GET /sapi/v1/dci/product/list.
-
-        Native symbols; decimal amounts are strings. Exchange eligibility applies.
-        Source: https://developers.binance.com/en/docs/catalog/investment-and-services-dual-investment/api/rest-api/market-data#get-dual-investment-product-list
-        """
-        return self._native_public(
-            "get_dual_investment_product_list",
-            self._params(
-                optionType=option_type,
-                exercisedCoin=exercised_coin,
-                investCoin=invest_coin,
-                pageSize=page_size,
-                pageIndex=page_index,
-                recvWindow=recv_window,
-            ),
-        )

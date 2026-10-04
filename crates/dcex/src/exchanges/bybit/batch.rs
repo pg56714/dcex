@@ -47,6 +47,10 @@ mod trade_requests {
             _method_name: &str,
             params: &BybitParams,
         ) -> Result<ValidatedResponse> {
+            crate::exchanges::bybit::trade::validate_batch_request(
+                &params.json_required("request")?,
+                false,
+            )?;
             self.batch_request(BATCH_PLACE_ORDER, params).await
         }
         pub(in crate::exchanges::bybit) async fn dispatch_amend_batch_order(
@@ -54,6 +58,10 @@ mod trade_requests {
             _method_name: &str,
             params: &BybitParams,
         ) -> Result<ValidatedResponse> {
+            crate::exchanges::bybit::trade::validate_batch_request(
+                &params.json_required("request")?,
+                true,
+            )?;
             self.batch_request(BATCH_AMEND_ORDER, params).await
         }
     }

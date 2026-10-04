@@ -34,8 +34,16 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         sl_order_type: str | None = None,
         tp_limit_price: str | None = None,
         sl_limit_price: str | None = None,
+        *,
+        auto_borrow: str | None = None,
+        px_amend_type: str | None = None,
     ) -> dict[str, Any]:
-        """Place a Bitget UTA order."""
+        """
+        Place a Bitget UTA order.
+
+        auto_borrow (SPOT only) and px_amend_type (limit orders) take the documented
+        "yes"/"no" values; unsupported fields or values are rejected before sending.
+        """
         return self._native_private(
             "place_uta_order",
             self._native_params(
@@ -59,6 +67,8 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
                 slOrderType=sl_order_type,
                 tpLimitPrice=tp_limit_price,
                 slLimitPrice=sl_limit_price,
+                autoBorrow=auto_borrow,
+                pxAmendType=px_amend_type,
             ),
         )
 

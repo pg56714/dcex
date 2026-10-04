@@ -531,6 +531,11 @@ impl ExtendedOrderSpec {
                 self.time_in_force
             )));
         }
+        if self.post_only && self.time_in_force == "IOC" {
+            return Err(DcexError::InvalidInput(
+                "Extended post-only orders cannot use IOC time in force".to_string(),
+            ));
+        }
         if !matches!(
             self.self_trade_protection_level.as_str(),
             "DISABLED" | "ACCOUNT" | "CLIENT"
@@ -878,6 +883,24 @@ mod tests {
                 .unwrap()
                 .starts_with("0x")
         );
+    }
+
+    #[test]
+    fn rejects_post_only_ioc_combination() {
+        let params = ExtendedParams::from_pairs(vec![
+            ("side".to_string(), "BUY".to_string()),
+            ("qty".to_string(), "1".to_string()),
+            ("price".to_string(), "100".to_string()),
+            ("fee".to_string(), "0.00025".to_string()),
+            ("post_only".to_string(), "true".to_string()),
+            ("time_in_force".to_string(), "IOC".to_string()),
+        ]);
+
+        let spec = ExtendedOrderSpec::from_params(&params, "BTC-USD".to_string()).unwrap();
+        let error = spec
+            .validate(StarknetDomain::mainnet())
+            .expect_err("post-only IOC is contradictory");
+        assert!(error.to_string().contains("post-only"), "{error}");
     }
 
     #[test]

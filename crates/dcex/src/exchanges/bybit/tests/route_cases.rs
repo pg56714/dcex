@@ -1334,7 +1334,7 @@ pub(super) const CASES: &[RouteCase] = &[
         params: &[
             (
                 "request",
-                "[{\"symbol\":\"BTCUSDT\",\"side\":\"Buy\",\"orderType\":\"Limit\",\"qty\":\"1\",\"price\":\"1\"}]",
+                "[{\"symbol\":\"BTCUSDT\",\"orderId\":\"1\",\"qty\":\"1\",\"price\":\"1\"}]",
             ),
             ("category", "linear"),
         ],

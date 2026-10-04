@@ -259,8 +259,8 @@ mod schema_methods {
     ]; }
 
     crate::exchanges::impl_exchange_method_wrappers! { @extend; BinanceClient; public [
-    get_dual_investment_product_list(option_type => "optionType",exercised_coin => "exercisedCoin",invest_coin => "investCoin"),
     ]; private [
+    get_dual_investment_product_list(option_type => "optionType",exercised_coin => "exercisedCoin",invest_coin => "investCoin"),
     tradfi_options_contract(),
     get_cloud_mining_payment_and_refund_history(start_time => "startTime",end_time => "endTime"),
     query_user_delegation_history(email => "email",start_time => "startTime",end_time => "endTime"),

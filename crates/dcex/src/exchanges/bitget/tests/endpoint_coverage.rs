@@ -394,8 +394,26 @@ async fn private_dispatch_names_reach_documented_routes() {
     let (url, receiver) = recording_server();
     let client = signed_client(url);
     for (name, method, path) in PRIVATE_ROUTES {
+        let params = if *name == "place_uta_batch_orders" {
+            vec![(
+                "orderList".to_string(),
+                r#"[{"category":"SPOT","symbol":"BTCUSDT","side":"buy","orderType":"limit","qty":"1","price":"1"}]"#
+                    .to_string(),
+            )]
+        } else if *name == "place_uta_order" {
+            // place_uta_order rejects keys outside its documented body.
+            base_params()
+                .into_iter()
+                .filter(|(key, _)| {
+                    key == "product_symbol"
+                        || crate::exchanges::bitget::trade::UTA_ORDER_KEYS.contains(&key.as_str())
+                })
+                .collect()
+        } else {
+            base_params()
+        };
         client
-            .private_request(name, base_params())
+            .private_request(name, params)
             .await
             .unwrap_or_else(|error| panic!("{name}: {error}"));
         let recorded = next(&receiver, name);
@@ -436,7 +454,7 @@ async fn uta_batch_order_body() {
             "place_uta_batch_orders",
             vec![(
                 "orderList".into(),
-                r#"[{"category":"SPOT","symbol":"BTCUSDT","qty":"1"}]"#.into(),
+                r#"[{"category":"SPOT","symbol":"BTCUSDT","side":"buy","orderType":"limit","qty":"1","price":"100","timeInForce":"post_only"}]"#.into(),
             )],
         )
         .await

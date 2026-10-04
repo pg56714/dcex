@@ -98,7 +98,7 @@ REDUCE_ONLY_CODES = {
     "okx": {"51169", "51170"},  # No position in this direction to reduce / same direction.
     "bitget": {"22002"},  # No position to close.
     "kucoin": {"300009"},  # No open positions to close.
-    "mexc": {"2008", "2009"},  # No closable position / position nonexistent or closed.
+    "mexc": {"2009"},  # Position nonexistent or closed.
     "extended": {"REDUCE_ONLY_FAILED"},  # Reduce-only order failed (position conflict).
 }
 REDUCE_ONLY_MESSAGE = re.compile(
@@ -596,9 +596,14 @@ async def run_lifecycle(
                 result["cleanup"] = (
                     "cleanup cancellation unconfirmed; inspect test order ID and client ID manually"
                 )
+        sweep_error = None
         if rejected_ids and result.get("stage") != "complete":
             # Only this run's explicitly rejected client IDs; never other open orders.
-            await cleanup_client_ids(adapter, rejected_ids, result, poll_delay)
+            try:
+                await cleanup_client_ids(adapter, rejected_ids, result, poll_delay)
+            except LifecycleError as error:
+                # Still run the position check below before failing.
+                sweep_error = error
         if placement_started and not cancelled:
             try:
                 remaining_positions = await adapter.positions()
@@ -613,6 +618,8 @@ async def run_lifecycle(
                     result["cleanup"] = result.get("cleanup", "") + "; " + warning
                     result["error_message"] = result.get("error_message", "") + "; " + warning
                     raise LifecycleError(result["error_message"])
+        if sweep_error is not None:
+            raise sweep_error
 
 
 async def cleanup_amend(

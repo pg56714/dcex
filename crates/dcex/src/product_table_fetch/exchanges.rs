@@ -397,12 +397,18 @@ pub(super) fn option_product_symbol(
     Some(format!("{base}-{quote}-{expiry}-{strike}-{side}-OPTION"))
 }
 
+/// Parses Bybit's `DMMMYY` option expiry, whose day has no leading zero (`6NOV26`,
+/// `25JUN27`), into the canonical zero-padded `YYMMDD` (`261106`, `270625`).
 pub(super) fn bybit_option_expiry(expiry: &str) -> Option<String> {
-    if expiry.len() != 7 {
+    if !expiry.is_ascii() || !matches!(expiry.len(), 6 | 7) {
         return None;
     }
-    let day = &expiry[0..2];
-    let month = match &expiry[2..5].to_ascii_uppercase()[..] {
+    let day_len = expiry.len() - 5;
+    let day = &expiry[..day_len];
+    if day.starts_with('0') {
+        return None;
+    }
+    let month = match &expiry[day_len..day_len + 3].to_ascii_uppercase()[..] {
         "JAN" => "01",
         "FEB" => "02",
         "MAR" => "03",
@@ -417,14 +423,17 @@ pub(super) fn bybit_option_expiry(expiry: &str) -> Option<String> {
         "DEC" => "12",
         _ => return None,
     };
-    let year = &expiry[5..7];
+    let year = &expiry[day_len + 3..];
     if !day.bytes().all(|byte| byte.is_ascii_digit())
         || !year.bytes().all(|byte| byte.is_ascii_digit())
-        || !(1..=31).contains(&day.parse::<u8>().ok()?)
     {
         return None;
     }
-    Some(format!("{year}{month}{day}"))
+    let day = day.parse::<u8>().ok()?;
+    if !(1..=31).contains(&day) {
+        return None;
+    }
+    Some(format!("{year}{month}{day:02}"))
 }
 
 pub(super) fn binance_option_market_info(market: &Value) -> Option<MarketInfo> {

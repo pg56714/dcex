@@ -27,6 +27,7 @@ native = pytest.importorskip("dcex._native")
 LINEAR = "BTC-USDT-SWAP"
 SPOT = "BTC-USDT-SPOT"
 BATCH = [{"symbol": "BTCUSDT", "side": "Buy", "orderType": "Limit", "qty": "1", "price": "1"}]
+AMEND_BATCH = [{"symbol": "BTCUSDT", "orderId": "1", "qty": "1", "price": "1"}]
 RFQ_LEGS = [{"category": "option", "symbol": "BTC-C", "side": "Buy", "qty": "1"}]
 
 
@@ -1271,7 +1272,7 @@ CASES: tuple[RouteCase, ...] = (
     _get("get_order_history", "/v5/order/history", "linear", LINEAR),
     _get("get_execution_list", "/v5/execution/list", "linear", LINEAR),
     _post("place_batch_order", "/v5/order/create-batch", BATCH, "linear"),
-    _post("amend_batch_order", "/v5/order/amend-batch", BATCH, "linear"),
+    _post("amend_batch_order", "/v5/order/amend-batch", AMEND_BATCH, "linear"),
     _post("cancel_batch_orders", "/v5/order/cancel-batch", BATCH, "linear"),
     _post(
         "set_disconnected_cancel_all",

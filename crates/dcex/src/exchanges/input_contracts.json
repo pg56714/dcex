@@ -10247,6 +10247,14 @@
           "slTriggerBy": {
             "type": "string",
             "description": "place_uta_order/slTriggerBy: selects the documented mode, unit, or reference used by this operation."
+          },
+          "px_amend_type": {
+            "type": "string",
+            "description": "place_uta_order/px_amend_type: selects whether Bitget may amend an out-of-band limit price, using documented yes or no."
+          },
+          "pxAmendType": {
+            "type": "string",
+            "description": "place_uta_order/pxAmendType: selects whether Bitget may amend an out-of-band limit price, using documented yes or no."
           }
         }
       },

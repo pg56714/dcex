@@ -1075,7 +1075,7 @@
     "symbol_market": "BinanceMarket::Spot",
     "method": "HttpMethod::Get",
     "path": "/sapi/v1/dci/product/list",
-    "public": true,
+    "public": false,
     "api_key": false,
     "allowed": [
       "optionType",

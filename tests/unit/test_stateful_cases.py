@@ -914,7 +914,8 @@ def coded(message, code):
         ("okx", coded("okx: code=51169 no position", "51169"), True),
         ("kucoin", coded("kucoin: code=300009 No open positions to close.", "300009"), True),
         ("mexc", coded("mexc: code=2009 Position is nonexistent or closed", "2009"), True),
-        ("mexc", coded('HTTP 200: {"success":false,"code":2008}', ""), True),
+        ("mexc", coded('HTTP 200: {"success":false,"code":2009}', ""), True),
+        ("mexc", coded('HTTP 200: {"success":false,"code":2008}', ""), False),
         ("mexc", coded("mexc: code=8917 reduce-only insufficient margin", "8917"), False),
         ("mexc", coded("mexc: code=2005 Insufficient balance", "2005"), False),
         ("extended", coded('HTTP 400: {"error":{"code":"REDUCE_ONLY_FAILED"}}', "400"), True),
@@ -1146,3 +1147,39 @@ async def test_arcus_unqueryable_ioc_passes_on_zero_fill_acknowledgement():
 @pytest.mark.parametrize(("exchange", "market_"), [("extended", "swap"), ("kucoin", "swap")])
 def test_library_gaps_are_named(exchange, market_):
     assert "library has no order amendment" in not_applicable(exchange, market_, "amend")
+
+
+@pytest.mark.asyncio
+async def test_unconfirmed_sweep_still_reports_unexpected_position():
+    # A price-band rejection, a retried placement, then a failing cancel: the
+    # position check must still run (and win) even though the sweep is unconfirmed.
+    client = ArcusCaseMock("sync", "lifecycle")
+    client.price_rejections = 1
+    adapter = ArcusAdapter(client, "arcus", "swap", "BTC-USD")
+
+    async def broken(client_id):
+        raise LifecycleError("open orders unavailable")
+
+    async def failing_cancel(identifier):
+        raise LifecycleError("cancel failed")
+
+    positions = []
+
+    async def position_check():
+        return positions
+
+    adapter.recover_client_order = broken
+    adapter.cancel = failing_cancel
+    adapter.positions = position_check
+    original_place = adapter.place
+
+    async def place(plan):
+        identifier = await original_place(plan)
+        positions.append({"size": "1"})  # appears only after our order exists
+        return identifier
+
+    adapter.place = place
+    result = {}
+    with pytest.raises(LifecycleError, match="UNEXPECTED POSITION"):
+        await run_lifecycle(adapter, result, poll_delay=0)
+    assert "REJECTED CLIENT ID CLEANUP UNCONFIRMED" in result["error_message"]

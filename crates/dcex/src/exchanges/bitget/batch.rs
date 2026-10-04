@@ -14,11 +14,10 @@ mod trade_requests {
             params: &BitgetParams,
         ) -> Result<ValidatedResponse> {
             {
-                self.post_private(
-                    UTA_BATCH_PLACE_ORDER,
-                    self.normalize_batch_symbols(params.json_required("orderList")?)?,
-                )
-                .await
+                let orders = params.json_required("orderList")?;
+                crate::exchanges::bitget::trade::validate_uta_batch_orders(&orders)?;
+                self.post_private(UTA_BATCH_PLACE_ORDER, self.normalize_batch_symbols(orders)?)
+                    .await
             }
         }
         pub(in crate::exchanges::bitget) async fn dispatch_cancel_uta_batch_orders(

@@ -66,6 +66,7 @@ impl BinanceClient {
                 .send_place_equity_order(product_symbol, side, order_type, extra_params)
                 .await;
         }
+        validate_order_flags(market, &extra_params)?;
         if market == BinanceMarket::Futures && is_futures_conditional_order(order_type) {
             return self
                 .send_place_futures_algo_order(
@@ -124,6 +125,7 @@ impl BinanceClient {
                     .to_string(),
             ));
         }
+        validate_order_flags(market, &extra_params)?;
         self.order_request(
             HttpMethod::Post,
             product_symbol,
@@ -511,6 +513,13 @@ impl BinanceClient {
             ));
         }
         if market == BinanceMarket::Spot {
+            // Spot LIMIT_MAKER has no position or reduce-only semantics; never drop them.
+            if request.position_side.is_some() || request.reduce_only.is_some() {
+                return Err(DcexError::InvalidInput(
+                    "Binance Spot post-only (LIMIT_MAKER) orders do not support positionSide or reduceOnly."
+                        .to_string(),
+                ));
+            }
             self.send_place_order(
                 product_symbol,
                 side,
@@ -1093,6 +1102,46 @@ impl BinanceClient {
     }
 }
 
+/// Validates documented `timeInForce` values and futures-only flags before any request.
+///
+/// Spot: <https://developers.binance.com/docs/binance-spot-api-docs/enums> (GTC/IOC/FOK; no
+/// reduceOnly/positionSide). USD-M: <https://developers.binance.com/docs/derivatives/usds-margined-futures/common-definition>
+/// (GTC/IOC/FOK/GTX/GTD/RPI; reduceOnly "true"/"false"). Options:
+/// <https://developers.binance.com/docs/derivatives/options-trading/trade/New-Order>.
+pub(super) fn validate_order_flags(
+    market: BinanceMarket,
+    params: &[(String, String)],
+) -> Result<()> {
+    let time_in_force: &[&str] = match market {
+        BinanceMarket::Spot => &["GTC", "IOC", "FOK"],
+        BinanceMarket::Futures => &["GTC", "IOC", "FOK", "GTX", "GTD", "RPI"],
+        BinanceMarket::Options => &["GTC", "IOC", "FOK", "GTX"],
+        _ => return Ok(()),
+    };
+    for (key, value) in params {
+        match key.as_str() {
+            "timeInForce" if !time_in_force.contains(&value.as_str()) => {
+                return Err(DcexError::InvalidInput(format!(
+                    "invalid Binance timeInForce: {value}; expected one of {}",
+                    time_in_force.join(", ")
+                )));
+            }
+            "reduceOnly" | "positionSide" if market == BinanceMarket::Spot => {
+                return Err(DcexError::InvalidInput(format!(
+                    "Binance Spot orders do not support {key}."
+                )));
+            }
+            "reduceOnly" if !matches!(value.as_str(), "true" | "false") => {
+                return Err(DcexError::InvalidInput(format!(
+                    "invalid Binance reduceOnly: {value}; expected true or false"
+                )));
+            }
+            _ => {}
+        }
+    }
+    Ok(())
+}
+
 fn is_futures_conditional_order(order_type: &str) -> bool {
     matches!(
         order_type.to_ascii_uppercase().as_str(),
@@ -1113,4 +1162,55 @@ fn futures_algo_params(params: Vec<(String, String)>) -> Vec<(String, String)> {
             (key, value)
         })
         .collect()
+}
+
+#[cfg(test)]
+mod order_flag_tests {
+    use super::*;
+
+    fn pairs(items: &[(&str, &str)]) -> Vec<(String, String)> {
+        items
+            .iter()
+            .map(|(key, value)| ((*key).to_string(), (*value).to_string()))
+            .collect()
+    }
+
+    #[test]
+    fn documented_time_in_force_and_reduce_only_are_accepted() {
+        for tif in ["GTC", "IOC", "FOK"] {
+            validate_order_flags(BinanceMarket::Spot, &pairs(&[("timeInForce", tif)]))
+                .expect("spot tif");
+        }
+        for tif in ["GTC", "IOC", "FOK", "GTX", "GTD", "RPI"] {
+            validate_order_flags(
+                BinanceMarket::Futures,
+                &pairs(&[("timeInForce", tif), ("reduceOnly", "true")]),
+            )
+            .expect("usd-m tif");
+        }
+        validate_order_flags(
+            BinanceMarket::Futures,
+            &pairs(&[("reduceOnly", "false"), ("positionSide", "LONG")]),
+        )
+        .expect("futures position side");
+    }
+
+    #[test]
+    fn unsupported_flags_are_rejected() {
+        for (market, params) in [
+            (BinanceMarket::Spot, pairs(&[("timeInForce", "GTX")])),
+            (BinanceMarket::Spot, pairs(&[("timeInForce", "gtc")])),
+            (BinanceMarket::Spot, pairs(&[("reduceOnly", "true")])),
+            (BinanceMarket::Spot, pairs(&[("positionSide", "LONG")])),
+            (BinanceMarket::Futures, pairs(&[("timeInForce", "DAY")])),
+            (BinanceMarket::Futures, pairs(&[("reduceOnly", "yes")])),
+            (BinanceMarket::Futures, pairs(&[("reduceOnly", "1")])),
+            (BinanceMarket::Options, pairs(&[("timeInForce", "GTD")])),
+        ] {
+            assert!(
+                validate_order_flags(market, &params).is_err(),
+                "{market:?} {params:?}"
+            );
+        }
+    }
 }

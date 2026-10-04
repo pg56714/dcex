@@ -95,64 +95,64 @@ impl OkxClient {
             }
             "place_batch_orders" => self.dispatch_place_batch_orders(method_name, params).await,
             "place_market_order" => {
-                let mut pairs = params.without(&["ordType"]);
-                pairs.push(("ordType".to_string(), "market".to_string()));
-                self.place_order_from_params(&OkxParams::from_pairs(pairs))
-                    .await
+                self.place_order_from_params(&forced_order_params(
+                    params,
+                    &[("ordType", "market")],
+                )?)
+                .await
             }
             "place_market_buy_order" => {
-                let mut pairs = params.without(&["side", "ordType"]);
-                pairs.push(("side".to_string(), "buy".to_string()));
-                pairs.push(("ordType".to_string(), "market".to_string()));
-                self.place_order_from_params(&OkxParams::from_pairs(pairs))
-                    .await
+                self.place_order_from_params(&forced_order_params(
+                    params,
+                    &[("side", "buy"), ("ordType", "market")],
+                )?)
+                .await
             }
             "place_market_sell_order" => {
-                let mut pairs = params.without(&["side", "ordType"]);
-                pairs.push(("side".to_string(), "sell".to_string()));
-                pairs.push(("ordType".to_string(), "market".to_string()));
-                self.place_order_from_params(&OkxParams::from_pairs(pairs))
-                    .await
+                self.place_order_from_params(&forced_order_params(
+                    params,
+                    &[("side", "sell"), ("ordType", "market")],
+                )?)
+                .await
             }
             "place_limit_order" => {
-                let mut pairs = params.without(&["ordType"]);
-                pairs.push(("ordType".to_string(), "limit".to_string()));
-                self.place_order_from_params(&OkxParams::from_pairs(pairs))
+                self.place_order_from_params(&forced_order_params(params, &[("ordType", "limit")])?)
                     .await
             }
             "place_limit_buy_order" => {
-                let mut pairs = params.without(&["side", "ordType"]);
-                pairs.push(("side".to_string(), "buy".to_string()));
-                pairs.push(("ordType".to_string(), "limit".to_string()));
-                self.place_order_from_params(&OkxParams::from_pairs(pairs))
-                    .await
+                self.place_order_from_params(&forced_order_params(
+                    params,
+                    &[("side", "buy"), ("ordType", "limit")],
+                )?)
+                .await
             }
             "place_limit_sell_order" => {
-                let mut pairs = params.without(&["side", "ordType"]);
-                pairs.push(("side".to_string(), "sell".to_string()));
-                pairs.push(("ordType".to_string(), "limit".to_string()));
-                self.place_order_from_params(&OkxParams::from_pairs(pairs))
-                    .await
+                self.place_order_from_params(&forced_order_params(
+                    params,
+                    &[("side", "sell"), ("ordType", "limit")],
+                )?)
+                .await
             }
             "place_post_only_limit_order" => {
-                let mut pairs = params.without(&["ordType"]);
-                pairs.push(("ordType".to_string(), "post_only".to_string()));
-                self.place_order_from_params(&OkxParams::from_pairs(pairs))
-                    .await
+                self.place_order_from_params(&forced_order_params(
+                    params,
+                    &[("ordType", "post_only")],
+                )?)
+                .await
             }
             "place_post_only_limit_buy_order" => {
-                let mut pairs = params.without(&["side", "ordType"]);
-                pairs.push(("side".to_string(), "buy".to_string()));
-                pairs.push(("ordType".to_string(), "post_only".to_string()));
-                self.place_order_from_params(&OkxParams::from_pairs(pairs))
-                    .await
+                self.place_order_from_params(&forced_order_params(
+                    params,
+                    &[("side", "buy"), ("ordType", "post_only")],
+                )?)
+                .await
             }
             "place_post_only_limit_sell_order" => {
-                let mut pairs = params.without(&["side", "ordType"]);
-                pairs.push(("side".to_string(), "sell".to_string()));
-                pairs.push(("ordType".to_string(), "post_only".to_string()));
-                self.place_order_from_params(&OkxParams::from_pairs(pairs))
-                    .await
+                self.place_order_from_params(&forced_order_params(
+                    params,
+                    &[("side", "sell"), ("ordType", "post_only")],
+                )?)
+                .await
             }
             "cancel_order" => self.cancel_order_from_params(params).await,
             "cancel_batch_orders" => self.dispatch_cancel_batch_orders(method_name, params).await,
@@ -197,6 +197,237 @@ impl OkxClient {
     }
 }
 
+/// Documented `POST /api/v5/trade/order` fields:
+/// <https://www.okx.com/docs-v5/en/#order-book-trading-trade-post-place-order>.
+const PLACE_ORDER_KEYS: &[&str] = &[
+    "product_symbol",
+    "tdMode",
+    "side",
+    "ordType",
+    "sz",
+    "ccy",
+    "clOrdId",
+    "tag",
+    "posSide",
+    "px",
+    "outcome",
+    "pxUsd",
+    "pxVol",
+    "reduceOnly",
+    "tgtCcy",
+    "banAmend",
+    "pxAmendType",
+    "tradeQuoteCcy",
+    "slippagePct",
+    "stpMode",
+    "rpiTakerAccess",
+    "isElpTakerAccess",
+    "rpiPxRound",
+    "attachAlgoOrds",
+];
+/// Documented `POST /api/v5/trade/order-precheck` fields:
+/// <https://www.okx.com/docs-v5/en/#order-book-trading-trade-post-order-precheck>.
+const PRE_CHECK_ORDER_KEYS: &[&str] = &[
+    "product_symbol",
+    "tdMode",
+    "side",
+    "ordType",
+    "sz",
+    "posSide",
+    "px",
+    "outcome",
+    "reduceOnly",
+    "tgtCcy",
+    "attachAlgoOrds",
+];
+
+/// Rejects undocumented keys and enum values before any request instead of dropping them.
+pub(in crate::exchanges::okx) fn validate_order_params(
+    params: &OkxParams,
+    pre_check: bool,
+) -> Result<()> {
+    let (allowed, label) = if pre_check {
+        (PRE_CHECK_ORDER_KEYS, "order precheck")
+    } else {
+        (PLACE_ORDER_KEYS, "order")
+    };
+    ensure_okx_keys(params, allowed, label)?;
+    validate_order_enums(params, pre_check)
+}
+
+fn ensure_okx_keys(params: &OkxParams, allowed: &[&str], label: &str) -> Result<()> {
+    for (key, _) in params.pairs() {
+        if !allowed.contains(&key.as_str()) {
+            return Err(DcexError::InvalidInput(format!(
+                "unsupported OKX {label} parameter: {key}"
+            )));
+        }
+    }
+    Ok(())
+}
+
+/// Documented `POST /api/v5/trade/batch-orders` element fields (`isElpTakerAccess` is the
+/// documented alias of `rpiTakerAccess`).
+const BATCH_ORDER_KEYS: &[&str] = &[
+    "instId",
+    "tdMode",
+    "ccy",
+    "clOrdId",
+    "tag",
+    "side",
+    "posSide",
+    "ordType",
+    "sz",
+    "px",
+    "speedBump",
+    "outcome",
+    "pxUsd",
+    "pxVol",
+    "reduceOnly",
+    "tgtCcy",
+    "banAmend",
+    "pxAmendType",
+    "tradeQuoteCcy",
+    "slippagePct",
+    "stpMode",
+    "rpiTakerAccess",
+    "isElpTakerAccess",
+    "rpiPxRound",
+    "attachAlgoOrds",
+];
+
+/// Documented `POST /api/v5/trade/amend-order` fields (`instId` comes from `product_symbol`).
+const AMEND_ORDER_KEYS: &[&str] = &[
+    "product_symbol",
+    "cxlOnFail",
+    "ordId",
+    "clOrdId",
+    "reqId",
+    "newSz",
+    "newPx",
+    "speedBump",
+    "newPxUsd",
+    "newPxVol",
+    "pxAmendType",
+    "attachAlgoOrds",
+    "rpiTakerAccess",
+    "rpiPxRound",
+];
+
+const ORDER_BOOL_KEYS: &[&str] = &[
+    "reduceOnly",
+    "banAmend",
+    "rpiTakerAccess",
+    "isElpTakerAccess",
+    "rpiPxRound",
+    "cxlOnFail",
+];
+
+fn validate_okx_bools(params: &OkxParams) -> Result<()> {
+    for key in ORDER_BOOL_KEYS {
+        if let Some(value) = params.get(key)
+            && !matches!(value, "true" | "false")
+        {
+            return Err(DcexError::InvalidInput(format!(
+                "OKX {key} must be true or false, got {value}"
+            )));
+        }
+    }
+    Ok(())
+}
+
+/// Converts one JSON batch element into string pairs for the shared validators.
+fn json_order_params(order: &Value) -> Result<OkxParams> {
+    let order = order.as_object().ok_or_else(|| {
+        DcexError::InvalidInput("each OKX batch order must be a JSON object".to_string())
+    })?;
+    Ok(OkxParams::from_pairs(
+        order
+            .iter()
+            .map(|(key, value)| {
+                let value = match value {
+                    Value::String(text) => text.clone(),
+                    other => other.to_string(),
+                };
+                (key.clone(), value)
+            })
+            .collect(),
+    ))
+}
+
+/// Validates every batch element like a single order; any failure rejects the whole batch.
+pub(in crate::exchanges::okx) fn validate_batch_orders(orders: &Value) -> Result<()> {
+    let items = orders
+        .as_array()
+        .ok_or_else(|| DcexError::InvalidInput("OKX orders must be a JSON array".to_string()))?;
+    for order in items {
+        let params = json_order_params(order)?;
+        ensure_okx_keys(&params, BATCH_ORDER_KEYS, "batch order")?;
+        validate_order_enums(&params, false)?;
+        validate_okx_bools(&params)?;
+    }
+    validate_batch_order_slippage(orders)
+}
+
+fn validate_order_enums(params: &OkxParams, pre_check: bool) -> Result<()> {
+    let mut order_types = vec![
+        "market",
+        "limit",
+        "post_only",
+        "fok",
+        "ioc",
+        "optimal_limit_ioc",
+        "rpi",
+        "elp",
+    ];
+    if !pre_check {
+        order_types.extend(["mmp", "mmp_and_post_only"]);
+    }
+    for (key, allowed) in [
+        ("ordType", order_types.as_slice()),
+        (
+            "tdMode",
+            &["cross", "isolated", "cash", "spot_isolated"][..],
+        ),
+        (
+            "stpMode",
+            &["cancel_maker", "cancel_taker", "cancel_both"][..],
+        ),
+    ] {
+        if let Some(value) = params.get(key)
+            && !allowed.contains(&value)
+        {
+            return Err(DcexError::InvalidInput(format!(
+                "invalid OKX {key}: {value}; expected one of {}",
+                allowed.join(", ")
+            )));
+        }
+    }
+    Ok(())
+}
+
+/// Applies a convenience method's fixed fields, rejecting a conflicting caller value
+/// instead of silently replacing it.
+fn forced_order_params(params: &OkxParams, forced: &[(&str, &str)]) -> Result<OkxParams> {
+    let keys: Vec<&str> = forced.iter().map(|(key, _)| *key).collect();
+    for (key, value) in forced {
+        if let Some(existing) = params.get(key)
+            && !existing.eq_ignore_ascii_case(value)
+        {
+            return Err(DcexError::InvalidInput(format!(
+                "this OKX order method sets {key}={value}; got conflicting {key}={existing}"
+            )));
+        }
+    }
+    let mut pairs = params.without(&keys);
+    pairs.extend(
+        forced
+            .iter()
+            .map(|(key, value)| ((*key).to_string(), (*value).to_string())),
+    );
+    Ok(OkxParams::from_pairs(pairs))
+}
+
 impl OkxClient {
     pub(in crate::exchanges::okx) async fn place_order_from_params(
         &self,
@@ -229,6 +460,7 @@ impl OkxClient {
         params: &OkxParams,
         pre_check: bool,
     ) -> Result<Map<String, Value>> {
+        validate_order_params(params, pre_check)?;
         let mut body = params.required_body(&["tdMode", "ordType", "sz"])?;
         self.insert_required_inst_id(&mut body, params)?;
         body.insert(
@@ -381,6 +613,8 @@ impl OkxClient {
         &self,
         params: &OkxParams,
     ) -> Result<ValidatedResponse> {
+        ensure_okx_keys(params, AMEND_ORDER_KEYS, "amend order")?;
+        validate_okx_bools(params)?;
         require_one(params, &["ordId", "clOrdId"])?;
         require_one(
             params,
@@ -609,7 +843,6 @@ mod tests {
             ("isElpTakerAccess".to_string(), "true".to_string()),
             ("rpiTakerAccess".to_string(), "true".to_string()),
             ("rpiPxRound".to_string(), "true".to_string()),
-            ("speedBump".to_string(), "1".to_string()),
             (
                 "attachAlgoOrds".to_string(),
                 r#"[{"tpTriggerPx":"110","tpOrdPx":"109"}]"#.to_string(),
@@ -624,7 +857,6 @@ mod tests {
         assert_eq!(body["isElpTakerAccess"], Value::Bool(true));
         assert_eq!(body["rpiTakerAccess"], Value::Bool(true));
         assert_eq!(body["rpiPxRound"], Value::Bool(true));
-        assert!(!body.contains_key("speedBump"));
         assert_eq!(
             body["attachAlgoOrds"],
             json!([{"tpTriggerPx": "110", "tpOrdPx": "109"}])
@@ -657,15 +889,132 @@ mod tests {
             ("sz".to_string(), "1".to_string()),
             ("px".to_string(), "100".to_string()),
             ("outcome".to_string(), "yes".to_string()),
-            ("clOrdId".to_string(), "not-valid-for-precheck".to_string()),
-            ("stpMode".to_string(), "cancel_maker".to_string()),
         ]);
 
         let body = client()
             .order_body_from_params(&params, true)
             .expect("body");
         assert_eq!(body["outcome"], "yes");
-        assert!(!body.contains_key("clOrdId"));
-        assert!(!body.contains_key("stpMode"));
+
+        for (key, value) in [("clOrdId", "x"), ("stpMode", "cancel_maker")] {
+            let mut pairs = vec![
+                ("product_symbol".to_string(), "BTC-USDT-SWAP".to_string()),
+                ("tdMode".to_string(), "cross".to_string()),
+                ("side".to_string(), "buy".to_string()),
+                ("ordType".to_string(), "limit".to_string()),
+                ("sz".to_string(), "1".to_string()),
+            ];
+            pairs.push((key.to_string(), value.to_string()));
+            let error = client()
+                .order_body_from_params(&OkxParams::from_pairs(pairs), true)
+                .expect_err("place-only field must be rejected by precheck");
+            assert!(error.to_string().contains(key), "{error}");
+        }
+    }
+
+    #[test]
+    pub(in crate::exchanges::okx) fn place_order_rejects_undocumented_keys_and_enums() {
+        let base = || {
+            vec![
+                ("product_symbol".to_string(), "BTC-USDT-SWAP".to_string()),
+                ("tdMode".to_string(), "cross".to_string()),
+                ("side".to_string(), "buy".to_string()),
+                ("ordType".to_string(), "limit".to_string()),
+                ("sz".to_string(), "1".to_string()),
+                ("px".to_string(), "100".to_string()),
+            ]
+        };
+        let mut valid = base();
+        valid.push(("clOrdId".to_string(), "abc1".to_string()));
+        valid.push(("stpMode".to_string(), "cancel_both".to_string()));
+        let body = client()
+            .order_body_from_params(&OkxParams::from_pairs(valid), false)
+            .expect("documented fields");
+        assert_eq!(body["clOrdId"], "abc1");
+        assert_eq!(body["stpMode"], "cancel_both");
+        for ord_type in [
+            "market",
+            "post_only",
+            "fok",
+            "ioc",
+            "optimal_limit_ioc",
+            "mmp",
+            "mmp_and_post_only",
+            "rpi",
+        ] {
+            let mut pairs = base();
+            pairs[3].1 = ord_type.to_string();
+            client()
+                .order_body_from_params(&OkxParams::from_pairs(pairs), false)
+                .expect("documented ordType");
+        }
+        for (key, value) in [
+            ("speedBump", "1"),
+            ("timeInForce", "GTC"),
+            ("ordType", "LIMIT"),
+            ("ordType", "gtd"),
+            ("tdMode", "margin"),
+            ("stpMode", "none"),
+            ("reduceOnly", "yes"),
+        ] {
+            let mut pairs: Vec<_> = base().into_iter().filter(|(k, _)| k != key).collect();
+            pairs.push((key.to_string(), value.to_string()));
+            assert!(
+                client()
+                    .order_body_from_params(&OkxParams::from_pairs(pairs), false)
+                    .is_err(),
+                "{key}={value} must be rejected"
+            );
+        }
+    }
+
+    #[test]
+    pub(in crate::exchanges::okx) fn batch_orders_are_validated_per_element() {
+        let valid = json!([
+            {"instId": "BTC-USDT", "tdMode": "cash", "side": "buy", "ordType": "post_only",
+             "sz": "1", "px": "100", "clOrdId": "a1", "stpMode": "cancel_maker",
+             "reduceOnly": false, "speedBump": "1",
+             "attachAlgoOrds": [{"tpTriggerPx": "110", "tpOrdPx": "-1"}]}
+        ]);
+        validate_batch_orders(&valid).expect("documented batch element");
+        for bad in [
+            json!([{"instId": "BTC-USDT", "ordType": "limit", "timeInForce": "GTC"}]),
+            json!([{"instId": "BTC-USDT", "ordType": "gtc"}]),
+            json!([{"instId": "BTC-USDT", "tdMode": "margin"}]),
+            json!([{"instId": "BTC-USDT", "reduceOnly": "yes"}]),
+            json!([{"instId": "BTC-USDT", "ordType": "limit"}, {"product_symbol": "x"}]),
+            json!(["not-an-object"]),
+        ] {
+            assert!(validate_batch_orders(&bad).is_err(), "{bad}");
+        }
+    }
+
+    #[tokio::test]
+    pub(in crate::exchanges::okx) async fn amend_rejects_undocumented_keys_before_network() {
+        for (key, value) in [("newOrdType", "limit"), ("cxlOnFail", "yes")] {
+            let params = OkxParams::from_pairs(vec![
+                ("product_symbol".to_string(), "BTC-USDT-SWAP".to_string()),
+                ("ordId".to_string(), "1".to_string()),
+                ("newSz".to_string(), "2".to_string()),
+                (key.to_string(), value.to_string()),
+            ]);
+            let error = client()
+                .amend_order_from_params(&params)
+                .await
+                .expect_err("must fail before network");
+            assert!(error.to_string().contains(key), "{error}");
+        }
+    }
+
+    #[test]
+    pub(in crate::exchanges::okx) fn convenience_order_rejects_conflicting_ord_type() {
+        let params = OkxParams::from_pairs(vec![
+            ("product_symbol".to_string(), "BTC-USDT-SWAP".to_string()),
+            ("ordType".to_string(), "ioc".to_string()),
+        ]);
+        let error = forced_order_params(&params, &[("ordType", "post_only")])
+            .err()
+            .expect("conflict");
+        assert!(error.to_string().contains("conflicting"));
     }
 }

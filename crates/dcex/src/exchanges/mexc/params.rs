@@ -38,14 +38,20 @@ impl MexcParams {
         keys: &[&str],
         number_keys: &[&str],
         bool_keys: &[&str],
-    ) -> Map<String, Value> {
+    ) -> Result<Map<String, Value>> {
         keys.iter()
             .filter_map(|key| {
                 self.get(key).map(|value| {
-                    (
-                        (*key).to_string(),
-                        body_value(value, number_keys.contains(key), bool_keys.contains(key)),
-                    )
+                    let value =
+                        body_value(value, number_keys.contains(key), bool_keys.contains(key));
+                    if bool_keys.contains(key) && !value.is_boolean() {
+                        // Never forward a boolean field as a JSON string the exchange may
+                        // misread; reject it before any request.
+                        return Err(DcexError::InvalidInput(format!(
+                            "MEXC parameter {key} must be a boolean (true or false)"
+                        )));
+                    }
+                    Ok(((*key).to_string(), value))
                 })
             })
             .collect()
@@ -192,6 +198,25 @@ pub(in crate::exchanges::mexc) fn invalid(message: impl std::fmt::Display) -> cr
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn boolean_body_fields_reject_non_booleans() {
+        let params = |value: &str| {
+            MexcParams::from_pairs(vec![("reduceOnly".to_string(), value.to_string())])
+        };
+        let body = params("true")
+            .body(&["reduceOnly"], &[], &["reduceOnly"])
+            .expect("bool");
+        assert_eq!(body["reduceOnly"], Value::Bool(true));
+        for invalid in ["yes", "2", ""] {
+            assert!(
+                params(invalid)
+                    .body(&["reduceOnly"], &[], &["reduceOnly"])
+                    .is_err(),
+                "{invalid}"
+            );
+        }
+    }
 
     #[test]
     fn requires_one_cancel_identifier() {

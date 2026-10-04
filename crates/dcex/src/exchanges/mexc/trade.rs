@@ -379,14 +379,14 @@ impl MexcClient {
                 for key in ["orderId", "price", "vol"] {
                     params.required(key)?;
                 }
-                let body = params.body(&["orderId", "price", "vol"], &["orderId"], &[]);
+                let body = params.body(&["orderId", "price", "vol"], &["orderId"], &[])?;
                 self.contract_post_json(CONTRACT_CHANGE_LIMIT_ORDER, Value::Object(body))
                     .await
             }
             "chase_contract_limit_order" => {
                 params.ensure_allowed(&["orderId"])?;
                 params.required("orderId")?;
-                let body = params.body(&["orderId"], &["orderId"], &[]);
+                let body = params.body(&["orderId"], &["orderId"], &[])?;
                 self.contract_post_json(CONTRACT_CHASE_LIMIT_ORDER, Value::Object(body))
                     .await
             }
@@ -399,7 +399,7 @@ impl MexcClient {
                 params.ensure_allowed(&["product_symbol", "symbol", "positionId", "vol"])?;
                 params.required("positionId")?;
                 params.required("vol")?;
-                let mut body = params.body(&["positionId", "vol"], &["positionId"], &[]);
+                let mut body = params.body(&["positionId", "vol"], &["positionId"], &[])?;
                 self.insert_required_product_symbol(&mut body, params, "_")?;
                 self.contract_post_json(CONTRACT_REVERSE_POSITION, Value::Object(body))
                     .await
@@ -459,7 +459,7 @@ impl MexcClient {
                         "positionMode",
                     ],
                     &["reduceOnly"],
-                );
+                )?;
                 self.insert_required_product_symbol(&mut body, params, "_")?;
                 self.contract_post_json(CONTRACT_TRACK_PLACE, Value::Object(body))
                     .await
@@ -467,7 +467,7 @@ impl MexcClient {
             "cancel_contract_trailing_order" => {
                 params.ensure_allowed(&["product_symbol", "symbol", "trackOrderId"])?;
                 require_one_identifier(params, &["product_symbol", "symbol", "trackOrderId"])?;
-                let mut body = params.body(&["trackOrderId"], &["trackOrderId"], &[]);
+                let mut body = params.body(&["trackOrderId"], &["trackOrderId"], &[])?;
                 self.insert_product_symbol(&mut body, params, "_")?;
                 self.contract_post_json(CONTRACT_TRACK_CANCEL, Value::Object(body))
                     .await
@@ -497,7 +497,7 @@ impl MexcClient {
                     ],
                     &["trackOrderId", "trend", "backType"],
                     &[],
-                );
+                )?;
                 self.insert_required_product_symbol(&mut body, params, "_")?;
                 self.contract_post_json(CONTRACT_TRACK_CHANGE, Value::Object(body))
                     .await
@@ -563,7 +563,7 @@ impl MexcClient {
                     ],
                     &["orderId", "orderType", "triggerType", "trend", "from"],
                     &[],
-                );
+                )?;
                 self.insert_required_product_symbol(&mut body, params, "_")?;
                 self.contract_post_json(CONTRACT_CHANGE_PLAN_ORDER, Value::Object(body))
                     .await
@@ -624,7 +624,7 @@ impl MexcClient {
                         "stopLossType",
                     ],
                     &[],
-                );
+                )?;
                 self.contract_post_json(CONTRACT_PLACE_POSITION_TPSL, Value::Object(body))
                     .await
             }
@@ -650,7 +650,7 @@ impl MexcClient {
             }
             "cancel_all_contract_tpsl_orders" => {
                 params.ensure_allowed(&["product_symbol", "symbol", "positionId"])?;
-                let mut body = params.body(&["positionId"], &["positionId"], &[]);
+                let mut body = params.body(&["positionId"], &["positionId"], &[])?;
                 self.insert_product_symbol(&mut body, params, "_")?;
                 self.contract_post_json(CONTRACT_CANCEL_ALL_TPSL, Value::Object(body))
                     .await
@@ -698,7 +698,7 @@ impl MexcClient {
                         "stopLossReverse",
                     ],
                     &[],
-                );
+                )?;
                 if plan {
                     self.insert_required_product_symbol(&mut body, params, "_")?;
                 }
@@ -724,7 +724,7 @@ impl MexcClient {
             }
             "cancel_contract_order_with_external_id" => {
                 params.ensure_allowed(&["product_symbol", "symbol", "externalOid"])?;
-                let mut body = params.body(&["externalOid"], &[], &[]);
+                let mut body = params.body(&["externalOid"], &[], &[])?;
                 params.required("externalOid")?;
                 self.insert_required_product_symbol(&mut body, params, "_")?;
                 self.contract_post_json(
@@ -934,7 +934,7 @@ impl MexcClient {
                         "profitTrend",
                     ],
                     &["reduceOnly"],
-                );
+                )?;
                 for key in [
                     "vol",
                     "leverage",
@@ -1110,6 +1110,15 @@ impl MexcClient {
         for key in ["openType", "vol"] {
             params.required(key)?;
         }
+        for (key, forced) in [("side", side_override), ("type", type_override)] {
+            if let (Some(forced), Some(given)) = (forced, params.get(key))
+                && given != forced.to_string()
+            {
+                return Err(DcexError::InvalidInput(format!(
+                    "this MEXC Contract order method sets {key}={forced}; got conflicting {key}={given}"
+                )));
+            }
+        }
         let side = side_override
             .map(|value| value.to_string())
             .or_else(|| params.get("side").map(ToString::to_string))
@@ -1153,7 +1162,7 @@ impl MexcClient {
             CONTRACT_ORDER_KEYS,
             CONTRACT_ORDER_NUMBER_KEYS,
             &["reduceOnly", "marketCeiling", "flashClose"],
-        );
+        )?;
         self.insert_required_product_symbol(&mut body, params, "_")?;
         if let Some(side) = side_override {
             body.insert("side".to_string(), Value::Number(Number::from(side)));
@@ -1245,11 +1254,13 @@ mod tests {
             ("bboTypeNum".to_string(), "1".to_string()),
             ("stpMode".to_string(), "3".to_string()),
         ]);
-        let body = params.body(
-            CONTRACT_ORDER_KEYS,
-            CONTRACT_ORDER_NUMBER_KEYS,
-            &["reduceOnly", "marketCeiling", "flashClose"],
-        );
+        let body = params
+            .body(
+                CONTRACT_ORDER_KEYS,
+                CONTRACT_ORDER_NUMBER_KEYS,
+                &["reduceOnly", "marketCeiling", "flashClose"],
+            )
+            .expect("body");
         assert_eq!(body.get("positionId"), Some(&Value::from(7)));
         assert_eq!(body.get("marketCeiling"), Some(&Value::Bool(true)));
         assert!(body.contains_key("lossTrend"));

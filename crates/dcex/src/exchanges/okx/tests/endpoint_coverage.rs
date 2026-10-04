@@ -3137,9 +3137,8 @@ async fn trading_validations_fail_before_network() {
 }
 
 #[tokio::test]
-async fn market_buy_helper_forces_side_and_type_over_caller_values() {
-    let (base_url, handle) = server();
-    client(base_url)
+async fn market_buy_helper_rejects_conflicting_caller_values_before_request() {
+    let error = client("http://127.0.0.1:9".to_string())
         .private_request(
             "place_market_buy_order",
             owned(&[
@@ -3147,6 +3146,20 @@ async fn market_buy_helper_forces_side_and_type_over_caller_values() {
                 ("tdMode", "cash"),
                 ("side", "sell"),
                 ("ordType", "limit"),
+                ("sz", "1"),
+            ]),
+        )
+        .await
+        .expect_err("conflicting side/ordType must not be silently replaced");
+    assert!(error.to_string().contains("conflicting"), "{error}");
+
+    let (base_url, handle) = server();
+    client(base_url)
+        .private_request(
+            "place_market_buy_order",
+            owned(&[
+                ("product_symbol", "BTC-USDT-SPOT"),
+                ("tdMode", "cash"),
                 ("sz", "1"),
             ]),
         )

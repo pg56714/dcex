@@ -186,7 +186,7 @@ CASES = [
         "GET",
         "/sapi/v1/dci/product/list",
         {"optionType": "CALL", "exercisedCoin": "example", "investCoin": "example"},
-        False,
+        True,
         False,
     ),
     (

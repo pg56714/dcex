@@ -299,6 +299,15 @@ fn validate_signing_params(params: &ExtendedParams) -> Result<()> {
             "unsupported Extended time_in_force: {time_in_force}"
         )));
     }
+    if params.first(&["time_in_force", "timeInForce"]) == Some("IOC")
+        && params
+            .first(&["post_only", "postOnly"])
+            .is_some_and(|value| value.eq_ignore_ascii_case("true"))
+    {
+        return Err(DcexError::InvalidInput(
+            "Extended post-only orders cannot use IOC time in force".to_string(),
+        ));
+    }
     for key in ["expiry_epoch_millis", "expiryEpochMillis", "expire_time_ms"] {
         params.optional_u64_range(key, 1, u64::MAX)?;
     }
@@ -384,6 +393,11 @@ fn validate_order_body(body: &Value, domain: StarknetDomain) -> Result<()> {
     )?;
     let reduce_only = json_bool(body, "reduceOnly")?.unwrap_or(false);
     let post_only = json_bool(body, "postOnly")?.unwrap_or(false);
+    if post_only && json_string(body, "timeInForce", true)? == Some("IOC") {
+        return Err(DcexError::InvalidInput(
+            "Extended post-only orders cannot use IOC time in force".to_string(),
+        ));
+    }
     let price = json_decimal(body, "price", order_type != "TPSL")?;
     if let Some(price) = price {
         if order_type == "TPSL" {

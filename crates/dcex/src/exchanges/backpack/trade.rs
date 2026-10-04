@@ -368,6 +368,15 @@ impl BackpackClient {
             params.optional_bool(key)?;
         }
         params.optional_one_of("timeInForce", &["GTC", "IOC", "FOK"])?;
+        // POST /api/v1/order documents reduceOnly as "Futures only".
+        if params.bool("reduceOnly") == Some(true)
+            && self.is_spot_symbol(params.required_any(&["product_symbol", "symbol"])?)?
+        {
+            return Err(DcexError::InvalidInput(
+                "Backpack reduceOnly is futures-only and cannot be used on spot markets"
+                    .to_string(),
+            ));
+        }
         params.optional_one_of(
             "selfTradePrevention",
             &["RejectTaker", "RejectMaker", "RejectBoth"],
@@ -411,6 +420,11 @@ impl BackpackClient {
             insert_required_string(&mut body, "orderType", order_type);
         }
         Ok(body)
+    }
+
+    /// Spot markets are `BASE_QUOTE`; perps/RFQ carry a suffix (`_PERP`, `_RFQ`).
+    pub(in crate::exchanges::backpack) fn is_spot_symbol(&self, symbol: &str) -> Result<bool> {
+        Ok(self.exchange_symbol(symbol)?.split('_').count() == 2)
     }
 
     pub(in crate::exchanges::backpack) fn ensure_order_lookup(
@@ -511,6 +525,26 @@ mod tests {
                 .validate_order_params(&market_with_true_post_only, Some("Market"))
                 .is_err()
         );
+
+        let spot_reduce_only = BackpackParams::from_pairs(vec![
+            ("product_symbol".to_string(), "BTC-USDC-SPOT".to_string()),
+            ("side".to_string(), "Ask".to_string()),
+            ("quantity".to_string(), "1".to_string()),
+            ("reduceOnly".to_string(), "true".to_string()),
+        ]);
+        let error = client
+            .validate_order_params(&spot_reduce_only, Some("Market"))
+            .expect_err("reduceOnly is futures-only");
+        assert!(error.to_string().contains("futures-only"));
+        let perp_reduce_only = BackpackParams::from_pairs(vec![
+            ("product_symbol".to_string(), "BTC-USDC-SWAP".to_string()),
+            ("side".to_string(), "Ask".to_string()),
+            ("quantity".to_string(), "1".to_string()),
+            ("reduceOnly".to_string(), "true".to_string()),
+        ]);
+        client
+            .validate_order_params(&perp_reduce_only, Some("Market"))
+            .expect("perp reduceOnly is documented");
 
         let broker_params = BackpackParams::from_pairs(vec![
             ("brokerId".to_string(), "42".to_string()),

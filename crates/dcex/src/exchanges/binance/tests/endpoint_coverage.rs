@@ -4081,7 +4081,7 @@ fn completion_account_endpoints_use_official_routes() {
             "GET",
             "/sapi/v1/copyTrading/futures/leadSymbol",
         ),
-        public(
+        private(
             "get_dual_investment_product_list",
             &[
                 ("optionType", "CALL"),

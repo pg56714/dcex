@@ -11,6 +11,31 @@ pub(in crate::exchanges::arcus) use super::signing::{legacy_signing_message, tim
 pub(in crate::exchanges::arcus) use crate::http::{HttpMethod, HttpRequest, RequestBody};
 pub(in crate::exchanges::arcus) use crate::{DcexError, Result};
 
+/// Fields the signed placeOrder payload is built from; anything else is rejected, not dropped.
+const PLACE_ORDER_KEYS: &[&str] = &[
+    "product_symbol",
+    "side",
+    "price",
+    "quantity",
+    "order_type",
+    "time_in_force",
+    "good_til_time",
+    "reduce_only",
+    "client_order_id",
+];
+/// Fields the signed modifyOrder payload is built from.
+const MODIFY_ORDER_KEYS: &[&str] = &[
+    "product_symbol",
+    "side",
+    "price",
+    "quantity",
+    "time_in_force",
+    "good_til_time",
+    "reduce_only",
+    "client_order_id",
+    "order_id",
+];
+
 impl ArcusClient {
     /// Builds a signed WebSocket trading frame using the same validation and signing as REST.
     /// May fetch market metadata, but never submits the trading request.
@@ -51,6 +76,20 @@ impl ArcusClient {
             return Err(DcexError::InvalidInput(
                 "Arcus TP/SL orders require batch_place_orders and its grouping field".into(),
             ));
+        }
+        let allowed: &[&str] = match method_name {
+            "place_order" => PLACE_ORDER_KEYS,
+            "modify_order" => MODIFY_ORDER_KEYS,
+            _ => &[],
+        };
+        if !allowed.is_empty()
+            && let Some((key, _)) = params
+                .iter()
+                .find(|(key, _)| !allowed.contains(&key.as_str()))
+        {
+            return Err(DcexError::InvalidInput(format!(
+                "unsupported Arcus {method_name} parameter: {key}"
+            )));
         }
         if matches!(
             method_name,

@@ -14,6 +14,10 @@ impl BybitParams {
         Self(pairs)
     }
 
+    pub(super) fn pairs(&self) -> &[(String, String)] {
+        &self.0
+    }
+
     pub(super) fn get(&self, key: &str) -> Option<&str> {
         self.0
             .iter()

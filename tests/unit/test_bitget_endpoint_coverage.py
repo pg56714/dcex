@@ -203,6 +203,18 @@ VALUES: dict[str, Any] = {
 # Optional parameters that the documented endpoint requires.
 EXTRA: dict[str, dict[str, Any]] = {
     "get_uta_order": {"orderId": "1"},
+    "place_uta_batch_orders": {
+        "order_list": [
+            {
+                "category": "SPOT",
+                "symbol": "BTCUSDT",
+                "side": "buy",
+                "orderType": "limit",
+                "qty": "1",
+                "price": "1",
+            }
+        ]
+    },
     "cancel_uta_order": {"orderId": "1"},
     "cancel_reality_order": {"orderId": "1"},
     "cancel_uta_strategy_order": {"orderId": "1"},

@@ -17,7 +17,7 @@ mod trade_requests {
         ) -> Result<ValidatedResponse> {
             {
                 let orders = params.json_required("orders")?;
-                validate_batch_order_slippage(&orders)?;
+                validate_batch_orders(&orders)?;
                 self.post_request(TRADE_BATCH_ORDERS, orders).await
             }
         }

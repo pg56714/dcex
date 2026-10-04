@@ -308,6 +308,11 @@ impl KrakenClient {
         ordertype: Option<&str>,
         oflags: Option<&str>,
     ) -> Result<ValidatedResponse> {
+        params.ensure_allowed(SPOT_ORDER_KEYS)?;
+        reject_override_conflict(params, "side", side)?;
+        reject_override_conflict(params, "ordertype", ordertype)?;
+        validate_optional_bool(params, "reduce_only")?;
+        validate_optional_bool(params, "validate")?;
         if params.get("userref").is_some() && params.get("cl_ord_id").is_some() {
             return Err(crate::DcexError::InvalidInput(
                 "userref and cl_ord_id are mutually exclusive.".to_string(),
@@ -398,7 +403,8 @@ impl KrakenClient {
         push_optional(&mut query, "price2", params.get("price2"));
         push_optional(&mut query, "displayvol", params.get("displayvol"));
         push_optional(&mut query, "leverage", params.get("leverage"));
-        push_optional(&mut query, "oflags", params.get("oflags").or(oflags));
+        let merged_oflags = merge_oflags(params.get("oflags"), oflags);
+        push_optional(&mut query, "oflags", merged_oflags.as_deref());
         push_optional(&mut query, "timeinforce", params.get("timeinforce"));
         push_optional(&mut query, "expiretm", params.get("expiretm"));
         push_optional(&mut query, "starttm", params.get("starttm"));
@@ -436,6 +442,19 @@ impl KrakenClient {
         order_type: Option<&str>,
         limit_price_alias: Option<&str>,
     ) -> Result<ValidatedResponse> {
+        let mut allowed = FUTURES_ORDER_KEYS.to_vec();
+        if let Some(alias) = limit_price_alias {
+            allowed.push(alias);
+            if params.get("limitPrice").is_some() && params.get(alias).is_some() {
+                return Err(crate::DcexError::InvalidInput(format!(
+                    "pass either limitPrice or {alias}, not both."
+                )));
+            }
+        }
+        params.ensure_allowed(&allowed)?;
+        reject_override_conflict(params, "side", side)?;
+        reject_override_conflict(params, "orderType", order_type)?;
+        validate_optional_bool(params, "reduceOnly")?;
         let mut query = Vec::new();
         self.push_required_product_symbol(&mut query, params, "symbol", "PF_")?;
         push_required_or_override(&mut query, "side", side, params, "side")?;
@@ -578,6 +597,90 @@ impl KrakenClient {
     }
 }
 
+/// Documented AddOrder fields: <https://docs.kraken.com/api/docs/rest-api/add-order>.
+const SPOT_ORDER_KEYS: &[&str] = &[
+    "product_symbol",
+    "side",
+    "ordertype",
+    "volume",
+    "price",
+    "price2",
+    "displayvol",
+    "leverage",
+    "oflags",
+    "timeinforce",
+    "expiretm",
+    "starttm",
+    "asset_class",
+    "trigger",
+    "stptype",
+    "reduce_only",
+    "userref",
+    "cl_ord_id",
+    "validate",
+    "deadline",
+    "broker",
+    "close[ordertype]",
+    "close[price]",
+    "close[price2]",
+];
+
+/// Documented sendorder fields:
+/// <https://docs.kraken.com/api/docs/futures-api/trading/send-order>.
+const FUTURES_ORDER_KEYS: &[&str] = &[
+    "product_symbol",
+    "side",
+    "orderType",
+    "size",
+    "limitPrice",
+    "stopPrice",
+    "cliOrdId",
+    "triggerSignal",
+    "reduceOnly",
+    "processBefore",
+    "trailingStopMaxDeviation",
+    "trailingStopDeviationUnit",
+    "limitPriceOffsetValue",
+    "limitPriceOffsetUnit",
+    "broker",
+];
+
+/// A convenience method's fixed side/type must not silently replace a different caller value.
+fn reject_override_conflict(
+    params: &KrakenParams,
+    key: &str,
+    override_value: Option<&str>,
+) -> Result<()> {
+    if let (Some(forced), Some(given)) = (override_value, params.get(key))
+        && forced != given
+    {
+        return Err(crate::DcexError::InvalidInput(format!(
+            "this Kraken order method sets {key}={forced}; got conflicting {key}={given}"
+        )));
+    }
+    Ok(())
+}
+
+fn validate_optional_bool(params: &KrakenParams, key: &str) -> Result<()> {
+    match params.get(key) {
+        Some("true" | "false") | None => Ok(()),
+        Some(value) => Err(crate::DcexError::InvalidInput(format!(
+            "Kraken {key} must be true or false, got {value}"
+        ))),
+    }
+}
+
+/// Post-only helpers add `post` to caller flags instead of letting caller flags drop it.
+fn merge_oflags(caller: Option<&str>, forced: Option<&str>) -> Option<String> {
+    match (caller, forced) {
+        (Some(caller), Some(forced)) if caller.split(',').any(|flag| flag.trim() == forced) => {
+            Some(caller.to_string())
+        }
+        (Some(caller), Some(forced)) => Some(format!("{caller},{forced}")),
+        (caller, forced) => caller.or(forced).map(str::to_string),
+    }
+}
+
 fn push_required_or_override(
     query: &mut Vec<(String, String)>,
     key: &str,
@@ -636,6 +739,39 @@ mod tests {
             .expect("override should be enough");
 
         assert_eq!(query, vec![("side".to_string(), "buy".to_string())]);
+    }
+
+    #[test]
+    fn order_guards_reject_conflicts_non_bools_and_keep_post_flag() {
+        let params = |pairs: &[(&str, &str)]| {
+            KrakenParams::from_pairs(
+                pairs
+                    .iter()
+                    .map(|(k, v)| ((*k).to_string(), (*v).to_string()))
+                    .collect(),
+            )
+        };
+        assert!(
+            reject_override_conflict(&params(&[("side", "sell")]), "side", Some("buy")).is_err()
+        );
+        assert!(reject_override_conflict(&params(&[("side", "buy")]), "side", Some("buy")).is_ok());
+        assert!(validate_optional_bool(&params(&[("reduceOnly", "yes")]), "reduceOnly").is_err());
+        assert!(validate_optional_bool(&params(&[("reduceOnly", "true")]), "reduceOnly").is_ok());
+        assert_eq!(
+            merge_oflags(Some("fciq"), Some("post")).as_deref(),
+            Some("fciq,post")
+        );
+        assert_eq!(
+            merge_oflags(Some("post,fciq"), Some("post")).as_deref(),
+            Some("post,fciq")
+        );
+        assert_eq!(merge_oflags(None, Some("post")).as_deref(), Some("post"));
+        assert_eq!(merge_oflags(Some("viqc"), None).as_deref(), Some("viqc"));
+        assert!(
+            params(&[("product_symbol", "x"), ("speedBump", "1")])
+                .ensure_allowed(FUTURES_ORDER_KEYS)
+                .is_err()
+        );
     }
 
     #[test]

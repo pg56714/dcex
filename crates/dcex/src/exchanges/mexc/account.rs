@@ -273,7 +273,7 @@ impl MexcClient {
                 params.required("amount")?;
                 params.required("type")?;
                 validate_enum(params, "type", &["ADD", "SUB"])?;
-                let body = params.body(&["positionId", "amount", "type"], &["positionId"], &[]);
+                let body = params.body(&["positionId", "amount", "type"], &["positionId"], &[])?;
                 self.contract_post_json(CONTRACT_CHANGE_MARGIN, Value::Object(body))
                     .await
             }
@@ -286,7 +286,7 @@ impl MexcClient {
                     &["positionId", "isEnabled"],
                     &["positionId"],
                     &["isEnabled"],
-                );
+                )?;
                 self.contract_post_json(CONTRACT_CHANGE_AUTO_ADD_MARGIN, Value::Object(body))
                     .await
             }
@@ -336,7 +336,7 @@ impl MexcClient {
                         "leverageMode",
                     ],
                     &["marginSelected", "leverageSelected"],
-                );
+                )?;
                 self.insert_product_symbol(&mut body, params, "_")?;
                 self.contract_post_json(CONTRACT_CHANGE_LEVERAGE, Value::Object(body))
                     .await

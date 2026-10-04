@@ -64,9 +64,35 @@ fn normalizes_listed_option_symbols_across_exchanges() {
 }
 
 #[test]
+fn bybit_single_digit_day_option_matches_two_digit_canonical_form() {
+    let market = |symbol: &str| {
+        serde_json::json!({
+            "symbol": symbol,
+            "baseCoin": "BTC",
+            "quoteCoin": "USDT",
+            "priceFilter": {"tickSize": "5"},
+            "lotSizeFilter": {"qtyStep": "0.01", "minOrderQty": "0.01"},
+        })
+    };
+    let single = bybit_option_market_info(&market("BTC-9OCT26-82500-P-USDT")).expect("1-digit day");
+    assert_eq!(single.exchange_symbol, "BTC-9OCT26-82500-P-USDT");
+    assert_eq!(single.product_symbol, "BTC-USDT-261009-82500-P-OPTION");
+    let double =
+        bybit_option_market_info(&market("BTC-19OCT26-82500-P-USDT")).expect("2-digit day");
+    assert_eq!(double.product_symbol, "BTC-USDT-261019-82500-P-OPTION");
+    assert_ne!(single.product_symbol, double.product_symbol);
+}
+
+#[test]
 fn rejects_malformed_option_symbols() {
     assert_eq!(bybit_option_expiry("25JUN27").as_deref(), Some("270625"));
     assert!(bybit_option_expiry("32JUN27").is_none());
+    // Bybit omits the leading zero for single-digit days (e.g. BTC-6NOV26-110000-P-USDT).
+    assert_eq!(bybit_option_expiry("9OCT26").as_deref(), Some("261009"));
+    assert_eq!(bybit_option_expiry("6NOV26").as_deref(), Some("261106"));
+    for malformed in ["0OCT26", "09OCT26", "XOCT26", "9OCT2", "9XXX26", "100OCT26"] {
+        assert!(bybit_option_expiry(malformed).is_none(), "{malformed}");
+    }
     assert!(option_product_symbol("BTC", "USDT", "260925", "0", "C").is_none());
     assert!(option_product_symbol("BTC", "USDT", "260925", "145000", "X").is_none());
     assert_eq!(

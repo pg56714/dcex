@@ -623,6 +623,29 @@ fn unsafe_orders_are_rejected_before_any_state_changing_request() {
             ("quantity", "0.001"),
         ]),
     );
+    // Undocumented keys are rejected instead of being silently dropped from the signed body.
+    for (name, key) in [
+        ("place_order", "post_only"),
+        ("place_order", "stp_mode"),
+        ("modify_order", "order_type"),
+    ] {
+        let mut params = pairs(&[
+            ("product_symbol", "BTC-USD"),
+            ("side", "BUY"),
+            ("price", "100"),
+            ("quantity", "0.01"),
+            (key, "true"),
+        ]);
+        if name == "modify_order" {
+            params.extend(pairs(&[
+                ("order_id", "1"),
+                ("time_in_force", "GTT"),
+                ("reduce_only", "false"),
+                ("good_til_time", "99999999999999999"),
+            ]));
+        }
+        assert_rejected_offline(Kind::Private, name, params);
+    }
     // Modify must identify exactly one order.
     assert_rejected_offline(
         Kind::Private,

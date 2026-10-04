@@ -10,6 +10,172 @@ pub(in crate::exchanges::bybit) use crate::Result;
 pub(in crate::exchanges::bybit) use crate::common::OrderSide;
 pub(in crate::exchanges::bybit) use crate::exchange::ValidatedResponse;
 
+/// Documented `/v5/order/create` body keys: <https://bybit-exchange.github.io/docs/v5/order/create-order>.
+const ORDER_STRING_KEYS: [&str; 21] = [
+    "price",
+    "marketUnit",
+    "slippageToleranceType",
+    "slippageTolerance",
+    "orderFilter",
+    "triggerPrice",
+    "triggerBy",
+    "orderIv",
+    "timeInForce",
+    "takeProfit",
+    "stopLoss",
+    "tpTriggerBy",
+    "slTriggerBy",
+    "tpslMode",
+    "tpLimitPrice",
+    "slLimitPrice",
+    "tpOrderType",
+    "slOrderType",
+    "orderLinkId",
+    "smpType",
+    "bboSideType",
+];
+const ORDER_INT_KEYS: [&str; 4] = ["isLeverage", "triggerDirection", "positionIdx", "bboLevel"];
+const ORDER_BOOL_KEYS: [&str; 4] = ["rpiTakerAccess", "reduceOnly", "closeOnTrigger", "mmp"];
+
+/// Rejects undocumented keys and enum values before any request, so nothing is silently
+/// dropped. Enums: <https://bybit-exchange.github.io/docs/v5/enum>.
+pub(in crate::exchanges::bybit) fn validate_order_params(params: &BybitParams) -> Result<()> {
+    validate_order_fields(params, &["product_symbol", "category"])
+}
+
+fn validate_order_fields(params: &BybitParams, extra_keys: &[&str]) -> Result<()> {
+    for (key, _) in params.pairs() {
+        let key = key.as_str();
+        let known = matches!(key, "side" | "orderType" | "qty")
+            || extra_keys.contains(&key)
+            || ORDER_STRING_KEYS.contains(&key)
+            || ORDER_INT_KEYS.contains(&key)
+            || ORDER_BOOL_KEYS.contains(&key);
+        if !known {
+            return Err(crate::DcexError::InvalidInput(format!(
+                "unsupported Bybit order parameter: {key}"
+            )));
+        }
+    }
+    for (key, allowed) in [
+        ("orderType", &["Market", "Limit"][..]),
+        ("timeInForce", &["GTC", "IOC", "FOK", "PostOnly", "RPI"][..]),
+        (
+            "smpType",
+            &["None", "CancelMaker", "CancelTaker", "CancelBoth"][..],
+        ),
+    ] {
+        if let Some(value) = params.get(key)
+            && !allowed.contains(&value)
+        {
+            return Err(crate::DcexError::InvalidInput(format!(
+                "invalid Bybit {key}: {value}; expected one of {}",
+                allowed.join(", ")
+            )));
+        }
+    }
+    Ok(())
+}
+
+/// Applies a convenience method's fixed fields, rejecting a conflicting caller value
+/// instead of silently replacing it.
+fn forced_order_params(params: &BybitParams, forced: &[(&str, &str)]) -> Result<BybitParams> {
+    let keys: Vec<&str> = forced.iter().map(|(key, _)| *key).collect();
+    for (key, value) in forced {
+        // Side is accepted case-insensitively (OrderSide::parse); other fields are exact.
+        if let Some(existing) = params.get(key)
+            && !(existing == *value || *key == "side" && existing.eq_ignore_ascii_case(value))
+        {
+            return Err(crate::DcexError::InvalidInput(format!(
+                "this Bybit order method sets {key}={value}; got conflicting {key}={existing}"
+            )));
+        }
+    }
+    let mut pairs = params.without(&keys);
+    pairs.extend(
+        forced
+            .iter()
+            .map(|(key, value)| ((*key).to_string(), (*value).to_string())),
+    );
+    Ok(BybitParams::from_pairs(pairs))
+}
+
+/// Documented `/v5/order/amend` fields: <https://bybit-exchange.github.io/docs/v5/order/amend-order>.
+const AMEND_ORDER_KEYS: &[&str] = &[
+    "orderId",
+    "orderLinkId",
+    "orderIv",
+    "triggerPrice",
+    "qty",
+    "price",
+    "tpslMode",
+    "takeProfit",
+    "stopLoss",
+    "tpTriggerBy",
+    "slTriggerBy",
+    "triggerBy",
+    "tpLimitPrice",
+    "slLimitPrice",
+];
+
+fn ensure_amend_keys(params: &BybitParams, extra_keys: &[&str]) -> Result<()> {
+    for (key, _) in params.pairs() {
+        if !(AMEND_ORDER_KEYS.contains(&key.as_str()) || extra_keys.contains(&key.as_str())) {
+            return Err(crate::DcexError::InvalidInput(format!(
+                "unsupported Bybit amend parameter: {key}"
+            )));
+        }
+    }
+    Ok(())
+}
+
+/// Validates every create-batch / amend-batch element like the single-order path, so an
+/// unsupported field rejects the whole batch before any request.
+/// <https://bybit-exchange.github.io/docs/v5/order/batch-place>,
+/// <https://bybit-exchange.github.io/docs/v5/order/batch-amend>.
+pub(in crate::exchanges::bybit) fn validate_batch_request(
+    request: &Value,
+    amend: bool,
+) -> Result<()> {
+    let items = request.as_array().ok_or_else(|| {
+        crate::DcexError::InvalidInput("Bybit batch request must be a JSON array".to_string())
+    })?;
+    for item in items {
+        let object = item.as_object().ok_or_else(|| {
+            crate::DcexError::InvalidInput("each Bybit batch item must be a JSON object".into())
+        })?;
+        let params = BybitParams::from_pairs(
+            object
+                .iter()
+                .map(|(key, value)| {
+                    let value = match value {
+                        Value::String(text) => text.clone(),
+                        other => other.to_string(),
+                    };
+                    (key.clone(), value)
+                })
+                .collect(),
+        );
+        params.required("symbol")?;
+        if amend {
+            ensure_amend_keys(&params, &["symbol"])?;
+            require_one_identifier(&params, &["orderId", "orderLinkId"])?;
+        } else {
+            validate_order_fields(&params, &["symbol"])?;
+            for key in ORDER_BOOL_KEYS {
+                if let Some(value) = params.get(key)
+                    && !matches!(value, "true" | "false")
+                {
+                    return Err(crate::DcexError::InvalidInput(format!(
+                        "invalid boolean parameter {key}: {value}"
+                    )));
+                }
+            }
+        }
+    }
+    Ok(())
+}
+
 impl BybitClient {
     pub(super) async fn trade_private_request(
         &self,
@@ -29,67 +195,75 @@ impl BybitClient {
                 self.post_request(DISCONNECTED_CANCEL_ALL, body).await
             }
             "place_market_order" => {
-                let mut pairs = params.without(&["orderType"]);
-                pairs.push(("orderType".to_string(), "Market".to_string()));
-                self.place_order_from_params(&BybitParams::from_pairs(pairs))
-                    .await
+                self.place_order_from_params(&forced_order_params(
+                    params,
+                    &[("orderType", "Market")],
+                )?)
+                .await
             }
             "place_market_buy_order" => {
-                let mut pairs = params.without(&["side", "orderType"]);
-                pairs.push(("side".to_string(), "Buy".to_string()));
-                pairs.push(("orderType".to_string(), "Market".to_string()));
-                self.place_order_from_params(&BybitParams::from_pairs(pairs))
-                    .await
+                self.place_order_from_params(&forced_order_params(
+                    params,
+                    &[("side", "Buy"), ("orderType", "Market")],
+                )?)
+                .await
             }
             "place_market_sell_order" => {
-                let mut pairs = params.without(&["side", "orderType"]);
-                pairs.push(("side".to_string(), "Sell".to_string()));
-                pairs.push(("orderType".to_string(), "Market".to_string()));
-                self.place_order_from_params(&BybitParams::from_pairs(pairs))
-                    .await
+                self.place_order_from_params(&forced_order_params(
+                    params,
+                    &[("side", "Sell"), ("orderType", "Market")],
+                )?)
+                .await
             }
             "place_limit_order" => {
-                let mut pairs = params.without(&["orderType"]);
-                pairs.push(("orderType".to_string(), "Limit".to_string()));
-                self.place_order_from_params(&BybitParams::from_pairs(pairs))
-                    .await
+                self.place_order_from_params(&forced_order_params(
+                    params,
+                    &[("orderType", "Limit")],
+                )?)
+                .await
             }
             "place_limit_buy_order" => {
-                let mut pairs = params.without(&["side", "orderType"]);
-                pairs.push(("side".to_string(), "Buy".to_string()));
-                pairs.push(("orderType".to_string(), "Limit".to_string()));
-                self.place_order_from_params(&BybitParams::from_pairs(pairs))
-                    .await
+                self.place_order_from_params(&forced_order_params(
+                    params,
+                    &[("side", "Buy"), ("orderType", "Limit")],
+                )?)
+                .await
             }
             "place_limit_sell_order" => {
-                let mut pairs = params.without(&["side", "orderType"]);
-                pairs.push(("side".to_string(), "Sell".to_string()));
-                pairs.push(("orderType".to_string(), "Limit".to_string()));
-                self.place_order_from_params(&BybitParams::from_pairs(pairs))
-                    .await
+                self.place_order_from_params(&forced_order_params(
+                    params,
+                    &[("side", "Sell"), ("orderType", "Limit")],
+                )?)
+                .await
             }
             "place_post_only_limit_order" => {
-                let mut pairs = params.without(&["orderType", "timeInForce"]);
-                pairs.push(("orderType".to_string(), "Limit".to_string()));
-                pairs.push(("timeInForce".to_string(), "PostOnly".to_string()));
-                self.place_order_from_params(&BybitParams::from_pairs(pairs))
-                    .await
+                self.place_order_from_params(&forced_order_params(
+                    params,
+                    &[("orderType", "Limit"), ("timeInForce", "PostOnly")],
+                )?)
+                .await
             }
             "place_post_only_limit_buy_order" => {
-                let mut pairs = params.without(&["side", "orderType", "timeInForce"]);
-                pairs.push(("side".to_string(), "Buy".to_string()));
-                pairs.push(("orderType".to_string(), "Limit".to_string()));
-                pairs.push(("timeInForce".to_string(), "PostOnly".to_string()));
-                self.place_order_from_params(&BybitParams::from_pairs(pairs))
-                    .await
+                self.place_order_from_params(&forced_order_params(
+                    params,
+                    &[
+                        ("side", "Buy"),
+                        ("orderType", "Limit"),
+                        ("timeInForce", "PostOnly"),
+                    ],
+                )?)
+                .await
             }
             "place_post_only_limit_sell_order" => {
-                let mut pairs = params.without(&["side", "orderType", "timeInForce"]);
-                pairs.push(("side".to_string(), "Sell".to_string()));
-                pairs.push(("orderType".to_string(), "Limit".to_string()));
-                pairs.push(("timeInForce".to_string(), "PostOnly".to_string()));
-                self.place_order_from_params(&BybitParams::from_pairs(pairs))
-                    .await
+                self.place_order_from_params(&forced_order_params(
+                    params,
+                    &[
+                        ("side", "Sell"),
+                        ("orderType", "Limit"),
+                        ("timeInForce", "PostOnly"),
+                    ],
+                )?)
+                .await
             }
             "amend_order" => self.amend_order_from_params(params).await,
             "cancel_order" => self.cancel_order_from_params(params).await,
@@ -302,6 +476,7 @@ impl BybitClient {
         &self,
         params: &BybitParams,
     ) -> Result<Map<String, Value>> {
+        validate_order_params(params)?;
         let product_symbol = params.required("product_symbol")?;
         let mut body = Map::new();
         self.insert_symbol_category(&mut body, product_symbol, params.get("category"))?;
@@ -321,35 +496,13 @@ impl BybitClient {
             "qty".to_string(),
             Value::String(params.required("qty")?.to_string()),
         );
-        for key in [
-            "price",
-            "marketUnit",
-            "slippageToleranceType",
-            "slippageTolerance",
-            "orderFilter",
-            "triggerPrice",
-            "triggerBy",
-            "orderIv",
-            "timeInForce",
-            "takeProfit",
-            "stopLoss",
-            "tpTriggerBy",
-            "slTriggerBy",
-            "tpslMode",
-            "tpLimitPrice",
-            "slLimitPrice",
-            "tpOrderType",
-            "slOrderType",
-            "orderLinkId",
-            "smpType",
-            "bboSideType",
-        ] {
+        for key in ORDER_STRING_KEYS {
             insert_optional_string(&mut body, key, params.get(key));
         }
-        for key in ["isLeverage", "triggerDirection", "positionIdx", "bboLevel"] {
+        for key in ORDER_INT_KEYS {
             insert_optional_i64(&mut body, key, params.get(key))?;
         }
-        for key in ["rpiTakerAccess", "reduceOnly", "closeOnTrigger", "mmp"] {
+        for key in ORDER_BOOL_KEYS {
             insert_optional_bool(&mut body, key, params.get(key))?;
         }
         Ok(body)
@@ -359,6 +512,7 @@ impl BybitClient {
         &self,
         params: &BybitParams,
     ) -> Result<ValidatedResponse> {
+        ensure_amend_keys(params, &["product_symbol", "category"])?;
         require_one_identifier(params, &["orderId", "orderLinkId"])?;
         let product_symbol = params.required("product_symbol")?;
         let mut body = Map::new();
@@ -541,6 +695,108 @@ mod tests {
 
     use super::*;
     use crate::DcexError;
+
+    fn order(items: &[(&str, &str)]) -> BybitParams {
+        let mut pairs = vec![
+            ("product_symbol".to_string(), "BTC-USDT-SWAP".to_string()),
+            ("side".to_string(), "Buy".to_string()),
+            ("orderType".to_string(), "Limit".to_string()),
+            ("qty".to_string(), "1".to_string()),
+            ("price".to_string(), "100".to_string()),
+        ];
+        for (key, value) in items {
+            pairs.retain(|(existing, _)| existing != key);
+            pairs.push(((*key).to_string(), (*value).to_string()));
+        }
+        BybitParams::from_pairs(pairs)
+    }
+
+    #[test]
+    fn order_accepts_documented_enums_and_rejects_others() {
+        for tif in ["GTC", "IOC", "FOK", "PostOnly", "RPI"] {
+            client()
+                .order_body_from_params(&order(&[("timeInForce", tif), ("smpType", "CancelBoth")]))
+                .expect("documented timeInForce");
+        }
+        for (key, value) in [
+            ("timeInForce", "GTX"),
+            ("timeInForce", "postonly"),
+            ("orderType", "LIMIT"),
+            ("smpType", "CancelAll"),
+            ("clientOrderId", "x"),
+            ("postOnly", "true"),
+        ] {
+            assert!(
+                client()
+                    .order_body_from_params(&order(&[(key, value)]))
+                    .is_err(),
+                "{key}={value}"
+            );
+        }
+    }
+
+    #[test]
+    fn batch_items_are_validated_like_single_orders() {
+        let place = serde_json::json!([
+            {"symbol": "BTCUSDT", "side": "Buy", "orderType": "Limit", "qty": "1",
+             "price": "100", "timeInForce": "PostOnly", "orderLinkId": "a", "reduceOnly": false}
+        ]);
+        validate_batch_request(&place, false).expect("documented create-batch item");
+        let amend = serde_json::json!([{"symbol": "BTCUSDT", "orderId": "1", "price": "101"}]);
+        validate_batch_request(&amend, true).expect("documented amend-batch item");
+        for (bad, is_amend) in [
+            (
+                serde_json::json!([{"symbol": "BTCUSDT", "timeInForce": "GTX"}]),
+                false,
+            ),
+            (
+                serde_json::json!([{"symbol": "BTCUSDT", "clientOrderId": "x"}]),
+                false,
+            ),
+            (
+                serde_json::json!([{"symbol": "BTCUSDT", "reduceOnly": "yes"}]),
+                false,
+            ),
+            (
+                serde_json::json!([{"symbol": "BTCUSDT", "orderId": "1", "side": "Buy"}]),
+                true,
+            ),
+            (
+                serde_json::json!([{"symbol": "BTCUSDT", "price": "1"}]),
+                true,
+            ),
+            (serde_json::json!([{"orderId": "1"}]), true),
+        ] {
+            assert!(validate_batch_request(&bad, is_amend).is_err(), "{bad}");
+        }
+    }
+
+    #[test]
+    fn amend_rejects_undocumented_keys() {
+        let params = BybitParams::from_pairs(vec![
+            ("product_symbol".to_string(), "BTC-USDT-SWAP".to_string()),
+            ("orderId".to_string(), "1".to_string()),
+            ("timeInForce".to_string(), "IOC".to_string()),
+        ]);
+        assert!(ensure_amend_keys(&params, &["product_symbol", "category"]).is_err());
+    }
+
+    #[test]
+    fn convenience_side_conflict_is_case_insensitive() {
+        let params = order(&[("side", "buy")]);
+        assert!(forced_order_params(&params, &[("side", "Buy")]).is_ok());
+        let params = order(&[("side", "sell")]);
+        assert!(forced_order_params(&params, &[("side", "Buy")]).is_err());
+    }
+
+    #[test]
+    fn convenience_methods_reject_conflicting_fixed_fields() {
+        let params = order(&[("timeInForce", "IOC")]);
+        assert!(forced_order_params(&params, &[("timeInForce", "PostOnly")]).is_err());
+        let params = order(&[("timeInForce", "PostOnly")]);
+        let forced = forced_order_params(&params, &[("timeInForce", "PostOnly")]).expect("same");
+        assert_eq!(forced.get("timeInForce"), Some("PostOnly"));
+    }
 
     pub(in crate::exchanges::bybit) fn client() -> BybitClient {
         BybitClient::public(5_000, false, Duration::from_secs(1)).expect("client")
