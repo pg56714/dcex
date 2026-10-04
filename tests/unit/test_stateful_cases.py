@@ -590,7 +590,7 @@ DEX_IOC = {
 }
 DEX_REDUCE = {
     "extended": {"reduce_only": True, "post_only": True, "time_in_force": "GTT"},
-    "ondo": {"reduceOnly": True, "postOnly": True, "timeInForce": "GTC"},
+    "ondo": {"reduceOnly": True, "postOnly": None, "timeInForce": "IOC"},
     "hyperliquid": {"reduceOnly": True, "tif": "Alo"},
     "lighter": {"reduce_only": True, "time_in_force": 2},
 }
@@ -918,7 +918,30 @@ def coded(message, code):
         ("mexc", coded('HTTP 200: {"success":false,"code":2008}', ""), False),
         ("mexc", coded("mexc: code=8917 reduce-only insufficient margin", "8917"), False),
         ("mexc", coded("mexc: code=2005 Insufficient balance", "2005"), False),
-        ("extended", coded('HTTP 400: {"error":{"code":"REDUCE_ONLY_FAILED"}}', "400"), True),
+        (
+            "extended",
+            coded(
+                'HTTP 400: {"status":"ERROR","error":{"code":1137,"message":"Position is missing for reduce-only order"}}',
+                "400",
+            ),
+            True,
+        ),
+        (
+            "bybit",
+            coded(
+                "bybit place_order: code=Unknown Bybit API Error: [110017] current position is zero",
+                "Unknown",
+            ),
+            True,
+        ),
+        (
+            "bybit",
+            coded(
+                "bybit place_order: code=Unknown Bybit API Error: [110007] insufficient balance",
+                "Unknown",
+            ),
+            False,
+        ),
         ("backpack", coded("backpack: code=4000 Reduce only order not reduced", "4000"), True),
         (
             "hyperliquid",
@@ -1183,3 +1206,104 @@ async def test_unconfirmed_sweep_still_reports_unexpected_position():
     with pytest.raises(LifecycleError, match="UNEXPECTED POSITION"):
         await run_lifecycle(adapter, result, poll_delay=0)
     assert "REJECTED CLIENT ID CLEANUP UNCONFIRMED" in result["error_message"]
+
+
+# Live-run regressions: venue kill/rejection shapes seen on mainnet --------------------
+
+
+class KilledAtPlacementMock(CaseMock):
+    def __init__(self, exchange, message):
+        super().__init__(exchange, False, "sync", "fok")
+        self.message = message
+
+    def payload(self, method, kw):
+        if method.startswith("place_"):
+            raise RuntimeError(self.message)
+        return super().payload(method, kw)
+
+
+@pytest.mark.parametrize(
+    "exchange,message,passes",
+    [
+        ("binance", "BINANCE API Error: [-5021] Due to the order could not be filled", True),
+        ("backpack", '{"message":"Fill or kill order would not complete fill immediately"}', True),
+        ("binance", "BINANCE API Error: [-2019] Margin is insufficient.", False),
+    ],
+)
+@pytest.mark.asyncio
+async def test_documented_fok_refusal_ends_unfilled(exchange, message, passes):
+    client = KilledAtPlacementMock(exchange, message)
+    result = {}
+    lifecycle = run_lifecycle(
+        cex_adapter(client, exchange, False), result, poll_delay=0, case="fok"
+    )
+    if not passes:
+        with pytest.raises(LifecycleError, match="-2019"):
+            await lifecycle
+        return
+    await lifecycle
+    assert result["stage"] == "complete" and "placement unfilled" in result["cleanup"]
+
+
+@pytest.mark.parametrize(("case", "reason"), [("ioc", "IOC_CANCELED"), ("fok", "FOK_FAILED")])
+@pytest.mark.asyncio
+async def test_arcus_ioc_fok_kill_acknowledgement_ends_unfilled(case, reason):
+    class Killed(ArcusCaseMock):
+        def payload(self, name, kwargs):
+            if name == "place_order":
+                self.calls.append((name, kwargs))
+                return {"status": "REJECTED", "rejectionReason": reason, "filledSize": "0"}
+            return super().payload(name, kwargs)
+
+    result = {}
+    adapter = ArcusAdapter(Killed("sync", case), "arcus", "swap", "BTC-USD")
+    await run_lifecycle(adapter, result, poll_delay=0, case=case)
+    assert result["stage"] == "complete" and reason in result["cleanup"]
+
+
+@pytest.mark.parametrize(("ack_order", "passes"), [("arcus-order-1", True), ("other", False)])
+@pytest.mark.asyncio
+async def test_arcus_modify_ack_without_client_id(ack_order, passes):
+    class Modify(ArcusCaseMock):
+        def payload(self, name, kwargs):
+            data = super().payload(name, kwargs)
+            if name == "modify_order":
+                return dict(data, orderId=ack_order, clientId="")
+            return data
+
+    result = {}
+    adapter = ArcusAdapter(Modify("sync", "amend"), "arcus", "swap", "BTC-USD")
+    lifecycle = run_lifecycle(adapter, result, poll_delay=0, case="amend")
+    if passes:
+        await lifecycle
+        assert result["stage"] == "complete"
+    else:
+        with pytest.raises(LifecycleError, match="different order"):
+            await lifecycle
+
+
+@pytest.mark.parametrize("has_position", [False, True])
+@pytest.mark.asyncio
+async def test_lighter_reduce_only_never_created(has_position, monkeypatch):
+    class Dropped(DexCaseMock):
+        def response(self, method, kw):
+            if method == "get_account_orders":
+                return {"orders": []}
+            if method == "get_account" and has_position:
+                return {"accounts": [{"positions": [{"position": "1"}], "available_balance": "20"}]}
+            return super().response(method, kw)
+
+    async def no_wait(_delay):
+        return None
+
+    monkeypatch.setattr("tests.stateful_dex.asyncio.sleep", no_wait)
+    client = Dropped("lighter", "sync", "reduce_only")
+    adapter = dex_adapter(client, LighterAdapter, "lighter", "mainnet", "ETH")
+    result = {}
+    lifecycle = run_lifecycle(adapter, result, poll_delay=0, case="reduce_only")
+    if has_position:
+        with pytest.raises(LifecycleError):
+            await lifecycle
+        return
+    await lifecycle
+    assert result["stage"] == "complete" and "not created" in result["cleanup"]

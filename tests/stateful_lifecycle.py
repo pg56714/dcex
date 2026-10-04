@@ -96,10 +96,10 @@ REDUCE_ONLY_CODES = {
     "aster": {"-2022"},
     "bybit": {"110017"},  # Reduce-only rule not satisfied / position is zero.
     "okx": {"51169", "51170"},  # No position in this direction to reduce / same direction.
-    "bitget": {"22002"},  # No position to close.
+    "bitget": {"22002", "25227"},  # No position to close / no position available to close.
     "kucoin": {"300009"},  # No open positions to close.
     "mexc": {"2009"},  # Position nonexistent or closed.
-    "extended": {"REDUCE_ONLY_FAILED"},  # Reduce-only order failed (position conflict).
+    "extended": {"1137"},  # Position is missing for reduce-only order.
 }
 REDUCE_ONLY_MESSAGE = re.compile(
     r"reduce[ _-]?only\b.*\b(reject|not|would|cannot|can't|invalid|fail)"
@@ -107,7 +107,8 @@ REDUCE_ONLY_MESSAGE = re.compile(
     r"|wouldnotreduceposition|no (open )?position",
     re.IGNORECASE,
 )
-EXCHANGE_CODE = r'code"?\s*[=:]\s*"?'
+# "code=N", "code": N or the "[N]" prefix the HTTP layer gives exchange errors.
+EXCHANGE_CODE = r'(?:code"?\s*[=:]\s*"?|\[)'
 
 
 def explicit_rejection(error: Exception, exchange: str = "") -> bool:

@@ -36,7 +36,7 @@ from tests.stateful_lifecycle import (
 CASE = "ws_order_stream"
 EVENT_TIMEOUT = 20.0
 HEARTBEAT_INTERVAL = 15.0
-PUSH_ONLY_SETTLE = 1.0
+PUSH_ONLY_SETTLE = 3.0  # Live: BingX swap listenKey push missed an order at 1s.
 ARCUS_SPOT_NA = "N/A: Arcus has no spot market for the stateful lifecycle"
 
 OPEN, CANCELLED, FILLED, OTHER = "open", "cancelled", "filled", "other"
@@ -58,6 +58,7 @@ class OrderEvent:
     client_ids: tuple[str, ...]
     state: str
     received_at: float
+    raw_state: str = ""  # Native status text, kept only for timeout diagnostics.
 
 
 # --------------------------------------------------------------------------- parsing
@@ -98,7 +99,8 @@ _MEXC_FUTURES_STATES = {"2": OPEN, "3": FILLED, "4": CANCELLED}
 FIELDS: dict[str, Fields] = {
     "binance": _BINANCE,
     "aster": _BINANCE,
-    "bingx": _BINANCE,
+    # Live swap ORDER_TRADE_UPDATE reports a resting order as WORKING; REST uses PENDING.
+    "bingx": Fields(("i",), ("c", "C"), ("X",), {"working": OPEN, "pending": OPEN}),
     "backpack": Fields(("i",), ("c",), ("X",)),
     "bybit": Fields(("orderId",), ("orderLinkId",), ("orderStatus",)),
     "okx": Fields(("ordId",), ("clOrdId",), ("state",)),
@@ -142,6 +144,33 @@ def _text(value: object) -> str:
     return "" if value is None or isinstance(value, dict | list) else str(value)
 
 
+def _key_shape(value: object, depth: int = 0) -> str:
+    """Nested key names only (no values), e.g. {e,o:{X,c,i}}."""
+    if isinstance(value, dict) and depth < 3:
+        parts = [
+            f"{key}:{_key_shape(item, depth + 1)}" if isinstance(item, dict | list) else str(key)
+            for key, item in list(value.items())[:24]
+        ]
+        return "{" + ",".join(parts) + "}"
+    if isinstance(value, list) and value and depth < 3:
+        return "[" + _key_shape(value[0], depth + 1) + "]"
+    return "[]" if isinstance(value, list) else "_"
+
+
+def frame_kind(payload: object) -> str:
+    """A diagnostic label: the event-type field or the key names, never values."""
+    if isinstance(payload, bytes | bytearray | memoryview):
+        return f"bytes[{len(payload)}]"
+    if isinstance(payload, str):
+        return "text:" + payload[:12] if payload.isalpha() else "text"
+    if isinstance(payload, dict):
+        for key in ("e", "dataType", "event", "topic", "channel", "type", "op"):
+            if isinstance(payload.get(key), str):
+                return f"{key}={payload[key][:40]}"
+        return "keys=" + "/".join(sorted(map(str, payload))[:6])
+    return type(payload).__name__
+
+
 def extract_events(exchange: str, payload: object, received_at: float = 0.0) -> list[OrderEvent]:
     """Extract order rows from one decoded payload using the exchange's field names."""
     if isinstance(payload, bytes | bytearray | memoryview):
@@ -163,7 +192,8 @@ def extract_events(exchange: str, payload: object, received_at: float = 0.0) -> 
         state = normalize_state(row[status_key], spec.states)
         if exchange == "kucoin" and state == OTHER:
             state = normalize_state(row.get("status", ""))
-        events.append(OrderEvent(order_id, clients, state, received_at))
+        raw = str(row[status_key])[:24]
+        events.append(OrderEvent(order_id, clients, state, received_at, raw))
     return events
 
 
@@ -282,10 +312,17 @@ class OrderStream:
         self.error: BaseException | None = None
         self._changed = asyncio.Event()
         self._tasks: list[asyncio.Task[None]] = []
+        self.frames = 0
+        self.kinds: list[str] = []  # Event type labels only, never payload values.
+        self.unparsed: list[str] = []  # Key names of order frames that yielded no event.
 
     def feed(self, payload: object) -> None:
         """Record order rows; payloads are parsed immediately and never retained."""
         now = self.clock()
+        self.frames += 1
+        kind = frame_kind(payload)
+        if kind not in self.kinds and len(self.kinds) < 12:
+            self.kinds.append(kind)
         if self.ack is not None and not self.confirmed.is_set():
             verdict = self.ack(payload)
             if verdict == "error":
@@ -294,7 +331,10 @@ class OrderStream:
             elif verdict == "ok":
                 self.confirmed.set()
         try:
-            self.events.extend(extract_events(self.exchange, payload, now))
+            found = extract_events(self.exchange, payload, now)
+            self.events.extend(found)
+            if not found and "ORDER" in kind.upper() and len(self.unparsed) < 3:
+                self.unparsed.append(_key_shape(payload))
         except Exception:  # noqa: BLE001 - a malformed frame must not stop the reader
             pass
         self._changed.set()
@@ -344,6 +384,22 @@ class OrderStream:
                 f"{self.exchange}: private stream closed before subscription: " + redact(self.error)
             )
 
+    def describe(self, order_id: str, client_id: str, since: float) -> str:
+        """Diagnostics without values: native state, ID match and timing per event."""
+        rows = []
+        for event in self.events[-6:]:
+            id_ok = bool(order_id) and event.order_id.lower() == str(order_id).lower()
+            client_ok = bool(client_id) and str(client_id).lower() in {
+                c.lower() for c in event.client_ids
+            }
+            rows.append(
+                f"{event.raw_state or '?'}->{event.state}"
+                f" id={'ok' if id_ok else f'no(len {len(event.order_id)})'}"
+                f" client={'ok' if client_ok else f'no(n {len(event.client_ids)})'}"
+                f"{' early' if event.received_at < since else ''}"
+            )
+        return ", ".join(rows) or "none"
+
     def find(
         self, order_id: str, client_id: str, states: set[str], since: float = 0.0
     ) -> OrderEvent | None:
@@ -383,7 +439,10 @@ class OrderStream:
             if remaining <= 0:
                 raise StreamEventMissing(
                     f"{self.exchange}: no '{state}' order-update event for the test order "
-                    f"within {timeout:g}s on the private stream"
+                    f"within {timeout:g}s on the private stream (received {self.frames} "
+                    f"frames: {', '.join(self.kinds) or 'none'}; "
+                    f"order events: {self.describe(order_id, client_id, since)}; "
+                    f"unparsed order frames: {' | '.join(self.unparsed) or 'none'})"
                 )
             try:
                 await asyncio.wait_for(self._changed.wait(), remaining)

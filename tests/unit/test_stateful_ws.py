@@ -244,6 +244,8 @@ async def test_stream_closed_fails_clearly():
             CANCELLED,
         ),
         ("binance", {"e": "ORDER_TRADE_UPDATE", "o": {"i": 1, "c": "c", "X": "NEW"}}, OPEN),
+        ("bingx", {"e": "ORDER_TRADE_UPDATE", "o": {"i": 1, "c": "c", "X": "PENDING"}}, OPEN),
+        ("bingx", {"e": "ORDER_TRADE_UPDATE", "o": {"i": 1, "c": "c", "X": "WORKING"}}, OPEN),
         (
             "binance",
             {

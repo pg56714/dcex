@@ -14,6 +14,7 @@ from tests.stateful_lifecycle import (
     LifecycleError,
     MarketUnavailable,
     Order,
+    OrderClosed,
     OrderRejected,
     PriceBandRejected,
     Rules,
@@ -148,6 +149,9 @@ class ArcusAdapter(CexAdapter):
             self.placed_fill = decimal(data["filledSize"])
         if data.get("rejectionReason") == "OracleDeviation" and data.get("status") == "REJECTED":
             raise PriceBandRejected("arcus: price range rejected (OracleDeviation)")
+        if self.tif and data.get("rejectionReason") in {"IOC_CANCELED", "FOK_FAILED"}:
+            # The venue killed the IOC/FOK unfilled at placement; nothing rests.
+            raise OrderClosed("arcus: " + str(data["rejectionReason"]))
         if data.get("status") == "REJECTED":
             raise OrderRejected(
                 "arcus: order acknowledgement rejected (" + str(data.get("rejectionReason")) + ")"
@@ -204,11 +208,14 @@ class ArcusAdapter(CexAdapter):
             reduce_only=False,
             order_id=identifier,
         )
-        # The subsequent order query re-validates the market, side, price and size.
-        defaults = dict(
+        if checked_id(data.get("orderId", identifier)) != identifier:
+            raise LifecycleError("arcus: modify acknowledgement names a different order")
+        # The modify acknowledgement does not echo the client ID (live: unchanged on the
+        # order); the subsequent order query re-validates the market, side, price and size.
+        identity = dict(
             orderId=identifier, clientId=self.client_order_id, marketDisplayName=self.native
         )
-        return self.acknowledged({**defaults, **data})
+        return self.acknowledged({**data, **identity})
 
     async def cancel(self, identifier):
         data = await self.call("cancel_order", product_symbol=self.native, order_id=identifier)

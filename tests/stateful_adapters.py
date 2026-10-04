@@ -19,6 +19,13 @@ from tests.stateful_lifecycle import (
     plan_order,
 )
 
+# Documented refusals of an IOC/FOK that cannot fill immediately (never recorded).
+TAKER_KILLED_AT_PLACEMENT = {
+    "binance": ("[-5021]",),  # FOK order rejected: could not be filled immediately.
+    "aster": ("[-5021]",),
+    "backpack": ("Fill or kill order would not complete fill immediately",),
+}
+
 # Documented executed-quantity fields of placement acknowledgements.
 FILL_FIELDS = ("executedQty", "executedQuantity", "cumExecQty", "accFillSz", "filledSize")
 
@@ -236,6 +243,10 @@ class CexAdapter:
                 )
             ):
                 label = "account eligibility issue: "
+            killed = TAKER_KILLED_AT_PLACEMENT.get(self.exchange, ())
+            if self.tif and method.startswith("place") and any(k in message for k in killed):
+                # The venue refused an IOC/FOK that could not fill at once: nothing rests.
+                raise OrderClosed(f"{self.exchange} {method}: {message}") from None
             reported = LifecycleError(f"{self.exchange} {method}: {label}code={code} {message}")
             reported.code = code
             raise reported from None

@@ -150,7 +150,12 @@ class OndoAdapter(CexAdapter):
             type="limit",
             price=str(plan.price),
             size=str(plan.size),
-            **({"timeInForce": self.tif} if self.tif else {"timeInForce": "GTC", "postOnly": True}),
+            # Live: Ondo accepts reduce-only only as IOC (reduce_only_invalid_tif).
+            **(
+                {"timeInForce": self.tif or "IOC"}
+                if self.tif or self.reduce
+                else {"timeInForce": "GTC", "postOnly": True}
+            ),
             **({"reduceOnly": True} if self.reduce else {}),
             clientOrderId=self.client_order_id,
         )
@@ -440,6 +445,12 @@ class LighterAdapter(CexAdapter):
             if row is not None:
                 return checked_id(row["order_index"])
             await asyncio.sleep(0.25)
+        if self.reduce and not await self.positions():
+            # Live: the sequencer drops a reduce-only order with no position; no order
+            # (active or inactive) is ever created for the client index.
+            raise OrderRejected(
+                f"lighter: reduce-only order not created with no position (client index {self.client_index})"
+            )
         raise LifecycleError(
             f"lighter: acknowledgement could not be resolved to an order ID; inspect client index {self.client_index}; do not retry placement"
         )
