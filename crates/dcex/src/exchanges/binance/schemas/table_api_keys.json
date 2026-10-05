@@ -154,10 +154,17 @@
     "public": false,
     "api_key": false,
     "allowed": [
+      "apiKey",
       "symbol",
       "recvWindow"
     ],
     "fields": [
+      {
+        "key": "apiKey",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
       {
         "key": "symbol",
         "kind": "s",

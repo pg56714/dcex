@@ -105,7 +105,6 @@ CASES = [
         signature="11" * 65,
         source="api",
     ),
-    case("invalidate_jwt", "/v1/auth/invalidate_jwt"),
     case("hello", "/hello"),
     case("hello", "/hello"),
     # Market data
@@ -329,29 +328,6 @@ CASES = [
         {"id": "c1", "signature": "0xsig"},
         id="c1",
         signature="0xsig",
-    ),
-    case("list_api_keys", "/v1/api_keys"),
-    case(
-        "create_api_key",
-        "/v1/api_keys",
-        {"name": "bot", "scopes": ["trade", "transfer"]},
-        name="bot",
-        scopes=["trade", "transfer"],
-    ),
-    case("delete_api_key", "/v1/api_keys/k1", apiKeyID="k1", confirm=True),
-    case(
-        "set_api_key_ip_whitelist",
-        "/v1/api_keys/k1/ip_whitelist",
-        {"ip": "10.0.0.1"},
-        apiKeyID="k1",
-        ip="10.0.0.1",
-    ),
-    case(
-        "remove_api_key_ip_whitelist",
-        "/v1/api_keys/k1/ip_whitelist",
-        {"ip": "10.0.0.1"},
-        apiKeyID="k1",
-        ip="10.0.0.1",
     ),
 ]
 

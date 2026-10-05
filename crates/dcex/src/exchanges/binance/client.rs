@@ -209,10 +209,7 @@ impl BinanceClient {
         let data = response.json()?;
         let failed = data.get("success") == Some(&Value::Bool(false))
             || data.get("code").is_some_and(|code| {
-                !matches!(
-                    super::signing::json_value_string(code).as_str(),
-                    "0" | "000000" | "200"
-                )
+                !super::signing::is_success_code(&super::signing::json_value_string(code))
             });
         if failed {
             let (code, message) = crate::http::error_parts(&response.body);

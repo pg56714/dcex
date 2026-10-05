@@ -341,47 +341,6 @@
     "scoped": false
   },
   {
-    "name": "get_copy_trading_v1_swap_trace_current_track",
-    "method": "GET",
-    "path": "/openApi/copyTrading/v1/swap/trace/currentTrack",
-    "signed": true,
-    "fields": [
-      {
-        "name": "symbol",
-        "type": "string",
-        "required": true,
-        "description": "Filter by trading pair, e.g. `BTC-USDT",
-        "kind": "str"
-      },
-      {
-        "name": "offset",
-        "type": "int",
-        "required": false,
-        "description": "Offset, default is 0.",
-        "kind": "int"
-      },
-      {
-        "name": "limit",
-        "type": "int",
-        "required": false,
-        "description": "Number of results",
-        "kind": "int"
-      }
-    ],
-    "source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/copytrade-swap/api-reference.md#L16",
-    "summary": "1. Trader's Current Orders",
-    "scoped": false,
-    "input_schema": {
-      "type": "object",
-      "properties": {
-        "offset": {
-          "type": "integer",
-          "description": "skips an integer number of copy trading v1 swap trace current track records before returning the next page."
-        }
-      }
-    }
-  },
-  {
     "name": "post_copy_trading_v1_swap_trace_close_track_order",
     "method": "POST",
     "path": "/openApi/copyTrading/v1/swap/trace/closeTrackOrder",

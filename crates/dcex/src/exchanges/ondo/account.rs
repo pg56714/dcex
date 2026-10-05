@@ -1,6 +1,4 @@
-use std::net::Ipv4Addr;
-
-use serde_json::{Value, json};
+use serde_json::Value;
 
 use crate::exchange::ValidatedResponse;
 use crate::{DcexError, Result};
@@ -20,17 +18,12 @@ impl OndoClient {
             "create_withdrawal" | "sandbox_withdrawal" => {
                 self.dispatch_create_withdrawal(method_name, params).await
             }
-            "invalidate_jwt" => {
-                self.empty_private_get(params, "/v1/auth/invalidate_jwt")
-                    .await
-            }
             "get_account" => self.empty_private_get(params, ACCOUNT).await,
             "get_open_order_counts" => self.empty_private_get(params, ORDER_COUNTS).await,
             "get_deposits" => self.empty_private_get(params, DEPOSITS).await,
             "get_withdrawals" => self.empty_private_get(params, WITHDRAWALS).await,
             "get_withdrawal_limits" => self.empty_private_get(params, WITHDRAWAL_LIMITS).await,
             "get_address_book" => self.empty_private_get(params, ADDRESS_BOOK).await,
-            "list_api_keys" => self.empty_private_get(params, API_KEYS).await,
             "get_address_book_challenge" => {
                 let body = params.body(
                     &["walletAddress", "chainId", "withdrawalAddress"],
@@ -119,40 +112,6 @@ impl OndoClient {
                 )?;
                 require_string_fields(&body, &["withdrawalAddress"])?;
                 self.private_delete_body(ADDRESS_BOOK, body).await
-            }
-            "create_api_key" => {
-                let body = params.body(
-                    &["name", "scopes"],
-                    &["name", "scopes"],
-                    &[],
-                    &[],
-                    &["scopes"],
-                )?;
-                require_string_fields(&body, &["name"])?;
-                validate_api_key_scopes(&body)?;
-                self.private_post(API_KEYS, body).await
-            }
-            "delete_api_key" => {
-                params.ensure_allowed(&["apiKeyID"])?;
-                let id = params.path_segment("apiKeyID")?;
-                self.private_delete(&path_with_id(API_KEYS, id), Vec::new())
-                    .await
-            }
-            "set_api_key_ip_whitelist" | "remove_api_key_ip_whitelist" => {
-                params.ensure_allowed(&["apiKeyID", "ip"])?;
-                params.ensure_required(&["apiKeyID", "ip"])?;
-                let id = params.path_segment("apiKeyID")?;
-                let ip = params.required("ip")?;
-                ip.parse::<Ipv4Addr>().map_err(|error| {
-                    DcexError::InvalidInput(format!("invalid Ondo IPv4 address: {error}"))
-                })?;
-                let path = format!("{}/ip_whitelist", path_with_id(API_KEYS, id));
-                let body = json!({"ip": ip});
-                if method_name == "set_api_key_ip_whitelist" {
-                    self.private_post(&path, body).await
-                } else {
-                    self.private_delete_body(&path, body).await
-                }
             }
             "get_positions" => self.empty_private_get(params, POSITIONS).await,
             "get_balance" => self.empty_private_get(params, BALANCE).await,
@@ -326,21 +285,6 @@ pub(super) fn validate_account_wallet_key(body: &Value, key: &str) -> Result<()>
         return Err(DcexError::InvalidInput(format!(
             "Ondo body field {key}.wallet must be main or margin"
         )));
-    }
-    Ok(())
-}
-
-fn validate_api_key_scopes(body: &Value) -> Result<()> {
-    let scopes = body
-        .get("scopes")
-        .and_then(Value::as_array)
-        .ok_or_else(|| DcexError::InvalidInput("Ondo scopes must be an array".to_string()))?;
-    for scope in scopes {
-        if !matches!(scope.as_str(), Some("trade" | "transfer")) {
-            return Err(DcexError::InvalidInput(
-                "Ondo API-key scopes must contain only trade or transfer".to_string(),
-            ));
-        }
     }
     Ok(())
 }

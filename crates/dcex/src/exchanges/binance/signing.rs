@@ -78,7 +78,8 @@ impl ResponseValidator for BinanceResponseValidator {
         let data = response.json()?;
         if let Some(object) = data.as_object()
             && let Some(code) = object.get("code")
-            && json_value_string(code) != "200"
+            && !is_success_code(&json_value_string(code))
+            && object.get("success") != Some(&Value::Bool(true))
         {
             let message = object.get("msg").and_then(Value::as_str).unwrap_or("");
             let code = json_value_string(code);
@@ -105,6 +106,11 @@ impl ResponseValidator for BinanceResponseValidator {
         response.ensure_success("Binance")?;
         Ok(data)
     }
+}
+
+/// Success codes in Binance bodies; SAPI product routes use "000000"/"000000000" (verified live).
+pub(super) fn is_success_code(code: &str) -> bool {
+    matches!(code, "0" | "200" | "000000" | "000000000")
 }
 
 pub(super) fn json_value_string(value: &Value) -> String {
@@ -147,6 +153,36 @@ mod partial_order_tests {
             headers
                 .iter()
                 .any(|(key, value)| key == "x-mbx-used-weight-1m" && value == "12")
+        );
+    }
+
+    #[test]
+    fn sapi_success_codes_are_not_errors() {
+        for body in [
+            r#"{"code":"000000","message":null,"data":{"a":1},"success":true}"#,
+            r#"{"code":"000000000","data":{"page":1}}"#,
+            r#"{"code":200,"msg":"","data":[]}"#,
+        ] {
+            let response = HttpResponse {
+                status: 200,
+                headers: std::collections::BTreeMap::new(),
+                body: body.as_bytes().to_vec(),
+            };
+            assert!(
+                BinanceResponseValidator.validate(&response).is_ok(),
+                "{body}"
+            );
+        }
+        let failure = HttpResponse {
+            status: 200,
+            headers: std::collections::BTreeMap::new(),
+            body: br#"{"code":-1102,"msg":"Mandatory parameter 'type' was not sent"}"#.to_vec(),
+        };
+        let error = BinanceResponseValidator.validate(&failure).unwrap_err();
+        assert!(
+            error
+                .to_string()
+                .starts_with("Binance API Error: [-1102] Mandatory")
         );
     }
 }

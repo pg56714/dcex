@@ -2,14 +2,14 @@
   "reviewed": "2026-09-30",
   "source_file": "dcex 端點覆蓋表.html",
   "source_sha256": "6479d7c578f35b2bd9b6a243c37b239dbea399f17054dbecd1edfe98ffd92e07",
-  "row_count": 4860,
+  "row_count": 4861,
   "note": "All documented endpoints are in scope. Every official inventory row has an explicit disposition; no pending rows remain. Rows may group or duplicate operations; counts are not an endpoint coverage percentage. Implemented/protocol mean offline wire evidence, not live certification. Documentation-only sections and incomplete official contracts have explicit reasons.",
   "counts": {
     "protocol": 395,
     "partial": 1,
-    "implemented": 3418,
-    "superseded": 979,
-    "unavailable": 19,
+    "implemented": 3411,
+    "superseded": 980,
+    "unavailable": 26,
     "unverified": 11,
     "blocked": 37
   },
@@ -52547,20 +52547,19 @@
       "category": "Futures trading",
       "endpoint": "POST /api/v1/private/order/open_order_total_count",
       "source_status": "supported",
-      "status": "implemented",
-      "rust": true,
-      "python_sync": true,
-      "python_async": true,
-      "methods": [
-        "get_contract_open_order_count"
-      ],
-      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "status": "superseded",
+      "rust": false,
+      "python_sync": false,
+      "python_async": false,
+      "methods": [],
+      "note": "Documented as POST, but the live route answers 404 for POST and serves GET (read-only check 2026-10-05); implemented as the observed GET route.",
       "evidence": [
         "tests/unit/test_mexc_endpoint_coverage.py"
       ],
       "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/query-in-flight-order-counts",
       "path": "/api/v1/private/order/open_order_total_count",
-      "http_method": "POST"
+      "http_method": "POST",
+      "superseded_reason": "Live route serves GET only; see the observed GET row."
     },
     {
       "row": 2231,
@@ -72598,14 +72597,12 @@
       "category": "Auth",
       "endpoint": "GET /v1/auth/invalidate_jwt",
       "source_status": "missing",
-      "status": "implemented",
-      "rust": true,
-      "python_sync": true,
-      "python_async": true,
-      "methods": [
-        "invalidate_jwt"
-      ],
-      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "status": "unavailable",
+      "rust": false,
+      "python_sync": false,
+      "python_async": false,
+      "methods": [],
+      "note": "Removed: Ondo API keys can only be granted view, trade and transfer permissions; API-key management and JWT session calls need a web-session JWT, which this library does not support (live: key_not_allowed_for_action, 2026-10-05).",
       "evidence": [
         "crates/dcex/src/exchanges/ondo/tests/endpoint_coverage.rs",
         "tests/unit/test_ondo_endpoint_coverage.py"
@@ -73028,14 +73025,12 @@
       "category": "API keys",
       "endpoint": "GET /v1/api_keys",
       "source_status": "supported",
-      "status": "implemented",
-      "rust": true,
-      "python_sync": true,
-      "python_async": true,
-      "methods": [
-        "list_api_keys"
-      ],
-      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "status": "unavailable",
+      "rust": false,
+      "python_sync": false,
+      "python_async": false,
+      "methods": [],
+      "note": "Removed: Ondo API keys can only be granted view, trade and transfer permissions; API-key management and JWT session calls need a web-session JWT, which this library does not support (live: key_not_allowed_for_action, 2026-10-05).",
       "evidence": [
         "crates/dcex/src/exchanges/ondo/tests/endpoint_coverage.rs",
         "tests/unit/test_ondo_endpoint_coverage.py"
@@ -73052,14 +73047,12 @@
       "category": "API keys",
       "endpoint": "POST /v1/api_keys",
       "source_status": "supported",
-      "status": "implemented",
-      "rust": true,
-      "python_sync": true,
-      "python_async": true,
-      "methods": [
-        "create_api_key"
-      ],
-      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "status": "unavailable",
+      "rust": false,
+      "python_sync": false,
+      "python_async": false,
+      "methods": [],
+      "note": "Removed: Ondo API keys can only be granted view, trade and transfer permissions; API-key management and JWT session calls need a web-session JWT, which this library does not support (live: key_not_allowed_for_action, 2026-10-05).",
       "evidence": [
         "crates/dcex/src/exchanges/ondo/tests/endpoint_coverage.rs",
         "tests/unit/test_ondo_endpoint_coverage.py"
@@ -73076,14 +73069,12 @@
       "category": "API keys",
       "endpoint": "DELETE /v1/api_keys/{apiKeyID}",
       "source_status": "supported",
-      "status": "implemented",
-      "rust": true,
-      "python_sync": true,
-      "python_async": true,
-      "methods": [
-        "delete_api_key"
-      ],
-      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "status": "unavailable",
+      "rust": false,
+      "python_sync": false,
+      "python_async": false,
+      "methods": [],
+      "note": "Removed: Ondo API keys can only be granted view, trade and transfer permissions; API-key management and JWT session calls need a web-session JWT, which this library does not support (live: key_not_allowed_for_action, 2026-10-05).",
       "evidence": [
         "crates/dcex/src/exchanges/ondo/tests/endpoint_coverage.rs",
         "tests/unit/test_ondo_endpoint_coverage.py"
@@ -73100,14 +73091,12 @@
       "category": "API keys",
       "endpoint": "POST /v1/api_keys/{apiKeyID}/ip_whitelist",
       "source_status": "supported",
-      "status": "implemented",
-      "rust": true,
-      "python_sync": true,
-      "python_async": true,
-      "methods": [
-        "set_api_key_ip_whitelist"
-      ],
-      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "status": "unavailable",
+      "rust": false,
+      "python_sync": false,
+      "python_async": false,
+      "methods": [],
+      "note": "Removed: Ondo API keys can only be granted view, trade and transfer permissions; API-key management and JWT session calls need a web-session JWT, which this library does not support (live: key_not_allowed_for_action, 2026-10-05).",
       "evidence": [
         "crates/dcex/src/exchanges/ondo/tests/endpoint_coverage.rs",
         "tests/unit/test_ondo_endpoint_coverage.py"
@@ -73124,14 +73113,12 @@
       "category": "API keys",
       "endpoint": "DELETE /v1/api_keys/{apiKeyID}/ip_whitelist",
       "source_status": "supported",
-      "status": "implemented",
-      "rust": true,
-      "python_sync": true,
-      "python_async": true,
-      "methods": [
-        "remove_api_key_ip_whitelist"
-      ],
-      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "status": "unavailable",
+      "rust": false,
+      "python_sync": false,
+      "python_async": false,
+      "methods": [],
+      "note": "Removed: Ondo API keys can only be granted view, trade and transfer permissions; API-key management and JWT session calls need a web-session JWT, which this library does not support (live: key_not_allowed_for_action, 2026-10-05).",
       "evidence": [
         "crates/dcex/src/exchanges/ondo/tests/endpoint_coverage.rs",
         "tests/unit/test_ondo_endpoint_coverage.py"
@@ -106146,14 +106133,12 @@
       "category": "Official documentation inventory",
       "endpoint": "GET /openApi/copyTrading/v1/swap/trace/currentTrack",
       "source_status": "official inventory",
-      "status": "implemented",
-      "rust": true,
-      "python_sync": true,
-      "python_async": true,
-      "methods": [
-        "get_copy_trading_v1_swap_trace_current_track"
-      ],
-      "note": "Dedicated Rust and sync/async Python wrappers; official request fields, HTTP verb, query/body, host selection, and authentication verified by offline wire tests. Not tested with a live account.",
+      "status": "unavailable",
+      "rust": false,
+      "python_sync": false,
+      "python_async": false,
+      "methods": [],
+      "note": "Removed: the live route answers BingX 100400 'this api is not exist' (read-only check 2026-10-05); the only source was a BingX AI-skills reference, not the API docs.",
       "evidence": [
         "crates/dcex/src/exchanges/bingx/schema_requests/request_tables.rs",
         "tests/unit/test_bingx_schema_requests.py::test_inventory_wire"
@@ -116002,6 +115987,29 @@
       "http_method": "WS",
       "path": "/ws",
       "channel": "tradesSpot"
+    },
+    {
+      "row": 4861,
+      "source_index": null,
+      "exchange": "mexc",
+      "kind": "REST",
+      "category": "Futures trading",
+      "endpoint": "GET /api/v1/private/order/open_order_total_count",
+      "source_status": "observed private route",
+      "status": "implemented",
+      "rust": true,
+      "python_sync": true,
+      "python_async": true,
+      "methods": [
+        "get_contract_open_order_count"
+      ],
+      "note": "Observed live route (read-only check 2026-10-05): GET returns the documented sumCount fields; the documented POST returns 404.",
+      "evidence": [
+        "tests/unit/test_mexc_endpoint_coverage.py"
+      ],
+      "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/query-in-flight-order-counts",
+      "path": "/api/v1/private/order/open_order_total_count",
+      "http_method": "GET"
     }
   ],
   "verification": {

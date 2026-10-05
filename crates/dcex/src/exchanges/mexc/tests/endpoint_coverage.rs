@@ -1045,7 +1045,7 @@ const ROUTE_CASES: &[(bool, &str, &[(&str, &str)], &str, &str)] = &[
         false,
         "get_contract_open_order_count",
         &[],
-        "POST",
+        "GET",
         "/api/v1/private/order/open_order_total_count",
     ),
     (

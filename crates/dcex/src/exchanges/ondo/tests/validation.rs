@@ -120,19 +120,6 @@ async fn stateful_account_requests_are_validated_before_transport() {
         .await
         .expect_err("one withdrawal identifier is required");
     assert!(error.to_string().contains("requires exactly one"));
-
-    let error = client
-        .private_request(
-            "create_api_key",
-            vec![
-                ("name".to_string(), "test".to_string()),
-                ("scopes".to_string(), r#"["admin"]"#.to_string()),
-            ],
-        )
-        .await
-        .expect_err("invalid API-key scope");
-    assert!(error.to_string().contains("trade or transfer"));
-
     let error = client
         .private_request(
             "sandbox_deposit",
@@ -149,16 +136,4 @@ async fn stateful_account_requests_are_validated_before_transport() {
         .await
         .expect_err("invalid wallet kind");
     assert!(error.to_string().contains("main or margin"));
-
-    let error = client
-        .private_request(
-            "set_api_key_ip_whitelist",
-            vec![
-                ("apiKeyID".to_string(), "key-id".to_string()),
-                ("ip".to_string(), "not-an-ip".to_string()),
-            ],
-        )
-        .await
-        .expect_err("invalid IP address");
-    assert!(error.to_string().contains("IPv4"));
 }

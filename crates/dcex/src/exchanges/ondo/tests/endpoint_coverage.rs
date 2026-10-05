@@ -285,7 +285,6 @@ fn public_market_data_routes_match_official_paths() {
             target: "/v1/auth/erc-4361/login/complete_challenge",
             body: Some(r#"{"id":"challenge1","signature":"signed"}"#),
         },
-        private("invalidate_jwt", &[], "GET", "/v1/auth/invalidate_jwt"),
         public("hello", &[], "GET", "/hello"),
         public("hello", &[], "GET", "/hello"),
         public("get_markets", &[], "GET", "/v1/markets"),
@@ -738,34 +737,6 @@ fn private_wallet_and_key_routes_match_official_paths() {
             "POST",
             "/v1/auth/erc-4361/address_book/complete_challenge",
             r#"{"id":"c1","signature":"0xsig"}"#,
-        ),
-        private("list_api_keys", &[], "GET", "/v1/api_keys"),
-        private_body(
-            "create_api_key",
-            &[("name", "bot"), ("scopes", r#"["trade"]"#)],
-            "POST",
-            "/v1/api_keys",
-            r#"{"name":"bot","scopes":["trade"]}"#,
-        ),
-        private(
-            "delete_api_key",
-            &[("confirm", "true"), ("apiKeyID", "k1")],
-            "DELETE",
-            "/v1/api_keys/k1",
-        ),
-        private_body(
-            "set_api_key_ip_whitelist",
-            &[("apiKeyID", "k1"), ("ip", "10.0.0.1")],
-            "POST",
-            "/v1/api_keys/k1/ip_whitelist",
-            r#"{"ip":"10.0.0.1"}"#,
-        ),
-        private_body(
-            "remove_api_key_ip_whitelist",
-            &[("apiKeyID", "k1"), ("ip", "10.0.0.1")],
-            "DELETE",
-            "/v1/api_keys/k1/ip_whitelist",
-            r#"{"ip":"10.0.0.1"}"#,
         ),
     ]);
 }

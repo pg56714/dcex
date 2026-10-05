@@ -673,7 +673,7 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
         asset: str | None = None,
         startTime: int | None = None,
         endTime: int | None = None,
-        type_: str | None = None,
+        type_: str,
         current: int | None = None,
         size: int | None = None,
         recvWindow: int | None = None,

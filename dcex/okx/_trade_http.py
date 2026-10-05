@@ -3639,7 +3639,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
     def get_mmp_config(
         self,
         *,
-        inst_family: str | None = None,
+        inst_family: str,
     ) -> Any:  # noqa: ANN401
         """
         GET /api/v5/account/mmp-config.

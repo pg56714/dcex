@@ -4,7 +4,6 @@
 
 from typing import Any
 
-from ..._operation_guards import require_confirmation
 from ._http_manager import HTTPManager
 from ._withdrawals_http import AccountHTTPWithdrawalsHTTP
 
@@ -90,9 +89,6 @@ class AccountHTTP(AccountHTTPWithdrawalsHTTP, HTTPManager):
     async def get_address_book(self) -> Any:
         return await self._native_private("get_address_book")
 
-    async def list_api_keys(self) -> Any:
-        return await self._native_private("list_api_keys")
-
     async def get_address_book_challenge(
         self,
         walletAddress: str,
@@ -164,28 +160,6 @@ class AccountHTTP(AccountHTTPWithdrawalsHTTP, HTTPManager):
             withdrawalAddress=withdrawalAddress,
         )
 
-    async def create_api_key(self, name: str, scopes: list[str]) -> Any:
-        return await self._native_private("create_api_key", name=name, scopes=scopes)
-
-    async def delete_api_key(self, apiKeyID: str, *, confirm: bool = False) -> Any:
-        """This revokes the API key and its access. Requires confirm=True."""
-        require_confirmation(confirm)
-        return await self._native_private("delete_api_key", apiKeyID=apiKeyID, confirm=confirm)
-
-    async def set_api_key_ip_whitelist(self, apiKeyID: str, ip: str) -> Any:
-        return await self._native_private(
-            "set_api_key_ip_whitelist",
-            apiKeyID=apiKeyID,
-            ip=ip,
-        )
-
-    async def remove_api_key_ip_whitelist(self, apiKeyID: str, ip: str) -> Any:
-        return await self._native_private(
-            "remove_api_key_ip_whitelist",
-            apiKeyID=apiKeyID,
-            ip=ip,
-        )
-
     async def get_candles(
         self,
         market: str,
@@ -240,7 +214,3 @@ class AccountHTTP(AccountHTTPWithdrawalsHTTP, HTTPManager):
 
     async def get_portfolio_summary_graph(self, range_: str | None = None) -> Any:
         return await self._native_private("get_portfolio_summary_graph", range_=range_)
-
-    async def invalidate_jwt(self) -> Any:
-        """Invalidate all JWT sessions for this account using API key authentication."""
-        return await self._native_private("invalidate_jwt")

@@ -311,7 +311,7 @@ fn validate(endpoint: &Endpoint, p: &PublicParams) -> Result<()> {
             return Err(invalid("pageSize must be positive"));
         }
     }
-    if path.ends_with("/openOrder")
+    if (path.ends_with("/openOrder") || path.ends_with("/orderAmendment"))
         && p.get("orderId").is_none()
         && p.get("origClientOrderId").is_none()
     {

@@ -5004,7 +5004,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         )
 
     async def query_margin_special_key(
-        self, *, symbol: str | None = None, recv_window: int | None = None
+        self, *, api_key: str, symbol: str | None = None, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
         """
         Query Special key(Low Latency Trading) (TRADE).
@@ -5015,7 +5015,8 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
 
         """
         return await self._native_private(
-            "query_margin_special_key", self._params(symbol=symbol, recvWindow=recv_window)
+            "query_margin_special_key",
+            self._params(apiKey=api_key, symbol=symbol, recvWindow=recv_window),
         )
 
     async def query_margin_special_key_list(

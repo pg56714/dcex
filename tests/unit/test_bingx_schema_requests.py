@@ -12,15 +12,21 @@ import pytest
 
 from scripts.build_bingx_wrappers import field_kind, operation_name
 from scripts.build_bitget_wrappers import snake
+from scripts.build_bingx_wrappers import UNAVAILABLE_PATHS
 from tests.unit.endpoint_wrapper_helpers import generated_method_members
 from tests.unit.native_http_helpers import _http_server
 
 ROOT = Path(__file__).resolve().parents[2]
-OPERATIONS = json.loads(
-    (ROOT / "docs/official-endpoint-inventory/sources/bingx-operations.json").read_text(
-        encoding="utf8"
+# Documented operations minus the ones the generator excludes as absent live.
+OPERATIONS = [
+    op
+    for op in json.loads(
+        (ROOT / "docs/official-endpoint-inventory/sources/bingx-operations.json").read_text(
+            encoding="utf8"
+        )
     )
-)
+    if op["path"] not in UNAVAILABLE_PATHS
+]
 NAMES = {operation_name(o) for o in OPERATIONS}
 
 
@@ -106,4 +112,8 @@ async def test_inventory_wire(asynchronous, op):
 def test_inventory_surface():
     for prefix in ["dcex", "dcex.async_support"]:
         cls = importlib.import_module(prefix + ".bingx._generated").GeneratedHTTP
-        assert {k for k, v in generated_method_members(cls).items() if not k.startswith("_") and callable(v)} == NAMES
+        assert {
+            k
+            for k, v in generated_method_members(cls).items()
+            if not k.startswith("_") and callable(v)
+        } == NAMES

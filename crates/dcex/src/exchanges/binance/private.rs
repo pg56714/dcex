@@ -248,6 +248,15 @@ impl BinanceClient {
                     .await
             }
             "get_prevented_matches" => {
+                // Checked after the symbol so a missing symbol is reported first.
+                if params.get("product_symbol").is_some()
+                    && params.get("orderId").is_some() == params.get("preventedMatchId").is_some()
+                {
+                    return Err(crate::DcexError::InvalidInput(
+                        "Binance: exactly one of orderId and preventedMatchId is required"
+                            .to_string(),
+                    ));
+                }
                 self.spot_signed_request(HttpMethod::Get, SPOT_PREVENTED_MATCHES, params, true)
                     .await
             }

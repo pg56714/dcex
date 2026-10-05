@@ -39,6 +39,11 @@ mod asset_requests {
             _method_name: &str,
             params: &OkxParams,
         ) -> Result<ValidatedResponse> {
+            if params.get("transId").is_none() && params.get("clientId").is_none() {
+                return Err(crate::DcexError::InvalidInput(
+                    "OKX: one of transId, clientId is required".to_string(),
+                ));
+            }
             {
                 self.get_request(
                     ASSET_TRANSFER_STATE,

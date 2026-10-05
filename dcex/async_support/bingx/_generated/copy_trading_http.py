@@ -191,19 +191,6 @@ class GeneratedCopyTradingHTTP(MarketHTTP):
             "get_copy_trading_v1_spot_profit_history_summarys", self._native_params(**{})
         )
 
-    async def get_copy_trading_v1_swap_trace_current_track(
-        self, *, symbol: str, offset: int | None = None, limit: int | None = None
-    ) -> Any:  # noqa: ANN401
-        """1. Trader's Current Orders.
-
-        Use native BingX symbols. Decimal fields are strings to preserve precision.
-        Source: https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/copytrade-swap/api-reference.md#L16
-        """
-        return await self._native_private(
-            "get_copy_trading_v1_swap_trace_current_track",
-            self._native_params(**{"symbol": symbol, "offset": offset, "limit": limit}),
-        )
-
     async def post_copy_trading_v1_swap_trace_close_track_order(self, *, position_id: int) -> Any:  # noqa: ANN401
         """2. Close Position by Order Number.
 

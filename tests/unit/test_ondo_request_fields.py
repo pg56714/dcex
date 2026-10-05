@@ -145,26 +145,17 @@ def test_ondo_account_management_fields_are_encoded() -> None:
     client._native_client = native
 
     assert not hasattr(client, "withdraw")
+    # API-key management needs a web-session JWT; Ondo API keys cannot be granted it.
+    for removed in ("list_api_keys", "create_api_key", "delete_api_key", "invalidate_jwt"):
+        assert not hasattr(client, removed)
     assert callable(client.sandbox_withdrawal)
     assert callable(client.create_withdrawal)
-    client.create_api_key("trader", ["trade", "transfer"])
     client.get_withdrawal_status(customer_withdrawal_id="withdrawal-id")
-    client.set_api_key_ip_whitelist("api-key-id", "192.0.2.1")
 
     assert native.calls == [
         (
             "private",
-            "create_api_key",
-            [("name", "trader"), ("scopes", '["trade","transfer"]')],
-        ),
-        (
-            "private",
             "get_withdrawal_status",
             [("customer_withdrawal_id", "withdrawal-id")],
-        ),
-        (
-            "private",
-            "set_api_key_ip_whitelist",
-            [("apiKeyID", "api-key-id"), ("ip", "192.0.2.1")],
         ),
     ]

@@ -5,7 +5,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
     public [
     ];
     private [
-        get_agent_v1_asset_partner_data(),
+        get_agent_v1_asset_partner_data(start_time => "startTime", end_time => "endTime", page_index => "pageIndex", page_size => "pageSize"),
         get_agent_v2_reward_commission_data_list(start_time => "startTime", end_time => "endTime", page_index => "pageIndex", page_size => "pageSize", recv_window => "recvWindow"),
         get_agent_v1_reward_third_commission_data_list(commission_biz_type => "commissionBizType", start_time => "startTime", end_time => "endTime", page_index => "pageIndex", page_size => "pageSize"),
         get_agent_v1_commission_data_list_referral_code(direct_invitation => "directInvitation"),

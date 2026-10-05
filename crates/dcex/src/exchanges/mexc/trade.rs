@@ -392,7 +392,8 @@ impl MexcClient {
             }
             "get_contract_open_order_count" => {
                 params.ensure_allowed(&[])?;
-                self.contract_post_json(CONTRACT_OPEN_ORDER_TOTAL_COUNT, Value::Object(Map::new()))
+                // The docs say POST, but the live route answers only GET (POST is 404).
+                self.contract_get(CONTRACT_OPEN_ORDER_TOTAL_COUNT, Vec::new())
                     .await
             }
             "reverse_contract_position" => {

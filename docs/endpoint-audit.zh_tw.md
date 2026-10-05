@@ -2,7 +2,7 @@
 
 [English](endpoint-audit.md) | **繁體中文**
 
-核對日期：2026-09-30。原始報表有 3,180 列；目前清冊共 4,860 列，另保存 15 家交易所的官方文件清冊。
+核對日期：2026-09-30。原始報表有 3,180 列；目前清冊共 4,861 列，另保存 15 家交易所的官方文件清冊。
 
 所有官方端點均納入範圍，包含提款、地址管理、做市商、RFQ、經紀商、推薦與合作夥伴操作。原先 111 個 excluded 列已處理，沒有保留範圍排除；這不代表所有新發現端點均已實作。
 
@@ -16,10 +16,10 @@ API 提款沒有第二次確認，送出即執行。建議交易用 API 金鑰�
 
 | 狀態 | 列數 | 定義 |
 | --- | ---: | --- |
-| `implemented` | 3,418 | 具備精確離線 HTTP 路由證據及 Rust／Python 公開方法 |
+| `implemented` | 3,411 | 具備精確離線 HTTP 路由證據及 Rust／Python 公開方法 |
 | `protocol` | 395 | 非同步 WebSocket 協定支援，附離線驗證證據；不代表線上認證 |
-| `superseded` | 979 | 歷史端點或群組列，已由目前的明確列取代 |
-| `unavailable` | 19 | 官方停用、目前不可用的操作，或沒有獨立端點的文件章節 |
+| `superseded` | 980 | 歷史端點或群組列，已由目前的明確列取代 |
+| `unavailable` | 26 | 官方停用、目前不可用的操作，或沒有獨立端點的文件章節 |
 | `unverified` | 11 | 已有包裝，但部分官方規格不完整 |
 | `blocked` | 37 | 缺少必要簽章或授權規格 |
 | `partial` | 1 | 群組能力仍有明確記錄的缺口 |
@@ -35,7 +35,7 @@ API 提款沒有第二次確認，送出即執行。建議交易用 API 金鑰�
 | [bybit](official-endpoint-inventory/bybit.json) | 448 | 434 | 0 |
 | [okx](official-endpoint-inventory/okx.json) | 404 | 388 | 0 |
 | [bitget](official-endpoint-inventory/bitget.json) | 328 | 328 | 0 |
-| [bingx](official-endpoint-inventory/bingx.json) | 210 | 191 | 0 |
+| [bingx](official-endpoint-inventory/bingx.json) | 209 | 190 | 0 |
 | [kraken](official-endpoint-inventory/kraken.json) | 164 | 148 | 0 |
 | [mexc](official-endpoint-inventory/mexc.json) | 176 | 157 | 0 |
 | [kucoin](official-endpoint-inventory/kucoin.json) | 365 | 340 | 0 |
@@ -44,7 +44,7 @@ API 提款沒有第二次確認，送出即執行。建議交易用 API 金鑰�
 | [backpack](official-endpoint-inventory/backpack.json) | 82 | 79 | 0 |
 | [aster](official-endpoint-inventory/aster.json) | 156 | 152 | 0 |
 | [extended](official-endpoint-inventory/extended.json) | 71 | 72 | 0 |
-| [ondo](official-endpoint-inventory/ondo.json) | 81 | 76 | 0 |
+| [ondo](official-endpoint-inventory/ondo.json) | 75 | 70 | 0 |
 | [arcus](official-endpoint-inventory/arcus.json) | 90 | 77 | 0 |
 
 ## 驗證與限制

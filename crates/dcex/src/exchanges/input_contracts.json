@@ -9544,15 +9544,6 @@
           }
         }
       },
-      "get_copy_trading_v1_swap_trace_current_track": {
-        "type": "object",
-        "properties": {
-          "offset": {
-            "type": "integer",
-            "description": "skips an integer number of copy trading v1 swap trace current track records before returning the next page."
-          }
-        }
-      },
       "post_wealth_v1_product_dual_currency_invest_asset_list": {
         "type": "object",
         "properties": {

@@ -32,6 +32,14 @@ def field_kind(field: dict[str, Any]) -> str:
     return "str"
 
 
+# Documented but absent live: BingX answers 100400 "this api is not exist" (2026-10-05).
+UNAVAILABLE_PATHS = {"/openApi/copyTrading/v1/swap/trace/currentTrack"}
+# Documented as optional but required live (100400 "Missing required parameter", 2026-10-05).
+REQUIRED_LIVE = {
+    "/openApi/agent/v1/asset/partnerData": {"startTime", "endTime", "pageIndex", "pageSize"}
+}
+
+
 def main() -> None:
     """Regenerate both Python clients and the native wrapper metadata."""
     operations = json.loads(
@@ -41,9 +49,14 @@ def main() -> None:
     )
     specs = []
     for op in operations:
+        if op["path"] in UNAVAILABLE_PATHS:
+            continue
         fields = [
             {**f, "kind": field_kind(f)} for f in op["parameters"] if f["name"] != "timestamp"
         ]
+        for field in fields:
+            if field["name"] in REQUIRED_LIVE.get(op["path"], ()):
+                field["required"] = True
         if op["path"] == "/openApi/cswap/v2/trade/order":
             for field in fields:
                 if field["name"] in {"takeProfit", "stopLoss"}:

@@ -3135,7 +3135,7 @@ fn remaining_account_and_market_endpoints_use_documented_routes() {
         ),
         private(
             "get_coin_futures_order_modify_history",
-            &[("symbol", "BTCUSD_PERP")],
+            &[("symbol", "BTCUSD_PERP"), ("orderId", "1")],
             "GET",
             "/dapi/v1/orderAmendment",
         ),
@@ -3407,7 +3407,7 @@ fn remaining_account_and_market_endpoints_use_documented_routes() {
         ),
         private(
             "get_futures_order_modify_history",
-            &[("symbol", "BTCUSDT")],
+            &[("symbol", "BTCUSDT"), ("orderId", "1")],
             "GET",
             "/fapi/v1/orderAmendment",
         ),
@@ -3570,7 +3570,7 @@ fn remaining_account_and_market_endpoints_use_documented_routes() {
         ),
         private(
             "query_margin_special_key",
-            &[],
+            &[("apiKey", "key-1")],
             "GET",
             "/sapi/v1/margin/apiKey",
         ),

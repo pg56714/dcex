@@ -430,7 +430,7 @@
       {
         "key": "order_id",
         "kind": "string",
-        "required": false,
+        "required": true,
         "values": [],
         "minimum": 0
       },

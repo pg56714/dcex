@@ -274,8 +274,10 @@
     "keys": [
       "instFamily"
     ],
-    "required": [],
+    "required": [
+      "instFamily"
+    ],
     "bools": [],
-    "schema": "{\"type\":\"object\",\"properties\":{\"instFamily\":{\"type\":\"string\"}},\"required\":[]}"
+    "schema": "{\"type\":\"object\",\"properties\":{\"instFamily\":{\"type\":\"string\"}},\"required\":[\"instFamily\"]}"
   }
 ]

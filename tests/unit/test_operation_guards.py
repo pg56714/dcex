@@ -26,7 +26,6 @@ CONFIRMED = [
     ("bybit", "delete_api_key", {}),
     ("bybit", "modify_api_key", {"read_only": 1}),
     ("kucoin", "set_uta_account_mode", {"account_type": "UNIFIED"}),
-    ("ondo", "delete_api_key", {"apiKeyID": "key"}),
     ("aster", "trigger_futures_asset_exchange", {}),
 ]
 SCOPED = [

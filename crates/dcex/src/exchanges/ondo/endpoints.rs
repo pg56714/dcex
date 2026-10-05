@@ -51,4 +51,3 @@ pub(super) const DEPOSIT_ADDRESSES: &str = "/v1/wallet/deposit_address/list";
 pub(super) const DEPOSITS_CSV: &str = "/v1/wallet/deposits/csv";
 pub(super) const WITHDRAWALS_CSV: &str = "/v1/wallet/withdrawals/csv";
 pub(super) const ADDRESS_BOOK: &str = "/v1/wallet/address_book";
-pub(super) const API_KEYS: &str = "/v1/api_keys";

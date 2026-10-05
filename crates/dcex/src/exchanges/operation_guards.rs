@@ -17,7 +17,6 @@ pub(super) fn validate(
         "bingx" => matches!(method, "reverse_swap_position" | "set_swap_asset_mode"),
         "bybit" => matches!(method, "delete_api_key" | "modify_api_key"),
         "kucoin" => method == "set_uta_account_mode",
-        "ondo" => method == "delete_api_key",
         "aster" => matches!(method, "trigger_futures_asset_exchange"),
         _ => false,
     };
@@ -139,7 +138,7 @@ mod tests {
 
     #[test]
     fn local_flags_cannot_be_omitted_duplicated_or_sent_to_exchange() {
-        for exchange in ["bybit", "ondo"] {
+        for exchange in ["bybit"] {
             assert!(validate(exchange, "delete_api_key", vec![]).is_err());
             for value in ["false", "1", "True", ""] {
                 assert!(

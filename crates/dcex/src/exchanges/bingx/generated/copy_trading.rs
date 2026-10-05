@@ -16,7 +16,6 @@ crate::exchanges::impl_exchange_method_wrappers! {
         post_copy_trading_v1_spot_trader_sell_order(order_id => "orderId"),
         post_copy_trading_v1_p_futures_set_commission(new_commission => "newCommission"),
         get_copy_trading_v1_spot_profit_history_summarys(),
-        get_copy_trading_v1_swap_trace_current_track(symbol => "symbol"),
         post_copy_trading_v1_swap_trace_close_track_order(position_id => "positionId"),
     ];
 }

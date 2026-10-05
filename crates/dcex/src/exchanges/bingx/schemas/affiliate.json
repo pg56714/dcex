@@ -15,28 +15,28 @@
       {
         "name": "startTime",
         "type": "int64",
-        "required": false,
+        "required": true,
         "description": "Start time, unit: day, only supports querying the latest 3 months. ",
         "kind": "int"
       },
       {
         "name": "endTime",
         "type": "int64",
-        "required": false,
+        "required": true,
         "description": "End time, unit: day, only supports querying the latest 3 months. ",
         "kind": "int"
       },
       {
         "name": "pageIndex",
         "type": "int64",
-        "required": false,
+        "required": true,
         "description": "如果未填寫，預設值為1",
         "kind": "int"
       },
       {
         "name": "pageSize",
         "type": "int64",
-        "required": false,
+        "required": true,
         "description": "the maximum value is 200",
         "kind": "int"
       },

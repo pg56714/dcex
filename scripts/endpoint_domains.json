@@ -263,7 +263,6 @@
       "get_agent_v1_account_superior_check": "affiliate",
       "get_content_v1_announcement": "announcements",
       "post_api_lindorm_v1_ai_kline_query": "market",
-      "get_copy_trading_v1_swap_trace_current_track": "copy_trading",
       "post_copy_trading_v1_swap_trace_close_track_order": "copy_trading"
     },
     "generated_methods": [
@@ -303,7 +302,6 @@
       "get_agent_v1_account_superior_check",
       "get_content_v1_announcement",
       "post_api_lindorm_v1_ai_kline_query",
-      "get_copy_trading_v1_swap_trace_current_track",
       "post_copy_trading_v1_swap_trace_close_track_order"
     ]
   },

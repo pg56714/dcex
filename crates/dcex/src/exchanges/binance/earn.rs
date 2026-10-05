@@ -208,7 +208,12 @@ impl BinanceClient {
             "get_locked_earn_redemption_history" => {
                 (HttpMethod::Get, SIMPLE_EARN_LOCKED_REDEMPTIONS)
             }
-            "get_flexible_earn_rewards_history" => (HttpMethod::Get, SIMPLE_EARN_FLEXIBLE_REWARDS),
+            "get_flexible_earn_rewards_history" => {
+                // Official and live (-1102): type is mandatory.
+                params.required("type")?;
+                params.optional_one_of("type", &["BONUS", "REALTIME", "REWARDS"])?;
+                (HttpMethod::Get, SIMPLE_EARN_FLEXIBLE_REWARDS)
+            }
             "get_locked_earn_rewards_history" => (HttpMethod::Get, SIMPLE_EARN_LOCKED_REWARDS),
             _ => return Ok(None),
         };

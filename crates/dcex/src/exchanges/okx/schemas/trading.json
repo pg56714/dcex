@@ -121,7 +121,7 @@
         "name": "instFamily",
         "python_name": "inst_family",
         "type": "string",
-        "required": false,
+        "required": true,
         "description": "Instrument Family"
       }
     ],
@@ -132,7 +132,9 @@
           "type": "string"
         }
       },
-      "required": []
+      "required": [
+        "instFamily"
+      ]
     },
     "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-mmp-config",
     "row": 1068

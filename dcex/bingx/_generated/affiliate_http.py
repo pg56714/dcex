@@ -11,11 +11,11 @@ class GeneratedAffiliateHTTP(MarketHTTP):
     def get_agent_v1_asset_partner_data(
         self,
         *,
+        start_time: int,
+        end_time: int,
+        page_index: int,
+        page_size: int,
         uid: int | None = None,
-        start_time: int | None = None,
-        end_time: int | None = None,
-        page_index: int | None = None,
-        page_size: int | None = None,
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """Query partner information.
@@ -27,11 +27,11 @@ class GeneratedAffiliateHTTP(MarketHTTP):
             "get_agent_v1_asset_partner_data",
             self._native_params(
                 **{
-                    "uid": uid,
                     "startTime": start_time,
                     "endTime": end_time,
                     "pageIndex": page_index,
                     "pageSize": page_size,
+                    "uid": uid,
                     "recvWindow": recv_window,
                 }
             ),

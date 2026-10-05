@@ -1020,7 +1020,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         )
 
     def get_spot_order_amends(
-        self, *, order_id: str | None = None, rebase_multiplier: str | None = None
+        self, *, order_id: str, rebase_multiplier: str | None = None
     ) -> dict[str, Any]:
         """
         POST /0/private/OrderAmends.

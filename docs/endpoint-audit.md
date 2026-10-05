@@ -2,7 +2,7 @@
 
 **English** | [繁體中文](endpoint-audit.zh_tw.md)
 
-Reviewed: 2026-09-30. The original report contained 3,180 rows; the reconciled ledger contains 4,860 rows, with official documentation inventories for all 15 exchanges.
+Reviewed: 2026-09-30. The original report contained 3,180 rows; the reconciled ledger contains 4,861 rows, with official documentation inventories for all 15 exchanges.
 
 All documented endpoints are in scope, including withdrawals, address management, market making, RFQ, broker, referral and partner operations. All 111 originally excluded rows have been addressed; there are no scope exclusions. This does not mean every newly discovered endpoint is implemented.
 
@@ -16,10 +16,10 @@ Historical, grouped and overlapping rows prevent converting these counts into an
 
 | Status | Rows | Definition |
 | --- | ---: | --- |
-| `implemented` | 3,418 | Exact offline HTTP route and public Rust/Python wrappers |
+| `implemented` | 3,411 | Exact offline HTTP route and public Rust/Python wrappers |
 | `protocol` | 395 | Asynchronous WebSocket protocol support with cited offline evidence; no live certification |
-| `superseded` | 979 | Historical or grouped row replaced by explicit current rows |
-| `unavailable` | 19 | Retired/unavailable operation, or documentation-only section with no endpoint |
+| `superseded` | 980 | Historical or grouped row replaced by explicit current rows |
+| `unavailable` | 26 | Retired/unavailable operation, or documentation-only section with no endpoint |
 | `unverified` | 11 | Wrapper exists, but part of the official specification is incomplete |
 | `blocked` | 37 | Required signing or authorization specification is missing |
 | `partial` | 1 | Grouped capability still has a documented gap |
@@ -35,7 +35,7 @@ Method counts include aliases and signing helpers, not endpoints.
 | [bybit](official-endpoint-inventory/bybit.json) | 448 | 434 | 0 |
 | [okx](official-endpoint-inventory/okx.json) | 404 | 388 | 0 |
 | [bitget](official-endpoint-inventory/bitget.json) | 328 | 328 | 0 |
-| [bingx](official-endpoint-inventory/bingx.json) | 210 | 191 | 0 |
+| [bingx](official-endpoint-inventory/bingx.json) | 209 | 190 | 0 |
 | [kraken](official-endpoint-inventory/kraken.json) | 164 | 148 | 0 |
 | [mexc](official-endpoint-inventory/mexc.json) | 176 | 157 | 0 |
 | [kucoin](official-endpoint-inventory/kucoin.json) | 365 | 340 | 0 |
@@ -44,7 +44,7 @@ Method counts include aliases and signing helpers, not endpoints.
 | [backpack](official-endpoint-inventory/backpack.json) | 82 | 79 | 0 |
 | [aster](official-endpoint-inventory/aster.json) | 156 | 152 | 0 |
 | [extended](official-endpoint-inventory/extended.json) | 71 | 72 | 0 |
-| [ondo](official-endpoint-inventory/ondo.json) | 81 | 76 | 0 |
+| [ondo](official-endpoint-inventory/ondo.json) | 75 | 70 | 0 |
 | [arcus](official-endpoint-inventory/arcus.json) | 90 | 77 | 0 |
 
 ## Verification and limits
