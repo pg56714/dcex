@@ -82,6 +82,9 @@ COMMON: dict[str, Any] = {
     "end_time": NOW_MS,
     "endTime": NOW_MS,
     "limit": 5,
+    "page": 1,
+    "page_index": 1,
+    "page_size": 10,
     "ccy": "BTC",
     "coin": "BTC",
     "currency": "BTC",
@@ -265,10 +268,16 @@ def classify(error: BaseException) -> dict[str, str]:
     return {"outcome": "transport_error", "message": text[:300]}
 
 
-def call_method(client: Any, exchange: str, name: str, fn: Any) -> dict[str, Any]:  # noqa: ANN401
-    """Call one public method with fixtures and record the outcome."""
+def call_method(
+    client: Any,  # noqa: ANN401
+    exchange: str,
+    name: str,
+    fn: Any,  # noqa: ANN401
+    skip: re.Pattern[str] = SKIP_NAME,
+) -> dict[str, Any]:
+    """Call one method with fixtures and record only the outcome (never the response)."""
     row: dict[str, Any] = {"exchange": exchange, "method": name}
-    if SKIP_NAME.search(name):
+    if skip.search(name):
         return {**row, "outcome": "skipped", "message": "not a plain read"}
     kwargs, missing = build_kwargs(exchange, name, fn)
     if missing:
