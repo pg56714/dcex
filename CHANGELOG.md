@@ -1,3 +1,9 @@
+## 0.36.2 (2026-10-05)
+
+### Fix
+
+- correct private read endpoints found by the live read-only smoke run
+
 ## 0.36.1 (2026-10-04)
 
 ### Fix
