@@ -72,12 +72,18 @@ def main() -> None:
         fields = [
             {**f, "wire": wire_name(f["name"]), "kind": field_kind(f)} for f in op["parameters"]
         ]
+        spec = {
+            "name": operation_name(op),
+            "method": op["method"],
+            "path": path,
+            "public": public,
+        }
+        # MARKET_DATA routes are unsigned but still require the X-MBX-APIKEY header.
+        if public and not path.startswith("/bapi/"):
+            spec["api_key"] = True
         specs.append(
             {
-                "name": operation_name(op),
-                "method": op["method"],
-                "path": path,
-                "public": public,
+                **spec,
                 "fields": fields,
                 "json_body": path in {"/sapi/v1/fiat/deposit", "/sapi/v2/fiat/withdraw"},
                 "source": op["official_source"],
