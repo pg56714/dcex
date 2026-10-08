@@ -3172,3 +3172,25 @@ async fn market_buy_helper_rejects_conflicting_caller_values_before_request() {
     assert_eq!(body["ordType"], "market");
     assert_eq!(body["instId"], "BTC-USDT");
 }
+
+#[tokio::test]
+async fn every_typed_wrapper_reaches_dispatch() {
+    // The typed Rust methods must reach the same dispatch Python calls by name.
+    let url = crate::exchanges::wrapper_dispatch::instant_server();
+    let client = client(url.clone());
+    crate::exchanges::wrapper_dispatch::assert_dispatch(
+        "okx",
+        "OkxClient",
+        |name, public, params| {
+            let client = &client;
+            async move {
+                if public {
+                    client.public_request(name, params).await
+                } else {
+                    client.private_request(name, params).await
+                }
+            }
+        },
+    )
+    .await;
+}

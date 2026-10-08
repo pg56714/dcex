@@ -2319,7 +2319,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
     def set_coin_futures_margin_type(
         self,
         product_symbol: str,
-        margin_type: str | None = None,
+        margin_type: str,
         *,
         recv_window: int | None = None,
     ) -> dict[str, Any] | list[dict[str, Any]]:
@@ -2336,7 +2336,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
     def set_coin_futures_cancel_countdown(
         self,
         product_symbol: str,
-        countdown_time: int | None = None,
+        countdown_time: int,
         *,
         recv_window: int | None = None,
     ) -> dict[str, Any] | list[dict[str, Any]]:
@@ -2391,7 +2391,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
     def set_coin_futures_leverage(
         self,
         product_symbol: str,
-        leverage: int | None = None,
+        leverage: int,
         *,
         recv_window: int | None = None,
     ) -> dict[str, Any] | list[dict[str, Any]]:

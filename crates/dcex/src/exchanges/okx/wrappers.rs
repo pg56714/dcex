@@ -406,7 +406,7 @@ mod business_methods {
         private [
             reset_mmp(inst_family => "instFamily"),
             set_mmp_config(inst_family => "instFamily", time_interval => "timeInterval", frozen_interval => "frozenInterval", qty_limit => "qtyLimit"),
-            get_mmp_config(),
+            get_mmp_config(inst_family => "instFamily"),
             get_glp_today_performance(),
             get_glp_historical_performance(program => "program"),
             mass_cancel_options_orders(inst_type => "instType", inst_family => "instFamily"),

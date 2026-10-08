@@ -114,7 +114,7 @@ class MarketHTTP(HTTPManager):
 
     def get_futures_orderbook(
         self,
-        product_symbol: str | None = None,
+        product_symbol: str,
         depth: int | None = None,
     ) -> dict[str, Any]:
         """Retrieve KuCoin futures orderbook."""

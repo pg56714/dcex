@@ -60,7 +60,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         cancel_order(product_symbol => "product_symbol"),
 
         get_open_orders(),
-        cancel_open_orders(),
+        cancel_open_orders(product_symbol => "product_symbol"),
         get_fill_history(),
         get_order_history(),
         get_open_positions(),

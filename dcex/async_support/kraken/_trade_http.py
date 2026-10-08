@@ -708,7 +708,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         self,
         product_symbol: str,
         *,
-        margin_mode: str | None = None,
+        margin_mode: str,
         max_leverage: str | None = None,
     ) -> dict[str, Any]:
         """Select margin_mode explicitly: isolated requires max_leverage; cross forbids it."""

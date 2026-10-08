@@ -45,7 +45,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_uta_open_interest(category => "category"),
         get_uta_current_funding_rate(),
 
-        get_uta_liquidations(product_symbol => "product_symbol"),
+        get_uta_liquidations(category => "category"),
         get_uta_instruments(category => "category"),
         get_uta_tickers(category => "category"),
         get_uta_orderbook(category => "category", product_symbol => "product_symbol"),
@@ -171,7 +171,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_uta_positions(category => "category"),
         place_uta_strategy_order(category => "category", product_symbol => "product_symbol"),
         modify_uta_strategy_order(qty => "qty"),
-        cancel_uta_strategy_order(),
+        cancel_uta_strategy_order(order_id => "orderId"),
         get_uta_unfilled_strategy_orders(category => "category"),
         get_uta_history_strategy_orders(category => "category"),
 

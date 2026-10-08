@@ -215,9 +215,16 @@ impl AsyncHttpClient {
     }
 
     pub async fn execute(&self, request: HttpRequest) -> Result<HttpResponse> {
-        let mut builder = self
-            .client
-            .request(request.method.as_reqwest(), request.url()?);
+        let url = request.url()?;
+        // Unit tests never reach a real exchange; live checks live under tests/ and scripts/.
+        #[cfg(test)]
+        if !matches!(url.host_str(), Some("127.0.0.1" | "localhost" | "[::1]")) {
+            return Err(DcexError::Transport(format!(
+                "unit tests must not reach external host {}",
+                url.host_str().unwrap_or_default()
+            )));
+        }
+        let mut builder = self.client.request(request.method.as_reqwest(), url);
         if !request.query.is_empty() {
             builder = builder.query(&request.query);
         }

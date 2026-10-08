@@ -201,7 +201,7 @@ mod schema_methods {
     query_margin_liquidation_loan(),
     query_margin_liquidation_loan_repay_history(),
     query_margin_prevented_matches(symbol => "symbol"),
-    query_margin_special_key(),
+    query_margin_special_key(api_key => "apiKey"),
     query_margin_special_key_list(),
     margin_small_liability_exchange(asset_names => "assetNames"),
     get_margin_cross_margin_transfer_history(),

@@ -821,3 +821,36 @@ fn all_open_orders_rejects_unified_symbol_for_another_market() {
     .expect_err("conflicting market_type");
     assert!(error.to_string().contains("market_type"), "{error}");
 }
+
+#[tokio::test]
+async fn every_typed_wrapper_reaches_dispatch() {
+    // The typed Rust methods must reach the same dispatch Python calls by name.
+    let url = crate::exchanges::wrapper_dispatch::instant_server();
+    let client = BinanceClient::with_all_base_urls(
+        Some("api-key".into()),
+        Some("secret".into()),
+        Duration::from_secs(10),
+        url.clone(),
+        url.clone(),
+        url.clone(),
+    )
+    .expect("client")
+    .with_alpha_base_url(url.clone())
+    .with_portfolio_margin_base_url(url.clone())
+    .with_coin_futures_base_url(url.clone());
+    crate::exchanges::wrapper_dispatch::assert_dispatch(
+        "binance",
+        "BinanceClient",
+        |name, public, params| {
+            let client = &client;
+            async move {
+                if public {
+                    client.public_request(name, params).await
+                } else {
+                    client.private_request(name, params).await
+                }
+            }
+        },
+    )
+    .await;
+}

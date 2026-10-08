@@ -1838,3 +1838,25 @@ fn info_queries_are_independent_of_websocket_subscriptions() {
         json!({"type":"userTwapSliceFills","user":USER_LOWER})
     );
 }
+
+#[tokio::test]
+async fn every_typed_wrapper_reaches_dispatch() {
+    // The typed Rust methods must reach the same dispatch Python calls by name.
+    let url = crate::exchanges::wrapper_dispatch::instant_server();
+    let client = signing_client(url.clone());
+    crate::exchanges::wrapper_dispatch::assert_dispatch(
+        "hyperliquid",
+        "HyperliquidClient",
+        |name, public, params| {
+            let client = &client;
+            async move {
+                if public {
+                    client.public_request(name, params).await
+                } else {
+                    client.private_request(name, params).await
+                }
+            }
+        },
+    )
+    .await;
+}

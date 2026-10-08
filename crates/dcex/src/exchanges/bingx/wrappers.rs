@@ -22,7 +22,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_spot_kline(product_symbol => "product_symbol", interval => "interval"),
         get_spot_kline_v2(product_symbol => "product_symbol", interval => "interval"),
         get_spot_orderbook(product_symbol => "product_symbol"),
-        get_spot_orderbook_v2(product_symbol => "product_symbol"),
+        get_spot_orderbook_v2(product_symbol => "product_symbol", depth => "depth"),
         get_spot_price_ticker(product_symbol => "product_symbol"),
         get_spot_public_trades(product_symbol => "product_symbol"),
         get_spot_ticker(),

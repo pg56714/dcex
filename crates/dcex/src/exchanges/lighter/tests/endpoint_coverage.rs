@@ -1884,3 +1884,25 @@ fn same_master_transfer_has_no_external_wallet_signature() {
     assert_eq!(info["Memo"], json!([0; 32].to_vec()));
     assert_eq!(info["Amount"], 4294967297_u64);
 }
+
+#[tokio::test]
+async fn every_typed_wrapper_reaches_dispatch() {
+    // The typed Rust methods must reach the same dispatch Python calls by name.
+    let url = crate::exchanges::wrapper_dispatch::instant_server();
+    let client = signing_client(url.clone());
+    crate::exchanges::wrapper_dispatch::assert_dispatch(
+        "lighter",
+        "LighterClient",
+        |name, public, params| {
+            let client = &client;
+            async move {
+                if public {
+                    client.public_request(name, params).await
+                } else {
+                    client.private_request(name, params).await
+                }
+            }
+        },
+    )
+    .await;
+}

@@ -1937,3 +1937,5 @@ fn every_client_has_a_catalog_identity() {
 
 #[cfg(test)]
 mod symbol_tests;
+#[cfg(test)]
+pub(crate) mod wrapper_dispatch;

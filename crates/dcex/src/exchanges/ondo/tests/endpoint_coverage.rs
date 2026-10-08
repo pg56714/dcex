@@ -319,7 +319,7 @@ fn public_market_data_routes_match_official_paths() {
             "/v1/perps/trades?market=AAPL-USD.P&limit=10",
         ),
         public(
-            "get_recent_trades",
+            "get_trades",
             &[("product_symbol", "BTC-USD-SWAP")],
             "GET",
             "/v1/perps/trades?market=BTC-USD.P",
@@ -329,12 +329,6 @@ fn public_market_data_routes_match_official_paths() {
             &[("market", MARKET), ("depth", "20")],
             "GET",
             "/v1/perps/depth?market=AAPL-USD.P&depth=20",
-        ),
-        public(
-            "get_order_book_depth",
-            &[("market", MARKET)],
-            "GET",
-            "/v1/perps/depth?market=AAPL-USD.P",
         ),
         public("get_symbol_info", &[], "GET", "/v1/perps/symbol_info"),
         public(
@@ -853,4 +847,32 @@ fn market_normalization_applies_to_batch_bodies_only_through_market_field() {
             "takeProfit": {"triggerPrice": "2"}
         }]})
     );
+}
+
+#[tokio::test]
+async fn every_typed_wrapper_reaches_dispatch() {
+    // The typed Rust methods must reach the same dispatch Python calls by name.
+    let url = crate::exchanges::wrapper_dispatch::instant_server();
+    let client = OndoClient::with_base_url(
+        Some("key-id".to_string()),
+        Some("ondoApiSecret_SECRET".to_string()),
+        Duration::from_secs(10),
+        url.clone(),
+    )
+    .expect("client");
+    crate::exchanges::wrapper_dispatch::assert_dispatch(
+        "ondo",
+        "OndoClient",
+        |name, public, params| {
+            let client = &client;
+            async move {
+                if public {
+                    client.public_request(name, params).await
+                } else {
+                    client.private_request(name, params).await
+                }
+            }
+        },
+    )
+    .await;
 }

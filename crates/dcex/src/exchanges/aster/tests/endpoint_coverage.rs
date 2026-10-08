@@ -1714,3 +1714,25 @@ fn migration_history_route() {
         &["batchId=batch1"],
     )]);
 }
+
+#[tokio::test]
+async fn every_typed_wrapper_reaches_dispatch() {
+    // The typed Rust methods must reach the same dispatch Python calls by name.
+    let url = crate::exchanges::wrapper_dispatch::instant_server();
+    let client = client(&url);
+    crate::exchanges::wrapper_dispatch::assert_dispatch(
+        "aster",
+        "AsterClient",
+        |name, public, params| {
+            let client = &client;
+            async move {
+                if public {
+                    client.public_request(name, params).await
+                } else {
+                    client.private_request(name, params).await
+                }
+            }
+        },
+    )
+    .await;
+}

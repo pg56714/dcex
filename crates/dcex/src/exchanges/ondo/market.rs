@@ -114,12 +114,12 @@ impl OndoClient {
                 params.ensure_allowed(&[])?;
                 self.public_get(MARKETS, Vec::new()).await
             }
-            "get_trades" | "get_recent_trades" => {
+            "get_trades" => {
                 let query = self.market_query(&params, &["limit", "cursor"])?;
                 params.optional_u64("limit")?;
                 self.public_get(TRADES, query).await
             }
-            "get_order_book_depth" | "get_depth" => {
+            "get_depth" => {
                 let query = self.market_query(&params, &["depth"])?;
                 params.optional_u64("depth")?;
                 self.public_get(DEPTH, query).await

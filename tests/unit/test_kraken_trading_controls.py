@@ -20,7 +20,8 @@ def test_kraken_leverage_mode_must_be_explicit_and_consistent(kwargs):
     with _route_server() as (base, received):
         client = Client(**_client_kwargs(base))
         try:
-            with pytest.raises(ValueError):
+            # A missing margin_mode fails at the call (required argument); others locally.
+            with pytest.raises(TypeError if not kwargs else ValueError):
                 client.set_futures_leverage_preference("BTC-USD-SWAP", **kwargs)
         finally:
             client.close()

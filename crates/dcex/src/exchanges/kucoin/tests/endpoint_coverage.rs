@@ -3135,3 +3135,33 @@ async fn uta_batch_and_risk_reject_invalid_inputs_before_transport() {
         );
     }
 }
+
+#[tokio::test]
+async fn every_typed_wrapper_reaches_dispatch() {
+    // The typed Rust methods must reach the same dispatch Python calls by name.
+    let url = crate::exchanges::wrapper_dispatch::instant_server();
+    let client = KucoinClient::with_base_urls(
+        Some("key".into()),
+        Some("secret".into()),
+        Some("passphrase".into()),
+        Duration::from_secs(10),
+        url.clone(),
+        url.clone(),
+    )
+    .expect("client");
+    crate::exchanges::wrapper_dispatch::assert_dispatch(
+        "kucoin",
+        "KucoinClient",
+        |name, public, params| {
+            let client = &client;
+            async move {
+                if public {
+                    client.public_request(name, params).await
+                } else {
+                    client.private_request(name, params).await
+                }
+            }
+        },
+    )
+    .await;
+}

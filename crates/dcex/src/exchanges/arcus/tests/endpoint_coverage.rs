@@ -893,3 +893,50 @@ fn metadata_routes_and_preference_signature_are_exact() {
     );
     assert_eq!(header(&requests[0], "X-Signature"), Some(sig.as_str()));
 }
+
+#[tokio::test]
+async fn every_typed_wrapper_reaches_dispatch() {
+    // The typed Rust methods must reach the same dispatch Python calls by name.
+    let url = crate::exchanges::wrapper_dispatch::instant_server();
+    let client = perps_client(&url);
+    crate::exchanges::wrapper_dispatch::assert_dispatch(
+        "arcus",
+        "ArcusClient",
+        |name, public, params| {
+            let client = &client;
+            async move {
+                if public {
+                    client.public_request(name, params).await
+                } else {
+                    client.private_request(name, params).await
+                }
+            }
+        },
+    )
+    .await;
+}
+
+#[tokio::test]
+async fn every_typed_spot_wrapper_reaches_dispatch() {
+    // The typed Rust methods must reach the same dispatch Python calls by name.
+    let url = crate::exchanges::wrapper_dispatch::instant_server();
+    let client = ArcusSpotClient::new(Some("spot-key".into()), true, Duration::from_secs(10))
+        .expect("client")
+        .with_base_url(url.clone())
+        .expect("base URL");
+    crate::exchanges::wrapper_dispatch::assert_dispatch(
+        "arcus",
+        "ArcusSpotClient",
+        |name, public, params| {
+            let client = &client;
+            async move {
+                if public {
+                    client.public_request(name, params).await
+                } else {
+                    client.private_request(name, params).await
+                }
+            }
+        },
+    )
+    .await;
+}

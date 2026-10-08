@@ -243,10 +243,9 @@ impl KucoinClient {
             }
             "get_futures_orderbook" => {
                 params.ensure_allowed(&["product_symbol", "symbol", "depth"])?;
-                if params.get("depth").is_some() {
-                    params.required_any(&["product_symbol", "symbol"])?;
-                    validate_enum(&params, "depth", &["20", "100"])?;
-                }
+                // Live 400100 "Symbol parameter cannot be left empty" for the full snapshot too.
+                params.required_any(&["product_symbol", "symbol"])?;
+                validate_enum(&params, "depth", &["20", "100"])?;
                 Ok(())
             }
             "get_futures_kline" => {
