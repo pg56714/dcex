@@ -228,8 +228,8 @@ impl PythonMexcPrivateWebSocketClient {
     ) -> PyResult<Self> {
         let timeout = websocket_timeout(timeout)?;
         let client = match (spot_http_base_url, ws_base_url) {
-            (None, None) => MexcPrivateWebSocket::with_secret(api_key, api_secret, timeout),
-            (spot_http_base_url, ws_base_url) => MexcPrivateWebSocket::with_urls_and_secret(
+            (None, None) => MexcPrivateWebSocket::new(api_key, api_secret, timeout),
+            (spot_http_base_url, ws_base_url) => MexcPrivateWebSocket::with_urls(
                 api_key,
                 api_secret,
                 timeout,

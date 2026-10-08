@@ -29,7 +29,7 @@ pub struct MexcPrivateWebSocket {
 
 impl MexcPrivateWebSocket {
     pub fn new(api_key: String, api_secret: String, timeout: Duration) -> Result<Self> {
-        Self::with_urls_and_secret(
+        Self::with_urls(
             api_key,
             api_secret,
             timeout,
@@ -38,27 +38,7 @@ impl MexcPrivateWebSocket {
         )
     }
 
-    pub fn with_secret(api_key: String, api_secret: String, timeout: Duration) -> Result<Self> {
-        Self::new(api_key, api_secret, timeout)
-    }
-
     pub fn with_urls(
-        api_key: String,
-        api_secret: String,
-        timeout: Duration,
-        spot_http_base_url: impl Into<String>,
-        ws_base_url: impl Into<String>,
-    ) -> Result<Self> {
-        Self::with_urls_and_secret(
-            api_key,
-            api_secret,
-            timeout,
-            spot_http_base_url,
-            ws_base_url,
-        )
-    }
-
-    pub fn with_urls_and_secret(
         api_key: String,
         api_secret: String,
         timeout: Duration,
@@ -322,7 +302,7 @@ mod tests {
 
     #[test]
     fn listen_key_request_is_signed_when_secret_is_available() {
-        let ws = MexcPrivateWebSocket::with_urls_and_secret(
+        let ws = MexcPrivateWebSocket::with_urls(
             "key".to_string(),
             "secret".to_string(),
             Duration::from_secs(10),
