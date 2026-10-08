@@ -7,7 +7,7 @@ use std::sync::{
     Arc,
     atomic::{AtomicU64, Ordering},
 };
-use std::time::{Duration, SystemTime, UNIX_EPOCH};
+use std::time::Duration;
 
 use base64::{Engine, engine::general_purpose::STANDARD};
 use ed25519_dalek::{Signer, SigningKey};
@@ -15,6 +15,7 @@ use serde_json::{Map, Value, json};
 use tokio::sync::{Mutex, mpsc, oneshot};
 
 use crate::crypto::hmac_sha256_hex;
+use crate::exchange::ServerClock;
 use crate::ws::{WebSocketConfig, WebSocketConnection};
 use crate::{DcexError, Result};
 
@@ -48,6 +49,7 @@ pub struct BinanceWebSocketApi {
     signer: Option<ApiSigner>,
     next_id: AtomicU64,
     session: Mutex<Option<Session>>,
+    clock: ServerClock,
 }
 
 impl BinanceWebSocketApi {
@@ -63,12 +65,22 @@ impl BinanceWebSocketApi {
         ed25519_seed: Option<String>,
         timeout: Duration,
     ) -> Result<Self> {
-        let url = match market {
-            BinanceWebSocketApiMarket::Spot => "wss://ws-api.binance.com:443/ws-api/v3",
-            BinanceWebSocketApiMarket::Futures => "wss://ws-fapi.binance.com/ws-fapi/v1",
-            BinanceWebSocketApiMarket::CoinFutures => "wss://ws-dapi.binance.com/ws-dapi/v1",
-        };
-        Self::with_url(market, api_key, api_secret, ed25519_seed, timeout, url)
+        Self::with_url(
+            market,
+            api_key,
+            api_secret,
+            ed25519_seed,
+            timeout,
+            official_urls(market).0,
+        )
+    }
+
+    /// Correct signed timestamps with the server clock from this REST `time` URL, fetched
+    /// once before the first signed request. The official URLs use the market's REST time
+    /// endpoint; other URLs use the local clock unless this is called.
+    pub fn with_server_time_url(mut self, url: Option<String>) -> Self {
+        self.clock.set_url(url);
+        self
     }
 
     pub fn with_url(
@@ -100,6 +112,9 @@ impl BinanceWebSocketApi {
         } else {
             api_secret.map(ApiSigner::Hmac)
         };
+        let url = url.into();
+        let (official, time_url) = official_urls(market);
+        let official_time_url = (url.trim_end_matches('/') == official).then_some(time_url);
         Ok(Self {
             config: WebSocketConfig::new(url, timeout)?,
             market,
@@ -107,6 +122,10 @@ impl BinanceWebSocketApi {
             signer,
             next_id: AtomicU64::new(1),
             session: Mutex::new(None),
+            clock: ServerClock::new(
+                official_time_url,
+                super::super::signing::extract_server_time_ms,
+            ),
         })
     }
 
@@ -143,6 +162,10 @@ impl BinanceWebSocketApi {
     /// `timestamp` may be supplied for clock synchronization; otherwise it is added.
     /// Caller-supplied apiKey/signature are rejected to prevent accidental overrides.
     pub async fn request(&self, method: &str, params: Value) -> Result<u64> {
+        let signed = schema(self.market, method).is_some_and(|(auth, _)| auth == Auth::Signed);
+        if signed && params.get("timestamp").is_none() {
+            self.clock.sync("Binance", self.config.timeout).await?;
+        }
         let payload = self.prepare(method, params)?;
         let id = payload["id"].as_u64().expect("locally generated ID");
         let session = self.current().await?;
@@ -200,14 +223,7 @@ impl BinanceWebSocketApi {
         }
         if auth == Auth::Signed {
             if !params.contains_key("timestamp") {
-                let timestamp = SystemTime::now()
-                    .duration_since(UNIX_EPOCH)
-                    .map_err(|_| invalid("system clock precedes Unix epoch"))?
-                    .as_millis();
-                params.insert(
-                    "timestamp".into(),
-                    json!(u64::try_from(timestamp).map_err(|_| invalid("timestamp overflow"))?),
-                );
+                params.insert("timestamp".into(), json!(self.clock.now_ms()?));
             }
             let payload = signature_payload(&params)?;
             let signature = match self
@@ -225,6 +241,28 @@ impl BinanceWebSocketApi {
             .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
             .map_err(|_| invalid("request ID range exhausted"))?;
         Ok(json!({"id":id,"method":method,"params":params}))
+    }
+}
+
+/// The market's official WebSocket API URL and its REST `time` endpoint.
+fn official_urls(market: BinanceWebSocketApiMarket) -> (&'static str, String) {
+    use super::super::endpoints::{
+        COIN_FUTURES_BASE_URL, COIN_FUTURES_SERVER_TIME, FUTURES_BASE_URL, FUTURES_SERVER_TIME,
+        SPOT_BASE_URL, SPOT_SERVER_TIME,
+    };
+    match market {
+        BinanceWebSocketApiMarket::Spot => (
+            "wss://ws-api.binance.com:443/ws-api/v3",
+            format!("{SPOT_BASE_URL}{SPOT_SERVER_TIME}"),
+        ),
+        BinanceWebSocketApiMarket::Futures => (
+            "wss://ws-fapi.binance.com/ws-fapi/v1",
+            format!("{FUTURES_BASE_URL}{FUTURES_SERVER_TIME}"),
+        ),
+        BinanceWebSocketApiMarket::CoinFutures => (
+            "wss://ws-dapi.binance.com/ws-dapi/v1",
+            format!("{COIN_FUTURES_BASE_URL}{COIN_FUTURES_SERVER_TIME}"),
+        ),
     }
 }
 
@@ -284,6 +322,54 @@ fn disconnected() -> DcexError {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn official_urls_sync_the_server_clock_and_custom_urls_do_not() {
+        let build = |market, url: &str| {
+            BinanceWebSocketApi::with_url(market, None, None, None, Duration::from_secs(1), url)
+                .unwrap()
+        };
+        let spot = BinanceWebSocketApi::new(
+            BinanceWebSocketApiMarket::Spot,
+            None,
+            None,
+            None,
+            Duration::from_secs(1),
+        )
+        .unwrap();
+        assert_eq!(
+            spot.clock.url(),
+            Some("https://api.binance.com/api/v3/time")
+        );
+        assert_eq!(
+            build(
+                BinanceWebSocketApiMarket::Futures,
+                "wss://ws-fapi.binance.com/ws-fapi/v1/"
+            )
+            .clock
+            .url(),
+            Some("https://fapi.binance.com/fapi/v1/time")
+        );
+        assert_eq!(
+            build(
+                BinanceWebSocketApiMarket::CoinFutures,
+                "wss://ws-dapi.binance.com/ws-dapi/v1"
+            )
+            .clock
+            .url(),
+            Some("https://dapi.binance.com/dapi/v1/time")
+        );
+        assert_eq!(
+            build(
+                BinanceWebSocketApiMarket::Spot,
+                "wss://ws-api.testnet.binance.vision/ws-api/v3"
+            )
+            .clock
+            .url(),
+            None
+        );
+    }
+
     #[test]
     fn official_hmac_vector() {
         let client = BinanceWebSocketApi::new(

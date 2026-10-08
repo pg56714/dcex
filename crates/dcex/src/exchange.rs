@@ -133,6 +133,75 @@ pub fn unix_timestamp_ms() -> Result<u64> {
     u64::try_from(duration.as_millis()).map_err(|error| DcexError::Runtime(error.to_string()))
 }
 
+/// Corrects signed WebSocket timestamps with an exchange's REST time endpoint, fetched once
+/// before the first signed message, as the REST clients do. Without a URL it is the local
+/// clock (custom or test endpoints).
+pub(crate) struct ServerClock {
+    url: Option<String>,
+    extract: fn(&serde_json::Value) -> Option<u64>,
+    offset_ms: std::sync::Mutex<Option<i64>>,
+}
+
+impl ServerClock {
+    pub(crate) fn new(url: Option<String>, extract: fn(&serde_json::Value) -> Option<u64>) -> Self {
+        Self {
+            url,
+            extract,
+            offset_ms: std::sync::Mutex::new(None),
+        }
+    }
+
+    #[cfg(test)]
+    pub(crate) fn url(&self) -> Option<&str> {
+        self.url.as_deref()
+    }
+
+    pub(crate) fn set_url(&mut self, url: Option<String>) {
+        self.url = url;
+        *self
+            .offset_ms
+            .get_mut()
+            .unwrap_or_else(|poison| poison.into_inner()) = None;
+    }
+
+    pub(crate) async fn sync(&self, exchange: &str, timeout: std::time::Duration) -> Result<()> {
+        let Some(url) = &self.url else {
+            return Ok(());
+        };
+        if self.offset()?.is_some() {
+            return Ok(());
+        }
+        let client = crate::http::AsyncHttpClient::new(timeout)?;
+        let request = crate::http::HttpRequest::new(crate::http::HttpMethod::Get, url, "");
+        let start = unix_timestamp_ms()?;
+        let response = client.execute(request).await?;
+        let end = unix_timestamp_ms()?;
+        response.ensure_success(exchange)?;
+        let server = (self.extract)(&response.json()?).ok_or_else(|| {
+            DcexError::Decode(format!("{exchange} server time response missing its time"))
+        })?;
+        let midpoint = (start + end) / 2;
+        *self.lock()? = Some(server as i64 - midpoint as i64);
+        Ok(())
+    }
+
+    /// Local time corrected by the synced offset (the local clock before any sync).
+    pub(crate) fn now_ms(&self) -> Result<u64> {
+        let corrected = unix_timestamp_ms()? as i64 + self.offset()?.unwrap_or_default();
+        Ok(corrected.max(0) as u64)
+    }
+
+    fn offset(&self) -> Result<Option<i64>> {
+        Ok(*self.lock()?)
+    }
+
+    fn lock(&self) -> Result<std::sync::MutexGuard<'_, Option<i64>>> {
+        self.offset_ms
+            .lock()
+            .map_err(|_| DcexError::Runtime("server clock offset lock poisoned".into()))
+    }
+}
+
 pub fn exchange_names() -> Vec<&'static str> {
     Exchange::ALL.into_iter().map(Exchange::as_str).collect()
 }

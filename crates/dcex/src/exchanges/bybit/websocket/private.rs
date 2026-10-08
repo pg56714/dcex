@@ -3,7 +3,7 @@ use std::time::Duration;
 use serde_json::{Value, json};
 
 use crate::crypto::hmac_sha256_hex;
-use crate::exchange::unix_timestamp_ms;
+use crate::exchange::{ServerClock, unix_timestamp_ms};
 use crate::ws::{WebSocketConfig, WebSocketConnection};
 use crate::{DcexError, Result};
 
@@ -18,6 +18,8 @@ pub struct BybitPrivateWebSocket {
     next_request_id: u64,
     authenticated: bool,
     trade_mode: bool,
+    timeout: Duration,
+    pub(super) clock: ServerClock,
 }
 
 impl BybitPrivateWebSocket {
@@ -29,6 +31,14 @@ impl BybitPrivateWebSocket {
         Self::with_url(api_key, api_secret, TRADE_WS_URL.to_string(), timeout)
     }
 
+    /// Correct trade-order `X-BAPI-TIMESTAMP` headers with this REST time URL, fetched once
+    /// before the first order. The official trade URL uses Bybit's time endpoint; other
+    /// URLs use the local clock unless this is called.
+    pub fn with_server_time_url(mut self, url: Option<String>) -> Self {
+        self.clock.set_url(url);
+        self
+    }
+
     pub fn with_url(
         api_key: String,
         api_secret: String,
@@ -38,6 +48,10 @@ impl BybitPrivateWebSocket {
         validate_credential("Bybit API key", &api_key)?;
         validate_credential("Bybit API secret", &api_secret)?;
         let url = url.into();
+        let official_time_url = (url.trim_end_matches('/') == TRADE_WS_URL).then(|| {
+            use super::super::endpoints::{BASE_URL, TIME_ENDPOINT};
+            format!("{BASE_URL}{TIME_ENDPOINT}")
+        });
         let trade_mode = url
             .split('?')
             .next()
@@ -49,6 +63,11 @@ impl BybitPrivateWebSocket {
             next_request_id: 1,
             authenticated: false,
             trade_mode,
+            timeout,
+            clock: ServerClock::new(
+                official_time_url,
+                super::super::signing::extract_server_time_ms,
+            ),
         })
     }
 
@@ -144,10 +163,11 @@ impl BybitPrivateWebSocket {
                 "Bybit trade order args must be a JSON object.".to_string(),
             ));
         }
+        self.clock.sync("Bybit", self.timeout).await?;
         let request_id = self.next_request_id();
         let payload = json!({
             "reqId": request_id,
-            "header": {"X-BAPI-TIMESTAMP": unix_timestamp_ms()?.to_string()},
+            "header": {"X-BAPI-TIMESTAMP": self.clock.now_ms()?.to_string()},
             "op": op,
             "args": [args],
         });

@@ -136,3 +136,71 @@ async fn rejected_auth_fails_the_connection() {
         .is_err()
     );
 }
+
+#[tokio::test]
+async fn trade_headers_use_the_server_clock_once_synced() {
+    use crate::ws::test_peer::http_sequence;
+
+    let mut peer = TestPeer::start().await;
+    let (http, calls) = http_sequence(vec![
+        json!({"retCode": 0, "result": {"timeSecond": "0", "timeNano": ((now_ms() - 5_000) * 1_000_000).to_string()}})
+            .to_string(),
+    ]);
+    let mut client = BybitPrivateWebSocket::with_url(
+        "api-key".into(),
+        "api-secret".into(),
+        format!("{}/v5/trade", peer.url),
+        Duration::from_secs(5),
+    )
+    .expect("client")
+    .with_server_time_url(Some(format!("{http}/v5/market/time")));
+    peer.push_json(&json!({"op": "auth", "retCode": 0, "retMsg": "OK"}));
+    client.connect().await.expect("connect");
+    peer.next_json().await;
+    for _ in 0..2 {
+        client
+            .send_trade_order(
+                "order.cancel",
+                json!({"category": "linear", "symbol": "BTCUSDT", "orderId": "1"}),
+            )
+            .await
+            .unwrap();
+        let header: u64 = peer.next_json().await["header"]["X-BAPI-TIMESTAMP"]
+            .as_str()
+            .unwrap()
+            .parse()
+            .unwrap();
+        assert!(header.abs_diff(now_ms() - 5_000) < 1_000, "offset applied");
+    }
+    let calls = calls.join().unwrap();
+    assert_eq!(calls.len(), 1);
+    assert_eq!(calls[0].target, "/v5/market/time");
+}
+
+#[test]
+fn only_the_official_trade_url_syncs_the_server_clock() {
+    let build = |url: &str| {
+        BybitPrivateWebSocket::with_url(
+            "k".into(),
+            "s".into(),
+            url.to_string(),
+            Duration::from_secs(1),
+        )
+        .unwrap()
+    };
+    let official =
+        BybitPrivateWebSocket::new_trade("k".into(), "s".into(), Duration::from_secs(1)).unwrap();
+    assert_eq!(
+        official.clock.url(),
+        Some("https://api.bybit.com/v5/market/time")
+    );
+    assert_eq!(
+        build("wss://stream.bybit.com/v5/trade/").clock.url(),
+        Some("https://api.bybit.com/v5/market/time")
+    );
+    assert_eq!(build("wss://stream.bybit.com/v5/private").clock.url(), None);
+    assert_eq!(
+        build("wss://stream-testnet.bybit.com/v5/trade").clock.url(),
+        None
+    );
+}

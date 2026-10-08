@@ -227,3 +227,65 @@ async fn market_specific_account_methods_pick_the_documented_name() {
         assert!(frame["params"]["signature"].is_string());
     }
 }
+
+fn now_ms() -> i64 {
+    std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap()
+        .as_millis() as i64
+}
+
+#[tokio::test]
+async fn signed_requests_use_the_server_clock_once_synced() {
+    use crate::ws::test_peer::http_sequence;
+
+    let mut peer = TestPeer::start().await;
+    // The server clock runs 5 s behind this machine; only one sync request is served.
+    let (http, calls) = http_sequence(vec![json!({"serverTime": now_ms() - 5_000}).to_string()]);
+    let api = BinanceWebSocketApi::with_url(
+        BinanceWebSocketApiMarket::Spot,
+        Some("api-key".into()),
+        Some("secret".into()),
+        None,
+        Duration::from_secs(5),
+        peer.url.clone(),
+    )
+    .unwrap()
+    .with_server_time_url(Some(format!("{http}/api/v3/time")));
+    api.connect().await.unwrap();
+    for _ in 0..2 {
+        api.request("account.status", json!({})).await.unwrap();
+        let sent = peer.next_json().await["params"]["timestamp"]
+            .as_i64()
+            .unwrap();
+        assert!((sent - (now_ms() - 5_000)).abs() < 1_000, "offset applied");
+    }
+    // A caller-supplied timestamp is kept and public methods never sync.
+    api.request("account.status", json!({"timestamp": 42}))
+        .await
+        .unwrap();
+    assert_eq!(peer.next_json().await["params"]["timestamp"], 42);
+    let calls = calls.join().unwrap();
+    assert_eq!(calls.len(), 1);
+    assert_eq!(calls[0].target, "/api/v3/time");
+}
+
+#[tokio::test]
+async fn custom_urls_sign_with_the_local_clock() {
+    let mut peer = TestPeer::start().await;
+    let api = BinanceWebSocketApi::with_url(
+        BinanceWebSocketApiMarket::Spot,
+        Some("api-key".into()),
+        Some("secret".into()),
+        None,
+        Duration::from_secs(5),
+        peer.url.clone(),
+    )
+    .unwrap();
+    api.connect().await.unwrap();
+    api.request("account.status", json!({})).await.unwrap();
+    let sent = peer.next_json().await["params"]["timestamp"]
+        .as_i64()
+        .unwrap();
+    assert!((sent - now_ms()).abs() < 1_000);
+}
