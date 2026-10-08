@@ -1,3 +1,9 @@
+## 0.14.3 (2026-10-08)
+
+### Fix
+
+- align typed wrapper signatures with dispatch and prove Rust and Python reach the same methods
+
 ## 0.14.2 (2026-10-05)
 
 ### Fix
