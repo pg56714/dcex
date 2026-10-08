@@ -6,6 +6,8 @@ use serde_json::Value;
 use crate::{DcexError, Result};
 
 mod private;
+#[cfg(test)]
+mod private_tests;
 mod public;
 
 pub use private::BingxPrivateWebSocket;

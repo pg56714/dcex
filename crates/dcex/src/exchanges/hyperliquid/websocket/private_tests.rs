@@ -189,3 +189,122 @@ async fn pushed_messages_are_received_and_close_disconnects() {
     client.close().await.unwrap();
     assert!(!client.is_connected());
 }
+
+const KEY: &str = "0x1111111111111111111111111111111111111111111111111111111111111111";
+
+fn expected_signature(
+    action: &crate::exchanges::hyperliquid::msgpack::OrderedValue,
+) -> serde_json::Value {
+    use crate::exchanges::hyperliquid::{msgpack::encode_msgpack, signing::hyperliquid_signature};
+    let signature = hyperliquid_signature(
+        &encode_msgpack(action),
+        1_700_000_000_000,
+        Some("0x2222222222222222222222222222222222222222"),
+        Some(1_700_000_060_000),
+        true,
+        &[0x11; 32],
+    )
+    .unwrap();
+    json!({"r": signature.r, "s": signature.s, "v": signature.v})
+}
+
+#[tokio::test]
+async fn offline_signed_cancels_and_orders_post_unchanged() {
+    use crate::exchanges::hyperliquid::msgpack::OrderedValue;
+    let vault = Some("0x2222222222222222222222222222222222222222");
+    let cancel = HyperliquidPrivateWebSocket::sign_cancel(
+        r#"[{"a": 3, "o": 77}]"#,
+        1_700_000_000_000,
+        KEY,
+        true,
+        vault,
+        Some(1_700_000_060_000),
+    )
+    .unwrap();
+    let action = OrderedValue::Object(vec![
+        ("type".into(), OrderedValue::String("cancel".into())),
+        (
+            "cancels".into(),
+            OrderedValue::Array(vec![OrderedValue::Object(vec![
+                ("a".into(), OrderedValue::Uint(3)),
+                ("o".into(), OrderedValue::Uint(77)),
+            ])]),
+        ),
+    ]);
+    assert_eq!(cancel["action"], action.to_json());
+    assert_eq!(cancel["signature"], expected_signature(&action));
+    assert_eq!(cancel["nonce"], 1_700_000_000_000_u64);
+    assert_eq!(
+        cancel["vaultAddress"],
+        "0x2222222222222222222222222222222222222222"
+    );
+    assert_eq!(cancel["expiresAfter"], 1_700_000_060_000_u64);
+
+    let order = HyperliquidPrivateWebSocket::sign_order(
+        r#"[{"a": 0, "b": true, "p": "100", "s": "0.01", "r": false, "t": {"limit": {"tif": "Gtc"}}}]"#,
+        "na",
+        1_700_000_000_000,
+        KEY,
+        true,
+        vault,
+        Some(1_700_000_060_000),
+    )
+    .unwrap();
+    assert_eq!(order["action"]["type"], "order");
+    assert_eq!(order["action"]["grouping"], "na");
+    let keys: Vec<&String> = order["action"]["orders"][0]
+        .as_object()
+        .unwrap()
+        .keys()
+        .collect();
+    assert_eq!(keys, ["a", "b", "p", "s", "r", "t"]);
+
+    let (mut client, mut peer) = connected().await;
+    client.post_action(9, cancel.clone()).await.unwrap();
+    assert_eq!(peer.next_json().await["request"]["payload"], cancel);
+}
+
+#[test]
+fn offline_signing_rejects_malformed_input() {
+    let sign_order = |orders: &str, grouping: &str| {
+        HyperliquidPrivateWebSocket::sign_order(orders, grouping, 1, KEY, false, None, None)
+    };
+    let order = r#"[{"a": 0, "b": true, "p": "100", "s": "1", "r": false, "t": {"limit": {"tif": "Gtc"}}}]"#;
+    assert!(sign_order(order, "bogus").is_err());
+    assert!(sign_order("[]", "na").is_err());
+    assert!(sign_order("{}", "na").is_err());
+    assert!(sign_order(r#"[{"a": 0}]"#, "na").is_err());
+    assert!(
+        HyperliquidPrivateWebSocket::sign_order(order, "na", 1, "0x12", false, None, None).is_err()
+    );
+    let sign_cancel = |cancels: &str| {
+        HyperliquidPrivateWebSocket::sign_cancel(cancels, 1, KEY, false, None, None)
+    };
+    assert!(sign_cancel("[]").is_err());
+    assert!(sign_cancel(r#"[{"a": 1}]"#).is_err());
+    assert!(sign_cancel(r#"[{"a": 1, "o": -2}]"#).is_err());
+    assert!(sign_cancel(r#"[{"a": 1, "o": 2, "x": 3}]"#).is_err());
+}
+
+#[tokio::test]
+async fn raw_and_dex_user_subscriptions() {
+    let (mut client, mut peer) = connected().await;
+    client
+        .subscribe_user_subscription_for_dex("openOrders", "xyz")
+        .await
+        .unwrap();
+    assert_eq!(
+        peer.next_json().await["subscription"],
+        json!({"type": "openOrders", "user": USER_LOWER, "dex": "xyz"})
+    );
+    client
+        .subscribe(json!({"type": "userFills", "user": USER_LOWER}))
+        .await
+        .unwrap();
+    client
+        .unsubscribe(json!({"type": "userFills", "user": USER_LOWER}))
+        .await
+        .unwrap();
+    assert_eq!(peer.next_json().await["method"], "subscribe");
+    assert_eq!(peer.next_json().await["method"], "unsubscribe");
+}

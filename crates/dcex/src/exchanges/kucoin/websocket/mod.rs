@@ -6,6 +6,8 @@ use crate::{DcexError, Result};
 mod pro;
 pub use pro::KucoinProWebSocket;
 mod private;
+#[cfg(test)]
+mod private_tests;
 mod public;
 
 pub use private::KucoinPrivateWebSocket;

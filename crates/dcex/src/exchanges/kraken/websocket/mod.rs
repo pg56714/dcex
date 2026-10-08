@@ -2,6 +2,8 @@ mod futures;
 mod trading;
 pub use futures::KrakenFuturesWebSocket;
 mod private;
+#[cfg(test)]
+mod private_tests;
 mod public;
 
 pub use private::KrakenPrivateWebSocket;

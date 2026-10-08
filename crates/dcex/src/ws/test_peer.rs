@@ -171,3 +171,83 @@ impl TestPeer {
         let _ = self.outgoing.send(Message::Close(None));
     }
 }
+
+/// One recorded HTTP request: method, path with query, lower-cased headers and body.
+#[derive(Debug, Clone)]
+pub(crate) struct HttpCall {
+    pub method: String,
+    pub target: String,
+    pub headers: Vec<(String, String)>,
+    pub body: String,
+}
+
+impl HttpCall {
+    pub(crate) fn header(&self, name: &str) -> Option<&str> {
+        let name = name.to_ascii_lowercase();
+        self.headers
+            .iter()
+            .find(|(key, _)| *key == name)
+            .map(|(_, value)| value.as_str())
+    }
+}
+
+/// A local HTTP server answering each request with the next JSON body (status 200),
+/// for clients that fetch a token or listen key before opening a stream.
+pub(crate) fn http_sequence(
+    bodies: Vec<String>,
+) -> (String, std::thread::JoinHandle<Vec<HttpCall>>) {
+    use std::io::{Read, Write};
+
+    let listener = std::net::TcpListener::bind("127.0.0.1:0").expect("bind");
+    let url = format!("http://{}", listener.local_addr().expect("address"));
+    let handle = std::thread::spawn(move || {
+        let mut calls = Vec::new();
+        for body in bodies {
+            let (mut stream, _) = listener.accept().expect("accept");
+            let mut raw = Vec::new();
+            let mut buffer = [0u8; 4096];
+            let (head, length) = loop {
+                let size = stream.read(&mut buffer).expect("read");
+                assert!(size > 0, "request ended before its headers");
+                raw.extend_from_slice(&buffer[..size]);
+                let text = String::from_utf8_lossy(&raw).into_owned();
+                if let Some(end) = text.find("\r\n\r\n") {
+                    let length = text[..end]
+                        .lines()
+                        .find_map(|line| {
+                            line.to_ascii_lowercase()
+                                .strip_prefix("content-length:")
+                                .and_then(|value| value.trim().parse::<usize>().ok())
+                        })
+                        .unwrap_or(0);
+                    break (end + 4, length);
+                }
+            };
+            while raw.len() < head + length {
+                let size = stream.read(&mut buffer).expect("read body");
+                assert!(size > 0, "request ended before its body");
+                raw.extend_from_slice(&buffer[..size]);
+            }
+            let text = String::from_utf8_lossy(&raw).into_owned();
+            let mut lines = text[..head - 4].lines();
+            let mut request_line = lines.next().unwrap_or_default().split(' ');
+            calls.push(HttpCall {
+                method: request_line.next().unwrap_or_default().to_string(),
+                target: request_line.next().unwrap_or_default().to_string(),
+                headers: lines
+                    .filter_map(|line| line.split_once(':'))
+                    .map(|(key, value)| (key.trim().to_ascii_lowercase(), value.trim().to_string()))
+                    .collect(),
+                body: text[head..].to_string(),
+            });
+            let response = format!(
+                "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {}\r\n\
+Connection: close\r\n\r\n{body}",
+                body.len()
+            );
+            stream.write_all(response.as_bytes()).expect("write");
+        }
+        calls
+    });
+    (url, handle)
+}
