@@ -25,12 +25,11 @@ impl OndoPublicWebSocket {
                 .exchange_symbol
                 .clone());
         }
-        Ok(if spot {
-            symbol.strip_suffix("-SPOT").unwrap_or(symbol)
+        if spot {
+            Ok(symbol.strip_suffix("-SPOT").unwrap_or(symbol).to_string())
         } else {
-            symbol
+            super::super::client::perp_symbol_fallback(symbol)
         }
-        .to_string())
     }
 
     pub fn set_product_table(&mut self, table: crate::product_table::ProductTable) {

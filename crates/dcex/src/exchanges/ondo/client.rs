@@ -301,23 +301,7 @@ impl OndoClient {
                 .exchange_symbol
                 .clone());
         }
-        if product_symbol.ends_with("-SPOT") {
-            return Err(DcexError::InvalidInput(
-                "Ondo -SPOT symbols are only valid for get_spot_* endpoints".into(),
-            ));
-        }
-        if product_symbol.ends_with(".P") {
-            return Ok(product_symbol.to_string());
-        }
-        let parts = product_symbol.split('-').collect::<Vec<_>>();
-        match parts.as_slice() {
-            [base, quote, "SWAP"] if !base.is_empty() && !quote.is_empty() => {
-                Ok(format!("{base}-{quote}.P"))
-            }
-            _ => Err(DcexError::InvalidInput(format!(
-                "invalid Ondo product symbol: {product_symbol}"
-            ))),
-        }
+        perp_symbol_fallback(product_symbol)
     }
 
     pub(super) fn normalize_market_query(
@@ -424,6 +408,27 @@ fn validate_ondo_response(data: &Value) -> Result<()> {
         .and_then(Value::as_str)
         .unwrap_or("Ondo request failed");
     Err(DcexError::Runtime(format!("Ondo {code}: {message}")))
+}
+
+/// A perpetual market without a product table: `BASE-QUOTE-SWAP` or native `BASE-QUOTE.P`.
+pub(super) fn perp_symbol_fallback(product_symbol: &str) -> Result<String> {
+    if product_symbol.ends_with("-SPOT") {
+        return Err(DcexError::InvalidInput(
+            "Ondo -SPOT symbols are only valid for spot endpoints".into(),
+        ));
+    }
+    if product_symbol.ends_with(".P") {
+        return Ok(product_symbol.to_string());
+    }
+    let parts = product_symbol.split('-').collect::<Vec<_>>();
+    match parts.as_slice() {
+        [base, quote, "SWAP"] if !base.is_empty() && !quote.is_empty() => {
+            Ok(format!("{base}-{quote}.P"))
+        }
+        _ => Err(DcexError::InvalidInput(format!(
+            "invalid Ondo product symbol: {product_symbol}"
+        ))),
+    }
 }
 
 #[cfg(test)]

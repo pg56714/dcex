@@ -57,6 +57,9 @@ class PublicClient(AsyncWebSocketMixin):
     async def subscribe_trades(self, markets: str | list[str]) -> None:
         await self.subscribe("tradesPerps", markets)
 
+    async def subscribe_top_of_book(self, markets: str | list[str]) -> None:
+        await self.subscribe("topOfBooksPerps", markets)
+
     async def subscribe_depth(self, markets: str | list[str]) -> None:
         await self.subscribe("depthBooksPerps", markets)
 
@@ -71,6 +74,9 @@ class PublicClient(AsyncWebSocketMixin):
 
     async def subscribe_mark_prices(self, markets: str | list[str]) -> None:
         await self.subscribe("markPricesPerps", markets)
+
+    async def subscribe_funding_rates(self, markets: str | list[str]) -> None:
+        await self.subscribe("fundingRatesPerps", markets)
 
     async def subscribe_klines(self, market: str, resolution: str) -> None:
         await self._native_client.subscribe_klines(market, resolution)

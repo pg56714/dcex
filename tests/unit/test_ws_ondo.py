@@ -112,10 +112,10 @@ async def test_ondo_connect_login_ping_and_subscriptions(channel):
                 await client.subscribe_cancel_all_orders_after(60)
                 expected["timeout_seconds"] = 60
             elif channel == "kLinePerps":
-                await client.subscribe_klines("BTC-PERP", "1H")
-                expected.update(markets=["BTC-PERP"], resolution="1H")
+                await client.subscribe_klines("BTC-USD.P", "1H")
+                expected.update(markets=["BTC-USD.P"], resolution="1H")
             else:
-                market = "SPY-USDC" if channel.endswith("Spot") else "BTC-PERP"
+                market = "SPY-USDC" if channel.endswith("Spot") else "BTC-USD.P"
                 await client.subscribe(
                     channel,
                     [market] if channel == "ordersSummariesPerps" or not private else None,
@@ -149,6 +149,32 @@ async def test_ondo_public_spot_helpers_send_no_authentication(method, channel, 
             assert await client.recv() == {"op": "subscribe", "channel": channel, "markets": expected}
             await client.unsubscribe(channel, markets)
             assert await client.recv() == {"op": "unsubscribe", "channel": channel, "markets": expected}
+            assert all(event["op"] != "login" for event in received)
+        finally:
+            await client.close()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("method,channel", [
+    ("subscribe_top_of_book", "topOfBooksPerps"),
+    ("subscribe_depth", "depthBooksPerps"),
+    ("subscribe_trades", "tradesPerps"),
+    ("subscribe_funding_rates", "fundingRatesPerps"),
+    ("subscribe_mark_prices", "markPricesPerps"),
+])
+async def test_ondo_public_perp_helpers_map_unified_symbols(method, channel):
+    async with authenticated_peer("ondo") as (url, received):
+        client = ondo.PublicClient(base_url=url, timeout=10)
+        try:
+            await client.connect()
+            await getattr(client, method)(["BTC-USD-SWAP", "ETH-USD.P"])
+            assert await client.recv() == {
+                "op": "subscribe",
+                "channel": channel,
+                "markets": ["BTC-USD.P", "ETH-USD.P"],
+            }
+            with pytest.raises(ValueError, match="invalid Ondo product symbol"):
+                await getattr(client, method)("BTC-USD")
             assert all(event["op"] != "login" for event in received)
         finally:
             await client.close()

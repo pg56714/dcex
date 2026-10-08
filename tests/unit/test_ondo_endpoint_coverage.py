@@ -455,7 +455,7 @@ async def test_spot_symbols_cannot_reach_perpetual_order_transport(asynchronous,
     _drain(received)
     client = (AsyncClient if asynchronous else Client)(**_client_kwargs(base_url))
     try:
-        with pytest.raises(ValueError, match=r"Ondo -SPOT symbols are only valid for get_spot_\* endpoints"):
+        with pytest.raises(ValueError, match=r"Ondo -SPOT symbols are only valid for spot endpoints"):
             result = getattr(client, method)(market="SPY-USDC-SPOT", **(dict(side="buy", type="limit", price="1", size="1") if method == "place_order" else {}))
             if asynchronous:
                 await result

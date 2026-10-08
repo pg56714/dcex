@@ -141,6 +141,15 @@ impl OndoPrivateWebSocket {
                 "Ondo ordersSummariesPerps requires at least one market".to_string(),
             ));
         }
+        // Perps channels take the same market names as REST (`BTC-USD-SWAP` or `BTC-USD.P`).
+        let markets = if channel.ends_with("Perps") {
+            markets
+                .iter()
+                .map(|market| super::super::client::perp_symbol_fallback(market))
+                .collect::<Result<Vec<_>>>()?
+        } else {
+            markets
+        };
         if markets.is_empty() {
             self.connection
                 .send_json(&json!({"op": "subscribe", "channel": channel}))
