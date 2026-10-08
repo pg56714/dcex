@@ -24,7 +24,8 @@ pub enum DcexError {
         status: u16,
         message: String,
         headers: Vec<(String, String)>,
-        data: serde_json::Value,
+        /// Boxed: a preserve-order JSON value would make every `Result` carry 128+ bytes.
+        data: Box<serde_json::Value>,
     },
     InvalidInput(String),
     Runtime(String),

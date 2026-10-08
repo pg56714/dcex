@@ -140,33 +140,6 @@ fn time_range_payload(
     Ok(payload)
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn time_range_queries_preserve_official_request_types() {
-        let params = HyperliquidParams::from_pairs(vec![
-            ("user".into(), format!("0x{}", "11".repeat(20))),
-            ("startTime".into(), "1000".into()),
-            ("endTime".into(), "2000".into()),
-            ("aggregateByTime".into(), "true".into()),
-        ]);
-        let fills = time_range_payload(&params, "userFillsByTime", true).expect("fills");
-        assert_eq!(fills["type"], "userFillsByTime");
-        assert_eq!(fills["startTime"], 1000);
-        assert_eq!(fills["endTime"], 2000);
-        assert_eq!(fills["aggregateByTime"], true);
-        assert!(time_range_payload(&params, "userFunding", false).is_err());
-        let funding = HyperliquidParams::from_pairs(vec![
-            ("user".into(), format!("0x{}", "11".repeat(20))),
-            ("startTime".into(), "2000".into()),
-            ("endTime".into(), "1000".into()),
-        ]);
-        assert!(time_range_payload(&funding, "userFunding", false).is_err());
-    }
-}
-
 fn order_id_value(value: &str) -> Result<Value> {
     if value.starts_with("0x") || value.starts_with("0X") {
         return Ok(Value::String(super::params::normalize_cloid(value, "oid")?));
@@ -194,5 +167,32 @@ fn insert_optional_bool(payload: &mut Value, key: &str, value: Option<bool>) {
         && let Some(object) = payload.as_object_mut()
     {
         object.insert(key.to_string(), Value::Bool(value));
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn time_range_queries_preserve_official_request_types() {
+        let params = HyperliquidParams::from_pairs(vec![
+            ("user".into(), format!("0x{}", "11".repeat(20))),
+            ("startTime".into(), "1000".into()),
+            ("endTime".into(), "2000".into()),
+            ("aggregateByTime".into(), "true".into()),
+        ]);
+        let fills = time_range_payload(&params, "userFillsByTime", true).expect("fills");
+        assert_eq!(fills["type"], "userFillsByTime");
+        assert_eq!(fills["startTime"], 1000);
+        assert_eq!(fills["endTime"], 2000);
+        assert_eq!(fills["aggregateByTime"], true);
+        assert!(time_range_payload(&params, "userFunding", false).is_err());
+        let funding = HyperliquidParams::from_pairs(vec![
+            ("user".into(), format!("0x{}", "11".repeat(20))),
+            ("startTime".into(), "2000".into()),
+            ("endTime".into(), "1000".into()),
+        ]);
+        assert!(time_range_payload(&funding, "userFunding", false).is_err());
     }
 }

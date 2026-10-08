@@ -139,6 +139,7 @@ fn private_payload(method: &'static str, params: &[(&str, &str)]) -> Recorded {
 
 #[test]
 fn info_requests_match_official_request_types() {
+    #[allow(clippy::type_complexity)]
     let cases: Vec<(&'static str, Vec<(&str, &str)>, Value)> = vec![
         (
             "get_vault_details",
@@ -463,6 +464,7 @@ fn info_requests_reject_invalid_parameters_before_network() {
 
 #[test]
 fn exchange_actions_match_official_wire_format() {
+    #[allow(clippy::type_complexity)]
     let cases: Vec<(&'static str, Vec<(&str, &str)>, Value)> = vec![
         (
             "cancel_order",
@@ -841,6 +843,7 @@ const BTC_META: &str =
 
 #[test]
 fn additional_info_requests_match_official_request_types() {
+    #[allow(clippy::type_complexity)]
     let cases: Vec<(&'static str, Vec<(&str, &str)>, Value)> = vec![
         ("get_perp_dexs", vec![], json!({"type": "perpDexs"})),
         (

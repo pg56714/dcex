@@ -94,7 +94,7 @@ impl ResponseValidator for BinanceResponseValidator {
                     status: response.status,
                     message,
                     headers,
-                    data: outcomes.clone(),
+                    data: Box::new(outcomes.clone()),
                 });
             }
             return Err(DcexError::HttpStatus {
@@ -148,7 +148,7 @@ mod partial_order_tests {
             panic!("expected exchange error");
         };
         assert_eq!(status, 409);
-        assert_eq!(data, outcomes);
+        assert_eq!(*data, outcomes);
         assert!(
             headers
                 .iter()

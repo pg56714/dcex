@@ -880,6 +880,7 @@ fn listen_key_creation_is_unsigned_post_with_api_key_header() {
 fn order_helpers_force_side_type_position_side_and_time_in_force() {
     let (url, receiver) = recording_server();
     let client = signed_client(url);
+    #[allow(clippy::type_complexity)]
     let cases: &[(&str, &[(&str, &str)], &[(&str, &str)])] = &[
         (
             "place_swap_market_buy_order",
@@ -1631,6 +1632,7 @@ fn coin_swap_and_oco_routes_match_official_paths() {
         url,
     )
     .unwrap();
+    #[allow(clippy::type_complexity)]
     let cases: &[(bool, &str, &[(&str, &str)], &str, &str)] = &[
         (
             true,

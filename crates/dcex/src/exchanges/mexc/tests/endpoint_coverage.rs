@@ -1474,10 +1474,10 @@ fn route_cases_cover_every_dispatch_name() {
     // Multi-line match arms (`"a"\n | "b" => ...`) are collected from `|` lines too.
     for line in source.lines() {
         let trimmed = line.trim_start();
-        if let Some(rest) = trimmed.strip_prefix("| \"") {
-            if let Some(name) = rest.split('"').next() {
-                names.insert(name.to_string());
-            }
+        if let Some(rest) = trimmed.strip_prefix("| \"")
+            && let Some(name) = rest.split('"').next()
+        {
+            names.insert(name.to_string());
         }
     }
     names.insert("ping".to_string());

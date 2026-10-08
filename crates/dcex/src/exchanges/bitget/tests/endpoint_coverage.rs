@@ -790,6 +790,7 @@ async fn additional_trading_controls_preserve_wire_types() {
 async fn ordinary_risk_routes_preserve_parameters_and_authentication() {
     let (url, receiver) = recording_server();
     let client = signed_client(url);
+    #[allow(clippy::type_complexity)]
     let cases: &[(&str, &str, &str, bool, &[(&str, &str)], &str)] = &[
         (
             "get_futures_trade_history",
@@ -1184,6 +1185,7 @@ async fn batch_controls_preserve_nested_and_root_array_bodies() {
 async fn internal_transfer_routes_preserve_parameters_and_authentication() {
     let (url, receiver) = recording_server();
     let client = signed_client(url);
+    #[allow(clippy::type_complexity)]
     let cases: &[(&str, &str, &str, bool, &[(&str, &str)], &str)] = &[
         (
             "transfer_uta_account",
@@ -1292,6 +1294,7 @@ async fn internal_transfer_routes_preserve_parameters_and_authentication() {
 async fn remaining_query_routes_preserve_parameters_and_authentication() {
     let (url, receiver) = recording_server();
     let client = signed_client(url);
+    #[allow(clippy::type_complexity)]
     let cases: &[(&str, &str, &str, bool, &[(&str, &str)], &str)] = &[
         (
             "get_uta_strategy_sub_orders",
@@ -1358,6 +1361,7 @@ async fn remaining_query_routes_preserve_parameters_and_authentication() {
 async fn supplementary_routes_preserve_parameters_and_authentication() {
     let (url, receiver) = recording_server();
     let client = signed_client(url);
+    #[allow(clippy::type_complexity)]
     let cases: &[(&str, &str, &str, bool, &[(&str, &str)], &str)] = &[
         (
             "set_uta_fee_deduction",
@@ -1510,6 +1514,7 @@ async fn supplementary_routes_preserve_parameters_and_authentication() {
 async fn remaining_routes_preserve_parameters_and_authentication() {
     let (url, receiver) = recording_server();
     let client = signed_client(url);
+    #[allow(clippy::type_complexity)]
     let cases: &[(&str, &str, &str, bool, &[(&str, &str)], &str)] = &[
         (
             "get_uta_deposit_address",

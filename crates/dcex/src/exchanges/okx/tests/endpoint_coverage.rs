@@ -3106,6 +3106,7 @@ async fn unknown_method_names_are_rejected_before_network() {
 #[tokio::test]
 async fn trading_validations_fail_before_network() {
     let client = OkxClient::public(Duration::from_secs(10)).expect("client");
+    #[allow(clippy::type_complexity)]
     let cases: &[(&str, &[(&str, &str)], &str)] = &[
         ("cancel_order", &[SWAP], "ordId"),
         ("get_order", &[SWAP], "ordId"),

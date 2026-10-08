@@ -222,7 +222,7 @@ impl BinanceClient {
                     &message,
                 ),
                 headers: response.headers.into_iter().collect(),
-                data,
+                data: Box::new(data),
             });
         }
         Ok(ValidatedResponse {

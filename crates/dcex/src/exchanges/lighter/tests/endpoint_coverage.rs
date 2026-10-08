@@ -175,6 +175,7 @@ fn record_private(method: &'static str, params: &[(&str, &str)]) -> Recorded {
 
 #[test]
 fn public_routes_follow_official_paths_and_query_names() {
+    #[allow(clippy::type_complexity)]
     let cases: Vec<(&'static str, Vec<(&str, &str)>, &str, Vec<(&str, &str)>)> = vec![
         ("get_status", vec![], "/", vec![]),
         ("get_info", vec![], "/info", vec![]),
@@ -360,6 +361,7 @@ fn public_routes_follow_official_paths_and_query_names() {
 
 #[test]
 fn public_routes_forward_optional_authorization_header() {
+    #[allow(clippy::type_complexity)]
     let cases: Vec<(&'static str, Vec<(&str, &str)>, &str)> = vec![
         (
             "get_account_metadata",
@@ -424,6 +426,7 @@ fn public_routes_forward_optional_authorization_header() {
 #[test]
 fn private_routes_follow_official_paths_and_attach_auth() {
     let auth = ("authorization", TOKEN);
+    #[allow(clippy::type_complexity)]
     let cases: Vec<(&'static str, Vec<(&str, &str)>, &str, Vec<(&str, &str)>)> = vec![
         (
             "get_account_limits",
@@ -1551,6 +1554,7 @@ fn account_config_rejects_invalid_modes_before_nonce_lookup() {
 
 #[test]
 fn additional_account_and_deposit_routes_preserve_form_and_authorization() {
+    #[allow(clippy::type_complexity)]
     let cases: &[(&str, bool, &str, &str, &[(&str, &str)])] = &[
         (
             "set_maker_only_api_keys",

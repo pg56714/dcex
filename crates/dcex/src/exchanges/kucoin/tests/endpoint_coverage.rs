@@ -2605,13 +2605,14 @@ fn declared_wrapper_names() -> (Vec<&'static str>, Vec<&'static str>) {
             section = Some(true);
         } else if trimmed.starts_with("];") {
             section = None;
-        } else if let (Some(is_private), Some((name, _))) = (section, trimmed.split_once('(')) {
-            if !name.is_empty() && name.chars().all(|c| c.is_ascii_lowercase() || c == '_') {
-                if is_private {
-                    private.push(name);
-                } else {
-                    public.push(name);
-                }
+        } else if let (Some(is_private), Some((name, _))) = (section, trimmed.split_once('('))
+            && !name.is_empty()
+            && name.chars().all(|c| c.is_ascii_lowercase() || c == '_')
+        {
+            if is_private {
+                private.push(name);
+            } else {
+                public.push(name);
             }
         }
     }

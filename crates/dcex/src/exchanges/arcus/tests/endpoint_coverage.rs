@@ -180,6 +180,7 @@ fn header<'a>(request: &'a str, name: &str) -> Option<&'a str> {
 }
 
 /// (dispatch name, params, exact expected request line target)
+#[allow(clippy::type_complexity)]
 const PUBLIC_CASES: &[(&str, &[(&str, &str)], &str)] = &[
     (
         "get_leaderboard",
@@ -514,6 +515,7 @@ fn internal_transfer_posts_wallet_signed_body_without_api_headers() {
 
 #[test]
 fn spot_router_routes_match_official_paths() {
+    #[allow(clippy::type_complexity)]
     let cases: &[(&str, Vec<(String, String)>, &str)] = &[
         ("health", Vec::new(), "/health"),
         ("get_tokens", Vec::new(), "/v1/tokens"),

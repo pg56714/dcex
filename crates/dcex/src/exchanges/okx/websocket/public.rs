@@ -543,7 +543,7 @@ mod tests {
             );
         }
         assert_eq!(
-            subscription_route(&[trades.clone()]).expect("route"),
+            subscription_route(std::slice::from_ref(&trades)).expect("route"),
             OkxWebSocketRoute::Public
         );
         assert!(subscription_route(&[candle, trades]).is_err());

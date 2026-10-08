@@ -118,8 +118,7 @@ async fn current_required_and_conditional_fields_are_rejected_before_transport()
         let error = client
             .private_request(method, params)
             .await
-            .err()
-            .expect("validation error");
+            .expect_err("validation error");
         assert!(error.to_string().contains(expected), "{error}");
     }
 
@@ -135,8 +134,7 @@ async fn current_required_and_conditional_fields_are_rejected_before_transport()
             ],
         )
         .await
-        .err()
-        .expect("validation error");
+        .expect_err("validation error");
     assert!(
         error
             .to_string()

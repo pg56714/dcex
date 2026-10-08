@@ -840,11 +840,12 @@ mod tests {
         let orders = OkxPrivateWebSocketArg::new("orders").expect("orders");
         let algo_orders = OkxPrivateWebSocketArg::new("orders-algo").expect("algo orders");
         assert_eq!(
-            authenticated_subscription_route(&[orders.clone()]).expect("private route"),
+            authenticated_subscription_route(std::slice::from_ref(&orders)).expect("private route"),
             OkxAuthenticatedWebSocketRoute::Private
         );
         assert_eq!(
-            authenticated_subscription_route(&[algo_orders.clone()]).expect("business route"),
+            authenticated_subscription_route(std::slice::from_ref(&algo_orders))
+                .expect("business route"),
             OkxAuthenticatedWebSocketRoute::Business
         );
         assert!(authenticated_subscription_route(&[orders, algo_orders]).is_err());
