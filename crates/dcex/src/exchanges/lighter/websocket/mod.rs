@@ -1,5 +1,9 @@
 mod private;
+#[cfg(test)]
+mod private_tests;
 mod public;
+#[cfg(test)]
+mod public_tests;
 mod trading;
 
 pub use private::LighterPrivateWebSocket;

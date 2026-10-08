@@ -1,5 +1,7 @@
 mod api;
 mod api_methods;
+#[cfg(test)]
+mod api_methods_tests;
 mod api_schema;
 mod api_validation;
 pub use api::{BinanceWebSocketApi, BinanceWebSocketApiMarket};

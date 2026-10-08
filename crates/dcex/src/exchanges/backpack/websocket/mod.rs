@@ -1,5 +1,7 @@
 mod private;
 mod public;
+#[cfg(test)]
+mod stream_tests;
 
 pub use private::BackpackPrivateWebSocket;
 pub use public::BackpackPublicWebSocket;
