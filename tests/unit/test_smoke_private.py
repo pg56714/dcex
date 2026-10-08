@@ -1,6 +1,6 @@
 """The private smoke runner calls only plain reads and never keeps response data."""
 
-# ruff: noqa: D103
+# ruff: noqa: D101, D102, D103
 from __future__ import annotations
 
 import json
@@ -40,15 +40,36 @@ def test_read_verbs_with_noun_words_are_reads(name: str) -> None:
         "get_futures_download_id_for_futures_trade_history",
         "get_monthly_statement",
         "get_account_bills_history_archive",
+        "delete_ip_list_for_a_sub_account_api_key",
+        "request_file_get_file_upload_sign",
+        "broker_get_subaccount_apikey",
+        "prediction_get_quote",
     ],
 )
 def test_actions_and_minting_reads_are_never_called(name: str) -> None:
     assert smoke_private.classify(name) == "never"
 
 
-@pytest.mark.parametrize("name", ["cfd_trade_get_current_positions", "pre_check_order"])
+@pytest.mark.parametrize("name", ["cfd_trade_get_unreviewed_thing", "pre_check_order"])
 def test_read_verb_inside_the_name_needs_review(name: str) -> None:
     assert smoke_private.classify(name) == "review"
+
+
+@pytest.mark.parametrize(
+    "name",
+    [
+        "prediction_query_positions",
+        "copy_trading_follower_get_current_copy",
+        "post_v2_copy_trade_get_cross_mode_margin_requirement",
+    ],
+)
+def test_reviewed_reads_are_reads(name: str) -> None:
+    assert smoke_private.classify(name) == "read"
+
+
+def test_reviewed_sets_never_overlap() -> None:
+    assert not smoke_private.REVIEWED_READS & smoke_private.REVIEWED_NEVER
+    assert all(smoke_private.classify(n) == "read" for n in smoke_private.REVIEWED_READS)
 
 
 class FakeClient:
@@ -63,6 +84,9 @@ class FakeClient:
 
     def cfd_trade_get_positions(self) -> None:
         raise AssertionError("a review method was called")
+
+    def prediction_query_positions(self) -> list[str]:
+        return []
 
     def close(self) -> None:
         pass
@@ -85,6 +109,18 @@ def test_run_calls_reads_only_and_records_no_response(monkeypatch: pytest.Monkey
     rows = smoke_private.run_exchange("okx")
     assert [(r["method"], r["outcome"]) for r in rows] == [("get_balance", "ok")]
     assert "do-not-store-me" not in json.dumps(rows)
+
+
+def test_reviewed_only_calls_just_the_reviewed_reads(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(smoke_private, "make_client", lambda exchange: FakeClient())
+    monkeypatch.setattr(
+        smoke_private,
+        "private_methods",
+        lambda exchange: ["get_balance", "prediction_query_positions", "place_order"],
+    )
+    monkeypatch.setattr(smoke_private, "PAUSE_SECONDS", 0)
+    rows = smoke_private.run_exchange("binance", reviewed_only=True)
+    assert [(r["method"], r["outcome"]) for r in rows] == [("prediction_query_positions", "ok")]
 
 
 def test_missing_credentials_skip_the_exchange(monkeypatch: pytest.MonkeyPatch) -> None:
