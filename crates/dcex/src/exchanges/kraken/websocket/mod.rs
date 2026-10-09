@@ -1,5 +1,7 @@
 mod futures;
 mod trading;
+#[cfg(test)]
+mod trading_tests;
 pub use futures::KrakenFuturesWebSocket;
 mod private;
 #[cfg(test)]

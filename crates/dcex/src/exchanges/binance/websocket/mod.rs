@@ -4,6 +4,8 @@ mod api_methods;
 mod api_methods_tests;
 mod api_schema;
 mod api_validation;
+#[cfg(test)]
+mod api_validation_tests;
 pub use api::{BinanceWebSocketApi, BinanceWebSocketApiMarket};
 mod equity;
 #[cfg(test)]
