@@ -15,8 +15,12 @@ impl BybitClient {
         params: &BybitParams,
     ) -> Result<Option<ValidatedResponse>> {
         let (path, mut query) = match method_name {
-            "get_byusdt_product" => (BYUSDT_PRODUCT, vec![]),
+            "get_byusdt_product" => {
+                params.ensure_allowed(&[])?;
+                (BYUSDT_PRODUCT, vec![])
+            }
             "get_byusdt_apr_history" => {
+                params.ensure_allowed(&["range"])?;
                 let range = params.required("range")?;
                 if !matches!(range, "1" | "2" | "3") {
                     return Err(DcexError::InvalidInput(
@@ -41,6 +45,15 @@ impl BybitClient {
     ) -> Result<Option<ValidatedResponse>> {
         let result = match method_name {
             "get_byusdt_orders" => {
+                params.ensure_allowed(&[
+                    "orderId",
+                    "orderLinkId",
+                    "orderType",
+                    "startTime",
+                    "endTime",
+                    "limit",
+                    "cursor",
+                ])?;
                 validate_optional_order_type(params)?;
                 validate_times(params)?;
                 validate_limit(params, Some(100))?;
@@ -67,10 +80,12 @@ impl BybitClient {
                 .await
             }
             "get_byusdt_position" => {
+                params.ensure_allowed(&[])?;
                 self.get_request(BYUSDT_POSITION, query_with_coin(params, &[]))
                     .await
             }
             "get_byusdt_daily_yield" | "get_byusdt_hourly_yield" => {
+                params.ensure_allowed(&["startTime", "endTime", "limit", "cursor"])?;
                 validate_times(params)?;
                 validate_limit(params, None)?;
                 let path = if method_name == "get_byusdt_daily_yield" {
@@ -85,6 +100,7 @@ impl BybitClient {
                 .await
             }
             "place_byusdt_order" => {
+                params.ensure_allowed(&["orderType", "accountType", "amount", "orderLinkId"])?;
                 let order_type = params.required("orderType")?;
                 let account_type = params.required("accountType")?;
                 match (order_type, account_type) {

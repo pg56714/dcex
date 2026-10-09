@@ -14,6 +14,7 @@ mod account_requests {
             _method_name: &str,
             params: &OkxParams,
         ) -> Result<ValidatedResponse> {
+            params.ensure_allowed(&["ccy"])?;
             {
                 let mut query = Vec::new();
                 push_optional_owned(&mut query, "ccy", params.csv("ccy")?);
@@ -37,6 +38,7 @@ mod asset_requests {
             _method_name: &str,
             params: &OkxParams,
         ) -> Result<ValidatedResponse> {
+            params.ensure_allowed(&["wdId", "txId", "ccy", "to", "chain"])?;
             {
                 validate_deposit_withdraw_status(params)?;
                 self.get_request(

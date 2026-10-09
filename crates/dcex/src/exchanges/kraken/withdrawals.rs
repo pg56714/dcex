@@ -13,6 +13,7 @@ mod account_requests {
             _method_name: &str,
             params: &KrakenParams,
         ) -> Result<ValidatedResponse> {
+            params.ensure_allowed(&["amount", "currency", "sourceWallet"])?;
             {
                 params.required("amount")?;
                 params.required("currency")?;

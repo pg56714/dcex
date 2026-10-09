@@ -53,6 +53,7 @@ impl KrakenClient {
                     .await
             }
             "get_spot_open_orders" => {
+                params.ensure_allowed(&["trades", "userref", "cl_ord_id", "rebase_multiplier"])?;
                 self.private_post(
                     KrakenAuth::Spot,
                     SPOT_OPEN_ORDERS,
@@ -61,6 +62,18 @@ impl KrakenClient {
                 .await
             }
             "get_spot_closed_orders" => {
+                params.ensure_allowed(&[
+                    "trades",
+                    "userref",
+                    "cl_ord_id",
+                    "start",
+                    "end",
+                    "ofs",
+                    "closetime",
+                    "consolidate_taker",
+                    "without_count",
+                    "rebase_multiplier",
+                ])?;
                 self.private_post(
                     KrakenAuth::Spot,
                     SPOT_CLOSED_ORDERS,
@@ -80,6 +93,13 @@ impl KrakenClient {
                 .await
             }
             "get_spot_orders" => {
+                params.ensure_allowed(&[
+                    "txid",
+                    "trades",
+                    "userref",
+                    "consolidate_taker",
+                    "rebase_multiplier",
+                ])?;
                 self.private_post(
                     KrakenAuth::Spot,
                     SPOT_QUERY_ORDERS,
@@ -94,6 +114,17 @@ impl KrakenClient {
                 .await
             }
             "get_spot_trade_history" => {
+                params.ensure_allowed(&[
+                    "trades",
+                    "start",
+                    "end",
+                    "ofs",
+                    "without_count",
+                    "consolidate_taker",
+                    "ledgers",
+                    "rebase_multiplier",
+                    "type",
+                ])?;
                 let mut query = params.only(&[
                     "trades",
                     "start",
@@ -109,6 +140,18 @@ impl KrakenClient {
                     .await
             }
             "amend_spot_order" => {
+                params.ensure_allowed(&[
+                    "post_only",
+                    "txid",
+                    "cl_ord_id",
+                    "order_qty",
+                    "display_qty",
+                    "limit_price",
+                    "trigger_price",
+                    "pair",
+                    "deadline",
+                    "product_symbol",
+                ])?;
                 require_one_identifier(params, &["txid", "cl_ord_id"])?;
                 if [
                     "order_qty",
@@ -156,10 +199,12 @@ impl KrakenClient {
                     .await
             }
             "cancel_spot_all_orders" => {
+                params.ensure_allowed(&[])?;
                 self.private_post(KrakenAuth::Spot, SPOT_CANCEL_ALL, Vec::new())
                     .await
             }
             "cancel_spot_all_orders_after" => {
+                params.ensure_allowed(&["timeout"])?;
                 params.required("timeout")?;
                 self.private_post(
                     KrakenAuth::Spot,
@@ -169,6 +214,7 @@ impl KrakenClient {
                 .await
             }
             "get_spot_websocket_token" => {
+                params.ensure_allowed(&[])?;
                 self.private_post(KrakenAuth::Spot, SPOT_WEBSOCKET_TOKEN, Vec::new())
                     .await
             }
@@ -213,10 +259,12 @@ impl KrakenClient {
                     .await
             }
             "get_futures_open_orders" => {
+                params.ensure_allowed(&[])?;
                 self.private_get(KrakenAuth::Futures, FUTURES_OPEN_ORDERS, Vec::new())
                     .await
             }
             "get_futures_order_status" => {
+                params.ensure_allowed(&["orderIds", "cliOrdIds"])?;
                 self.private_post(
                     KrakenAuth::Futures,
                     FUTURES_ORDER_STATUS,
@@ -225,6 +273,17 @@ impl KrakenClient {
                 .await
             }
             "edit_futures_order" => {
+                params.ensure_allowed(&[
+                    "qtyMode",
+                    "processBefore",
+                    "orderId",
+                    "cliOrdId",
+                    "size",
+                    "limitPrice",
+                    "stopPrice",
+                    "trailingStopMaxDeviation",
+                    "trailingStopDeviationUnit",
+                ])?;
                 require_one_identifier(params, &["orderId", "cliOrdId"])?;
                 if [
                     "size",
@@ -273,12 +332,14 @@ impl KrakenClient {
                 .await
             }
             "cancel_futures_all_orders" => {
+                params.ensure_allowed(&["product_symbol"])?;
                 let mut query = Vec::new();
                 self.push_product_symbol(&mut query, params, "symbol", "PF_")?;
                 self.private_post(KrakenAuth::Futures, FUTURES_CANCEL_ALL, query)
                     .await
             }
             "cancel_futures_all_orders_after" => {
+                params.ensure_allowed(&["timeout"])?;
                 let timeout = params.required("timeout")?.parse::<u32>().map_err(|_| {
                     crate::DcexError::InvalidInput(
                         "Kraken Futures timeout must be a non-negative 32-bit integer".to_string(),

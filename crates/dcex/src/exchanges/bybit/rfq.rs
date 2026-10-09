@@ -27,6 +27,7 @@ impl BybitClient {
     ) -> Result<Option<ValidatedResponse>> {
         let result = match method_name {
             "get_rfq_public_trades" => {
+                params.ensure_allowed(&["startTime", "endTime", "limit", "cursor"])?;
                 validate_limit(params)?;
                 validate_time_range(params, 30)?;
                 self.get_request(
@@ -35,12 +36,24 @@ impl BybitClient {
                 )
                 .await
             }
-            "get_rfq_config" => self.get_request(RFQ_CONFIG, Vec::new()).await,
+            "get_rfq_config" => {
+                params.ensure_allowed(&[])?;
+                self.get_request(RFQ_CONFIG, Vec::new()).await
+            }
             "create_rfq" => {
+                params.ensure_allowed(&[
+                    "counterparties",
+                    "list",
+                    "rfqLinkId",
+                    "anonymous",
+                    "strategyType",
+                    "hedge",
+                ])?;
                 self.post_request(CREATE_RFQ, create_rfq_body(params)?)
                     .await
             }
             "cancel_rfq" => {
+                params.ensure_allowed(&["rfqId", "rfqLinkId"])?;
                 require_one_identifier(params, &["rfqId", "rfqLinkId"])?;
                 self.post_request(
                     CANCEL_RFQ,
@@ -48,8 +61,12 @@ impl BybitClient {
                 )
                 .await
             }
-            "cancel_all_rfqs" => self.post_request(CANCEL_ALL_RFQS, Map::new()).await,
+            "cancel_all_rfqs" => {
+                params.ensure_allowed(&[])?;
+                self.post_request(CANCEL_ALL_RFQS, Map::new()).await
+            }
             "accept_other_rfq_quote" => {
+                params.ensure_allowed(&["rfqId"])?;
                 self.post_request(
                     ACCEPT_OTHER_RFQ_QUOTE,
                     string_body(&[("rfqId", params.required("rfqId")?)]),
@@ -57,10 +74,19 @@ impl BybitClient {
                 .await
             }
             "create_rfq_quote" => {
+                params.ensure_allowed(&[
+                    "rfqId",
+                    "quoteLinkId",
+                    "anonymous",
+                    "expireIn",
+                    "quoteBuyList",
+                    "quoteSellList",
+                ])?;
                 self.post_request(CREATE_RFQ_QUOTE, create_quote_body(params)?)
                     .await
             }
             "execute_rfq_quote" => {
+                params.ensure_allowed(&["quoteSide", "rfqId", "quoteId", "isHedge"])?;
                 let side = params.required("quoteSide")?;
                 validate_enum("quoteSide", side, &["Buy", "Sell"])?;
                 let mut body = string_body(&[
@@ -72,6 +98,7 @@ impl BybitClient {
                 self.post_request(EXECUTE_RFQ_QUOTE, body).await
             }
             "cancel_rfq_quote" => {
+                params.ensure_allowed(&["quoteId", "quoteLinkId", "rfqId"])?;
                 require_one_identifier(params, &["quoteId", "quoteLinkId", "rfqId"])?;
                 self.post_request(
                     CANCEL_RFQ_QUOTE,
@@ -79,8 +106,12 @@ impl BybitClient {
                 )
                 .await
             }
-            "cancel_all_rfq_quotes" => self.post_request(CANCEL_ALL_RFQ_QUOTES, Map::new()).await,
+            "cancel_all_rfq_quotes" => {
+                params.ensure_allowed(&[])?;
+                self.post_request(CANCEL_ALL_RFQ_QUOTES, Map::new()).await
+            }
             "get_realtime_rfqs" => {
+                params.ensure_allowed(&["rfqId", "rfqLinkId", "traderType"])?;
                 validate_trader_type(params)?;
                 self.get_request(
                     RFQ_REALTIME,
@@ -89,6 +120,14 @@ impl BybitClient {
                 .await
             }
             "get_rfqs" => {
+                params.ensure_allowed(&[
+                    "rfqId",
+                    "rfqLinkId",
+                    "traderType",
+                    "status",
+                    "limit",
+                    "cursor",
+                ])?;
                 validate_trader_type(params)?;
                 validate_status(params, RFQ_STATUSES)?;
                 validate_limit(params)?;
@@ -106,6 +145,16 @@ impl BybitClient {
                 .await
             }
             "get_rfq_details" => {
+                params.ensure_allowed(&[
+                    "rfqId",
+                    "rfqLinkId",
+                    "status",
+                    "traderType",
+                    "startTime",
+                    "endTime",
+                    "limit",
+                    "cursor",
+                ])?;
                 validate_trader_type(params)?;
                 validate_status(params, RFQ_STATUSES)?;
                 validate_limit(params)?;
@@ -126,6 +175,7 @@ impl BybitClient {
                 .await
             }
             "get_realtime_rfq_quotes" => {
+                params.ensure_allowed(&["rfqId", "quoteId", "quoteLinkId", "traderType"])?;
                 validate_trader_type(params)?;
                 self.get_request(
                     RFQ_QUOTE_REALTIME,
@@ -134,6 +184,15 @@ impl BybitClient {
                 .await
             }
             "get_rfq_quotes" => {
+                params.ensure_allowed(&[
+                    "rfqId",
+                    "quoteId",
+                    "quoteLinkId",
+                    "traderType",
+                    "status",
+                    "limit",
+                    "cursor",
+                ])?;
                 validate_trader_type(params)?;
                 validate_status(params, RFQ_STATUSES)?;
                 validate_limit(params)?;
@@ -152,6 +211,18 @@ impl BybitClient {
                 .await
             }
             "get_rfq_trade_history" => {
+                params.ensure_allowed(&[
+                    "rfqId",
+                    "rfqLinkId",
+                    "quoteId",
+                    "quoteLinkId",
+                    "traderType",
+                    "status",
+                    "limit",
+                    "cursor",
+                    "Filled",
+                    "Failed",
+                ])?;
                 validate_trader_type(params)?;
                 validate_status(params, &["Filled", "Failed"])?;
                 validate_limit(params)?;

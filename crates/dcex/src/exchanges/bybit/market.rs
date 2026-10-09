@@ -78,6 +78,78 @@ impl BybitClient {
         {
             return Ok(result);
         }
+        // Official query fields per endpoint, plus the canonical `product_symbol`.
+        let official: Option<&[&str]> = match method_name {
+            "get_instruments_info" => Some(&[
+                "category",
+                "symbol",
+                "symbolType",
+                "status",
+                "baseCoin",
+                "limit",
+                "cursor",
+            ]),
+            "get_kline"
+            | "get_mark_price_kline"
+            | "get_index_price_kline"
+            | "get_premium_index_price_kline" => {
+                Some(&["category", "symbol", "interval", "start", "end", "limit"])
+            }
+            "get_orderbook" => Some(&["category", "symbol", "limit"]),
+            "get_tickers" => Some(&["category", "symbol", "baseCoin", "expDate"]),
+            "get_funding_rate_history" => {
+                Some(&["category", "symbol", "startTime", "endTime", "limit"])
+            }
+            "get_public_trade_history" => {
+                Some(&["category", "symbol", "baseCoin", "optionType", "limit"])
+            }
+            "get_open_interest" => Some(&[
+                "category",
+                "symbol",
+                "intervalTime",
+                "startTime",
+                "endTime",
+                "limit",
+                "cursor",
+            ]),
+            "get_long_short_ratio" => Some(&[
+                "category",
+                "symbol",
+                "period",
+                "startTime",
+                "endTime",
+                "limit",
+                "cursor",
+            ]),
+            "get_historical_volatility" => Some(&[
+                "category",
+                "baseCoin",
+                "quoteCoin",
+                "period",
+                "startTime",
+                "endTime",
+            ]),
+            "get_insurance_pool" => Some(&["coin"]),
+            "get_delivery_price" => Some(&[
+                "category",
+                "symbol",
+                "baseCoin",
+                "settleCoin",
+                "limit",
+                "cursor",
+            ]),
+            "get_order_price_limit" => Some(&["category", "symbol"]),
+            "get_adl_alert" => Some(&["symbol"]),
+            "get_risk_limit" => Some(&["category", "symbol", "cursor"]),
+            _ => None,
+        };
+        if let Some(official) = official {
+            let mut allowed = official.to_vec();
+            if official.contains(&"symbol") {
+                allowed.push("product_symbol");
+            }
+            BybitParams::from_pairs(params.clone()).ensure_allowed(&allowed)?;
+        }
         let (path, params) = match method_name {
             "get_instruments_info" => (
                 INSTRUMENTS_INFO,
@@ -242,10 +314,6 @@ impl BybitClient {
             .map(|(key, value)| {
                 if key == "interval" {
                     Ok((key, bybit_timeframe(&value)?.to_string()))
-                } else if key == "startTime" {
-                    Ok(("start".to_string(), value))
-                } else if key == "endTime" {
-                    Ok(("end".to_string(), value))
                 } else {
                     Ok((key, value))
                 }
@@ -341,22 +409,36 @@ mod tests {
     }
 
     #[test]
-    fn kline_maps_official_start_and_end_names() {
+    fn kline_takes_only_the_official_start_and_end_names() {
         let params = client()
             .normalize_kline_params(vec![
                 ("product_symbol".to_string(), "BTC-USDT-SPOT".to_string()),
                 ("interval".to_string(), "1m".to_string()),
-                ("startTime".to_string(), "100".to_string()),
-                ("endTime".to_string(), "200".to_string()),
+                ("start".to_string(), "100".to_string()),
+                ("end".to_string(), "200".to_string()),
             ])
             .expect("params");
-
         assert!(params.contains(&("start".to_string(), "100".to_string())));
         assert!(params.contains(&("end".to_string(), "200".to_string())));
+        assert!(params.contains(&("interval".to_string(), "1".to_string())));
+        let client = client();
+        let error = crate::http::block_on(async move {
+            client
+                .public_request(
+                    "get_kline",
+                    vec![
+                        ("product_symbol".to_string(), "BTC-USDT-SPOT".to_string()),
+                        ("interval".to_string(), "1m".to_string()),
+                        ("startTime".to_string(), "100".to_string()),
+                    ],
+                )
+                .await
+        })
+        .expect_err("startTime is not a kline field");
         assert!(
-            !params
-                .iter()
-                .any(|(key, _)| key == "startTime" || key == "endTime")
+            error
+                .to_string()
+                .contains("unsupported Bybit parameter: startTime")
         );
     }
 }

@@ -12,6 +12,44 @@ struct Field {
     csv: bool,
 }
 pub(super) fn validate(name: &str, params: &BTreeMap<String, String>) -> Result<()> {
+    // Official query and path fields for routes without range constraints; path segments
+    // use the library names `market` and `order_id`.
+    let names_only: Option<&[&str]> = match name {
+        "get_markets" => Some(&["market"]),
+        "get_spot_assets" | "get_fee_tiers" => Some(&[]),
+        "get_account" => Some(&["address", "accountIndex"]),
+        "get_bbo" => Some(&["market"]),
+        "get_l2_orderbook" => Some(&["market", "nLevels", "sigFigs", "roundStep"]),
+        "get_positions" | "get_leverages" => Some(&["address", "accountIndex", "market"]),
+        "get_open_orders" => Some(&[
+            "address",
+            "accountIndex",
+            "market",
+            "status",
+            "limit",
+            "from",
+            "to",
+        ]),
+        "get_order_status" => Some(&["order_id", "address", "accountIndex"]),
+        "get_fills" => Some(&[
+            "address",
+            "accountIndex",
+            "market",
+            "role",
+            "side",
+            "limit",
+            "from",
+            "to",
+        ]),
+        "get_transfer_updates" => Some(&["address", "accountIndex", "limit", "from", "to"]),
+        _ => None,
+    };
+    if let Some(allowed) = names_only {
+        if let Some(key) = params.keys().find(|key| !allowed.contains(&key.as_str())) {
+            return Err(invalid(format!("unsupported {name} field: {key}")));
+        }
+        return Ok(());
+    }
     let fields: &[Field] = match name {
         "get_trade" => &[
             Field {

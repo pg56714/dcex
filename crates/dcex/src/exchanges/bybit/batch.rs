@@ -40,6 +40,7 @@ mod trade_requests {
             _method_name: &str,
             params: &BybitParams,
         ) -> Result<ValidatedResponse> {
+            params.ensure_allowed(&["category", "request"])?;
             self.batch_request(CANCEL_BATCH_ORDERS, params).await
         }
         pub(in crate::exchanges::bybit) async fn dispatch_place_batch_order(
@@ -47,6 +48,7 @@ mod trade_requests {
             _method_name: &str,
             params: &BybitParams,
         ) -> Result<ValidatedResponse> {
+            params.ensure_allowed(&["request", "category"])?;
             crate::exchanges::bybit::trade::validate_batch_request(
                 &params.json_required("request")?,
                 false,
@@ -58,6 +60,7 @@ mod trade_requests {
             _method_name: &str,
             params: &BybitParams,
         ) -> Result<ValidatedResponse> {
+            params.ensure_allowed(&["request", "category"])?;
             crate::exchanges::bybit::trade::validate_batch_request(
                 &params.json_required("request")?,
                 true,

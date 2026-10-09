@@ -2506,12 +2506,7 @@ const CASES: &[Case] = &[
     ),
     post(
         "funds_transfer",
-        &[
-            ("ccy", "USDT"),
-            ("amt", "1"),
-            ("from_account", "FUND"),
-            ("to_account", "TRADING"),
-        ],
+        &[("ccy", "USDT"), ("amt", "1"), ("from", "6"), ("to", "18")],
         "/api/v5/asset/transfer",
         &[r#""from":"6""#, r#""to":"18""#],
     ),
@@ -2602,8 +2597,8 @@ const CASES: &[Case] = &[
             ("amt", "1"),
             ("fromSubAccount", "alpha"),
             ("toSubAccount", "beta"),
-            ("from_account", "FUND"),
-            ("to_account", "TRADING"),
+            ("from", "6"),
+            ("to", "18"),
         ],
         "/api/v5/asset/subaccount/transfer",
         &[

@@ -186,6 +186,7 @@ impl BybitClient {
             "place_order" => self.place_order_from_params(params).await,
             "pre_check_order" => self.pre_check_order_from_params(params).await,
             "set_disconnected_cancel_all" => {
+                params.ensure_allowed(&["product", "timeWindow"])?;
                 let mut body = Map::new();
                 insert_optional_string(&mut body, "product", params.get("product"));
                 body.insert(
@@ -266,15 +267,80 @@ impl BybitClient {
                 .await
             }
             "amend_order" => self.amend_order_from_params(params).await,
-            "cancel_order" => self.cancel_order_from_params(params).await,
-            "get_open_orders" => self.get_open_orders_from_params(params).await,
+            "cancel_order" => {
+                params.ensure_allowed(&[
+                    "product_symbol",
+                    "category",
+                    "orderId",
+                    "orderLinkId",
+                    "orderFilter",
+                ])?;
+                self.cancel_order_from_params(params).await
+            }
+            "get_open_orders" => {
+                params.ensure_allowed(&[
+                    "category",
+                    "limit",
+                    "product_symbol",
+                    "baseCoin",
+                    "settleCoin",
+                    "orderId",
+                    "orderLinkId",
+                    "openOnly",
+                    "orderFilter",
+                    "cursor",
+                ])?;
+                self.get_open_orders_from_params(params).await
+            }
             "cancel_batch_orders" => self.dispatch_cancel_batch_orders(method_name, params).await,
-            "cancel_all_orders" => self.cancel_all_orders_from_params(params).await,
-            "get_order_history" => self.get_order_history_from_params(params).await,
-            "get_execution_list" => self.get_execution_list_from_params(params).await,
+            "cancel_all_orders" => {
+                params.ensure_allowed(&[
+                    "category",
+                    "product_symbol",
+                    "baseCoin",
+                    "settleCoin",
+                    "orderFilter",
+                    "stopOrderType",
+                ])?;
+                self.cancel_all_orders_from_params(params).await
+            }
+            "get_order_history" => {
+                params.ensure_allowed(&[
+                    "category",
+                    "product_symbol",
+                    "baseCoin",
+                    "settleCoin",
+                    "orderId",
+                    "orderLinkId",
+                    "orderFilter",
+                    "orderStatus",
+                    "startTime",
+                    "endTime",
+                    "cursor",
+                    "limit",
+                ])?;
+                self.get_order_history_from_params(params).await
+            }
+            "get_execution_list" => {
+                params.ensure_allowed(&[
+                    "category",
+                    "limit",
+                    "product_symbol",
+                    "orderId",
+                    "orderLinkId",
+                    "baseCoin",
+                    "settleCoin",
+                    "startTime",
+                    "endTime",
+                    "execType",
+                    "cursor",
+                ])?;
+                self.get_execution_list_from_params(params).await
+            }
             "place_batch_order" => self.dispatch_place_batch_order(method_name, params).await,
             "amend_batch_order" => self.dispatch_amend_batch_order(method_name, params).await,
             "get_borrow_quota" => {
+                params.ensure_allowed(&["product_symbol", "side"])?;
                 let product_symbol = params.required("product_symbol")?;
                 let query = vec![
                     ("category".to_string(), "spot".to_string()),
@@ -292,14 +358,17 @@ impl BybitClient {
                 self.get_request(GET_BORROW_QUOTA, query).await
             }
             "get_vip_margin_data" => {
+                params.ensure_allowed(&["vipLevel", "currency"])?;
                 self.get_request(VIP_MARGIN_DATA, params.only(&["vipLevel", "currency"]))
                     .await
             }
             "get_collateral" => {
+                params.ensure_allowed(&["currency"])?;
                 self.get_request(SPOT_MARGIN_COLLATERAL, params.only(&["currency"]))
                     .await
             }
             "get_historical_interest_rate" => {
+                params.ensure_allowed(&["currency", "vipLevel", "startTime", "endTime"])?;
                 let mut query = vec![(
                     "currency".to_string(),
                     params.required("currency")?.to_string(),
@@ -309,8 +378,12 @@ impl BybitClient {
                 push_optional(&mut query, "endTime", params.get("endTime"));
                 self.get_request(HISTORICAL_INTEREST, query).await
             }
-            "get_status_and_leverage" => self.get_request(STATUS_AND_LEVERAGE, Vec::new()).await,
+            "get_status_and_leverage" => {
+                params.ensure_allowed(&[])?;
+                self.get_request(STATUS_AND_LEVERAGE, Vec::new()).await
+            }
             "get_margin_max_borrowable" => {
+                params.ensure_allowed(&["currency"])?;
                 self.get_request(
                     MARGIN_MAX_BORROWABLE,
                     vec![(
@@ -321,14 +394,17 @@ impl BybitClient {
                 .await
             }
             "get_margin_position_tiers" => {
+                params.ensure_allowed(&["currency"])?;
                 self.get_request(MARGIN_POSITION_TIERS, params.only(&["currency"]))
                     .await
             }
             "get_margin_coin_state" => {
+                params.ensure_allowed(&["currency"])?;
                 self.get_request(MARGIN_COIN_STATE, params.only(&["currency"]))
                     .await
             }
             "get_margin_repayment_available_amount" => {
+                params.ensure_allowed(&["currency"])?;
                 self.get_request(
                     MARGIN_REPAYMENT_AVAILABLE_AMOUNT,
                     vec![(
@@ -339,6 +415,7 @@ impl BybitClient {
                 .await
             }
             "set_margin_auto_repay_mode" => {
+                params.ensure_allowed(&["autoRepayMode", "currency"])?;
                 let mode = params.required("autoRepayMode")?;
                 if !["0", "1"].contains(&mode) {
                     return Err(crate::DcexError::InvalidInput(
@@ -351,10 +428,12 @@ impl BybitClient {
                 self.post_request(SET_MARGIN_AUTO_REPAY_MODE, body).await
             }
             "get_margin_auto_repay_mode" => {
+                params.ensure_allowed(&["currency"])?;
                 self.get_request(GET_MARGIN_AUTO_REPAY_MODE, params.only(&["currency"]))
                     .await
             }
             "get_fixed_borrow_quote" => {
+                params.ensure_allowed(&["orderCurrency", "term", "orderBy", "sort", "limit"])?;
                 let mut query = vec![(
                     "orderCurrency".to_string(),
                     params.required("orderCurrency")?.to_string(),
@@ -365,6 +444,14 @@ impl BybitClient {
                 self.get_request(FIXED_BORROW_QUOTE, query).await
             }
             "borrow_fixed_rate" => {
+                params.ensure_allowed(&[
+                    "orderCurrency",
+                    "orderAmount",
+                    "annualRate",
+                    "term",
+                    "repayType",
+                    "strategyType",
+                ])?;
                 let mut body = Map::new();
                 for key in ["orderCurrency", "orderAmount", "annualRate", "term"] {
                     body.insert(
@@ -378,6 +465,7 @@ impl BybitClient {
                 self.post_request(FIXED_BORROW, body).await
             }
             "renew_fixed_rate_borrow" => {
+                params.ensure_allowed(&["loanId", "qty"])?;
                 let mut body = Map::new();
                 body.insert(
                     "loanId".to_string(),
@@ -387,6 +475,14 @@ impl BybitClient {
                 self.post_request(FIXED_BORROW_RENEW, body).await
             }
             "get_fixed_borrow_orders" => {
+                params.ensure_allowed(&[
+                    "orderId",
+                    "orderCurrency",
+                    "state",
+                    "term",
+                    "limit",
+                    "cursor",
+                ])?;
                 self.get_request(
                     FIXED_BORROW_ORDER_INFO,
                     params.only(&[
@@ -401,6 +497,7 @@ impl BybitClient {
                 .await
             }
             "get_fixed_borrow_contracts" => {
+                params.ensure_allowed(&["orderId", "orderCurrency", "term", "limit", "cursor"])?;
                 self.get_request(
                     FIXED_BORROW_CONTRACT_INFO,
                     params.only(&["orderId", "orderCurrency", "term", "limit", "cursor"]),
@@ -408,6 +505,7 @@ impl BybitClient {
                 .await
             }
             "get_margin_liability" => {
+                params.ensure_allowed(&["currency"])?;
                 self.get_request(
                     MARGIN_LIABILITY,
                     vec![(
@@ -418,6 +516,7 @@ impl BybitClient {
                 .await
             }
             "get_flexible_borrow_inventory" => {
+                params.ensure_allowed(&["currency"])?;
                 self.get_request(
                     FLEXIBLE_BORROW_INVENTORY,
                     vec![(
@@ -428,6 +527,7 @@ impl BybitClient {
                 .await
             }
             "get_fixed_borrow_inventory" => {
+                params.ensure_allowed(&["currency", "term", "annualRate"])?;
                 self.get_request(
                     FIXED_BORROW_INVENTORY,
                     vec![

@@ -25,6 +25,16 @@ impl OkxParams {
             .ok_or_else(|| DcexError::InvalidInput(format!("missing required parameter: {key}")))
     }
 
+    /// Rejects any parameter outside `keys` instead of silently dropping it.
+    pub(super) fn ensure_allowed(&self, keys: &[&str]) -> Result<()> {
+        match self.0.iter().find(|(key, _)| !keys.contains(&key.as_str())) {
+            Some((key, _)) => Err(DcexError::InvalidInput(format!(
+                "unsupported OKX parameter: {key}"
+            ))),
+            None => Ok(()),
+        }
+    }
+
     pub(super) fn only(&self, keys: &[&str]) -> Vec<(String, String)> {
         self.0
             .iter()
@@ -171,11 +181,13 @@ pub(super) fn insert_optional_bool(
     Ok(())
 }
 
-pub(super) fn okx_account_id(account: &str) -> &str {
-    match account {
-        "FUND" => "6",
-        "TRADING" => "18",
-        _ => account,
+/// Official transfer account IDs: `6` (funding) or `18` (trading).
+pub(super) fn okx_account_id(params: &OkxParams, key: &str) -> Result<String> {
+    match params.required(key)? {
+        account @ ("6" | "18") => Ok(account.to_string()),
+        other => Err(DcexError::InvalidInput(format!(
+            "OKX {key} must be 6 (funding) or 18 (trading), got {other}"
+        ))),
     }
 }
 

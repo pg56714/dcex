@@ -161,8 +161,8 @@ async def test_async_okx_asset_current_fields_are_forwarded() -> None:
     await client.funds_transfer(
         "USDT",
         "1",
-        "FUND",
-        "TRADING",
+        "6",
+        "18",
         loanTrans=True,
         omitPosRisk=False,
         clientId="transfer-client-id",

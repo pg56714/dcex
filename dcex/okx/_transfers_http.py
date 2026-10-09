@@ -12,8 +12,8 @@ class AssetHTTPTransfersHTTP(HTTPManager):
         self,
         ccy: str,
         amt: str,
-        from_account: str,
-        to_account: str,
+        from_: str,
+        to: str,
         type: str | None = None,
         subAcct: str | None = None,
         loanTrans: bool | str | None = None,
@@ -26,8 +26,8 @@ class AssetHTTPTransfersHTTP(HTTPManager):
         Args:
             ccy: Currency code
             amt: Transfer amount
-            from_account: Source account ("FUND" or "TRADING")
-            to_account: Destination account ("FUND" or "TRADING")
+            from_: Source account ID, 6 (funding) or 18 (trading)
+            to: Destination account ID, 6 (funding) or 18 (trading)
             type: Transfer type
             subAcct: Sub-account name
             loanTrans: Loan transfer flag
@@ -40,8 +40,8 @@ class AssetHTTPTransfersHTTP(HTTPManager):
             self._native_params(
                 ccy=ccy,
                 amt=amt,
-                from_account=from_account,
-                to_account=to_account,
+                from_=from_,
+                to=to,
                 type=type,
                 subAcct=subAcct,
                 loanTrans=loanTrans,
@@ -80,8 +80,8 @@ class SubaccountHTTPTransfersHTTP(HTTPManager):
         self,
         ccy: str,
         amt: str,
-        from_account: str,
-        to_account: str,
+        from_: str,
+        to: str,
         fromSubAccount: str,
         toSubAccount: str,
         *,
@@ -93,8 +93,8 @@ class SubaccountHTTPTransfersHTTP(HTTPManager):
             self._native_params(
                 ccy=ccy,
                 amt=amt,
-                from_account=from_account,
-                to_account=to_account,
+                from_=from_,
+                to=to,
                 fromSubAccount=fromSubAccount,
                 toSubAccount=toSubAccount,
                 loanTrans=loanTrans,

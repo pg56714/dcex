@@ -16,6 +16,7 @@ impl BybitClient {
     ) -> Result<Option<ValidatedResponse>> {
         let (path, query) = match method_name {
             "get_spread_instruments" => {
+                params.ensure_allowed(&["symbol", "baseCoin", "limit", "cursor"])?;
                 limit(params, 500)?;
                 (
                     SPREAD_INSTRUMENTS,
@@ -23,15 +24,18 @@ impl BybitClient {
                 )
             }
             "get_spread_orderbook" => {
+                params.ensure_allowed(&["symbol", "limit"])?;
                 nonempty(params, "symbol")?;
                 limit(params, 25)?;
                 (SPREAD_ORDERBOOK, params.only(&["symbol", "limit"]))
             }
             "get_spread_tickers" => {
+                params.ensure_allowed(&["symbol"])?;
                 nonempty(params, "symbol")?;
                 (SPREAD_TICKERS, params.only(&["symbol"]))
             }
             "get_spread_recent_trades" => {
+                params.ensure_allowed(&["symbol", "limit"])?;
                 nonempty(params, "symbol")?;
                 limit(params, 1000)?;
                 (SPREAD_RECENT_TRADES, params.only(&["symbol", "limit"]))
@@ -51,6 +55,15 @@ impl BybitClient {
     ) -> Result<Option<ValidatedResponse>> {
         let result = match method_name {
             "place_spread_order" => {
+                params.ensure_allowed(&[
+                    "orderType",
+                    "symbol",
+                    "side",
+                    "qty",
+                    "price",
+                    "timeInForce",
+                    "orderLinkId",
+                ])?;
                 nonempty(params, "symbol")?;
                 choice(params, "side", &["Buy", "Sell"])?;
                 choice(params, "orderType", &["Limit", "Market"])?;
@@ -74,6 +87,7 @@ impl BybitClient {
                 self.post_request(SPREAD_CREATE_ORDER, body).await
             }
             "amend_spread_order" => {
+                params.ensure_allowed(&["qty", "price", "symbol", "orderId", "orderLinkId"])?;
                 nonempty(params, "symbol")?;
                 one_identifier(params)?;
                 if params.get("qty").is_none() && params.get("price").is_none() {
@@ -91,6 +105,7 @@ impl BybitClient {
                 self.post_request(SPREAD_AMEND_ORDER, body).await
             }
             "cancel_spread_order" => {
+                params.ensure_allowed(&["orderId", "orderLinkId"])?;
                 one_identifier(params)?;
                 let mut body = Map::new();
                 for key in ["orderId", "orderLinkId"] {
@@ -99,6 +114,7 @@ impl BybitClient {
                 self.post_request(SPREAD_CANCEL_ORDER, body).await
             }
             "cancel_all_spread_orders" => {
+                params.ensure_allowed(&["symbol", "cancelAll"])?;
                 let mut body = Map::new();
                 insert_optional_string(&mut body, "symbol", params.get("symbol"));
                 if let Some(cancel_all) = params.get("cancelAll") {
@@ -119,6 +135,7 @@ impl BybitClient {
                 self.post_request(SPREAD_CANCEL_ALL_ORDERS, body).await
             }
             "get_spread_open_orders" | "get_spread_order_history" | "get_spread_trade_history" => {
+                params.ensure_allowed(&["limit"])?;
                 if let Some(limit) = params.get("limit") {
                     let limit = limit.parse::<u64>().map_err(|_| {
                         DcexError::InvalidInput("Bybit spread limit must be an integer".into())
@@ -166,6 +183,7 @@ impl BybitClient {
                 self.get_request(path, params.only(fields)).await
             }
             "get_spread_max_qty" => {
+                params.ensure_allowed(&["symbol", "side", "orderPrice"])?;
                 nonempty(params, "symbol")?;
                 choice(params, "side", &["1", "2"])?;
                 nonempty(params, "orderPrice")?;

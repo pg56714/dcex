@@ -13,6 +13,7 @@ impl KrakenClient {
     ) -> Result<Option<ValidatedResponse>> {
         let result = match method_name {
             "get_earn_strategies" => {
+                params.ensure_allowed(&["ascending", "asset", "cursor", "limit", "lock_type"])?;
                 validate_optional_bool(params, "ascending")?;
                 validate_optional_limit(params)?;
                 self.private_post(
@@ -23,6 +24,13 @@ impl KrakenClient {
                 .await
             }
             "get_earn_allocations" => {
+                params.ensure_allowed(&[
+                    "ascending",
+                    "converted_asset",
+                    "cursor",
+                    "hide_zero_allocations",
+                    "limit",
+                ])?;
                 validate_optional_bool(params, "ascending")?;
                 validate_optional_bool(params, "hide_zero_allocations")?;
                 validate_optional_limit(params)?;
@@ -40,6 +48,7 @@ impl KrakenClient {
                 .await
             }
             "allocate_earn_funds" | "deallocate_earn_funds" => {
+                params.ensure_allowed(&["strategy_id", "amount"])?;
                 require_strategy_amount(params)?;
                 let path = if method_name == "allocate_earn_funds" {
                     EARN_ALLOCATE
@@ -54,6 +63,7 @@ impl KrakenClient {
                 .await
             }
             "get_earn_allocation_status" | "get_earn_deallocation_status" => {
+                params.ensure_allowed(&["strategy_id"])?;
                 params.required("strategy_id")?;
                 let path = if method_name == "get_earn_allocation_status" {
                     EARN_ALLOCATE_STATUS

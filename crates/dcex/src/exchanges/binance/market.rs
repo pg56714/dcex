@@ -643,10 +643,18 @@ impl BinanceClient {
         }
         match method_name {
             "get_server_time" => {
+                params.ensure_allowed(&["market_type"])?;
                 self.get_server_time(params.get("market_type").unwrap_or("spot"))
                     .await
             }
             "get_spot_exchange_info" => {
+                params.ensure_allowed(&[
+                    "product_symbol",
+                    "product_symbols",
+                    "permissions",
+                    "showPermissionSets",
+                    "symbolStatus",
+                ])?;
                 self.send_get_spot_exchange_info(BinanceSymbolListParams {
                     product_symbol: params.get("product_symbol"),
                     product_symbols: params.values("product_symbols"),
@@ -657,6 +665,7 @@ impl BinanceClient {
                 .await
             }
             "get_spot_orderbook" => {
+                params.ensure_allowed(&["product_symbol", "limit", "symbolStatus"])?;
                 self.send_get_spot_orderbook(
                     params.required("product_symbol")?,
                     BinanceLimitParams {
@@ -667,6 +676,7 @@ impl BinanceClient {
                 .await
             }
             "get_spot_trades" => {
+                params.ensure_allowed(&["product_symbol", "limit", "symbolStatus"])?;
                 self.send_get_spot_trades(
                     params.required("product_symbol")?,
                     BinanceLimitParams {
@@ -677,6 +687,7 @@ impl BinanceClient {
                 .await
             }
             "get_spot_price" => {
+                params.ensure_allowed(&["product_symbol", "product_symbols", "symbolStatus"])?;
                 self.send_get_spot_price(BinanceSymbolListParams {
                     product_symbol: params.get("product_symbol"),
                     product_symbols: params.values("product_symbols"),
@@ -687,6 +698,14 @@ impl BinanceClient {
                 .await
             }
             "get_klines" => {
+                params.ensure_allowed(&[
+                    "product_symbol",
+                    "interval",
+                    "start_time",
+                    "end_time",
+                    "time_zone",
+                    "limit",
+                ])?;
                 self.send_get_klines(
                     params.required("product_symbol")?,
                     params.required("interval")?,
@@ -699,7 +718,10 @@ impl BinanceClient {
                 )
                 .await
             }
-            "get_futures_exchange_info" => self.get_futures_exchange_info().await,
+            "get_futures_exchange_info" => {
+                params.ensure_allowed(&[])?;
+                self.get_futures_exchange_info().await
+            }
             "get_futures_orderbook" => {
                 params.ensure_allowed(&["product_symbol", "limit"])?;
                 params.optional_one_of("limit", &["5", "10", "20", "50", "100", "500", "1000"])?;
@@ -710,18 +732,21 @@ impl BinanceClient {
                 .await
             }
             "get_futures_ticker" => {
+                params.ensure_allowed(&["product_symbol"])?;
                 self.send_get_futures_ticker(BinanceOptionalSymbolParams {
                     product_symbol: params.get("product_symbol"),
                 })
                 .await
             }
             "get_futures_premium_index" => {
+                params.ensure_allowed(&["product_symbol"])?;
                 self.send_get_futures_premium_index(BinanceOptionalSymbolParams {
                     product_symbol: params.get("product_symbol"),
                 })
                 .await
             }
             "get_futures_funding_rate" => {
+                params.ensure_allowed(&["product_symbol", "startTime", "endTime", "limit"])?;
                 self.send_get_futures_funding_rate(BinanceFundingRateParams {
                     product_symbol: params.get("product_symbol"),
                     start_time: params.u64("startTime")?,
@@ -731,10 +756,18 @@ impl BinanceClient {
                 .await
             }
             "get_futures_open_interest" => {
+                params.ensure_allowed(&["product_symbol"])?;
                 self.get_futures_open_interest(params.required("product_symbol")?)
                     .await
             }
             "get_futures_open_interest_history" => {
+                params.ensure_allowed(&[
+                    "product_symbol",
+                    "period",
+                    "limit",
+                    "startTime",
+                    "endTime",
+                ])?;
                 self.send_get_futures_open_interest_history(
                     params.required("product_symbol")?,
                     params.get("period").unwrap_or("5m"),
@@ -747,6 +780,13 @@ impl BinanceClient {
                 .await
             }
             "get_futures_global_long_short_account_ratio" => {
+                params.ensure_allowed(&[
+                    "product_symbol",
+                    "period",
+                    "limit",
+                    "startTime",
+                    "endTime",
+                ])?;
                 self.send_get_futures_global_long_short_account_ratio(
                     params.required("product_symbol")?,
                     params.get("period").unwrap_or("5m"),
@@ -759,6 +799,13 @@ impl BinanceClient {
                 .await
             }
             "get_futures_top_long_short_account_ratio" => {
+                params.ensure_allowed(&[
+                    "product_symbol",
+                    "period",
+                    "limit",
+                    "startTime",
+                    "endTime",
+                ])?;
                 self.send_get_futures_top_long_short_account_ratio(
                     params.required("product_symbol")?,
                     params.get("period").unwrap_or("5m"),
@@ -771,6 +818,13 @@ impl BinanceClient {
                 .await
             }
             "get_futures_top_long_short_position_ratio" => {
+                params.ensure_allowed(&[
+                    "product_symbol",
+                    "period",
+                    "limit",
+                    "startTime",
+                    "endTime",
+                ])?;
                 self.send_get_futures_top_long_short_position_ratio(
                     params.required("product_symbol")?,
                     params.get("period").unwrap_or("5m"),
@@ -783,6 +837,13 @@ impl BinanceClient {
                 .await
             }
             "get_futures_taker_buy_sell_volume" => {
+                params.ensure_allowed(&[
+                    "product_symbol",
+                    "period",
+                    "limit",
+                    "startTime",
+                    "endTime",
+                ])?;
                 self.send_get_futures_taker_buy_sell_volume(
                     params.required("product_symbol")?,
                     params.get("period").unwrap_or("5m"),
@@ -795,6 +856,14 @@ impl BinanceClient {
                 .await
             }
             "get_futures_basis" => {
+                params.ensure_allowed(&[
+                    "product_symbol",
+                    "contractType",
+                    "period",
+                    "limit",
+                    "startTime",
+                    "endTime",
+                ])?;
                 self.send_get_futures_basis(
                     params.required("product_symbol")?,
                     params.get("contractType").unwrap_or("PERPETUAL"),

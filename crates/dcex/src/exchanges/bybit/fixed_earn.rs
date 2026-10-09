@@ -17,6 +17,7 @@ impl BybitClient {
         if method_name != "get_fixed_earn_products" {
             return Ok(None);
         }
+        params.ensure_allowed(&["coin"])?;
         let response = self
             .request(
                 HttpMethod::Get,
@@ -36,6 +37,7 @@ impl BybitClient {
     ) -> Result<Option<ValidatedResponse>> {
         let result = match method_name {
             "get_fixed_earn_positions" => {
+                params.ensure_allowed(&["productId", "category", "coin"])?;
                 validate_optional_category(params)?;
                 self.get_request(
                     FIXED_EARN_POSITION,
@@ -44,6 +46,16 @@ impl BybitClient {
                 .await
             }
             "get_fixed_earn_orders" => {
+                params.ensure_allowed(&[
+                    "productId",
+                    "category",
+                    "orderType",
+                    "orderId",
+                    "startTime",
+                    "endTime",
+                    "limit",
+                    "cursor",
+                ])?;
                 validate_optional_category(params)?;
                 if params.get("productId").is_some() && params.get("category").is_none() {
                     return Err(DcexError::InvalidInput(
@@ -70,6 +82,15 @@ impl BybitClient {
                 .await
             }
             "place_fixed_earn_order" => {
+                params.ensure_allowed(&[
+                    "category",
+                    "amount",
+                    "accountType",
+                    "orderLinkId",
+                    "productId",
+                    "coin",
+                    "autoInvest",
+                ])?;
                 let category = params.required("category")?;
                 validate_enum("category", category, CATEGORIES)?;
                 let amount = params.required("amount")?;
@@ -93,6 +114,7 @@ impl BybitClient {
                 self.post_request(FIXED_EARN_PLACE_ORDER, body).await
             }
             "redeem_fixed_earn" => {
+                params.ensure_allowed(&["category", "productId", "positionId"])?;
                 if params.required("category")? != "FundPool" {
                     return Err(DcexError::InvalidInput(
                         "early redemption is only available for FundPool".to_string(),
@@ -109,6 +131,7 @@ impl BybitClient {
                 .await
             }
             "set_fixed_earn_auto_invest" => {
+                params.ensure_allowed(&["category", "status", "productId", "positionId"])?;
                 let category = params.required("category")?;
                 validate_enum("category", category, CATEGORIES)?;
                 let status = params.required("status")?;

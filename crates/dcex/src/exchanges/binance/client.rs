@@ -254,6 +254,8 @@ impl BinanceClient {
         params: Vec<(String, String)>,
         signed: bool,
     ) -> Result<ValidatedResponse> {
+        let path = path.into();
+        ensure_official_fields(method, &path, &params)?;
         if signed {
             self.sync_server_time(market).await?;
         }
@@ -362,6 +364,7 @@ impl BinanceClient {
         path: &str,
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
+        ensure_official_fields(method, path, &params)?;
         let api_key = self.api_key.as_deref().ok_or_else(|| {
             DcexError::InvalidInput("Binance API key is required for this request.".to_string())
         })?;
@@ -535,5 +538,42 @@ impl BinanceClient {
             ))),
             market => Ok(market),
         }
+    }
+}
+
+/// Rejects a field the official SDK inventory does not document for this endpoint, before
+/// any network call. `timestamp`, `recvWindow` and `signature` are request plumbing.
+fn ensure_official_fields(
+    method: HttpMethod,
+    path: &str,
+    params: &[(String, String)],
+) -> Result<()> {
+    let method = match method {
+        HttpMethod::Get => "GET",
+        HttpMethod::Post => "POST",
+        HttpMethod::Put => "PUT",
+        HttpMethod::Delete => "DELETE",
+        HttpMethod::Patch => "PATCH",
+    };
+    let path = path.split_once('?').map_or(path, |(path, _)| path);
+    let Some(fields) = super::official_fields::official_fields(method, path) else {
+        return Ok(());
+    };
+    // Indexed list fields (`orderArgs[0].symbol`) belong to their list field.
+    let comparable = |key: &str| {
+        key.split('[')
+            .next()
+            .unwrap_or(key)
+            .replace('_', "")
+            .to_ascii_lowercase()
+    };
+    match params.iter().find(|(key, _)| {
+        !matches!(key.as_str(), "timestamp" | "recvWindow" | "signature")
+            && !fields.contains(&comparable(key).as_str())
+    }) {
+        Some((key, _)) => Err(DcexError::InvalidInput(format!(
+            "unsupported Binance parameter for {method} {path}: {key}"
+        ))),
+        None => Ok(()),
     }
 }

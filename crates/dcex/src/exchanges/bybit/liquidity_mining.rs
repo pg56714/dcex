@@ -17,6 +17,7 @@ impl BybitClient {
         if method_name != "get_liquidity_mining_products" {
             return Ok(None);
         }
+        params.ensure_allowed(&["baseCoin", "quoteCoin"])?;
         let result = self
             .request(
                 HttpMethod::Get,
@@ -36,6 +37,7 @@ impl BybitClient {
     ) -> Result<Option<ValidatedResponse>> {
         let result = match method_name {
             "get_liquidity_mining_positions" => {
+                params.ensure_allowed(&["productId", "baseCoin"])?;
                 self.get_request(
                     LIQUIDITY_MINING_POSITION,
                     params.only(&["productId", "baseCoin"]),
@@ -43,6 +45,17 @@ impl BybitClient {
                 .await
             }
             "get_liquidity_mining_orders" => {
+                params.ensure_allowed(&[
+                    "orderId",
+                    "orderLinkId",
+                    "productId",
+                    "orderType",
+                    "startTime",
+                    "endTime",
+                    "status",
+                    "limit",
+                    "cursor",
+                ])?;
                 validate_history(params)?;
                 if params.get("orderId").is_some() && params.get("orderLinkId").is_some() {
                     return Err(DcexError::InvalidInput(
@@ -72,6 +85,14 @@ impl BybitClient {
                 .await
             }
             "get_liquidity_mining_yield_records" => {
+                params.ensure_allowed(&[
+                    "baseCoin",
+                    "quoteCoin",
+                    "startTime",
+                    "endTime",
+                    "limit",
+                    "cursor",
+                ])?;
                 validate_history(params)?;
                 self.get_request(
                     LIQUIDITY_MINING_YIELD_RECORDS,
@@ -87,6 +108,14 @@ impl BybitClient {
                 .await
             }
             "get_liquidity_mining_liquidation_records" => {
+                params.ensure_allowed(&[
+                    "baseCoin",
+                    "quoteCoin",
+                    "startTime",
+                    "endTime",
+                    "limit",
+                    "cursor",
+                ])?;
                 validate_history(params)?;
                 self.get_request(
                     LIQUIDITY_MINING_LIQUIDATION_RECORDS,
@@ -102,6 +131,15 @@ impl BybitClient {
                 .await
             }
             "add_liquidity_mining" => {
+                params.ensure_allowed(&[
+                    "quoteAmount",
+                    "baseAmount",
+                    "quoteAccountType",
+                    "baseAccountType",
+                    "leverage",
+                    "orderLinkId",
+                    "productId",
+                ])?;
                 let mut body = order_body(params)?;
                 let quote = params.get("quoteAmount");
                 let base = params.get("baseAmount");
@@ -131,6 +169,13 @@ impl BybitClient {
                 self.post_request(LIQUIDITY_MINING_ADD, body).await
             }
             "remove_liquidity_mining" => {
+                params.ensure_allowed(&[
+                    "positionId",
+                    "removeRate",
+                    "removeType",
+                    "orderLinkId",
+                    "productId",
+                ])?;
                 let mut body = order_body(params)?;
                 insert_optional_string(
                     &mut body,
@@ -157,6 +202,7 @@ impl BybitClient {
                 self.post_request(LIQUIDITY_MINING_REMOVE, body).await
             }
             "reinvest_liquidity_mining" => {
+                params.ensure_allowed(&["positionId", "leverage", "orderLinkId", "productId"])?;
                 let mut body = order_body(params)?;
                 insert_optional_string(
                     &mut body,
@@ -168,6 +214,13 @@ impl BybitClient {
                 self.post_request(LIQUIDITY_MINING_REINVEST, body).await
             }
             "add_liquidity_mining_margin" => {
+                params.ensure_allowed(&[
+                    "amount",
+                    "quoteAccountType",
+                    "positionId",
+                    "orderLinkId",
+                    "productId",
+                ])?;
                 let mut body = order_body(params)?;
                 let amount = params.required("amount")?;
                 positive_amount("amount", amount)?;
@@ -183,6 +236,7 @@ impl BybitClient {
                 self.post_request(LIQUIDITY_MINING_ADD_MARGIN, body).await
             }
             "claim_liquidity_mining_interest" => {
+                params.ensure_allowed(&["productId"])?;
                 let body = string_body(&[("productId", params.required("productId")?)]);
                 self.post_request(LIQUIDITY_MINING_CLAIM, body).await
             }

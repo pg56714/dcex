@@ -31,9 +31,27 @@ impl BitgetClient {
             return Ok(result);
         }
         match method_name {
-            "get_spot_coins" => self.public_get(SPOT_COINS, params.only(&["coin"])).await,
+            "get_spot_coins" => {
+                params.ensure_allowed(&["coin"], false)?;
+                self.public_get(SPOT_COINS, params.only(&["coin"])).await
+            }
 
             "get_spot_market_trades" => {
+                params.ensure_allowed(
+                    &[
+                        "product_symbol",
+                        "limit",
+                        "idLessThan",
+                        "startTime",
+                        "endTime",
+                        "productType",
+                        "marginCoin",
+                        "marginMode",
+                        "granularity",
+                        "interval",
+                    ],
+                    false,
+                )?;
                 let symbol = self
                     .exchange_symbol_category(params.required("product_symbol")?, Some("spot"))?;
                 let mut query = params.only(&["limit", "idLessThan", "startTime", "endTime"]);
@@ -42,6 +60,7 @@ impl BitgetClient {
             }
 
             "get_uta_instruments" => {
+                params.ensure_allowed(&["category", "product_symbol", "symbol"], false)?;
                 params.required("category")?;
                 self.public_get(
                     UTA_INSTRUMENTS,
@@ -54,6 +73,7 @@ impl BitgetClient {
                 .await
             }
             "get_uta_tickers" => {
+                params.ensure_allowed(&["category", "product_symbol", "symbol"], false)?;
                 params.required("category")?;
                 self.public_get(
                     UTA_TICKERS,
@@ -66,6 +86,7 @@ impl BitgetClient {
                 .await
             }
             "get_uta_orderbook" => {
+                params.ensure_allowed(&["product_symbol", "category", "limit"], false)?;
                 require_all(&params, &["category", "product_symbol"])?;
                 self.public_get(
                     UTA_ORDERBOOK,
@@ -78,6 +99,7 @@ impl BitgetClient {
                 .await
             }
             "get_uta_public_fills" => {
+                params.ensure_allowed(&["product_symbol", "category", "limit"], false)?;
                 require_all(&params, &["category", "product_symbol"])?;
                 self.public_get(
                     UTA_PUBLIC_FILLS,
@@ -119,6 +141,7 @@ impl BitgetClient {
                 .await
             }
             "get_uta_liquidations" => {
+                params.ensure_allowed(&["category", "product_symbol", "limit", "cursor"], false)?;
                 params.required("category")?;
                 self.public_get(
                     UTA_LIQUIDATIONS,
@@ -132,14 +155,19 @@ impl BitgetClient {
                 .await
             }
             "get_reality_stock_info" => {
+                params.ensure_allowed(&["product_symbol", "symbol"], false)?;
                 self.public_get(
                     REALITY_STOCK_INFO,
                     self.normalize_symbol_params(params.only(&["product_symbol", "symbol"]))?,
                 )
                 .await
             }
-            "get_reality_market_states" => self.public_get(REALITY_MARKET_STATES, Vec::new()).await,
+            "get_reality_market_states" => {
+                params.ensure_allowed(&[], false)?;
+                self.public_get(REALITY_MARKET_STATES, Vec::new()).await
+            }
             "get_reality_market_calendar" => {
+                params.ensure_allowed(&[], false)?;
                 self.public_get(REALITY_MARKET_CALENDAR, Vec::new()).await
             }
             _ => Err(DcexError::InvalidInput(format!(

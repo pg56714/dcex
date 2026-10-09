@@ -155,6 +155,16 @@ fn skip_noise(mut text: &str) -> &str {
     }
 }
 
+/// Methods that forward caller fields verbatim because the official docs publish no
+/// request-field table for them.
+const RAW_PASSTHROUGH: &[(&str, &str)] = &[
+    ("aster", "get_futures_market_klines"),
+    ("aster", "get_spot_optimized_ticker_24hr"),
+    ("aster", "place_spot_batch_orders_raw"),
+    ("aster", "cancel_spot_batch_orders_raw"),
+    ("kucoin", "cancel_margin_stop_order_by_id_raw"),
+];
+
 /// Call each declared wrapper the way its typed method does and report dispatch errors:
 /// an unknown method for its visibility, or a declared key the dispatch rejects.
 /// Every other outcome (validation of the placeholder values, transport) is fine.
@@ -172,6 +182,7 @@ where
         "{exchange}: no {client} wrappers found"
     );
     let mut failures = Vec::new();
+    let mut unknown_accepted = Vec::new();
     for wrapper in &wrappers {
         let name: &'static str = Box::leak(wrapper.name.clone().into_boxed_str());
         let params = wrapper
@@ -179,6 +190,21 @@ where
             .iter()
             .map(|key| (key.clone(), placeholder(key)))
             .collect();
+        // A key the method does not document must be rejected before any request is sent.
+        // Raw pass-throughs exist only where the official docs publish no request fields.
+        if !RAW_PASSTHROUGH.contains(&(exchange, name)) {
+            let mut probe: Vec<(String, String)> = wrapper
+                .keys
+                .iter()
+                .map(|key| (key.clone(), placeholder(key)))
+                .collect();
+            probe.push(("zz_unknown".into(), "1".into()));
+            match call(name, wrapper.public, probe).await {
+                Err(DcexError::InvalidInput(_) | DcexError::Runtime(_)) => {}
+                Ok(_) => unknown_accepted.push(name.to_string()),
+                Err(other) => unknown_accepted.push(format!("{name} ({other})")),
+            }
+        }
         if let Err(DcexError::InvalidInput(message) | DcexError::Runtime(message)) =
             call(name, wrapper.public, params).await
         {
@@ -200,6 +226,11 @@ where
         failures.len(),
         wrappers.len(),
         failures.join("\n")
+    );
+    assert!(
+        unknown_accepted.is_empty(),
+        "{exchange} {client}: wrappers sent a request with an undocumented key:\n{}",
+        unknown_accepted.join("\n")
     );
 }
 
@@ -276,13 +307,9 @@ pub(crate) fn assert_typed_requests(exchange: &str, mut called: Vec<&str>, failu
     assert_eq!(called, declared, "{exchange}: typed request list is stale");
     assert!(
         failures.is_empty(),
-        "{exchange}: {} typed requests do not reach dispatch:
-{}",
+        "{exchange}: {} typed requests do not reach dispatch:\n{}",
         failures.len(),
-        failures.join(
-            "
-"
-        )
+        failures.join("\n")
     );
 }
 

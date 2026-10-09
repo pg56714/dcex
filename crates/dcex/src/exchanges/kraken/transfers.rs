@@ -13,6 +13,7 @@ mod account_requests {
             _method_name: &str,
             params: &KrakenParams,
         ) -> Result<ValidatedResponse> {
+            params.ensure_allowed(&["asset", "amount", "to", "from"])?;
             {
                 params.required("asset")?;
                 params.required("amount")?;
@@ -28,6 +29,7 @@ mod account_requests {
             _method_name: &str,
             params: &KrakenParams,
         ) -> Result<ValidatedResponse> {
+            params.ensure_allowed(&["amount", "fromAccount", "toAccount", "unit"])?;
             {
                 for key in ["amount", "fromAccount", "toAccount", "unit"] {
                     params.required(key)?;

@@ -374,13 +374,39 @@ fn json_body(recorded: &Recorded) -> serde_json::Value {
     serde_json::from_str(&recorded.body).expect("json body")
 }
 
+/// `base_params` is a superset for every route; drop each key a method rejects as
+/// unsupported (dispatch rejects unknown keys before sending) and call again.
+async fn call_with_own_params<F, Fut, T>(
+    mut params: Vec<(String, String)>,
+    mut call: F,
+) -> crate::Result<T>
+where
+    F: FnMut(Vec<(String, String)>) -> Fut,
+    Fut: std::future::Future<Output = crate::Result<T>>,
+{
+    loop {
+        match call(params.clone()).await {
+            Err(crate::DcexError::InvalidInput(message))
+                if message.starts_with("unsupported parameter: ") =>
+            {
+                let key = message
+                    .trim_start_matches("unsupported parameter: ")
+                    .to_string();
+                let before = params.len();
+                params.retain(|(candidate, _)| *candidate != key);
+                assert!(params.len() < before, "rejected key {key} was not supplied");
+            }
+            other => return other,
+        }
+    }
+}
+
 #[tokio::test]
 async fn public_dispatch_names_reach_documented_routes() {
     let (url, receiver) = recording_server();
     let client = signed_client(url);
     for (name, method, path) in PUBLIC_ROUTES {
-        client
-            .public_request(name, base_params())
+        call_with_own_params(base_params(), |params| client.public_request(name, params))
             .await
             .unwrap_or_else(|error| panic!("{name}: {error}"));
         let recorded = next(&receiver, name);
@@ -412,8 +438,7 @@ async fn private_dispatch_names_reach_documented_routes() {
         } else {
             base_params()
         };
-        client
-            .private_request(name, params)
+        call_with_own_params(params, |params| client.private_request(name, params))
             .await
             .unwrap_or_else(|error| panic!("{name}: {error}"));
         let recorded = next(&receiver, name);

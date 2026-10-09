@@ -354,8 +354,8 @@ def test_sync_bybit_current_market_and_asset_fields_are_forwarded() -> None:
 
     market = MarketHTTP(preload_product_table=False)
     market_capture = _capture_sync_public_request(market)
-    market.get_kline("BTC-USDT-SPOT", "1m", startTime=100, endTime=200)
-    assert dict(market_capture["params"])["endTime"] == "200"
+    market.get_kline("BTC-USDT-SPOT", "1m", start=100, end=200)
+    assert dict(market_capture["params"])["end"] == "200"
 
     asset = AssetHTTP(preload_product_table=False)
     asset_capture = _capture_sync_private_request(asset)

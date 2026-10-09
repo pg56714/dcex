@@ -14,6 +14,7 @@ mod account_requests {
             _method_name: &str,
             params: &BybitParams,
         ) -> Result<ValidatedResponse> {
+            params.ensure_allowed(&["coins"])?;
             {
                 let coins = params.required("coins")?;
                 if coins.is_empty() {
@@ -53,6 +54,15 @@ mod asset_requests {
             _method_name: &str,
             params: &BybitParams,
         ) -> Result<ValidatedResponse> {
+            params.ensure_allowed(&[
+                "limit",
+                "transferId",
+                "coin",
+                "status",
+                "startTime",
+                "endTime",
+                "cursor",
+            ])?;
             {
                 let mut query = vec![(
                     "limit".to_string(),
@@ -72,6 +82,7 @@ mod asset_requests {
             _method_name: &str,
             params: &BybitParams,
         ) -> Result<ValidatedResponse> {
+            params.ensure_allowed(&["fromAccountType", "toAccountType"])?;
             {
                 let query = vec![
                     (
@@ -91,6 +102,13 @@ mod asset_requests {
             _method_name: &str,
             params: &BybitParams,
         ) -> Result<ValidatedResponse> {
+            params.ensure_allowed(&[
+                "coin",
+                "amount",
+                "fromAccountType",
+                "toAccountType",
+                "transferId",
+            ])?;
             {
                 let mut body = string_body(&[
                     ("coin", params.required("coin")?),
@@ -111,6 +129,15 @@ mod asset_requests {
             _method_name: &str,
             params: &BybitParams,
         ) -> Result<ValidatedResponse> {
+            params.ensure_allowed(&[
+                "coin",
+                "amount",
+                "fromMemberId",
+                "toMemberId",
+                "fromAccountType",
+                "toAccountType",
+                "transferId",
+            ])?;
             {
                 let mut body = string_body(&[
                     ("coin", params.required("coin")?),
@@ -133,6 +160,17 @@ mod asset_requests {
             _method_name: &str,
             params: &BybitParams,
         ) -> Result<ValidatedResponse> {
+            params.ensure_allowed(&[
+                "limit",
+                "transferId",
+                "coin",
+                "status",
+                "startTime",
+                "endTime",
+                "fromMemberId",
+                "toMemberId",
+                "cursor",
+            ])?;
             {
                 let mut query = vec![(
                     "limit".to_string(),

@@ -32,6 +32,7 @@ impl OkxClient {
             ),
             _ => return Ok(None),
         };
+        params.ensure_allowed(keys)?;
         if matches!(
             name,
             "get_spread_books"
@@ -55,6 +56,8 @@ impl OkxClient {
     ) -> Result<Option<ValidatedResponse>> {
         let response = match name {
             "place_spread_order" => {
+                params
+                    .ensure_allowed(&["sprdId", "side", "ordType", "sz", "px", "clOrdId", "tag"])?;
                 params.required("sprdId")?;
                 let side = params.required("side")?;
                 if !matches!(side, "buy" | "sell") {
@@ -81,6 +84,7 @@ impl OkxClient {
                 .await?
             }
             "cancel_spread_order" => {
+                params.ensure_allowed(&["ordId", "clOrdId"])?;
                 require_one(params, &["ordId", "clOrdId"])?;
                 self.post_request(
                     SPREAD_CANCEL_ORDER,
@@ -89,15 +93,19 @@ impl OkxClient {
                 .await?
             }
             "cancel_all_spread_orders" => {
+                params.ensure_allowed(&["sprdId"])?;
                 self.post_request(SPREAD_MASS_CANCEL, Value::Object(params.body(&["sprdId"])))
                     .await?
             }
             "get_spread_order" => {
+                params.ensure_allowed(&["ordId", "clOrdId"])?;
                 require_one(params, &["ordId", "clOrdId"])?;
                 self.get_request(SPREAD_ORDER, params.only(&["ordId", "clOrdId"]))
                     .await?
             }
             "get_spread_orders_pending" => {
+                params
+                    .ensure_allowed(&["sprdId", "ordType", "state", "beginId", "endId", "limit"])?;
                 self.get_request(
                     SPREAD_ORDERS_PENDING,
                     params.only(&["sprdId", "ordType", "state", "beginId", "endId", "limit"]),
@@ -105,6 +113,9 @@ impl OkxClient {
                 .await?
             }
             "get_spread_orders_history" => {
+                params.ensure_allowed(&[
+                    "sprdId", "ordType", "state", "beginId", "endId", "begin", "end", "limit",
+                ])?;
                 self.get_request(
                     SPREAD_ORDERS_HISTORY,
                     params.only(&[
@@ -114,6 +125,7 @@ impl OkxClient {
                 .await?
             }
             "set_spread_cancel_all_after" => {
+                params.ensure_allowed(&["timeOut"])?;
                 let timeout = params.required("timeOut")?.parse::<u16>().map_err(|_| {
                     DcexError::InvalidInput(
                         "OKX spread timeOut must be a nonnegative integer".into(),
@@ -131,6 +143,9 @@ impl OkxClient {
                 .await?
             }
             "get_spread_trades" => {
+                params.ensure_allowed(&[
+                    "sprdId", "tradeId", "ordId", "beginId", "endId", "begin", "end", "limit",
+                ])?;
                 self.get_request(
                     SPREAD_TRADES,
                     params.only(&[

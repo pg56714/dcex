@@ -10,11 +10,12 @@ impl BybitClient {
     pub(super) async fn hold_to_earn_public_request(
         &self,
         method_name: &str,
-        _params: &BybitParams,
+        params: &BybitParams,
     ) -> Result<Option<ValidatedResponse>> {
         if method_name != "get_hold_to_earn_products" {
             return Ok(None);
         }
+        params.ensure_allowed(&[])?;
         let result = self
             .request(HttpMethod::Get, HOLD_TO_EARN_PRODUCT, vec![], None, false)
             .await?;
@@ -29,6 +30,7 @@ impl BybitClient {
         if method_name != "get_hold_to_earn_yield_history" {
             return Ok(None);
         }
+        params.ensure_allowed(&["timeStart", "timeEnd", "limit", "cursor"])?;
         let limit = params
             .required("limit")?
             .parse::<u16>()

@@ -14,13 +14,31 @@ impl BitgetClient {
         params: &BitgetParams,
     ) -> Result<Option<ValidatedResponse>> {
         let result = match method_name {
-            "get_uta_account_assets" => self.get_private(UTA_ACCOUNT_ASSETS, Vec::new()).await,
+            "get_uta_account_assets" => {
+                params.ensure_allowed(&[], false)?;
+                self.get_private(UTA_ACCOUNT_ASSETS, Vec::new()).await
+            }
             "get_reality_orderbook" => {
+                params.ensure_allowed(
+                    &[
+                        "product_symbol",
+                        "productType",
+                        "marginCoin",
+                        "marginMode",
+                        "granularity",
+                        "category",
+                    ],
+                    false,
+                )?;
                 let mut query = Vec::new();
                 self.push_required_product_symbol(&mut query, params)?;
                 self.get_private(REALITY_ORDERBOOK, query).await
             }
             "get_reality_fills" => {
+                params.ensure_allowed(
+                    &["limit", "product_symbol", "category", "productType"],
+                    false,
+                )?;
                 if let Some(limit) = params.get("limit")
                     && !limit
                         .parse::<u16>()
@@ -34,20 +52,48 @@ impl BitgetClient {
                 self.push_required_product_symbol(&mut query, params)?;
                 self.get_private(REALITY_FILLS, query).await
             }
-            "get_uta_account_info" => self.get_private(UTA_ACCOUNT_INFO, Vec::new()).await,
+            "get_uta_account_info" => {
+                params.ensure_allowed(&[], false)?;
+                self.get_private(UTA_ACCOUNT_INFO, Vec::new()).await
+            }
             "get_uta_all_fee_rates" => {
+                params.ensure_allowed(
+                    &["category", "symbol", "productType", "product_symbol"],
+                    false,
+                )?;
                 params.required("category")?;
                 let mut query = params.only(&["category"]);
                 self.push_uta_symbol(&mut query, params)?;
                 self.get_private(UTA_ALL_FEE_RATES, query).await
             }
-            "get_uta_loan_data" => self.get_private(UTA_LOAN_DATA, Vec::new()).await,
-            "get_uta_collateral_type" => self.get_private(UTA_COLLATERAL_TYPE, Vec::new()).await,
+            "get_uta_loan_data" => {
+                params.ensure_allowed(&[], false)?;
+                self.get_private(UTA_LOAN_DATA, Vec::new()).await
+            }
+            "get_uta_collateral_type" => {
+                params.ensure_allowed(&[], false)?;
+                self.get_private(UTA_COLLATERAL_TYPE, Vec::new()).await
+            }
             "get_uta_custom_collateral_coins" => {
+                params.ensure_allowed(&[], false)?;
                 self.get_private(UTA_CUSTOM_COLLATERAL_COINS, Vec::new())
                     .await
             }
             "get_uta_pre_set_leverage" => {
+                params.ensure_allowed(
+                    &[
+                        "category",
+                        "marginMode",
+                        "coin",
+                        "leverage",
+                        "longLeverage",
+                        "shortLeverage",
+                        "symbol",
+                        "productType",
+                        "product_symbol",
+                    ],
+                    false,
+                )?;
                 params.required("category")?;
                 params.required("marginMode")?;
                 let mut query = params.only(&[
@@ -62,6 +108,21 @@ impl BitgetClient {
                 self.get_private(UTA_PRE_SET_LEVERAGE, query).await
             }
             "set_uta_leverage" => {
+                params.ensure_allowed(
+                    &[
+                        "category",
+                        "leverage",
+                        "coin",
+                        "posSide",
+                        "marginMode",
+                        "longLeverage",
+                        "shortLeverage",
+                        "symbol",
+                        "productType",
+                        "product_symbol",
+                    ],
+                    false,
+                )?;
                 params.required("category")?;
                 params.required("leverage")?;
                 let mut body = params.body(&[
@@ -78,6 +139,7 @@ impl BitgetClient {
                     .await
             }
             "set_uta_hold_mode" => {
+                params.ensure_allowed(&["holdMode"], false)?;
                 params.required("holdMode")?;
                 self.post_private(UTA_SET_HOLD_MODE, Value::Object(params.body(&["holdMode"])))
                     .await

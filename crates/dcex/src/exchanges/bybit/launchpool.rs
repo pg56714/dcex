@@ -17,6 +17,7 @@ impl BybitClient {
         if method_name != "get_launchpool_projects" {
             return Ok(None);
         }
+        params.ensure_allowed(&["status", "activityCoin", "projectId", "cursor", "limit"])?;
         let status = parse_u64(params, "status")?.ok_or_else(|| {
             DcexError::InvalidInput("missing required parameter: status".to_string())
         })?;
@@ -45,9 +46,19 @@ impl BybitClient {
     ) -> Result<Option<ValidatedResponse>> {
         let result = match method_name {
             "get_launchpool_current_staking" => {
+                params.ensure_allowed(&[])?;
                 self.get_request(LAUNCHPOOL_CURRENT_STAKING, vec![]).await
             }
             "get_launchpool_activity_log" => {
+                params.ensure_allowed(&[
+                    "pageSize",
+                    "current",
+                    "type",
+                    "status",
+                    "stakeCoin",
+                    "startTime",
+                    "endTime",
+                ])?;
                 validate_bounded(params, "pageSize", 10)?;
                 validate_bounded(params, "current", 100)?;
                 validate_time_pair(params)?;
@@ -61,6 +72,14 @@ impl BybitClient {
                 self.post_request(LAUNCHPOOL_ACTIVITY_LOG, body).await
             }
             "get_launchpool_history" => {
+                params.ensure_allowed(&[
+                    "pageSize",
+                    "current",
+                    "stakeCoin",
+                    "rewardCoin",
+                    "startTime",
+                    "endTime",
+                ])?;
                 validate_bounded(params, "pageSize", 10)?;
                 validate_bounded(params, "current", 100)?;
                 validate_time_pair(params)?;

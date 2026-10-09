@@ -80,6 +80,7 @@ impl ArcusClient {
         let allowed: &[&str] = match method_name {
             "place_order" => PLACE_ORDER_KEYS,
             "modify_order" => MODIFY_ORDER_KEYS,
+            "cancel_order" => &["product_symbol", "order_id"],
             _ => &[],
         };
         if !allowed.is_empty()

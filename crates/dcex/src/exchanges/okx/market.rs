@@ -150,6 +150,7 @@ impl OkxClient {
                 raw.required(key)?;
             }
         }
+        raw.ensure_allowed(allowed)?;
         let mut params = raw.only(allowed);
         let path = match method_name {
             "get_price_limit" => {

@@ -42,6 +42,16 @@ impl BybitParams {
         })
     }
 
+    /// Rejects any parameter outside `keys` instead of silently dropping it.
+    pub(super) fn ensure_allowed(&self, keys: &[&str]) -> Result<()> {
+        match self.0.iter().find(|(key, _)| !keys.contains(&key.as_str())) {
+            Some((key, _)) => Err(DcexError::InvalidInput(format!(
+                "unsupported Bybit parameter: {key}"
+            ))),
+            None => Ok(()),
+        }
+    }
+
     pub(super) fn only(&self, keys: &[&str]) -> Vec<(String, String)> {
         self.0
             .iter()

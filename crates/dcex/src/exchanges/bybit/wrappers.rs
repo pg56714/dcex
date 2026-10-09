@@ -216,7 +216,7 @@ move_positions(from_uid => "fromUid",to_uid => "toUid",legs => "list"),
         set_leverage(product_symbol => "product_symbol", leverage => "leverage"),
         add_position_margin(product_symbol => "product_symbol", margin => "margin"),
         set_auto_add_margin(product_symbol => "product_symbol", auto_add_margin => "autoAddMargin"),
-        set_margin_mode(margin_mode => "margin_mode"),
+        set_margin_mode(margin_mode => "setMarginMode"),
         switch_position_mode(mode => "mode"),
         upgrade_to_unified_trading_account(),
     ];

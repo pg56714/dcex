@@ -15,6 +15,7 @@ mod trade_requests {
             _method_name: &str,
             params: &OkxParams,
         ) -> Result<ValidatedResponse> {
+            params.ensure_allowed(&["orders"])?;
             {
                 let orders = params.json_required("orders")?;
                 validate_batch_orders(&orders)?;
@@ -26,6 +27,7 @@ mod trade_requests {
             _method_name: &str,
             params: &OkxParams,
         ) -> Result<ValidatedResponse> {
+            params.ensure_allowed(&["orders"])?;
             {
                 self.post_request(TRADE_CANCEL_BATCH_ORDERS, params.json_required("orders")?)
                     .await

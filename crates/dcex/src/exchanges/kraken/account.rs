@@ -13,6 +13,7 @@ impl KrakenClient {
     ) -> Result<Option<ValidatedResponse>> {
         let result = match method_name {
             "get_spot_account_balance" => {
+                params.ensure_allowed(&["rebase_multiplier"])?;
                 self.private_post(
                     KrakenAuth::Spot,
                     SPOT_BALANCE,
@@ -21,6 +22,7 @@ impl KrakenClient {
                 .await
             }
             "get_spot_trade_balance" => {
+                params.ensure_allowed(&["asset", "rebase_multiplier"])?;
                 self.private_post(
                     KrakenAuth::Spot,
                     SPOT_TRADE_BALANCE,
@@ -29,6 +31,12 @@ impl KrakenClient {
                 .await
             }
             "get_spot_open_positions" => {
+                params.ensure_allowed(&[
+                    "txid",
+                    "docalcs",
+                    "consolidation",
+                    "rebase_multiplier",
+                ])?;
                 self.private_post(
                     KrakenAuth::Spot,
                     SPOT_OPEN_POSITIONS,
@@ -37,6 +45,16 @@ impl KrakenClient {
                 .await
             }
             "get_spot_ledgers" => {
+                params.ensure_allowed(&[
+                    "asset",
+                    "aclass",
+                    "start",
+                    "end",
+                    "ofs",
+                    "without_count",
+                    "rebase_multiplier",
+                    "type",
+                ])?;
                 let mut query = params.only(&[
                     "asset",
                     "aclass",
@@ -51,6 +69,12 @@ impl KrakenClient {
                     .await
             }
             "get_spot_trade_volume" => {
+                params.ensure_allowed(&[
+                    "pair",
+                    "fee_schedule",
+                    "rebase_multiplier",
+                    "fee-info",
+                ])?;
                 let mut query = params.only(&["pair", "fee_schedule", "rebase_multiplier"]);
                 push_optional(&mut query, "fee-info", params.get("fee-info"));
                 self.private_post(KrakenAuth::Spot, SPOT_TRADE_VOLUME, query)
@@ -61,14 +85,17 @@ impl KrakenClient {
                     .await
             }
             "get_futures_accounts" => {
+                params.ensure_allowed(&[])?;
                 self.private_get(KrakenAuth::Futures, FUTURES_ACCOUNTS, Vec::new())
                     .await
             }
             "get_futures_open_positions" => {
+                params.ensure_allowed(&[])?;
                 self.private_get(KrakenAuth::Futures, FUTURES_OPEN_POSITIONS, Vec::new())
                     .await
             }
             "get_futures_fills" => {
+                params.ensure_allowed(&["lastFillTime"])?;
                 self.private_get(
                     KrakenAuth::Futures,
                     FUTURES_FILLS,

@@ -14,13 +14,19 @@ impl BitgetClient {
         params: &BitgetParams,
     ) -> Result<Option<ValidatedResponse>> {
         let result = match method_name {
-            "get_elite_earn_products" => self.get_private(ELITE_EARN_PRODUCTS, Vec::new()).await,
+            "get_elite_earn_products" => {
+                params.ensure_allowed(&[], false)?;
+                self.get_private(ELITE_EARN_PRODUCTS, Vec::new()).await
+            }
             "get_elite_earn_subscription_info" => {
+                params.ensure_allowed(&["productId"], false)?;
                 params.required("productId")?;
                 self.get_private(ELITE_EARN_SUBSCRIBE_INFO, params.only(&["productId"]))
                     .await
             }
             "subscribe_elite_earn" => {
+                params
+                    .ensure_allowed(&["productSubId", "amount", "coin", "paymentAccount"], false)?;
                 validate_elite_subscription(params)?;
                 self.post_private(
                     ELITE_EARN_SUBSCRIBE,
@@ -34,11 +40,13 @@ impl BitgetClient {
                 .await
             }
             "get_elite_earn_subscription_result" => {
+                params.ensure_allowed(&["orderId"], false)?;
                 params.required("orderId")?;
                 self.get_private(ELITE_EARN_SUBSCRIBE_RESULT, params.only(&["orderId"]))
                     .await
             }
             "get_elite_earn_redemption_info" => {
+                params.ensure_allowed(&["productId"], false)?;
                 params.required("productId")?;
                 self.get_private(ELITE_EARN_REDEEM_INFO, params.only(&["productId"]))
                     .await
@@ -59,7 +67,10 @@ impl BitgetClient {
                 )
                 .await
             }
-            "get_elite_earn_assets" => self.get_private(ELITE_EARN_ASSETS, Vec::new()).await,
+            "get_elite_earn_assets" => {
+                params.ensure_allowed(&[], false)?;
+                self.get_private(ELITE_EARN_ASSETS, Vec::new()).await
+            }
             "get_elite_earn_records" => {
                 validate_elite_records(params)?;
                 self.get_private(

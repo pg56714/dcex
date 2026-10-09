@@ -13,8 +13,19 @@ impl BybitClient {
         params: &BybitParams,
     ) -> Result<Option<ValidatedResponse>> {
         let result = match method_name {
-            "get_positions" => self.get_positions_from_params(params).await,
+            "get_positions" => {
+                params.ensure_allowed(&[
+                    "category",
+                    "limit",
+                    "product_symbol",
+                    "baseCoin",
+                    "settleCoin",
+                    "cursor",
+                ])?;
+                self.get_positions_from_params(params).await
+            }
             "set_leverage" => {
+                params.ensure_allowed(&["product_symbol", "category", "leverage"])?;
                 let product_symbol = params.required("product_symbol")?;
                 let mut body = Map::new();
                 self.insert_symbol_category(&mut body, product_symbol, params.get("category"))?;
@@ -29,22 +40,53 @@ impl BybitClient {
                 self.post_request(SET_LEVERAGE, body).await
             }
             "set_trading_stop" => {
+                params.ensure_allowed(&[
+                    "product_symbol",
+                    "category",
+                    "tpslMode",
+                    "takeProfit",
+                    "stopLoss",
+                    "trailingStop",
+                    "tpTriggerBy",
+                    "slTriggerBy",
+                    "activePrice",
+                    "tpOrderType",
+                    "slOrderType",
+                    "tpLimitPrice",
+                    "slLimitPrice",
+                    "tpSize",
+                    "slSize",
+                    "positionIdx",
+                ])?;
                 let body = self.trading_stop_body_from_params(params)?;
                 self.post_request(SET_TRADING_STOP, body).await
             }
             "add_position_margin" => {
+                params.ensure_allowed(&["product_symbol", "category", "margin"])?;
                 let body = self.position_margin_body_from_params(params)?;
                 self.post_request(ADD_POSITION_MARGIN, body).await
             }
             "set_auto_add_margin" => {
+                params.ensure_allowed(&["product_symbol", "category", "autoAddMargin"])?;
                 let body = self.auto_add_margin_body_from_params(params)?;
                 self.post_request(SET_AUTO_ADD_MARGIN, body).await
             }
             "switch_position_mode" => {
+                params.ensure_allowed(&["category", "mode", "product_symbol", "coin"])?;
                 let body = self.switch_position_mode_body_from_params(params)?;
                 self.post_request(SWITCH_POSITION_MODE, body).await
             }
-            "get_closed_pnl" => self.get_closed_pnl_from_params(params).await,
+            "get_closed_pnl" => {
+                params.ensure_allowed(&[
+                    "category",
+                    "limit",
+                    "product_symbol",
+                    "startTime",
+                    "endTime",
+                    "cursor",
+                ])?;
+                self.get_closed_pnl_from_params(params).await
+            }
             _ => return Ok(None),
         };
         Ok(Some(result?))

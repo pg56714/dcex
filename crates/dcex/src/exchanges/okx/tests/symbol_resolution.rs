@@ -35,10 +35,10 @@ async fn loaded_canonical_and_native_symbols_reach_the_same_wire_instrument() {
             for private in [false, true] {
                 let (url, capture) = server();
                 let client = client(url).with_product_table(table.clone());
-                let params = vec![
-                    ("product_symbol".into(), symbol.clone()),
-                    ("ordId".into(), "order-fixture".into()),
-                ];
+                let mut params = vec![("product_symbol".into(), symbol.clone())];
+                if private {
+                    params.push(("ordId".into(), "order-fixture".into()));
+                }
                 if private {
                     client
                         .private_request("get_order", params)

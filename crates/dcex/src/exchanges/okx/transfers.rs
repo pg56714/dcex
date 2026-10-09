@@ -16,16 +16,22 @@ mod asset_requests {
             _method_name: &str,
             params: &OkxParams,
         ) -> Result<ValidatedResponse> {
+            params.ensure_allowed(&[
+                "ccy",
+                "amt",
+                "loanTrans",
+                "omitPosRisk",
+                "from",
+                "to",
+                "type",
+                "subAcct",
+                "clientId",
+            ])?;
             {
                 let mut body = params.required_body(&["ccy", "amt"])?;
-                body.insert(
-                    "from".to_string(),
-                    Value::String(okx_account_id(params.required("from_account")?).to_string()),
-                );
-                body.insert(
-                    "to".to_string(),
-                    Value::String(okx_account_id(params.required("to_account")?).to_string()),
-                );
+                for key in ["from", "to"] {
+                    body.insert(key.to_string(), Value::String(okx_account_id(params, key)?));
+                }
                 for key in ["type", "subAcct", "clientId"] {
                     insert_optional_string(&mut body, key, params.get(key));
                 }
@@ -39,6 +45,7 @@ mod asset_requests {
             _method_name: &str,
             params: &OkxParams,
         ) -> Result<ValidatedResponse> {
+            params.ensure_allowed(&["transId", "clientId", "type"])?;
             if params.get("transId").is_none() && params.get("clientId").is_none() {
                 return Err(crate::DcexError::InvalidInput(
                     "OKX: one of transId, clientId is required".to_string(),
@@ -69,17 +76,22 @@ mod subaccount_requests {
             _method_name: &str,
             params: &OkxParams,
         ) -> Result<ValidatedResponse> {
+            params.ensure_allowed(&[
+                "ccy",
+                "amt",
+                "fromSubAccount",
+                "toSubAccount",
+                "loanTrans",
+                "omitPosRisk",
+                "from",
+                "to",
+            ])?;
             {
                 let mut body =
                     params.required_body(&["ccy", "amt", "fromSubAccount", "toSubAccount"])?;
-                body.insert(
-                    "from".to_string(),
-                    Value::String(okx_account_id(params.required("from_account")?).to_string()),
-                );
-                body.insert(
-                    "to".to_string(),
-                    Value::String(okx_account_id(params.required("to_account")?).to_string()),
-                );
+                for key in ["from", "to"] {
+                    body.insert(key.to_string(), Value::String(okx_account_id(params, key)?));
+                }
                 insert_optional_bool(&mut body, "loanTrans", params.get("loanTrans"))?;
                 insert_optional_bool(&mut body, "omitPosRisk", params.get("omitPosRisk"))?;
                 self.post_request(SUBACCOUNT_TRANSFER, Value::Object(body))
@@ -97,8 +109,8 @@ mod wrappers {
 
      ];
      private [
-    funds_transfer(ccy => "ccy", amt => "amt", from_account => "from_account", to_account => "to_account"),
-    transfer_between_subaccounts(ccy => "ccy", amt => "amt", from_account => "from_account", to_account => "to_account", from_subaccount => "fromSubAccount", to_subaccount => "toSubAccount"),
+    funds_transfer(ccy => "ccy", amt => "amt", from_account => "from", to_account => "to"),
+    transfer_between_subaccounts(ccy => "ccy", amt => "amt", from_account => "from", to_account => "to", from_subaccount => "fromSubAccount", to_subaccount => "toSubAccount"),
     get_transfer_state()
      ];
     }

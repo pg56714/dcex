@@ -11,6 +11,7 @@ mod generated;
 mod loan;
 mod margin;
 mod market;
+mod official_fields;
 mod options;
 mod params;
 mod portfolio_margin;

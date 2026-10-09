@@ -114,7 +114,23 @@ impl BitgetClient {
     ) -> Result<Option<ValidatedResponse>> {
         let result = match method_name {
             "place_uta_order" => self.place_uta_order_from_params(params).await,
-            "place_reality_order" => self.place_reality_order_from_params(params).await,
+            "place_reality_order" => {
+                params.ensure_allowed(
+                    &[
+                        "category",
+                        "side",
+                        "orderType",
+                        "qty",
+                        "price",
+                        "clientOid",
+                        "product_symbol",
+                        "symbol",
+                        "productType",
+                    ],
+                    false,
+                )?;
+                self.place_reality_order_from_params(params).await
+            }
             "place_uta_batch_orders" => {
                 self.dispatch_place_uta_batch_orders(method_name, params)
                     .await
@@ -131,12 +147,38 @@ impl BitgetClient {
                     .await
             }
             "get_uta_open_orders" => {
+                params.ensure_allowed(
+                    &[
+                        "category",
+                        "startTime",
+                        "endTime",
+                        "limit",
+                        "cursor",
+                        "symbol",
+                        "productType",
+                        "product_symbol",
+                    ],
+                    false,
+                )?;
                 let mut query =
                     params.only(&["category", "startTime", "endTime", "limit", "cursor"]);
                 self.push_uta_symbol(&mut query, params)?;
                 self.get_private(UTA_PENDING_ORDERS, query).await
             }
             "get_uta_history_orders" => {
+                params.ensure_allowed(
+                    &[
+                        "category",
+                        "startTime",
+                        "endTime",
+                        "limit",
+                        "cursor",
+                        "symbol",
+                        "productType",
+                        "product_symbol",
+                    ],
+                    false,
+                )?;
                 params.required("category")?;
                 let mut query =
                     params.only(&["category", "startTime", "endTime", "limit", "cursor"]);
@@ -144,6 +186,17 @@ impl BitgetClient {
                 self.get_private(UTA_HISTORY_ORDERS, query).await
             }
             "get_uta_fills" => {
+                params.ensure_allowed(
+                    &[
+                        "category",
+                        "orderId",
+                        "startTime",
+                        "endTime",
+                        "limit",
+                        "cursor",
+                    ],
+                    false,
+                )?;
                 self.get_private(
                     UTA_FILLS,
                     params.only(&[
@@ -158,12 +211,50 @@ impl BitgetClient {
                 .await
             }
             "get_uta_positions" => {
+                params.ensure_allowed(
+                    &[
+                        "category",
+                        "posSide",
+                        "symbol",
+                        "productType",
+                        "product_symbol",
+                    ],
+                    false,
+                )?;
                 params.required("category")?;
                 let mut query = params.only(&["category", "posSide"]);
                 self.push_uta_symbol(&mut query, params)?;
                 self.get_private(UTA_POSITIONS, query).await
             }
             "place_uta_strategy_order" => {
+                params.ensure_allowed(
+                    &[
+                        "category",
+                        "clientOid",
+                        "type",
+                        "tpslMode",
+                        "qty",
+                        "side",
+                        "posSide",
+                        "reduceOnly",
+                        "tpTriggerBy",
+                        "slTriggerBy",
+                        "takeProfit",
+                        "stopLoss",
+                        "tpOrderType",
+                        "slOrderType",
+                        "tpLimitPrice",
+                        "slLimitPrice",
+                        "triggerBy",
+                        "triggerPrice",
+                        "triggerOrderType",
+                        "triggerOrderPrice",
+                        "product_symbol",
+                        "symbol",
+                        "productType",
+                    ],
+                    false,
+                )?;
                 params.required("category")?;
                 require_uta_symbol(params)?;
                 let mut body = params.body(&[
@@ -218,6 +309,7 @@ impl BitgetClient {
                 .await
             }
             "cancel_uta_strategy_order" => {
+                params.ensure_allowed(&["orderId", "clientOid"], false)?;
                 params.required("orderId")?;
                 self.post_private(
                     UTA_CANCEL_STRATEGY_ORDER,
@@ -226,6 +318,7 @@ impl BitgetClient {
                 .await
             }
             "get_uta_unfilled_strategy_orders" => {
+                params.ensure_allowed(&["category", "type"], false)?;
                 params.required("category")?;
                 self.get_private(
                     UTA_UNFILLED_STRATEGY_ORDERS,
@@ -234,6 +327,17 @@ impl BitgetClient {
                 .await
             }
             "get_uta_history_strategy_orders" => {
+                params.ensure_allowed(
+                    &[
+                        "category",
+                        "type",
+                        "startTime",
+                        "endTime",
+                        "limit",
+                        "cursor",
+                    ],
+                    false,
+                )?;
                 params.required("category")?;
                 self.get_private(
                     UTA_HISTORY_STRATEGY_ORDERS,

@@ -31,6 +31,7 @@ impl BybitClient {
         } else {
             &["category", "productId", "startTime", "endTime"]
         };
+        params.ensure_allowed(keys)?;
         let result = self
             .request(HttpMethod::Get, path, params.only(keys), None, false)
             .await?;
@@ -44,11 +45,13 @@ impl BybitClient {
     ) -> Result<Option<ValidatedResponse>> {
         let result = match method_name {
             "get_earn_coupons" => {
+                params.ensure_allowed(&["category"])?;
                 validate_enum(params, "category", &["FlexibleSaving", "DualAssets"])?;
                 self.get_request(EARN_COUPONS, params.only(&["category"]))
                     .await
             }
             "set_earn_auto_reinvest" => {
+                params.ensure_allowed(&["autoReinvest", "category", "productId", "positionId"])?;
                 validate_enum(params, "category", &["OnChain"])?;
                 let product_id = positive_id(params, "productId")?;
                 let position_id = positive_id(params, "positionId")?;
@@ -66,6 +69,18 @@ impl BybitClient {
                 self.post_request(EARN_POSITION_MODIFY, body).await
             }
             "place_earn_order" => {
+                params.ensure_allowed(&[
+                    "amount",
+                    "orderLinkId",
+                    "redeemPositionId",
+                    "toAccountType",
+                    "interestCard",
+                    "orderType",
+                    "accountType",
+                    "coin",
+                    "productId",
+                    "category",
+                ])?;
                 validate_category(params)?;
                 validate_enum(params, "orderType", &["Stake", "Redeem"])?;
                 validate_enum(params, "accountType", &["FUND", "UNIFIED"])?;
@@ -117,6 +132,16 @@ impl BybitClient {
                 self.post_request(EARN_PLACE_ORDER, body).await
             }
             "get_earn_order_history" => {
+                params.ensure_allowed(&[
+                    "category",
+                    "orderId",
+                    "orderLinkId",
+                    "productId",
+                    "startTime",
+                    "endTime",
+                    "limit",
+                    "cursor",
+                ])?;
                 validate_category(params)?;
                 if params.get("category") == Some("OnChain")
                     && params.get("orderId").is_none()
@@ -143,6 +168,7 @@ impl BybitClient {
                 .await
             }
             "get_earn_positions" => {
+                params.ensure_allowed(&["category", "productId", "coin"])?;
                 validate_category(params)?;
                 self.get_request(
                     EARN_POSITION,
@@ -151,6 +177,14 @@ impl BybitClient {
                 .await
             }
             "get_earn_yield_history" => {
+                params.ensure_allowed(&[
+                    "category",
+                    "productId",
+                    "startTime",
+                    "endTime",
+                    "limit",
+                    "cursor",
+                ])?;
                 validate_category(params)?;
                 if params.get("category") == Some("OnChain") && params.get("productId").is_some() {
                     return Err(DcexError::InvalidInput(
@@ -172,6 +206,14 @@ impl BybitClient {
                 .await
             }
             "get_earn_hourly_yield_history" => {
+                params.ensure_allowed(&[
+                    "category",
+                    "productId",
+                    "startTime",
+                    "endTime",
+                    "limit",
+                    "cursor",
+                ])?;
                 validate_enum(params, "category", &["FlexibleSaving"])?;
                 validate_history(params)?;
                 self.get_request(

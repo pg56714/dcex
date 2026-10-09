@@ -1744,7 +1744,7 @@ pub(super) const CASES: &[RouteCase] = &[
     RouteCase {
         public: false,
         name: "set_margin_mode",
-        params: &[("margin_mode", "REGULAR_MARGIN")],
+        params: &[("setMarginMode", "REGULAR_MARGIN")],
         verb: "POST",
         path: "/v5/account/set-margin-mode",
     },

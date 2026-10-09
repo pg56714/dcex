@@ -15,10 +15,12 @@ impl OkxClient {
     ) -> Result<Option<ValidatedResponse>> {
         let result = match method_name {
             "get_saving_balance" => {
+                params.ensure_allowed(&["ccy"])?;
                 self.get_request(SAVINGS_BALANCE, params.only(&["ccy"]))
                     .await
             }
             "purchase_redeem_savings" => {
+                params.ensure_allowed(&["ccy", "amt", "side", "rate"])?;
                 validate_positive_amount(params)?;
                 validate_savings_side(params)?;
                 let mut body = params.required_body(&["ccy", "amt", "side"])?;
@@ -27,6 +29,7 @@ impl OkxClient {
                     .await
             }
             "set_savings_lending_rate" => {
+                params.ensure_allowed(&["ccy", "rate"])?;
                 self.post_request(
                     SAVINGS_SET_LENDING_RATE,
                     Value::Object(params.required_body(&["ccy", "rate"])?),
@@ -34,6 +37,7 @@ impl OkxClient {
                 .await
             }
             "get_savings_lending_history" => {
+                params.ensure_allowed(&["ccy", "after", "before", "limit"])?;
                 self.get_request(
                     SAVINGS_LENDING_HISTORY,
                     params.only(&["ccy", "after", "before", "limit"]),
@@ -41,6 +45,7 @@ impl OkxClient {
                 .await
             }
             "set_auto_earn" => {
+                params.ensure_allowed(&["action", "earnType", "ccy"])?;
                 let action = params.required("action")?;
                 if !["turn_on", "turn_off"].contains(&action) {
                     return Err(DcexError::InvalidInput(
@@ -60,6 +65,7 @@ impl OkxClient {
                     .await
             }
             "get_staking_offers" => {
+                params.ensure_allowed(&["productId", "protocolType", "ccy"])?;
                 self.get_request(
                     STAKING_OFFERS,
                     params.only(&["productId", "protocolType", "ccy"]),
@@ -67,6 +73,7 @@ impl OkxClient {
                 .await
             }
             "purchase_staking" => {
+                params.ensure_allowed(&["productId", "investData", "term", "tag"])?;
                 params.required("productId")?;
                 let invest_data = params.json_required("investData")?;
                 if !invest_data.is_array() {
@@ -86,6 +93,7 @@ impl OkxClient {
                     .await
             }
             "redeem_staking" => {
+                params.ensure_allowed(&["ordId", "protocolType", "allowEarlyRedeem"])?;
                 let mut body = params.required_body(&["ordId", "protocolType"])?;
                 insert_optional_bool(
                     &mut body,
@@ -95,6 +103,7 @@ impl OkxClient {
                 self.post_request(STAKING_REDEEM, Value::Object(body)).await
             }
             "cancel_staking" => {
+                params.ensure_allowed(&["ordId", "protocolType"])?;
                 self.post_request(
                     STAKING_CANCEL,
                     Value::Object(params.required_body(&["ordId", "protocolType"])?),
@@ -102,6 +111,7 @@ impl OkxClient {
                 .await
             }
             "get_active_staking_orders" => {
+                params.ensure_allowed(&["productId", "protocolType", "ccy", "state"])?;
                 self.get_request(
                     STAKING_ACTIVE_ORDERS,
                     params.only(&["productId", "protocolType", "ccy", "state"]),
@@ -109,6 +119,14 @@ impl OkxClient {
                 .await
             }
             "get_staking_order_history" => {
+                params.ensure_allowed(&[
+                    "productId",
+                    "protocolType",
+                    "ccy",
+                    "after",
+                    "before",
+                    "limit",
+                ])?;
                 self.get_request(
                     STAKING_ORDER_HISTORY,
                     params.only(&[
@@ -123,9 +141,11 @@ impl OkxClient {
                 .await
             }
             "get_eth_staking_product_info" => {
+                params.ensure_allowed(&[])?;
                 self.get_request(ETH_STAKING_PRODUCT_INFO, Vec::new()).await
             }
             "purchase_eth_staking" => {
+                params.ensure_allowed(&["amt"])?;
                 validate_positive_amount(params)?;
                 self.post_request(
                     ETH_STAKING_PURCHASE,
@@ -134,6 +154,7 @@ impl OkxClient {
                 .await
             }
             "redeem_eth_staking" => {
+                params.ensure_allowed(&["amt"])?;
                 validate_positive_amount(params)?;
                 self.post_request(
                     ETH_STAKING_REDEEM,
@@ -142,14 +163,19 @@ impl OkxClient {
                 .await
             }
             "cancel_eth_staking_redemption" => {
+                params.ensure_allowed(&["ordId"])?;
                 self.post_request(
                     ETH_STAKING_CANCEL_REDEEM,
                     Value::Object(params.required_body(&["ordId"])?),
                 )
                 .await
             }
-            "get_eth_staking_balance" => self.get_request(ETH_STAKING_BALANCE, Vec::new()).await,
+            "get_eth_staking_balance" => {
+                params.ensure_allowed(&[])?;
+                self.get_request(ETH_STAKING_BALANCE, Vec::new()).await
+            }
             "get_eth_staking_history" => {
+                params.ensure_allowed(&["type", "status", "after", "before", "limit"])?;
                 self.get_request(
                     ETH_STAKING_HISTORY,
                     params.only(&["type", "status", "after", "before", "limit"]),
@@ -157,9 +183,11 @@ impl OkxClient {
                 .await
             }
             "get_sol_staking_product_info" => {
+                params.ensure_allowed(&[])?;
                 self.get_request(SOL_STAKING_PRODUCT_INFO, Vec::new()).await
             }
             "purchase_sol_staking" => {
+                params.ensure_allowed(&["amt"])?;
                 validate_positive_amount(params)?;
                 self.post_request(
                     SOL_STAKING_PURCHASE,
@@ -168,6 +196,7 @@ impl OkxClient {
                 .await
             }
             "redeem_sol_staking" => {
+                params.ensure_allowed(&["amt"])?;
                 validate_positive_amount(params)?;
                 self.post_request(
                     SOL_STAKING_REDEEM,
@@ -175,8 +204,12 @@ impl OkxClient {
                 )
                 .await
             }
-            "get_sol_staking_balance" => self.get_request(SOL_STAKING_BALANCE, Vec::new()).await,
+            "get_sol_staking_balance" => {
+                params.ensure_allowed(&[])?;
+                self.get_request(SOL_STAKING_BALANCE, Vec::new()).await
+            }
             "get_sol_staking_history" => {
+                params.ensure_allowed(&["type", "status", "after", "before", "limit"])?;
                 self.get_request(
                     SOL_STAKING_HISTORY,
                     params.only(&["type", "status", "after", "before", "limit"]),
@@ -184,14 +217,17 @@ impl OkxClient {
                 .await
             }
             "get_flexible_loan_borrow_currencies" => {
+                params.ensure_allowed(&[])?;
                 self.get_request(FLEXIBLE_LOAN_BORROW_CURRENCIES, Vec::new())
                     .await
             }
             "get_flexible_loan_collateral_assets" => {
+                params.ensure_allowed(&["ccy"])?;
                 self.get_request(FLEXIBLE_LOAN_COLLATERAL_ASSETS, params.only(&["ccy"]))
                     .await
             }
             "get_flexible_loan_max_loan" => {
+                params.ensure_allowed(&["borrowCcy", "supCollateral"])?;
                 params.required("borrowCcy")?;
                 let supported_collateral = params.json_required("supCollateral")?;
                 if !supported_collateral.is_array() {
@@ -209,11 +245,13 @@ impl OkxClient {
                     .await
             }
             "get_flexible_loan_max_collateral_redeem" => {
+                params.ensure_allowed(&["ccy"])?;
                 params.required("ccy")?;
                 self.get_request(FLEXIBLE_LOAN_MAX_COLLATERAL_REDEEM, params.only(&["ccy"]))
                     .await
             }
             "adjust_flexible_loan_collateral" => {
+                params.ensure_allowed(&["type", "collateralCcy", "collateralAmt"])?;
                 let adjustment_type = params.required("type")?;
                 if !["add", "reduce"].contains(&adjustment_type) {
                     return Err(DcexError::InvalidInput(
@@ -231,10 +269,12 @@ impl OkxClient {
                 .await
             }
             "get_flexible_loan_info" => {
+                params.ensure_allowed(&["ordId"])?;
                 self.get_request(FLEXIBLE_LOAN_INFO, params.only(&["ordId"]))
                     .await
             }
             "get_flexible_loan_history" => {
+                params.ensure_allowed(&["type", "after", "before", "limit"])?;
                 self.get_request(
                     FLEXIBLE_LOAN_HISTORY,
                     params.only(&["type", "after", "before", "limit"]),
@@ -242,6 +282,7 @@ impl OkxClient {
                 .await
             }
             "get_flexible_loan_interest_accrued" => {
+                params.ensure_allowed(&["ccy", "ordId", "after", "before", "limit"])?;
                 self.get_request(
                     FLEXIBLE_LOAN_INTEREST_ACCRUED,
                     params.only(&["ccy", "ordId", "after", "before", "limit"]),
@@ -249,6 +290,13 @@ impl OkxClient {
                 .await
             }
             "borrow_flexible_loan" => {
+                params.ensure_allowed(&[
+                    "loanData",
+                    "clOrdId",
+                    "ordId",
+                    "collateralData",
+                    "eMode",
+                ])?;
                 let loan_data = params.json_required("loanData")?;
                 if !loan_data.is_array() {
                     return Err(DcexError::InvalidInput(
@@ -275,6 +323,7 @@ impl OkxClient {
                     .await
             }
             "repay_flexible_loan" => {
+                params.ensure_allowed(&["ordId", "ccy", "amt", "clOrdId"])?;
                 validate_positive_amount(params)?;
                 self.post_request(
                     FLEXIBLE_LOAN_REPAY,
@@ -283,13 +332,16 @@ impl OkxClient {
                 .await
             }
             "get_flexible_loan_emode_info" => {
+                params.ensure_allowed(&[])?;
                 self.get_request(FLEXIBLE_LOAN_EMODE_INFO, Vec::new()).await
             }
             "get_dual_investment_currency_pairs" => {
+                params.ensure_allowed(&[])?;
                 self.get_request(DUAL_INVESTMENT_CURRENCY_PAIRS, Vec::new())
                     .await
             }
             "get_dual_investment_products" => {
+                params.ensure_allowed(&["baseCcy", "quoteCcy", "optType"])?;
                 params.required("baseCcy")?;
                 params.required("quoteCcy")?;
                 params.required("optType")?;
@@ -300,6 +352,7 @@ impl OkxClient {
                 .await
             }
             "request_dual_investment_quote" => {
+                params.ensure_allowed(&["productId", "notionalSz", "notionalCcy"])?;
                 self.post_request(
                     DUAL_INVESTMENT_QUOTE,
                     Value::Object(params.required_body(&[
@@ -311,6 +364,7 @@ impl OkxClient {
                 .await
             }
             "trade_dual_investment" => {
+                params.ensure_allowed(&["quoteId"])?;
                 self.post_request(
                     DUAL_INVESTMENT_TRADE,
                     Value::Object(params.required_body(&["quoteId"])?),
@@ -318,6 +372,7 @@ impl OkxClient {
                 .await
             }
             "request_dual_investment_redeem_quote" => {
+                params.ensure_allowed(&["ordId"])?;
                 self.post_request(
                     DUAL_INVESTMENT_REDEEM_QUOTE,
                     Value::Object(params.required_body(&["ordId"])?),
@@ -325,6 +380,7 @@ impl OkxClient {
                 .await
             }
             "redeem_dual_investment" => {
+                params.ensure_allowed(&["ordId", "quoteId"])?;
                 self.post_request(
                     DUAL_INVESTMENT_REDEEM,
                     Value::Object(params.required_body(&["ordId", "quoteId"])?),
@@ -332,11 +388,23 @@ impl OkxClient {
                 .await
             }
             "get_dual_investment_order_status" => {
+                params.ensure_allowed(&["ordId"])?;
                 params.required("ordId")?;
                 self.get_request(DUAL_INVESTMENT_ORDER_STATUS, params.only(&["ordId"]))
                     .await
             }
             "get_dual_investment_order_history" => {
+                params.ensure_allowed(&[
+                    "ordId",
+                    "productId",
+                    "uly",
+                    "state",
+                    "beginId",
+                    "endId",
+                    "begin",
+                    "end",
+                    "limit",
+                ])?;
                 self.get_request(
                     DUAL_INVESTMENT_ORDER_HISTORY,
                     params.only(&[
@@ -353,13 +421,21 @@ impl OkxClient {
                 )
                 .await
             }
-            "get_okusd_limits" => self.get_request(OKUSD_LIMITS, Vec::new()).await,
-            "get_okusd_account" => self.get_request(OKUSD_ACCOUNT, Vec::new()).await,
+            "get_okusd_limits" => {
+                params.ensure_allowed(&[])?;
+                self.get_request(OKUSD_LIMITS, Vec::new()).await
+            }
+            "get_okusd_account" => {
+                params.ensure_allowed(&[])?;
+                self.get_request(OKUSD_ACCOUNT, Vec::new()).await
+            }
             "get_okusd_rate_history" => {
+                params.ensure_allowed(&["limit", "begin", "end"])?;
                 self.get_request(OKUSD_RATE_HISTORY, params.only(&["limit", "begin", "end"]))
                     .await
             }
             "get_okusd_subscribe_history" => {
+                params.ensure_allowed(&["limit", "begin", "end"])?;
                 self.get_request(
                     OKUSD_SUBSCRIBE_HISTORY,
                     params.only(&["limit", "begin", "end"]),
@@ -367,6 +443,7 @@ impl OkxClient {
                 .await
             }
             "get_okusd_redeem_history" => {
+                params.ensure_allowed(&["limit", "begin", "end", "type"])?;
                 self.get_request(
                     OKUSD_REDEEM_HISTORY,
                     params.only(&["limit", "begin", "end", "type"]),
@@ -374,6 +451,7 @@ impl OkxClient {
                 .await
             }
             "get_okusd_rewards_history" => {
+                params.ensure_allowed(&["limit", "begin", "end"])?;
                 self.get_request(
                     OKUSD_REWARDS_HISTORY,
                     params.only(&["limit", "begin", "end"]),
@@ -381,6 +459,7 @@ impl OkxClient {
                 .await
             }
             "subscribe_okusd" => {
+                params.ensure_allowed(&["amt", "clOrdId"])?;
                 validate_okusd_amount(params)?;
                 self.post_request(
                     OKUSD_SUBSCRIBE,
@@ -389,6 +468,7 @@ impl OkxClient {
                 .await
             }
             "redeem_okusd" => {
+                params.ensure_allowed(&["redeemType", "amt", "clOrdId"])?;
                 validate_okusd_amount(params)?;
                 let redeem_type = params.required("redeemType")?;
                 if !["1", "2"].contains(&redeem_type) {

@@ -16,6 +16,7 @@ impl BybitClient {
     ) -> Result<Option<ValidatedResponse>> {
         let result = match method_name {
             "set_spot_margin_leverage" => {
+                params.ensure_allowed(&["leverage", "currency"])?;
                 if !params
                     .required("leverage")?
                     .parse::<u32>()
@@ -32,6 +33,7 @@ impl BybitClient {
                     .await
             }
             "set_spot_margin_mode" => {
+                params.ensure_allowed(&["spotMarginMode"])?;
                 let mode = params.required("spotMarginMode")?;
                 if !["0", "1"].contains(&mode) {
                     return Err(DcexError::InvalidInput(
@@ -45,6 +47,16 @@ impl BybitClient {
             }
 
             "get_wallet_balance" => {
+                params.ensure_allowed(&["accountType", "coin"])?;
+                // Unified Trading Accounts are the only account type the endpoint serves.
+                if params
+                    .get("accountType")
+                    .is_some_and(|value| value != "UNIFIED")
+                {
+                    return Err(DcexError::InvalidInput(
+                        "Bybit get_wallet_balance accountType must be UNIFIED".into(),
+                    ));
+                }
                 let mut query = vec![("accountType".to_string(), "UNIFIED".to_string())];
                 push_optional(&mut query, "coin", params.get("coin"));
                 self.get_request(GET_WALLET_BALANCE, query).await
@@ -54,10 +66,12 @@ impl BybitClient {
                     .await
             }
             "upgrade_to_unified_trading_account" => {
+                params.ensure_allowed(&[])?;
                 self.post_request(UPGRADE_TO_UNIFIED_ACCOUNT, Map::new())
                     .await
             }
             "get_borrow_history" => {
+                params.ensure_allowed(&["limit", "coin", "startTime", "endTime", "cursor"])?;
                 let mut query = vec![(
                     "limit".to_string(),
                     params.get("limit").unwrap_or("20").to_string(),
@@ -69,11 +83,13 @@ impl BybitClient {
                 self.get_request(GET_BORROW_HISTORY, query).await
             }
             "get_collateral_info" => {
+                params.ensure_allowed(&["currency"])?;
                 let mut query = Vec::new();
                 push_optional(&mut query, "currency", params.get("currency"));
                 self.get_request(GET_COLLATERAL_INFO, query).await
             }
             "manual_borrow" => {
+                params.ensure_allowed(&["coin", "amount"])?;
                 let mut body = Map::new();
                 body.insert(
                     "coin".to_string(),
@@ -86,6 +102,7 @@ impl BybitClient {
                 self.post_request(MANUAL_BORROW, body).await
             }
             "manual_repay" => {
+                params.ensure_allowed(&["repaymentType", "coin", "amount"])?;
                 let repayment_type = params.get("repaymentType").unwrap_or("FLEXIBLE");
                 if !["ALL", "FIXED", "FLEXIBLE"].contains(&repayment_type) {
                     return Err(DcexError::InvalidInput(
@@ -112,6 +129,7 @@ impl BybitClient {
                 self.post_request(MANUAL_REPAY, body).await
             }
             "manual_repay_without_conversion" => {
+                params.ensure_allowed(&["repaymentType", "coin", "amount"])?;
                 let repayment_type = params.get("repaymentType").unwrap_or("FLEXIBLE");
                 if !["ALL", "FIXED", "FLEXIBLE"].contains(&repayment_type) {
                     return Err(DcexError::InvalidInput(
@@ -135,6 +153,7 @@ impl BybitClient {
             | "get_linear_fee_rates"
             | "get_inverse_fee_rates"
             | "get_option_fee_rates" => {
+                params.ensure_allowed(&["product_symbol", "baseCoin"])?;
                 let mut query = Vec::new();
                 if let Some(product_symbol) = params.get("product_symbol") {
                     let category = match method_name {
@@ -169,8 +188,23 @@ impl BybitClient {
                 push_optional(&mut query, "baseCoin", params.get("baseCoin"));
                 self.get_request(GET_FEE_RATE, query).await
             }
-            "get_account_info" => self.get_request(GET_ACCOUNT_INFO, Vec::new()).await,
+            "get_account_info" => {
+                params.ensure_allowed(&[])?;
+                self.get_request(GET_ACCOUNT_INFO, Vec::new()).await
+            }
             "get_transaction_log" => {
+                params.ensure_allowed(&[
+                    "limit",
+                    "accountType",
+                    "category",
+                    "coin",
+                    "baseCoin",
+                    "type",
+                    "transSubType",
+                    "startTime",
+                    "endTime",
+                    "cursor",
+                ])?;
                 let mut query = vec![(
                     "limit".to_string(),
                     params.get("limit").unwrap_or("20").to_string(),
@@ -187,10 +221,11 @@ impl BybitClient {
                 self.get_request(GET_TRANSACTION_LOG, query).await
             }
             "set_margin_mode" => {
+                params.ensure_allowed(&["setMarginMode"])?;
                 let mut body = Map::new();
                 body.insert(
                     "setMarginMode".to_string(),
-                    Value::String(params.required("margin_mode")?.to_string()),
+                    Value::String(params.required("setMarginMode")?.to_string()),
                 );
                 self.post_request(SET_MARGIN_MODE, body).await
             }

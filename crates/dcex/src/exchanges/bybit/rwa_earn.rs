@@ -15,8 +15,12 @@ impl BybitClient {
         params: &BybitParams,
     ) -> Result<Option<ValidatedResponse>> {
         let (path, query) = match method_name {
-            "get_rwa_earn_products" => (RWA_EARN_PRODUCT, params.only(&["coin"])),
+            "get_rwa_earn_products" => {
+                params.ensure_allowed(&["coin"])?;
+                (RWA_EARN_PRODUCT, params.only(&["coin"]))
+            }
             "get_rwa_earn_nav_chart" => {
+                params.ensure_allowed(&["productId", "startTime", "endTime"])?;
                 positive_product_id(params.required("productId")?)?;
                 validate_times(params, 180)?;
                 (
@@ -38,8 +42,21 @@ impl BybitClient {
         params: &BybitParams,
     ) -> Result<Option<ValidatedResponse>> {
         let result = match method_name {
-            "get_rwa_earn_positions" => self.get_request(RWA_EARN_POSITION, vec![]).await,
+            "get_rwa_earn_positions" => {
+                params.ensure_allowed(&[])?;
+                self.get_request(RWA_EARN_POSITION, vec![]).await
+            }
             "get_rwa_earn_orders" => {
+                params.ensure_allowed(&[
+                    "orderType",
+                    "productId",
+                    "orderId",
+                    "orderLinkId",
+                    "limit",
+                    "startTime",
+                    "endTime",
+                    "cursor",
+                ])?;
                 if let Some(order_type) = params.get("orderType") {
                     validate_order_type(order_type)?;
                 }
@@ -75,6 +92,14 @@ impl BybitClient {
                 .await
             }
             "place_rwa_earn_order" => {
+                params.ensure_allowed(&[
+                    "productId",
+                    "orderType",
+                    "coin",
+                    "orderLinkId",
+                    "accountType",
+                    "stakeAmount",
+                ])?;
                 let product_id = positive_product_id(params.required("productId")?)?;
                 let order_type = params.required("orderType")?;
                 validate_order_type(order_type)?;

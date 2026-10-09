@@ -18,6 +18,7 @@ impl OkxClient {
     ) -> Result<Option<ValidatedResponse>> {
         let result = match method_name {
             "get_easy_convert_currencies" => {
+                params.ensure_allowed(&["source"])?;
                 if let Some(source) = params.get("source")
                     && !matches!(source, "1" | "2")
                 {
@@ -29,6 +30,7 @@ impl OkxClient {
                     .await
             }
             "get_easy_convert_history" => {
+                params.ensure_allowed(&["limit", "after", "before"])?;
                 if let Some(limit) = params.get("limit")
                     && !(1..=100).contains(&limit.parse::<u16>().map_err(|_| {
                         DcexError::InvalidInput(
@@ -47,6 +49,7 @@ impl OkxClient {
                 .await
             }
             "place_easy_convert" => {
+                params.ensure_allowed(&["fromCcy", "toCcy", "source"])?;
                 let currencies = params.json_required("fromCcy")?;
                 if !currencies.as_array().is_some_and(|items| {
                     (1..=5).contains(&items.len())
@@ -84,6 +87,7 @@ impl OkxClient {
             "place_order" => self.place_order_from_params(params).await,
             "pre_check_order" => self.pre_check_order_from_params(params).await,
             "set_cancel_all_after" => {
+                params.ensure_allowed(&["timeOut", "tag"])?;
                 let mut body = Map::new();
                 body.insert(
                     "timeOut".to_string(),
@@ -154,15 +158,31 @@ impl OkxClient {
                 )?)
                 .await
             }
-            "cancel_order" => self.cancel_order_from_params(params).await,
+            "cancel_order" => {
+                params.ensure_allowed(&["ordId", "clOrdId", "product_symbol"])?;
+                self.cancel_order_from_params(params).await
+            }
             "cancel_batch_orders" => self.dispatch_cancel_batch_orders(method_name, params).await,
-            "cancel_all_orders" => self.cancel_all_orders_from_params(params).await,
+            "cancel_all_orders" => {
+                params.ensure_allowed(&["product_symbol", "after", "before", "limit"])?;
+                self.cancel_all_orders_from_params(params).await
+            }
             "amend_order" => self.amend_order_from_params(params).await,
             "amend_multiple_orders" => {
+                params.ensure_allowed(&["orders"])?;
                 self.post_request(TRADE_AMEND_BATCH_ORDERS, params.json_required("orders")?)
                     .await
             }
             "close_positions" => {
+                params.ensure_allowed(&[
+                    "mgnMode",
+                    "posSide",
+                    "autoCxl",
+                    "ccy",
+                    "tag",
+                    "clOrdId",
+                    "product_symbol",
+                ])?;
                 let mut body = params.required_body(&["mgnMode"])?;
                 self.insert_required_inst_id(&mut body, params)?;
                 insert_optional_string(&mut body, "posSide", params.get("posSide"));
@@ -173,22 +193,85 @@ impl OkxClient {
                 self.post_request(TRADE_CLOSE_POSITION, Value::Object(body))
                     .await
             }
-            "get_order" => self.get_order_lookup(TRADE_ORDER, params).await,
-            "get_order_list" => self.get_order_list_from_params(params).await,
+            "get_order" => {
+                params.ensure_allowed(&["ordId", "clOrdId", "product_symbol"])?;
+                self.get_order_lookup(TRADE_ORDER, params).await
+            }
+            "get_order_list" => {
+                params.ensure_allowed(&[
+                    "instType",
+                    "instFamily",
+                    "ordType",
+                    "state",
+                    "after",
+                    "before",
+                    "limit",
+                ])?;
+                self.get_order_list_from_params(params).await
+            }
             "get_orders_history" => {
+                params.ensure_allowed(&[
+                    "instType",
+                    "instFamily",
+                    "ordType",
+                    "state",
+                    "category",
+                    "after",
+                    "before",
+                    "begin",
+                    "end",
+                    "limit",
+                ])?;
                 self.get_order_history_request(TRADE_ORDERS_HISTORY, params, true)
                     .await
             }
             "get_orders_history_archive" => {
+                params.ensure_allowed(&[
+                    "instType",
+                    "instFamily",
+                    "ordType",
+                    "state",
+                    "category",
+                    "after",
+                    "before",
+                    "begin",
+                    "end",
+                    "limit",
+                ])?;
                 self.get_order_history_request(TRADE_ORDERS_HISTORY_ARCHIVE, params, true)
                     .await
             }
-            "get_fills" => self.get_fills_request(TRADE_FILLS, params, false).await,
+            "get_fills" => {
+                params.ensure_allowed(&[
+                    "instType",
+                    "instFamily",
+                    "ordId",
+                    "subType",
+                    "after",
+                    "before",
+                    "begin",
+                    "end",
+                    "limit",
+                ])?;
+                self.get_fills_request(TRADE_FILLS, params, false).await
+            }
             "get_fills_history" => {
+                params.ensure_allowed(&[
+                    "instType",
+                    "instFamily",
+                    "ordId",
+                    "subType",
+                    "after",
+                    "before",
+                    "begin",
+                    "end",
+                    "limit",
+                ])?;
                 self.get_fills_request(TRADE_FILLS_HISTORY, params, true)
                     .await
             }
             "get_account_rate_limit" => {
+                params.ensure_allowed(&[])?;
                 self.get_request(TRADE_ACCOUNT_RATE_LIMIT, Vec::new()).await
             }
             _ => return Ok(None),

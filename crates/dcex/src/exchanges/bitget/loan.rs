@@ -25,10 +25,13 @@ impl BitgetClient {
     ) -> Result<Option<ValidatedResponse>> {
         let result = match method_name {
             "get_crypto_loan_coins" => {
+                params.ensure_allowed(&["coin"], false)?;
                 self.get_private(CRYPTO_LOAN_COINS, params.only(&["coin"]))
                     .await
             }
             "get_crypto_loan_interest" => {
+                params
+                    .ensure_allowed(&["loanCoin", "pledgeCoin", "daily", "pledgeAmount"], false)?;
                 for key in ["loanCoin", "pledgeCoin", "daily", "pledgeAmount"] {
                     params.required(key)?;
                 }
@@ -61,6 +64,7 @@ impl BitgetClient {
                 .await
             }
             "get_crypto_loan_ongoing" => {
+                params.ensure_allowed(&["orderId", "loanCoin", "pledgeCoin"], false)?;
                 self.get_private(
                     CRYPTO_LOAN_BORROW_ONGOING,
                     params.only(&["orderId", "loanCoin", "pledgeCoin"]),
@@ -68,6 +72,7 @@ impl BitgetClient {
                 .await
             }
             "get_crypto_loan_borrow_history" => {
+                params.ensure_allowed(&["startTime", "endTime"], false)?;
                 params.required("startTime")?;
                 params.required("endTime")?;
                 let mut fields = HISTORY_FIELDS.to_vec();
@@ -93,12 +98,25 @@ impl BitgetClient {
                 .await
             }
             "get_crypto_loan_repay_history" => {
+                params.ensure_allowed(
+                    &[
+                        "startTime",
+                        "endTime",
+                        "orderId",
+                        "loanCoin",
+                        "pledgeCoin",
+                        "pageNum",
+                        "pageSize",
+                    ],
+                    false,
+                )?;
                 params.required("startTime")?;
                 params.required("endTime")?;
                 self.get_private(CRYPTO_LOAN_REPAY_HISTORY, params.only(HISTORY_FIELDS))
                     .await
             }
             "revise_crypto_loan_pledge" => {
+                params.ensure_allowed(&["orderId", "amount", "pledgeCoin", "reviseType"], false)?;
                 for key in ["orderId", "amount", "pledgeCoin", "reviseType"] {
                     params.required(key)?;
                 }
@@ -109,6 +127,18 @@ impl BitgetClient {
                 .await
             }
             "get_crypto_loan_pledge_history" => {
+                params.ensure_allowed(
+                    &[
+                        "startTime",
+                        "endTime",
+                        "orderId",
+                        "reviseSide",
+                        "pledgeCoin",
+                        "pageNum",
+                        "pageSize",
+                    ],
+                    false,
+                )?;
                 params.required("startTime")?;
                 params.required("endTime")?;
                 self.get_private(
@@ -126,6 +156,7 @@ impl BitgetClient {
                 .await
             }
             "get_crypto_loan_liquidations" => {
+                params.ensure_allowed(&["startTime", "endTime"], false)?;
                 params.required("startTime")?;
                 params.required("endTime")?;
                 let mut fields = HISTORY_FIELDS.to_vec();
@@ -133,8 +164,12 @@ impl BitgetClient {
                 self.get_private(CRYPTO_LOAN_REDUCES, params.only(&fields))
                     .await
             }
-            "get_crypto_loan_debts" => self.get_private(CRYPTO_LOAN_DEBTS, Vec::new()).await,
+            "get_crypto_loan_debts" => {
+                params.ensure_allowed(&[], false)?;
+                self.get_private(CRYPTO_LOAN_DEBTS, Vec::new()).await
+            }
             "repay_uta_liability" => {
+                params.ensure_allowed(&["repayableCoinList", "paymentCoinList"], false)?;
                 let mut body = serde_json::Map::new();
                 insert_optional_value(
                     &mut body,

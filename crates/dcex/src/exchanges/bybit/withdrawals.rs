@@ -14,6 +14,7 @@ mod asset_requests {
             _method_name: &str,
             params: &BybitParams,
         ) -> Result<ValidatedResponse> {
+            params.ensure_allowed(&["coin"])?;
             {
                 self.get_request(
                     GET_WITHDRAWABLE_AMOUNT,

@@ -13,6 +13,7 @@ mod trade_requests {
             _method_name: &str,
             params: &BitgetParams,
         ) -> Result<ValidatedResponse> {
+            params.ensure_allowed(&["orderList"], false)?;
             {
                 let orders = params.json_required("orderList")?;
                 crate::exchanges::bitget::trade::validate_uta_batch_orders(&orders)?;
@@ -25,6 +26,7 @@ mod trade_requests {
             _method_name: &str,
             params: &BitgetParams,
         ) -> Result<ValidatedResponse> {
+            params.ensure_allowed(&["orderList"], false)?;
             {
                 self.post_private(
                     UTA_BATCH_CANCEL_ORDERS,

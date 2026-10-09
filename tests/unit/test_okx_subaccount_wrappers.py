@@ -36,8 +36,8 @@ def test_sync_okx_subaccount_wrappers_forward_official_fields() -> None:
     client.transfer_between_subaccounts(
         "USDT",
         "1",
-        "FUND",
-        "TRADING",
+        "6",
+        "18",
         "alpha",
         "beta",
         loanTrans=False,

@@ -12,16 +12,22 @@ impl BybitClient {
     ) -> Result<Option<ValidatedResponse>> {
         let result = match method_name {
             "get_coin_info" => {
+                params.ensure_allowed(&["coin"])?;
                 self.get_request(GET_COIN_INFO, params.only(&["coin"]))
                     .await
             }
-            "get_sub_uid" => self.get_request(GET_SUB_UID, Vec::new()).await,
+            "get_sub_uid" => {
+                params.ensure_allowed(&[])?;
+                self.get_request(GET_SUB_UID, Vec::new()).await
+            }
             "get_spot_asset_info" => {
+                params.ensure_allowed(&["coin"])?;
                 let mut query = vec![("accountType".to_string(), "SPOT".to_string())];
                 push_optional(&mut query, "coin", params.get("coin"));
                 self.get_request(GET_SPOT_ASSET_INFO, query).await
             }
             "get_coins_balance" => {
+                params.ensure_allowed(&["accountType", "coin", "memberId", "withBonus"])?;
                 let mut query = vec![(
                     "accountType".to_string(),
                     params.required("accountType")?.to_string(),
@@ -32,6 +38,16 @@ impl BybitClient {
                 self.get_request(GET_ALL_COINS_BALANCE, query).await
             }
             "get_coin_balance" => {
+                params.ensure_allowed(&[
+                    "accountType",
+                    "coin",
+                    "memberId",
+                    "toMemberId",
+                    "toAccountType",
+                    "withBonus",
+                    "withTransferSafeAmount",
+                    "withLtvTransferSafeAmount",
+                ])?;
                 let mut query = vec![
                     (
                         "accountType".to_string(),
@@ -80,10 +96,20 @@ impl BybitClient {
                     .await
             }
             "set_deposit_account" => {
+                params.ensure_allowed(&["accountType"])?;
                 let body = string_body(&[("accountType", params.required("accountType")?)]);
                 self.post_request(SET_DEPOSIT_ACCOUNT, body).await
             }
             "get_deposit_records" => {
+                params.ensure_allowed(&[
+                    "limit",
+                    "id",
+                    "txID",
+                    "coin",
+                    "startTime",
+                    "endTime",
+                    "cursor",
+                ])?;
                 let mut query = vec![(
                     "limit".to_string(),
                     params.get("limit").unwrap_or("20").to_string(),
@@ -97,6 +123,16 @@ impl BybitClient {
                 self.get_request(GET_DEPOSIT_RECORDS, query).await
             }
             "get_sub_deposit_records" => {
+                params.ensure_allowed(&[
+                    "subMemberId",
+                    "limit",
+                    "id",
+                    "txID",
+                    "coin",
+                    "startTime",
+                    "endTime",
+                    "cursor",
+                ])?;
                 let mut query = vec![
                     (
                         "subMemberId".to_string(),
@@ -117,6 +153,14 @@ impl BybitClient {
                     .await
             }
             "get_internal_deposit_records" => {
+                params.ensure_allowed(&[
+                    "limit",
+                    "txID",
+                    "coin",
+                    "startTime",
+                    "endTime",
+                    "cursor",
+                ])?;
                 let mut query = vec![(
                     "limit".to_string(),
                     params.get("limit").unwrap_or("20").to_string(),
@@ -129,6 +173,7 @@ impl BybitClient {
                 self.get_request(GET_INTERNAL_DEPOSIT_RECORDS, query).await
             }
             "get_master_deposit_address" => {
+                params.ensure_allowed(&["coin", "chainType"])?;
                 let mut query = vec![("coin".to_string(), params.required("coin")?.to_string())];
                 push_optional(&mut query, "chainType", params.get("chainType"));
                 self.get_request(GET_MASTER_DEPOSIT_ADDRESS, query).await

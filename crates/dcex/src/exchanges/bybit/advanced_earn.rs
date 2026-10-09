@@ -27,6 +27,7 @@ impl BybitClient {
     ) -> Result<Option<ValidatedResponse>> {
         let result = match method_name {
             "get_advanced_earn_products" => {
+                params.ensure_allowed(&["category", "coin", "duration"])?;
                 validate_category(params.required("category")?)?;
                 self.request(
                     HttpMethod::Get,
@@ -38,6 +39,7 @@ impl BybitClient {
                 .await
             }
             "get_advanced_earn_product_quote" => {
+                params.ensure_allowed(&["category", "productId"])?;
                 validate_category(params.required("category")?)?;
                 params.required("productId")?;
                 self.request(
@@ -61,10 +63,22 @@ impl BybitClient {
     ) -> Result<Option<ValidatedResponse>> {
         let result = match method_name {
             "place_advanced_earn_order" => {
+                let mut allowed = vec![
+                    "category",
+                    "productId",
+                    "orderType",
+                    "accountType",
+                    "orderLinkId",
+                    "amount",
+                    "coin",
+                ];
+                allowed.extend_from_slice(EXTRA_FIELDS);
+                params.ensure_allowed(&allowed)?;
                 self.post_request(ADVANCED_EARN_PLACE_ORDER, advanced_order_body(params)?)
                     .await
             }
             "get_advanced_earn_positions" => {
+                params.ensure_allowed(&["category", "productId", "coin", "limit", "cursor"])?;
                 validate_category(params.required("category")?)?;
                 validate_limit(params, 20)?;
                 self.get_request(
@@ -74,6 +88,16 @@ impl BybitClient {
                 .await
             }
             "get_advanced_earn_orders" => {
+                params.ensure_allowed(&[
+                    "category",
+                    "productId",
+                    "orderId",
+                    "orderLinkId",
+                    "startTime",
+                    "endTime",
+                    "limit",
+                    "cursor",
+                ])?;
                 validate_category(params.required("category")?)?;
                 validate_limit(params, 20)?;
                 validate_ordered_time_range(params)?;
@@ -93,6 +117,7 @@ impl BybitClient {
                 .await
             }
             "get_advanced_earn_redeem_estimates" => {
+                params.ensure_allowed(&["category", "positionIds"])?;
                 let category = params.required("category")?;
                 validate_enum("category", category, &["SmartLeverage", "DoubleWin"])?;
                 let position_ids = params.required("positionIds")?;
@@ -112,6 +137,12 @@ impl BybitClient {
                 .await
             }
             "get_double_win_leverage" => {
+                params.ensure_allowed(&[
+                    "productId",
+                    "initialPrice",
+                    "lowerPrice",
+                    "upperPrice",
+                ])?;
                 for key in ["productId", "initialPrice", "lowerPrice", "upperPrice"] {
                     params.required(key)?;
                 }

@@ -14488,7 +14488,11 @@
         "properties": {
           "margin_mode": {
             "type": "string",
-            "description": "selects cross or isolated margin using the documented integer enumeration."
+            "description": "Python spelling of setMarginMode; a mode name, not a margin amount."
+          },
+          "setMarginMode": {
+            "type": "string",
+            "description": "ISOLATED_MARGIN, REGULAR_MARGIN or PORTFOLIO_MARGIN; a mode name, not a margin amount."
           }
         }
       },

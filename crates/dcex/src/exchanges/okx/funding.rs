@@ -15,16 +15,19 @@ impl OkxClient {
     ) -> Result<Option<ValidatedResponse>> {
         let result = match method_name {
             "get_currencies" => {
+                params.ensure_allowed(&["ccy"])?;
                 let mut query = Vec::new();
                 push_optional_owned(&mut query, "ccy", params.csv("ccy")?);
                 self.get_request(ASSET_CURRENCIES, query).await
             }
             "get_balances" => {
+                params.ensure_allowed(&["ccy"])?;
                 let mut query = Vec::new();
                 push_optional_owned(&mut query, "ccy", params.csv("ccy")?);
                 self.get_request(ASSET_BALANCES, query).await
             }
             "get_asset_valuation" => {
+                params.ensure_allowed(&["ccy"])?;
                 let mut query = Vec::new();
                 push_optional_owned(&mut query, "ccy", params.csv("ccy")?);
                 self.get_request(ASSET_VALUATION, query).await
@@ -32,6 +35,15 @@ impl OkxClient {
             "funds_transfer" => self.dispatch_funds_transfer(method_name, params).await,
             "get_transfer_state" => self.dispatch_get_transfer_state(method_name, params).await,
             "get_bills" => {
+                params.ensure_allowed(&[
+                    "ccy",
+                    "type",
+                    "thirdPartyType",
+                    "clientId",
+                    "after",
+                    "before",
+                    "limit",
+                ])?;
                 self.get_request(
                     ASSET_BILLS,
                     params.only(&[
@@ -47,10 +59,14 @@ impl OkxClient {
                 .await
             }
             "get_deposit_address" => {
+                params.ensure_allowed(&["ccy"])?;
                 self.get_request(ASSET_DEPOSIT_ADDRESS, params.required_only(&["ccy"])?)
                     .await
             }
             "get_deposit_history" => {
+                params.ensure_allowed(&[
+                    "ccy", "depId", "fromWdId", "txId", "type", "state", "after", "before", "limit",
+                ])?;
                 self.get_request(
                     ASSET_DEPOSIT_HISTORY,
                     params.only(&[
@@ -64,8 +80,12 @@ impl OkxClient {
                 self.dispatch_get_deposit_withdraw_status(method_name, params)
                     .await
             }
-            "get_exchange_list" => self.get_request(ASSET_EXCHANGE_LIST, Vec::new()).await,
+            "get_exchange_list" => {
+                params.ensure_allowed(&[])?;
+                self.get_request(ASSET_EXCHANGE_LIST, Vec::new()).await
+            }
             "post_monthly_statement" => {
+                params.ensure_allowed(&["month"])?;
                 self.post_request(
                     ASSET_MONTHLY_STATEMENT,
                     Value::Object(params.body(&["month"])),
@@ -73,13 +93,16 @@ impl OkxClient {
                 .await
             }
             "get_monthly_statement" => {
+                params.ensure_allowed(&["month"])?;
                 self.get_request(ASSET_MONTHLY_STATEMENT, params.required_only(&["month"])?)
                     .await
             }
             "get_convert_currencies" => {
+                params.ensure_allowed(&[])?;
                 self.get_request(ASSET_CONVERT_CURRENCIES, Vec::new()).await
             }
             "get_convert_history" => {
+                params.ensure_allowed(&["clTReqId", "after", "before", "limit", "tag"])?;
                 self.get_request(
                     ASSET_CONVERT_HISTORY,
                     params.only(&["clTReqId", "after", "before", "limit", "tag"]),

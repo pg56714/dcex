@@ -67,8 +67,8 @@ class MarketHTTP(HTTPManager):
         self,
         product_symbol: str,
         interval: str,
-        startTime: int | None = None,
-        endTime: int | None = None,
+        start: int | None = None,
+        end: int | None = None,
         limit: int | None = None,
     ) -> dict[str, Any]:
         """Get kline/candlestick data."""
@@ -77,8 +77,8 @@ class MarketHTTP(HTTPManager):
             self._params(
                 product_symbol=product_symbol,
                 interval=interval,
-                startTime=startTime,
-                endTime=endTime,
+                start=start,
+                end=end,
                 limit=limit,
             ),
         )

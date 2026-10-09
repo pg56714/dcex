@@ -167,7 +167,7 @@ class AccountHTTP(
         """Set margin mode."""
         return self._native_private(
             "set_margin_mode",
-            self._native_params(margin_mode=margin_mode),
+            self._native_params(setMarginMode=margin_mode),
         )
 
     def set_spot_margin_leverage(
