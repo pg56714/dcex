@@ -1,3 +1,13 @@
+## 0.37.0 (2026-10-09)
+
+### BREAKING CHANGE
+
+- remove MEXC private WebSocket constructor aliases
+
+### Fix
+
+- map unified Ondo perp symbols on WebSocket streams and add perp top-of-book and funding helpers
+
 ## 0.36.3 (2026-10-08)
 
 ### Fix

@@ -1,3 +1,15 @@
+## 0.15.0 (2026-10-09)
+
+### BREAKING CHANGE
+
+- remove MEXC private WebSocket constructor aliases
+- box exchange error data so results stay small and clear clippy warnings
+
+### Fix
+
+- map unified Ondo perp symbols on WebSocket streams and add perp top-of-book and funding helpers
+- sign Binance WebSocket API and Bybit trade requests with the exchange clock
+
 ## 0.14.3 (2026-10-08)
 
 ### Fix
