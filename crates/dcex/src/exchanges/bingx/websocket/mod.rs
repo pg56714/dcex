@@ -41,13 +41,17 @@ pub(super) fn is_application_ping_text(text: &str) -> bool {
 }
 
 fn decode_event_text(payload: &[u8]) -> Result<String> {
-    let text_error = match std::str::from_utf8(payload) {
-        Ok(text) => return Ok(text.to_string()),
-        Err(error) => Some(DcexError::Decode(format!(
-            "failed to decode BingX WebSocket text payload: {error}"
-        ))),
-    };
-    gunzip(payload).map_err(|error| text_error.unwrap_or(error))
+    // gzip frames report their own inflate or UTF-8 failure instead of a text error.
+    if payload.starts_with(&[0x1f, 0x8b]) {
+        return gunzip(payload);
+    }
+    std::str::from_utf8(payload)
+        .map(str::to_string)
+        .map_err(|error| {
+            DcexError::Decode(format!(
+                "failed to decode BingX WebSocket text payload: {error}"
+            ))
+        })
 }
 
 fn parse_event_text(text: &str) -> Result<Value> {
