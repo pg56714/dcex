@@ -2,6 +2,8 @@ mod private;
 #[cfg(test)]
 mod private_tests;
 mod public;
+#[cfg(test)]
+mod routing_tests;
 
 pub use private::{OkxPrivateWebSocket, OkxPrivateWebSocketArg};
 pub use public::{OkxPublicWebSocket, OkxWebSocketArg};

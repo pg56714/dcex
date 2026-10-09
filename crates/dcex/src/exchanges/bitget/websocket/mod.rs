@@ -1,4 +1,6 @@
 mod private;
+#[cfg(test)]
+mod private_tests;
 mod public;
 mod trading;
 

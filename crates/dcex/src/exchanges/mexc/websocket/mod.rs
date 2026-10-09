@@ -1,4 +1,6 @@
 mod futures;
+#[cfg(test)]
+mod futures_tests;
 pub use futures::MexcFuturesWebSocket;
 mod private;
 #[cfg(test)]

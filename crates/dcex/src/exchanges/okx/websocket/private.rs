@@ -9,8 +9,8 @@ use crate::{DcexError, Result};
 
 use super::is_business_channel;
 
-const PRIVATE_WS_URL: &str = "wss://ws.okx.com:8443/ws/v5/private";
-const BUSINESS_WS_URL: &str = "wss://ws.okx.com:8443/ws/v5/business";
+/// Official base of the managed routes; each route appends its path segment.
+const ROUTE_BASE_URL: &str = "wss://ws.okx.com:8443/ws/v5";
 const LOGIN_METHOD: &str = "GET";
 const LOGIN_PATH: &str = "/users/self/verify";
 
@@ -21,10 +21,10 @@ enum OkxAuthenticatedWebSocketRoute {
 }
 
 impl OkxAuthenticatedWebSocketRoute {
-    fn url(self) -> &'static str {
+    fn url(self, base: &str) -> String {
         match self {
-            Self::Private => PRIVATE_WS_URL,
-            Self::Business => BUSINESS_WS_URL,
+            Self::Private => format!("{base}/private"),
+            Self::Business => format!("{base}/business"),
         }
     }
 }
@@ -163,7 +163,7 @@ impl OkxPrivateWebSocketArg {
         Ok(self)
     }
 
-    fn to_json(&self) -> Value {
+    pub(super) fn to_json(&self) -> Value {
         let mut arg = serde_json::Map::new();
         arg.insert("channel".to_string(), Value::String(self.channel.clone()));
         if let Some(inst_type) = &self.inst_type {
@@ -193,6 +193,7 @@ pub struct OkxPrivateWebSocket {
     logged_in: bool,
     timeout: Duration,
     managed_route: Option<OkxAuthenticatedWebSocketRoute>,
+    route_base: String,
     subscription_count: usize,
 }
 
@@ -203,13 +204,7 @@ impl OkxPrivateWebSocket {
         passphrase: String,
         timeout: Duration,
     ) -> Result<Self> {
-        Self::with_managed_route(
-            api_key,
-            api_secret,
-            passphrase,
-            OkxAuthenticatedWebSocketRoute::Private,
-            timeout,
-        )
+        Self::with_managed_route(api_key, api_secret, passphrase, ROUTE_BASE_URL, timeout)
     }
 
     pub fn with_url(
@@ -230,19 +225,29 @@ impl OkxPrivateWebSocket {
             logged_in: false,
             timeout,
             managed_route: None,
+            route_base: ROUTE_BASE_URL.to_string(),
             subscription_count: 0,
         })
     }
 
-    fn with_managed_route(
+    /// Starts on the private route and moves to authenticated business channels as needed.
+    pub(super) fn with_managed_route(
         api_key: String,
         api_secret: String,
         passphrase: String,
-        route: OkxAuthenticatedWebSocketRoute,
+        route_base: &str,
         timeout: Duration,
     ) -> Result<Self> {
-        let mut client = Self::with_url(api_key, api_secret, passphrase, route.url(), timeout)?;
+        let route = OkxAuthenticatedWebSocketRoute::Private;
+        let mut client = Self::with_url(
+            api_key,
+            api_secret,
+            passphrase,
+            route.url(route_base),
+            timeout,
+        )?;
         client.managed_route = Some(route);
+        client.route_base = route_base.to_string();
         Ok(client)
     }
 
@@ -549,8 +554,10 @@ impl OkxPrivateWebSocket {
             self.connection.close().await?;
             self.logged_in = false;
         }
-        self.connection =
-            WebSocketConnection::new(WebSocketConfig::new(target_route.url(), self.timeout)?);
+        self.connection = WebSocketConnection::new(WebSocketConfig::new(
+            target_route.url(&self.route_base),
+            self.timeout,
+        )?);
         self.managed_route = Some(target_route);
         if was_connected {
             self.connect().await?;

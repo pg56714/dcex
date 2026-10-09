@@ -127,3 +127,22 @@ fn credentials_and_urls_are_validated() {
         .is_err()
     );
 }
+
+#[tokio::test]
+async fn official_constructors_and_unconnected_use() {
+    let timeout = Duration::from_secs(1);
+    let mut swap = BingxPrivateWebSocket::new_swap("k".into(), "s".into(), timeout).unwrap();
+    assert!(BingxPrivateWebSocket::new_coin_swap("k".into(), "s".into(), timeout).is_ok());
+    let error = swap.keep_alive().await.unwrap_err().to_string();
+    assert!(error.contains("listen key is not available"), "{error}");
+    assert!(
+        swap.ping()
+            .await
+            .unwrap_err()
+            .to_string()
+            .contains("not connected")
+    );
+    assert!(swap.recv().await.is_err());
+    // Closing without a connection or key is a no-op.
+    swap.close().await.unwrap();
+}

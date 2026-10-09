@@ -204,3 +204,47 @@ fn only_the_official_trade_url_syncs_the_server_clock() {
         None
     );
 }
+
+#[tokio::test]
+async fn private_stream_rejects_malformed_topics_and_trade_args() {
+    let (mut client, mut peer) =
+        authenticated("/v5/private", json!({"op": "auth", "success": true})).await;
+    for (result, reason) in [
+        (
+            client.subscribe(vec![]).await,
+            "at least one Bybit private WebSocket topic",
+        ),
+        (
+            client.subscribe(vec![" ".into()]).await,
+            "topic must not be empty",
+        ),
+    ] {
+        let error = result.unwrap_err().to_string();
+        assert!(error.contains(reason), "{reason}: {error}");
+    }
+    peer.push("{\"op\":\"pong\"}");
+    assert_eq!(client.recv_bytes().await.unwrap(), b"{\"op\":\"pong\"}");
+    assert!(peer.quiet(Duration::from_millis(200)).await);
+
+    let (mut trade, _peer) = authenticated(
+        "/v5/trade",
+        json!({"op": "auth", "retCode": 0, "retMsg": "OK"}),
+    )
+    .await;
+    let error = trade
+        .unsubscribe(vec!["order".into()])
+        .await
+        .unwrap_err()
+        .to_string();
+    assert!(
+        error.contains("does not support topic subscriptions"),
+        "{error}"
+    );
+    let error = trade
+        .send_trade_order("order.create", json!([1]))
+        .await
+        .unwrap_err()
+        .to_string();
+    assert!(error.contains("args must be a JSON object"), "{error}");
+    assert!(BybitPrivateWebSocket::new("k".into(), "s".into(), Duration::from_secs(1)).is_ok());
+}

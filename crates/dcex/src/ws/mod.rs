@@ -1,4 +1,6 @@
 pub mod arcus;
+#[cfg(test)]
+mod arcus_tests;
 pub mod aster;
 pub mod backpack;
 pub mod binance;

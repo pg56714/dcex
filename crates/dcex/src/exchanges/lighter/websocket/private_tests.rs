@@ -180,3 +180,55 @@ async fn pings_and_pushed_messages_flow_until_close() {
     client.close().await.unwrap();
     assert!(!client.is_connected());
 }
+
+#[tokio::test]
+async fn constructors_auth_tokens_and_transaction_fields() {
+    use crate::exchanges::lighter::chains::LighterNetwork;
+    use crate::exchanges::lighter::credentials::LighterCredentials;
+
+    let timeout = Duration::from_secs(1);
+    assert!(
+        LighterPrivateWebSocket::with_network(
+            ACCOUNT,
+            API_KEY,
+            private_key(),
+            LighterNetwork::Mainnet,
+            timeout
+        )
+        .is_ok()
+    );
+    let credentials = LighterCredentials::new(ACCOUNT, API_KEY, private_key()).unwrap();
+    assert!(
+        LighterPrivateWebSocket::with_credentials(credentials, LighterNetwork::Mainnet, timeout)
+            .is_ok()
+    );
+    assert!(super::LighterPublicWebSocket::with_network(LighterNetwork::Testnet, timeout).is_ok());
+
+    let (mut client, mut peer) = connected().await;
+    let error = client
+        .subscribe_with_auth("account_tx/12", " ".into())
+        .await
+        .unwrap_err()
+        .to_string();
+    assert!(error.contains("auth token must not be empty"), "{error}");
+    let error = client
+        .subscribe("account_all/abc")
+        .await
+        .unwrap_err()
+        .to_string();
+    assert!(
+        error.contains("unsupported Lighter WebSocket channel"),
+        "{error}"
+    );
+    let unsigned_nonce = json!({"AccountIndex": ACCOUNT, "ApiKeyIndex": API_KEY, "Nonce": "5", "ExpiredAt": 6, "Sig": "s"});
+    let error = client
+        .send_tx("x", 14, &unsigned_nonce.to_string())
+        .await
+        .unwrap_err()
+        .to_string();
+    assert!(
+        error.contains("Nonce must be an unsigned integer"),
+        "{error}"
+    );
+    assert!(peer.quiet(Duration::from_millis(200)).await);
+}

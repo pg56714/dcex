@@ -10,8 +10,8 @@ use crate::{DcexError, Result};
 use super::super::params::exchange_symbol_fallback;
 use super::is_business_channel;
 
-const PUBLIC_WS_URL: &str = "wss://ws.okx.com:8443/ws/v5/public";
-const BUSINESS_WS_URL: &str = "wss://ws.okx.com:8443/ws/v5/business";
+/// Official base of the managed routes; each route appends its path segment.
+const ROUTE_BASE_URL: &str = "wss://ws.okx.com:8443/ws/v5";
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum OkxWebSocketRoute {
@@ -20,10 +20,10 @@ enum OkxWebSocketRoute {
 }
 
 impl OkxWebSocketRoute {
-    fn url(self) -> &'static str {
+    fn url(self, base: &str) -> String {
         match self {
-            Self::Public => PUBLIC_WS_URL,
-            Self::Business => BUSINESS_WS_URL,
+            Self::Public => format!("{base}/public"),
+            Self::Business => format!("{base}/business"),
         }
     }
 }
@@ -120,12 +120,13 @@ pub struct OkxPublicWebSocket {
     product_table: Option<Arc<ProductTable>>,
     timeout: Duration,
     managed_route: Option<OkxWebSocketRoute>,
+    route_base: String,
     subscription_count: usize,
 }
 
 impl OkxPublicWebSocket {
     pub fn new(timeout: Duration) -> Result<Self> {
-        Self::with_managed_route(OkxWebSocketRoute::Public, timeout)
+        Self::with_managed_route(ROUTE_BASE_URL, timeout)
     }
 
     pub fn with_url(url: impl Into<String>, timeout: Duration) -> Result<Self> {
@@ -134,16 +135,23 @@ impl OkxPublicWebSocket {
             product_table: None,
             timeout,
             managed_route: None,
+            route_base: ROUTE_BASE_URL.to_string(),
             subscription_count: 0,
         })
     }
 
-    fn with_managed_route(route: OkxWebSocketRoute, timeout: Duration) -> Result<Self> {
+    /// Starts on the public route and moves to business channels as subscriptions need.
+    pub(super) fn with_managed_route(route_base: &str, timeout: Duration) -> Result<Self> {
+        let route = OkxWebSocketRoute::Public;
         Ok(Self {
-            connection: WebSocketConnection::new(WebSocketConfig::new(route.url(), timeout)?),
+            connection: WebSocketConnection::new(WebSocketConfig::new(
+                route.url(route_base),
+                timeout,
+            )?),
             product_table: None,
             timeout,
             managed_route: Some(route),
+            route_base: route_base.to_string(),
             subscription_count: 0,
         })
     }
@@ -356,8 +364,10 @@ impl OkxPublicWebSocket {
         if was_connected {
             self.connection.close().await?;
         }
-        self.connection =
-            WebSocketConnection::new(WebSocketConfig::new(target_route.url(), self.timeout)?);
+        self.connection = WebSocketConnection::new(WebSocketConfig::new(
+            target_route.url(&self.route_base),
+            self.timeout,
+        )?);
         self.managed_route = Some(target_route);
         if was_connected {
             self.connection.connect().await?;
