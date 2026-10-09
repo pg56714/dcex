@@ -137,10 +137,6 @@ impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
         self.param("aclass", value)
     }
 
-    pub fn action_mode(self, value: impl ToString) -> Self {
-        self.param("action_mode", value)
-    }
-
     pub fn activate_price(self, value: impl ToString) -> Self {
         self.param("activatePrice", value)
     }
@@ -177,10 +173,6 @@ impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
         self.param("allowMaxTimeWindow", value)
     }
 
-    pub fn amend_text(self, value: impl ToString) -> Self {
-        self.param("amend_text", value)
-    }
-
     pub fn amount(self, value: impl ToString) -> Self {
         self.param("amount", value)
     }
@@ -203,14 +195,6 @@ impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
 
     pub fn asset_id(self, value: impl ToString) -> Self {
         self.param("asset_id", value)
-    }
-
-    pub fn asset_type(self, value: impl ToString) -> Self {
-        self.param("assetType", value)
-    }
-
-    pub fn at_timestamp(self, value: impl ToString) -> Self {
-        self.param("at_timestamp", value)
     }
 
     pub fn auth(self, value: impl ToString) -> Self {
@@ -245,10 +229,6 @@ impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
         self.param("auto_repay", value)
     }
 
-    pub fn auto_size(self, value: impl ToString) -> Self {
-        self.param("auto_size", value)
-    }
-
     pub fn ban_amend(self, value: impl ToString) -> Self {
         self.param("banAmend", value)
     }
@@ -259,10 +239,6 @@ impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
 
     pub fn base_coin(self, value: impl ToString) -> Self {
         self.param("baseCoin", value)
-    }
-
-    pub fn batch_mode(self, value: impl ToString) -> Self {
-        self.param("batchMode", value)
     }
 
     pub fn bbo(self, value: impl ToString) -> Self {
@@ -279,14 +255,6 @@ impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
 
     pub fn between_timestamps(self, value: impl ToString) -> Self {
         self.param("between_timestamps", value)
-    }
-
-    pub fn bin_size(self, value: impl ToString) -> Self {
-        self.param("binSize", value)
-    }
-
-    pub fn biz_info(self, value: impl ToString) -> Self {
-        self.param("biz_info", value)
     }
 
     pub fn builder_address(self, value: impl ToString) -> Self {
@@ -327,14 +295,6 @@ impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
 
     pub fn chain(self, value: impl ToString) -> Self {
         self.param("chain", value)
-    }
-
-    pub fn change_type(self, value: impl ToString) -> Self {
-        self.param("change_type", value)
-    }
-
-    pub fn cl_ord_link_id(self, value: impl ToString) -> Self {
-        self.param("clOrdLinkID", value)
     }
 
     pub fn cl_t_req_id(self, value: impl ToString) -> Self {
@@ -409,20 +369,12 @@ impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
         self.param("coin", value)
     }
 
-    pub fn columns(self, value: impl ToString) -> Self {
-        self.param("columns", value)
-    }
-
     pub fn consolidate_taker(self, value: impl ToString) -> Self {
         self.param("consolidate_taker", value)
     }
 
     pub fn consolidation(self, value: impl ToString) -> Self {
         self.param("consolidation", value)
-    }
-
-    pub fn contingency_type(self, value: impl ToString) -> Self {
-        self.param("contingencyType", value)
     }
 
     pub fn contract(self, value: impl ToString) -> Self {
@@ -437,16 +389,8 @@ impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
         self.param("count", value)
     }
 
-    pub fn count_total(self, value: impl ToString) -> Self {
-        self.param("count_total", value)
-    }
-
     pub fn country(self, value: impl ToString) -> Self {
         self.param("country", value)
-    }
-
-    pub fn cross_leverage_limit(self, value: impl ToString) -> Self {
-        self.param("cross_leverage_limit", value)
     }
 
     pub fn ct_type(self, value: impl ToString) -> Self {
@@ -459,10 +403,6 @@ impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
 
     pub fn currency(self, value: impl ToString) -> Self {
         self.param("currency", value)
-    }
-
-    pub fn currency_pair(self, value: impl ToString) -> Self {
-        self.param("currency_pair", value)
     }
 
     pub fn current(self, value: impl ToString) -> Self {
@@ -501,10 +441,6 @@ impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
         self.param("dex", value)
     }
 
-    pub fn display_qty(self, value: impl ToString) -> Self {
-        self.param("displayQty", value)
-    }
-
     pub fn docalcs(self, value: impl ToString) -> Self {
         self.param("docalcs", value)
     }
@@ -527,10 +463,6 @@ impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
 
     pub fn exclude_platform(self, value: impl ToString) -> Self {
         self.param("excludePlatform", value)
-    }
-
-    pub fn exec_inst(self, value: impl ToString) -> Self {
-        self.param("execInst", value)
     }
 
     pub fn expire_after(self, value: impl ToString) -> Self {
@@ -565,10 +497,6 @@ impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
         self.param("filter", value)
     }
 
-    pub fn flow_type(self, value: impl ToString) -> Self {
-        self.param("flow_type", value)
-    }
-
     pub fn force(self, value: impl ToString) -> Self {
         self.param("force", value)
     }
@@ -593,10 +521,6 @@ impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
         self.param("from_time", value)
     }
 
-    pub fn from_timestamp(self, value: impl ToString) -> Self {
-        self.param("from_timestamp", value)
-    }
-
     pub fn from_type(self, value: impl ToString) -> Self {
         self.param("fromType", value)
     }
@@ -617,10 +541,6 @@ impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
         self.param("goodTillDate", value)
     }
 
-    pub fn group_type(self, value: impl ToString) -> Self {
-        self.param("groupType", value)
-    }
-
     pub fn grouping(self, value: impl ToString) -> Self {
         self.param("grouping", value)
     }
@@ -631,10 +551,6 @@ impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
 
     pub fn hold_side(self, value: impl ToString) -> Self {
         self.param("holdSide", value)
-    }
-
-    pub fn holding(self, value: impl ToString) -> Self {
-        self.param("holding", value)
     }
 
     pub fn iceberg(self, value: impl ToString) -> Self {
@@ -681,10 +597,6 @@ impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
         self.param("interval", value)
     }
 
-    pub fn interval_time(self, value: impl ToString) -> Self {
-        self.param("intervalTime", value)
-    }
-
     pub fn is_leverage(self, value: impl ToString) -> Self {
         self.param("isLeverage", value)
     }
@@ -693,28 +605,12 @@ impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
         self.param("isMarket", value)
     }
 
-    pub fn last_end_id(self, value: impl ToString) -> Self {
-        self.param("lastEndId", value)
-    }
-
     pub fn last_fill_time(self, value: impl ToString) -> Self {
         self.param("lastFillTime", value)
     }
 
-    pub fn last_id(self, value: impl ToString) -> Self {
-        self.param("last_id", value)
-    }
-
     pub fn last_time(self, value: impl ToString) -> Self {
         self.param("lastTime", value)
-    }
-
-    pub fn late_id(self, value: impl ToString) -> Self {
-        self.param("late_id", value)
-    }
-
-    pub fn leaves_qty(self, value: impl ToString) -> Self {
-        self.param("leavesQty", value)
     }
 
     pub fn leverage(self, value: impl ToString) -> Self {
@@ -785,16 +681,8 @@ impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
         self.param("month", value)
     }
 
-    pub fn multi_asset(self, value: impl ToString) -> Self {
-        self.param("multi_asset", value)
-    }
-
     pub fn need_btc_valuation(self, value: impl ToString) -> Self {
         self.param("needBtcValuation", value)
-    }
-
-    pub fn need_usd_valuation(self, value: impl ToString) -> Self {
-        self.param("needUsdValuation", value)
     }
 
     pub fn network(self, value: impl ToString) -> Self {
@@ -885,24 +773,8 @@ impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
         self.param("orderLinkId", value)
     }
 
-    pub fn order_mode(self, value: impl ToString) -> Self {
-        self.param("orderMode", value)
-    }
-
-    pub fn order_qty(self, value: impl ToString) -> Self {
-        self.param("orderQty", value)
-    }
-
-    pub fn order_state(self, value: impl ToString) -> Self {
-        self.param("order_state", value)
-    }
-
     pub fn order_type(self, value: impl ToString) -> Self {
         self.param("order_type", value)
-    }
-
-    pub fn orig_cl_ord_id(self, value: impl ToString) -> Self {
-        self.param("origClOrdID", value)
     }
 
     pub fn orig_client_order_id(self, value: impl ToString) -> Self {
@@ -927,10 +799,6 @@ impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
 
     pub fn pair(self, value: impl ToString) -> Self {
         self.param("pair", value)
-    }
-
-    pub fn partial(self, value: impl ToString) -> Self {
-        self.param("partial", value)
     }
 
     pub fn path(self, value: impl ToString) -> Self {
@@ -975,26 +843,6 @@ impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
 
     pub fn post_only(self, value: impl ToString) -> Self {
         self.param("postOnly", value)
-    }
-
-    pub fn precision(self, value: impl ToString) -> Self {
-        self.param("precision", value)
-    }
-
-    pub fn preset_stop_loss_price(self, value: impl ToString) -> Self {
-        self.param("preset_stop_loss_price", value)
-    }
-
-    pub fn preset_stop_loss_price_type(self, value: impl ToString) -> Self {
-        self.param("preset_stop_loss_price_type", value)
-    }
-
-    pub fn preset_take_profit_price(self, value: impl ToString) -> Self {
-        self.param("preset_take_profit_price", value)
-    }
-
-    pub fn preset_take_profit_price_type(self, value: impl ToString) -> Self {
-        self.param("preset_take_profit_price_type", value)
     }
 
     pub fn price(self, value: impl ToString) -> Self {
@@ -1069,14 +917,6 @@ impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
         self.param("quantity", value)
     }
 
-    pub fn query_state(self, value: impl ToString) -> Self {
-        self.param("queryState", value)
-    }
-
-    pub fn quick_mgn_type(self, value: impl ToString) -> Self {
-        self.param("quickMgnType", value)
-    }
-
     pub fn quote_asset(self, value: impl ToString) -> Self {
         self.param("quoteAsset", value)
     }
@@ -1113,10 +953,6 @@ impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
         self.param("role", value)
     }
 
-    pub fn rule_type(self, value: impl ToString) -> Self {
-        self.param("ruleType", value)
-    }
-
     pub fn self_trade_prevention(self, value: impl ToString) -> Self {
         self.param("selfTradePrevention", value)
     }
@@ -1131,10 +967,6 @@ impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
 
     pub fn settle_coin(self, value: impl ToString) -> Self {
         self.param("settleCoin", value)
-    }
-
-    pub fn settle(self, value: impl ToString) -> Self {
-        self.param("settle", value)
     }
 
     pub fn short_leverage(self, value: impl ToString) -> Self {
@@ -1253,20 +1085,8 @@ impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
         self.param("stopPriceType", value)
     }
 
-    pub fn stop_px(self, value: impl ToString) -> Self {
-        self.param("stopPx", value)
-    }
-
     pub fn stp(self, value: impl ToString) -> Self {
         self.param("stp", value)
-    }
-
-    pub fn stp_act(self, value: impl ToString) -> Self {
-        self.param("stp_act", value)
-    }
-
-    pub fn stp_id(self, value: impl ToString) -> Self {
-        self.param("stpId", value)
     }
 
     pub fn strategy_id(self, value: impl ToString) -> Self {
@@ -1279,10 +1099,6 @@ impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
 
     pub fn sub_type(self, value: impl ToString) -> Self {
         self.param("subType", value)
-    }
-
-    pub fn sub_uid(self, value: impl ToString) -> Self {
-        self.param("sub_uid", value)
     }
 
     pub fn subaccount_id(self, value: impl ToString) -> Self {
@@ -1321,16 +1137,8 @@ impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
         self.param("takeProfitPrice", value)
     }
 
-    pub fn target_account_ids_array(self, value: impl ToString) -> Self {
-        self.param("targetAccountIds_array", value)
-    }
-
     pub fn td_mode(self, value: impl ToString) -> Self {
         self.param("tdMode", value)
-    }
-
-    pub fn text(self, value: impl ToString) -> Self {
-        self.param("text", value)
     }
 
     pub fn tgt_ccy(self, value: impl ToString) -> Self {
@@ -1361,10 +1169,6 @@ impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
         self.param("timeinforce", value)
     }
 
-    pub fn timezone(self, value: impl ToString) -> Self {
-        self.param("timezone", value)
-    }
-
     pub fn to(self, value: impl ToString) -> Self {
         self.param("to", value)
     }
@@ -1387,10 +1191,6 @@ impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
 
     pub fn to_time(self, value: impl ToString) -> Self {
         self.param("to_time", value)
-    }
-
-    pub fn to_timestamp(self, value: impl ToString) -> Self {
-        self.param("to_timestamp", value)
     }
 
     pub fn to_user_id(self, value: impl ToString) -> Self {
@@ -1423,10 +1223,6 @@ impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
 
     pub fn trade_side(self, value: impl ToString) -> Self {
         self.param("tradeSide", value)
-    }
-
-    pub fn trade_side_type(self, value: impl ToString) -> Self {
-        self.param("tradeSideType", value)
     }
 
     pub fn trade_type(self, value: impl ToString) -> Self {
@@ -1511,10 +1307,6 @@ impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
 
     pub fn wd_id(self, value: impl ToString) -> Self {
         self.param("wdId", value)
-    }
-
-    pub fn with_id(self, value: impl ToString) -> Self {
-        self.param("with_id", value)
     }
 
     pub fn without_count(self, value: impl ToString) -> Self {
@@ -1935,6 +1727,8 @@ fn every_client_has_a_catalog_identity() {
     }
 }
 
+#[cfg(test)]
+mod param_setter_tests;
 #[cfg(test)]
 mod symbol_tests;
 #[cfg(test)]
