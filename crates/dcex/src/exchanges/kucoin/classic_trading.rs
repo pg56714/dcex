@@ -1,8 +1,9 @@
 //! Current classic trading and risk endpoints. See docs/endpoint-audit.md.
 use super::client::{KucoinClient, KucoinMarket};
 use super::params::{
-    KucoinParams, bool_value, generate_client_oid, require_exactly_one, validate_client_oid,
-    validate_enum, validate_positive_number, validate_time_range, validate_u64_range,
+    KucoinParams, bool_value, generate_client_oid, path_identifier, path_segment,
+    require_exactly_one, validate_bool, validate_client_oid, validate_enum,
+    validate_positive_number, validate_time_range, validate_u64_range,
 };
 use crate::exchange::ValidatedResponse;
 use crate::http::HttpMethod;
@@ -179,17 +180,8 @@ impl KucoinClient {
                 params.required_any(&["symbol", "product_symbol"])?;
                 params.required("clientOid")?;
 
-                let mut path = "/api/v1/hf/orders/client-order/{clientOid}".to_string();
-                let v = params.required("clientOid")?.to_string();
-                if !v
-                    .bytes()
-                    .all(|c| c.is_ascii_alphanumeric() || b"_-".contains(&c))
-                {
-                    return Err(DcexError::InvalidInput(
-                        "invalid KuCoin path identifier".into(),
-                    ));
-                }
-                path = path.replace("{clientOid}", &v);
+                let path = "/api/v1/hf/orders/client-order/{clientOid}"
+                    .replace("{clientOid}", path_identifier(params, "clientOid")?);
                 let mut query = params.only(&[]);
                 self.push_optional_symbol(&mut query, params, false)?;
                 self.request(
@@ -213,17 +205,8 @@ impl KucoinClient {
                 validate_positive_number(params, "cancelSize")?;
                 params.required("orderId")?;
 
-                let mut path = "/api/v1/hf/orders/cancel/{orderId}".to_string();
-                let v = params.required("orderId")?.to_string();
-                if !v
-                    .bytes()
-                    .all(|c| c.is_ascii_alphanumeric() || b"_-".contains(&c))
-                {
-                    return Err(DcexError::InvalidInput(
-                        "invalid KuCoin path identifier".into(),
-                    ));
-                }
-                path = path.replace("{orderId}", &v);
+                let path = "/api/v1/hf/orders/cancel/{orderId}"
+                    .replace("{orderId}", path_identifier(params, "orderId")?);
                 let mut query = params.only(&["cancelSize"]);
                 self.push_optional_symbol(&mut query, params, false)?;
                 self.request(
@@ -242,17 +225,8 @@ impl KucoinClient {
                 params.required_any(&["symbol", "product_symbol"])?;
                 params.required("orderId")?;
 
-                let mut path = "/api/v1/hf/orders/{orderId}".to_string();
-                let v = params.required("orderId")?.to_string();
-                if !v
-                    .bytes()
-                    .all(|c| c.is_ascii_alphanumeric() || b"_-".contains(&c))
-                {
-                    return Err(DcexError::InvalidInput(
-                        "invalid KuCoin path identifier".into(),
-                    ));
-                }
-                path = path.replace("{orderId}", &v);
+                let path = "/api/v1/hf/orders/{orderId}"
+                    .replace("{orderId}", path_identifier(params, "orderId")?);
                 let mut query = params.only(&[]);
                 self.push_optional_symbol(&mut query, params, false)?;
                 self.request(HttpMethod::Get, KucoinMarket::Spot, path, query, None, true)
@@ -264,17 +238,8 @@ impl KucoinClient {
                 params.required_any(&["symbol", "product_symbol"])?;
                 params.required("clientOid")?;
 
-                let mut path = "/api/v1/hf/orders/client-order/{clientOid}".to_string();
-                let v = params.required("clientOid")?.to_string();
-                if !v
-                    .bytes()
-                    .all(|c| c.is_ascii_alphanumeric() || b"_-".contains(&c))
-                {
-                    return Err(DcexError::InvalidInput(
-                        "invalid KuCoin path identifier".into(),
-                    ));
-                }
-                path = path.replace("{clientOid}", &v);
+                let path = "/api/v1/hf/orders/client-order/{clientOid}"
+                    .replace("{clientOid}", path_identifier(params, "clientOid")?);
                 let mut query = params.only(&[]);
                 self.push_optional_symbol(&mut query, params, false)?;
                 self.request(HttpMethod::Get, KucoinMarket::Spot, path, query, None, true)
@@ -362,13 +327,7 @@ impl KucoinClient {
                 validate_positive_number(params, "price")?;
                 validate_positive_number(params, "size")?;
                 validate_enum(params, "timeInForce", &["GTC", "GTT", "IOC", "FOK"])?;
-                if let Some(v) = params.get("postOnly")
-                    && bool_value(v).is_none()
-                {
-                    return Err(DcexError::InvalidInput(
-                        "postOnly must be true or false".into(),
-                    ));
-                }
+                validate_bool(params, "postOnly")?;
                 validate_positive_number(params, "funds")?;
                 params.required("stopPrice")?;
                 validate_positive_number(params, "stopPrice")?;
@@ -429,17 +388,8 @@ impl KucoinClient {
                 validate_params(params, &["orderId"])?;
                 params.required("orderId")?;
 
-                let mut path = "/api/v1/stop-order/{orderId}".to_string();
-                let v = params.required("orderId")?.to_string();
-                if !v
-                    .bytes()
-                    .all(|c| c.is_ascii_alphanumeric() || b"_-".contains(&c))
-                {
-                    return Err(DcexError::InvalidInput(
-                        "invalid KuCoin path identifier".into(),
-                    ));
-                }
-                path = path.replace("{orderId}", &v);
+                let path = "/api/v1/stop-order/{orderId}"
+                    .replace("{orderId}", path_identifier(params, "orderId")?);
                 let query = params.only(&[]);
                 self.request(
                     HttpMethod::Delete,
@@ -516,17 +466,8 @@ impl KucoinClient {
                 validate_params(params, &["orderId"])?;
                 params.required("orderId")?;
 
-                let mut path = "/api/v1/stop-order/{orderId}".to_string();
-                let v = params.required("orderId")?.to_string();
-                if !v
-                    .bytes()
-                    .all(|c| c.is_ascii_alphanumeric() || b"_-".contains(&c))
-                {
-                    return Err(DcexError::InvalidInput(
-                        "invalid KuCoin path identifier".into(),
-                    ));
-                }
-                path = path.replace("{orderId}", &v);
+                let path = "/api/v1/stop-order/{orderId}"
+                    .replace("{orderId}", path_identifier(params, "orderId")?);
                 let query = params.only(&[]);
                 self.request(HttpMethod::Get, KucoinMarket::Spot, path, query, None, true)
                     .await?
@@ -592,17 +533,8 @@ impl KucoinClient {
                 validate_params(params, &["orderId"])?;
                 params.required("orderId")?;
 
-                let mut path = "/api/v3/oco/order/{orderId}".to_string();
-                let v = params.required("orderId")?.to_string();
-                if !v
-                    .bytes()
-                    .all(|c| c.is_ascii_alphanumeric() || b"_-".contains(&c))
-                {
-                    return Err(DcexError::InvalidInput(
-                        "invalid KuCoin path identifier".into(),
-                    ));
-                }
-                path = path.replace("{orderId}", &v);
+                let path = "/api/v3/oco/order/{orderId}"
+                    .replace("{orderId}", path_identifier(params, "orderId")?);
                 let query = params.only(&[]);
                 self.request(
                     HttpMethod::Delete,
@@ -619,17 +551,8 @@ impl KucoinClient {
                 validate_params(params, &["clientOid"])?;
                 params.required("clientOid")?;
 
-                let mut path = "/api/v3/oco/client-order/{clientOid}".to_string();
-                let v = params.required("clientOid")?.to_string();
-                if !v
-                    .bytes()
-                    .all(|c| c.is_ascii_alphanumeric() || b"_-".contains(&c))
-                {
-                    return Err(DcexError::InvalidInput(
-                        "invalid KuCoin path identifier".into(),
-                    ));
-                }
-                path = path.replace("{clientOid}", &v);
+                let path = "/api/v3/oco/client-order/{clientOid}"
+                    .replace("{clientOid}", path_identifier(params, "clientOid")?);
                 let query = params.only(&[]);
                 self.request(
                     HttpMethod::Delete,
@@ -663,17 +586,8 @@ impl KucoinClient {
                 validate_params(params, &["orderId"])?;
                 params.required("orderId")?;
 
-                let mut path = "/api/v3/oco/order/{orderId}".to_string();
-                let v = params.required("orderId")?.to_string();
-                if !v
-                    .bytes()
-                    .all(|c| c.is_ascii_alphanumeric() || b"_-".contains(&c))
-                {
-                    return Err(DcexError::InvalidInput(
-                        "invalid KuCoin path identifier".into(),
-                    ));
-                }
-                path = path.replace("{orderId}", &v);
+                let path = "/api/v3/oco/order/{orderId}"
+                    .replace("{orderId}", path_identifier(params, "orderId")?);
                 let query = params.only(&[]);
                 self.request(HttpMethod::Get, KucoinMarket::Spot, path, query, None, true)
                     .await?
@@ -683,17 +597,8 @@ impl KucoinClient {
                 validate_params(params, &["clientOid"])?;
                 params.required("clientOid")?;
 
-                let mut path = "/api/v3/oco/client-order/{clientOid}".to_string();
-                let v = params.required("clientOid")?.to_string();
-                if !v
-                    .bytes()
-                    .all(|c| c.is_ascii_alphanumeric() || b"_-".contains(&c))
-                {
-                    return Err(DcexError::InvalidInput(
-                        "invalid KuCoin path identifier".into(),
-                    ));
-                }
-                path = path.replace("{clientOid}", &v);
+                let path = "/api/v3/oco/client-order/{clientOid}"
+                    .replace("{clientOid}", path_identifier(params, "clientOid")?);
                 let query = params.only(&[]);
                 self.request(HttpMethod::Get, KucoinMarket::Spot, path, query, None, true)
                     .await?
@@ -703,17 +608,8 @@ impl KucoinClient {
                 validate_params(params, &["orderId"])?;
                 params.required("orderId")?;
 
-                let mut path = "/api/v3/oco/order/details/{orderId}".to_string();
-                let v = params.required("orderId")?.to_string();
-                if !v
-                    .bytes()
-                    .all(|c| c.is_ascii_alphanumeric() || b"_-".contains(&c))
-                {
-                    return Err(DcexError::InvalidInput(
-                        "invalid KuCoin path identifier".into(),
-                    ));
-                }
-                path = path.replace("{orderId}", &v);
+                let path = "/api/v3/oco/order/details/{orderId}"
+                    .replace("{orderId}", path_identifier(params, "orderId")?);
                 let query = params.only(&[]);
                 self.request(HttpMethod::Get, KucoinMarket::Spot, path, query, None, true)
                     .await?
@@ -775,35 +671,11 @@ impl KucoinClient {
                 validate_positive_number(params, "price")?;
                 validate_positive_number(params, "size")?;
                 validate_enum(params, "timeInForce", &["GTC", "GTT", "IOC", "FOK"])?;
-                if let Some(v) = params.get("postOnly")
-                    && bool_value(v).is_none()
-                {
-                    return Err(DcexError::InvalidInput(
-                        "postOnly must be true or false".into(),
-                    ));
-                }
+                validate_bool(params, "postOnly")?;
                 validate_positive_number(params, "funds")?;
-                if let Some(v) = params.get("isIsolated")
-                    && bool_value(v).is_none()
-                {
-                    return Err(DcexError::InvalidInput(
-                        "isIsolated must be true or false".into(),
-                    ));
-                }
-                if let Some(v) = params.get("autoBorrow")
-                    && bool_value(v).is_none()
-                {
-                    return Err(DcexError::InvalidInput(
-                        "autoBorrow must be true or false".into(),
-                    ));
-                }
-                if let Some(v) = params.get("autoRepay")
-                    && bool_value(v).is_none()
-                {
-                    return Err(DcexError::InvalidInput(
-                        "autoRepay must be true or false".into(),
-                    ));
-                }
+                validate_bool(params, "isIsolated")?;
+                validate_bool(params, "autoBorrow")?;
+                validate_bool(params, "autoRepay")?;
 
                 validate_classic_order(params, false, false)?;
                 let path = "/api/v3/hf/margin/order".to_string();
@@ -861,35 +733,11 @@ impl KucoinClient {
                 validate_positive_number(params, "price")?;
                 validate_positive_number(params, "size")?;
                 validate_enum(params, "timeInForce", &["GTC", "GTT", "IOC", "FOK"])?;
-                if let Some(v) = params.get("postOnly")
-                    && bool_value(v).is_none()
-                {
-                    return Err(DcexError::InvalidInput(
-                        "postOnly must be true or false".into(),
-                    ));
-                }
+                validate_bool(params, "postOnly")?;
                 validate_positive_number(params, "funds")?;
-                if let Some(v) = params.get("isIsolated")
-                    && bool_value(v).is_none()
-                {
-                    return Err(DcexError::InvalidInput(
-                        "isIsolated must be true or false".into(),
-                    ));
-                }
-                if let Some(v) = params.get("autoBorrow")
-                    && bool_value(v).is_none()
-                {
-                    return Err(DcexError::InvalidInput(
-                        "autoBorrow must be true or false".into(),
-                    ));
-                }
-                if let Some(v) = params.get("autoRepay")
-                    && bool_value(v).is_none()
-                {
-                    return Err(DcexError::InvalidInput(
-                        "autoRepay must be true or false".into(),
-                    ));
-                }
+                validate_bool(params, "isIsolated")?;
+                validate_bool(params, "autoBorrow")?;
+                validate_bool(params, "autoRepay")?;
 
                 validate_classic_order(params, false, false)?;
                 let path = "/api/v3/hf/margin/order/test".to_string();
@@ -922,17 +770,8 @@ impl KucoinClient {
                 params.required_any(&["symbol", "product_symbol"])?;
                 params.required("orderId")?;
 
-                let mut path = "/api/v3/hf/margin/orders/{orderId}".to_string();
-                let v = params.required("orderId")?.to_string();
-                if !v
-                    .bytes()
-                    .all(|c| c.is_ascii_alphanumeric() || b"_-".contains(&c))
-                {
-                    return Err(DcexError::InvalidInput(
-                        "invalid KuCoin path identifier".into(),
-                    ));
-                }
-                path = path.replace("{orderId}", &v);
+                let path = "/api/v3/hf/margin/orders/{orderId}"
+                    .replace("{orderId}", path_identifier(params, "orderId")?);
                 let mut query = params.only(&[]);
                 self.push_optional_symbol(&mut query, params, false)?;
                 self.request(
@@ -951,17 +790,8 @@ impl KucoinClient {
                 params.required_any(&["symbol", "product_symbol"])?;
                 params.required("clientOid")?;
 
-                let mut path = "/api/v3/hf/margin/orders/client-order/{clientOid}".to_string();
-                let v = params.required("clientOid")?.to_string();
-                if !v
-                    .bytes()
-                    .all(|c| c.is_ascii_alphanumeric() || b"_-".contains(&c))
-                {
-                    return Err(DcexError::InvalidInput(
-                        "invalid KuCoin path identifier".into(),
-                    ));
-                }
-                path = path.replace("{clientOid}", &v);
+                let path = "/api/v3/hf/margin/orders/client-order/{clientOid}"
+                    .replace("{clientOid}", path_identifier(params, "clientOid")?);
                 let mut query = params.only(&[]);
                 self.push_optional_symbol(&mut query, params, false)?;
                 self.request(
@@ -1126,17 +956,8 @@ impl KucoinClient {
                 params.required_any(&["symbol", "product_symbol"])?;
                 params.required("orderId")?;
 
-                let mut path = "/api/v3/hf/margin/orders/{orderId}".to_string();
-                let v = params.required("orderId")?.to_string();
-                if !v
-                    .bytes()
-                    .all(|c| c.is_ascii_alphanumeric() || b"_-".contains(&c))
-                {
-                    return Err(DcexError::InvalidInput(
-                        "invalid KuCoin path identifier".into(),
-                    ));
-                }
-                path = path.replace("{orderId}", &v);
+                let path = "/api/v3/hf/margin/orders/{orderId}"
+                    .replace("{orderId}", path_identifier(params, "orderId")?);
                 let mut query = params.only(&[]);
                 self.push_optional_symbol(&mut query, params, false)?;
                 self.request(HttpMethod::Get, KucoinMarket::Spot, path, query, None, true)
@@ -1148,17 +969,8 @@ impl KucoinClient {
                 params.required_any(&["symbol", "product_symbol"])?;
                 params.required("clientOid")?;
 
-                let mut path = "/api/v3/hf/margin/orders/client-order/{clientOid}".to_string();
-                let v = params.required("clientOid")?.to_string();
-                if !v
-                    .bytes()
-                    .all(|c| c.is_ascii_alphanumeric() || b"_-".contains(&c))
-                {
-                    return Err(DcexError::InvalidInput(
-                        "invalid KuCoin path identifier".into(),
-                    ));
-                }
-                path = path.replace("{clientOid}", &v);
+                let path = "/api/v3/hf/margin/orders/client-order/{clientOid}"
+                    .replace("{clientOid}", path_identifier(params, "clientOid")?);
                 let mut query = params.only(&[]);
                 self.push_optional_symbol(&mut query, params, false)?;
                 self.request(HttpMethod::Get, KucoinMarket::Spot, path, query, None, true)
@@ -1198,38 +1010,14 @@ impl KucoinClient {
                 validate_positive_number(params, "price")?;
                 validate_positive_number(params, "size")?;
                 validate_enum(params, "timeInForce", &["GTC", "GTT", "IOC", "FOK"])?;
-                if let Some(v) = params.get("postOnly")
-                    && bool_value(v).is_none()
-                {
-                    return Err(DcexError::InvalidInput(
-                        "postOnly must be true or false".into(),
-                    ));
-                }
+                validate_bool(params, "postOnly")?;
                 validate_positive_number(params, "funds")?;
                 params.required("isIsolated")?;
-                if let Some(v) = params.get("isIsolated")
-                    && bool_value(v).is_none()
-                {
-                    return Err(DcexError::InvalidInput(
-                        "isIsolated must be true or false".into(),
-                    ));
-                }
+                validate_bool(params, "isIsolated")?;
                 params.required("autoBorrow")?;
-                if let Some(v) = params.get("autoBorrow")
-                    && bool_value(v).is_none()
-                {
-                    return Err(DcexError::InvalidInput(
-                        "autoBorrow must be true or false".into(),
-                    ));
-                }
+                validate_bool(params, "autoBorrow")?;
                 params.required("autoRepay")?;
-                if let Some(v) = params.get("autoRepay")
-                    && bool_value(v).is_none()
-                {
-                    return Err(DcexError::InvalidInput(
-                        "autoRepay must be true or false".into(),
-                    ));
-                }
+                validate_bool(params, "autoRepay")?;
                 validate_enum(params, "stop", &["loss", "entry"])?;
                 params.required("stopPrice")?;
                 validate_positive_number(params, "stopPrice")?;
@@ -1406,27 +1194,9 @@ impl KucoinClient {
                 params.required("limitPrice")?;
                 validate_positive_number(params, "limitPrice")?;
                 params.required("isIsolated")?;
-                if let Some(v) = params.get("isIsolated")
-                    && bool_value(v).is_none()
-                {
-                    return Err(DcexError::InvalidInput(
-                        "isIsolated must be true or false".into(),
-                    ));
-                }
-                if let Some(v) = params.get("autoRepay")
-                    && bool_value(v).is_none()
-                {
-                    return Err(DcexError::InvalidInput(
-                        "autoRepay must be true or false".into(),
-                    ));
-                }
-                if let Some(v) = params.get("autoBorrow")
-                    && bool_value(v).is_none()
-                {
-                    return Err(DcexError::InvalidInput(
-                        "autoBorrow must be true or false".into(),
-                    ));
-                }
+                validate_bool(params, "isIsolated")?;
+                validate_bool(params, "autoRepay")?;
+                validate_bool(params, "autoBorrow")?;
 
                 validate_classic_order(params, false, true)?;
                 let path = "/api/v3/hf/margin/oco-order".to_string();
@@ -1615,40 +1385,16 @@ impl KucoinClient {
                 validate_positive_number(params, "leverage")?;
                 validate_enum(params, "type", &["limit", "market"])?;
                 validate_enum(params, "stopPriceType", &["TP", "MP", "IP"])?;
-                if let Some(v) = params.get("reduceOnly")
-                    && bool_value(v).is_none()
-                {
-                    return Err(DcexError::InvalidInput(
-                        "reduceOnly must be true or false".into(),
-                    ));
-                }
-                if let Some(v) = params.get("closeOrder")
-                    && bool_value(v).is_none()
-                {
-                    return Err(DcexError::InvalidInput(
-                        "closeOrder must be true or false".into(),
-                    ));
-                }
-                if let Some(v) = params.get("forceHold")
-                    && bool_value(v).is_none()
-                {
-                    return Err(DcexError::InvalidInput(
-                        "forceHold must be true or false".into(),
-                    ));
-                }
+                validate_bool(params, "reduceOnly")?;
+                validate_bool(params, "closeOrder")?;
+                validate_bool(params, "forceHold")?;
                 validate_enum(params, "stp", &["CN", "CO", "CB"])?;
                 validate_enum(params, "marginMode", &["ISOLATED", "CROSS"])?;
                 validate_positive_number(params, "price")?;
                 validate_u64_range(params, "size", 0, 9223372036854775807)?;
                 validate_positive_number(params, "size")?;
                 validate_enum(params, "timeInForce", &["GTC", "IOC"])?;
-                if let Some(v) = params.get("postOnly")
-                    && bool_value(v).is_none()
-                {
-                    return Err(DcexError::InvalidInput(
-                        "postOnly must be true or false".into(),
-                    ));
-                }
+                validate_bool(params, "postOnly")?;
                 validate_positive_number(params, "triggerStopUpPrice")?;
                 validate_positive_number(params, "triggerStopDownPrice")?;
                 validate_positive_number(params, "qty")?;
@@ -1984,18 +1730,10 @@ impl KucoinClient {
                 validate_params(params, &["symbol", "product_symbol"])?;
                 params.required_any(&["symbol", "product_symbol"])?;
 
-                let mut path = "/api/v1/contracts/risk-limit/{symbol}".to_string();
-                let v = self
+                let symbol = self
                     .exchange_symbol(params.required_any(&["symbol", "product_symbol"])?, true)?;
-                if !v
-                    .bytes()
-                    .all(|c| c.is_ascii_alphanumeric() || b"_-".contains(&c))
-                {
-                    return Err(DcexError::InvalidInput(
-                        "invalid KuCoin path identifier".into(),
-                    ));
-                }
-                path = path.replace("{symbol}", &v);
+                let path = "/api/v1/contracts/risk-limit/{symbol}"
+                    .replace("{symbol}", path_segment(&symbol)?);
                 let query = params.only(&[]);
                 self.request(
                     HttpMethod::Get,
@@ -2030,18 +1768,10 @@ impl KucoinClient {
                 validate_params(params, &["symbol", "product_symbol"])?;
                 params.required_any(&["symbol", "product_symbol"])?;
 
-                let mut path = "/api/v1/funding-rate/{symbol}/current".to_string();
-                let v = self
+                let symbol = self
                     .exchange_symbol(params.required_any(&["symbol", "product_symbol"])?, true)?;
-                if !v
-                    .bytes()
-                    .all(|c| c.is_ascii_alphanumeric() || b"_-".contains(&c))
-                {
-                    return Err(DcexError::InvalidInput(
-                        "invalid KuCoin path identifier".into(),
-                    ));
-                }
-                path = path.replace("{symbol}", &v);
+                let path = "/api/v1/funding-rate/{symbol}/current"
+                    .replace("{symbol}", path_segment(&symbol)?);
                 let query = params.only(&[]);
                 self.request(
                     HttpMethod::Get,
@@ -2093,21 +1823,9 @@ impl KucoinClient {
                 params.required_any(&["symbol", "product_symbol"])?;
                 validate_u64_range(params, "startAt", 0, 9223372036854775807)?;
                 validate_u64_range(params, "endAt", 0, 9223372036854775807)?;
-                if let Some(v) = params.get("reverse")
-                    && bool_value(v).is_none()
-                {
-                    return Err(DcexError::InvalidInput(
-                        "reverse must be true or false".into(),
-                    ));
-                }
+                validate_bool(params, "reverse")?;
                 validate_u64_range(params, "offset", 0, 9223372036854775807)?;
-                if let Some(v) = params.get("forward")
-                    && bool_value(v).is_none()
-                {
-                    return Err(DcexError::InvalidInput(
-                        "forward must be true or false".into(),
-                    ));
-                }
+                validate_bool(params, "forward")?;
                 validate_u64_range(params, "maxCount", 0, 1500)?;
 
                 let path = "/api/v1/funding-history".to_string();

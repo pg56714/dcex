@@ -267,6 +267,33 @@ pub(super) fn bool_value(value: &str) -> Option<bool> {
     }
 }
 
+/// A URL path segment taken from caller input: letters, digits, `_` and `-` only.
+pub(super) fn path_segment(value: &str) -> Result<&str> {
+    if value
+        .bytes()
+        .all(|c| c.is_ascii_alphanumeric() || b"_-".contains(&c))
+    {
+        Ok(value)
+    } else {
+        Err(DcexError::InvalidInput(
+            "invalid KuCoin path identifier".into(),
+        ))
+    }
+}
+
+pub(super) fn path_identifier<'a>(params: &'a KucoinParams, key: &str) -> Result<&'a str> {
+    path_segment(params.required(key)?)
+}
+
+pub(super) fn validate_bool(params: &KucoinParams, key: &str) -> Result<()> {
+    match params.get(key) {
+        Some(value) if bool_value(value).is_none() => Err(DcexError::InvalidInput(format!(
+            "{key} must be true or false"
+        ))),
+        _ => Ok(()),
+    }
+}
+
 pub(super) fn validate_enum(params: &KucoinParams, key: &str, allowed: &[&str]) -> Result<()> {
     let Some(value) = params.get(key) else {
         return Ok(());
