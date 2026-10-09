@@ -124,3 +124,29 @@ fn broker_market_and_blank_credentials_are_rejected() {
     assert!(build("k", " ", "p", KucoinMarket::Spot).is_err());
     assert!(build("k", "s", " ", KucoinMarket::Spot).is_err());
 }
+
+#[tokio::test]
+async fn official_constructors_build_without_connecting() {
+    let timeout = Duration::from_secs(1);
+    let creds = || ("k".to_string(), "s".to_string(), "p".to_string());
+    let (k, s, p) = creds();
+    let mut spot = KucoinPrivateWebSocket::new(k, s, p, timeout).unwrap();
+    assert!(!spot.is_connected());
+    assert!(spot.subscribe_balances().await.is_err());
+    assert!(spot.recv_bytes().await.is_err());
+    spot.close().await.unwrap();
+    let (k, s, p) = creds();
+    assert!(KucoinPrivateWebSocket::new_futures(k, s, p, timeout).is_ok());
+    let (k, s, p) = creds();
+    assert!(
+        KucoinPrivateWebSocket::with_base_urls(
+            k,
+            s,
+            p,
+            timeout,
+            "http://127.0.0.1:9".into(),
+            "http://127.0.0.1:9".into(),
+        )
+        .is_ok()
+    );
+}

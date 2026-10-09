@@ -6,6 +6,8 @@ mod api_schema;
 mod api_validation;
 pub use api::{BinanceWebSocketApi, BinanceWebSocketApiMarket};
 mod equity;
+#[cfg(test)]
+mod equity_tests;
 mod private;
 mod public;
 
