@@ -46,21 +46,13 @@ impl KrakenClient {
                     "without_count",
                     "rebase_multiplier",
                 ]);
-                push_optional(
-                    &mut query,
-                    "type",
-                    params.get("type").or_else(|| params.get("type_")),
-                );
+                push_optional(&mut query, "type", params.get("type"));
                 self.private_post(KrakenAuth::Spot, SPOT_LEDGERS, query)
                     .await
             }
             "get_spot_trade_volume" => {
                 let mut query = params.only(&["pair", "fee_schedule", "rebase_multiplier"]);
-                push_optional(
-                    &mut query,
-                    "fee-info",
-                    params.get("fee-info").or_else(|| params.get("fee_info")),
-                );
+                push_optional(&mut query, "fee-info", params.get("fee-info"));
                 self.private_post(KrakenAuth::Spot, SPOT_TRADE_VOLUME, query)
                     .await
             }

@@ -109,7 +109,7 @@
     "fields": [
       "product_symbol",
       "side",
-      "type_",
+      "type",
       "positionSide",
       "quantity",
       "price",
@@ -124,7 +124,7 @@
     "required": [
       "product_symbol",
       "side",
-      "type_"
+      "type"
     ],
     "integers": [
       "recvWindow"
@@ -502,17 +502,17 @@
       "product_symbol",
       "positionSide",
       "amount",
-      "type_",
+      "type",
       "recvWindow"
     ],
     "required": [
       "product_symbol",
       "positionSide",
       "amount",
-      "type_"
+      "type"
     ],
     "integers": [
-      "type_",
+      "type",
       "recvWindow"
     ],
     "input_schema": {

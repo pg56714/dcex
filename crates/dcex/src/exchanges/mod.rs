@@ -486,7 +486,7 @@ impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
     }
 
     pub fn fee_info(self, value: impl ToString) -> Self {
-        self.param("fee_info", value)
+        self.param("fee-info", value)
     }
 
     pub fn fee_ten_bp(self, value: impl ToString) -> Self {
@@ -1243,10 +1243,6 @@ impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
 
     pub fn trans_id(self, value: impl ToString) -> Self {
         self.param("transId", value)
-    }
-
-    pub fn transfer_type(self, value: impl ToString) -> Self {
-        self.param("transfer_type", value)
     }
 
     pub fn trigger_by(self, value: impl ToString) -> Self {

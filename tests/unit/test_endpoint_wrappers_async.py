@@ -121,7 +121,7 @@ async def test_async_extended_place_limit_order_uses_native_signing_params() -> 
     assert calls[0]["path"] == "place_limit_order"
     params = dict(calls[0]["query"])
     assert params["type"] == "LIMIT"
-    assert params["post_only"] == "true"
+    assert params["postOnly"] == "true"
     assert params["qty"] == "0.001"
 
 

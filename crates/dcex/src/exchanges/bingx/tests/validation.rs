@@ -19,7 +19,7 @@ fn spot_cancel_replace_uses_official_path_and_required_fields() {
                     ("cancelOrderId".into(), "123".into()),
                     ("cancelReplaceMode".into(), "STOP_ON_FAILURE".into()),
                     ("side".into(), "BUY".into()),
-                    ("type_".into(), "LIMIT".into()),
+                    ("type".into(), "LIMIT".into()),
                     ("quantity".into(), "0.1".into()),
                     ("price".into(), "50000".into()),
                 ],
@@ -52,7 +52,7 @@ fn spot_cancel_all_after_validates_timeout_and_uses_signed_route() {
             .private_request(
                 "set_spot_cancel_all_after",
                 vec![
-                    ("type_".into(), "ACTIVATE".into()),
+                    ("type".into(), "ACTIVATE".into()),
                     ("timeOut".into(), "30".into()),
                 ],
             )
@@ -75,7 +75,7 @@ fn spot_cancel_all_after_validates_timeout_and_uses_signed_route() {
                 .private_request(
                     "set_spot_cancel_all_after",
                     vec![
-                        ("type_".into(), "ACTIVATE".into()),
+                        ("type".into(), "ACTIVATE".into()),
                         ("timeOut".into(), "9".into()),
                     ],
                 )

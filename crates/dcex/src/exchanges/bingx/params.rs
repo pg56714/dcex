@@ -53,7 +53,6 @@ impl BingxParams {
             .iter()
             .filter(|(key, _)| keys.contains(&key.as_str()))
             .cloned()
-            .map(|(key, value)| (normalize_key(&key).to_string(), value))
             .collect()
     }
 
@@ -64,13 +63,6 @@ impl BingxParams {
             )));
         }
         Ok(())
-    }
-}
-
-pub(super) fn normalize_key(key: &str) -> &str {
-    match key {
-        "type_" => "type",
-        _ => key,
     }
 }
 

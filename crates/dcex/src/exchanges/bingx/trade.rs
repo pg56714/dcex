@@ -135,7 +135,7 @@ impl BingxClient {
                     "cancelRestrictions",
                     "cancelReplaceMode",
                     "side",
-                    "type_",
+                    "type",
                     "timeInForce",
                     "quantity",
                     "quoteOrderQty",
@@ -158,7 +158,7 @@ impl BingxClient {
                     &["STOP_ON_FAILURE", "ALLOW_FAILURE"],
                 )?;
                 // Live cancelReplace rejects anything but an empty, IOC or POC timeInForce.
-                validate_spot_order(params, params.required("type_")?, &["IOC", "POC"])?;
+                validate_spot_order(params, params.required("type")?, &["IOC", "POC"])?;
                 let mut query = params.only(&[
                     "cancelOrderId",
                     "cancelClientOrderID",
@@ -174,7 +174,7 @@ impl BingxClient {
                 ]);
                 self.push_required_symbol(&mut query, params)?;
                 query.push(("side".into(), normalize_side(params.required("side")?)?));
-                query.push(("type".into(), params.required("type_")?.to_string()));
+                query.push(("type".into(), params.required("type")?.to_string()));
                 self.private_post(SPOT_CANCEL_REPLACE, query).await
             }
             "cancel_spot_order" => {
@@ -183,13 +183,11 @@ impl BingxClient {
                     "symbol",
                     "orderId",
                     "clientOrderID",
-                    "clientOrderId",
                     "cancelRestrictions",
                     "recvWindow",
                 ])?;
-                require_one_identifier(params, &["orderId", "clientOrderID", "clientOrderId"])?;
+                require_one_identifier(params, &["orderId", "clientOrderID"])?;
                 validate_client_id(params, "clientOrderID", false)?;
-                validate_client_id(params, "clientOrderId", false)?;
                 validate_enum(
                     params,
                     "cancelRestrictions",
@@ -202,7 +200,6 @@ impl BingxClient {
                     "cancelRestrictions",
                     "recvWindow",
                 ]);
-                push_parameter_alias(&mut query, params, "clientOrderID", "clientOrderId");
                 self.push_required_symbol(&mut query, params)?;
                 self.private_post(SPOT_CANCEL_ORDER, query).await
             }
@@ -218,10 +215,10 @@ impl BingxClient {
                 self.private_post(SPOT_CANCEL_OPEN_ORDERS, query).await
             }
             "set_spot_cancel_all_after" => {
-                params.ensure_allowed(&["type_", "timeOut", "recvWindow"])?;
-                validate_enum(params, "type_", &["ACTIVATE", "CLOSE"])?;
+                params.ensure_allowed(&["type", "timeOut", "recvWindow"])?;
+                validate_enum(params, "type", &["ACTIVATE", "CLOSE"])?;
                 validate_u64_range(params, "recvWindow", 1, 5000)?;
-                let action = params.required("type_")?;
+                let action = params.required("type")?;
                 let mut query = vec![("type".to_string(), action.to_string())];
                 if action == "ACTIVATE" {
                     params.required("timeOut")?;
@@ -241,15 +238,12 @@ impl BingxClient {
                     "symbol",
                     "orderId",
                     "clientOrderID",
-                    "clientOrderId",
                     "recvWindow",
                 ])?;
-                require_one_identifier(params, &["orderId", "clientOrderID", "clientOrderId"])?;
+                require_one_identifier(params, &["orderId", "clientOrderID"])?;
                 validate_client_id(params, "clientOrderID", false)?;
-                validate_client_id(params, "clientOrderId", false)?;
                 validate_u64_range(params, "recvWindow", 1, 5000)?;
                 let mut query = params.only(&["orderId", "clientOrderID", "recvWindow"]);
-                push_parameter_alias(&mut query, params, "clientOrderID", "clientOrderId");
                 self.push_required_symbol(&mut query, params)?;
                 self.private_get(SPOT_QUERY_ORDER, query).await
             }
@@ -270,7 +264,7 @@ impl BingxClient {
                     "pageIndex",
                     "pageSize",
                     "status",
-                    "type_",
+                    "type",
                     "recvWindow",
                 ])?;
                 validate_u64_range(params, "pageIndex", 1, 10_000)?;
@@ -279,7 +273,7 @@ impl BingxClient {
                 validate_time_range(params, "startTime", "endTime", None)?;
                 validate_page_window(params, "pageIndex", "pageSize", 1, 100, 10_000)?;
                 validate_enum(params, "status", &["FILLED", "CANCELED", "FAILED"])?;
-                validate_enum(params, "type_", SPOT_ORDER_TYPES)?;
+                validate_enum(params, "type", SPOT_ORDER_TYPES)?;
                 validate_u64_range(params, "recvWindow", 1, 5000)?;
                 let mut query = params.only(&[
                     "orderId",
@@ -291,7 +285,6 @@ impl BingxClient {
                     "type",
                     "recvWindow",
                 ]);
-                push_parameter_alias(&mut query, params, "type", "type_");
                 self.push_optional_symbol(&mut query, params)?;
                 if !query.iter().any(|(key, _)| key == "pageIndex") {
                     query.push(("pageIndex".to_string(), "1".to_string()));
@@ -475,10 +468,10 @@ impl BingxClient {
                     .await
             }
             "cancel_swap_all_orders" => {
-                params.ensure_allowed(&["product_symbol", "symbol", "type_", "recvWindow"])?;
-                validate_enum(params, "type_", SWAP_ORDER_TYPES)?;
+                params.ensure_allowed(&["product_symbol", "symbol", "type", "recvWindow"])?;
+                validate_enum(params, "type", SWAP_ORDER_TYPES)?;
                 validate_u64_range(params, "recvWindow", 1, 5000)?;
-                let mut query = params.only(&["type_", "recvWindow"]);
+                let mut query = params.only(&["type", "recvWindow"]);
                 self.push_optional_symbol(&mut query, params)?;
                 self.private_delete(SWAP_CANCEL_ALL_OPEN_ORDERS, query)
                     .await
@@ -522,10 +515,10 @@ impl BingxClient {
                 self.private_get(SWAP_PLACE_ORDER, query).await
             }
             "get_open_orders" => {
-                params.ensure_allowed(&["product_symbol", "symbol", "type_", "recvWindow"])?;
-                validate_enum(params, "type_", SWAP_ORDER_TYPES)?;
+                params.ensure_allowed(&["product_symbol", "symbol", "type", "recvWindow"])?;
+                validate_enum(params, "type", SWAP_ORDER_TYPES)?;
                 validate_u64_range(params, "recvWindow", 1, 5000)?;
-                let mut query = params.only(&["type_", "recvWindow"]);
+                let mut query = params.only(&["type", "recvWindow"]);
                 self.push_optional_symbol(&mut query, params)?;
                 self.private_get(SWAP_QUERY_ALL_OPEN_ORDERS, query).await
             }
@@ -640,18 +633,16 @@ impl BingxClient {
             "product_symbol",
             "symbol",
             "side",
-            "type_",
+            "type",
             "timeInForce",
             "quantity",
             "quoteOrderQty",
             "price",
             "stopPrice",
             "newClientOrderId",
-            "clientOrderId",
             "recvWindow",
         ])?;
         let mut query = params.only(SPOT_ORDER_OPTIONAL_KEYS);
-        push_parameter_alias(&mut query, params, "newClientOrderId", "clientOrderId");
         self.push_required_symbol(&mut query, params)?;
         let side = match side_override {
             Some(side) => side.to_string(),
@@ -659,7 +650,7 @@ impl BingxClient {
         };
         let order_type = match type_override {
             Some(order_type) => order_type,
-            None => params.required("type_")?,
+            None => params.required("type")?,
         };
         validate_spot_order(params, order_type, TIME_IN_FORCE_VALUES)?;
         query.push(("side".to_string(), side));
@@ -682,7 +673,7 @@ impl BingxClient {
             "product_symbol",
             "symbol",
             "side",
-            "type_",
+            "type",
             "positionSide",
             "reduceOnly",
             "price",
@@ -709,7 +700,7 @@ impl BingxClient {
         self.push_required_symbol(&mut query, params)?;
         let order_type = match defaults.order_type {
             Some(order_type) => order_type,
-            None => params.required("type_")?,
+            None => params.required("type")?,
         };
         let side = match defaults.side {
             Some(side) => side.to_string(),
@@ -746,7 +737,7 @@ impl BingxClient {
             "cancelOrderId",
             "cancelClientOrderId",
             "cancelReplaceMode",
-            "type_",
+            "type",
             "side",
             "positionSide",
             "reduceOnly",
@@ -779,14 +770,14 @@ impl BingxClient {
             &["ONLY_NEW", "ONLY_PENDING", "ONLY_PARTIALLY_FILLED"],
         )?;
         validate_client_id(params, "cancelClientOrderId", false)?;
-        validate_swap_order(params, params.required("type_")?)?;
+        validate_swap_order(params, params.required("type")?)?;
         let mut query = params.only(SWAP_REPLACE_OPTIONAL_KEYS);
         self.push_required_symbol(&mut query, params)?;
         query.push((
             "cancelReplaceMode".to_string(),
             params.required("cancelReplaceMode")?.to_string(),
         ));
-        query.push(("type".to_string(), params.required("type_")?.to_string()));
+        query.push(("type".to_string(), params.required("type")?.to_string()));
         query.push((
             "side".to_string(),
             normalize_side(params.required("side")?)?,
@@ -841,7 +832,6 @@ pub(in crate::exchanges::bingx) fn validate_spot_order(
     }
     validate_enum(params, "timeInForce", time_in_force)?;
     validate_client_id(params, "newClientOrderId", true)?;
-    validate_client_id(params, "clientOrderId", true)?;
     validate_u64_range(params, "recvWindow", 1, 5000)?;
     for key in ["quantity", "quoteOrderQty", "price", "stopPrice"] {
         validate_positive_number(params, key)?;
@@ -879,11 +869,7 @@ pub(in crate::exchanges::bingx) fn validate_swap_order(
         "workingType",
         &["MARK_PRICE", "CONTRACT_PRICE", "INDEX_PRICE"],
     )?;
-    validate_enum(
-        params,
-        "stopGuaranteed",
-        &["true", "false", "True", "False", "cutfee"],
-    )?;
+    validate_enum(params, "stopGuaranteed", &["true", "false", "cutfee"])?;
     validate_bool(params, "reduceOnly")?;
     validate_bool(params, "closePosition")?;
     validate_client_id(params, "clientOrderId", false)?;
@@ -981,18 +967,6 @@ pub(in crate::exchanges::bingx) fn validate_list_size(
     )))
 }
 
-pub(in crate::exchanges::bingx) fn push_parameter_alias(
-    query: &mut Vec<(String, String)>,
-    params: &BingxParams,
-    official_key: &str,
-    legacy_key: &str,
-) {
-    if query.iter().any(|(key, _)| key == official_key) {
-        return;
-    }
-    push_optional(query, official_key, params.get(legacy_key));
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1006,25 +980,5 @@ mod tests {
         let query = params.only(SPOT_ORDER_OPTIONAL_KEYS);
         assert!(query.contains(&("stopPrice".to_string(), "90".to_string())));
         assert!(query.contains(&("newClientOrderId".to_string(), "new-id".to_string())));
-    }
-
-    #[test]
-    pub(in crate::exchanges::bingx) fn maps_legacy_client_id_to_official_key() {
-        let params =
-            BingxParams::from_pairs(vec![("clientOrderId".to_string(), "legacy-id".to_string())]);
-        let mut query = Vec::new();
-        push_parameter_alias(&mut query, &params, "clientOrderID", "clientOrderId");
-        assert_eq!(
-            query,
-            vec![("clientOrderID".to_string(), "legacy-id".to_string())]
-        );
-    }
-
-    #[test]
-    pub(in crate::exchanges::bingx) fn maps_python_order_type_alias_to_official_key() {
-        let params = BingxParams::from_pairs(vec![("type_".to_string(), "LIMIT".to_string())]);
-        let mut query = Vec::new();
-        push_parameter_alias(&mut query, &params, "type", "type_");
-        assert_eq!(query, vec![("type".to_string(), "LIMIT".to_string())]);
     }
 }

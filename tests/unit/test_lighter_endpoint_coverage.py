@@ -661,7 +661,7 @@ WRAPPER_CASES = [
         "public",
         "get_trades",
         ("timestamp", 10),
-        [("sort_by", "timestamp"), ("limit", "10"), ("market_id", "1"), ("type_", "trade")],
+        [("sort_by", "timestamp"), ("limit", "10"), ("market_id", "1"), ("type", "trade")],
         "/api/v1/trades",
         market_id=1,
         type_="trade",
@@ -789,7 +789,7 @@ WRAPPER_CASES = [
         "private",
         "get_export",
         ("trade",),
-        [("type_", "trade"), ("market_id", "1")],
+        [("type", "trade"), ("market_id", "1")],
         "/api/v1/export",
         market_id=1,
     ),
@@ -815,7 +815,7 @@ WRAPPER_CASES = [
         "private",
         "get_transfer_history",
         (),
-        [("type_", "L2Transfer"), ("type_", "L2BurnShares")],
+        [("type", "L2Transfer"), ("type", "L2BurnShares")],
         "/api/v1/transfer/history",
         type_=["L2Transfer", "L2BurnShares"],
     ),
@@ -1001,7 +1001,6 @@ def _public_methods(cls: type) -> set[str]:
     } - NON_ENDPOINT_METHODS
 
 
-
 COMPLETION_CASES = json.loads(
     (Path(__file__).parents[1] / "fixtures/lighter_request_cases.json").read_text(encoding="utf-8")
 )
@@ -1009,6 +1008,7 @@ WRAPPER_CASES.extend(
     _case(x["kind"], x["name"], (), [tuple(p) for p in x["params"]], x["path"], **x["kwargs"])
     for x in COMPLETION_CASES
 )
+
 
 def test_every_lighter_wrapper_has_a_coverage_case() -> None:
     """New sync or async wrappers must be added to this offline coverage table."""
@@ -1100,6 +1100,7 @@ def test_wrapper_params_reach_official_route(case: WrapperCase) -> None:
     assert len(requests) == 1
     assert requests[0]["method"] == EXPECTED_VERBS[case.method]
     from tests.unit.wire_contracts import assert_wire_contract
+
     assert_wire_contract("lighter", case.method, requests[0])
     url = urlsplit(requests[0]["path"])
     query = parse_qsl(url.query)

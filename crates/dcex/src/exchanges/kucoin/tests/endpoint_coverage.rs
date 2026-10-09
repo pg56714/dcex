@@ -1639,7 +1639,7 @@ const PRIVATE_CASES: &[Case] = &[
     private(
         "get_transfer_quotas",
         Host::Spot,
-        &[("currency", "USDT"), ("account_type", "MAIN")],
+        &[("currency", "USDT"), ("type", "MAIN")],
         "GET /api/v1/accounts/transferable",
     ),
     private(

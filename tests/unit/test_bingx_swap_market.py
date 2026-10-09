@@ -30,8 +30,8 @@ def test_sync_swap_market_and_commission_wrappers() -> None:
     ]
     assert calls[1].args[1] == [
         ("product_symbol", "BTC-USDT"),
-        ("start_time", "1000"),
-        ("end_time", "2000"),
+        ("startTime", "1000"),
+        ("endTime", "2000"),
         ("limit", "10"),
     ]
     account = object.__new__(AccountHTTP)

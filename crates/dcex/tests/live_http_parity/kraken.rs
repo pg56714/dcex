@@ -105,7 +105,7 @@ async fn kraken_private_read_live_parity() -> dcex::Result<()> {
             ),
             Case::new(
                 "get_spot_trade_volume",
-                &[("pair", "XBTUSDT"), ("fee_info", "true")],
+                &[("pair", "XBTUSDT"), ("fee-info", "true")],
             ),
             Case::new("get_spot_open_orders", &[]),
             Case::new("get_spot_closed_orders", &[]),

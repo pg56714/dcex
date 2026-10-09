@@ -310,7 +310,7 @@ fn public_info_routes_match_official_paths() {
             "get_candles",
             &[
                 ("market", "BTC-USD"),
-                ("candle_type", "index-prices"),
+                ("candleType", "index-prices"),
                 ("interval", "P1D"),
                 ("limit", "1"),
             ],
@@ -477,7 +477,7 @@ fn private_order_routes_match_official_paths() {
         ),
         private(
             "get_order_by_external_id",
-            &[("external_id", "cid-1")],
+            &[("externalId", "cid-1")],
             "GET",
             "/api/v1/user/orders/external/cid-1",
         ),
@@ -583,7 +583,7 @@ fn auto_signed_limit_order_fetches_market_and_fee_then_posts() {
         ("side", "BUY"),
         ("qty", "0.001"),
         ("price", "10000"),
-        ("post_only", "true"),
+        ("postOnly", "true"),
         ("nonce", "123"),
     ]);
     let (result, requests) = run(Kind::Private, "place_limit_order", params);
@@ -667,7 +667,7 @@ fn unsafe_requests_are_rejected_before_any_request() {
             ("side", "BUY"),
             ("qty", "1"),
             ("price", "1"),
-            ("time_in_force", "FOK"),
+            ("timeInForce", "FOK"),
         ]),
     );
     // Both market aliases at once are ambiguous.
@@ -773,7 +773,8 @@ const MARKET_JSON: &str = r#"{"name":"BTC-USD","l2Config":{"collateralId":"0x555
 
 #[test]
 fn market_json_skips_markets_lookup_when_signing() {
-    for key in ["market_json", "marketJson"] {
+    {
+        let key = "market_json";
         let params = pairs(&[
             ("market", "BTC-USD"),
             ("side", "BUY"),
@@ -839,10 +840,7 @@ fn market_json_for_another_market_or_duplicated_is_rejected_offline() {
     assert_rejected_offline(
         Kind::Private,
         "place_limit_order",
-        order(
-            "BTC-USD",
-            &[("market_json", MARKET_JSON), ("marketJson", MARKET_JSON)],
-        ),
+        order("BTC-USD", &[("marketJson", MARKET_JSON)]),
     );
 }
 

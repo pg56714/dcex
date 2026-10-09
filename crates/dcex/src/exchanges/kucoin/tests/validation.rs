@@ -100,7 +100,7 @@ async fn current_required_and_conditional_fields_are_rejected_before_transport()
         (
             "flex_transfer",
             vec![
-                ("transfer_type".to_string(), "PARENT_TO_SUB".to_string()),
+                ("type".to_string(), "PARENT_TO_SUB".to_string()),
                 ("currency".to_string(), "USDT".to_string()),
                 ("amount".to_string(), "1".to_string()),
                 ("fromAccountType".to_string(), "MARGIN_V2".to_string()),

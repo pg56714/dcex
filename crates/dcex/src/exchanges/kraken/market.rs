@@ -137,14 +137,16 @@ impl KrakenClient {
             "get_futures_tickers" => &["contractType", "symbol"],
             "get_futures_orderbook" => &["symbol"],
             "get_futures_public_trades" => &["symbol", "lastTime"],
-            "get_futures_kline" => &["from", "from_", "to", "count"],
+            "get_futures_kline" => &["from", "to", "count"],
             _ => unreachable!("method was validated above"),
         };
-        params.retain(|(key, _)| allowed_params.contains(&key.as_str()));
-        for (key, _) in &mut params {
-            if key == "from_" {
-                *key = "from".to_string();
-            }
+        if let Some((key, _)) = params
+            .iter()
+            .find(|(key, _)| !allowed_params.contains(&key.as_str()))
+        {
+            return Err(DcexError::InvalidInput(format!(
+                "unsupported Kraken {method_name} parameter: {key}"
+            )));
         }
         validate_public_params(method_name, &params)?;
 

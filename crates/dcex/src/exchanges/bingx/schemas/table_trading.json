@@ -5,14 +5,14 @@
     "verb": "POST",
     "public": false,
     "fields": [
-      "type_",
+      "type",
       "product_symbol",
       "triggerPrice",
       "workingType",
       "recvWindow"
     ],
     "required": [
-      "type_",
+      "type",
       "product_symbol"
     ],
     "integers": [

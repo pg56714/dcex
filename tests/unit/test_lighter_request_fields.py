@@ -133,7 +133,7 @@ def test_lighter_native_params_expand_multi_values_and_enums() -> None:
     assert HTTPManager._native_params(
         type_=[TransferType.ALL, TransferType.L2_TRANSFER],
         enabled=True,
-    ) == [("type_", "all"), ("type_", "L2Transfer"), ("enabled", "true")]
+    ) == [("type", "all"), ("type", "L2Transfer"), ("enabled", "true")]
 
 
 def test_lighter_current_public_query_fields_and_no_trades_auth_query() -> None:
@@ -181,8 +181,8 @@ def test_lighter_transfer_history_uses_repeated_type_and_position_funding_is_pub
             "get_transfer_history",
             [
                 ("account_index", "12"),
-                ("type_", "all"),
-                ("type_", "L2Transfer"),
+                ("type", "all"),
+                ("type", "L2Transfer"),
             ],
         )
         client.private_request_json(

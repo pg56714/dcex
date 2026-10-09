@@ -184,7 +184,7 @@ impl LighterClient {
             "get_export" => {
                 params.ensure_allowed(&[
                     "account_index",
-                    "type_",
+                    "type",
                     "market_id",
                     "product_symbol",
                     "start_timestamp",
@@ -197,7 +197,7 @@ impl LighterClient {
                 ])?;
                 self.validate_private_account(params)?;
                 validate_market_selector(params, false)?;
-                params.required_one_of("type_", &["funding", "trade"])?;
+                params.required_one_of("type", &["funding", "trade"])?;
                 params.optional_one_of("side", &["all", "long", "short"])?;
                 params.optional_one_of("role", &["all", "maker", "taker"])?;
                 params.optional_one_of(
@@ -254,8 +254,8 @@ impl LighterClient {
             }
             "get_transfer_history" => {
                 params.ensure_allowed_with_repeated(
-                    &["account_index", "cursor", "type_", "authorization"],
-                    &["type_"],
+                    &["account_index", "cursor", "type", "authorization"],
+                    &["type"],
                 )?;
                 self.validate_private_account(params)?;
                 const TYPES: &[&str] = &[
@@ -266,10 +266,10 @@ impl LighterClient {
                     "L2StakeAssets",
                     "L2UnstakeAssets",
                 ];
-                for value in params.values("type_") {
+                for value in params.values("type") {
                     if !TYPES.contains(&value) {
                         return Err(DcexError::InvalidInput(format!(
-                            "invalid Lighter type_: {value}; expected one of {}",
+                            "invalid Lighter type: {value}; expected one of {}",
                             TYPES.join(", ")
                         )));
                     }
@@ -400,7 +400,7 @@ mod tests {
         )
         .expect("client");
         let params = LighterParams::from_pairs(vec![
-            ("type_".to_string(), "trade".to_string()),
+            ("type".to_string(), "trade".to_string()),
             ("authorization".to_string(), "token".to_string()),
         ]);
 

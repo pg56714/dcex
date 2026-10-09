@@ -100,8 +100,8 @@ impl BingxClient {
             validate_u64_range(params, "limit", 1, 500)?;
         }
         if name == "reverse_swap_position" {
-            validate_enum(params, "type_", &["Reverse", "TriggerReverse"])?;
-            if params.get("type_") == Some("TriggerReverse") {
+            validate_enum(params, "type", &["Reverse", "TriggerReverse"])?;
+            if params.get("type") == Some("TriggerReverse") {
                 params.required("triggerPrice")?;
                 params.required("workingType")?;
             }
@@ -184,14 +184,14 @@ impl BingxClient {
             require_one_identifier(params, &["orderListId", "clientOrderId"])?;
         }
         if name == "adjust_coin_swap_position_margin" {
-            validate_enum(params, "type_", &["1", "2"])?;
+            validate_enum(params, "type", &["1", "2"])?;
             validate_enum(params, "positionSide", &["LONG", "SHORT"])?;
         }
         if name == "place_coin_swap_order" {
-            let kind = params.required("type_")?;
+            let kind = params.required("type")?;
             validate_enum(
                 params,
-                "type_",
+                "type",
                 &[
                     "MARKET",
                     "LIMIT",

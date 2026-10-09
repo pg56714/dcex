@@ -322,7 +322,7 @@ fn spot_and_usdm_trading_routes_match_official_paths() {
             &[
                 ("product_symbol", SPOT),
                 ("side", "BUY"),
-                ("type_", "LIMIT"),
+                ("type", "LIMIT"),
                 ("quantity", "1"),
                 ("price", "100"),
                 ("timeInForce", "GTC"),
@@ -335,7 +335,7 @@ fn spot_and_usdm_trading_routes_match_official_paths() {
             &[
                 ("product_symbol", SWAP),
                 ("side", "SELL"),
-                ("type_", "MARKET"),
+                ("type", "MARKET"),
                 ("quantity", "1"),
             ],
             "POST",
@@ -346,7 +346,7 @@ fn spot_and_usdm_trading_routes_match_official_paths() {
             &[
                 ("product_symbol", SPOT),
                 ("side", "BUY"),
-                ("type_", "MARKET"),
+                ("type", "MARKET"),
                 ("quantity", "1"),
             ],
             "POST",
@@ -357,7 +357,7 @@ fn spot_and_usdm_trading_routes_match_official_paths() {
             &[
                 ("product_symbol", SWAP),
                 ("side", "BUY"),
-                ("type_", "MARKET"),
+                ("type", "MARKET"),
                 ("quantity", "1"),
             ],
             "POST",
@@ -609,7 +609,7 @@ fn spot_and_usdm_trading_routes_match_official_paths() {
             &[
                 ("product_symbol", SWAP),
                 ("side", "SELL"),
-                ("type_", "STOP_MARKET"),
+                ("type", "STOP_MARKET"),
                 ("quantity", "1"),
                 ("triggerPrice", "90"),
             ],
@@ -2015,7 +2015,7 @@ fn portfolio_margin_trading_routes_match_official_paths() {
             &[
                 ("product_symbol", SWAP),
                 ("side", "BUY"),
-                ("type_", "MARKET"),
+                ("type", "MARKET"),
                 ("quantity", "1"),
             ],
             "POST",
@@ -2080,7 +2080,7 @@ fn portfolio_margin_trading_routes_match_official_paths() {
             &[
                 ("product_symbol", SWAP),
                 ("side", "SELL"),
-                ("type_", "STOP_MARKET"),
+                ("type", "STOP_MARKET"),
                 ("quantity", "1"),
                 ("triggerPrice", "90"),
             ],
@@ -2122,7 +2122,7 @@ fn portfolio_margin_trading_routes_match_official_paths() {
             &[
                 ("product_symbol", CM),
                 ("side", "BUY"),
-                ("type_", "LIMIT"),
+                ("type", "LIMIT"),
                 ("quantity", "1"),
                 ("price", "100"),
                 ("timeInForce", "GTC"),
@@ -2237,7 +2237,7 @@ fn portfolio_margin_trading_routes_match_official_paths() {
             &[
                 ("product_symbol", SPOT),
                 ("side", "BUY"),
-                ("type_", "MARKET"),
+                ("type", "MARKET"),
                 ("quantity", "1"),
             ],
             "POST",

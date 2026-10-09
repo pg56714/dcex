@@ -134,8 +134,8 @@ class MarketHTTP(HTTPManager):
             self._native_params(
                 product_symbol=product_symbol,
                 interval=interval,
-                start_time=start_time,
-                end_time=end_time,
+                startTime=start_time,
+                endTime=end_time,
                 limit=limit,
             ),
         )
@@ -154,8 +154,8 @@ class MarketHTTP(HTTPManager):
             self._native_params(
                 product_symbol=product_symbol,
                 interval=interval,
-                start_time=start_time,
-                end_time=end_time,
+                startTime=start_time,
+                endTime=end_time,
                 limit=limit,
             ),
         )
@@ -174,8 +174,8 @@ class MarketHTTP(HTTPManager):
             self._native_params(
                 product_symbol=product_symbol,
                 interval=interval,
-                start_time=start_time,
-                end_time=end_time,
+                startTime=start_time,
+                endTime=end_time,
                 limit=limit,
             ),
         )
@@ -201,8 +201,8 @@ class MarketHTTP(HTTPManager):
             self._native_params(
                 product_symbol=product_symbol,
                 interval=interval,
-                start_time=start_time,
-                end_time=end_time,
+                startTime=start_time,
+                endTime=end_time,
                 limit=limit,
             ),
         )
@@ -235,8 +235,8 @@ class MarketHTTP(HTTPManager):
             "get_swap_funding_rate",
             self._native_params(
                 product_symbol=product_symbol,
-                start_time=start_time,
-                end_time=end_time,
+                startTime=start_time,
+                endTime=end_time,
                 limit=limit,
             ),
         )

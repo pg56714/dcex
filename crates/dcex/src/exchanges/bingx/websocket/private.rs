@@ -189,7 +189,7 @@ impl BingxPrivateWebSocket {
         self.http_client
             .private_request(
                 "keep_alive_listen_key",
-                vec![("listen_key".to_string(), listen_key.to_string())],
+                vec![("listenKey".to_string(), listen_key.to_string())],
             )
             .await?;
         Ok(listen_key.to_string())
@@ -200,7 +200,7 @@ impl BingxPrivateWebSocket {
             self.http_client
                 .private_request(
                     "close_listen_key",
-                    vec![("listen_key".to_string(), listen_key)],
+                    vec![("listenKey".to_string(), listen_key)],
                 )
                 .await?;
         }

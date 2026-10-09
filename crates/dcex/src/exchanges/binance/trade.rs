@@ -48,7 +48,7 @@ impl BinanceClient {
             vec![
                 ("product_symbol".to_string(), product_symbol.to_string()),
                 ("side".to_string(), side.to_string()),
-                ("type_".to_string(), order_type.to_string()),
+                ("type".to_string(), order_type.to_string()),
             ],
         )
     }
@@ -101,7 +101,7 @@ impl BinanceClient {
             vec![
                 ("product_symbol".to_string(), product_symbol.to_string()),
                 ("side".to_string(), side.to_string()),
-                ("type_".to_string(), order_type.to_string()),
+                ("type".to_string(), order_type.to_string()),
             ],
         )
     }
@@ -150,7 +150,7 @@ impl BinanceClient {
             vec![
                 ("product_symbol".to_string(), product_symbol.to_string()),
                 ("side".to_string(), side.to_string()),
-                ("type_".to_string(), order_type.to_string()),
+                ("type".to_string(), order_type.to_string()),
                 ("algoType".to_string(), algo_type.to_string()),
             ],
         )

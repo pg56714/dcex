@@ -17,8 +17,8 @@ impl BingxClient {
             "set_swap_cancel_all_after" => (
                 "/openApi/swap/v2/trade/cancelAllAfter",
                 true,
-                &["type_", "timeOut", "recvWindow"],
-                &["type_", "timeOut"],
+                &["type", "timeOut", "recvWindow"],
+                &["type", "timeOut"],
             ),
             "get_swap_open_order" => (
                 "/openApi/swap/v2/trade/openOrder",
@@ -61,10 +61,10 @@ impl BingxClient {
                     "amount",
                     "positionSide",
                     "positionId",
-                    "type_",
+                    "type",
                     "recvWindow",
                 ],
-                &["product_symbol", "amount", "type_"],
+                &["product_symbol", "amount", "type"],
             ),
             "amend_swap_order" => (
                 "/openApi/swap/v1/trade/amend",
@@ -308,10 +308,10 @@ impl BingxClient {
             require_one_identifier(params, &["orderId", "clientOrderId"])?;
         }
         if name == "adjust_swap_position_margin" {
-            validate_enum(params, "type_", &["1", "2"])?;
+            validate_enum(params, "type", &["1", "2"])?;
         }
         if name == "set_swap_cancel_all_after" {
-            validate_enum(params, "type_", &["ACTIVATE", "CLOSE"])?;
+            validate_enum(params, "type", &["ACTIVATE", "CLOSE"])?;
             validate_u64_range(params, "timeOut", 10, 120)?;
         }
         if name == "place_swap_twap_order" {

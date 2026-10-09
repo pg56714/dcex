@@ -20493,7 +20493,7 @@
       "get_transfer_history": {
         "type": "object",
         "properties": {
-          "type_": {
+          "type": {
             "type": "array",
             "items": {
               "type": "string"

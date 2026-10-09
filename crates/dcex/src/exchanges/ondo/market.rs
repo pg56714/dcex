@@ -176,7 +176,6 @@ impl OndoClient {
         let value = params
             .get("product_symbol")
             .or_else(|| params.get("market"))
-            .or_else(|| params.get("symbol"))
             .ok_or_else(|| {
                 DcexError::InvalidInput(
                     "missing required parameter: market or product_symbol".to_string(),

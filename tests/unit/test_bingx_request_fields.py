@@ -85,7 +85,7 @@ def test_sync_bingx_forwards_official_spot_fields() -> None:
 
     assert dict(calls[0]["query"]) == {
         "product_symbol": "BTC-USDT-SPOT",
-        "type_": "step2",
+        "type": "step2",
         "depth": "50",
     }
     assert dict(calls[1]["query"])["newClientOrderId"] == "client_1"
@@ -154,14 +154,13 @@ def test_native_bingx_uses_official_wire_fields() -> None:
         )
         client.private_request_json(
             "get_asset_transfer_records",
-            [("tranId", "123")],
+            [("transferId", "123")],
         )
 
     post_only = dict(parse_qsl(urlsplit(received.get_nowait()["path"]).query))
     transfer = dict(parse_qsl(urlsplit(received.get_nowait()["path"]).query))
     assert post_only["timeInForce"] == "PostOnly"
     assert transfer["transferId"] == "123"
-    assert "tranId" not in transfer
 
 
 def test_native_bingx_spot_v2_depth_uses_underscore_symbol() -> None:
@@ -172,7 +171,7 @@ def test_native_bingx_spot_v2_depth_uses_underscore_symbol() -> None:
             [
                 ("product_symbol", "BTC-USDT-SPOT"),
                 ("depth", "20"),
-                ("type_", "step1"),
+                ("type", "step1"),
             ],
         )
 
@@ -189,7 +188,7 @@ def test_native_bingx_accepts_current_swap_trigger_order_type() -> None:
                 ("product_symbol", "BTC-USDT"),
                 ("side", "BUY"),
                 ("positionSide", "BOTH"),
-                ("type_", "TRIGGER_MARKET"),
+                ("type", "TRIGGER_MARKET"),
                 ("quantity", "0.001"),
                 ("stopPrice", "100000"),
             ],
@@ -206,7 +205,7 @@ def test_native_bingx_accepts_current_swap_trigger_order_type() -> None:
         (
             "cancel_spot_order",
             [("product_symbol", "BTC-USDT-SPOT")],
-            "one of orderId, clientOrderID, clientOrderId is required",
+            "one of orderId, clientOrderID is required",
         ),
         (
             "cancel_swap_order",

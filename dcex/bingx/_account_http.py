@@ -161,9 +161,9 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
             "get_fund_flow",
             self._native_params(
                 product_symbol=product_symbol,
-                income_type=income_type,
-                start_time=start_time,
-                end_time=end_time,
+                incomeType=income_type,
+                startTime=start_time,
+                endTime=end_time,
                 limit=limit,
                 recvWindow=recv_window,
             ),
@@ -180,12 +180,12 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
         """Keep alive listen key."""
         return self._native_private(
             "keep_alive_listen_key",
-            self._native_params(listen_key=listen_key),
+            self._native_params(listenKey=listen_key),
         )
 
     def close_listen_key(self, listen_key: str) -> dict[str, Any]:
         """Close listen key."""
         return self._native_private(
             "close_listen_key",
-            self._native_params(listen_key=listen_key),
+            self._native_params(listenKey=listen_key),
         )

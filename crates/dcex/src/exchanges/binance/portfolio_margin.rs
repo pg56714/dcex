@@ -81,7 +81,7 @@ impl BinanceClient {
             vec![
                 ("product_symbol".into(), product_symbol.into()),
                 ("side".into(), side.into()),
-                ("type_".into(), order_type.into()),
+                ("type".into(), order_type.into()),
                 ("quantity".into(), quantity.into()),
             ],
         )
@@ -98,7 +98,7 @@ impl BinanceClient {
             vec![
                 ("product_symbol".into(), product_symbol.into()),
                 ("side".into(), side.into()),
-                ("type_".into(), order_type.into()),
+                ("type".into(), order_type.into()),
             ],
         )
     }
@@ -305,7 +305,7 @@ impl BinanceClient {
             vec![
                 ("product_symbol".into(), product_symbol.into()),
                 ("side".into(), side.into()),
-                ("type_".into(), order_type.into()),
+                ("type".into(), order_type.into()),
                 ("quantity".into(), quantity.into()),
             ],
         )
@@ -323,7 +323,7 @@ impl BinanceClient {
             vec![
                 ("product_symbol".into(), product_symbol.into()),
                 ("side".into(), side.into()),
-                ("type_".into(), order_type.into()),
+                ("type".into(), order_type.into()),
                 ("quantity".into(), quantity.into()),
             ],
         )
@@ -761,7 +761,7 @@ impl BinanceClient {
                 params.ensure_allowed(&[
                     "product_symbol",
                     "side",
-                    "type_",
+                    "type",
                     "positionSide",
                     "timeInForce",
                     "quantity",
@@ -780,7 +780,7 @@ impl BinanceClient {
                         "Binance PM side must be BUY or SELL".into(),
                     ));
                 }
-                let order_type = params.required("type_")?;
+                let order_type = params.required("type")?;
                 if !matches!(order_type, "LIMIT" | "MARKET") {
                     return Err(DcexError::InvalidInput(
                         "Binance PM UM wrapper supports LIMIT and MARKET orders".into(),
@@ -792,7 +792,7 @@ impl BinanceClient {
                     params.required("timeInForce")?;
                 }
                 params.optional_bool("reduceOnly")?;
-                let mut query = params.without(&["product_symbol", "type_"]);
+                let mut query = params.without(&["product_symbol", "type"]);
                 query.push(("type".into(), order_type.into()));
                 (HttpMethod::Post, PM_UM_ORDER, query)
             }
@@ -800,7 +800,7 @@ impl BinanceClient {
                 params.ensure_allowed(&[
                     "product_symbol",
                     "side",
-                    "type_",
+                    "type",
                     "positionSide",
                     "timeInForce",
                     "quantity",
@@ -825,7 +825,7 @@ impl BinanceClient {
                         "Binance PM algo side must be BUY or SELL".into(),
                     ));
                 }
-                let order_type = params.required("type_")?;
+                let order_type = params.required("type")?;
                 if !matches!(
                     order_type,
                     "STOP"
@@ -875,7 +875,7 @@ impl BinanceClient {
                 if matches!(order_type, "STOP" | "TAKE_PROFIT") {
                     positive_decimal(params.required("price")?, "price")?;
                 }
-                let mut query = params.without(&["product_symbol", "type_"]);
+                let mut query = params.without(&["product_symbol", "type"]);
                 query.push(("type".into(), order_type.into()));
                 query.push(("algoType".into(), "CONDITIONAL".into()));
                 (HttpMethod::Post, PM_UM_ALGO_ORDER, query)
@@ -1065,7 +1065,7 @@ impl BinanceClient {
                 params.ensure_allowed(&[
                     "product_symbol",
                     "side",
-                    "type_",
+                    "type",
                     "quantity",
                     "quoteOrderQty",
                     "positionSide",
@@ -1088,7 +1088,7 @@ impl BinanceClient {
                         "Binance PM side must be BUY or SELL".into(),
                     ));
                 }
-                let order_type = params.required("type_")?;
+                let order_type = params.required("type")?;
                 if !matches!(order_type, "LIMIT" | "MARKET") {
                     return Err(DcexError::InvalidInput(
                         "Binance PM CM/Margin wrapper supports LIMIT and MARKET orders".into(),
@@ -1106,7 +1106,7 @@ impl BinanceClient {
                 } else {
                     PM_MARGIN_ORDER
                 };
-                let mut query = params.without(&["product_symbol", "type_"]);
+                let mut query = params.without(&["product_symbol", "type"]);
                 query.push(("type".into(), order_type.into()));
                 (HttpMethod::Post, path, query)
             }

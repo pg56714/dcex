@@ -184,23 +184,25 @@ impl BingxClient {
                 params.ensure_allowed(&[
                     "product_symbol",
                     "symbol",
-                    "income_type",
-                    "start_time",
-                    "end_time",
+                    "incomeType",
+                    "startTime",
+                    "endTime",
                     "limit",
                     "recvWindow",
                 ])?;
-                validate_enum(params, "income_type", INCOME_TYPES)?;
+                validate_enum(params, "incomeType", INCOME_TYPES)?;
                 validate_u64_range(params, "limit", 1, 1000)?;
-                validate_time_range(params, "start_time", "end_time", None)?;
+                validate_time_range(params, "startTime", "endTime", None)?;
                 validate_recv_window(params)?;
                 let mut query = Vec::new();
                 self.push_optional_symbol(&mut query, params)?;
-                push_optional(&mut query, "incomeType", params.get("income_type"));
-                push_optional(&mut query, "startTime", params.get("start_time"));
-                push_optional(&mut query, "endTime", params.get("end_time"));
-                push_optional(&mut query, "limit", params.get("limit"));
-                push_optional(&mut query, "recvWindow", params.get("recvWindow"));
+                query.extend(params.only(&[
+                    "incomeType",
+                    "startTime",
+                    "endTime",
+                    "limit",
+                    "recvWindow",
+                ]));
                 self.private_get(SWAP_FUND_FLOW, query).await
             }
             "get_listen_key" => {
@@ -209,26 +211,14 @@ impl BingxClient {
                     .await
             }
             "keep_alive_listen_key" => {
-                params.ensure_allowed(&["listen_key"])?;
-                self.private_put(
-                    SWAP_LISTEN_KEY,
-                    vec![(
-                        "listenKey".to_string(),
-                        params.required("listen_key")?.to_string(),
-                    )],
-                )
-                .await
+                params.ensure_allowed(&["listenKey"])?;
+                self.private_put(SWAP_LISTEN_KEY, params.only(&["listenKey"]))
+                    .await
             }
             "close_listen_key" => {
-                params.ensure_allowed(&["listen_key"])?;
-                self.private_delete(
-                    SWAP_LISTEN_KEY,
-                    vec![(
-                        "listenKey".to_string(),
-                        params.required("listen_key")?.to_string(),
-                    )],
-                )
-                .await
+                params.ensure_allowed(&["listenKey"])?;
+                self.private_delete(SWAP_LISTEN_KEY, params.only(&["listenKey"]))
+                    .await
             }
             _ => return Ok(None),
         };

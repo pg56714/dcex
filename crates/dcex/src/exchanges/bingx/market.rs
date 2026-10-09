@@ -83,19 +83,16 @@ impl BingxClient {
             "get_orderbook" => self.depth_get(SWAP_ORDERBOOK, &params, "limit", None).await,
             "get_spot_orderbook" => self.depth_get(SPOT_ORDERBOOK, &params, "limit", None).await,
             "get_spot_orderbook_v2" => {
-                params.ensure_allowed(&["product_symbol", "symbol", "limit", "depth", "type_"])?;
-                let type_ = params.get("type_").unwrap_or("step0").to_string();
+                params.ensure_allowed(&["product_symbol", "symbol", "depth", "type"])?;
+                let type_ = params.get("type").unwrap_or("step0").to_string();
                 validate_enum(
                     &params,
-                    "type_",
+                    "type",
                     &["step0", "step1", "step2", "step3", "step4", "step5"],
                 )?;
-                let depth = params
-                    .get("depth")
-                    .or_else(|| params.get("limit"))
-                    .ok_or_else(|| {
-                        DcexError::InvalidInput("missing required parameter: depth".to_string())
-                    })?;
+                let depth = params.get("depth").ok_or_else(|| {
+                    DcexError::InvalidInput("missing required parameter: depth".to_string())
+                })?;
                 depth
                     .parse::<u64>()
                     .ok()
@@ -149,16 +146,16 @@ impl BingxClient {
                 params.ensure_allowed(&[
                     "product_symbol",
                     "symbol",
-                    "start_time",
-                    "end_time",
+                    "startTime",
+                    "endTime",
                     "limit",
                 ])?;
-                validate_time_range(&params, "start_time", "end_time", None)?;
+                validate_time_range(&params, "startTime", "endTime", None)?;
                 validate_u64_range(&params, "limit", 1, 1000)?;
                 let mut query = Vec::new();
                 self.push_optional_symbol(&mut query, &params)?;
-                push_optional_value(&mut query, "startTime", params.get("start_time"));
-                push_optional_value(&mut query, "endTime", params.get("end_time"));
+                push_optional_value(&mut query, "startTime", params.get("startTime"));
+                push_optional_value(&mut query, "endTime", params.get("endTime"));
                 push_optional_value(&mut query, "limit", params.get("limit"));
                 self.market_get(SWAP_FUNDING_RATE, query).await
             }
@@ -230,12 +227,12 @@ impl BingxClient {
             "product_symbol",
             "symbol",
             "interval",
-            "start_time",
-            "end_time",
+            "startTime",
+            "endTime",
             "limit",
         ])?;
         validate_enum(params, "interval", KLINE_INTERVALS)?;
-        validate_time_range(params, "start_time", "end_time", None)?;
+        validate_time_range(params, "startTime", "endTime", None)?;
         validate_u64_range(params, "limit", 1, 1440)?;
         let mut query = Vec::new();
         self.push_required_symbol(&mut query, params)?;
@@ -243,8 +240,8 @@ impl BingxClient {
             "interval".to_string(),
             params.required("interval")?.to_string(),
         ));
-        push_optional_value(&mut query, "startTime", params.get("start_time"));
-        push_optional_value(&mut query, "endTime", params.get("end_time"));
+        push_optional_value(&mut query, "startTime", params.get("startTime"));
+        push_optional_value(&mut query, "endTime", params.get("endTime"));
         push_optional_value(&mut query, "limit", params.get("limit"));
         self.market_get(path, query).await
     }

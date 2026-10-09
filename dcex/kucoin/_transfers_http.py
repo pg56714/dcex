@@ -17,7 +17,7 @@ class AccountHTTPTransfersHTTP(HTTPManager):
         """Retrieve transferable balance for one KuCoin account type."""
         return self._native_private(
             "get_transfer_quotas",
-            self._native_params(currency=currency, account_type=account_type, tag=tag),
+            self._native_params(currency=currency, type_=account_type, tag=tag),
         )
 
     def flex_transfer(
@@ -42,7 +42,7 @@ class AccountHTTPTransfersHTTP(HTTPManager):
                 fromAccountType=fromAccountType,
                 toAccountType=toAccountType,
                 clientOid=clientOid,
-                transfer_type=transfer_type,
+                type_=transfer_type,
                 fromUserId=fromUserId,
                 toUserId=toUserId,
                 fromAccountTag=fromAccountTag,

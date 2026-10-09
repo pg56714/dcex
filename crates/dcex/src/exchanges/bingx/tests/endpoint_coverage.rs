@@ -391,13 +391,13 @@ const PRIVATE_ROUTES: &[Case] = &[
     ),
     (
         "keep_alive_listen_key",
-        &[("listen_key", "k")],
+        &[("listenKey", "k")],
         "PUT",
         "/openApi/user/auth/userDataStream",
     ),
     (
         "close_listen_key",
-        &[("listen_key", "k")],
+        &[("listenKey", "k")],
         "DELETE",
         "/openApi/user/auth/userDataStream",
     ),
@@ -407,7 +407,7 @@ const PRIVATE_ROUTES: &[Case] = &[
         &[
             SPOT,
             ("side", "BUY"),
-            ("type_", "LIMIT"),
+            ("type", "LIMIT"),
             ("quantity", "1"),
             ("price", "1"),
         ],
@@ -478,7 +478,7 @@ const PRIVATE_ROUTES: &[Case] = &[
             ("cancelOrderId", "123"),
             ("cancelReplaceMode", "STOP_ON_FAILURE"),
             ("side", "BUY"),
-            ("type_", "LIMIT"),
+            ("type", "LIMIT"),
             ("quantity", "0.1"),
             ("price", "50000"),
         ],
@@ -505,7 +505,7 @@ const PRIVATE_ROUTES: &[Case] = &[
     ),
     (
         "set_spot_cancel_all_after",
-        &[("type_", "CLOSE")],
+        &[("type", "CLOSE")],
         "POST",
         "/openApi/spot/v1/trade/cancelAllAfter",
     ),
@@ -545,7 +545,7 @@ const PRIVATE_ROUTES: &[Case] = &[
         &[
             SWAP,
             ("side", "BUY"),
-            ("type_", "LIMIT"),
+            ("type", "LIMIT"),
             ("positionSide", "LONG"),
             ("quantity", "1"),
             ("price", "1"),
@@ -558,7 +558,7 @@ const PRIVATE_ROUTES: &[Case] = &[
         &[
             SWAP,
             ("side", "SELL"),
-            ("type_", "MARKET"),
+            ("type", "MARKET"),
             ("quantity", "1"),
         ],
         "POST",
@@ -651,7 +651,7 @@ const PRIVATE_ROUTES: &[Case] = &[
             SWAP,
             ("cancelOrderId", "1"),
             ("cancelReplaceMode", "STOP_ON_FAILURE"),
-            ("type_", "LIMIT"),
+            ("type", "LIMIT"),
             ("side", "BUY"),
             ("positionSide", "LONG"),
             ("quantity", "1"),
@@ -930,11 +930,11 @@ fn order_helpers_force_side_type_position_side_and_time_in_force() {
 }
 
 #[test]
-fn type_alias_is_translated_for_swap_cancel_all_and_open_orders() {
+fn order_type_filters_use_the_official_type_key() {
     let (url, receiver) = recording_server();
     let client = signed_client(url);
     for name in ["cancel_swap_all_orders", "get_open_orders"] {
-        private_call(&client, name, &[SWAP, ("type_", "LIMIT")]);
+        private_call(&client, name, &[SWAP, ("type", "LIMIT")]);
         let recorded = next(&receiver, name);
         assert_eq!(recorded.get("type"), Some("LIMIT"), "{name}");
         assert!(recorded.get("type_").is_none(), "{name}");
@@ -942,7 +942,7 @@ fn type_alias_is_translated_for_swap_cancel_all_and_open_orders() {
     private_call(
         &client,
         "get_spot_order_history",
-        &[SPOT, ("type_", "LIMIT")],
+        &[SPOT, ("type", "LIMIT")],
     );
     let recorded = next(&receiver, "get_spot_order_history");
     assert_eq!(recorded.get("type"), Some("LIMIT"));
@@ -957,7 +957,7 @@ fn identifier_lists_and_client_ids_use_official_keys() {
     private_call(
         &client,
         "cancel_spot_order",
-        &[SPOT, ("clientOrderId", "cid-1")],
+        &[SPOT, ("clientOrderID", "cid-1")],
     );
     let recorded = next(&receiver, "cancel_spot_order");
     assert_eq!(recorded.get("clientOrderID"), Some("cid-1"));
@@ -970,18 +970,22 @@ fn identifier_lists_and_client_ids_use_official_keys() {
     let recorded = next(&receiver, "cancel_spot_batch_orders");
     assert_eq!(recorded.get("orderIds"), Some("1,2"));
 
-    private_call(&client, "get_asset_transfer_records", &[("tranId", "9")]);
+    private_call(
+        &client,
+        "get_asset_transfer_records",
+        &[("transferId", "9")],
+    );
     let recorded = next(&receiver, "get_asset_transfer_records");
     assert_eq!(recorded.get("transferId"), Some("9"));
 
-    private_call(&client, "keep_alive_listen_key", &[("listen_key", "abc")]);
+    private_call(&client, "keep_alive_listen_key", &[("listenKey", "abc")]);
     let recorded = next(&receiver, "keep_alive_listen_key");
     assert_eq!(recorded.get("listenKey"), Some("abc"));
 
     private_call(
         &client,
         "get_fund_flow",
-        &[SWAP, ("income_type", "FUNDING_FEE"), ("limit", "5")],
+        &[SWAP, ("incomeType", "FUNDING_FEE"), ("limit", "5")],
     );
     let recorded = next(&receiver, "get_fund_flow");
     assert_eq!(recorded.get("incomeType"), Some("FUNDING_FEE"));
@@ -1011,7 +1015,7 @@ fn invalid_parameters_fail_before_transport() {
             &[
                 SWAP,
                 ("side", "BUY"),
-                ("type_", "STOP_MARKET"),
+                ("type", "STOP_MARKET"),
                 ("quantity", "1"),
             ],
         ),
@@ -1020,7 +1024,7 @@ fn invalid_parameters_fail_before_transport() {
             &[
                 SWAP,
                 ("side", "BUY"),
-                ("type_", "MARKET"),
+                ("type", "MARKET"),
                 ("quantity", "1"),
                 ("positionSide", "LONG"),
                 ("reduceOnly", "true"),
@@ -1029,7 +1033,7 @@ fn invalid_parameters_fail_before_transport() {
         ("place_spot_batch_order", &[("data", "[]")]),
         (
             "set_spot_cancel_all_after",
-            &[("type_", "CLOSE"), ("timeOut", "30")],
+            &[("type", "CLOSE"), ("timeOut", "30")],
         ),
         (
             "get_order_history",
@@ -1079,7 +1083,7 @@ async fn swap_trading_controls_use_documented_parameters() {
         .private_request(
             "set_swap_cancel_all_after",
             vec![
-                ("type_".into(), "ACTIVATE".into()),
+                ("type".into(), "ACTIVATE".into()),
                 ("timeOut".into(), "30".into()),
             ],
         )
@@ -1175,7 +1179,7 @@ async fn swap_trading_controls_use_documented_parameters() {
             vec![
                 ("product_symbol".into(), "BTC-USDT".into()),
                 ("amount".into(), "2".into()),
-                ("type_".into(), "2".into()),
+                ("type".into(), "2".into()),
                 ("positionSide".into(), "LONG".into()),
             ],
         )
@@ -1674,7 +1678,7 @@ fn coin_swap_and_oco_routes_match_official_paths() {
             "reverse_swap_position",
             &[
                 ("confirm", "true"),
-                ("type_", "Reverse"),
+                ("type", "Reverse"),
                 ("product_symbol", "BTC-USDT"),
             ],
             "POST",
@@ -1861,7 +1865,7 @@ fn coin_swap_and_oco_routes_match_official_paths() {
             &[
                 ("product_symbol", "BTC-USD"),
                 ("side", "SELL"),
-                ("type_", "MARKET"),
+                ("type", "MARKET"),
                 ("quantity", "1"),
             ],
             "POST",
@@ -1962,7 +1966,7 @@ fn coin_swap_and_oco_routes_match_official_paths() {
                 ("product_symbol", "BTC-USD"),
                 ("positionSide", "LONG"),
                 ("amount", "1"),
-                ("type_", "1"),
+                ("type", "1"),
             ],
             "POST",
             "/openApi/cswap/v1/trade/positionMargin",
@@ -2146,7 +2150,7 @@ fn coin_swap_attached_tpsl_preserves_fractional_json_numbers() {
         &[
             ("product_symbol", "BTC-USD"),
             ("side", "BUY"),
-            ("type_", "MARKET"),
+            ("type", "MARKET"),
             ("quantity", "1"),
             (
                 "takeProfit",

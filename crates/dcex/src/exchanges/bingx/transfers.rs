@@ -7,8 +7,8 @@ mod account_requests {
 
     use crate::Result;
     use crate::exchanges::bingx::params::{
-        BingxParams, push_optional, require_pair_or_identifier, validate_positive_number,
-        validate_time_range, validate_u64_range,
+        BingxParams, require_pair_or_identifier, validate_positive_number, validate_time_range,
+        validate_u64_range,
     };
     impl BingxClient {
         pub(in crate::exchanges::bingx) async fn dispatch_get_transferable_coins(
@@ -64,23 +64,21 @@ mod account_requests {
                     "fromAccount",
                     "toAccount",
                     "transferId",
-                    "tranId",
                     "startTime",
                     "endTime",
                     "pageIndex",
                     "pageSize",
                     "recvWindow",
                 ])?;
-                if params.get("transferId").is_none() && params.get("tranId").is_none() {
+                if params.get("transferId").is_none() {
                     require_pair_or_identifier(params, "fromAccount", "toAccount", "transferId")?;
                 }
                 validate_u64_range(params, "pageIndex", 1, u64::MAX)?;
                 validate_u64_range(params, "pageSize", 1, 100)?;
                 validate_u64_range(params, "transferId", 1, u64::MAX)?;
-                validate_u64_range(params, "tranId", 1, u64::MAX)?;
                 validate_time_range(params, "startTime", "endTime", None)?;
                 validate_recv_window(params)?;
-                let mut query = params.only(&[
+                let query = params.only(&[
                     "fromAccount",
                     "toAccount",
                     "transferId",
@@ -90,9 +88,6 @@ mod account_requests {
                     "pageSize",
                     "recvWindow",
                 ]);
-                if !query.iter().any(|(key, _)| key == "transferId") {
-                    push_optional(&mut query, "transferId", params.get("tranId"));
-                }
                 self.private_get(TRANSFER_RECORDS, query).await
             }
         }

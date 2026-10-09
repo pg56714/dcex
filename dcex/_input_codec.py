@@ -118,9 +118,16 @@ def normalize(
     return value
 
 
+# Official wire names that Python spells with a trailing underscore: ``from`` is a keyword
+# and ``type``/``range`` shadow builtins, so keyword arguments use ``from_``/``type_``/``range_``.
+PYTHON_RESERVED_KEYWORDS = {"from_": "from", "type_": "type", "range_": "range"}
+
+
 def normalize_params(values: dict[str, Any]) -> dict[str, Any]:
-    """Preserve exact values after validation at the endpoint boundary."""
-    return normalize(values)
+    """Restore official names for reserved-word arguments and keep exact values."""
+    return normalize(
+        {PYTHON_RESERVED_KEYWORDS.get(key, key): value for key, value in values.items()}
+    )
 
 
 def encode_json(value: Any, *, signed_fields: tuple[str, ...] = (), **options: Any) -> str:  # noqa: ANN401

@@ -143,7 +143,7 @@ mod trade_requests {
                         .map(|(k, v)| {
                             (
                                 if k == "type" {
-                                    "type_".into()
+                                    "type".into()
                                 } else {
                                     k.clone()
                                 },

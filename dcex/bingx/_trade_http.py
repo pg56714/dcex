@@ -31,7 +31,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         price: str | Decimal | None = None,
         stop_price: str | Decimal | None = None,
         new_client_order_id: str | None = None,
-        client_order_id: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
         """Place spot order."""
@@ -45,7 +44,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
                         "quoteOrderQty": "quote_order_qty",
                         "stopPrice": "stop_price",
                         "newClientOrderId": "new_client_order_id",
-                        "clientOrderId": "client_order_id",
                         "recvWindow": "recv_window",
                     },
                 )
@@ -56,7 +54,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         self,
         product_symbol: str,
         quote_order_qty: str | Decimal,
-        client_order_id: str | None = None,
         new_client_order_id: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
@@ -68,7 +65,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
                     locals(),
                     {
                         "quoteOrderQty": "quote_order_qty",
-                        "clientOrderId": "client_order_id",
                         "newClientOrderId": "new_client_order_id",
                         "recvWindow": "recv_window",
                     },
@@ -80,7 +76,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         self,
         product_symbol: str,
         quantity: str | Decimal,
-        client_order_id: str | None = None,
         new_client_order_id: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
@@ -91,7 +86,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
                 wire_keywords(
                     locals(),
                     {
-                        "clientOrderId": "client_order_id",
                         "newClientOrderId": "new_client_order_id",
                         "recvWindow": "recv_window",
                     },
@@ -106,7 +100,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         quantity: str | Decimal,
         price: str | Decimal,
         time_in_force: str | None = None,
-        client_order_id: str | None = None,
         new_client_order_id: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
@@ -118,7 +111,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
                     locals(),
                     {
                         "timeInForce": "time_in_force",
-                        "clientOrderId": "client_order_id",
                         "newClientOrderId": "new_client_order_id",
                         "recvWindow": "recv_window",
                     },
@@ -132,7 +124,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         quantity: str | Decimal,
         price: str | Decimal,
         time_in_force: str | None = None,
-        client_order_id: str | None = None,
         new_client_order_id: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
@@ -144,7 +135,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
                     locals(),
                     {
                         "timeInForce": "time_in_force",
-                        "clientOrderId": "client_order_id",
                         "newClientOrderId": "new_client_order_id",
                         "recvWindow": "recv_window",
                     },
@@ -158,7 +148,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         quantity: str | Decimal,
         price: str | Decimal,
         time_in_force: str | None = None,
-        client_order_id: str | None = None,
         new_client_order_id: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
@@ -170,7 +159,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
                     locals(),
                     {
                         "timeInForce": "time_in_force",
-                        "clientOrderId": "client_order_id",
                         "newClientOrderId": "new_client_order_id",
                         "recvWindow": "recv_window",
                     },
@@ -184,7 +172,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         side: str,
         quantity: str | Decimal,
         price: str | Decimal,
-        client_order_id: str | None = None,
         new_client_order_id: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
@@ -195,7 +182,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
                 wire_keywords(
                     locals(),
                     {
-                        "clientOrderId": "client_order_id",
                         "newClientOrderId": "new_client_order_id",
                         "recvWindow": "recv_window",
                     },
@@ -208,7 +194,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         product_symbol: str,
         quantity: str | Decimal,
         price: str | Decimal,
-        client_order_id: str | None = None,
         new_client_order_id: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
@@ -219,7 +204,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
                 wire_keywords(
                     locals(),
                     {
-                        "clientOrderId": "client_order_id",
                         "newClientOrderId": "new_client_order_id",
                         "recvWindow": "recv_window",
                     },
@@ -232,7 +216,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         product_symbol: str,
         quantity: str | Decimal,
         price: str | Decimal,
-        client_order_id: str | None = None,
         new_client_order_id: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
@@ -243,7 +226,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
                 wire_keywords(
                     locals(),
                     {
-                        "clientOrderId": "client_order_id",
                         "newClientOrderId": "new_client_order_id",
                         "recvWindow": "recv_window",
                     },

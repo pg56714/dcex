@@ -94,7 +94,7 @@ impl LighterClient {
                     &params,
                     &[
                         ("account_index", "account_index"),
-                        ("type_", "type"),
+                        ("type", "type"),
                         ("market_id", "market_id"),
                         ("start_timestamp", "start_timestamp"),
                         ("end_timestamp", "end_timestamp"),
@@ -148,7 +148,7 @@ impl LighterClient {
                     &[
                         ("account_index", "account_index"),
                         ("cursor", "cursor"),
-                        ("type_", "type"),
+                        ("type", "type"),
                     ],
                 )?,
                 auth_header_from_params(

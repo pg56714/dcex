@@ -6,7 +6,7 @@ mod account_requests {
     use crate::exchanges::kraken::account::*;
     use crate::exchanges::kraken::client::{KrakenAuth, KrakenClient};
 
-    use crate::exchanges::kraken::params::{KrakenParams, push_optional};
+    use crate::exchanges::kraken::params::KrakenParams;
     impl KrakenClient {
         pub(in crate::exchanges::kraken) async fn dispatch_wallet_transfer_to_futures(
             &self,
@@ -17,17 +17,8 @@ mod account_requests {
                 params.required("asset")?;
                 params.required("amount")?;
                 params.required("to")?;
-                if params.get("from").or_else(|| params.get("from_")).is_none() {
-                    return Err(crate::DcexError::InvalidInput(
-                        "missing required parameter: from".to_string(),
-                    ));
-                }
-                let mut query = params.only(&["asset", "to", "amount"]);
-                push_optional(
-                    &mut query,
-                    "from",
-                    params.get("from").or_else(|| params.get("from_")),
-                );
+                params.required("from")?;
+                let query = params.only(&["asset", "from", "to", "amount"]);
                 self.private_post(KrakenAuth::Spot, SPOT_WALLET_TRANSFER, query)
                     .await
             }

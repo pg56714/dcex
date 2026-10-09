@@ -221,8 +221,8 @@ impl BinanceClient {
                 self.send_place_order(
                     params.required("product_symbol")?,
                     params.required("side")?,
-                    params.required("type_")?,
-                    params.without(&["product_symbol", "side", "type_"]),
+                    params.required("type")?,
+                    params.without(&["product_symbol", "side", "type"]),
                 )
                 .await
             }
@@ -230,8 +230,8 @@ impl BinanceClient {
                 self.send_test_order(
                     params.required("product_symbol")?,
                     params.required("side")?,
-                    params.required("type_")?,
-                    params.without(&["product_symbol", "side", "type_"]),
+                    params.required("type")?,
+                    params.without(&["product_symbol", "side", "type"]),
                 )
                 .await
             }
@@ -272,9 +272,9 @@ impl BinanceClient {
                 self.send_place_futures_algo_order(
                     params.required("product_symbol")?,
                     params.required("side")?,
-                    params.required("type_")?,
+                    params.required("type")?,
                     params.get("algoType").unwrap_or("CONDITIONAL"),
-                    params.without(&["product_symbol", "side", "type_", "algoType"]),
+                    params.without(&["product_symbol", "side", "type", "algoType"]),
                 )
                 .await
             }

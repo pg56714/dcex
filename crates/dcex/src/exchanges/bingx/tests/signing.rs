@@ -76,8 +76,8 @@ fn swap_commission_route_is_signed_and_funding_range_is_checked() {
                 .public_request(
                     "get_swap_funding_rate",
                     vec![
-                        ("start_time".into(), "2000".into()),
-                        ("end_time".into(), "1000".into()),
+                        ("startTime".into(), "2000".into()),
+                        ("endTime".into(), "1000".into()),
                     ],
                 )
                 .await

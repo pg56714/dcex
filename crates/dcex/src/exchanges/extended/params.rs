@@ -19,23 +19,6 @@ impl ExtendedParams {
             .map(|(_, value)| value.as_str())
     }
 
-    pub(super) fn first(&self, keys: &[&str]) -> Option<&str> {
-        keys.iter().find_map(|key| self.get(key))
-    }
-
-    pub(super) fn first_required(&self, keys: &[&str]) -> Result<&str> {
-        let value = self.first(keys).ok_or_else(|| {
-            DcexError::InvalidInput(format!("missing required parameter: {}", keys.join(" or ")))
-        })?;
-        if value.trim().is_empty() {
-            return Err(DcexError::InvalidInput(format!(
-                "Extended parameter {} must not be empty",
-                keys.join(" or ")
-            )));
-        }
-        Ok(value)
-    }
-
     pub(super) fn required(&self, key: &str) -> Result<&str> {
         let value = self
             .get(key)
@@ -75,17 +58,6 @@ impl ExtendedParams {
         if count != 1 {
             return Err(DcexError::InvalidInput(format!(
                 "specify exactly one of {}",
-                keys.join(" or ")
-            )));
-        }
-        Ok(())
-    }
-
-    pub(super) fn ensure_at_most_one(&self, keys: &[&str]) -> Result<()> {
-        let count = keys.iter().filter(|key| self.get(key).is_some()).count();
-        if count > 1 {
-            return Err(DcexError::InvalidInput(format!(
-                "specify at most one of {}",
                 keys.join(" or ")
             )));
         }
@@ -217,14 +189,12 @@ impl ExtendedParams {
     }
 
     pub(super) fn body_required(&self) -> Result<Value> {
-        self.body_optional()?.ok_or_else(|| {
-            DcexError::InvalidInput("missing required parameter: body or order JSON".to_string())
-        })
+        self.body_optional()?
+            .ok_or_else(|| DcexError::InvalidInput("missing required parameter: body".to_string()))
     }
 
     pub(super) fn body_optional(&self) -> Result<Option<Value>> {
-        self.ensure_at_most_one(&["body", "order"])?;
-        let Some(body) = self.get("body").or_else(|| self.get("order")) else {
+        let Some(body) = self.get("body") else {
             return Ok(None);
         };
         serde_json::from_str(body)

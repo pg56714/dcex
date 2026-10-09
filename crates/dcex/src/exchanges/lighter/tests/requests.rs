@@ -89,7 +89,7 @@ fn export_sends_resolved_market_id_with_configured_account_index() {
                 "get_export",
                 vec![
                     ("product_symbol".to_string(), "BTC-USDC-SWAP".to_string()),
-                    ("type_".to_string(), "trade".to_string()),
+                    ("type".to_string(), "trade".to_string()),
                     ("aggregate".to_string(), "true".to_string()),
                     ("authorization".to_string(), "token".to_string()),
                 ],

@@ -79,10 +79,10 @@ impl LighterClient {
                         ("sort_by", "sort_by"),
                         ("sort_dir", "sort_dir"),
                         ("cursor", "cursor"),
-                        ("from_", "from"),
+                        ("from", "from"),
                         ("ask_filter", "ask_filter"),
                         ("role", "role"),
-                        ("type_", "type"),
+                        ("type", "type"),
                         ("limit", "limit"),
                         ("aggregate", "aggregate"),
                         ("skip_ask_order_id", "skip_ask_order_id"),
@@ -315,10 +315,10 @@ impl LighterClient {
                     "sort_by",
                     "sort_dir",
                     "cursor",
-                    "from_",
+                    "from",
                     "ask_filter",
                     "role",
-                    "type_",
+                    "type",
                     "limit",
                     "aggregate",
                     "skip_ask_order_id",
@@ -331,7 +331,7 @@ impl LighterClient {
                 params.optional_one_of("sort_dir", &["desc"])?;
                 params.optional_one_of("role", &["all", "maker", "taker"])?;
                 params.optional_one_of(
-                    "type_",
+                    "type",
                     &[
                         "all",
                         "trade",
@@ -343,7 +343,7 @@ impl LighterClient {
                 params.required_u64_range("limit", 1, 100)?;
                 validate_optional_i64(
                     params,
-                    &["account_index", "order_index", "from_", "ask_filter"],
+                    &["account_index", "order_index", "from", "ask_filter"],
                 )?;
                 params.optional_bool("aggregate")?;
                 validate_optional_nonempty(

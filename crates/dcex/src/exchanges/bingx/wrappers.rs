@@ -35,7 +35,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
     ];
     private [
 
-        place_coin_swap_order(product_symbol => "product_symbol", side => "side", type_ => "type_"),
+        place_coin_swap_order(product_symbol => "product_symbol", side => "side", type_ => "type"),
         cancel_coin_swap_order(product_symbol => "product_symbol"),
         cancel_coin_swap_all_orders(),
         close_coin_swap_all_positions(),
@@ -56,7 +56,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
             product_symbol => "product_symbol",
             position_side => "positionSide",
             amount => "amount",
-            type_ => "type_"
+            type_ => "type"
         ),
         get_coin_swap_commission_rate(),
         get_coin_swap_balance(),
@@ -74,7 +74,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_spot_open_oco(page_index => "pageIndex", page_size => "pageSize"),
         get_spot_oco_history(page_index => "pageIndex", page_size => "pageSize"),
         get_deposit_history(),
-        set_swap_cancel_all_after(type_ => "type_", time_out => "timeOut"),
+        set_swap_cancel_all_after(type_ => "type", time_out => "timeOut"),
         get_swap_open_order(product_symbol => "product_symbol"),
         get_swap_force_orders(),
         get_swap_trade_fills(
@@ -85,7 +85,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         adjust_swap_position_margin(
             product_symbol => "product_symbol",
             amount => "amount",
-            type_ => "type_"
+            type_ => "type"
         ),
         amend_swap_order(product_symbol => "product_symbol", quantity => "quantity"),
         place_swap_twap_order(
@@ -140,7 +140,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
 
 
         cancel_spot_open_orders(),
-        set_spot_cancel_all_after(type_ => "type_"),
+        set_spot_cancel_all_after(type_ => "type"),
         cancel_spot_order(product_symbol => "product_symbol"),
         cancel_swap_all_orders(),
 
@@ -148,7 +148,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         change_margin_type(product_symbol => "product_symbol", margin_type => "marginType"),
         close_swap_all_positions(),
         close_swap_position(position_id => "positionId"),
-        close_listen_key(listen_key => "listen_key"),
+        close_listen_key(listen_key => "listenKey"),
         get_account_balance(),
         get_account_uid(),
         get_all_account_balance(),
@@ -178,13 +178,13 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_swap_account_balance(),
         get_swap_commission_rate(),
 
-        keep_alive_listen_key(listen_key => "listen_key"),
+        keep_alive_listen_key(listen_key => "listenKey"),
 
         replace_spot_order(
             product_symbol => "product_symbol",
             cancel_replace_mode => "cancelReplaceMode",
             side => "side",
-            type_ => "type_"
+            type_ => "type"
         ),
         place_spot_limit_buy_order(
             product_symbol => "product_symbol",
@@ -207,7 +207,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
             quote_order_qty => "quoteOrderQty"
         ),
         place_spot_market_sell_order(product_symbol => "product_symbol", quantity => "quantity"),
-        place_spot_order(product_symbol => "product_symbol", side => "side", type_ => "type_"),
+        place_spot_order(product_symbol => "product_symbol", side => "side", type_ => "type"),
         place_spot_post_only_buy_order(
             product_symbol => "product_symbol",
             quantity => "quantity",
@@ -250,7 +250,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
             quantity => "quantity"
         ),
         place_swap_market_sell_order(product_symbol => "product_symbol", quantity => "quantity", position_side => "positionSide"),
-        place_swap_order(product_symbol => "product_symbol", type_ => "type_", side => "side"),
+        place_swap_order(product_symbol => "product_symbol", type_ => "type", side => "side"),
         place_swap_post_only_buy_order(
             product_symbol => "product_symbol",
             quantity => "quantity",
@@ -272,13 +272,13 @@ crate::exchanges::impl_exchange_method_wrappers! {
         replace_swap_order(
             product_symbol => "product_symbol",
             cancel_replace_mode => "cancelReplaceMode",
-            type_ => "type_",
+            type_ => "type",
             side => "side",
             position_side => "positionSide"
         ),
         set_leverage(product_symbol => "product_symbol", side => "side", leverage => "leverage"),
         set_position_mode(dual_side_position => "dualSidePosition"),
-        test_swap_order(product_symbol => "product_symbol", type_ => "type_", side => "side"),
+        test_swap_order(product_symbol => "product_symbol", type_ => "type", side => "side"),
 
     ];
 }
@@ -294,7 +294,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_coin_network_config(),
         get_deposit_addresses(coin => "coin"),
         get_deposit_risk_records(),
-        reverse_swap_position(type_ => "type_", product_symbol => "product_symbol"),
+        reverse_swap_position(type_ => "type", product_symbol => "product_symbol"),
         adjust_simulated_trading_balance(),
         get_standard_futures_positions(),
         get_standard_futures_orders(product_symbol => "product_symbol"),

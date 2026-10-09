@@ -70,19 +70,14 @@ impl ExtendedClient {
                 self.private_get(&path, Vec::new()).await
             }
             "get_order_by_external_id" => {
-                params.ensure_allowed(&["externalId", "external_id"], &[])?;
-                params.ensure_exactly_one(&["externalId", "external_id"])?;
-                let external_id = if params.get("externalId").is_some() {
-                    params.path_segment("externalId")?
-                } else {
-                    params.path_segment("external_id")?
-                };
+                params.ensure_allowed(&["externalId"], &[])?;
+                let external_id = params.path_segment("externalId")?;
                 let path = format!("{ORDERS}/external/{}", external_id);
                 self.private_get(&path, Vec::new()).await
             }
             "place_order" | "create_order" => match params.body_optional()? {
                 Some(body) => {
-                    params.ensure_allowed(&["body", "order"], &[])?;
+                    params.ensure_allowed(&["body"], &[])?;
                     validate_order_body(&body, self.signing_domain())?;
                     self.private_post_value(ORDER, body, Vec::new()).await
                 }
@@ -93,7 +88,7 @@ impl ExtendedClient {
             },
             "place_rfq_order" | "create_rfq_order" => match params.body_optional()? {
                 Some(body) => {
-                    params.ensure_allowed(&["body", "order"], &[])?;
+                    params.ensure_allowed(&["body"], &[])?;
                     validate_order_body(&body, self.signing_domain())?;
                     self.private_post_value(RFQ_ORDER, body, Vec::new()).await
                 }
@@ -192,19 +187,16 @@ impl ExtendedClient {
         params: &ExtendedParams,
         market: &str,
     ) -> Result<ExtendedParams> {
-        if params.first(&["fee", "taker_fee", "takerFee"]).is_some() {
+        if params.get("fee").is_some() {
             return Ok(params.clone());
         }
 
         let mut query = vec![("market".to_string(), market.to_string())];
-        if let Some(builder_id) = params.first(&["builder_id", "builderId"]) {
+        if let Some(builder_id) = params.get("builderId") {
             query.push(("builderId".to_string(), builder_id.to_string()));
         }
         let response = self.private_get(FEES, query).await?;
-        let post_only = matches!(
-            params.first(&["post_only", "postOnly"]),
-            Some("true" | "TRUE" | "1" | "yes" | "YES")
-        );
+        let post_only = params.get("postOnly") == Some("true");
         Ok(params.with("fee", fee_from_response(&response.data, market, post_only)?))
     }
 
@@ -222,115 +214,70 @@ impl ExtendedClient {
 }
 
 fn validate_signing_params(params: &ExtendedParams) -> Result<()> {
+    // Official order fields, plus the library's `product_symbol` and `market_json`.
     const ALLOWED: &[&str] = &[
         "market",
         "product_symbol",
         "side",
         "qty",
-        "quantity",
-        "amount",
-        "amount_of_synthetic",
         "price",
         "type",
-        "order_type",
-        "orderType",
-        "post_only",
         "postOnly",
-        "time_in_force",
         "timeInForce",
-        "reduce_only",
         "reduceOnly",
-        "expiry_epoch_millis",
         "expiryEpochMillis",
-        "expire_time_ms",
         "nonce",
         "fee",
-        "taker_fee",
-        "takerFee",
-        "self_trade_protection_level",
         "selfTradeProtectionLevel",
         "id",
-        "external_id",
-        "externalId",
-        "order_external_id",
-        "builder_fee",
         "builderFee",
-        "builder_id",
         "builderId",
         "market_json",
-        "marketJson",
     ];
     params.ensure_allowed(ALLOWED, &[])?;
     params.ensure_exactly_one(&["market", "product_symbol"])?;
-    params.ensure_exactly_one(&["qty", "quantity", "amount", "amount_of_synthetic"])?;
-    for group in [
-        &["type", "order_type", "orderType"][..],
-        &["post_only", "postOnly"],
-        &["time_in_force", "timeInForce"],
-        &["reduce_only", "reduceOnly"],
-        &["expiry_epoch_millis", "expiryEpochMillis", "expire_time_ms"],
-        &["fee", "taker_fee", "takerFee"],
-        &["self_trade_protection_level", "selfTradeProtectionLevel"],
-        &["id", "external_id", "externalId", "order_external_id"],
-        &["builder_fee", "builderFee"],
-        &["builder_id", "builderId"],
-        &["market_json", "marketJson"],
-    ] {
-        params.ensure_at_most_one(group)?;
-    }
-    params.first_required(&["side"])?;
+    params.required("side")?;
     params.required_positive_decimal("price")?;
-    let qty = params.first_required(&["qty", "quantity", "amount", "amount_of_synthetic"])?;
-    validate_positive_decimal("qty", qty)?;
-    if let Some(order_type) = params.first(&["type", "order_type", "orderType"])
+    params.required_positive_decimal("qty")?;
+    if let Some(order_type) = params.get("type")
         && !order_type.eq_ignore_ascii_case("LIMIT")
     {
         return Err(DcexError::InvalidInput(
             "Extended automatic order signing currently supports LIMIT orders only".to_string(),
         ));
     }
-    for key in ["post_only", "postOnly", "reduce_only", "reduceOnly"] {
+    for key in ["postOnly", "reduceOnly"] {
         params.optional_bool(key)?;
     }
-    if let Some(time_in_force) = params.first(&["time_in_force", "timeInForce"])
+    if let Some(time_in_force) = params.get("timeInForce")
         && !matches!(time_in_force, "GTT" | "IOC")
     {
         return Err(DcexError::InvalidInput(format!(
-            "unsupported Extended time_in_force: {time_in_force}"
+            "unsupported Extended timeInForce: {time_in_force}"
         )));
     }
-    if params.first(&["time_in_force", "timeInForce"]) == Some("IOC")
-        && params
-            .first(&["post_only", "postOnly"])
-            .is_some_and(|value| value.eq_ignore_ascii_case("true"))
-    {
+    if params.get("timeInForce") == Some("IOC") && params.get("postOnly") == Some("true") {
         return Err(DcexError::InvalidInput(
             "Extended post-only orders cannot use IOC time in force".to_string(),
         ));
     }
-    for key in ["expiry_epoch_millis", "expiryEpochMillis", "expire_time_ms"] {
-        params.optional_u64_range(key, 1, u64::MAX)?;
-    }
+    params.optional_u64_range("expiryEpochMillis", 1, u64::MAX)?;
     params.optional_u64_range("nonce", 1, 1u64 << 31)?;
-    if let Some(fee) = params.first(&["fee", "taker_fee", "takerFee"]) {
+    if let Some(fee) = params.get("fee") {
         validate_fraction("fee", fee)?;
     }
-    if let Some(level) = params.first(&["self_trade_protection_level", "selfTradeProtectionLevel"])
+    if let Some(level) = params.get("selfTradeProtectionLevel")
         && !matches!(level, "DISABLED" | "ACCOUNT" | "CLIENT")
     {
         return Err(DcexError::InvalidInput(format!(
-            "unsupported Extended self trade protection level: {level}"
+            "unsupported Extended selfTradeProtectionLevel: {level}"
         )));
     }
-    if let Some(builder_fee) = params.first(&["builder_fee", "builderFee"]) {
+    if let Some(builder_fee) = params.get("builderFee") {
         validate_fraction("builderFee", builder_fee)?;
     }
-    for key in ["builder_id", "builderId"] {
-        params.optional_u64_range(key, 1, u64::MAX)?;
-    }
-    if params.first(&["builder_fee", "builderFee"]).is_some()
-        != params.first(&["builder_id", "builderId"]).is_some()
-    {
+    params.optional_u64_range("builderId", 1, u64::MAX)?;
+    if params.get("builderFee").is_some() != params.get("builderId").is_some() {
         return Err(DcexError::InvalidInput(
             "Extended builderFee and builderId must be provided together".to_string(),
         ));

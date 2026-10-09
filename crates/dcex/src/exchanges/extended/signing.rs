@@ -435,58 +435,46 @@ struct ExtendedOrderSpec {
 
 impl ExtendedOrderSpec {
     fn from_params(params: &ExtendedParams, market: String) -> Result<Self> {
-        let order_type = params
-            .first(&["type", "order_type", "orderType"])
-            .unwrap_or("LIMIT")
-            .to_ascii_uppercase();
-        let side = OrderSide::parse(params.first_required(&["side"])?)?;
-        let qty = params.first_required(&["qty", "quantity", "amount", "amount_of_synthetic"])?;
-        let price = params.first_required(&["price"])?;
-        let taker_fee = params.first_required(&["fee", "taker_fee", "takerFee"])?;
+        let order_type = params.get("type").unwrap_or("LIMIT").to_ascii_uppercase();
+        let side = OrderSide::parse(params.required("side")?)?;
         let builder_fee = params
-            .first(&["builder_fee", "builderFee"])
-            .map(|value| ExactDecimal::parse(value, "builder_fee"))
+            .get("builderFee")
+            .map(|value| ExactDecimal::parse(value, "builderFee"))
             .transpose()?;
         let builder_id = params
-            .first(&["builder_id", "builderId"])
-            .map(|value| parse_u64(value, "builder_id"))
+            .get("builderId")
+            .map(|value| parse_u64(value, "builderId"))
             .transpose()?;
         Ok(Self {
             market,
             order_type,
             side,
-            synthetic_amount: ExactDecimal::parse(qty, "qty")?,
-            price: ExactDecimal::parse(price, "price")?,
-            post_only: parse_bool(params.first(&["post_only", "postOnly"]).unwrap_or("false"))?,
+            synthetic_amount: ExactDecimal::parse(params.required("qty")?, "qty")?,
+            price: ExactDecimal::parse(params.required("price")?, "price")?,
+            post_only: parse_bool(params.get("postOnly").unwrap_or("false"))?,
             time_in_force: params
-                .first(&["time_in_force", "timeInForce"])
+                .get("timeInForce")
                 .unwrap_or("GTT")
                 .to_ascii_uppercase(),
             expiry_epoch_millis: params
-                .first(&["expiry_epoch_millis", "expiryEpochMillis", "expire_time_ms"])
-                .map(|value| parse_u64(value, "expiry_epoch_millis"))
+                .get("expiryEpochMillis")
+                .map(|value| parse_u64(value, "expiryEpochMillis"))
                 .transpose()?
                 .unwrap_or(now_ms()? + DEFAULT_ORDER_LIFETIME_MS),
-            taker_fee: ExactDecimal::parse(taker_fee, "fee")?,
+            taker_fee: ExactDecimal::parse(params.required("fee")?, "fee")?,
             self_trade_protection_level: params
-                .first(&["self_trade_protection_level", "selfTradeProtectionLevel"])
+                .get("selfTradeProtectionLevel")
                 .unwrap_or("ACCOUNT")
                 .to_ascii_uppercase(),
             nonce: params
-                .first(&["nonce"])
+                .get("nonce")
                 .map(|value| parse_u64(value, "nonce"))
                 .transpose()?
                 .unwrap_or(random_nonce()?),
-            external_id: params
-                .first(&["id", "external_id", "externalId", "order_external_id"])
-                .map(ToString::to_string),
+            external_id: params.get("id").map(ToString::to_string),
             builder_fee,
             builder_id,
-            reduce_only: parse_bool(
-                params
-                    .first(&["reduce_only", "reduceOnly"])
-                    .unwrap_or("false"),
-            )?,
+            reduce_only: parse_bool(params.get("reduceOnly").unwrap_or("false"))?,
         })
     }
 
@@ -581,9 +569,9 @@ fn random_nonce() -> Result<u64> {
 }
 
 fn parse_bool(value: &str) -> Result<bool> {
-    match value.to_ascii_lowercase().as_str() {
-        "true" | "1" | "yes" => Ok(true),
-        "false" | "0" | "no" => Ok(false),
+    match value {
+        "true" => Ok(true),
+        "false" => Ok(false),
         _ => Err(DcexError::InvalidInput(format!(
             "invalid boolean value: {value}"
         ))),
@@ -744,7 +732,7 @@ pub(super) fn extract_market_from_param(
     params: &ExtendedParams,
     market_name: &str,
 ) -> Result<Option<ExtendedMarket>> {
-    let Some(market_json) = params.first(&["market_json", "marketJson"]) else {
+    let Some(market_json) = params.get("market_json") else {
         return Ok(None);
     };
     let value = serde_json::from_str::<Value>(market_json)
@@ -846,7 +834,7 @@ mod tests {
             ("qty".to_string(), "0.001".to_string()),
             ("price".to_string(), "10000".to_string()),
             ("fee".to_string(), "0".to_string()),
-            ("post_only".to_string(), "true".to_string()),
+            ("postOnly".to_string(), "true".to_string()),
             (
                 "expiry_epoch_millis".to_string(),
                 (now_ms().unwrap() + DEFAULT_ORDER_LIFETIME_MS).to_string(),
@@ -892,8 +880,8 @@ mod tests {
             ("qty".to_string(), "1".to_string()),
             ("price".to_string(), "100".to_string()),
             ("fee".to_string(), "0.00025".to_string()),
-            ("post_only".to_string(), "true".to_string()),
-            ("time_in_force".to_string(), "IOC".to_string()),
+            ("postOnly".to_string(), "true".to_string()),
+            ("timeInForce".to_string(), "IOC".to_string()),
         ]);
 
         let spec = ExtendedOrderSpec::from_params(&params, "BTC-USD".to_string()).unwrap();
@@ -910,7 +898,7 @@ mod tests {
             ("qty".to_string(), "1".to_string()),
             ("price".to_string(), "100".to_string()),
             ("fee".to_string(), "0.00025".to_string()),
-            ("time_in_force".to_string(), "FOK".to_string()),
+            ("timeInForce".to_string(), "FOK".to_string()),
         ]);
 
         let spec = ExtendedOrderSpec::from_params(&params, "BTC-USD".to_string()).unwrap();
@@ -924,7 +912,7 @@ mod tests {
             ("qty".to_string(), "1".to_string()),
             ("price".to_string(), "100".to_string()),
             ("fee".to_string(), "0.00025".to_string()),
-            ("builder_fee".to_string(), "0.0001".to_string()),
+            ("builderFee".to_string(), "0.0001".to_string()),
         ]);
 
         let spec = ExtendedOrderSpec::from_params(&params, "BTC-USD".to_string()).unwrap();
@@ -1022,12 +1010,12 @@ mod tests {
                 "fee must be between zero and one",
             ),
             (
-                vec![("builder_fee", "2"), ("builder_id", "1")],
+                vec![("builderFee", "2"), ("builderId", "1")],
                 StarknetDomain::mainnet(),
                 "builder_fee must be between zero and one",
             ),
             (
-                vec![("self_trade_protection_level", "NONE")],
+                vec![("selfTradeProtectionLevel", "NONE")],
                 StarknetDomain::mainnet(),
                 "self_trade_protection_level",
             ),
@@ -1037,7 +1025,7 @@ mod tests {
                 "nonce must be between 1 and 2147483648",
             ),
             (
-                vec![("expiry_epoch_millis", far.as_str())],
+                vec![("expiryEpochMillis", far.as_str())],
                 StarknetDomain::sepolia(),
                 "no more than 28 days away",
             ),
@@ -1048,7 +1036,7 @@ mod tests {
                 .to_string();
             assert!(error.contains(expected), "{expected}: {error}");
         }
-        spec(&[("expiry_epoch_millis", far.as_str())])
+        spec(&[("expiryEpochMillis", far.as_str())])
             .validate(StarknetDomain::mainnet())
             .expect("40 days is within the mainnet limit");
     }

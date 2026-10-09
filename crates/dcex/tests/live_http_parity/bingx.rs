@@ -55,7 +55,7 @@ async fn bingx_public_live_parity() -> dcex::Result<()> {
                 &[
                     ("product_symbol", BTC_USDT_SPOT),
                     ("limit", "5"),
-                    ("type_", "step0"),
+                    ("type", "step0"),
                 ],
             ),
             Case::new(

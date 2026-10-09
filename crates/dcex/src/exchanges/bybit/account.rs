@@ -70,11 +70,7 @@ impl BybitClient {
             }
             "get_collateral_info" => {
                 let mut query = Vec::new();
-                push_optional(
-                    &mut query,
-                    "currency",
-                    params.get("currency").or_else(|| params.get("coin")),
-                );
+                push_optional(&mut query, "currency", params.get("currency"));
                 self.get_request(GET_COLLATERAL_INFO, query).await
             }
             "manual_borrow" => {

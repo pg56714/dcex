@@ -104,11 +104,7 @@ impl KrakenClient {
                     "ledgers",
                     "rebase_multiplier",
                 ]);
-                push_optional(
-                    &mut query,
-                    "type",
-                    params.get("type").or_else(|| params.get("type_")),
-                );
+                push_optional(&mut query, "type", params.get("type"));
                 self.private_post(KrakenAuth::Spot, SPOT_TRADES_HISTORY, query)
                     .await
             }

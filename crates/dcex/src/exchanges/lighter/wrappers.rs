@@ -55,7 +55,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_account_inactive_orders(limit => "limit"),
         get_account_limits(),
         get_deposit_history(l1_address => "l1_address"),
-        get_export(type_ => "type_"),
+        get_export(type_ => "type"),
 
         get_l1_metadata(l1_address => "l1_address"),
         get_leases(),

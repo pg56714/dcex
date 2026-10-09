@@ -156,7 +156,7 @@ BINGX_REPLACE = [
     ("cancelOrderId", "123"),
     ("cancelReplaceMode", "STOP_ON_FAILURE"),
     ("side", "BUY"),
-    ("type_", "LIMIT"),
+    ("type", "LIMIT"),
     ("quantity", "1"),
     ("price", "100"),
 ]
@@ -173,7 +173,7 @@ VALID = [
         "binance-spot",
         _binance,
         "place_order",
-        [*BINANCE_SPOT, ("type_", "LIMIT"), ("price", "100"), ("timeInForce", "FOK")],
+        [*BINANCE_SPOT, ("type", "LIMIT"), ("price", "100"), ("timeInForce", "FOK")],
         {"timeInForce": "FOK"},
     ),
     (
@@ -182,7 +182,7 @@ VALID = [
         "place_order",
         [
             *BINANCE_SWAP,
-            ("type_", "LIMIT"),
+            ("type", "LIMIT"),
             ("price", "100"),
             ("timeInForce", "GTX"),
             ("reduceOnly", "true"),
@@ -272,19 +272,19 @@ INVALID = [
         "binance-spot-gtx",
         _binance,
         "place_order",
-        [*BINANCE_SPOT, ("type_", "LIMIT"), ("price", "100"), ("timeInForce", "GTX")],
+        [*BINANCE_SPOT, ("type", "LIMIT"), ("price", "100"), ("timeInForce", "GTX")],
     ),
     (
         "binance-spot-reduce",
         _binance,
         "place_order",
-        [*BINANCE_SPOT, ("type_", "MARKET"), ("reduceOnly", "true")],
+        [*BINANCE_SPOT, ("type", "MARKET"), ("reduceOnly", "true")],
     ),
     (
         "binance-usdm-reduce",
         _binance,
         "place_order",
-        [*BINANCE_SWAP, ("type_", "MARKET"), ("reduceOnly", "yes")],
+        [*BINANCE_SWAP, ("type", "MARKET"), ("reduceOnly", "yes")],
     ),
     (
         "binance-post-only-spot",

@@ -251,8 +251,8 @@ fn public_routes_follow_official_paths_and_query_names() {
                 ("sort_by", "timestamp"),
                 ("limit", "10"),
                 ("market_id", "1"),
-                ("from_", "1700000000000"),
-                ("type_", "liquidation"),
+                ("from", "1700000000000"),
+                ("type", "liquidation"),
                 ("role", "maker"),
                 ("aggregate", "true"),
             ],
@@ -498,7 +498,7 @@ fn private_routes_follow_official_paths_and_attach_auth() {
         ),
         (
             "get_transfer_history",
-            vec![("type_", "L2Transfer"), ("type_", "L2MintShares"), auth],
+            vec![("type", "L2Transfer"), ("type", "L2MintShares"), auth],
             "/api/v1/transfer/history",
             vec![
                 ("type", "L2Transfer"),
@@ -1125,8 +1125,8 @@ fn market_and_account_queries_reject_invalid_parameters_before_network() {
         (true, "unknown_public_method", vec![]),
         (false, "get_account_inactive_orders", vec![("limit", "0")]),
         (false, "get_deposit_history", vec![("filter", "all")]),
-        (false, "get_export", vec![("type_", "orders")]),
-        (false, "get_transfer_history", vec![("type_", "L2Withdraw")]),
+        (false, "get_export", vec![("type", "orders")]),
+        (false, "get_transfer_history", vec![("type", "L2Withdraw")]),
         (false, "get_liquidations", vec![("limit", "101")]),
         (false, "get_next_nonce", vec![("api_key_index", "255")]),
     ] {

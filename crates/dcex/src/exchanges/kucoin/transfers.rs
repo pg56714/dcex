@@ -18,8 +18,8 @@ mod account_requests {
             params: &KucoinParams,
         ) -> Result<ValidatedResponse> {
             {
-                params.ensure_allowed(&["currency", "account_type", "type", "tag"])?;
-                let account_type = params.required_any(&["account_type", "type"])?;
+                params.ensure_allowed(&["currency", "type", "tag"])?;
+                let account_type = params.required("type")?;
                 if !matches!(
                     account_type,
                     "MAIN" | "TRADE" | "MARGIN" | "ISOLATED" | "MARGIN_V2" | "ISOLATED_V2"
@@ -54,7 +54,6 @@ mod account_requests {
                     "fromUserId",
                     "fromAccountType",
                     "fromAccountTag",
-                    "transfer_type",
                     "type",
                     "toUserId",
                     "toAccountType",
@@ -62,9 +61,7 @@ mod account_requests {
                 ])?;
                 validate_positive_number(params, "amount")?;
                 validate_text_length(params, "clientOid", 128, true)?;
-                let transfer_type = params
-                    .get_any(&["transfer_type", "type"])
-                    .unwrap_or("INTERNAL");
+                let transfer_type = params.get("type").unwrap_or("INTERNAL");
                 if !matches!(
                     transfer_type,
                     "INTERNAL" | "PARENT_TO_SUB" | "SUB_TO_PARENT" | "SUB_TO_SUB"
@@ -118,7 +115,7 @@ mod wrappers {
     transfer_uta_accounts(client_oid => "clientOid", transfer_type => "transferType", currency => "currency", amount => "amount", from_account_type => "fromAccountType", from_account_tag => "fromAccountTag", to_account_type => "toAccountType", to_account_tag => "toAccountTag"),
     get_uta_transfer_quota(account_type => "accountType", currency => "currency"),
     flex_transfer(currency => "currency", amount => "amount", from_account_type => "fromAccountType", to_account_type => "toAccountType"),
-    get_transfer_quotas(currency => "currency", account_type => "account_type")
+    get_transfer_quotas(currency => "currency", account_type => "type")
      ];
     }
 }

@@ -77,14 +77,10 @@ impl ExtendedClient {
             "get_candles" => {
                 self.validate_market_params(
                     &params,
-                    &["candleType", "candle_type", "interval", "limit", "endTime"],
+                    &["candleType", "interval", "limit", "endTime"],
                 )?;
-                params.ensure_at_most_one(&["candleType", "candle_type"])?;
                 let market = self.required_market(&params)?;
-                let candle_type = params
-                    .get("candleType")
-                    .or_else(|| params.get("candle_type"))
-                    .unwrap_or("trades");
+                let candle_type = params.get("candleType").unwrap_or("trades");
                 if !matches!(candle_type, "trades" | "mark-prices" | "index-prices") {
                     return Err(DcexError::InvalidInput(format!(
                         "unsupported Extended candle type: {candle_type}"

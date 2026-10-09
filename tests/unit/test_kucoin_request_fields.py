@@ -312,7 +312,7 @@ def test_native_kucoin_futures_kline_uses_minute_granularity() -> None:
         (
             "flex_transfer",
             [
-                ("transfer_type", "PARENT_TO_SUB"),
+                ("type", "PARENT_TO_SUB"),
                 ("currency", "USDT"),
                 ("amount", "1"),
                 ("fromAccountType", "MARGIN_V2"),
