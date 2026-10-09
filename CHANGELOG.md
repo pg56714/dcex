@@ -1,3 +1,16 @@
+## 0.38.0 (2026-10-09)
+
+### BREAKING CHANGE
+
+- name dated futures BASE-QUOTE-YYMMDD-FUTURES on every exchange
+- accept only official parameter names
+- Hyperliquid REST requests are POST-only
+- drop legacy WebSocket options for Lighter, Bitget and OKX
+
+### Feat
+
+- expose the full contract list alongside the documented one
+
 ## 0.37.0 (2026-10-09)
 
 ### BREAKING CHANGE

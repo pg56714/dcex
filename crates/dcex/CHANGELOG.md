@@ -1,3 +1,26 @@
+## 0.16.0 (2026-10-09)
+
+### BREAKING CHANGE
+
+- name dated futures BASE-QUOTE-YYMMDD-FUTURES on every exchange
+- accept only official parameter names
+- Hyperliquid REST requests are POST-only
+- drop legacy WebSocket options for Lighter, Bitget and OKX
+
+### Feat
+
+- expose the full contract list alongside the documented one
+
+### Fix
+
+- reject unknown batch order fields and check balance options before RPC
+- report BingX WebSocket gzip failures instead of a text decode error
+
+### Refactor
+
+- share path-identifier and boolean checks
+- drop generated parameter setters that no dispatch reads
+
 ## 0.15.0 (2026-10-09)
 
 ### BREAKING CHANGE
