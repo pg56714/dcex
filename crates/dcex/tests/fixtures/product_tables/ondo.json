@@ -1,0 +1,236 @@
+{
+ "GET /v1/markets": {
+  "success": true,
+  "result": {
+   "spot": {
+    "tradingPairs": [
+     {
+      "market": "SPYon-USDC",
+      "pair": {
+       "base": "SPYon",
+       "quote": "USDC"
+      },
+      "baseIncrement": "0.001",
+      "quoteIncrement": "0.001",
+      "makerFee": "0",
+      "takerFee": "0",
+      "disabled": true,
+      "tags": [
+       "ETF"
+      ]
+     },
+     {
+      "market": "QQQon-USDC",
+      "pair": {
+       "base": "QQQon",
+       "quote": "USDC"
+      },
+      "baseIncrement": "0.001",
+      "quoteIncrement": "0.001",
+      "makerFee": "0",
+      "takerFee": "0",
+      "disabled": true,
+      "tags": [
+       "ETF"
+      ]
+     },
+     {
+      "market": "SPY-USDC",
+      "pair": {
+       "base": "SPY",
+       "quote": "USDC"
+      },
+      "longName": "SPDR S&P 500 ETF",
+      "baseIncrement": "0.01",
+      "quoteIncrement": "0.01",
+      "makerFee": "0",
+      "takerFee": "0",
+      "tags": [
+       "ETF"
+      ]
+     }
+    ]
+   },
+   "perps": {
+    "tradingPairs": [
+     {
+      "market": "BTC-USD.P",
+      "underlyingMarket": "BTC-USD",
+      "displayName": "BTCUSD",
+      "longName": "Bitcoin",
+      "pair": {
+       "base": "BTC",
+       "quote": "USD"
+      },
+      "baseIncrement": "0.0001",
+      "quoteIncrement": "1",
+      "dailyInterestRate": "0.0003",
+      "fundingIntervalDivisions": 8,
+      "interestDampingRange": "0.0000625",
+      "fundingRateCap": "0.009",
+      "marginInfo": [
+       {
+        "positionBracketUsd": "1000000",
+        "maxLeverage": "40",
+        "maintenanceMarginRate": "0.0125",
+        "maintenanceAmount": "0"
+       }
+      ],
+      "defaultLeverage": "40",
+      "maxPositionBaseSize": "13",
+      "fundingRateMultiplier": "1",
+      "basisTradeMaxCollateralBaseSize": "1",
+      "makerFee": "0.0001",
+      "takerFee": "0.00025",
+      "impactPriceQuoteSize": "1000",
+      "tags": [
+       "Crypto"
+      ],
+      "logoUrl": "https://cache.enclave.market/tokens/BTC.svg",
+      "backgroundColour": "#E9983D"
+     },
+     {
+      "market": "ENA-USD.P",
+      "underlyingMarket": "ENA-USD",
+      "displayName": "ENAUSD",
+      "longName": "Ethena",
+      "pair": {
+       "base": "ENA",
+       "quote": "USD"
+      },
+      "baseIncrement": "1",
+      "quoteIncrement": "0.00001",
+      "dailyInterestRate": "0.0003",
+      "fundingIntervalDivisions": 8,
+      "interestDampingRange": "0.0000625",
+      "fundingRateCap": "0.01",
+      "marginInfo": [
+       {
+        "positionBracketUsd": "1000000",
+        "maxLeverage": "5",
+        "maintenanceMarginRate": "0.1",
+        "maintenanceAmount": "0"
+       }
+      ],
+      "defaultLeverage": "5",
+      "maxPositionBaseSize": "6700000",
+      "fundingRateMultiplier": "1",
+      "basisTradeMaxCollateralBaseSize": "200000",
+      "makerFee": "0.0001",
+      "takerFee": "0.00025",
+      "listedAt": "2026-09-01T00:00:00Z",
+      "impactPriceQuoteSize": "1000",
+      "tags": [
+       "Crypto"
+      ],
+      "logoUrl": "https://cache.enclave.market/tokens/ENA.webp",
+      "backgroundColour": "#FFFFFF"
+     },
+     {
+      "market": "ETH-USD.P",
+      "underlyingMarket": "ETH-USD",
+      "displayName": "ETHUSD",
+      "longName": "Ethereum",
+      "pair": {
+       "base": "ETH",
+       "quote": "USD"
+      },
+      "baseIncrement": "0.001",
+      "quoteIncrement": "0.1",
+      "dailyInterestRate": "0.0003",
+      "fundingIntervalDivisions": 8,
+      "interestDampingRange": "0.0000625",
+      "fundingRateCap": "0.01",
+      "marginInfo": [
+       {
+        "positionBracketUsd": "1000000",
+        "maxLeverage": "25",
+        "maintenanceMarginRate": "0.02",
+        "maintenanceAmount": "0"
+       }
+      ],
+      "defaultLeverage": "25",
+      "maxPositionBaseSize": "420",
+      "fundingRateMultiplier": "1",
+      "basisTradeMaxCollateralBaseSize": "37.5",
+      "makerFee": "0.0001",
+      "takerFee": "0.00025",
+      "impactPriceQuoteSize": "1000",
+      "tags": [
+       "Crypto"
+      ],
+      "logoUrl": "https://cache.enclave.market/tokens/ETH.svg",
+      "backgroundColour": "#715CCE"
+     }
+    ]
+   },
+   "tokenConfig": [
+    {
+     "currentSettleFee": "0",
+     "ledgerUnit": "tokens",
+     "collateralEligible": true,
+     "id": "USDC",
+     "name": "USD Coin",
+     "decimals": 6,
+     "ucid": 3408,
+     "coinGeckoId": "usd-coin",
+     "coinGeckoCurrency": "usd",
+     "bridgeInfoUrl": "",
+     "description": "",
+     "networks": {
+      "arbitrum": {
+       "contractAddress": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
+       "contractDecimals": 6
+      },
+      "ethereum": {
+       "contractAddress": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+       "contractDecimals": 6
+      }
+     }
+    },
+    {
+     "currentSettleFee": "0",
+     "ledgerUnit": "shares",
+     "custodiedAs": "SPYon",
+     "sharesMultiplier": "1.009473072784042724",
+     "collateralEligible": true,
+     "id": "SPY",
+     "name": "Ondo Tokenized SPDR S&P 500 ETF Trust",
+     "decimals": 18,
+     "ucid": 0,
+     "coinGeckoId": "",
+     "coinGeckoCurrency": "",
+     "bridgeInfoUrl": "",
+     "description": "",
+     "networks": {
+      "ethereum": {
+       "contractAddress": "0xfedc5f4a6c38211c1338aa411018dfaf26612c08",
+       "contractDecimals": 18
+      }
+     }
+    },
+    {
+     "currentSettleFee": "0",
+     "ledgerUnit": "shares",
+     "custodiedAs": "QQQon",
+     "sharesMultiplier": "1.004082430180208355",
+     "collateralEligible": true,
+     "id": "QQQ",
+     "name": "Ondo Tokenized Invesco QQQ Trust",
+     "decimals": 18,
+     "ucid": 0,
+     "coinGeckoId": "",
+     "coinGeckoCurrency": "",
+     "bridgeInfoUrl": "",
+     "description": "",
+     "networks": {
+      "ethereum": {
+       "contractAddress": "0x0e397938c1aa0680954093495b70a9f5e2249aba",
+       "contractDecimals": 18
+      }
+     }
+    }
+   ]
+  }
+ }
+}

@@ -1,0 +1,393 @@
+{
+ "GET /v1/markets": {
+  "markets": [
+   {
+    "marketDisplayName": "BTC-USD",
+    "fullAssetName": "Bitcoin",
+    "marketId": 1,
+    "status": "ONLINE",
+    "baseAsset": "BTC",
+    "quoteAsset": "USD",
+    "tickSize": "0.1",
+    "stepSize": "0.00000001",
+    "tickTiers": [
+     {
+      "upToPrice": "500000",
+      "tick": "0.1"
+     },
+     {
+      "upToPrice": "1000000",
+      "tick": "0.2"
+     },
+     {
+      "upToPrice": "2000000",
+      "tick": "0.5"
+     },
+     {
+      "upToPrice": "5000000",
+      "tick": "1"
+     },
+     {
+      "upToPrice": "10000000",
+      "tick": "2"
+     },
+     {
+      "tick": "5"
+     }
+    ],
+    "minOrderNotional": "5",
+    "minOrderSize": "0.0001",
+    "maxOrderSize": "10000",
+    "oraclePrice": "82615.2",
+    "markPrice": "82650.4",
+    "lastTradePrice": "82651.4",
+    "fundingRate": "0.0000125",
+    "nextFundingRate": "0.0000125",
+    "nextFundingAt": 1791536400,
+    "priceChange24h": "-0.0040",
+    "volume24h": "2514.1",
+    "volume24hNotional": "206375979.3",
+    "high24h": "83142.4",
+    "low24h": "80350.7",
+    "trades24h": 131054,
+    "openInterest": "198.73093609",
+    "openInterestCapNotional": null,
+    "liquidationFeePpm": null,
+    "initialMarginFraction": "0.025",
+    "maintenanceMarginFraction": "0.016667",
+    "offHoursInitialMarginFraction": "0.025",
+    "regularTradingHours": null,
+    "isOutsideRth": false,
+    "currentSettlementPrice": null,
+    "upperTradingBound": null,
+    "lowerTradingBound": null,
+    "nextUpperTradingBound": null,
+    "nextLowerTradingBound": null,
+    "isUpperInExpansionZone": null,
+    "isLowerInExpansionZone": null,
+    "upperZoneEnteredAt": null,
+    "upperExpectedExpansionAt": null,
+    "lowerZoneEnteredAt": null,
+    "lowerExpectedExpansionAt": null,
+    "type": "PERPETUAL",
+    "category": "CRYPTO",
+    "addedTimestamp": 1778786860,
+    "assetResolution": "10000000000",
+    "pythId": "1"
+   },
+   {
+    "marketDisplayName": "F-USD",
+    "fullAssetName": "Ford Motor Company",
+    "marketId": 11,
+    "status": "OFFLINE",
+    "baseAsset": "F",
+    "quoteAsset": "USD",
+    "tickSize": "0.01",
+    "stepSize": "0.0000001",
+    "tickTiers": [
+     {
+      "upToPrice": "5000",
+      "tick": "0.01"
+     },
+     {
+      "upToPrice": "10000",
+      "tick": "0.02"
+     },
+     {
+      "upToPrice": "20000",
+      "tick": "0.05"
+     },
+     {
+      "upToPrice": "50000",
+      "tick": "0.1"
+     },
+     {
+      "upToPrice": "100000",
+      "tick": "0.2"
+     },
+     {
+      "tick": "0.5"
+     }
+    ],
+    "minOrderNotional": "5",
+    "minOrderSize": "1",
+    "maxOrderSize": "10000000",
+    "oraclePrice": "0.0000",
+    "markPrice": "0",
+    "fundingRate": "0",
+    "nextFundingRate": "0",
+    "nextFundingAt": 1791536400,
+    "priceChange24h": "0",
+    "volume24h": "0",
+    "volume24hNotional": "0",
+    "trades24h": 0,
+    "openInterest": "0",
+    "openInterestCapNotional": null,
+    "liquidationFeePpm": null,
+    "initialMarginFraction": "0.2",
+    "maintenanceMarginFraction": "0.133334",
+    "offHoursInitialMarginFraction": "0.3",
+    "regularTradingHours": {
+     "startSecondsOfDay": 14400,
+     "endSecondsOfDay": 72000,
+     "timezone": "America/New_York",
+     "isOvernight": false
+    },
+    "isOutsideRth": null,
+    "currentSettlementPrice": null,
+    "upperTradingBound": null,
+    "lowerTradingBound": null,
+    "nextUpperTradingBound": null,
+    "nextLowerTradingBound": null,
+    "isUpperInExpansionZone": null,
+    "isLowerInExpansionZone": null,
+    "upperZoneEnteredAt": null,
+    "upperExpectedExpansionAt": null,
+    "lowerZoneEnteredAt": null,
+    "lowerExpectedExpansionAt": null,
+    "type": "PERPETUAL",
+    "category": "EQUITIES",
+    "addedTimestamp": 1778786860,
+    "assetResolution": "10000000000",
+    "pythId": "1126"
+   },
+   {
+    "marketDisplayName": "AMD-USD",
+    "fullAssetName": "Advanced Micro Devices",
+    "marketId": 9,
+    "status": "ONLINE",
+    "baseAsset": "AMD",
+    "quoteAsset": "USD",
+    "tickSize": "0.01",
+    "stepSize": "0.0000001",
+    "tickTiers": [
+     {
+      "upToPrice": "5000",
+      "tick": "0.01"
+     },
+     {
+      "upToPrice": "10000",
+      "tick": "0.02"
+     },
+     {
+      "upToPrice": "20000",
+      "tick": "0.05"
+     },
+     {
+      "upToPrice": "50000",
+      "tick": "0.1"
+     },
+     {
+      "upToPrice": "100000",
+      "tick": "0.2"
+     },
+     {
+      "tick": "0.5"
+     }
+    ],
+    "minOrderNotional": "5",
+    "minOrderSize": "0.01",
+    "maxOrderSize": "100000",
+    "oraclePrice": "631.44",
+    "markPrice": "630.89",
+    "lastTradePrice": "630.77",
+    "fundingRate": "0.000005069444444444",
+    "nextFundingRate": "0.000005069444467592",
+    "nextFundingAt": 1791536400,
+    "priceChange24h": "-0.0097",
+    "volume24h": "2203.86",
+    "volume24hNotional": "1393174.75",
+    "high24h": "643.53",
+    "low24h": "613.06",
+    "trades24h": 7136,
+    "openInterest": "454.69873",
+    "openInterestCapNotional": "1000000",
+    "liquidationFeePpm": null,
+    "initialMarginFraction": "0.1",
+    "maintenanceMarginFraction": "0.066667",
+    "offHoursInitialMarginFraction": "0.15",
+    "regularTradingHours": {
+     "startSecondsOfDay": 14400,
+     "endSecondsOfDay": 72000,
+     "timezone": "America/New_York",
+     "isOvernight": false
+    },
+    "isOutsideRth": false,
+    "currentSettlementPrice": null,
+    "upperTradingBound": null,
+    "lowerTradingBound": null,
+    "nextUpperTradingBound": null,
+    "nextLowerTradingBound": null,
+    "isUpperInExpansionZone": null,
+    "isLowerInExpansionZone": null,
+    "upperZoneEnteredAt": null,
+    "upperExpectedExpansionAt": null,
+    "lowerZoneEnteredAt": null,
+    "lowerExpectedExpansionAt": null,
+    "type": "PERPETUAL",
+    "category": "EQUITIES",
+    "addedTimestamp": 1778786860,
+    "assetResolution": "10000000000",
+    "pythId": "949"
+   },
+   {
+    "marketDisplayName": "GLD-USD",
+    "fullAssetName": "SPDR Gold Shares",
+    "marketId": 20,
+    "status": "ONLINE",
+    "baseAsset": "GLD",
+    "quoteAsset": "USD",
+    "tickSize": "0.01",
+    "stepSize": "0.0000001",
+    "tickTiers": [
+     {
+      "upToPrice": "5000",
+      "tick": "0.01"
+     },
+     {
+      "upToPrice": "10000",
+      "tick": "0.02"
+     },
+     {
+      "upToPrice": "20000",
+      "tick": "0.05"
+     },
+     {
+      "upToPrice": "50000",
+      "tick": "0.1"
+     },
+     {
+      "upToPrice": "100000",
+      "tick": "0.2"
+     },
+     {
+      "tick": "0.5"
+     }
+    ],
+    "minOrderNotional": "5",
+    "minOrderSize": "0.01",
+    "maxOrderSize": "100000",
+    "oraclePrice": "384.62",
+    "markPrice": "384.7",
+    "lastTradePrice": "384.64",
+    "fundingRate": "0.000005069444444444",
+    "nextFundingRate": "0.00010578555483240481",
+    "nextFundingAt": 1791536400,
+    "priceChange24h": "0.0173",
+    "volume24h": "38796.28",
+    "volume24hNotional": "14735852.35",
+    "high24h": "385.86",
+    "low24h": "376.24",
+    "trades24h": 12336,
+    "openInterest": "5723.2194577",
+    "openInterestCapNotional": "16000000",
+    "liquidationFeePpm": null,
+    "initialMarginFraction": "0.04",
+    "maintenanceMarginFraction": "0.026667",
+    "offHoursInitialMarginFraction": "0.06",
+    "regularTradingHours": {
+     "startSecondsOfDay": 14400,
+     "endSecondsOfDay": 72000,
+     "timezone": "America/New_York",
+     "isOvernight": false
+    },
+    "isOutsideRth": false,
+    "currentSettlementPrice": null,
+    "upperTradingBound": null,
+    "lowerTradingBound": null,
+    "nextUpperTradingBound": null,
+    "nextLowerTradingBound": null,
+    "isUpperInExpansionZone": null,
+    "isLowerInExpansionZone": null,
+    "upperZoneEnteredAt": null,
+    "upperExpectedExpansionAt": null,
+    "lowerZoneEnteredAt": null,
+    "lowerExpectedExpansionAt": null,
+    "type": "PERPETUAL",
+    "category": "COMMODITIES",
+    "addedTimestamp": 1778786860,
+    "assetResolution": "10000000000",
+    "pythId": "1157"
+   },
+   {
+    "marketDisplayName": "SPY-USD",
+    "fullAssetName": "SPDR S&P 500 ETF Trust",
+    "marketId": 23,
+    "status": "ONLINE",
+    "baseAsset": "SPY",
+    "quoteAsset": "USD",
+    "tickSize": "0.01",
+    "stepSize": "0.0000001",
+    "tickTiers": [
+     {
+      "upToPrice": "5000",
+      "tick": "0.01"
+     },
+     {
+      "upToPrice": "10000",
+      "tick": "0.02"
+     },
+     {
+      "upToPrice": "20000",
+      "tick": "0.05"
+     },
+     {
+      "upToPrice": "50000",
+      "tick": "0.1"
+     },
+     {
+      "upToPrice": "100000",
+      "tick": "0.2"
+     },
+     {
+      "tick": "0.5"
+     }
+    ],
+    "minOrderNotional": "5",
+    "minOrderSize": "0.001",
+    "maxOrderSize": "10000",
+    "oraclePrice": "776.92",
+    "markPrice": "777.3",
+    "lastTradePrice": "777.32",
+    "fundingRate": "0.000095443962483217",
+    "nextFundingRate": "0.00009575129189642416",
+    "nextFundingAt": 1791536400,
+    "priceChange24h": "0.0025",
+    "volume24h": "96570.51",
+    "volume24hNotional": "74807537.38",
+    "high24h": "777.48",
+    "low24h": "770.68",
+    "trades24h": 106586,
+    "openInterest": "21251.0307158",
+    "openInterestCapNotional": "32000000",
+    "liquidationFeePpm": null,
+    "initialMarginFraction": "0.02",
+    "maintenanceMarginFraction": "0.013334",
+    "offHoursInitialMarginFraction": "0.03",
+    "regularTradingHours": {
+     "startSecondsOfDay": 14400,
+     "endSecondsOfDay": 72000,
+     "timezone": "America/New_York",
+     "isOvernight": false
+    },
+    "isOutsideRth": false,
+    "currentSettlementPrice": null,
+    "upperTradingBound": null,
+    "lowerTradingBound": null,
+    "nextUpperTradingBound": null,
+    "nextLowerTradingBound": null,
+    "isUpperInExpansionZone": null,
+    "isLowerInExpansionZone": null,
+    "upperZoneEnteredAt": null,
+    "upperExpectedExpansionAt": null,
+    "lowerZoneEnteredAt": null,
+    "lowerExpectedExpansionAt": null,
+    "type": "PERPETUAL",
+    "category": "INDICES",
+    "addedTimestamp": 1778786860,
+    "assetResolution": "10000000000",
+    "pythId": "1398"
+   }
+  ]
+ }
+}

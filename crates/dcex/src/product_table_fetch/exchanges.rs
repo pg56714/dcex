@@ -22,8 +22,7 @@ use crate::product_table::MarketInfo;
 use crate::{DcexError, Result};
 
 use super::*;
-pub(super) async fn fetch_arcus(timeout: Duration) -> Result<Vec<MarketInfo>> {
-    let client = ArcusClient::public(timeout)?;
+pub(super) async fn fetch_arcus(client: &ArcusClient) -> Result<Vec<MarketInfo>> {
     let response = client.public_request("get_markets", vec![]).await?;
     response_array(&response, &["markets"])
         .iter()
@@ -52,8 +51,7 @@ pub(super) fn arcus_market_info(market: &Value) -> Result<MarketInfo> {
     })
 }
 
-pub(super) async fn fetch_aster(timeout: Duration) -> Result<Vec<MarketInfo>> {
-    let client = AsterClient::public(timeout)?;
+pub(super) async fn fetch_aster(client: &AsterClient) -> Result<Vec<MarketInfo>> {
     let spot = client
         .public_request("get_spot_exchange_info", vec![])
         .await?;
@@ -116,8 +114,7 @@ fn aster_market_info(market: &Value, product_type: &str) -> Result<MarketInfo> {
     })
 }
 
-pub(super) async fn fetch_backpack(timeout: Duration) -> Result<Vec<MarketInfo>> {
-    let client = BackpackClient::public(5_000, timeout)?;
+pub(super) async fn fetch_backpack(client: &BackpackClient) -> Result<Vec<MarketInfo>> {
     let response = client
         .public_request(
             "get_markets",
@@ -218,8 +215,11 @@ fn backpack_largest_session_limit(sessions: &[Value], key: &str) -> String {
         .map_or_else(|| "0".to_string(), |(_, value)| value)
 }
 
-pub(super) async fn fetch_binance(timeout: Duration) -> Result<Vec<MarketInfo>> {
-    let client = BinanceClient::public(timeout)?;
+/// `equity` is a keyed client: the Equity metadata endpoint needs an API key though unsigned.
+pub(super) async fn fetch_binance(
+    client: &BinanceClient,
+    equity: Option<&BinanceClient>,
+) -> Result<Vec<MarketInfo>> {
     let spot = client
         .public_request("get_spot_exchange_info", vec![])
         .await?;
@@ -294,18 +294,13 @@ pub(super) async fn fetch_binance(timeout: Duration) -> Result<Vec<MarketInfo>> 
             rows.push(row);
         }
     }
-    // The Equity metadata endpoint requires an API key even though it is unsigned.
-    if let Ok(api_key) = std::env::var("BINANCE_API_KEY")
-        && !api_key.is_empty()
-    {
-        let equity_client = BinanceClient::new(Some(api_key), None, timeout)?;
-        if let Ok(equity) = equity_client
+    if let Some(equity_client) = equity
+        && let Ok(equity) = equity_client
             .public_request("get_equity_exchange_info", vec![])
             .await
-        {
-            for market in response_array(&equity, &["symbols"]) {
-                rows.push(binance_equity_market_info(market)?);
-            }
+    {
+        for market in response_array(&equity, &["symbols"]) {
+            rows.push(binance_equity_market_info(market)?);
         }
     }
     Ok(rows)
@@ -554,8 +549,7 @@ pub(super) fn bingx_swap_market_info(market: &Value) -> Result<MarketInfo> {
     })
 }
 
-pub(super) async fn fetch_bingx(timeout: Duration) -> Result<Vec<MarketInfo>> {
-    let client = BingxClient::public(timeout)?;
+pub(super) async fn fetch_bingx(client: &BingxClient) -> Result<Vec<MarketInfo>> {
     let swap = client
         .public_request("get_swap_instrument_info", vec![])
         .await?;
@@ -604,8 +598,7 @@ pub(super) fn validate_bingx_products(rows: &[MarketInfo]) -> Result<()> {
     Ok(())
 }
 
-pub(super) async fn fetch_bitget(timeout: Duration) -> Result<Vec<MarketInfo>> {
-    let client = BitgetClient::public(timeout)?;
+pub(super) async fn fetch_bitget(client: &BitgetClient) -> Result<Vec<MarketInfo>> {
     let spot = client
         .public_request(
             "get_uta_instruments",
@@ -684,11 +677,10 @@ pub(super) fn bitget_uta_futures_market_info(market: &Value, category: &str) -> 
     })
 }
 
-pub(super) async fn fetch_bybit(timeout: Duration) -> Result<Vec<MarketInfo>> {
-    let client = BybitClient::public(5_000, false, timeout)?;
+pub(super) async fn fetch_bybit(client: &BybitClient) -> Result<Vec<MarketInfo>> {
     let mut rows = Vec::new();
     for category in ["linear", "inverse", "spot", "option"] {
-        let markets = bybit_instruments(&client, category).await?;
+        let markets = bybit_instruments(client, category).await?;
         for market in markets {
             if category == "option" {
                 if value_string(&market, "status", "") == "Trading"
@@ -766,8 +758,7 @@ async fn bybit_instruments(client: &BybitClient, category: &str) -> Result<Vec<V
     Ok(rows)
 }
 
-pub(super) async fn fetch_extended(timeout: Duration) -> Result<Vec<MarketInfo>> {
-    let client = ExtendedClient::public(timeout)?;
+pub(super) async fn fetch_extended(client: &ExtendedClient) -> Result<Vec<MarketInfo>> {
     let response = client.public_request("get_markets", vec![]).await?;
     let mut rows = Vec::new();
     for market in response_array(&response, &["data"]) {
@@ -822,8 +813,7 @@ pub(super) fn extended_market_info(market: &Value) -> Result<MarketInfo> {
     })
 }
 
-pub(super) async fn fetch_hyperliquid(timeout: Duration) -> Result<Vec<MarketInfo>> {
-    let client = HyperliquidClient::public(false, timeout)?;
+pub(super) async fn fetch_hyperliquid(client: &HyperliquidClient) -> Result<Vec<MarketInfo>> {
     let perpetual = client.public_request("get_meta", Vec::new()).await?;
     let perpetual_dexs = client.public_request("get_perp_dexs", Vec::new()).await?;
     let spot = client.public_request("get_spot_meta", Vec::new()).await?;
@@ -959,8 +949,7 @@ pub(super) fn append_hyperliquid_spot_rows(
     Ok(())
 }
 
-pub(super) async fn fetch_kucoin(timeout: Duration) -> Result<Vec<MarketInfo>> {
-    let client = KucoinClient::public(timeout)?;
+pub(super) async fn fetch_kucoin(client: &KucoinClient) -> Result<Vec<MarketInfo>> {
     let spot = client
         .public_request("get_spot_instrument_info", vec![])
         .await?;
@@ -1027,8 +1016,7 @@ pub(super) fn kucoin_futures_market_info(market: &Value) -> Result<MarketInfo> {
     })
 }
 
-pub(super) async fn fetch_kraken(timeout: Duration) -> Result<Vec<MarketInfo>> {
-    let client = KrakenClient::public(timeout)?;
+pub(super) async fn fetch_kraken(client: &KrakenClient) -> Result<Vec<MarketInfo>> {
     let spot = client
         .public_request("get_spot_asset_pairs", vec![])
         .await?;
@@ -1154,8 +1142,7 @@ pub(crate) fn kraken_spot_rows(spot: &Value, tokenized: &Value) -> Vec<MarketInf
     rows
 }
 
-pub(super) async fn fetch_ondo(timeout: Duration) -> Result<Vec<MarketInfo>> {
-    let client = OndoClient::public(timeout)?;
+pub(super) async fn fetch_ondo(client: &OndoClient) -> Result<Vec<MarketInfo>> {
     let response = client.public_request("get_markets", Vec::new()).await?;
     ondo_market_rows(&response.data)
 }
@@ -1205,19 +1192,21 @@ pub(super) fn ondo_market_rows(data: &Value) -> Result<Vec<MarketInfo>> {
 }
 
 pub(super) async fn fetch_lighter(timeout: Duration) -> Result<Vec<MarketInfo>> {
-    let mut rows = fetch_lighter_network(timeout, LighterNetwork::Mainnet).await?;
-    if let Ok(mut robinhood_rows) = fetch_lighter_network(timeout, LighterNetwork::Robinhood).await
+    let mainnet = LighterClient::with_network(timeout, LighterNetwork::Mainnet)?;
+    let mut rows = fetch_lighter_network(&mainnet, LighterNetwork::Mainnet).await?;
+    let robinhood = LighterClient::with_network(timeout, LighterNetwork::Robinhood)?;
+    if let Ok(mut robinhood_rows) =
+        fetch_lighter_network(&robinhood, LighterNetwork::Robinhood).await
     {
         rows.append(&mut robinhood_rows);
     }
     Ok(rows)
 }
 
-async fn fetch_lighter_network(
-    timeout: Duration,
+pub(super) async fn fetch_lighter_network(
+    client: &LighterClient,
     network: LighterNetwork,
 ) -> Result<Vec<MarketInfo>> {
-    let client = LighterClient::with_network(timeout, network)?;
     let response = client
         .public_request("get_order_book_details", Vec::new())
         .await?;
@@ -1272,8 +1261,7 @@ fn lighter_market_info(market: &Value, product_type: &str) -> Result<MarketInfo>
     })
 }
 
-pub(super) async fn fetch_mexc(timeout: Duration) -> Result<Vec<MarketInfo>> {
-    let client = MexcClient::public(timeout)?;
+pub(super) async fn fetch_mexc(client: &MexcClient) -> Result<Vec<MarketInfo>> {
     let spot = client
         .public_request("get_spot_exchange_info", vec![])
         .await?;
@@ -1380,8 +1368,7 @@ pub(super) fn mexc_contract_pair(market: &Value) -> Result<(String, String)> {
     Ok((base, quote))
 }
 
-pub(super) async fn fetch_okx(timeout: Duration) -> Result<Vec<MarketInfo>> {
-    let client = OkxClient::public(timeout)?;
+pub(super) async fn fetch_okx(client: &OkxClient) -> Result<Vec<MarketInfo>> {
     let mut rows = Vec::new();
     for (instrument_type, product_type) in
         [("SWAP", "swap"), ("SPOT", "spot"), ("FUTURES", "futures")]

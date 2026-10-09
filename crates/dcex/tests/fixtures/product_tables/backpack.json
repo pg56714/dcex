@@ -1,0 +1,342 @@
+{
+ "GET /api/v1/markets": [
+  {
+   "baseSymbol": "SOL",
+   "createdAt": "2025-01-21T06:34:54.691858",
+   "filters": {
+    "price": {
+     "borrowEntryFeeMaxMultiplier": "1.01",
+     "borrowEntryFeeMinMultiplier": "0.99",
+     "discoveryBoundBand": null,
+     "maxImpactMultiplier": "1.01",
+     "maxMultiplier": "2",
+     "maxPrice": null,
+     "maxPriceUpdateMultiplier": "1.0025",
+     "meanMarkPriceBand": {
+      "maxMultiplier": "1.03",
+      "minMultiplier": "0.97"
+     },
+     "meanPremiumBand": null,
+     "minImpactMultiplier": "0.99",
+     "minMultiplier": "0.25",
+     "minPrice": "0.01",
+     "minPriceUpdateMultiplier": "0.9975",
+     "tickSize": "0.01"
+    },
+    "quantity": {
+     "maxQuantity": null,
+     "minQuantity": "0.01",
+     "stepSize": "0.01"
+    }
+   },
+   "fundingInterval": null,
+   "fundingRateLowerBound": null,
+   "fundingRateUpperBound": null,
+   "imfFunction": null,
+   "marketType": "SPOT",
+   "mmfFunction": null,
+   "openInterestLimit": "0",
+   "orderBookState": "Open",
+   "positionLimitWeight": null,
+   "quoteSymbol": "USDC",
+   "rwaMarketType": null,
+   "symbol": "SOL_USDC",
+   "visible": true
+  },
+  {
+   "baseSymbol": "SOL",
+   "createdAt": "2025-01-21T06:34:54.691858",
+   "filters": {
+    "price": {
+     "borrowEntryFeeMaxMultiplier": null,
+     "borrowEntryFeeMinMultiplier": null,
+     "discoveryBoundBand": null,
+     "maxImpactMultiplier": "1.01",
+     "maxMultiplier": "2",
+     "maxPrice": "1000",
+     "maxPriceUpdateMultiplier": "1.0025",
+     "meanMarkPriceBand": {
+      "maxMultiplier": "1.075",
+      "minMultiplier": "0.925"
+     },
+     "meanPremiumBand": {
+      "tolerancePct": "0.05"
+     },
+     "minImpactMultiplier": "0.99",
+     "minMultiplier": "0.25",
+     "minPrice": "0.01",
+     "minPriceUpdateMultiplier": "0.9975",
+     "tickSize": "0.01"
+    },
+    "quantity": {
+     "maxQuantity": null,
+     "minQuantity": "0.01",
+     "stepSize": "0.01"
+    }
+   },
+   "fundingInterval": 3600000,
+   "fundingRateLowerBound": "-100",
+   "fundingRateUpperBound": "100",
+   "imfFunction": {
+    "base": "0.02",
+    "factor": "0.000075",
+    "type": "sqrt"
+   },
+   "marketType": "PERP",
+   "mmfFunction": {
+    "base": "0.0135",
+    "factor": "0.0000375",
+    "type": "sqrt"
+   },
+   "openInterestLimit": "4000000",
+   "orderBookState": "Open",
+   "positionLimitWeight": "1",
+   "quoteSymbol": "USDC",
+   "rwaMarketType": null,
+   "symbol": "SOL_USDC_PERP",
+   "visible": true
+  },
+  {
+   "baseSymbol": "FOMC0126H0",
+   "createdAt": "2026-01-12T08:28:03.884246",
+   "filters": {
+    "price": {
+     "borrowEntryFeeMaxMultiplier": null,
+     "borrowEntryFeeMinMultiplier": null,
+     "discoveryBoundBand": null,
+     "maxImpactMultiplier": null,
+     "maxMultiplier": null,
+     "maxPrice": "1",
+     "maxPriceUpdateMultiplier": null,
+     "meanMarkPriceBand": null,
+     "meanPremiumBand": null,
+     "minImpactMultiplier": null,
+     "minMultiplier": null,
+     "minPrice": "0",
+     "minPriceUpdateMultiplier": null,
+     "tickSize": "0.001"
+    },
+    "quantity": {
+     "maxQuantity": null,
+     "minQuantity": "1",
+     "stepSize": "1"
+    }
+   },
+   "fundingInterval": null,
+   "fundingRateLowerBound": null,
+   "fundingRateUpperBound": null,
+   "imfFunction": {
+    "base": "1",
+    "factor": "0",
+    "type": "sqrt"
+   },
+   "marketType": "PREDICTION",
+   "mmfFunction": {
+    "base": "0.98",
+    "factor": "0",
+    "type": "sqrt"
+   },
+   "openInterestLimit": "10000000",
+   "orderBookState": "Closed",
+   "positionLimitWeight": "1",
+   "quoteSymbol": "USDC",
+   "rwaMarketType": null,
+   "symbol": "FOMC0126H0_USDC_PREDICTION",
+   "visible": true
+  },
+  {
+   "baseSymbol": "HNT",
+   "createdAt": "2025-01-21T06:34:54.691858",
+   "filters": {
+    "price": {
+     "borrowEntryFeeMaxMultiplier": null,
+     "borrowEntryFeeMinMultiplier": null,
+     "discoveryBoundBand": null,
+     "maxImpactMultiplier": "1.05",
+     "maxMultiplier": "1.25",
+     "maxPrice": null,
+     "maxPriceUpdateMultiplier": null,
+     "meanMarkPriceBand": {
+      "maxMultiplier": "1.15",
+      "minMultiplier": "0.85"
+     },
+     "meanPremiumBand": null,
+     "minImpactMultiplier": "0.95",
+     "minMultiplier": "0.75",
+     "minPrice": "0.1",
+     "minPriceUpdateMultiplier": null,
+     "tickSize": "0.001"
+    },
+    "quantity": {
+     "maxQuantity": null,
+     "minQuantity": "0.1",
+     "stepSize": "0.1"
+    }
+   },
+   "fundingInterval": null,
+   "fundingRateLowerBound": null,
+   "fundingRateUpperBound": null,
+   "imfFunction": null,
+   "marketType": "SPOT",
+   "mmfFunction": null,
+   "openInterestLimit": "0",
+   "orderBookState": "Closed",
+   "positionLimitWeight": null,
+   "quoteSymbol": "USDC",
+   "rwaMarketType": null,
+   "symbol": "HNT_USDC",
+   "visible": true
+  },
+  {
+   "baseSymbol": "MSFT.US",
+   "createdAt": "2026-09-15T00:41:57.726043",
+   "filters": {
+    "price": {
+     "borrowEntryFeeMaxMultiplier": null,
+     "borrowEntryFeeMinMultiplier": null,
+     "discoveryBoundBand": {
+      "maxMultiplier": "1.15",
+      "minMultiplier": "0.85"
+     },
+     "maxImpactMultiplier": "1.01",
+     "maxMultiplier": "2",
+     "maxPrice": "5000",
+     "maxPriceUpdateMultiplier": "1.005",
+     "meanMarkPriceBand": {
+      "maxMultiplier": "1.05",
+      "minMultiplier": "0.95"
+     },
+     "meanPremiumBand": {
+      "tolerancePct": "0.05"
+     },
+     "minImpactMultiplier": "0.99",
+     "minMultiplier": "0.25",
+     "minPrice": "0.01",
+     "minPriceUpdateMultiplier": "0.995",
+     "tickSize": "0.01"
+    },
+    "quantity": {
+     "maxQuantity": null,
+     "minQuantity": "0.01",
+     "stepSize": "0.01"
+    }
+   },
+   "fundingInterval": 3600000,
+   "fundingRateLowerBound": "-150",
+   "fundingRateUpperBound": "150",
+   "imfFunction": {
+    "base": "0.1",
+    "factor": "0.0006",
+    "type": "sqrt"
+   },
+   "marketType": "PERP",
+   "mmfFunction": {
+    "base": "0.05",
+    "factor": "0.00036",
+    "type": "sqrt"
+   },
+   "openInterestLimit": "80000",
+   "orderBookState": "PostOnly",
+   "positionLimitWeight": "20",
+   "quoteSymbol": "USDC",
+   "rwaMarketType": "STOCK",
+   "symbol": "MSFT.US_USDC_PERP",
+   "visible": false
+  }
+ ],
+ "GET /api/v1/securities": [
+  {
+   "asset": "AAPL.US",
+   "cusip": "037833100",
+   "name": "Apple Inc.",
+   "sessions": [
+    {
+     "maxQuantity": "1000",
+     "minQuantity": "1",
+     "name": "US_EQUITIES_PRE_MARKET",
+     "stepSize": "1"
+    },
+    {
+     "maxQuantity": "10000",
+     "minQuantity": "0.01",
+     "name": "US_EQUITIES_REGULAR",
+     "stepSize": "0.00001"
+    },
+    {
+     "maxQuantity": "1000",
+     "minQuantity": "1",
+     "name": "US_EQUITIES_POST_MARKET",
+     "stepSize": "1"
+    },
+    {
+     "maxQuantity": "1000",
+     "minQuantity": "1",
+     "name": "US_EQUITIES_OVERNIGHT",
+     "stepSize": "1"
+    }
+   ]
+  },
+  {
+   "asset": "AMZN.US",
+   "cusip": "023135106",
+   "name": "Amazon",
+   "sessions": [
+    {
+     "maxQuantity": "1000",
+     "minQuantity": "1",
+     "name": "US_EQUITIES_PRE_MARKET",
+     "stepSize": "1"
+    },
+    {
+     "maxQuantity": "10000",
+     "minQuantity": "0.01",
+     "name": "US_EQUITIES_REGULAR",
+     "stepSize": "0.00001"
+    },
+    {
+     "maxQuantity": "1000",
+     "minQuantity": "1",
+     "name": "US_EQUITIES_POST_MARKET",
+     "stepSize": "1"
+    },
+    {
+     "maxQuantity": "1000",
+     "minQuantity": "1",
+     "name": "US_EQUITIES_OVERNIGHT",
+     "stepSize": "1"
+    }
+   ]
+  },
+  {
+   "asset": "AVGO.US",
+   "cusip": "11135F101",
+   "name": "Broadcom Inc.",
+   "sessions": [
+    {
+     "maxQuantity": "1000",
+     "minQuantity": "1",
+     "name": "US_EQUITIES_PRE_MARKET",
+     "stepSize": "1"
+    },
+    {
+     "maxQuantity": "10000",
+     "minQuantity": "0.01",
+     "name": "US_EQUITIES_REGULAR",
+     "stepSize": "0.00001"
+    },
+    {
+     "maxQuantity": "1000",
+     "minQuantity": "1",
+     "name": "US_EQUITIES_POST_MARKET",
+     "stepSize": "1"
+    },
+    {
+     "maxQuantity": "1000",
+     "minQuantity": "1",
+     "name": "US_EQUITIES_OVERNIGHT",
+     "stepSize": "1"
+    }
+   ]
+  }
+ ]
+}

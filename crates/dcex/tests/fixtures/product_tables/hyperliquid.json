@@ -1,0 +1,1426 @@
+{
+ "{\"type\":\"meta\",\"dex\":\"xyz\"}": {
+  "universe": [
+   {
+    "szDecimals": 4,
+    "name": "xyz:XYZ100",
+    "maxLeverage": 30,
+    "marginTableId": 30,
+    "growthMode": "enabled",
+    "lastFeeScaleChangeTime": "2025-11-23T17:37:10.033211662",
+    "deployerFeeScale": "1.0"
+   },
+   {
+    "szDecimals": 3,
+    "name": "xyz:TSLA",
+    "maxLeverage": 20,
+    "marginTableId": 20,
+    "growthMode": "enabled",
+    "lastFeeScaleChangeTime": "2025-11-23T17:37:10.033211662",
+    "deployerFeeScale": "1.0"
+   },
+   {
+    "szDecimals": 3,
+    "name": "xyz:NVDA",
+    "maxLeverage": 20,
+    "marginTableId": 20,
+    "growthMode": "enabled",
+    "lastFeeScaleChangeTime": "2025-11-23T17:37:10.033211662",
+    "deployerFeeScale": "1.0"
+   }
+  ],
+  "marginTables": [
+   [
+    50,
+    {
+     "description": "",
+     "marginTiers": [
+      {
+       "lowerBound": "0.0",
+       "maxLeverage": 50
+      }
+     ]
+    }
+   ]
+  ],
+  "collateralToken": 0
+ },
+ "{\"type\":\"meta\"}": {
+  "universe": [
+   {
+    "szDecimals": 5,
+    "name": "BTC",
+    "maxLeverage": 40,
+    "marginTableId": 56
+   },
+   {
+    "szDecimals": 4,
+    "name": "ETH",
+    "maxLeverage": 25,
+    "marginTableId": 55
+   },
+   {
+    "szDecimals": 2,
+    "name": "ATOM",
+    "maxLeverage": 5,
+    "marginTableId": 5
+   }
+  ],
+  "marginTables": [
+   [
+    50,
+    {
+     "description": "",
+     "marginTiers": [
+      {
+       "lowerBound": "0.0",
+       "maxLeverage": 50
+      }
+     ]
+    }
+   ],
+   [
+    51,
+    {
+     "description": "tiered 10x",
+     "marginTiers": [
+      {
+       "lowerBound": "0.0",
+       "maxLeverage": 10
+      },
+      {
+       "lowerBound": "3000000.0",
+       "maxLeverage": 5
+      }
+     ]
+    }
+   ],
+   [
+    52,
+    {
+     "description": "tiered 10x (2)",
+     "marginTiers": [
+      {
+       "lowerBound": "0.0",
+       "maxLeverage": 10
+      },
+      {
+       "lowerBound": "20000000.0",
+       "maxLeverage": 5
+      }
+     ]
+    }
+   ],
+   [
+    53,
+    {
+     "description": "tiered 20x",
+     "marginTiers": [
+      {
+       "lowerBound": "0.0",
+       "maxLeverage": 20
+      },
+      {
+       "lowerBound": "40000000.0",
+       "maxLeverage": 10
+      }
+     ]
+    }
+   ],
+   [
+    54,
+    {
+     "description": "tiered 20x (2)",
+     "marginTiers": [
+      {
+       "lowerBound": "0.0",
+       "maxLeverage": 20
+      },
+      {
+       "lowerBound": "70000000.0",
+       "maxLeverage": 10
+      }
+     ]
+    }
+   ],
+   [
+    55,
+    {
+     "description": "tiered 25x",
+     "marginTiers": [
+      {
+       "lowerBound": "0.0",
+       "maxLeverage": 25
+      },
+      {
+       "lowerBound": "100000000.0",
+       "maxLeverage": 15
+      }
+     ]
+    }
+   ],
+   [
+    56,
+    {
+     "description": "tiered 40x",
+     "marginTiers": [
+      {
+       "lowerBound": "0.0",
+       "maxLeverage": 40
+      },
+      {
+       "lowerBound": "150000000.0",
+       "maxLeverage": 20
+      }
+     ]
+    }
+   ]
+  ],
+  "collateralToken": 0
+ },
+ "{\"type\":\"perpDexs\"}": [
+  null,
+  {
+   "name": "xyz",
+   "fullName": "XYZ",
+   "deployer": "0x88806a71d74ad0a510b350545c9ae490912f0888",
+   "oracleUpdater": null,
+   "feeRecipient": "0x83ffcfb1f2ad843c474b2e28df86c721cb869d3a",
+   "assetToStreamingOiCap": [
+    [
+     "xyz:AAOI",
+     "25000000.0"
+    ],
+    [
+     "xyz:AAPL",
+     "200000000.0"
+    ],
+    [
+     "xyz:ALUMINIUM",
+     "25000000.0"
+    ],
+    [
+     "xyz:AMAT",
+     "25000000.0"
+    ],
+    [
+     "xyz:AMD",
+     "100000000.0"
+    ],
+    [
+     "xyz:AMZN",
+     "100000000.0"
+    ],
+    [
+     "xyz:ARM",
+     "50000000.0"
+    ],
+    [
+     "xyz:ASML",
+     "25000000.0"
+    ],
+    [
+     "xyz:AVGO",
+     "75000000.0"
+    ],
+    [
+     "xyz:BABA",
+     "50000000.0"
+    ],
+    [
+     "xyz:BB",
+     "75000000.0"
+    ],
+    [
+     "xyz:BE",
+     "25000000.0"
+    ],
+    [
+     "xyz:BIRD",
+     "25000000.0"
+    ],
+    [
+     "xyz:BMNR",
+     "25000000.0"
+    ],
+    [
+     "xyz:BOT",
+     "25000000.0"
+    ],
+    [
+     "xyz:BRENTOIL",
+     "750000000.0"
+    ],
+    [
+     "xyz:BX",
+     "25000000.0"
+    ],
+    [
+     "xyz:CAMBRICON",
+     "25000000.0"
+    ],
+    [
+     "xyz:CBRS",
+     "150000000.0"
+    ],
+    [
+     "xyz:CL",
+     "1000000000.0"
+    ],
+    [
+     "xyz:COIN",
+     "50000000.0"
+    ],
+    [
+     "xyz:COPPER",
+     "300000000.0"
+    ],
+    [
+     "xyz:CORN",
+     "25000000.0"
+    ],
+    [
+     "xyz:COST",
+     "25000000.0"
+    ],
+    [
+     "xyz:CRCL",
+     "200000000.0"
+    ],
+    [
+     "xyz:CRWD",
+     "25000000.0"
+    ],
+    [
+     "xyz:CRWV",
+     "50000000.0"
+    ],
+    [
+     "xyz:CVX",
+     "25000000.0"
+    ],
+    [
+     "xyz:CXMT",
+     "250000000.0"
+    ],
+    [
+     "xyz:DELL",
+     "25000000.0"
+    ],
+    [
+     "xyz:DKNG",
+     "25000000.0"
+    ],
+    [
+     "xyz:DRAM",
+     "250000000.0"
+    ],
+    [
+     "xyz:DXY",
+     "25000000.0"
+    ],
+    [
+     "xyz:EBAY",
+     "25000000.0"
+    ],
+    [
+     "xyz:EUR",
+     "50000000.0"
+    ],
+    [
+     "xyz:EWJ",
+     "25000000.0"
+    ],
+    [
+     "xyz:EWT",
+     "25000000.0"
+    ],
+    [
+     "xyz:EWY",
+     "100000000.0"
+    ],
+    [
+     "xyz:EWZ",
+     "25000000.0"
+    ],
+    [
+     "xyz:GBP",
+     "25000000.0"
+    ],
+    [
+     "xyz:GEV",
+     "25000000.0"
+    ],
+    [
+     "xyz:GIGADEV",
+     "25000000.0"
+    ],
+    [
+     "xyz:GLW",
+     "25000000.0"
+    ],
+    [
+     "xyz:GME",
+     "25000000.0"
+    ],
+    [
+     "xyz:GOLD",
+     "750000000.0"
+    ],
+    [
+     "xyz:GOOGL",
+     "350000000.0"
+    ],
+    [
+     "xyz:H100",
+     "25000000.0"
+    ],
+    [
+     "xyz:HIMS",
+     "25000000.0"
+    ],
+    [
+     "xyz:HO",
+     "25000000.0"
+    ],
+    [
+     "xyz:HOOD",
+     "150000000.0"
+    ],
+    [
+     "xyz:HYUNDAI",
+     "25000000.0"
+    ],
+    [
+     "xyz:IBIDEN",
+     "25000000.0"
+    ],
+    [
+     "xyz:IBM",
+     "50000000.0"
+    ],
+    [
+     "xyz:IBOV",
+     "25000000.0"
+    ],
+    [
+     "xyz:INTC",
+     "350000000.0"
+    ],
+    [
+     "xyz:IREN",
+     "25000000.0"
+    ],
+    [
+     "xyz:JP225",
+     "25000000.0"
+    ],
+    [
+     "xyz:JPY",
+     "100000000.0"
+    ],
+    [
+     "xyz:KIOXIA",
+     "50000000.0"
+    ],
+    [
+     "xyz:KORU",
+     "25000000.0"
+    ],
+    [
+     "xyz:KR200",
+     "25000000.0"
+    ],
+    [
+     "xyz:KRW",
+     "25000000.0"
+    ],
+    [
+     "xyz:KSTR",
+     "25000000.0"
+    ],
+    [
+     "xyz:LITE",
+     "100000000.0"
+    ],
+    [
+     "xyz:LLY",
+     "25000000.0"
+    ],
+    [
+     "xyz:LRCX",
+     "25000000.0"
+    ],
+    [
+     "xyz:LYTE",
+     "25000000.0"
+    ],
+    [
+     "xyz:MAGS",
+     "25000000.0"
+    ],
+    [
+     "xyz:META",
+     "200000000.0"
+    ],
+    [
+     "xyz:MINIMAX",
+     "50000000.0"
+    ],
+    [
+     "xyz:MRNA",
+     "75000000.0"
+    ],
+    [
+     "xyz:MRVL",
+     "200000000.0"
+    ],
+    [
+     "xyz:MSFT",
+     "250000000.0"
+    ],
+    [
+     "xyz:MSTR",
+     "150000000.0"
+    ],
+    [
+     "xyz:MU",
+     "500000000.0"
+    ],
+    [
+     "xyz:NATGAS",
+     "100000000.0"
+    ],
+    [
+     "xyz:NBIS",
+     "150000000.0"
+    ],
+    [
+     "xyz:NCLD",
+     "25000000.0"
+    ],
+    [
+     "xyz:NET",
+     "25000000.0"
+    ],
+    [
+     "xyz:NFLX",
+     "50000000.0"
+    ],
+    [
+     "xyz:NIFTY",
+     "25000000.0"
+    ],
+    [
+     "xyz:NOK",
+     "25000000.0"
+    ],
+    [
+     "xyz:NOW",
+     "25000000.0"
+    ],
+    [
+     "xyz:NVDA",
+     "500000000.0"
+    ],
+    [
+     "xyz:ORCL",
+     "150000000.0"
+    ],
+    [
+     "xyz:OURA",
+     "25000000.0"
+    ],
+    [
+     "xyz:PALLADIUM",
+     "25000000.0"
+    ],
+    [
+     "xyz:PLATINUM",
+     "25000000.0"
+    ],
+    [
+     "xyz:PLTR",
+     "150000000.0"
+    ],
+    [
+     "xyz:PURRDAT",
+     "50000000.0"
+    ],
+    [
+     "xyz:QCOM",
+     "25000000.0"
+    ],
+    [
+     "xyz:QNT",
+     "20000000.0"
+    ],
+    [
+     "xyz:RDDT",
+     "25000000.0"
+    ],
+    [
+     "xyz:RIVN",
+     "25000000.0"
+    ],
+    [
+     "xyz:RKLB",
+     "50000000.0"
+    ],
+    [
+     "xyz:SHAZ",
+     "25000000.0"
+    ],
+    [
+     "xyz:SHEIN",
+     "25000000.0"
+    ],
+    [
+     "xyz:SILVER",
+     "500000000.0"
+    ],
+    [
+     "xyz:SKHX",
+     "1000000000.0"
+    ],
+    [
+     "xyz:SKHY",
+     "400000000.0"
+    ],
+    [
+     "xyz:SMH",
+     "25000000.0"
+    ],
+    [
+     "xyz:SMSN",
+     "250000000.0"
+    ],
+    [
+     "xyz:SNDK",
+     "500000000.0"
+    ],
+    [
+     "xyz:SNXX",
+     "25000000.0"
+    ],
+    [
+     "xyz:SOFTBANK",
+     "25000000.0"
+    ],
+    [
+     "xyz:SOXL",
+     "50000000.0"
+    ],
+    [
+     "xyz:SP500",
+     "1250000000.0"
+    ],
+    [
+     "xyz:SPCX",
+     "750000000.0"
+    ],
+    [
+     "xyz:STRC",
+     "50000000.0"
+    ],
+    [
+     "xyz:TLT",
+     "25000000.0"
+    ],
+    [
+     "xyz:TSLA",
+     "100000000.0"
+    ],
+    [
+     "xyz:TSM",
+     "50000000.0"
+    ],
+    [
+     "xyz:TTF",
+     "25000000.0"
+    ],
+    [
+     "xyz:TWST",
+     "25000000.0"
+    ],
+    [
+     "xyz:UMC",
+     "25000000.0"
+    ],
+    [
+     "xyz:UNITREE",
+     "100000000.0"
+    ],
+    [
+     "xyz:URANIUM",
+     "25000000.0"
+    ],
+    [
+     "xyz:URNM",
+     "25000000.0"
+    ],
+    [
+     "xyz:USAR",
+     "25000000.0"
+    ],
+    [
+     "xyz:VIX",
+     "25000000.0"
+    ],
+    [
+     "xyz:VOL",
+     "25000000.0"
+    ],
+    [
+     "xyz:WDC",
+     "50000000.0"
+    ],
+    [
+     "xyz:WHEAT",
+     "25000000.0"
+    ],
+    [
+     "xyz:XBI",
+     "25000000.0"
+    ],
+    [
+     "xyz:XLE",
+     "25000000.0"
+    ],
+    [
+     "xyz:XYZ100",
+     "1000000000.0"
+    ],
+    [
+     "xyz:YMTC",
+     "25000000.0"
+    ],
+    [
+     "xyz:ZHIPU",
+     "100000000.0"
+    ],
+    [
+     "xyz:ZM",
+     "25000000.0"
+    ]
+   ],
+   "subDeployers": [
+    [
+     "registerAsset",
+     [
+      "0x7d16f116d252db609c56d27d6c9605eb03e16657",
+      "0x8c4190018486a2dbac2629d688136e8990170ff2",
+      "0xc0892b4f864807ec26dde6ad8dad6914e079059d"
+     ]
+    ],
+    [
+     "setOracle",
+     [
+      "0x1234567890545d1df9ee64b35fdd16966e08acec"
+     ]
+    ],
+    [
+     "setFeeRecipient",
+     [
+      "0x7d16f116d252db609c56d27d6c9605eb03e16657",
+      "0xc0892b4f864807ec26dde6ad8dad6914e079059d"
+     ]
+    ],
+    [
+     "haltTrading",
+     [
+      "0x7d16f116d252db609c56d27d6c9605eb03e16657",
+      "0xc0892b4f864807ec26dde6ad8dad6914e079059d"
+     ]
+    ],
+    [
+     "setMarginTableIds",
+     [
+      "0x7d16f116d252db609c56d27d6c9605eb03e16657",
+      "0x8c4190018486a2dbac2629d688136e8990170ff2",
+      "0xc0892b4f864807ec26dde6ad8dad6914e079059d"
+     ]
+    ],
+    [
+     "setOpenInterestCaps",
+     [
+      "0x7d16f116d252db609c56d27d6c9605eb03e16657",
+      "0x8c4190018486a2dbac2629d688136e8990170ff2",
+      "0xc0892b4f864807ec26dde6ad8dad6914e079059d"
+     ]
+    ],
+    [
+     "setFundingMultipliers",
+     [
+      "0x7d16f116d252db609c56d27d6c9605eb03e16657",
+      "0x8c4190018486a2dbac2629d688136e8990170ff2",
+      "0xc0892b4f864807ec26dde6ad8dad6914e079059d"
+     ]
+    ],
+    [
+     "setMarginModes",
+     [
+      "0x7d16f116d252db609c56d27d6c9605eb03e16657",
+      "0x8c4190018486a2dbac2629d688136e8990170ff2",
+      "0xc0892b4f864807ec26dde6ad8dad6914e079059d"
+     ]
+    ],
+    [
+     "setDeployerFees",
+     [
+      "0x7d16f116d252db609c56d27d6c9605eb03e16657",
+      "0x8c4190018486a2dbac2629d688136e8990170ff2"
+     ]
+    ],
+    [
+     "setFundingInterestRates",
+     [
+      "0x7d16f116d252db609c56d27d6c9605eb03e16657",
+      "0x8c4190018486a2dbac2629d688136e8990170ff2",
+      "0xc0892b4f864807ec26dde6ad8dad6914e079059d"
+     ]
+    ],
+    [
+     "setPerpAnnotation",
+     [
+      "0x7d16f116d252db609c56d27d6c9605eb03e16657",
+      "0x8c4190018486a2dbac2629d688136e8990170ff2",
+      "0xc0892b4f864807ec26dde6ad8dad6914e079059d"
+     ]
+    ]
+   ],
+   "assetToFundingMultiplier": [
+    [
+     "xyz:AAOI",
+     "0.5"
+    ],
+    [
+     "xyz:AAPL",
+     "0.5"
+    ],
+    [
+     "xyz:ALUMINIUM",
+     "0.5"
+    ],
+    [
+     "xyz:AMAT",
+     "0.5"
+    ],
+    [
+     "xyz:AMD",
+     "0.5"
+    ],
+    [
+     "xyz:AMZN",
+     "0.5"
+    ],
+    [
+     "xyz:ARM",
+     "0.5"
+    ],
+    [
+     "xyz:ASML",
+     "0.5"
+    ],
+    [
+     "xyz:AVGO",
+     "0.5"
+    ],
+    [
+     "xyz:BABA",
+     "0.5"
+    ],
+    [
+     "xyz:BB",
+     "0.5"
+    ],
+    [
+     "xyz:BE",
+     "0.5"
+    ],
+    [
+     "xyz:BIRD",
+     "0.5"
+    ],
+    [
+     "xyz:BMNR",
+     "0.5"
+    ],
+    [
+     "xyz:BOT",
+     "0.5"
+    ],
+    [
+     "xyz:BRENTOIL",
+     "0.5"
+    ],
+    [
+     "xyz:BX",
+     "0.5"
+    ],
+    [
+     "xyz:CAMBRICON",
+     "0.5"
+    ],
+    [
+     "xyz:CBRS",
+     "0.5"
+    ],
+    [
+     "xyz:CL",
+     "0.5"
+    ],
+    [
+     "xyz:COIN",
+     "0.5"
+    ],
+    [
+     "xyz:COPPER",
+     "0.5"
+    ],
+    [
+     "xyz:CORN",
+     "0.5"
+    ],
+    [
+     "xyz:COST",
+     "0.5"
+    ],
+    [
+     "xyz:CRCL",
+     "0.5"
+    ],
+    [
+     "xyz:CRWD",
+     "0.5"
+    ],
+    [
+     "xyz:CRWV",
+     "0.5"
+    ],
+    [
+     "xyz:CVX",
+     "0.5"
+    ],
+    [
+     "xyz:CXMT",
+     "0.5"
+    ],
+    [
+     "xyz:DELL",
+     "0.5"
+    ],
+    [
+     "xyz:DKNG",
+     "0.5"
+    ],
+    [
+     "xyz:DRAM",
+     "0.5"
+    ],
+    [
+     "xyz:DXY",
+     "0.5"
+    ],
+    [
+     "xyz:EBAY",
+     "0.5"
+    ],
+    [
+     "xyz:EUR",
+     "0.5"
+    ],
+    [
+     "xyz:EWJ",
+     "0.5"
+    ],
+    [
+     "xyz:EWT",
+     "0.5"
+    ],
+    [
+     "xyz:EWY",
+     "0.5"
+    ],
+    [
+     "xyz:EWZ",
+     "0.5"
+    ],
+    [
+     "xyz:GBP",
+     "0.5"
+    ],
+    [
+     "xyz:GEV",
+     "0.5"
+    ],
+    [
+     "xyz:GIGADEV",
+     "0.5"
+    ],
+    [
+     "xyz:GLW",
+     "0.5"
+    ],
+    [
+     "xyz:GME",
+     "0.5"
+    ],
+    [
+     "xyz:GOLD",
+     "0.5"
+    ],
+    [
+     "xyz:GOOGL",
+     "0.5"
+    ],
+    [
+     "xyz:H100",
+     "0.5"
+    ],
+    [
+     "xyz:HIMS",
+     "0.5"
+    ],
+    [
+     "xyz:HO",
+     "0.5"
+    ],
+    [
+     "xyz:HOOD",
+     "0.5"
+    ],
+    [
+     "xyz:HYUNDAI",
+     "0.5"
+    ],
+    [
+     "xyz:IBIDEN",
+     "0.5"
+    ],
+    [
+     "xyz:IBM",
+     "0.5"
+    ],
+    [
+     "xyz:IBOV",
+     "0.5"
+    ],
+    [
+     "xyz:INTC",
+     "0.5"
+    ],
+    [
+     "xyz:IREN",
+     "0.5"
+    ],
+    [
+     "xyz:JP225",
+     "0.5"
+    ],
+    [
+     "xyz:JPY",
+     "0.5"
+    ],
+    [
+     "xyz:KIOXIA",
+     "0.5"
+    ],
+    [
+     "xyz:KORU",
+     "0.5"
+    ],
+    [
+     "xyz:KR200",
+     "0.5"
+    ],
+    [
+     "xyz:KRW",
+     "0.5"
+    ],
+    [
+     "xyz:KSTR",
+     "0.5"
+    ],
+    [
+     "xyz:LITE",
+     "0.5"
+    ],
+    [
+     "xyz:LLY",
+     "0.5"
+    ],
+    [
+     "xyz:LRCX",
+     "0.5"
+    ],
+    [
+     "xyz:LYTE",
+     "0.5"
+    ],
+    [
+     "xyz:MAGS",
+     "0.5"
+    ],
+    [
+     "xyz:META",
+     "0.5"
+    ],
+    [
+     "xyz:MINIMAX",
+     "0.5"
+    ],
+    [
+     "xyz:MRNA",
+     "0.5"
+    ],
+    [
+     "xyz:MRVL",
+     "0.5"
+    ],
+    [
+     "xyz:MSFT",
+     "0.5"
+    ],
+    [
+     "xyz:MSTR",
+     "0.5"
+    ],
+    [
+     "xyz:MU",
+     "0.5"
+    ],
+    [
+     "xyz:NATGAS",
+     "0.5"
+    ],
+    [
+     "xyz:NBIS",
+     "0.5"
+    ],
+    [
+     "xyz:NCLD",
+     "0.5"
+    ],
+    [
+     "xyz:NET",
+     "0.5"
+    ],
+    [
+     "xyz:NFLX",
+     "0.5"
+    ],
+    [
+     "xyz:NIFTY",
+     "0.5"
+    ],
+    [
+     "xyz:NOK",
+     "0.5"
+    ],
+    [
+     "xyz:NOW",
+     "0.5"
+    ],
+    [
+     "xyz:NVDA",
+     "0.5"
+    ],
+    [
+     "xyz:ORCL",
+     "0.5"
+    ],
+    [
+     "xyz:OURA",
+     "0.005"
+    ],
+    [
+     "xyz:PALLADIUM",
+     "0.5"
+    ],
+    [
+     "xyz:PLATINUM",
+     "0.5"
+    ],
+    [
+     "xyz:PLTR",
+     "0.5"
+    ],
+    [
+     "xyz:PURRDAT",
+     "0.5"
+    ],
+    [
+     "xyz:QCOM",
+     "0.5"
+    ],
+    [
+     "xyz:QNT",
+     "0.5"
+    ],
+    [
+     "xyz:RDDT",
+     "0.5"
+    ],
+    [
+     "xyz:RIVN",
+     "0.5"
+    ],
+    [
+     "xyz:RKLB",
+     "0.5"
+    ],
+    [
+     "xyz:SHAZ",
+     "0.5"
+    ],
+    [
+     "xyz:SHEIN",
+     "0.5"
+    ],
+    [
+     "xyz:SILVER",
+     "0.5"
+    ],
+    [
+     "xyz:SKHX",
+     "0.5"
+    ],
+    [
+     "xyz:SKHY",
+     "0.5"
+    ],
+    [
+     "xyz:SMH",
+     "0.5"
+    ],
+    [
+     "xyz:SMSN",
+     "0.5"
+    ],
+    [
+     "xyz:SNDK",
+     "0.5"
+    ],
+    [
+     "xyz:SNXX",
+     "0.5"
+    ],
+    [
+     "xyz:SOFTBANK",
+     "0.5"
+    ],
+    [
+     "xyz:SOXL",
+     "0.5"
+    ],
+    [
+     "xyz:SP500",
+     "0.5"
+    ],
+    [
+     "xyz:SPCX",
+     "0.5"
+    ],
+    [
+     "xyz:STRC",
+     "0.5"
+    ],
+    [
+     "xyz:TLT",
+     "0.5"
+    ],
+    [
+     "xyz:TSLA",
+     "0.5"
+    ],
+    [
+     "xyz:TSM",
+     "0.5"
+    ],
+    [
+     "xyz:TTF",
+     "0.5"
+    ],
+    [
+     "xyz:TWST",
+     "0.5"
+    ],
+    [
+     "xyz:UMC",
+     "0.5"
+    ],
+    [
+     "xyz:UNITREE",
+     "0.5"
+    ],
+    [
+     "xyz:URANIUM",
+     "0.5"
+    ],
+    [
+     "xyz:URNM",
+     "0.5"
+    ],
+    [
+     "xyz:USAR",
+     "0.5"
+    ],
+    [
+     "xyz:VIX",
+     "0.5"
+    ],
+    [
+     "xyz:VOL",
+     "0.5"
+    ],
+    [
+     "xyz:WDC",
+     "0.5"
+    ],
+    [
+     "xyz:WHEAT",
+     "0.5"
+    ],
+    [
+     "xyz:XBI",
+     "0.5"
+    ],
+    [
+     "xyz:XLE",
+     "0.5"
+    ],
+    [
+     "xyz:XYZ100",
+     "0.5"
+    ],
+    [
+     "xyz:YMTC",
+     "0.5"
+    ],
+    [
+     "xyz:ZHIPU",
+     "0.5"
+    ],
+    [
+     "xyz:ZM",
+     "0.5"
+    ]
+   ],
+   "assetToFundingInterestRate": [
+    [
+     "xyz:EUR",
+     "0.0"
+    ],
+    [
+     "xyz:GBP",
+     "0.0"
+    ],
+    [
+     "xyz:JPY",
+     "0.0"
+    ],
+    [
+     "xyz:KRW",
+     "0.0"
+    ]
+   ],
+   "assetToFundingClamp": []
+  }
+ ],
+ "{\"type\":\"spotMeta\"}": {
+  "universe": [
+   {
+    "tokens": [
+     1,
+     0
+    ],
+    "name": "PURR/USDC",
+    "index": 0,
+    "isCanonical": true
+   },
+   {
+    "tokens": [
+     2,
+     0
+    ],
+    "name": "@1",
+    "index": 1,
+    "isCanonical": false
+   },
+   {
+    "tokens": [
+     3,
+     0
+    ],
+    "name": "@2",
+    "index": 2,
+    "isCanonical": false
+   },
+   {
+    "tokens": [
+     2,
+     0
+    ],
+    "name": "@1",
+    "index": 1,
+    "isCanonical": false
+   }
+  ],
+  "tokens": [
+   {
+    "name": "USDC",
+    "szDecimals": 8,
+    "weiDecimals": 8,
+    "index": 0,
+    "tokenId": "0x6d1e7cde53ba9467b783cb7c530ce054",
+    "isCanonical": true,
+    "evmContract": {
+     "address": "0x6b9e773128f453f5c2c60935ee2de2cbc5390a24",
+     "evm_extra_wei_decimals": -2
+    },
+    "fullName": null,
+    "deployerTradingFeeShare": "0.0"
+   },
+   {
+    "name": "PURR",
+    "szDecimals": 0,
+    "weiDecimals": 5,
+    "index": 1,
+    "tokenId": "0xc1fb593aeffbeb02f85e0308e9956a90",
+    "isCanonical": true,
+    "evmContract": {
+     "address": "0x9b498c3c8a0b8cd8ba1d9851d40d186f1872b44e",
+     "evm_extra_wei_decimals": 13
+    },
+    "fullName": null,
+    "deployerTradingFeeShare": "0.0"
+   },
+   {
+    "name": "HFUN",
+    "szDecimals": 2,
+    "weiDecimals": 8,
+    "index": 2,
+    "tokenId": "0xbaf265ef389da684513d98d68edf4eae",
+    "isCanonical": false,
+    "evmContract": {
+     "address": "0xa320d9f65ec992eff38622c63627856382db726c",
+     "evm_extra_wei_decimals": 10
+    },
+    "fullName": null,
+    "deployerTradingFeeShare": "0.0"
+   },
+   {
+    "name": "LICK",
+    "szDecimals": 0,
+    "weiDecimals": 5,
+    "index": 3,
+    "tokenId": "0xba3aaf468f793d9b42fd3328e24f1de9",
+    "isCanonical": false,
+    "evmContract": null,
+    "fullName": null,
+    "deployerTradingFeeShare": "0.0"
+   }
+  ]
+ }
+}

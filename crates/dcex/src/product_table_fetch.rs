@@ -37,22 +37,40 @@ pub(crate) async fn fetch_product_rows(
 }
 
 async fn fetch_exchange_rows(exchange: Exchange, timeout: Duration) -> Result<Vec<MarketInfo>> {
+    use self::exchanges as fetch;
+    use crate::exchanges::{
+        arcus::ArcusClient, aster::AsterClient, backpack::BackpackClient, binance::BinanceClient,
+        bingx::BingxClient, bitget::BitgetClient, bybit::BybitClient, extended::ExtendedClient,
+        hyperliquid::HyperliquidClient, kraken::KrakenClient, kucoin::KucoinClient,
+        mexc::MexcClient, okx::OkxClient, ondo::OndoClient,
+    };
     match exchange {
-        Exchange::Arcus => self::exchanges::fetch_arcus(timeout).await,
-        Exchange::Aster => self::exchanges::fetch_aster(timeout).await,
-        Exchange::Backpack => self::exchanges::fetch_backpack(timeout).await,
-        Exchange::Binance => self::exchanges::fetch_binance(timeout).await,
-        Exchange::BingX => self::exchanges::fetch_bingx(timeout).await,
-        Exchange::Bitget => self::exchanges::fetch_bitget(timeout).await,
-        Exchange::Bybit => self::exchanges::fetch_bybit(timeout).await,
-        Exchange::Extended => self::exchanges::fetch_extended(timeout).await,
-        Exchange::Hyperliquid => self::exchanges::fetch_hyperliquid(timeout).await,
-        Exchange::KuCoin => self::exchanges::fetch_kucoin(timeout).await,
-        Exchange::Kraken => self::exchanges::fetch_kraken(timeout).await,
-        Exchange::Lighter => self::exchanges::fetch_lighter(timeout).await,
-        Exchange::Mexc => self::exchanges::fetch_mexc(timeout).await,
-        Exchange::Okx => self::exchanges::fetch_okx(timeout).await,
-        Exchange::Ondo => self::exchanges::fetch_ondo(timeout).await,
+        Exchange::Arcus => fetch::fetch_arcus(&ArcusClient::public(timeout)?).await,
+        Exchange::Aster => fetch::fetch_aster(&AsterClient::public(timeout)?).await,
+        Exchange::Backpack => fetch::fetch_backpack(&BackpackClient::public(5_000, timeout)?).await,
+        Exchange::Binance => {
+            // The Equity metadata endpoint requires an API key even though it is unsigned.
+            let equity = match std::env::var("BINANCE_API_KEY") {
+                Ok(api_key) if !api_key.is_empty() => {
+                    Some(BinanceClient::new(Some(api_key), None, timeout)?)
+                }
+                _ => None,
+            };
+            fetch::fetch_binance(&BinanceClient::public(timeout)?, equity.as_ref()).await
+        }
+        Exchange::BingX => fetch::fetch_bingx(&BingxClient::public(timeout)?).await,
+        Exchange::Bitget => fetch::fetch_bitget(&BitgetClient::public(timeout)?).await,
+        Exchange::Bybit => fetch::fetch_bybit(&BybitClient::public(5_000, false, timeout)?).await,
+        Exchange::Extended => fetch::fetch_extended(&ExtendedClient::public(timeout)?).await,
+        Exchange::Hyperliquid => {
+            fetch::fetch_hyperliquid(&HyperliquidClient::public(false, timeout)?).await
+        }
+        Exchange::KuCoin => fetch::fetch_kucoin(&KucoinClient::public(timeout)?).await,
+        Exchange::Kraken => fetch::fetch_kraken(&KrakenClient::public(timeout)?).await,
+        Exchange::Lighter => fetch::fetch_lighter(timeout).await,
+        Exchange::Mexc => fetch::fetch_mexc(&MexcClient::public(timeout)?).await,
+        Exchange::Okx => fetch::fetch_okx(&OkxClient::public(timeout)?).await,
+        Exchange::Ondo => fetch::fetch_ondo(&OndoClient::public(timeout)?).await,
     }
 }
 
@@ -62,6 +80,9 @@ mod exchanges;
 #[cfg(test)]
 pub(crate) use self::exchanges::kraken_spot_rows;
 
+#[cfg(test)]
+#[path = "product_table_fetch/fetch_tests.rs"]
+mod fetch_tests;
 #[cfg(test)]
 #[path = "product_table_fetch/tests.rs"]
 mod tests;
