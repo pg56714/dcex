@@ -61,10 +61,10 @@ impl BybitClient {
         let derived = match (market.as_str(), parts.as_slice()) {
             ("spot", [_, _, "SPOT"]) => "UTA_SPOT",
             ("inverse", [_, "USD", "SWAP"]) => "UTA_INVERSE",
-            ("inverse", [_, "USD", _, "SWAP"]) => "UTA_INVERSE_FUTURE",
+            ("inverse", [_, "USD", _, "FUTURES"]) => "UTA_INVERSE_FUTURE",
             ("linear", [_, "USDT", "SWAP"]) => "UTA_USDT",
             ("linear", [_, "USDC", "SWAP"]) => "UTA_USDC",
-            ("linear", [_, "USDT", _, "SWAP"]) => "UTA_USDT_FUTURE",
+            ("linear", [_, "USDT", _, "FUTURES"]) => "UTA_USDT_FUTURE",
             _ => return Err(invalid("unsupported strategy product symbol/category")),
         };
         if requested.is_some_and(|category| category != derived) {

@@ -173,11 +173,10 @@ fn check(exchange: &str, rows: &[MarketInfo], seen: &Arc<Mutex<Vec<String>>>) {
             !row.price_precision.is_empty() && !row.size_precision.is_empty(),
             "{row:?}"
         );
-        // Dated futures do not share one canonical suffix yet (`-SWAP`, `-FUTURES` or none).
         let suffixes: &[&str] = match row.product_type.as_str() {
             "spot" => &["-SPOT"],
             "swap" => &["-SWAP"],
-            "futures" => &["-SWAP", "-FUTURES", ""],
+            "futures" => &["-FUTURES"],
             "option" => &[""],
             "rfq" => &["-RFQ"],
             other => panic!("{exchange}: unexpected product type {other} in {row:?}"),
@@ -188,6 +187,14 @@ fn check(exchange: &str, rows: &[MarketInfo], seen: &Arc<Mutex<Vec<String>>>) {
                 .any(|suffix| row.product_symbol.ends_with(suffix)),
             "{row:?}"
         );
+        // Dated futures read BASE-QUOTE-YYMMDD[-INVERSE]-FUTURES.
+        if row.product_type == "futures" {
+            let date = row.product_symbol.split('-').nth(2).unwrap_or_default();
+            assert!(
+                date.len() == 6 && date.bytes().all(|byte| byte.is_ascii_digit()),
+                "{row:?}"
+            );
+        }
     }
 }
 

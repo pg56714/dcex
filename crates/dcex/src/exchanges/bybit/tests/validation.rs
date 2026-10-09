@@ -350,14 +350,14 @@ async fn loaded_tables_map_strategy_and_batch_symbols_to_native_markets() {
         market("BTC-USDC-SWAP", "BTCPERP", "linear", "swap", "USDC"),
         market("BTC-USD-SWAP", "BTCUSD", "inverse", "swap", "USD"),
         market(
-            "BTC-USD-260327-SWAP",
+            "BTC-USD-260327-FUTURES",
             "BTCUSDH26",
             "inverse",
             "futures",
             "USD",
         ),
         market(
-            "BTC-USDT-260327-SWAP",
+            "BTC-USDT-260327-FUTURES",
             "BTC-27MAR26",
             "linear",
             "futures",
@@ -376,8 +376,8 @@ async fn loaded_tables_map_strategy_and_batch_symbols_to_native_markets() {
         ("BTC-USDT-SWAP", "BTCUSDT", "UTA_USDT"),
         ("BTC-USDC-SWAP", "BTCPERP", "UTA_USDC"),
         ("BTC-USD-SWAP", "BTCUSD", "UTA_INVERSE"),
-        ("BTC-USD-260327-SWAP", "BTCUSDH26", "UTA_INVERSE_FUTURE"),
-        ("BTC-USDT-260327-SWAP", "BTC-27MAR26", "UTA_USDT_FUTURE"),
+        ("BTC-USD-260327-FUTURES", "BTCUSDH26", "UTA_INVERSE_FUTURE"),
+        ("BTC-USDT-260327-FUTURES", "BTC-27MAR26", "UTA_USDT_FUTURE"),
     ] {
         let params = [
             ("product_symbol", product_symbol),

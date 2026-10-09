@@ -37,7 +37,7 @@ Method counts include aliases and signing helpers, not endpoints.
 | [bitget](official-endpoint-inventory/bitget.json) | 328 | 328 | 0 |
 | [bingx](official-endpoint-inventory/bingx.json) | 209 | 190 | 0 |
 | [kraken](official-endpoint-inventory/kraken.json) | 164 | 148 | 0 |
-| [mexc](official-endpoint-inventory/mexc.json) | 176 | 157 | 0 |
+| [mexc](official-endpoint-inventory/mexc.json) | 177 | 157 | 0 |
 | [kucoin](official-endpoint-inventory/kucoin.json) | 365 | 340 | 0 |
 | [hyperliquid](official-endpoint-inventory/hyperliquid.json) | 145 | 118 | 0 |
 | [lighter](official-endpoint-inventory/lighter.json) | 133 | 110 | 0 |

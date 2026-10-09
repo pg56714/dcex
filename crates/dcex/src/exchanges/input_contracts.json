@@ -14780,10 +14780,6 @@
       "place_limit_order": {
         "type": "object",
         "properties": {
-          "builder_fee": {
-            "type": "string",
-            "format": "decimal"
-          },
           "fee": {
             "type": "string",
             "format": "decimal"
@@ -14793,6 +14789,14 @@
             "format": "decimal"
           },
           "qty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "builderFee": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "builder_fee": {
             "type": "string",
             "format": "decimal"
           }
@@ -14801,10 +14805,6 @@
       "place_order": {
         "type": "object",
         "properties": {
-          "builder_fee": {
-            "type": "string",
-            "format": "decimal"
-          },
           "fee": {
             "type": "string",
             "format": "decimal"
@@ -14814,6 +14814,14 @@
             "format": "decimal"
           },
           "qty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "builderFee": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "builder_fee": {
             "type": "string",
             "format": "decimal"
           }
@@ -14822,10 +14830,6 @@
       "sign_create_order": {
         "type": "object",
         "properties": {
-          "builder_fee": {
-            "type": "string",
-            "format": "decimal"
-          },
           "fee": {
             "type": "string",
             "format": "decimal"
@@ -14835,6 +14839,14 @@
             "format": "decimal"
           },
           "qty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "builderFee": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "builder_fee": {
             "type": "string",
             "format": "decimal"
           }
@@ -20494,6 +20506,14 @@
         "type": "object",
         "properties": {
           "type": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For get transfer history, selects the documented mode, unit, or reference used by this operation.",
+            "x-delimited-string": true
+          },
+          "type_": {
             "type": "array",
             "items": {
               "type": "string"

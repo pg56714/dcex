@@ -112,6 +112,12 @@ asyncio.run(main())
 
 PTM maps normalized `product_symbol` values, such as `BTC-USDT-SWAP`, to exchange-native `exchange_symbol` values and exposes trading metadata. Clients use this mapping where applicable.
 
+| Product | `product_symbol` | Example |
+| --- | --- | --- |
+| Spot | `BASE-QUOTE-SPOT` | `BTC-USDT-SPOT` |
+| Perpetual | `BASE-QUOTE-SWAP` | `BTC-USDT-SWAP` |
+| Dated futures | `BASE-QUOTE-YYMMDD-FUTURES` (UTC delivery date) | `BTC-USD-261225-FUTURES` |
+
 | Fields | Meaning |
 | --- | --- |
 | `exchange`, `product_symbol`, `exchange_symbol` | Exchange and normalized/native symbols |

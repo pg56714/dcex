@@ -99,7 +99,11 @@ impl OkxParams {
 }
 
 pub(super) fn exchange_symbol_fallback(product_symbol: &str) -> Result<String> {
-    if ["-FUTURES", "-OPTION", "-OPTIONS"]
+    // Delivery instIds are the canonical BASE-QUOTE-YYMMDD without the `-FUTURES` suffix.
+    if let Some(inst_id) = product_symbol.strip_suffix("-FUTURES") {
+        return Ok(inst_id.to_string());
+    }
+    if ["-OPTION", "-OPTIONS"]
         .iter()
         .any(|suffix| product_symbol.ends_with(suffix))
     {

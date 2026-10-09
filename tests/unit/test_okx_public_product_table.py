@@ -67,7 +67,9 @@ async def test_public_instrument_query_resolves_loaded_table(
                 value = getattr(client, method)(**kwargs)
                 return await value if inspect.isawaitable(value) else value
 
-            if loaded:
+            # Delivery instIds equal the canonical symbol without `-FUTURES`, so they resolve
+            # without a table; options still need one.
+            if loaded or kind == "FUTURES":
                 await call()
                 assert parse_qs(urlsplit(received.get_nowait()["path"]).query)["instId"] == [
                     native_symbol

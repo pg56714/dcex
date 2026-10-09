@@ -206,10 +206,38 @@ fn binance_product_symbol(base: &str, quote: &str, symbol: &str, spot: bool) -> 
     if spot {
         return format!("{base}-{quote}-SPOT");
     }
+    // Delivery contracts carry their YYMMDD expiry after `_` (for example BTCUSDT_261225).
     symbol.split_once('_').map_or_else(
         || format!("{base}-{quote}-SWAP"),
-        |(_, expiry)| format!("{base}-{quote}-{expiry}-SWAP"),
+        |(_, expiry)| format!("{base}-{quote}-{expiry}-FUTURES"),
     )
+}
+
+/// Dated futures share one canonical form, `BASE-QUOTE-YYMMDD-FUTURES`, with the date taken
+/// from the exchange's delivery timestamp (milliseconds, UTC).
+fn delivery_date(market: &Value, key: &str) -> Result<String> {
+    let timestamp_ms = market
+        .get(key)
+        .and_then(|value| value.as_u64().or_else(|| value.as_str()?.parse().ok()))
+        .filter(|timestamp_ms| *timestamp_ms > 0)
+        .ok_or_else(|| DcexError::Decode(format!("dated futures market lacks {key}")))?;
+    yymmdd(&crate::time::format_timestamp_iso(timestamp_ms))
+}
+
+/// `YYMMDD` from an ISO-8601 date such as `2026-12-25T08:00:00.000Z`.
+fn yymmdd(iso: &str) -> Result<String> {
+    let bytes = iso.as_bytes();
+    let digits = |range: std::ops::Range<usize>| bytes[range].iter().all(u8::is_ascii_digit);
+    if bytes.len() < 10
+        || bytes[4] != b'-'
+        || bytes[7] != b'-'
+        || !digits(0..4)
+        || !digits(5..7)
+        || !digits(8..10)
+    {
+        return Err(DcexError::Decode(format!("invalid delivery date: {iso}")));
+    }
+    Ok(format!("{}{}{}", &iso[2..4], &iso[5..7], &iso[8..10]))
 }
 
 fn canonical_market_pair(
@@ -234,30 +262,19 @@ fn binance_product_type(contract_type: &str) -> &'static str {
 }
 
 fn bybit_product_symbol(
-    category: &str,
-    base: &mut String,
+    market: &Value,
+    base: &str,
     quote: &str,
-    symbol: &str,
-    parts: &[&str],
-) -> String {
-    if category == "spot" {
-        return format!("{base}-{quote}-SPOT");
-    }
-    if let Some(expiry) = parts.get(1) {
-        if category == "inverse" {
-            *base = parts[0].to_string();
-        }
-        format!("{base}-{quote}-{expiry}-SWAP")
-    } else {
-        let pair = format!("{base}{quote}");
-        if category == "inverse"
-            && let Some(expiry) = symbol.strip_prefix(&pair)
-            && !expiry.is_empty()
-        {
-            return format!("{base}-{quote}-{expiry}-SWAP");
-        }
-        format!("{base}-{quote}-SWAP")
-    }
+    product_type: &str,
+) -> Result<String> {
+    Ok(match product_type {
+        "spot" => format!("{base}-{quote}-SPOT"),
+        "futures" => format!(
+            "{base}-{quote}-{}-FUTURES",
+            delivery_date(market, "deliveryTime")?
+        ),
+        _ => format!("{base}-{quote}-SWAP"),
+    })
 }
 
 fn bybit_product_type(category: &str, contract_type: &str) -> &'static str {
@@ -327,7 +344,7 @@ fn kraken_futures_product(
     quote: &str,
     instrument_type: &str,
     market: &Value,
-) -> (String, String) {
+) -> Result<(String, String)> {
     let parts = symbol.split('_').collect::<Vec<_>>();
     let inverse = if instrument_type == "futures_inverse" {
         "-INVERSE"
@@ -338,18 +355,21 @@ fn kraken_futures_product(
         .get("lastTradingTime")
         .is_some_and(|value| !value.is_null() && value != "" && value != false);
     if last_trading_time {
-        if let Some(expiry) = parts.get(2).filter(|value| !value.is_empty()) {
-            return (
-                format!("{base}-{quote}-{expiry}{inverse}-SWAP"),
-                "futures".to_string(),
-            );
-        }
-        return (
-            format!("{base}-{quote}{inverse}-SWAP"),
+        // Fixed-maturity symbols end in their YYMMDD expiry (FI_XBTUSD_261225); otherwise the
+        // ISO `lastTradingTime` supplies it.
+        let expiry = match parts
+            .get(2)
+            .filter(|value| value.len() == 6 && value.bytes().all(|byte| byte.is_ascii_digit()))
+        {
+            Some(expiry) => expiry.to_string(),
+            None => yymmdd(&value_string(market, "lastTradingTime", ""))?,
+        };
+        return Ok((
+            format!("{base}-{quote}-{expiry}{inverse}-FUTURES"),
             "futures".to_string(),
-        );
+        ));
     }
-    (format!("{base}-{quote}{inverse}-SWAP"), "swap".to_string())
+    Ok((format!("{base}-{quote}{inverse}-SWAP"), "swap".to_string()))
 }
 
 fn lighter_precision(market: &Value, key: &str, fallback: &str) -> String {

@@ -178,12 +178,27 @@ fn preserves_python_precision_formatting() {
 fn builds_kraken_dated_inverse_product_symbol() {
     let market = serde_json::json!({"lastTradingTime": "2026-06-01"});
     assert_eq!(
-        kraken_futures_product("FI_XBTUSD_260601", "BTC", "USD", "futures_inverse", &market,),
+        kraken_futures_product("FI_XBTUSD_260601", "BTC", "USD", "futures_inverse", &market,)
+            .unwrap(),
         (
-            "BTC-USD-260601-INVERSE-SWAP".to_string(),
+            "BTC-USD-260601-INVERSE-FUTURES".to_string(),
             "futures".to_string(),
         )
     );
+}
+
+#[test]
+fn kraken_flexible_futures_take_their_date_from_last_trading_time() {
+    let market = serde_json::json!({"lastTradingTime": "2026-12-25T16:00:00.000Z"});
+    assert_eq!(
+        kraken_futures_product("FF_XBTUSD", "BTC", "USD", "flexible_futures", &market).unwrap(),
+        ("BTC-USD-261225-FUTURES".to_string(), "futures".to_string())
+    );
+    let malformed = serde_json::json!({"lastTradingTime": 12});
+    assert!(
+        kraken_futures_product("FF_XBTUSD", "BTC", "USD", "flexible_futures", &malformed).is_err()
+    );
+    assert!(yymmdd("2026/12/25").is_err());
 }
 
 #[test]
@@ -194,27 +209,21 @@ fn canonical_symbols_cover_exchange_specific_formats() {
     );
     assert_eq!(
         binance_product_symbol("BTC", "USDT", "BTCUSDT_260626", false),
-        "BTC-USDT-260626-SWAP"
+        "BTC-USDT-260626-FUTURES"
     );
     assert_eq!(binance_product_type("PERPETUAL"), "swap");
     assert_eq!(binance_product_type("CURRENT_QUARTER"), "futures");
-    let mut inverse_base = "BTC".to_string();
+    // Bybit's inverse quarterly BTCUSDH27 delivers 2027-03-26 08:00 UTC.
+    let quarterly = serde_json::json!({"deliveryTime": "1806048000000"});
     assert_eq!(
-        bybit_product_symbol(
-            "inverse",
-            &mut inverse_base,
-            "USD",
-            "BTC-27MAR26",
-            &["BTC", "27MAR26"],
-        ),
-        "BTC-USD-27MAR26-SWAP"
+        bybit_product_symbol(&quarterly, "BTC", "USD", "futures").unwrap(),
+        "BTC-USD-270326-FUTURES"
     );
-
-    let mut inverse_base = "BTC".to_string();
     assert_eq!(
-        bybit_product_symbol("inverse", &mut inverse_base, "USD", "BTCUSDH23", &[]),
-        "BTC-USD-H23-SWAP"
+        bybit_product_symbol(&quarterly, "BTC", "USD", "swap").unwrap(),
+        "BTC-USD-SWAP"
     );
+    assert!(bybit_product_symbol(&serde_json::json!({}), "BTC", "USD", "futures").is_err());
     assert_eq!(bybit_product_type("inverse", "InverseFutures"), "futures");
     assert_eq!(normalize_kucoin_currency("XBT"), "BTC");
     assert_eq!(normalize_kraken_currency("XXBT"), "BTC");
@@ -345,7 +354,7 @@ fn distinguishes_kucoin_delivery_months_from_perpetuals() {
     });
     let dated = serde_json::json!({
         "symbol": "XBTMU26", "baseCurrency": "XBT", "quoteCurrency": "USD",
-        "type": "FFICSX", "expireDate": 1780000000000_i64
+        "type": "FFICSX", "expireDate": 1790323200000_i64
     });
     assert_eq!(
         kucoin_futures_market_info(&perpetual)
@@ -354,7 +363,8 @@ fn distinguishes_kucoin_delivery_months_from_perpetuals() {
         "BTC-USD-SWAP"
     );
     let dated = kucoin_futures_market_info(&dated).unwrap();
-    assert_eq!(dated.product_symbol, "BTC-USD-U26-FUTURES");
+    // expireDate 2026-09-25 08:00 UTC.
+    assert_eq!(dated.product_symbol, "BTC-USD-260925-FUTURES");
     assert_eq!(dated.product_type, "futures");
 }
 
@@ -494,7 +504,7 @@ fn okx_xperp_keeps_futures_api_type_and_contract_value() {
         "minSz": "0.01", "ctVal": "0.1"
     });
     let row = okx_market_info(&market, "futures").expect("OKX stock X-Perp");
-    assert_eq!(row.product_symbol, "AAPL-USD_UM_XPERP-310613");
+    assert_eq!(row.product_symbol, "AAPL-USD_UM_XPERP-310613-FUTURES");
     assert_eq!(row.product_type, "futures");
     assert_eq!(row.exchange_type, "FUTURES");
     assert_eq!(row.min_size, "0.01");

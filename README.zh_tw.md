@@ -110,6 +110,12 @@ asyncio.run(main())
 
 PTM 將 `BTC-USDT-SWAP` 這類統一 `product_symbol` 對應到交易所原生 `exchange_symbol`，並提供交易規格；客戶端在適用時會使用此對應。
 
+| 商品 | `product_symbol` | 範例 |
+| --- | --- | --- |
+| 現貨 | `BASE-QUOTE-SPOT` | `BTC-USDT-SPOT` |
+| 永續 | `BASE-QUOTE-SWAP` | `BTC-USDT-SWAP` |
+| 到期期貨 | `BASE-QUOTE-YYMMDD-FUTURES`（UTC 交割日） | `BTC-USD-261225-FUTURES` |
+
 | 欄位 | 說明 |
 | --- | --- |
 | `exchange`、`product_symbol`、`exchange_symbol` | 交易所及統一／原生商品代號 |

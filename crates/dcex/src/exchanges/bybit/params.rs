@@ -223,8 +223,8 @@ mod tests {
             exchange_symbol_fallback("BTC-USDT-SWAP").expect("symbol"),
             "BTCUSDT"
         );
-        assert!(exchange_symbol_fallback("BTC-USDT-21FEB25-SWAP").is_err());
-        assert!(exchange_symbol_fallback("BTC-USD-H23-SWAP").is_err());
+        assert!(exchange_symbol_fallback("BTC-USDT-250221-FUTURES").is_err());
+        assert!(exchange_symbol_fallback("BTC-USD-230331-FUTURES").is_err());
     }
 }
 

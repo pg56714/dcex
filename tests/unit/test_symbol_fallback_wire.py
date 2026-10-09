@@ -154,18 +154,18 @@ async def test_public_symbol_wire(
         (
             "bitget",
             "get_uta_tickers",
-            {"category": "COIN-FUTURES", "product_symbol": "BTC-USD-BTCCMZ26-FUTURES"},
+            {"category": "COIN-FUTURES", "product_symbol": "BTC-USD-261225-FUTURES"},
         ),
         (
             "bybit",
             "get_instruments_info",
-            {"category": "linear", "product_symbol": "BTC-USDT-09OCT26-SWAP"},
+            {"category": "linear", "product_symbol": "BTC-USDT-261009-FUTURES"},
         ),
         ("bingx", "get_orderbook", {"product_symbol": "NEIRO-USDT-SWAP"}),
         ("mexc", "get_contract_depth", {"product_symbol": "NVDA-USDT-SWAP"}),
         ("extended", "get_order_book", {"market": "AAPL-USD-SWAP"}),
         ("backpack", "get_order_book_depth", {"product_symbol": "FOMC0126H0-USDC-PREDICTION"}),
-        ("kucoin", "get_futures_ticker", {"product_symbol": "BTC-USD-XBTMZ26-FUTURES"}),
+        ("kucoin", "get_futures_ticker", {"product_symbol": "BTC-USD-261225-FUTURES"}),
     ],
 )
 @pytest.mark.asyncio

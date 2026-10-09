@@ -658,7 +658,10 @@ pub(super) fn bitget_uta_futures_market_info(market: &Value, category: &str) -> 
     let product_symbol = if product_type == "swap" {
         format!("{base}-{quote}-SWAP")
     } else {
-        format!("{base}-{quote}-{symbol}-FUTURES")
+        format!(
+            "{base}-{quote}-{}-FUTURES",
+            delivery_date(market, "deliveryTime")?
+        )
     };
     Ok(MarketInfo {
         exchange: "bitget".to_string(),
@@ -690,13 +693,12 @@ pub(super) async fn fetch_bybit(client: &BybitClient) -> Result<Vec<MarketInfo>>
                 }
                 continue;
             }
-            let mut base = required_string(&market, "baseCoin")?;
+            let base = required_string(&market, "baseCoin")?;
             let quote = required_string(&market, "quoteCoin")?;
             let symbol = required_string(&market, "symbol")?;
-            let parts = symbol.split('-').collect::<Vec<_>>();
-            let product_symbol = bybit_product_symbol(category, &mut base, &quote, &symbol, &parts);
             let contract_type = value_string(&market, "contractType", "");
             let product_type = bybit_product_type(category, &contract_type);
+            let product_symbol = bybit_product_symbol(&market, &base, &quote, product_type)?;
             let price = market.get("priceFilter").unwrap_or(&Value::Null);
             let lot = market.get("lotSizeFilter").unwrap_or(&Value::Null);
             rows.push(MarketInfo {
@@ -991,11 +993,10 @@ pub(super) fn kucoin_futures_market_info(market: &Value) -> Result<MarketInfo> {
         .is_some_and(|expiry| !expiry.is_null());
     let product_type = if is_dated { "futures" } else { "swap" };
     let product_symbol = if is_dated {
-        // KuCoin embeds the standard delivery month/year code in the
-        // contract symbol (for example XBTMU26 versus XBTMZ26).
-        let expiry = symbol.chars().rev().take(3).collect::<String>();
-        let expiry = expiry.chars().rev().collect::<String>();
-        format!("{base}-{quote}-{expiry}-FUTURES")
+        format!(
+            "{base}-{quote}-{}-FUTURES",
+            delivery_date(market, "expireDate")?
+        )
     } else {
         format!("{base}-{quote}-SWAP")
     };
@@ -1052,7 +1053,7 @@ pub(super) async fn fetch_kraken(client: &KrakenClient) -> Result<Vec<MarketInfo
         let base = normalize_kraken_currency(&value_string(market, "base", ""));
         let quote = normalize_kraken_currency(&value_string(market, "quote", ""));
         let (product_symbol, product_type) =
-            kraken_futures_product(&symbol, &base, &quote, &instrument_type, market);
+            kraken_futures_product(&symbol, &base, &quote, &instrument_type, market)?;
         let precision = kraken_size_precision(market);
         rows.push(MarketInfo {
             exchange: "kraken".to_string(),
@@ -1438,10 +1439,11 @@ pub(super) fn okx_market_info(market: &Value, product_type: &str) -> Result<Mark
     };
     Ok(MarketInfo {
         exchange: "okx".to_string(),
-        product_symbol: if product_type == "spot" {
-            format!("{exchange_symbol}-SPOT")
-        } else {
-            exchange_symbol.clone()
+        product_symbol: match product_type {
+            "spot" => format!("{exchange_symbol}-SPOT"),
+            // OKX delivery instIds end in their YYMMDD expiry (BTC-USD-261225).
+            "futures" => format!("{base}-{quote}-{}-FUTURES", parts[parts.len() - 1]),
+            _ => exchange_symbol.clone(),
         },
         exchange_symbol,
         product_type: product_type.to_string(),

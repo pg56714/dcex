@@ -297,7 +297,7 @@
         "status": "online",
         "deliveryTime": "1798185600000"
       },
-      "input": "BTC-USD-BTCCMZ26-FUTURES",
+      "input": "BTC-USD-261225-FUTURES",
       "native": "BTCCMZ26",
       "mode": "delivery",
       "requires_table": true
@@ -314,7 +314,7 @@
         "deliveryTime": "1791532800000",
         "displayName": "BTCUSDT-09OCT26"
       },
-      "input": "BTC-USDT-09OCT26-SWAP",
+      "input": "BTC-USDT-261009-FUTURES",
       "native": "BTCUSDT-09OCT26",
       "mode": "delivery",
       "requires_table": true
@@ -631,7 +631,7 @@
         "marketStage": "NORMAL",
         "marketType": "CRYPTO"
       },
-      "input": "BTC-USD-XBTMZ26-FUTURES",
+      "input": "BTC-USD-261225-FUTURES",
       "native": "XBTMZ26",
       "mode": "delivery",
       "requires_table": true
@@ -773,7 +773,7 @@
         "state": "live",
         "uly": "BTC-USD"
       },
-      "input": "BTC-USD-261030",
+      "input": "BTC-USD-261030-FUTURES",
       "native": "BTC-USD-261030",
       "mode": "futures",
       "requires_table": false
