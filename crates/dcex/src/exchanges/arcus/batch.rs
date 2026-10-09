@@ -5,6 +5,7 @@ mod trade_operations {
     use crate::exchanges::arcus::client::ArcusClient;
     use crate::exchanges::arcus::params::required;
     use crate::exchanges::arcus::signing::timestamp_ns;
+    use crate::exchanges::arcus::trade::{MODIFY_ORDER_KEYS, PLACE_ORDER_KEYS};
 
     use crate::http::{HttpMethod, HttpRequest};
     use crate::{DcexError, Result};
@@ -97,6 +98,19 @@ mod trade_operations {
                 })?;
                 let mut order = BTreeMap::new();
                 for (key, value) in object {
+                    let known = match single_method {
+                        "place_order" => {
+                            PLACE_ORDER_KEYS.contains(&key.as_str())
+                                || matches!(key.as_str(), "tpsl_type" | "stop_price")
+                        }
+                        "modify_order" => MODIFY_ORDER_KEYS.contains(&key.as_str()),
+                        _ => matches!(key.as_str(), "product_symbol" | "order_id"),
+                    };
+                    if !known {
+                        return Err(DcexError::InvalidInput(format!(
+                            "unsupported Arcus {field} field: {key}"
+                        )));
+                    }
                     let scalar = match value {
                         Value::String(value) => value.clone(),
                         Value::Number(value) => value.to_string(),

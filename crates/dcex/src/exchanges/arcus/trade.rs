@@ -12,7 +12,7 @@ pub(in crate::exchanges::arcus) use crate::http::{HttpMethod, HttpRequest, Reque
 pub(in crate::exchanges::arcus) use crate::{DcexError, Result};
 
 /// Fields the signed placeOrder payload is built from; anything else is rejected, not dropped.
-const PLACE_ORDER_KEYS: &[&str] = &[
+pub(in crate::exchanges::arcus) const PLACE_ORDER_KEYS: &[&str] = &[
     "product_symbol",
     "side",
     "price",
@@ -24,7 +24,7 @@ const PLACE_ORDER_KEYS: &[&str] = &[
     "client_order_id",
 ];
 /// Fields the signed modifyOrder payload is built from.
-const MODIFY_ORDER_KEYS: &[&str] = &[
+pub(in crate::exchanges::arcus) const MODIFY_ORDER_KEYS: &[&str] = &[
     "product_symbol",
     "side",
     "price",
@@ -156,19 +156,12 @@ impl ArcusClient {
             "place_order" | "modify_order" => {
                 let is_modify = method_name == "modify_order";
                 let tpsl = values.get("tpsl_type").map(String::as_str);
-                if tpsl.is_some_and(|kind| !["STOP_LOSS", "TAKE_PROFIT"].contains(&kind))
-                    || is_modify && tpsl.is_some()
-                {
+                if tpsl.is_some_and(|kind| !["STOP_LOSS", "TAKE_PROFIT"].contains(&kind)) {
                     return Err(DcexError::InvalidInput("invalid Arcus tpsl_type".into()));
                 }
                 if values.contains_key("stop_price") != tpsl.is_some() {
                     return Err(DcexError::InvalidInput(
                         "Arcus tpsl_type and stop_price must be supplied together".into(),
-                    ));
-                }
-                if is_modify && values.contains_key("order_type") {
-                    return Err(DcexError::InvalidInput(
-                        "Arcus modify_order does not accept order_type".into(),
                     ));
                 }
                 let side = required(values, "side")?.to_ascii_uppercase();

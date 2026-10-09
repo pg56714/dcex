@@ -69,6 +69,26 @@ impl ArcusSpotClient {
         if method_name == "get_trade_history" {
             decimal_block(required(&values, "from_block")?)?;
         }
+        let include_wrapped = match values.get("include_wrapped").map(String::as_str) {
+            None | Some("true") => true,
+            Some("false") => false,
+            _ => {
+                return Err(DcexError::InvalidInput(
+                    "Arcus spot include_wrapped must be true or false".into(),
+                ));
+            }
+        };
+        let listed_tokens = values
+            .get("tokens_json")
+            .map(|raw| {
+                let tokens: Value = serde_json::from_str(raw).map_err(|_| {
+                    DcexError::InvalidInput("invalid Arcus spot tokens_json".into())
+                })?;
+                tokens.as_array().cloned().ok_or_else(|| {
+                    DcexError::InvalidInput("Arcus spot tokens_json must be an array".into())
+                })
+            })
+            .transpose()?;
         self.verify_rpc_chain().await?;
         let data = match method_name {
             "get_native_balance" => {
@@ -99,22 +119,8 @@ impl ArcusSpotClient {
             }
             "get_balances" => {
                 let address = self.wallet_address(&values)?;
-                let include_wrapped = match values.get("include_wrapped").map(String::as_str) {
-                    None | Some("true") => true,
-                    Some("false") => false,
-                    _ => {
-                        return Err(DcexError::InvalidInput(
-                            "Arcus spot include_wrapped must be true or false".into(),
-                        ));
-                    }
-                };
-                let tokens = if let Some(raw) = values.get("tokens_json") {
-                    let tokens: Value = serde_json::from_str(raw).map_err(|_| {
-                        DcexError::InvalidInput("invalid Arcus spot tokens_json".into())
-                    })?;
-                    tokens.as_array().cloned().ok_or_else(|| {
-                        DcexError::InvalidInput("Arcus spot tokens_json must be an array".into())
-                    })?
+                let tokens = if let Some(tokens) = listed_tokens {
+                    tokens
                 } else {
                     let response = self.router_request("get_tokens", vec![]).await?;
                     response.data.as_array().cloned().ok_or_else(|| {
@@ -545,7 +551,10 @@ mod tests {
                     serde_json::from_slice::<Value>(&raw[header_end..header_end + length])
                         .expect("JSON-RPC request"),
                 );
-                let payload = if requests.last().is_some_and(Value::is_array) {
+                // `{"raw": ...}` is sent verbatim, e.g. a JSON-RPC error object.
+                let payload = if let Some(raw) = result.get("raw") {
+                    raw.to_string()
+                } else if requests.last().is_some_and(Value::is_array) {
                     result.to_string()
                 } else {
                     json!({"jsonrpc": "2.0", "id": 1, "result": result}).to_string()
@@ -711,5 +720,209 @@ mod tests {
         assert_eq!(decoded["amountOut"], "19");
         assert_eq!(decoded["success"], true);
         assert_eq!(decoded["blockNumber"], "16");
+    }
+
+    fn wallet_client(rpc_url: String) -> ArcusSpotClient {
+        ArcusSpotClient::new(None, false, Duration::from_secs(10))
+            .unwrap()
+            .with_wallet_address(format!("0x{}", "11".repeat(20)))
+            .unwrap()
+            .with_rpc_url(rpc_url)
+            .unwrap()
+    }
+
+    fn wallet_error(
+        client: ArcusSpotClient,
+        method: &'static str,
+        params: &[(&str, &str)],
+    ) -> String {
+        let params = params
+            .iter()
+            .map(|(key, value)| (key.to_string(), value.to_string()))
+            .collect();
+        block_on(async move { client.wallet_request(method, params).await })
+            .expect_err(method)
+            .to_string()
+    }
+
+    #[test]
+    fn malformed_wallet_queries_fail_before_any_rpc() {
+        let hash = format!("0x{}", "ab".repeat(31));
+        for (method, params, expected) in [
+            ("get_code", vec![], "unknown Arcus spot wallet method"),
+            (
+                "get_block_number",
+                vec![("address", "0x1")],
+                "unknown Arcus spot wallet parameter: address",
+            ),
+            (
+                "get_transaction_receipt",
+                vec![("tx_hash", hash.as_str())],
+                "invalid Arcus Spot transaction hash",
+            ),
+            (
+                "get_trade_history",
+                vec![("from_block", "0x10")],
+                "block number must be a decimal u64",
+            ),
+            (
+                "get_balances",
+                vec![("include_wrapped", "yes")],
+                "include_wrapped must be true or false",
+            ),
+            (
+                "get_balances",
+                vec![("tokens_json", "[")],
+                "invalid Arcus spot tokens_json",
+            ),
+            (
+                "get_balances",
+                vec![("tokens_json", "{}")],
+                "tokens_json must be an array",
+            ),
+            (
+                "get_token_balance",
+                vec![("token", "0x12")],
+                "invalid Arcus Spot wallet or token address",
+            ),
+        ] {
+            let error = wallet_error(wallet_client("http://127.0.0.1:9".into()), method, &params);
+            assert!(error.contains(expected), "{method}: {error}");
+        }
+    }
+
+    #[test]
+    fn receipts_block_numbers_and_rpc_errors() {
+        let hash = format!("0x{}", "ab".repeat(32));
+        let (rpc_url, server) = rpc_server(vec![
+            json!("0x1237"),
+            json!({"status": "0x1"}),
+            json!("0x1237"),
+            json!("0x10"),
+            json!("0x1237"),
+            json!({"raw": {"jsonrpc": "2.0", "id": 1, "error": {"code": -32000}}}),
+            json!("0x1237"),
+            json!({"raw": {"jsonrpc": "2.0", "id": 1}}),
+        ]);
+        let client = wallet_client(rpc_url);
+        block_on(async move {
+            let receipt = client
+                .wallet_request("get_transaction_receipt", vec![("tx_hash".into(), hash)])
+                .await
+                .unwrap();
+            assert_eq!(receipt.data["status"], "0x1");
+            let block = client
+                .wallet_request("get_block_number", vec![])
+                .await
+                .unwrap();
+            assert_eq!(block.data["blockNumber"], "16");
+            let failed = client.wallet_request("get_block_number", vec![]).await;
+            assert!(
+                failed
+                    .unwrap_err()
+                    .to_string()
+                    .contains("eth_blockNumber failed")
+            );
+            let empty = client.wallet_request("get_block_number", vec![]).await;
+            assert!(
+                empty
+                    .unwrap_err()
+                    .to_string()
+                    .contains("returned no result")
+            );
+            Ok::<(), DcexError>(())
+        })
+        .unwrap();
+        assert_eq!(server.join().unwrap().len(), 8);
+    }
+
+    #[test]
+    fn rejected_batches_fall_back_to_single_balance_calls() {
+        let first = format!("0x{}", "22".repeat(20));
+        let second = format!("0x{}", "33".repeat(20));
+        let tokens = json!([first, {"address": second}]).to_string();
+        for batch in [
+            json!({}),
+            json!([{"id": 1, "result": "0x1"}]),
+            json!([{"id": 9, "result": "0x1"}, {"id": 1, "result": "0x1"}]),
+            json!([{"id": 1, "result": "0x1"}, {"id": 1, "result": "0x1"}]),
+            json!([{"id": 1, "error": {"code": 1}}, {"id": 2, "result": "0x1"}]),
+            json!([{"id": 1}, {"id": 2, "result": "0x1"}]),
+        ] {
+            let (rpc_url, server) = rpc_server(vec![
+                json!("0x1237"),
+                json!("0x0"),
+                batch.clone(),
+                json!("0x5"),
+                json!("0x"),
+            ]);
+            let client = wallet_client(rpc_url);
+            let tokens = tokens.clone();
+            let balances = block_on(async move {
+                client
+                    .wallet_request(
+                        "get_balances",
+                        vec![
+                            ("tokens_json".into(), tokens),
+                            ("include_wrapped".into(), "false".into()),
+                        ],
+                    )
+                    .await
+            })
+            .unwrap();
+            assert_eq!(balances.data["balances"][1]["balance"], "5", "{batch}");
+            assert_eq!(balances.data["balances"][2]["balance"], "0", "{batch}");
+            assert_eq!(server.join().unwrap().len(), 5);
+        }
+        let (rpc_url, server) = rpc_server(vec![json!("0x1237"), json!("0x0")]);
+        let error = wallet_error(
+            wallet_client(rpc_url),
+            "get_balances",
+            &[("tokens_json", r#"[{"symbol":"X"}]"#)],
+        );
+        assert!(error.contains("token address is required"), "{error}");
+        server.join().unwrap();
+    }
+
+    #[test]
+    fn trade_history_rejects_bad_ranges_and_logs() {
+        let token = format!("0x{}", "22".repeat(20));
+        let topic = format!("0x{}", "00".repeat(32));
+        let (rpc_url, server) = rpc_server(vec![json!("0x1237")]);
+        let error = wallet_error(
+            wallet_client(rpc_url),
+            "get_trade_history",
+            &[("from_block", "10"), ("to_block", "9")],
+        );
+        assert!(
+            error.contains("to_block must not precede from_block"),
+            "{error}"
+        );
+        server.join().unwrap();
+        for (logs, expected) in [
+            (json!({}), "eth_getLogs result must be an array"),
+            (json!([{"topics": [topic]}]), "log has invalid topics"),
+            (
+                json!([{"topics": [topic, topic, topic, topic], "data": "0x12"}]),
+                "log has invalid data",
+            ),
+            (
+                json!([{"blockNumber": "0x1", "logIndex": "0x0", "topics": [topic, "0x1", topic, topic], "data": format!("0x{}", "0".repeat(704))}]),
+                "address topic is invalid",
+            ),
+        ] {
+            let (rpc_url, server) = rpc_server(vec![json!("0x1237"), logs]);
+            let error = wallet_error(
+                wallet_client(rpc_url),
+                "get_trade_history",
+                &[
+                    ("from_block", "1"),
+                    ("to_block", "2"),
+                    ("token_in", token.as_str()),
+                ],
+            );
+            assert!(error.contains(expected), "{expected}: {error}");
+            server.join().unwrap();
+        }
     }
 }
