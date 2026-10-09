@@ -1,5 +1,3 @@
-use serde_json::{Map, Value};
-
 use crate::ethereum::{keccak256, recoverable_sign};
 use crate::http::HttpMethod;
 use crate::{DcexError, Result};
@@ -94,56 +92,6 @@ fn parse_address(address: &str) -> Result<[u8; 20]> {
             bytes.len()
         ))
     })
-}
-
-pub(super) fn encode_query(query: &Map<String, Value>) -> String {
-    let mut pairs = query
-        .iter()
-        .filter(|(_, value)| !value.is_null())
-        .map(|(key, value)| (key.as_str(), python_value(value)))
-        .collect::<Vec<_>>();
-    pairs.sort_by(|left, right| left.0.cmp(right.0));
-    url::form_urlencoded::Serializer::new(String::new())
-        .extend_pairs(pairs)
-        .finish()
-}
-
-fn python_value(value: &Value) -> String {
-    match value {
-        Value::Null => "None".to_string(),
-        Value::Bool(value) => {
-            if *value {
-                "True".to_string()
-            } else {
-                "False".to_string()
-            }
-        }
-        Value::Number(value) => value.to_string(),
-        Value::String(value) => value.clone(),
-        Value::Array(values) => format!(
-            "[{}]",
-            values
-                .iter()
-                .map(python_value_repr)
-                .collect::<Vec<_>>()
-                .join(", ")
-        ),
-        Value::Object(values) => format!(
-            "{{{}}}",
-            values
-                .iter()
-                .map(|(key, value)| format!("'{key}': {}", python_value_repr(value)))
-                .collect::<Vec<_>>()
-                .join(", ")
-        ),
-    }
-}
-
-fn python_value_repr(value: &Value) -> String {
-    match value {
-        Value::String(value) => format!("'{value}'"),
-        _ => python_value(value),
-    }
 }
 
 pub(super) const fn http_method_name(method: HttpMethod) -> &'static str {

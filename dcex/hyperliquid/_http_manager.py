@@ -183,7 +183,7 @@ class HTTPManager(BaseHTTPManager):
         Make HTTP request to the API.
 
         Args:
-            method: HTTP method (GET, POST)
+            method: HTTP method (Hyperliquid only accepts POST)
             path: API path
             query: Query parameters
             signed: Whether to sign the request

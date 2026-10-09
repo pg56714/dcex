@@ -11,7 +11,7 @@ use crate::{DcexError, Result};
 use super::endpoints::{EXCHANGE, INFO, MAINNET_URL, TESTNET_URL};
 use super::msgpack::{OrderedValue, encode_msgpack};
 use super::params::{fallback_coin, is_canonical_product_symbol, normalize_address};
-use super::signing::{encode_query, http_method_name, hyperliquid_signature, parse_private_key};
+use super::signing::{http_method_name, hyperliquid_signature, parse_private_key};
 
 #[derive(Clone)]
 pub struct HyperliquidClient {
@@ -200,7 +200,8 @@ impl HyperliquidClient {
         signed: bool,
         timestamp: u64,
     ) -> Result<HttpRequest> {
-        if !matches!(method, HttpMethod::Get | HttpMethod::Post) {
+        // Every Hyperliquid REST endpoint (`/info`, `/exchange`) is a JSON POST.
+        if method != HttpMethod::Post {
             return Err(DcexError::InvalidInput(format!(
                 "unsupported Hyperliquid HTTP method: {}",
                 http_method_name(method)
@@ -271,16 +272,9 @@ impl HyperliquidClient {
         let path = path.into();
         let mut request = HttpRequest::new(method, &self.endpoint, &path)
             .header("Content-Type", "application/json");
-        if method == HttpMethod::Get {
-            let query_string = encode_query(query_object);
-            if !query_string.is_empty() {
-                request.path = format!("{path}?{query_string}");
-            }
-        } else {
-            request.body = RequestBody::Raw(
-                serde_json::to_vec(&query).map_err(|error| DcexError::Decode(error.to_string()))?,
-            );
-        }
+        request.body = RequestBody::Raw(
+            serde_json::to_vec(&query).map_err(|error| DcexError::Decode(error.to_string()))?,
+        );
         Ok(request)
     }
 
