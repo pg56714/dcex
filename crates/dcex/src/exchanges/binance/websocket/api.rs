@@ -162,11 +162,12 @@ impl BinanceWebSocketApi {
     /// `timestamp` may be supplied for clock synchronization; otherwise it is added.
     /// Caller-supplied apiKey/signature are rejected to prevent accidental overrides.
     pub async fn request(&self, method: &str, params: Value) -> Result<u64> {
-        let signed = schema(self.market, method).is_some_and(|(auth, _)| auth == Auth::Signed);
-        if signed && params.get("timestamp").is_none() {
+        // Reject invalid requests before any network call, including the clock sync.
+        let (auth, params) = self.validated(method, params)?;
+        if auth == Auth::Signed && !params.contains_key("timestamp") {
             self.clock.sync("Binance", self.config.timeout).await?;
         }
-        let payload = self.prepare(method, params)?;
+        let payload = self.prepare(method, auth, params)?;
         let id = payload["id"].as_u64().expect("locally generated ID");
         let session = self.current().await?;
         let (ack, result) = oneshot::channel();
@@ -197,10 +198,11 @@ impl BinanceWebSocketApi {
         self.session.lock().await.clone().ok_or_else(disconnected)
     }
 
-    fn prepare(&self, method: &str, params: Value) -> Result<Value> {
+    /// Every local check: method, parameter shape and the credentials the method needs.
+    fn validated(&self, method: &str, params: Value) -> Result<(Auth, Map<String, Value>)> {
         let (auth, fields) = schema(self.market, method)
             .ok_or_else(|| invalid("unsupported method for this market"))?;
-        let mut params = params
+        let params = params
             .as_object()
             .cloned()
             .ok_or_else(|| invalid("params must be a JSON object"))?;
@@ -211,26 +213,25 @@ impl BinanceWebSocketApi {
         if method == "session.logon" && !matches!(self.signer, Some(ApiSigner::Ed25519(_))) {
             return Err(invalid("session.logon requires Ed25519 credentials"));
         }
-        if auth != Auth::Public {
-            params.insert(
-                "apiKey".into(),
-                json!(
-                    self.api_key
-                        .as_ref()
-                        .ok_or_else(|| invalid("api_key is required"))?
-                ),
-            );
+        if auth != Auth::Public && self.api_key.is_none() {
+            return Err(invalid("api_key is required"));
+        }
+        if auth == Auth::Signed && self.signer.is_none() {
+            return Err(invalid("signing credentials are required"));
+        }
+        Ok((auth, params))
+    }
+
+    fn prepare(&self, method: &str, auth: Auth, mut params: Map<String, Value>) -> Result<Value> {
+        if let Some(api_key) = self.api_key.as_ref().filter(|_| auth != Auth::Public) {
+            params.insert("apiKey".into(), json!(api_key));
         }
         if auth == Auth::Signed {
             if !params.contains_key("timestamp") {
                 params.insert("timestamp".into(), json!(self.clock.now_ms()?));
             }
             let payload = signature_payload(&params)?;
-            let signature = match self
-                .signer
-                .as_ref()
-                .ok_or_else(|| invalid("signing credentials are required"))?
-            {
+            let signature = match self.signer.as_ref().expect("validated signer") {
                 ApiSigner::Hmac(secret) => hmac_sha256_hex(secret.as_bytes(), payload.as_bytes())?,
                 ApiSigner::Ed25519(key) => STANDARD.encode(key.sign(payload.as_bytes()).to_bytes()),
             };
@@ -323,6 +324,11 @@ fn disconnected() -> DcexError {
 mod tests {
     use super::*;
 
+    fn prepare(client: &BinanceWebSocketApi, method: &str, params: Value) -> Result<Value> {
+        let (auth, params) = client.validated(method, params)?;
+        client.prepare(method, auth, params)
+    }
+
     #[test]
     fn official_urls_sync_the_server_clock_and_custom_urls_do_not() {
         let build = |market, url: &str| {
@@ -380,7 +386,7 @@ mod tests {
             Duration::from_secs(5),
         )
         .unwrap();
-        let request = client.prepare("order.place",json!({"symbol":"BTCUSDT","side":"SELL","type":"LIMIT","timeInForce":"GTC","quantity":"0.01000000","price":"52000.00","recvWindow":100,"timestamp":1645423376532_i64})).unwrap();
+        let request = prepare(&client, "order.place",json!({"symbol":"BTCUSDT","side":"SELL","type":"LIMIT","timeInForce":"GTC","quantity":"0.01000000","price":"52000.00","recvWindow":100,"timestamp":1645423376532_i64})).unwrap();
         assert_eq!(
             request["params"]["signature"],
             "aa1b5712c094bc4e57c05a1a5c1fd8d88dcd628338ea863fec7b88e59fe2db24"
@@ -410,12 +416,12 @@ mod tests {
             Duration::from_secs(2),
         )
         .unwrap();
-        let payload = client
-            .prepare(
-                "session.logon",
-                json!({"timestamp":1645423376532_i64,"recvWindow":5000}),
-            )
-            .unwrap();
+        let payload = prepare(
+            &client,
+            "session.logon",
+            json!({"timestamp":1645423376532_i64,"recvWindow":5000}),
+        )
+        .unwrap();
         let bytes = STANDARD
             .decode(payload["params"]["signature"].as_str().unwrap())
             .unwrap();
@@ -433,5 +439,50 @@ mod tests {
             )
             .unwrap();
         assert_eq!(payload["method"], "session.logon");
+    }
+
+    #[test]
+    fn invalid_signed_requests_fail_before_the_clock_sync() {
+        // An unreachable time URL turns any premature network call into a transport error.
+        for (market, method, params, expected) in [
+            (
+                BinanceWebSocketApiMarket::Spot,
+                "order.cancel",
+                json!({"symbol": "BTCUSDT"}),
+                "required",
+            ),
+            (
+                BinanceWebSocketApiMarket::Spot,
+                "session.logon",
+                json!({}),
+                "Ed25519",
+            ),
+            (
+                BinanceWebSocketApiMarket::Spot,
+                "order.place",
+                json!({"apiKey": "override"}),
+                "managed",
+            ),
+            (
+                BinanceWebSocketApiMarket::Futures,
+                "order.place",
+                json!({"symbol": "BTCUSDT", "side": "BUY", "type": "STOP_MARKET", "quantity": "1"}),
+                "algoOrder",
+            ),
+        ] {
+            let client = BinanceWebSocketApi::new(
+                market,
+                Some("key".into()),
+                Some("secret".into()),
+                None,
+                Duration::from_secs(2),
+            )
+            .unwrap()
+            .with_server_time_url(Some("http://127.0.0.1:9/time".into()));
+            let error = crate::http::block_on(async move { client.request(method, params).await })
+                .expect_err(method)
+                .to_string();
+            assert!(error.contains(expected), "{method}: {error}");
+        }
     }
 }
