@@ -854,3 +854,1965 @@ async fn every_typed_wrapper_reaches_dispatch() {
     )
     .await;
 }
+
+#[tokio::test]
+async fn every_typed_request_reaches_dispatch() {
+    // Hand-written typed requests (outside the wrapper macro) must reach dispatch too.
+    use crate::exchanges::wrapper_dispatch::note_typed_call as note;
+    let url = crate::exchanges::wrapper_dispatch::instant_server();
+    let client = BinanceClient::with_all_base_urls(
+        Some("api-key".into()),
+        Some("secret".into()),
+        Duration::from_secs(10),
+        url.clone(),
+        url.clone(),
+        url.clone(),
+    )
+    .expect("client")
+    .with_alpha_base_url(url.clone())
+    .with_portfolio_margin_base_url(url.clone())
+    .with_coin_futures_base_url(url.clone());
+    let (mut called, mut failures) = (Vec::new(), Vec::new());
+    note(
+        &mut called,
+        &mut failures,
+        "get_income_history",
+        client.get_income_history().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_wallet_balance",
+        client.get_wallet_balance().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_funding_wallet",
+        client.get_funding_wallet().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "place_options_batch_orders",
+        client.place_options_batch_orders("1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "cancel_options_batch_orders",
+        client.cancel_options_batch_orders("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_coin_futures_exchange_info",
+        client.get_coin_futures_exchange_info().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_coin_futures_orderbook",
+        client.get_coin_futures_orderbook("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_coin_futures_balance",
+        client.get_coin_futures_balance().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_coin_futures_positions",
+        client.get_coin_futures_positions().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_coin_futures_trades",
+        client.get_coin_futures_trades("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_coin_futures_klines",
+        client.get_coin_futures_klines("BTCUSDT", "1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_coin_futures_ticker",
+        client.get_coin_futures_ticker().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_coin_futures_mark_price",
+        client.get_coin_futures_mark_price().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_coin_futures_funding_rate",
+        client.get_coin_futures_funding_rate("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_coin_futures_account",
+        client.get_coin_futures_account().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_coin_futures_open_orders",
+        client.get_coin_futures_open_orders().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_coin_futures_order",
+        client.get_coin_futures_order("BTCUSDT", 1).send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "place_coin_futures_order",
+        client
+            .place_coin_futures_order("BTCUSDT", "BUY", "1", "1")
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "cancel_coin_futures_order",
+        client.cancel_coin_futures_order("BTCUSDT", 1).send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "cancel_all_coin_futures_orders",
+        client
+            .cancel_all_coin_futures_orders("BTCUSDT")
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "place_coin_futures_limit_order",
+        client
+            .place_coin_futures_limit_order("BTCUSDT", "BUY", "1", "1")
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_convert_pairs",
+        client.get_convert_pairs().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_convert_asset_info",
+        client.get_convert_asset_info().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_convert_quote",
+        client.get_convert_quote("1", "1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "accept_convert_quote",
+        client.accept_convert_quote("1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_convert_order_status",
+        client.get_convert_order_status("1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_convert_trade_history",
+        client.get_convert_trade_history(1, 1).send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "place_convert_limit_order",
+        client
+            .place_convert_limit_order("1", "1", "1", "BUY", "1")
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "cancel_convert_limit_order",
+        client.cancel_convert_limit_order(1).send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_open_convert_limit_orders",
+        client.get_open_convert_limit_orders().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_simple_earn_account",
+        client.get_simple_earn_account().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_flexible_earn_products",
+        client.get_flexible_earn_products().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_locked_earn_products",
+        client.get_locked_earn_products().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_flexible_earn_positions",
+        client.get_flexible_earn_positions().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_locked_earn_positions",
+        client.get_locked_earn_positions().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "subscribe_flexible_earn",
+        client.subscribe_flexible_earn("1", "1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "subscribe_locked_earn",
+        client.subscribe_locked_earn("1", "1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "redeem_flexible_earn",
+        client.redeem_flexible_earn("1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "redeem_locked_earn",
+        client.redeem_locked_earn("1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_flexible_earn_subscription_history",
+        client.get_flexible_earn_subscription_history().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_locked_earn_subscription_history",
+        client.get_locked_earn_subscription_history().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_flexible_earn_redemption_history",
+        client.get_flexible_earn_redemption_history().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_locked_earn_redemption_history",
+        client.get_locked_earn_redemption_history().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_flexible_earn_rewards_history",
+        client.get_flexible_earn_rewards_history().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_locked_earn_rewards_history",
+        client.get_locked_earn_rewards_history().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_equity_exchange_info",
+        client.get_equity_exchange_info().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_equity_tokenized_assets",
+        client.get_equity_tokenized_assets().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_equity_quote",
+        client.get_equity_quote("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "place_equity_order",
+        client
+            .place_equity_order("BTCUSDT", "BUY", "1")
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "cancel_equity_order",
+        client.cancel_equity_order("1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "cancel_all_equity_orders",
+        client.cancel_all_equity_orders().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_open_equity_orders",
+        client.get_open_equity_orders().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_equity_order_history",
+        client.get_equity_order_history(1, 1).send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_equity_order_detail",
+        client.get_equity_order_detail("1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_equity_trade_history",
+        client.get_equity_trade_history(1, 1).send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "mint_equity_token",
+        client.mint_equity_token("1", "1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "redeem_equity_token",
+        client.redeem_equity_token("1", "1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_equity_convert_status",
+        client.get_equity_convert_status("1", "1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_equity_convert_history",
+        client.get_equity_convert_history().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "sign_equity_disclaimer",
+        client.sign_equity_disclaimer().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "create_or_renew_equity_listen_key",
+        client.create_or_renew_equity_listen_key().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "check_flexible_loan_collateral_repay_rate",
+        client
+            .check_flexible_loan_collateral_repay_rate("1", "1")
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "adjust_flexible_loan_ltv",
+        client
+            .adjust_flexible_loan_ltv("1", "1", "1", "1")
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "borrow_flexible_loan",
+        client.borrow_flexible_loan("1", "1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "repay_flexible_loan",
+        client.repay_flexible_loan("1", "1", "1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_flexible_loan_assets",
+        client.get_flexible_loan_assets().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_flexible_loan_borrow_history",
+        client.get_flexible_loan_borrow_history().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_flexible_loan_collateral_assets",
+        client.get_flexible_loan_collateral_assets().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_flexible_loan_interest_rate_history",
+        client
+            .get_flexible_loan_interest_rate_history("1")
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_flexible_loan_liquidation_history",
+        client.get_flexible_loan_liquidation_history().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_flexible_loan_ltv_adjustment_history",
+        client
+            .get_flexible_loan_ltv_adjustment_history()
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_flexible_loan_ongoing_orders",
+        client.get_flexible_loan_ongoing_orders().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_flexible_loan_repayment_history",
+        client.get_flexible_loan_repayment_history().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_crypto_loan_income_history",
+        client.get_crypto_loan_income_history().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_stable_loan_borrow_history",
+        client.get_stable_loan_borrow_history().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_stable_loan_ltv_adjustment_history",
+        client.get_stable_loan_ltv_adjustment_history().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_stable_loan_repayment_history",
+        client.get_stable_loan_repayment_history().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_all_margin_assets",
+        client.get_all_margin_assets().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_all_cross_margin_pairs",
+        client.get_all_cross_margin_pairs().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_all_isolated_margin_symbols",
+        client.get_all_isolated_margin_symbols().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_margin_price_index",
+        client.get_margin_price_index("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_cross_margin_account",
+        client.get_cross_margin_account().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_isolated_margin_account",
+        client.get_isolated_margin_account().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "margin_borrow_repay",
+        client.margin_borrow_repay("1", "1", "1", true).send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "borrow_margin_asset",
+        client.borrow_margin_asset("1", "1", true).send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "repay_margin_asset",
+        client.repay_margin_asset("1", "1", true).send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_margin_borrow_repay_records",
+        client.get_margin_borrow_repay_records("1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_margin_interest_history",
+        client.get_margin_interest_history().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_margin_max_borrowable",
+        client.get_margin_max_borrowable("1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_margin_max_transferable",
+        client.get_margin_max_transferable("1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "place_margin_order",
+        client
+            .place_margin_order("BTCUSDT", "BUY", "1")
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "cancel_margin_order",
+        client.cancel_margin_order("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_margin_order",
+        client.get_margin_order("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_open_margin_orders",
+        client.get_open_margin_orders().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "cancel_all_open_margin_orders",
+        client.cancel_all_open_margin_orders("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_all_margin_orders",
+        client.get_all_margin_orders("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_margin_account_trades",
+        client.get_margin_account_trades("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_spot_exchange_info",
+        client.get_spot_exchange_info().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_spot_orderbook",
+        client.get_spot_orderbook("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_spot_trades",
+        client.get_spot_trades("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_spot_price",
+        client.get_spot_price().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_klines",
+        client.get_klines("BTCUSDT", "1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_futures_orderbook",
+        client.get_futures_orderbook("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_futures_ticker",
+        client.get_futures_ticker().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_futures_premium_index",
+        client.get_futures_premium_index().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_futures_funding_rate",
+        client.get_futures_funding_rate().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_futures_open_interest_history",
+        client
+            .get_futures_open_interest_history("BTCUSDT", "1")
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_futures_global_long_short_account_ratio",
+        client
+            .get_futures_global_long_short_account_ratio("BTCUSDT", "1")
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_futures_top_long_short_account_ratio",
+        client
+            .get_futures_top_long_short_account_ratio("BTCUSDT", "1")
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_futures_top_long_short_position_ratio",
+        client
+            .get_futures_top_long_short_position_ratio("BTCUSDT", "1")
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_futures_taker_buy_sell_volume",
+        client
+            .get_futures_taker_buy_sell_volume("BTCUSDT", "1")
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_futures_basis",
+        client.get_futures_basis("BTCUSDT", "1", "1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_options_exchange_info",
+        client.get_options_exchange_info().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_options_index_price",
+        client.get_options_index_price("1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_options_exercise_history",
+        client.get_options_exercise_history().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_options_klines",
+        client.get_options_klines("BTCUSDT", "1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_options_open_interest",
+        client.get_options_open_interest("1", "1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_options_mark_price",
+        client.get_options_mark_price().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_options_orderbook",
+        client.get_options_orderbook("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_options_block_trades",
+        client.get_options_block_trades().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_options_trades",
+        client.get_options_trades("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "ping_options",
+        client.ping_options().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_options_ticker",
+        client.get_options_ticker().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "place_options_order",
+        client
+            .place_options_order("BTCUSDT", "BUY", "1", "1")
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_options_account_bill",
+        client.get_options_account_bill("1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_options_margin_account",
+        client.get_options_margin_account().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_options_account_trades",
+        client.get_options_account_trades("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "cancel_all_options_orders_by_underlying",
+        client
+            .cancel_all_options_orders_by_underlying("1")
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "cancel_all_options_orders",
+        client.cancel_all_options_orders("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_options_order",
+        client.get_options_order("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "cancel_options_order",
+        client.cancel_options_order("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_options_positions",
+        client.get_options_positions().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_open_options_orders",
+        client.get_open_options_orders().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_options_order_history",
+        client.get_options_order_history("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_options_commission",
+        client.get_options_commission().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_options_exercise_records",
+        client.get_options_exercise_records().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "create_options_listen_key",
+        client.create_options_listen_key().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "keep_alive_options_listen_key",
+        client.keep_alive_options_listen_key().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "close_options_listen_key",
+        client.close_options_listen_key().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_pm_account",
+        client.get_pm_account().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_pm_um_account",
+        client.get_pm_um_account().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_pm_um_position_risk",
+        client.get_pm_um_position_risk().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_pm_um_open_orders",
+        client.get_pm_um_open_orders().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_pm_um_order",
+        client.get_pm_um_order("BTCUSDT", "1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "cancel_pm_um_order",
+        client.cancel_pm_um_order("BTCUSDT", "1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "cancel_all_pm_um_orders",
+        client.cancel_all_pm_um_orders("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "place_pm_um_order",
+        client
+            .place_pm_um_order("BTCUSDT", "BUY", "1", "1")
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "place_pm_um_algo_order",
+        client
+            .place_pm_um_algo_order("BTCUSDT", "BUY", "1")
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_pm_um_algo_order",
+        client.get_pm_um_algo_order("1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_pm_um_algo_order_by_client_id",
+        client.get_pm_um_algo_order_by_client_id("1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "cancel_pm_um_algo_order",
+        client.cancel_pm_um_algo_order("1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "cancel_pm_um_algo_order_by_client_id",
+        client
+            .cancel_pm_um_algo_order_by_client_id("1")
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "cancel_all_pm_um_algo_orders",
+        client.cancel_all_pm_um_algo_orders("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_pm_um_open_algo_orders",
+        client.get_pm_um_open_algo_orders().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_pm_um_algo_order_history",
+        client.get_pm_um_algo_order_history("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_pm_cm_account",
+        client.get_pm_cm_account().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_pm_cm_position_risk",
+        client.get_pm_cm_position_risk().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_pm_um_account_config",
+        client.get_pm_um_account_config().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_pm_um_symbol_config",
+        client.get_pm_um_symbol_config().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_pm_um_leverage_bracket",
+        client.get_pm_um_leverage_bracket().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_pm_um_api_trading_status",
+        client.get_pm_um_api_trading_status().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_pm_cm_adl_quantile",
+        client.get_pm_cm_adl_quantile("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_pm_margin_max_borrowable",
+        client.get_pm_margin_max_borrowable("1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_pm_um_force_orders",
+        client.get_pm_um_force_orders().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_pm_cm_force_orders",
+        client.get_pm_cm_force_orders().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_pm_margin_force_orders",
+        client.get_pm_margin_force_orders().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_pm_um_all_orders",
+        client.get_pm_um_all_orders("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_pm_um_user_trades",
+        client.get_pm_um_user_trades("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_pm_cm_open_orders",
+        client.get_pm_cm_open_orders().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_pm_cm_all_orders",
+        client.get_pm_cm_all_orders("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_pm_cm_user_trades",
+        client.get_pm_cm_user_trades("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_pm_margin_open_orders",
+        client.get_pm_margin_open_orders().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_pm_margin_all_orders",
+        client.get_pm_margin_all_orders("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_pm_margin_trades",
+        client.get_pm_margin_trades("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "place_pm_cm_order",
+        client
+            .place_pm_cm_order("BTCUSDT", "BUY", "1", "1")
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "place_pm_margin_order",
+        client
+            .place_pm_margin_order("BTCUSDT", "BUY", "1", "1")
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_pm_cm_order",
+        client.get_pm_cm_order("BTCUSDT", "1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "cancel_pm_cm_order",
+        client.cancel_pm_cm_order("BTCUSDT", "1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_pm_margin_order",
+        client.get_pm_margin_order("BTCUSDT", "1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "cancel_pm_margin_order",
+        client.cancel_pm_margin_order("BTCUSDT", "1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "cancel_all_pm_cm_orders",
+        client.cancel_all_pm_cm_orders("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "cancel_all_pm_margin_orders",
+        client.cancel_all_pm_margin_orders("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "modify_pm_um_order",
+        client
+            .modify_pm_um_order("BTCUSDT", "BUY", "1", "1", "1")
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "modify_pm_cm_order",
+        client
+            .modify_pm_cm_order("BTCUSDT", "BUY", "1", "1", "1")
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "borrow_pm_margin",
+        client.borrow_pm_margin("1", "1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "repay_pm_margin",
+        client.repay_pm_margin("1", "1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "place_pm_cm_conditional_order",
+        client
+            .place_pm_cm_conditional_order("BTCUSDT", "BUY", "1")
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "cancel_pm_cm_conditional_order",
+        client
+            .cancel_pm_cm_conditional_order("BTCUSDT", "1")
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "cancel_all_pm_cm_conditional_orders",
+        client
+            .cancel_all_pm_cm_conditional_orders("BTCUSDT")
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_pm_cm_conditional_order",
+        client
+            .get_pm_cm_conditional_order("BTCUSDT", "1")
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_pm_cm_conditional_order_history",
+        client
+            .get_pm_cm_conditional_order_history("BTCUSDT")
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_pm_cm_open_conditional_orders",
+        client.get_pm_cm_open_conditional_orders().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_pm_cm_all_conditional_orders",
+        client.get_pm_cm_all_conditional_orders().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "place_pm_margin_oco",
+        client
+            .place_pm_margin_oco("BTCUSDT", "BUY", "1", "1", "1")
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_pm_margin_oco",
+        client.get_pm_margin_oco("1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "cancel_pm_margin_oco",
+        client.cancel_pm_margin_oco("BTCUSDT", "1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_pm_margin_open_oco",
+        client.get_pm_margin_open_oco().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_pm_margin_all_oco",
+        client.get_pm_margin_all_oco().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_pm_balance",
+        client.get_pm_balance().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_pm_cm_leverage_bracket",
+        client.get_pm_cm_leverage_bracket().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "set_pm_um_leverage",
+        client.set_pm_um_leverage("BTCUSDT", 1).send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "set_pm_cm_leverage",
+        client.set_pm_cm_leverage("BTCUSDT", 1).send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_pm_um_position_mode",
+        client.get_pm_um_position_mode().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_pm_cm_position_mode",
+        client.get_pm_cm_position_mode().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "set_pm_um_position_mode",
+        client.set_pm_um_position_mode(true).send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "set_pm_cm_position_mode",
+        client.set_pm_cm_position_mode(true).send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_pm_um_adl_quantile",
+        client.get_pm_um_adl_quantile().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "repay_pm_margin_debt",
+        client.repay_pm_margin_debt("1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_pm_um_order_amendments",
+        client
+            .get_pm_um_order_amendments("BTCUSDT", "1")
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_pm_cm_order_amendments",
+        client
+            .get_pm_cm_order_amendments("BTCUSDT", "1")
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "create_oco_order",
+        client.create_oco_order("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "create_oto_order",
+        client.create_oto_order("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "create_otoco_order",
+        client.create_otoco_order("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_prevented_matches",
+        client.get_prevented_matches("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_allocations",
+        client.get_allocations("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_order_rate_limit",
+        client.get_order_rate_limit().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "redeem_eth_staking",
+        client.redeem_eth_staking("1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "subscribe_eth_staking",
+        client.subscribe_eth_staking("1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "wrap_beth",
+        client.wrap_beth("1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_onchain_yields_personal_quota",
+        client.get_onchain_yields_personal_quota("1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "preview_onchain_yields_subscription",
+        client
+            .preview_onchain_yields_subscription("1", "1")
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "subscribe_onchain_yields",
+        client.subscribe_onchain_yields("1", "1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "redeem_onchain_yields",
+        client.redeem_onchain_yields("1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "set_onchain_yields_auto_subscribe",
+        client
+            .set_onchain_yields_auto_subscribe("1", true)
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "set_onchain_yields_redeem_option",
+        client
+            .set_onchain_yields_redeem_option("1", "1")
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "set_soft_staking",
+        client.set_soft_staking(true).send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "subscribe_sol_staking",
+        client.subscribe_sol_staking("1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "redeem_sol_staking",
+        client.redeem_sol_staking("1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_eth_staking_account",
+        client.get_eth_staking_account().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_eth_staking_quota",
+        client.get_eth_staking_quota().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_eth_redemption_history",
+        client.get_eth_redemption_history().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_eth_staking_history",
+        client.get_eth_staking_history().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_wbeth_rate_history",
+        client.get_wbeth_rate_history().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_wbeth_rewards_history",
+        client.get_wbeth_rewards_history().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_wbeth_unwrap_history",
+        client.get_wbeth_unwrap_history().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_wbeth_wrap_history",
+        client.get_wbeth_wrap_history().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_onchain_yields_products",
+        client.get_onchain_yields_products().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_onchain_yields_positions",
+        client.get_onchain_yields_positions().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_onchain_yields_redemption_history",
+        client.get_onchain_yields_redemption_history().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_onchain_yields_rewards_history",
+        client.get_onchain_yields_rewards_history().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_onchain_yields_subscription_history",
+        client
+            .get_onchain_yields_subscription_history()
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_onchain_yields_account",
+        client.get_onchain_yields_account().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_soft_staking_products",
+        client.get_soft_staking_products().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_soft_staking_rewards_history",
+        client.get_soft_staking_rewards_history().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_sol_staking_account",
+        client.get_sol_staking_account().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_sol_staking_quota",
+        client.get_sol_staking_quota().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_bnsol_rate_history",
+        client.get_bnsol_rate_history().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_bnsol_rewards_history",
+        client.get_bnsol_rewards_history().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_sol_boost_rewards_history",
+        client.get_sol_boost_rewards_history().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_sol_redemption_history",
+        client.get_sol_redemption_history().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_sol_staking_history",
+        client.get_sol_staking_history().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_sol_unclaimed_rewards",
+        client.get_sol_unclaimed_rewards().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "claim_sol_boost_rewards",
+        client.claim_sol_boost_rewards().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_subaccounts",
+        client.get_subaccounts().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_subaccount_status",
+        client.get_subaccount_status().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_subaccount_transaction_statistics",
+        client.get_subaccount_transaction_statistics().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_subaccount_futures_position_risk",
+        client.get_subaccount_futures_position_risk().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_subaccount_futures_account",
+        client.get_subaccount_futures_account().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_subaccount_margin_account",
+        client.get_subaccount_margin_account().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_subaccount_futures_summary",
+        client.get_subaccount_futures_summary().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_subaccount_margin_summary",
+        client.get_subaccount_margin_summary().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_subaccount_assets",
+        client.get_subaccount_assets().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_subaccount_spot_summary",
+        client.get_subaccount_spot_summary().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_subaccount_futures_transfer_history",
+        client
+            .get_subaccount_futures_transfer_history()
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_subaccount_spot_transfer_history",
+        client.get_subaccount_spot_transfer_history().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_subaccount_universal_transfer_history",
+        client
+            .get_subaccount_universal_transfer_history()
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_subaccount_transfer_history",
+        client.get_subaccount_transfer_history().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "place_order",
+        client.place_order("BTCUSDT", "BUY", "1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "test_order",
+        client.test_order("BTCUSDT", "BUY", "1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "place_futures_algo_order",
+        client
+            .place_futures_algo_order("BTCUSDT", "BUY", "1", "1")
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "cancel_futures_algo_order",
+        client.cancel_futures_algo_order().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_futures_algo_order",
+        client.get_futures_algo_order().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_all_open_futures_algo_orders",
+        client.get_all_open_futures_algo_orders().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_all_futures_algo_orders",
+        client.get_all_futures_algo_orders("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "place_market_order",
+        client
+            .place_market_order("BTCUSDT", "BUY", "1")
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "place_market_buy_order",
+        client.place_market_buy_order("BTCUSDT", "1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "place_market_sell_order",
+        client.place_market_sell_order("BTCUSDT", "1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "place_limit_order",
+        client
+            .place_limit_order("BTCUSDT", "BUY", "1", "1", "1")
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "place_limit_buy_order",
+        client
+            .place_limit_buy_order("BTCUSDT", "1", "1", "1")
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "place_limit_sell_order",
+        client
+            .place_limit_sell_order("BTCUSDT", "1", "1", "1")
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "place_post_only_limit_order",
+        client
+            .place_post_only_limit_order("BTCUSDT", "BUY", "1", "1")
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "place_post_only_limit_buy_order",
+        client
+            .place_post_only_limit_buy_order("BTCUSDT", "1", "1")
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "place_post_only_limit_sell_order",
+        client
+            .place_post_only_limit_sell_order("BTCUSDT", "1", "1")
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "cancel_order",
+        client.cancel_order("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_order",
+        client.get_order("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_open_orders",
+        client.get_open_orders("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_all_open_orders",
+        client.get_all_open_orders().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_future_all_order",
+        client.get_future_all_order("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_all_orders",
+        client.get_all_orders("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_account_trades",
+        client.get_account_trades("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "create_universal_transfer",
+        client.create_universal_transfer("1", "1", "1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_universal_transfer_history",
+        client.get_universal_transfer_history("1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "transfer_subaccount_futures",
+        client
+            .transfer_subaccount_futures("1", "1", "1", 1)
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "transfer_subaccount_margin",
+        client
+            .transfer_subaccount_margin("1", "1", "1", 1)
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "transfer_between_subaccount_futures",
+        client
+            .transfer_between_subaccount_futures("1", "1", 1, "1", "1")
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "transfer_subaccount_to_master",
+        client.transfer_subaccount_to_master("1", "1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "transfer_subaccount_to_subaccount",
+        client
+            .transfer_subaccount_to_subaccount("1", "1", "1")
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "transfer_between_subaccounts",
+        client
+            .transfer_between_subaccounts("1", "1", "1", "1")
+            .send()
+            .await,
+    );
+    crate::exchanges::wrapper_dispatch::assert_typed_requests("binance", called, failures);
+}

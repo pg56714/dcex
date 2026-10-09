@@ -203,6 +203,89 @@ where
     );
 }
 
+/// Hand-written methods returning `ExchangeMethodRequest` (outside the wrapper macro)
+/// under `src/exchanges/<exchange>/`, by name.
+pub(crate) fn typed_request_methods(exchange: &str) -> Vec<String> {
+    const RETURNS: &str = "crate::exchanges::ExchangeMethodRequest<'_, Self>";
+    let root = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("src/exchanges")
+        .join(exchange);
+    let mut files = Vec::new();
+    collect_rs(&root, &mut files);
+    let mut names = Vec::new();
+    for file in files {
+        if file.to_string_lossy().ends_with("_tests.rs") {
+            continue;
+        }
+        let text = std::fs::read_to_string(&file).expect("read exchange source");
+        for chunk in text.split("pub fn ").skip(1) {
+            let name_end = chunk.find(['(', '<']).unwrap_or(0);
+            let signature = &chunk[..chunk.find('{').unwrap_or(chunk.len())];
+            if signature.contains("&self") && signature.contains(RETURNS) {
+                let name = &chunk[..name_end];
+                if name != "$name" {
+                    names.push(name.to_string());
+                }
+            }
+        }
+        // `macro_rules!` method lists: expand each invocation of a macro whose body
+        // declares `pub fn $name(&self) -> ExchangeMethodRequest`.
+        for chunk in text.split("macro_rules! ").skip(1) {
+            let macro_name = &chunk[..chunk.find([' ', '{']).unwrap_or(0)];
+            let body = &chunk[..chunk.find("\n}").unwrap_or(chunk.len())];
+            if !(body.contains("pub fn $name(&self)") && body.contains(RETURNS)) {
+                continue;
+            }
+            for call in text.split(&format!("{macro_name}!(")).skip(1) {
+                let list = &call[..call.find(')').expect("macro invocation")];
+                names.extend(
+                    list.split(',')
+                        .map(str::trim)
+                        .filter(|ident| !ident.is_empty())
+                        .map(str::to_string),
+                );
+            }
+        }
+    }
+    names.sort();
+    names
+}
+
+/// Record a typed request whose dispatch rejected its method or one of its keys.
+pub(crate) fn note_typed_call<T>(
+    called: &mut Vec<&'static str>,
+    failures: &mut Vec<String>,
+    name: &'static str,
+    result: Result<T>,
+) {
+    called.push(name);
+    if let Err(DcexError::InvalidInput(message) | DcexError::Runtime(message)) = result {
+        let lower = message.to_ascii_lowercase();
+        if lower.starts_with("unsupported")
+            && (lower.contains(" method") || lower.contains("parameter"))
+        {
+            failures.push(format!("{name}: {message}"));
+        }
+    }
+}
+
+/// Every hand-written typed request was called and none was rejected by its dispatch.
+pub(crate) fn assert_typed_requests(exchange: &str, mut called: Vec<&str>, failures: Vec<String>) {
+    called.sort_unstable();
+    let declared = typed_request_methods(exchange);
+    assert_eq!(called, declared, "{exchange}: typed request list is stale");
+    assert!(
+        failures.is_empty(),
+        "{exchange}: {} typed requests do not reach dispatch:
+{}",
+        failures.len(),
+        failures.join(
+            "
+"
+        )
+    );
+}
+
 /// A local server that answers every request at once with a generic success body
 /// (including a server time), so dispatch errors are never masked by a slow peer.
 pub(crate) fn instant_server() -> String {

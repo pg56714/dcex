@@ -635,5 +635,199 @@ pub(super) mod spot {
                 .unwrap();
             assert_eq!(body["builderFeeBps"], 80);
         }
+        fn typed_data() -> Value {
+            serde_json::json!({"domain": {"chainId": 4663}, "primaryType": "PermitWitnessTransferFrom"})
+        }
+
+        #[test]
+        fn malformed_firm_quotes_are_not_signed() {
+            let client = ArcusSpotClient::new(None, false, Duration::from_secs(1)).unwrap();
+            let taker = format!("0x{}", "11".repeat(20));
+            let signature = format!("0x{}", "22".repeat(65));
+            let quote = serde_json::json!({"venue": "arcus", "toSign": typed_data()});
+            for (quote, permits, route_tag, fee, expected) in [
+                (
+                    serde_json::json!([]),
+                    None,
+                    None,
+                    None,
+                    "firm quote must be a JSON object",
+                ),
+                (
+                    serde_json::json!({"venue": "other"}),
+                    None,
+                    None,
+                    None,
+                    "firm quote venue must be arcus",
+                ),
+                (
+                    serde_json::json!({"venue": "arcus"}),
+                    None,
+                    None,
+                    None,
+                    "firm quote toSign is required",
+                ),
+                (
+                    quote.clone(),
+                    Some(serde_json::json!({})),
+                    None,
+                    None,
+                    "permits must be a JSON array",
+                ),
+                (
+                    quote.clone(),
+                    None,
+                    Some(" "),
+                    None,
+                    "routeTag must not be empty",
+                ),
+                (
+                    quote.clone(),
+                    None,
+                    None,
+                    Some(10_001),
+                    "builderFeeBps must be at most 10000",
+                ),
+            ] {
+                let error = client
+                    .build_signed_quote_with_fee(quote, &taker, &signature, permits, route_tag, fee)
+                    .expect_err(expected)
+                    .to_string();
+                assert!(error.contains(expected), "{error}");
+            }
+        }
+
+        #[test]
+        fn signed_quotes_and_router_queries_are_validated_before_sending() {
+            let client = ArcusSpotClient::new(None, false, Duration::from_secs(1))
+                .unwrap()
+                .with_base_url("http://127.0.0.1:9".into())
+                .unwrap();
+            assert_eq!(client.chain_id(), 4663);
+            let taker = format!("0x{}", "11".repeat(20));
+            let signature = format!("0x{}", "22".repeat(65));
+            let signed = |changes: Value| {
+                let mut body = serde_json::json!({"venue": "arcus", "chainId": 4663, "taker": taker,
+                    "signature": signature, "typedData": typed_data()});
+                for (key, value) in changes.as_object().unwrap() {
+                    if value.is_null() {
+                        body.as_object_mut().unwrap().remove(key);
+                    } else {
+                        body[key] = value.clone();
+                    }
+                }
+                body
+            };
+            for (body, expected) in [
+                (
+                    serde_json::json!("quote"),
+                    "signed quote must be a JSON object",
+                ),
+                (
+                    signed(serde_json::json!({"venue": "other"})),
+                    "signed quote venue must be arcus",
+                ),
+                (
+                    signed(serde_json::json!({"chainId": 1})),
+                    "chainId does not match",
+                ),
+                (
+                    signed(serde_json::json!({"taker": null})),
+                    "signed quote taker is required",
+                ),
+                (
+                    signed(serde_json::json!({"signature": null})),
+                    "wallet signature is required",
+                ),
+                (
+                    signed(serde_json::json!({"typedData": null})),
+                    "typedData is required",
+                ),
+                (
+                    signed(serde_json::json!({"permits": "p"})),
+                    "permits must be a JSON array",
+                ),
+                (
+                    signed(serde_json::json!({"builderFeeBps": -1})),
+                    "invalid Arcus spot builderFeeBps",
+                ),
+                (
+                    signed(serde_json::json!({"builderFeeBps": 5})),
+                    "requires a router API key",
+                ),
+            ] {
+                let error = {
+                    let client = client.clone();
+                    crate::http::block_on(async move { client.submit_signed_quote(body).await })
+                }
+                .expect_err(expected)
+                .to_string();
+                assert!(error.contains(expected), "{error}");
+            }
+
+            let token_a = format!("0x{}", "aa".repeat(20));
+            let token_b = format!("0x{}", "bb".repeat(20));
+            let quote = |extra: &[(&str, &str)]| {
+                let mut params = vec![
+                    ("sellToken".to_string(), token_a.clone()),
+                    ("buyToken".to_string(), token_b.clone()),
+                    ("sellAmount".to_string(), "100".to_string()),
+                    ("taker".to_string(), taker.clone()),
+                ];
+                params.extend(extra.iter().map(|(k, v)| (k.to_string(), v.to_string())));
+                params
+            };
+            for (method, params, expected) in [
+                (
+                    "get_quote",
+                    quote(&[("builderFeeBps", "70000")]),
+                    "invalid Arcus spot builderFeeBps",
+                ),
+                (
+                    "get_quote",
+                    quote(&[("slippageBps", "70000")]),
+                    "invalid Arcus spot slippageBps",
+                ),
+                (
+                    "get_quote",
+                    quote(&[("slippageBps", "10001")]),
+                    "slippageBps must be at most 10000",
+                ),
+                (
+                    "get_quote",
+                    quote(&[("allowWrapped", "yes")]),
+                    "allowWrapped must be true or false",
+                ),
+                (
+                    "get_quote",
+                    quote(&[("chainId", "1")]),
+                    "chainId does not match selected network",
+                ),
+                (
+                    "get_status",
+                    vec![
+                        ("venue".into(), "uniswap".into()),
+                        ("id".into(), "0x1".into()),
+                    ],
+                    "status venue must be arcus",
+                ),
+                ("get_routes", vec![], "unknown Arcus spot public method"),
+                (
+                    "health",
+                    vec![("verbose".into(), "1".into())],
+                    "unknown Arcus spot parameter: verbose",
+                ),
+            ] {
+                let error = {
+                    let client = client.clone();
+                    crate::http::block_on(
+                        async move { client.public_request(method, params).await },
+                    )
+                }
+                .expect_err(expected)
+                .to_string();
+                assert!(error.contains(expected), "{method}: {error}");
+            }
+        }
     }
 }

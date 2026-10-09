@@ -369,3 +369,152 @@ async fn uta_v2_order_identifier_is_required_before_network() {
         .expect_err("order id is required");
     assert!(error.to_string().contains("orderId"));
 }
+
+#[tokio::test]
+async fn classic_trading_rejects_malformed_fields_before_transport() {
+    let client = KucoinClient::with_base_urls(
+        Some("key".to_string()),
+        Some("secret".to_string()),
+        Some("passphrase".to_string()),
+        Duration::from_secs(10),
+        "http://127.0.0.1:9".to_string(),
+        "http://127.0.0.1:9".to_string(),
+    )
+    .expect("client");
+    fn margin(extra: &[(&'static str, &'static str)]) -> Vec<(&'static str, &'static str)> {
+        let mut params = vec![
+            ("clientOid", "c1"),
+            ("side", "buy"),
+            ("symbol", "BTC-USDT"),
+            ("price", "1"),
+            ("size", "1"),
+        ];
+        params.extend_from_slice(extra);
+        params
+    }
+    fn tpsl(extra: &[(&'static str, &'static str)]) -> Vec<(&'static str, &'static str)> {
+        let mut params = vec![
+            ("clientOid", "c1"),
+            ("symbol", "XBTUSDTM"),
+            ("leverage", "1"),
+        ];
+        params.extend_from_slice(extra);
+        params
+    }
+    let batch_order = r#"{"clientOid":"c1","symbol":"XBTUSDTM","side":"buy","type":"limit","price":"1","size":"1","leverage":"1"}"#;
+    let duplicate = format!("[{batch_order},{batch_order}]");
+    type Case<'a> = (&'a str, Vec<(&'a str, &'a str)>, &'a str);
+    let cases: Vec<Case> = vec![
+        (
+            "place_futures_batch_orders",
+            vec![("orders", r#"[{"symbol":"XBTUSDTM","side":["buy"]}]"#)],
+            "batch order fields must be scalar values",
+        ),
+        (
+            "place_futures_batch_orders",
+            vec![("orders", &duplicate)],
+            "duplicate clientOid in batch",
+        ),
+        (
+            "cancel_futures_batch_orders",
+            vec![("orderIdsList", r#"["1"]"#), ("clientOidsList", "[]")],
+            "provide exactly one of orderIdsList or clientOidsList",
+        ),
+        (
+            "cancel_futures_batch_orders",
+            vec![("orderIdsList", "[]")],
+            "cancel list requires 1..=10 orders",
+        ),
+        (
+            "cancel_futures_batch_orders",
+            vec![("orderIdsList", r#"[" "]"#)],
+            "order IDs must be nonempty strings",
+        ),
+        (
+            "cancel_futures_batch_orders",
+            vec![("clientOidsList", r#"["c1"]"#)],
+            "clientOidsList items must be objects",
+        ),
+        (
+            "cancel_futures_batch_orders",
+            vec![("clientOidsList", r#"[{"clientOid":"c1","orderId":"1"}]"#)],
+            "unknown clientOidsList item field",
+        ),
+        (
+            "cancel_futures_batch_orders",
+            vec![("clientOidsList", r#"[{"symbol":"XBTUSDTM"}]"#)],
+            "clientOid is required",
+        ),
+        (
+            "cancel_futures_batch_orders",
+            vec![("clientOidsList", r#"[{"clientOid":"c1"}]"#)],
+            "symbol is required",
+        ),
+        (
+            "set_futures_batch_margin_mode",
+            vec![("marginMode", "CROSS"), ("symbols", "[]")],
+            "symbols must be a nonempty array",
+        ),
+        (
+            "set_futures_batch_margin_mode",
+            vec![("marginMode", "CROSS"), ("symbols", "[1]")],
+            "symbol must be a string",
+        ),
+        (
+            "get_spot_order",
+            vec![("symbol", "BTC-USDT"), ("orderId", "../x")],
+            "invalid KuCoin path identifier",
+        ),
+        (
+            "place_margin_order",
+            margin(&[("postOnly", "maybe")]),
+            "postOnly must be true or false",
+        ),
+        (
+            "place_margin_order",
+            margin(&[("autoRepay", "yes")]),
+            "autoRepay must be true or false",
+        ),
+        (
+            "place_margin_order",
+            margin(&[("type", "market")]),
+            "market orders cannot include limit order fields",
+        ),
+        (
+            "place_margin_order",
+            margin(&[("postOnly", "true"), ("timeInForce", "IOC")]),
+            "postOnly is incompatible with IOC/FOK",
+        ),
+        (
+            "place_margin_order",
+            margin(&[("timeInForce", "GTC"), ("cancelAfter", "10")]),
+            "cancelAfter requires GTT",
+        ),
+        (
+            "place_margin_order",
+            margin(&[("autoBorrow", "true")]),
+            "missing required parameter: funds",
+        ),
+        (
+            "place_futures_tpsl_order",
+            tpsl(&[("closeOrder", "true"), ("side", "buy")]),
+            "closeOrder requires side and quantity fields to be omitted",
+        ),
+        (
+            "place_futures_tpsl_order",
+            tpsl(&[("forceHold", "no")]),
+            "forceHold must be true or false",
+        ),
+    ];
+    for (method, params, expected) in cases {
+        let params = params
+            .into_iter()
+            .map(|(key, value)| (key.to_string(), value.to_string()))
+            .collect();
+        let error = client
+            .private_request(method, params)
+            .await
+            .expect_err(expected);
+        assert!(error.to_string().contains(expected), "{method}: {error}");
+    }
+}

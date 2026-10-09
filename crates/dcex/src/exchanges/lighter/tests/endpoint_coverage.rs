@@ -1910,3 +1910,94 @@ async fn every_typed_wrapper_reaches_dispatch() {
     )
     .await;
 }
+
+#[tokio::test]
+async fn every_typed_sign_wrapper_reaches_sign_dispatch() {
+    // Each typed `sign_*` method must name a signing route the dispatch knows; empty
+    // parameters are rejected by validation, never as an unknown sign method.
+    let client = signing_client(crate::exchanges::wrapper_dispatch::instant_server());
+    let calls: Vec<(
+        &str,
+        crate::Result<crate::exchanges::lighter::LighterSignedTransaction>,
+    )> = vec![
+        (
+            "sign_update_account_config",
+            client.sign_update_account_config(vec![]).await,
+        ),
+        (
+            "sign_update_account_asset_config",
+            client.sign_update_account_asset_config(vec![]).await,
+        ),
+        (
+            "sign_create_grouped_orders",
+            client.sign_create_grouped_orders(vec![]).await,
+        ),
+        ("sign_create_order", client.sign_create_order(vec![]).await),
+        ("sign_cancel_order", client.sign_cancel_order(vec![]).await),
+        ("sign_modify_order", client.sign_modify_order(vec![]).await),
+        (
+            "sign_cancel_all_orders",
+            client.sign_cancel_all_orders(vec![]).await,
+        ),
+        (
+            "sign_update_leverage",
+            client.sign_update_leverage(vec![]).await,
+        ),
+        (
+            "sign_update_margin",
+            client.sign_update_margin(vec![]).await,
+        ),
+        (
+            "sign_create_sub_account",
+            client.sign_create_sub_account(vec![]).await,
+        ),
+        (
+            "sign_change_api_key_signed",
+            client.sign_change_api_key_signed(vec![]).await,
+        ),
+        (
+            "sign_create_public_pool",
+            client.sign_create_public_pool(vec![]).await,
+        ),
+        (
+            "sign_update_public_pool",
+            client.sign_update_public_pool(vec![]).await,
+        ),
+        ("sign_mint_shares", client.sign_mint_shares(vec![]).await),
+        ("sign_burn_shares", client.sign_burn_shares(vec![]).await),
+        ("sign_stake_assets", client.sign_stake_assets(vec![]).await),
+        (
+            "sign_unstake_assets",
+            client.sign_unstake_assets(vec![]).await,
+        ),
+        (
+            "sign_transfer_l2_account",
+            client.sign_transfer_l2_account(vec![]).await,
+        ),
+        ("sign_withdraw_l2", client.sign_withdraw_l2(vec![]).await),
+        (
+            "sign_approve_integrator",
+            client.sign_approve_integrator(vec![]).await,
+        ),
+    ];
+    let source = std::fs::read_to_string(
+        std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("src/exchanges/lighter/wrappers.rs"),
+    )
+    .expect("wrappers source");
+    let mut declared: Vec<&str> = source
+        .split("pub async fn ")
+        .skip(1)
+        .map(|chunk| &chunk[..chunk.find('(').expect("signature")])
+        .collect();
+    let mut called: Vec<&str> = calls.iter().map(|(name, _)| *name).collect();
+    declared.sort_unstable();
+    called.sort_unstable();
+    assert_eq!(called, declared, "typed sign wrapper list is stale");
+    for (name, result) in calls {
+        let error = result.expect_err(name).to_string();
+        assert!(
+            !error.contains("unsupported Lighter sign method"),
+            "{name}: {error}"
+        );
+    }
+}

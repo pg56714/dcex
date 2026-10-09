@@ -1736,3 +1736,142 @@ async fn every_typed_wrapper_reaches_dispatch() {
     )
     .await;
 }
+
+#[tokio::test]
+async fn every_typed_request_reaches_dispatch() {
+    // Hand-written typed requests (outside the wrapper macro) must reach dispatch too.
+    use crate::exchanges::wrapper_dispatch::note_typed_call as note;
+    let url = crate::exchanges::wrapper_dispatch::instant_server();
+    let client = client(&url);
+    let (mut called, mut failures) = (Vec::new(), Vec::new());
+    note(
+        &mut called,
+        &mut failures,
+        "get_spot_orderbook",
+        client.get_spot_orderbook("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_futures_orderbook",
+        client.get_futures_orderbook("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_spot_recent_trades",
+        client.get_spot_recent_trades("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_futures_recent_trades",
+        client.get_futures_recent_trades("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_spot_historical_trades",
+        client.get_spot_historical_trades("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_futures_historical_trades",
+        client.get_futures_historical_trades("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_spot_agg_trades",
+        client.get_spot_agg_trades("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_futures_agg_trades",
+        client.get_futures_agg_trades("BTCUSDT").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_spot_klines",
+        client.get_spot_klines("BTCUSDT", "1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_futures_klines",
+        client.get_futures_klines("BTCUSDT", "1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_futures_index_price_klines",
+        client.get_futures_index_price_klines("1", "1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_futures_mark_price_klines",
+        client
+            .get_futures_mark_price_klines("BTCUSDT", "1")
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_spot_ticker_24hr",
+        client.get_spot_ticker_24hr().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_futures_ticker_24hr",
+        client.get_futures_ticker_24hr().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_spot_ticker_price",
+        client.get_spot_ticker_price().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_futures_ticker_price",
+        client.get_futures_ticker_price().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_spot_book_ticker",
+        client.get_spot_book_ticker().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_futures_book_ticker",
+        client.get_futures_book_ticker().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_futures_premium_index",
+        client.get_futures_premium_index().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_futures_funding_rate",
+        client.get_futures_funding_rate().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_futures_funding_info",
+        client.get_futures_funding_info().send().await,
+    );
+    crate::exchanges::wrapper_dispatch::assert_typed_requests("aster", called, failures);
+}

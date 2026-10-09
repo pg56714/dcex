@@ -1863,3 +1863,75 @@ async fn every_typed_wrapper_reaches_dispatch() {
     )
     .await;
 }
+
+#[test]
+fn malformed_mid_price_metadata_is_reported_without_ordering() {
+    let perp = "[\"BTC\",0]";
+    let spot = "[\"@107\",10107]";
+    for (symbol, response, expected) in [
+        (perp, "{}", "metaAndAssetCtxs response is invalid"),
+        (perp, "[{}]", "missing universe"),
+        (
+            perp,
+            "[{\"universe\":[{\"name\":\"ETH\"}]}]",
+            "does not contain coin BTC",
+        ),
+        (
+            perp,
+            "[{\"universe\":[{\"name\":\"BTC\"}]}]",
+            "missing szDecimals",
+        ),
+        (
+            perp,
+            "[{\"universe\":[{\"name\":\"BTC\",\"szDecimals\":5}]}]",
+            "metaAndAssetCtxs response is invalid",
+        ),
+        (
+            perp,
+            "[{\"universe\":[{\"name\":\"BTC\",\"szDecimals\":5}]},[]]",
+            "context index out of range: 0",
+        ),
+        (
+            perp,
+            "[{\"universe\":[{\"name\":\"BTC\",\"szDecimals\":5}]},[{}]]",
+            "missing midPx",
+        ),
+        (
+            perp,
+            "[{\"universe\":[{\"name\":\"BTC\",\"szDecimals\":5}]},[{\"midPx\":true}]]",
+            "invalid Hyperliquid midPx type",
+        ),
+        (spot, "{}", "spotMetaAndAssetCtxs response is invalid"),
+        (spot, "[{\"universe\":[]}]", "does not contain coin @107"),
+        (
+            spot,
+            "[{\"universe\":[{\"name\":\"X\",\"index\":107,\"tokens\":[150,0]}],\"tokens\":[]}]",
+            "spot token missing szDecimals",
+        ),
+        (
+            spot,
+            "[{\"universe\":[{\"name\":\"@107\",\"tokens\":[150,0]}],\"tokens\":[{\"index\":150,\"szDecimals\":2}]},[]]",
+            "spot asset context not found for @107",
+        ),
+    ] {
+        let (base_url, server) = serve_sequence(vec![response]);
+        let client = signing_client(base_url);
+        let params = pairs(&[("product_symbol", symbol), ("size", "1")]);
+        let error = crate::http::block_on(async move {
+            client
+                .private_request("place_future_market_buy_order", params)
+                .await
+        })
+        .expect_err(expected)
+        .to_string();
+        assert!(error.contains(expected), "{response}: {error}");
+        assert_eq!(server.join().expect("server").len(), 1, "{response}");
+    }
+    // A numeric midPx is accepted as well as the documented string form.
+    let recorded = market_order_requests(
+        "place_future_market_buy_order",
+        &[("product_symbol", perp), ("size", "0.01")],
+        "[{\"universe\":[{\"name\":\"BTC\",\"szDecimals\":5}]},[{\"midPx\":100}]]",
+    );
+    assert_eq!(recorded[1].body["action"]["orders"][0]["p"], "105");
+}

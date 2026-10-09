@@ -5,6 +5,7 @@
 //! asserts the HTTP method, path and key query/body fields match the official
 //! Arcus API reference (<https://docs.arcus.xyz/api-reference/introduction>).
 
+use std::collections::BTreeMap;
 use std::io::{ErrorKind, Read, Write};
 use std::net::{TcpListener, TcpStream};
 use std::sync::Arc;
@@ -941,4 +942,487 @@ async fn every_typed_spot_wrapper_reaches_dispatch() {
         },
     )
     .await;
+}
+
+#[tokio::test]
+async fn every_typed_request_reaches_dispatch() {
+    // Hand-written typed requests (outside the wrapper macro) must reach dispatch too.
+    use crate::exchanges::wrapper_dispatch::note_typed_call as note;
+    let url = crate::exchanges::wrapper_dispatch::instant_server();
+    let client = ArcusSpotClient::new(Some("spot-key".into()), true, Duration::from_secs(10))
+        .expect("client")
+        .with_base_url(url.clone())
+        .expect("base URL");
+    let (mut called, mut failures) = (Vec::new(), Vec::new());
+    note(
+        &mut called,
+        &mut failures,
+        "get_status",
+        client.get_status("1").send().await,
+    );
+    crate::exchanges::wrapper_dispatch::assert_typed_requests("arcus", called, failures);
+}
+
+#[test]
+fn scheduled_cancel_and_isolated_margin_use_legacy_signed_routes() {
+    let now_us = || {
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_micros() as u64
+    };
+    let deadline = (now_us() + 60_000_000).to_string();
+    let (result, requests) = run(
+        Kind::Private,
+        "schedule_cancel",
+        pairs(&[("product_symbol", "BTC-USD"), ("time", &deadline)]),
+    );
+    result.expect("schedule cancel");
+    let sent = assert_signed_post(requests.last().expect("post"), "/v1/scheduleCancel");
+    assert_eq!(sent["marketId"], 7);
+    assert_eq!(sent["time"].to_string(), deadline);
+
+    let (result, requests) = run(Kind::Private, "disarm_scheduled_cancel", Vec::new());
+    result.expect("disarm");
+    let sent = assert_signed_post(requests.last().expect("post"), "/v1/scheduleCancel");
+    assert!(sent.get("time").is_none());
+
+    let (result, requests) = run(
+        Kind::Private,
+        "adjust_isolated_margin",
+        pairs(&[("product_symbol", "BTC-USD"), ("amount", "-12.5")]),
+    );
+    result.expect("adjust margin");
+    let sent = assert_signed_post(requests.last().expect("post"), "/v1/adjustIsolatedMargin");
+    assert_eq!(sent["marketId"], 7);
+
+    let too_soon = (now_us() + 1_000_000).to_string();
+    for (name, params, reason) in [
+        (
+            "schedule_cancel",
+            pairs(&[("time", &too_soon)]),
+            "5 seconds to 5 minutes",
+        ),
+        (
+            "schedule_cancel",
+            pairs(&[("time", "1")]),
+            "must be in the future",
+        ),
+        (
+            "schedule_cancel",
+            pairs(&[("time", "soon")]),
+            "invalid Arcus deadline",
+        ),
+        (
+            "schedule_cancel",
+            pairs(&[("time", &deadline), ("side", "BUY")]),
+            "unknown Arcus schedule_cancel parameter",
+        ),
+        (
+            "disarm_scheduled_cancel",
+            pairs(&[("time", &deadline)]),
+            "must omit time",
+        ),
+        (
+            "adjust_isolated_margin",
+            pairs(&[("product_symbol", "BTC-USD"), ("amount", "0")]),
+            "must be nonzero",
+        ),
+        (
+            "adjust_isolated_margin",
+            pairs(&[("amount", "1"), ("side", "BUY")]),
+            "unknown Arcus adjust_isolated_margin parameter",
+        ),
+        (
+            "cancel_all_orders",
+            pairs(&[("side", "BUY")]),
+            "unknown Arcus cancel_all_orders parameter",
+        ),
+        (
+            "cancel_all_orders",
+            pairs(&[("valid_until", "later")]),
+            "invalid Arcus valid_until",
+        ),
+    ] {
+        let (result, requests) = run(Kind::Private, name, params);
+        let error = result.expect_err(name);
+        assert!(
+            error.contains(reason),
+            "{name}: expected {reason:?}, got {error:?}"
+        );
+        assert!(
+            requests
+                .iter()
+                .all(|request| line(request).starts_with("GET /v1/markets ")),
+            "{name} posted before validation: {requests:?}"
+        );
+    }
+}
+
+fn with_field(item: &Value, key: &str, value: Value) -> Value {
+    let mut item = item.clone();
+    item[key] = value;
+    item
+}
+
+#[test]
+fn order_fields_are_validated_before_signing() {
+    let order = |extra: &[(&str, &str)]| {
+        let mut values: BTreeMap<&str, &str> = [
+            ("product_symbol", "BTC-USD"),
+            ("side", "BUY"),
+            ("price", "100"),
+            ("quantity", "0.01"),
+        ]
+        .into();
+        values.extend(extra.iter().copied());
+        pairs(&values.into_iter().collect::<Vec<_>>())
+    };
+    let now_us = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap()
+        .as_micros() as u64;
+    let good_til = (now_us + 40 * 86_400 * 1_000_000).to_string();
+    let modify = |extra: &[(&str, &str)]| {
+        let mut params = vec![
+            ("time_in_force", "GTT"),
+            ("reduce_only", "false"),
+            ("good_til_time", good_til.as_str()),
+        ];
+        params.extend_from_slice(extra);
+        order(&params)
+    };
+    // TP/SL legs only travel through a grouped batch.
+    let leg = |extra: Value| {
+        let mut leg = json!({"product_symbol":"BTC-USD","side":"SELL","price":"100",
+            "quantity":"0.01","tpsl_type":"STOP_LOSS","stop_price":"90","reduce_only":true});
+        for (key, value) in extra.as_object().unwrap() {
+            if value.is_null() {
+                leg.as_object_mut().unwrap().remove(key);
+            } else {
+                leg[key] = value.clone();
+            }
+        }
+        vec![
+            ("orders".to_string(), json!([leg]).to_string()),
+            ("grouping".to_string(), "partialTpsl".to_string()),
+        ]
+    };
+    let batch = |field: &str, item: Value| vec![(field.to_string(), json!([item]).to_string())];
+    let entry = json!({"product_symbol":"BTC-USD","side":"BUY","price":"100","quantity":"0.01"});
+    for (name, params, reason) in [
+        (
+            "batch_place_orders",
+            batch("orders", with_field(&entry, "post_only", json!(true))),
+            "unsupported Arcus orders field: post_only",
+        ),
+        (
+            "batch_modify_orders",
+            batch("modifies", with_field(&entry, "order_type", json!("LIMIT"))),
+            "unsupported Arcus modifies field: order_type",
+        ),
+        (
+            "batch_cancel_orders",
+            batch(
+                "cancels",
+                json!({"product_symbol":"BTC-USD","order_id":"1","side":"BUY"}),
+            ),
+            "unsupported Arcus cancels field: side",
+        ),
+        (
+            "batch_place_orders",
+            leg(json!({"tpsl_type": "TRAILING"})),
+            "invalid Arcus tpsl_type",
+        ),
+        (
+            "batch_place_orders",
+            leg(json!({"stop_price": null})),
+            "must be supplied together",
+        ),
+        (
+            "batch_place_orders",
+            leg(json!({"reduce_only": false})),
+            "TPSL legs require reduce_only=true",
+        ),
+        (
+            "place_order",
+            order(&[("side", "HOLD")]),
+            "side must be BUY or SELL",
+        ),
+        (
+            "place_order",
+            order(&[("order_type", "STOP")]),
+            "supports LIMIT or MARKET orders",
+        ),
+        (
+            "place_order",
+            order(&[("order_type", "MARKET")]),
+            "MARKET orders require IOC",
+        ),
+        (
+            "place_order",
+            order(&[("time_in_force", "DAY")]),
+            "unsupported Arcus time in force",
+        ),
+        (
+            "place_order",
+            order(&[("quantity", "0.0001")]),
+            "multiple of market tick/step",
+        ),
+        (
+            "place_order",
+            order(&[("quantity", "200")]),
+            "exceeds maxOrderSize",
+        ),
+        (
+            "place_order",
+            order(&[("price", "0.1")]),
+            "below minOrderNotional",
+        ),
+        (
+            "place_order",
+            order(&[("good_til_time", "soon")]),
+            "invalid good_til_time",
+        ),
+        (
+            "place_order",
+            order(&[("good_til_time", "1")]),
+            "at least one month ahead",
+        ),
+        (
+            "place_order",
+            order(&[("reduce_only", "maybe")]),
+            "reduce_only must be true or false",
+        ),
+        (
+            "place_order",
+            order(&[("client_order_id", "not hex!")]),
+            "invalid Arcus client_order_id",
+        ),
+        (
+            "modify_order",
+            modify(&[("order_type", "LIMIT"), ("order_id", "1")]),
+            "unsupported Arcus modify_order parameter: order_type",
+        ),
+        (
+            "modify_order",
+            order(&[
+                ("time_in_force", "GTT"),
+                ("good_til_time", &good_til),
+                ("order_id", "1"),
+            ]),
+            "modify_order requires reduce_only",
+        ),
+        (
+            "modify_order",
+            modify(&[]),
+            "exactly one of order_id or client_order_id",
+        ),
+        (
+            "modify_order",
+            modify(&[("order_id", "")]),
+            "order_id is empty",
+        ),
+    ] {
+        let (result, requests) = run(Kind::Private, name, params);
+        let error = result.expect_err(reason);
+        assert!(
+            error.contains(reason),
+            "{name}: expected {reason:?}, got {error:?}"
+        );
+        assert!(
+            requests.iter().all(|request| !request.starts_with("POST")),
+            "{name} posted before validation: {requests:?}"
+        );
+    }
+}
+
+#[test]
+fn transfers_and_preferences_reject_malformed_fields_before_sending() {
+    let transfer = |changes: Value| {
+        let mut body = json!({
+            "ethereumAddress": ADDRESS, "fromAccountIndex": 0, "toAccountIndex": 1,
+            "amount": "1000000", "nonce": "1",
+            "signature": {"r": format!("0x{}", "ab".repeat(32)), "s": format!("0x{}", "cd".repeat(32)), "v": "0x1b"}
+        });
+        for (key, value) in changes.as_object().unwrap() {
+            body[key] = value.clone();
+        }
+        vec![("signed_transfer_json".to_string(), body.to_string())]
+    };
+    let other = format!("0x{}", "55".repeat(20));
+    let long_nonce = "1".repeat(65);
+    type Case<'a> = (Kind, &'a str, Vec<(String, String)>, &'a str);
+    let mut cases: Vec<Case> = vec![
+        (
+            Kind::Private,
+            "submit_internal_transfer",
+            pairs(&[("memo", "x")]),
+            "unknown Arcus internal transfer parameter",
+        ),
+        (
+            Kind::Private,
+            "submit_internal_transfer",
+            pairs(&[("signed_transfer_json", "{")]),
+            "invalid transfer JSON",
+        ),
+        (
+            Kind::Private,
+            "submit_internal_transfer",
+            transfer(json!({"ethereumAddress": null})),
+            "transfer ethereumAddress is required",
+        ),
+        (
+            Kind::Private,
+            "submit_internal_transfer",
+            transfer(json!({"ethereumAddress": "0x12"})),
+            "invalid transfer ethereumAddress",
+        ),
+        (
+            Kind::Private,
+            "submit_internal_transfer",
+            transfer(json!({"ethereumAddress": other})),
+            "does not match configured wallet",
+        ),
+        (
+            Kind::Private,
+            "submit_internal_transfer",
+            transfer(json!({"amount": "1.5"})),
+            "must be decimal quote quantums",
+        ),
+        (
+            Kind::Private,
+            "submit_internal_transfer",
+            transfer(json!({"amount": "0"})),
+            "must be positive quote quantums",
+        ),
+        (
+            Kind::Private,
+            "submit_internal_transfer",
+            transfer(json!({"nonce": long_nonce})),
+            "nonce must be 1..=64 characters",
+        ),
+        (
+            Kind::Private,
+            "submit_internal_transfer",
+            transfer(json!({"signature": {"r": "0x1", "s": "0x2", "v": "0x1b"}})),
+            "signature r must be 32-byte hex",
+        ),
+        (
+            Kind::Private,
+            "submit_internal_transfer",
+            transfer(
+                json!({"signature": {"r": format!("0x{}", "ab".repeat(32)), "s": format!("0x{}", "cd".repeat(32)), "v": "0x00"}}),
+            ),
+            "signature v must be 0x1b or 0x1c",
+        ),
+        (
+            Kind::Public,
+            "get_user_preferences",
+            pairs(&[("address", "0x12")]),
+            "invalid address",
+        ),
+        (
+            Kind::Public,
+            "get_metadata_candles",
+            pairs(&[("market", "BTC-USD"), ("to", "1")]),
+            "market, timeframe and to are required",
+        ),
+        (
+            Kind::Public,
+            "get_metadata_candles",
+            pairs(&[
+                ("market", "BTC-USD"),
+                ("timeframe", "1m"),
+                ("to", "1700000000000"),
+                ("countback", "1"),
+            ]),
+            "timestamps must be seconds",
+        ),
+        (
+            Kind::Public,
+            "get_metadata_candles",
+            pairs(&[
+                ("market", "BTC-USD"),
+                ("timeframe", "1m"),
+                ("to", "1"),
+                ("countback", "2000"),
+            ]),
+            "countback must be 1..1500",
+        ),
+        (
+            Kind::Public,
+            "get_metadata_candles",
+            pairs(&[
+                ("market", "BTC-USD"),
+                ("timeframe", "1m"),
+                ("to", "1"),
+                ("from", "2"),
+            ]),
+            "from must not exceed to",
+        ),
+        (
+            Kind::Public,
+            "get_market_overview",
+            pairs(&[("market", "BTC-USD")]),
+            "unknown or empty parameter",
+        ),
+    ];
+    for (preferences, reason) in [
+        (json!({}), "exceed documented size limits"),
+        (json!({"theme": "dark"}), "unknown preference key"),
+        (
+            json!({"favoritedMarkets": ["BTC"]}),
+            "invalid preference value type",
+        ),
+        (
+            json!({"favoriteSpotMarkets": [1]}),
+            "invalid preference value type",
+        ),
+        (
+            json!({"disabledAlerts": [true]}),
+            "invalid preference value type",
+        ),
+        (
+            json!({"lastSignedTOS": "now"}),
+            "invalid preference value type",
+        ),
+        (
+            json!({"isSpotLayoutLocked": "yes"}),
+            "invalid preference value type",
+        ),
+        (
+            json!({"subaccountPreferences": {"x": {"name": "a"}}}),
+            "invalid preference value type",
+        ),
+    ] {
+        cases.push((
+            Kind::Private,
+            "upsert_user_preferences",
+            vec![("preferences".to_string(), preferences.to_string())],
+            reason,
+        ));
+    }
+    for (kind, name, params, reason) in cases {
+        let (result, requests) = run(kind, name, params);
+        let error = result.expect_err(reason);
+        assert!(
+            error.contains(reason),
+            "{name}: expected {reason:?}, got {error:?}"
+        );
+        assert!(requests.is_empty(), "{name} sent {requests:?}");
+    }
+    // Valid preference shapes for every typed key are accepted.
+    let (result, _) = run(
+        Kind::Private,
+        "upsert_user_preferences",
+        vec![(
+            "preferences".to_string(),
+            json!({"favoritedMarkets": [1], "favoritePerpMarkets": ["BTC-USD"],
+                   "disabledAlerts": ["fills", 3], "lastSignedTOS": 1, "isPerpLayoutFlex": true,
+                   "subaccountPreferences": {"1": {"name": "main"}}})
+            .to_string(),
+        )],
+    );
+    result.expect("typed preferences");
 }

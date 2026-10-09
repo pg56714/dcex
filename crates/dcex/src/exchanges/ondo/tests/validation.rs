@@ -137,3 +137,155 @@ async fn stateful_account_requests_are_validated_before_transport() {
         .expect_err("invalid wallet kind");
     assert!(error.to_string().contains("main or margin"));
 }
+
+#[tokio::test]
+async fn order_and_body_fields_are_rejected_before_transport() {
+    let client = OndoClient::public(Duration::from_secs(5)).expect("client");
+    let order = |extra: serde_json::Value| {
+        let mut body = serde_json::json!({"market": "AAPL-USD.P", "side": "buy", "type": "limit",
+                                          "price": "200", "size": "1"});
+        for (key, value) in extra.as_object().unwrap() {
+            if value.is_null() {
+                body.as_object_mut().unwrap().remove(key);
+            } else {
+                body[key] = value.clone();
+            }
+        }
+        body
+    };
+    let body = |value: serde_json::Value| vec![("body", value.to_string())];
+    let twap = |value: serde_json::Value| body(value);
+    let pairs = |items: &[(&'static str, &'static str)]| {
+        items
+            .iter()
+            .map(|(key, value)| (*key, value.to_string()))
+            .collect::<Vec<_>>()
+    };
+    let base_twap = serde_json::json!({"market": "AAPL-USD.P", "side": "buy", "size": "1",
+                                       "runningTime": 60, "frequency": 30});
+    let mut twap_bad_bool = base_twap.clone();
+    twap_bad_bool["reduceOnly"] = "yes".into();
+    let mut twap_bad_int = base_twap.clone();
+    twap_bad_int["frequency"] = "30".into();
+    let mut twap_missing = base_twap.clone();
+    twap_missing["market"] = " ".into();
+    type Case<'a> = (&'a str, Vec<(&'a str, String)>, &'a str);
+    let cases: Vec<Case> = vec![
+        (
+            "place_order",
+            pairs(&[
+                ("market", "AAPL-USD.P"),
+                ("side", "buy"),
+                ("price", "1"),
+                ("size", "1"),
+                ("quoteSize", "1"),
+            ]),
+            "limit orders cannot include quoteSize",
+        ),
+        (
+            "place_order",
+            pairs(&[
+                ("market", "AAPL-USD.P"),
+                ("side", "buy"),
+                ("type", "market"),
+            ]),
+            "exactly one of size or quoteSize",
+        ),
+        (
+            "place_order",
+            pairs(&[
+                ("market", "AAPL-USD.P"),
+                ("side", "buy"),
+                ("market", "MSFT-USD.P"),
+            ]),
+            "duplicate Ondo parameter: market",
+        ),
+        (
+            "place_order",
+            pairs(&[
+                ("market", "AAPL-USD.P"),
+                ("side", "buy"),
+                ("postOnly", "yes"),
+            ]),
+            "invalid Ondo boolean postOnly",
+        ),
+        (
+            "place_order",
+            body(order(serde_json::json!({"leverage": "2"}))),
+            "unsupported Ondo body field: leverage",
+        ),
+        (
+            "place_order",
+            body(order(serde_json::json!({"market": " "}))),
+            "market must be a nonempty string",
+        ),
+        (
+            "place_order",
+            body(order(serde_json::json!({"type": "stop"}))),
+            "order type must be limit or market",
+        ),
+        (
+            "place_order",
+            body(order(serde_json::json!({"timeInForce": "FOK"}))),
+            "timeInForce must be GTC or IOC",
+        ),
+        (
+            "place_order",
+            body(order(serde_json::json!({"reduceOnly": "true"}))),
+            "reduceOnly must be boolean",
+        ),
+        (
+            "place_order",
+            body(order(serde_json::json!({"size": null}))),
+            "requires price and size",
+        ),
+        (
+            "place_order",
+            body(order(serde_json::json!({"type": "market"}))),
+            "invalid Ondo market order fields",
+        ),
+        (
+            "place_batch_orders",
+            body(serde_json::json!({"orders": [order(serde_json::json!({"side": "short"}))]})),
+            "side must be buy or sell",
+        ),
+        (
+            "place_twap_order",
+            twap(twap_bad_bool),
+            "reduceOnly must be boolean",
+        ),
+        (
+            "place_twap_order",
+            twap(twap_bad_int),
+            "frequency must be an unsigned integer",
+        ),
+        (
+            "place_twap_order",
+            twap(twap_missing),
+            "missing required Ondo body field: market",
+        ),
+        (
+            "get_orders",
+            pairs(&[("startTime", "x")]),
+            "invalid Ondo integer startTime",
+        ),
+        (
+            "get_orders",
+            pairs(&[("startTime", "1"), ("endTime", "y")]),
+            "invalid Ondo integer endTime",
+        ),
+        ("get_orders", pairs(&[("market", " ")]), "must not be empty"),
+    ];
+    for (method, params, expected) in cases {
+        let params = params
+            .into_iter()
+            .map(|(key, value)| (key.to_string(), value))
+            .collect();
+        let error = client
+            .private_request(method, params)
+            .await
+            .expect_err(expected)
+            .to_string();
+        assert!(error.contains(expected), "{method} {expected}: {error}");
+    }
+}

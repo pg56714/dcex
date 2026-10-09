@@ -965,3 +965,88 @@ async fn every_typed_wrapper_reaches_dispatch() {
     )
     .await;
 }
+
+#[tokio::test]
+async fn every_typed_request_reaches_dispatch() {
+    // Hand-written typed requests (outside the wrapper macro) must reach dispatch too.
+    use crate::exchanges::wrapper_dispatch::note_typed_call as note;
+    let url = crate::exchanges::wrapper_dispatch::instant_server();
+    let client = client(url.clone());
+    let (mut called, mut failures) = (Vec::new(), Vec::new());
+    note(
+        &mut called,
+        &mut failures,
+        "get_rfqs",
+        client.get_rfqs().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "submit_rfq",
+        client.submit_rfq("BTCUSDT", "BUY").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "submit_rfq_with_execution_mode",
+        client
+            .submit_rfq_with_execution_mode("BTCUSDT", "BUY", "1")
+            .send()
+            .await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "accept_rfq_quote",
+        client.accept_rfq_quote("1", "1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "accept_rfq_quote_by_client_id",
+        client.accept_rfq_quote_by_client_id(1, "1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "refresh_rfq",
+        client.refresh_rfq("1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "cancel_rfq",
+        client.cancel_rfq("1").send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "cancel_rfq_by_client_id",
+        client.cancel_rfq_by_client_id(1).send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_rfq_history",
+        client.get_rfq_history().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_quote_history",
+        client.get_quote_history().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_rfq_fill_history",
+        client.get_rfq_fill_history().send().await,
+    );
+    note(
+        &mut called,
+        &mut failures,
+        "get_quote_fill_history",
+        client.get_quote_fill_history().send().await,
+    );
+    crate::exchanges::wrapper_dispatch::assert_typed_requests("backpack", called, failures);
+}

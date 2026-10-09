@@ -730,6 +730,10 @@ fn fee_from_response(data: &Value, market: &str, post_only: bool) -> Result<Stri
 }
 
 #[cfg(test)]
+#[path = "trade_validation_tests.rs"]
+mod validation_tests;
+
+#[cfg(test)]
 mod tests {
     use serde_json::json;
 

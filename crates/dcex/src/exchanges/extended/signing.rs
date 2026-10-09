@@ -930,4 +930,126 @@ mod tests {
         let spec = ExtendedOrderSpec::from_params(&params, "BTC-USD".to_string()).unwrap();
         assert!(spec.validate(StarknetDomain::mainnet()).is_err());
     }
+
+    #[test]
+    fn exact_decimals_parse_scale_and_round() {
+        let parse = |value: &str| ExactDecimal::parse(value, "qty");
+        assert_eq!(parse("1.5e2").unwrap().to_plain_string(), "150");
+        assert_eq!(parse("15E-3").unwrap().to_plain_string(), "0.015");
+        assert_eq!(parse("-0.250").unwrap().to_plain_string(), "-0.25");
+        assert_eq!(parse("-7").unwrap().to_plain_string(), "-7");
+        assert_eq!(parse("000").unwrap().to_plain_string(), "0");
+        assert_eq!(parse("2.000").unwrap().to_plain_string(), "2");
+        for (value, expected) in [
+            (" ", "qty cannot be empty"),
+            ("-", "invalid qty"),
+            ("1.2.3", "invalid qty"),
+            ("1e", "invalid qty exponent"),
+        ] {
+            let error = parse(value).expect_err(value).to_string();
+            assert!(error.contains(expected), "{value}: {error}");
+        }
+        let third = parse("0.333").unwrap();
+        assert_eq!(
+            third.to_scaled_integer(100, DecimalRounding::Up).unwrap(),
+            BigInt::from(34)
+        );
+        assert_eq!(
+            third.to_scaled_integer(100, DecimalRounding::Down).unwrap(),
+            BigInt::from(33)
+        );
+        let negative = parse("-0.333").unwrap();
+        assert_eq!(
+            negative
+                .to_scaled_integer(100, DecimalRounding::Up)
+                .unwrap(),
+            BigInt::from(-34)
+        );
+        assert!(
+            parse("1e30")
+                .unwrap()
+                .to_stark_amount(1, DecimalRounding::Down)
+                .is_err()
+        );
+        assert!(negative.to_stark_fee(100).is_err());
+        assert!(OrderSide::parse("hold").is_err());
+        assert!(parse_bool("maybe").is_err());
+    }
+
+    #[test]
+    fn order_specs_reject_out_of_range_fields() {
+        let base = [
+            ("side", "BUY"),
+            ("qty", "1"),
+            ("price", "100"),
+            ("fee", "0.00025"),
+            ("nonce", "5"),
+        ];
+        let spec = |extra: &[(&str, &str)]| {
+            let mut pairs: Vec<(String, String)> = base
+                .iter()
+                .filter(|(key, _)| extra.iter().all(|(other, _)| other != key))
+                .map(|(key, value)| (key.to_string(), value.to_string()))
+                .collect();
+            pairs.extend(
+                extra
+                    .iter()
+                    .map(|(key, value)| (key.to_string(), value.to_string())),
+            );
+            ExtendedOrderSpec::from_params(&ExtendedParams::from_pairs(pairs), "BTC-USD".into())
+                .unwrap()
+        };
+        let far = (now_ms().unwrap() + 40 * 86_400_000).to_string();
+        for (extra, domain, expected) in [
+            (
+                vec![("type", "MARKET")],
+                StarknetDomain::mainnet(),
+                "supports LIMIT orders only",
+            ),
+            (
+                vec![("qty", "0")],
+                StarknetDomain::mainnet(),
+                "qty must be positive",
+            ),
+            (
+                vec![("price", "-1")],
+                StarknetDomain::mainnet(),
+                "price must be positive",
+            ),
+            (
+                vec![("fee", "1.5")],
+                StarknetDomain::mainnet(),
+                "fee must be between zero and one",
+            ),
+            (
+                vec![("builder_fee", "2"), ("builder_id", "1")],
+                StarknetDomain::mainnet(),
+                "builder_fee must be between zero and one",
+            ),
+            (
+                vec![("self_trade_protection_level", "NONE")],
+                StarknetDomain::mainnet(),
+                "self_trade_protection_level",
+            ),
+            (
+                vec![("nonce", "0")],
+                StarknetDomain::mainnet(),
+                "nonce must be between 1 and 2147483648",
+            ),
+            (
+                vec![("expiry_epoch_millis", far.as_str())],
+                StarknetDomain::sepolia(),
+                "no more than 28 days away",
+            ),
+        ] {
+            let error = spec(&extra)
+                .validate(domain)
+                .expect_err(expected)
+                .to_string();
+            assert!(error.contains(expected), "{expected}: {error}");
+        }
+        spec(&[("expiry_epoch_millis", far.as_str())])
+            .validate(StarknetDomain::mainnet())
+            .expect("40 days is within the mainnet limit");
+    }
 }

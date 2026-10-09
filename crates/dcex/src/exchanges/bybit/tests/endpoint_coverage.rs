@@ -120,3 +120,22 @@ async fn every_typed_wrapper_reaches_dispatch() {
     )
     .await;
 }
+
+#[tokio::test]
+async fn every_typed_request_reaches_dispatch() {
+    // Hand-written typed requests (outside the wrapper macro) must reach dispatch too.
+    use crate::exchanges::wrapper_dispatch::note_typed_call as note;
+    let url = crate::exchanges::wrapper_dispatch::instant_server();
+    let client = client(url.clone());
+    let (mut called, mut failures) = (Vec::new(), Vec::new());
+    note(
+        &mut called,
+        &mut failures,
+        "set_trading_stop",
+        client
+            .set_trading_stop("BTCUSDT", "1", 1, Some("1"), Some("1"), Some("1"))
+            .send()
+            .await,
+    );
+    crate::exchanges::wrapper_dispatch::assert_typed_requests("bybit", called, failures);
+}
