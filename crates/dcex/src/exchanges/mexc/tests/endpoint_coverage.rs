@@ -665,6 +665,13 @@ const ROUTE_CASES: &[(bool, &str, &[(&str, &str)], &str, &str)] = &[
     ),
     (
         true,
+        "get_all_contract_details",
+        &[],
+        "GET",
+        "/api/v1/contract/detail",
+    ),
+    (
+        true,
         "get_contract_ticker",
         &[],
         "GET",

@@ -163,6 +163,22 @@ class MarketHTTP(HTTPManager):
             self._native_params(product_symbol=product_symbol),
         )
 
+    def get_all_contract_details(
+        self,
+        product_symbol: str | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """
+        Retrieve every MEXC Contract, including ones API orders cannot trade.
+
+        Undocumented ``/api/v1/contract/detail``. Unlike :meth:`get_contract_details`
+        (``/detail/country``), it also lists ``apiAllowed: false`` contracts: Futures
+        Innovation Zone pairs that MEXC trades on Web/App only until they graduate.
+        """
+        return self._native_public(
+            "get_all_contract_details",
+            self._native_params(product_symbol=product_symbol),
+        )
+
     def get_contract_ticker(
         self,
         product_symbol: str | None = None,

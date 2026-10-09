@@ -7,6 +7,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_contract_depth(product_symbol => "product_symbol"),
         get_contract_depth_commits(product_symbol => "product_symbol", limit => "limit"),
         get_contract_details(),
+        get_all_contract_details(),
         get_contract_fair_price(product_symbol => "product_symbol"),
         get_contract_fair_price_kline(product_symbol => "product_symbol"),
         get_contract_funding_rate(product_symbol => "product_symbol"),

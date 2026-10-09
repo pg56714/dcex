@@ -366,6 +366,7 @@ CASES: dict[str, tuple[dict[str, Any], str, str, bool]] = {
     "get_contract_time": ({}, "GET", "/api/v1/contract/ping", False),
     # Docs list only /detail/country; legacy /detail still answers with the same schema.
     "get_contract_details": ({}, "GET", "/api/v1/contract/detail/country", False),
+    "get_all_contract_details": ({}, "GET", "/api/v1/contract/detail", False),
     "get_contract_ticker": ({}, "GET", "/api/v1/contract/ticker", False),
     "get_contract_depth": (
         {"product_symbol": SWAP},

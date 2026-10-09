@@ -427,6 +427,7 @@ fn rust_direct_clients_expose_python_method_names() {
         get_contract_depth,
         get_contract_depth_commits,
         get_contract_details,
+        get_all_contract_details,
         get_contract_fair_price,
         get_contract_fair_price_kline,
         get_contract_funding_rate,

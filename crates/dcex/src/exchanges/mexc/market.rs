@@ -164,6 +164,14 @@ impl MexcClient {
                 self.normalize_symbol_params(&mut query, "_")?;
                 (MexcApi::Contract, CONTRACT_DETAIL.to_string(), query)
             }
+            // Undocumented: includes Innovation Zone contracts that reject API orders
+            // (`apiAllowed: false`); see `CONTRACT_DETAIL_ALL`.
+            "get_all_contract_details" => {
+                params.ensure_allowed(&["product_symbol", "symbol"])?;
+                let mut query = params.into_inner();
+                self.normalize_symbol_params(&mut query, "_")?;
+                (MexcApi::Contract, CONTRACT_DETAIL_ALL.to_string(), query)
+            }
             "get_contract_ticker" => {
                 params.ensure_allowed(&["product_symbol", "symbol"])?;
                 let mut query = params.into_inner();

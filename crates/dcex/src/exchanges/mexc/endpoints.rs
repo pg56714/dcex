@@ -39,7 +39,14 @@ pub(super) const SPOT_ALL_ORDERS: &str = "/api/v3/allOrders";
 pub(super) const SPOT_MY_TRADES: &str = "/api/v3/myTrades";
 
 pub(super) const CONTRACT_PING: &str = "/api/v1/contract/ping";
+/// The only documented contract-info path. Unlike the undocumented `/api/v1/contract/detail`,
+/// it omits contracts with `apiAllowed: false` (Futures Innovation Zone pairs, which MEXC
+/// trades on Web/App only), so the product table lists only API-tradable markets.
 pub(super) const CONTRACT_DETAIL: &str = "/api/v1/contract/detail/country";
+/// Undocumented full contract list: also returns `apiAllowed: false` contracts, which MEXC
+/// keeps in the Futures Innovation Zone (Web/App trading only, no API orders) until they
+/// graduate. Exposed for inspection; the product table uses [`CONTRACT_DETAIL`].
+pub(super) const CONTRACT_DETAIL_ALL: &str = "/api/v1/contract/detail";
 pub(super) const CONTRACT_TICKER: &str = "/api/v1/contract/ticker";
 pub(super) const CONTRACT_RISK_REVERSE_HISTORY: &str = "/api/v1/contract/risk_reverse/history";
 pub(super) const CONTRACT_FUNDING_RATE_HISTORY: &str = "/api/v1/contract/funding_rate/history";
