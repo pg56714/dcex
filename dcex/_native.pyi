@@ -732,7 +732,6 @@ class LighterHttpClient(_NativeExchangeClient):
 class LighterPublicWebSocketClient:
     def __init__(
         self,
-        testnet: bool = False,
         timeout: float = 10.0,
         base_url: str | None = None,
         network: str | None = None,
@@ -762,7 +761,6 @@ class LighterPrivateWebSocketClient:
         account_index: int,
         api_key_index: int,
         api_private_key: str,
-        testnet: bool = False,
         timeout: float = 10.0,
         ws_base_url: str | None = None,
         http_base_url: str | None = None,

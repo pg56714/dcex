@@ -6,7 +6,7 @@ use crate::Result;
 use crate::ws::{WebSocketConfig, WebSocketConnection};
 
 use super::super::chains::LighterNetwork;
-use super::{legacy_network, market_channel, normalize_resolution, subscription_payload};
+use super::{market_channel, normalize_resolution, subscription_payload};
 
 pub struct LighterPublicWebSocket {
     network: Option<LighterNetwork>,
@@ -44,10 +44,6 @@ impl LighterPublicWebSocket {
     pub fn with_product_table(mut self, table: crate::product_table::ProductTable) -> Self {
         self.set_product_table(table);
         self
-    }
-
-    pub fn new(testnet: bool, timeout: Duration) -> Result<Self> {
-        Self::with_network(legacy_network(testnet), timeout)
     }
 
     pub fn with_network(network: LighterNetwork, timeout: Duration) -> Result<Self> {

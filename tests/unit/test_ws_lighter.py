@@ -6,12 +6,10 @@ import pytest
 class _FakeNativeLighterPublicWebSocketClient:
     def __init__(
         self,
-        testnet: bool = False,
         timeout: float = 10.0,
         base_url: str | None = None,
         network: str | None = None,
     ) -> None:
-        self.testnet = testnet
         self.timeout = timeout
         self.base_url = base_url
         self.network = network
@@ -76,7 +74,6 @@ class _FakeNativeLighterPrivateWebSocketClient:
         account_index: int,
         api_key_index: int,
         api_private_key: str,
-        testnet: bool = False,
         timeout: float = 10.0,
         ws_base_url: str | None = None,
         http_base_url: str | None = None,
@@ -85,7 +82,6 @@ class _FakeNativeLighterPrivateWebSocketClient:
         self._account_index = account_index
         self.api_key_index = api_key_index
         self.api_private_key = api_private_key
-        self.testnet = testnet
         self.timeout = timeout
         self.ws_base_url = ws_base_url
         self.http_base_url = http_base_url
@@ -183,16 +179,15 @@ async def test_lighter_public_ws_wrapper(monkeypatch: pytest.MonkeyPatch) -> Non
     monkeypatch.setattr(lighter, "_native", _FakeNative)
 
     async with lighter.public(
-        testnet=True,
+        network="testnet",
         timeout=2,
         base_url="wss://example.test/stream",
     ) as ws:
         native_client = ws._native_client
         assert native_client.connected is True
-        assert native_client.testnet is True
         assert native_client.timeout == 2
         assert native_client.base_url == "wss://example.test/stream"
-        assert native_client.network is None
+        assert native_client.network == "testnet"
 
         await ws.ping()
         await ws.subscribe_trades(0)
@@ -217,7 +212,6 @@ async def test_lighter_robinhood_public_ws_wrapper(monkeypatch: pytest.MonkeyPat
     ws = lighter.public(network=Network.ROBINHOOD)
     native_client = ws._native_client
 
-    assert native_client.testnet is False
     assert native_client.base_url is None
     assert native_client.network == "robinhood"
 
@@ -233,7 +227,7 @@ async def test_lighter_private_ws_wrapper(monkeypatch: pytest.MonkeyPatch) -> No
         account_index=42,
         api_key_index=7,
         api_private_key="private-key",
-        testnet=True,
+        network="testnet",
         timeout=2,
         ws_base_url="wss://example.test/stream",
         http_base_url="https://example.test",
@@ -243,11 +237,10 @@ async def test_lighter_private_ws_wrapper(monkeypatch: pytest.MonkeyPatch) -> No
         assert native_client.account_index() == 42
         assert native_client.api_key_index == 7
         assert native_client.api_private_key == "private-key"
-        assert native_client.testnet is True
         assert native_client.timeout == 2
         assert native_client.ws_base_url == "wss://example.test/stream"
         assert native_client.http_base_url == "https://example.test"
-        assert native_client.network is None
+        assert native_client.network == "testnet"
         assert ws.account_index() == 42
         assert ws.create_auth_token(deadline=60, api_key_index=7) == "token:60:7"
 
@@ -283,7 +276,6 @@ async def test_lighter_robinhood_private_ws_wrapper(monkeypatch: pytest.MonkeyPa
     )
     native_client = ws._native_client
 
-    assert native_client.testnet is False
     assert native_client.ws_base_url is None
     assert native_client.http_base_url is None
     assert native_client.network == "robinhood"
@@ -308,3 +300,12 @@ async def test_lighter_ws_rejects_unexpected_payload(
     ws = lighter.public()
     with pytest.raises(RuntimeError, match="Unexpected Lighter WebSocket event payload"):
         await ws.recv()
+
+
+def test_lighter_ws_selects_networks_only_by_name() -> None:
+    from dcex.ws import lighter
+
+    with pytest.raises(TypeError):
+        lighter.public(testnet=True)  # type: ignore[call-arg]
+    with pytest.raises(TypeError):
+        lighter.private(1, 2, "key", testnet=True)  # type: ignore[call-arg]

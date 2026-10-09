@@ -66,9 +66,6 @@ fn is_business_channel(channel: &str) -> bool {
                 | "algo-advance"
                 | "grid-orders-spot"
                 | "grid-orders-contract"
-                // Deprecated: OKX took moon grid offline (changelog 2024-04-18) and the
-                // channel is no longer documented; kept for backward compatibility.
-                | "grid-orders-moon"
                 | "grid-positions"
                 | "grid-sub-orders"
                 | "algo-recurring-buy"
@@ -104,7 +101,6 @@ mod tests {
             "economic-calendar",
             "copytrading-lead-notification",
             "orders-algo",
-            "grid-orders-moon",
         ] {
             assert!(is_business_channel(channel), "{channel} should be business");
         }

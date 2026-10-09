@@ -13,16 +13,6 @@ use serde_json::{Map, Value};
 
 use crate::{DcexError, Result};
 
-use super::chains::LighterNetwork;
-
-pub(crate) const fn legacy_network(testnet: bool) -> LighterNetwork {
-    if testnet {
-        LighterNetwork::Testnet
-    } else {
-        LighterNetwork::Mainnet
-    }
-}
-
 pub(crate) fn subscription_payload(
     operation: &str,
     channel: &str,

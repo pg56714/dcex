@@ -8,7 +8,7 @@ use crate::ws::{WebSocketConfig, WebSocketConnection};
 use super::super::chains::LighterNetwork;
 use super::super::client::LighterClient;
 use super::super::credentials::LighterCredentials;
-use super::{account_channel, legacy_network, market_channel, subscription_payload};
+use super::{account_channel, market_channel, subscription_payload};
 
 pub struct LighterPrivateWebSocket {
     connection: WebSocketConnection,
@@ -17,22 +17,6 @@ pub struct LighterPrivateWebSocket {
 }
 
 impl LighterPrivateWebSocket {
-    pub fn new(
-        account_index: u64,
-        api_key_index: u64,
-        api_private_key: String,
-        testnet: bool,
-        timeout: Duration,
-    ) -> Result<Self> {
-        Self::with_network(
-            account_index,
-            api_key_index,
-            api_private_key,
-            legacy_network(testnet),
-            timeout,
-        )
-    }
-
     pub fn with_network(
         account_index: u64,
         api_key_index: u64,

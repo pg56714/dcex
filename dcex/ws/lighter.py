@@ -20,14 +20,12 @@ class PublicClient(AsyncWebSocketMixin):
 
     def __init__(
         self,
-        testnet: bool = False,
         timeout: float = 10.0,
         base_url: str | None = None,
         network: Network | str | None = None,
     ) -> None:
         """Create a Lighter public WebSocket client."""
         self._native_client = _native.LighterPublicWebSocketClient(
-            testnet=testnet,
             timeout=timeout,
             base_url=base_url,
             network=None if network is None else normalize_network(network).value,
@@ -110,7 +108,6 @@ class PrivateClient(AsyncWebSocketMixin):
         account_index: int,
         api_key_index: int,
         api_private_key: str,
-        testnet: bool = False,
         timeout: float = 10.0,
         ws_base_url: str | None = None,
         http_base_url: str | None = None,
@@ -121,7 +118,6 @@ class PrivateClient(AsyncWebSocketMixin):
             account_index=account_index,
             api_key_index=api_key_index,
             api_private_key=api_private_key,
-            testnet=testnet,
             timeout=timeout,
             ws_base_url=ws_base_url,
             http_base_url=http_base_url,
@@ -264,20 +260,18 @@ class PrivateClient(AsyncWebSocketMixin):
 
 
 def public(
-    testnet: bool = False,
     timeout: float = 10.0,
     base_url: str | None = None,
     network: Network | str | None = None,
 ) -> PublicClient:
     """Create an async Lighter public market WebSocket client."""
-    return PublicClient(testnet=testnet, timeout=timeout, base_url=base_url, network=network)
+    return PublicClient(timeout=timeout, base_url=base_url, network=network)
 
 
 def private(
     account_index: int,
     api_key_index: int,
     api_private_key: str,
-    testnet: bool = False,
     timeout: float = 10.0,
     ws_base_url: str | None = None,
     http_base_url: str | None = None,
@@ -288,7 +282,6 @@ def private(
         account_index=account_index,
         api_key_index=api_key_index,
         api_private_key=api_private_key,
-        testnet=testnet,
         timeout=timeout,
         ws_base_url=ws_base_url,
         http_base_url=http_base_url,

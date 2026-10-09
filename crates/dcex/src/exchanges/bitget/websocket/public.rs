@@ -147,11 +147,6 @@ impl BitgetPublicWebSocket {
         })
     }
 
-    /// Connects to the UTA V3 public endpoint, which uses `topic`/`symbol` args.
-    pub fn new_uta(default_inst_type: impl Into<String>, timeout: Duration) -> Result<Self> {
-        Self::with_url(default_inst_type, UTA_PUBLIC_WS_URL, timeout)
-    }
-
     /// Whether this client targets the UTA V3 public endpoint.
     pub fn is_uta_v3(&self) -> bool {
         self.uta_v3
@@ -376,7 +371,6 @@ fn normalize_inst_type(inst_type: &str) -> Result<String> {
     let inst_type = inst_type.trim().to_ascii_uppercase();
     match inst_type.as_str() {
         "MARGIN" | "SPOT" | "USDT-FUTURES" | "COIN-FUTURES" | "USDC-FUTURES" => Ok(inst_type),
-        "MIX" | "SWAP" | "FUTURES" => Ok("USDT-FUTURES".to_string()),
         _ => Err(DcexError::InvalidInput(format!(
             "unsupported Bitget WebSocket instrument type: {inst_type}"
         ))),
@@ -426,7 +420,10 @@ mod tests {
             normalize_inst_type("usdt-futures").expect("inst_type"),
             "USDT-FUTURES"
         );
-        assert_eq!(normalize_inst_type("swap").expect("alias"), "USDT-FUTURES");
+        // Only the documented instType values; no guessing which futures market "swap" means.
+        for alias in ["swap", "mix", "futures"] {
+            assert!(normalize_inst_type(alias).is_err(), "{alias}");
+        }
         assert!(normalize_inst_type("bad").is_err());
     }
 
@@ -490,7 +487,7 @@ mod tests {
 
     #[test]
     fn uta_public_client_uses_v3_topics() {
-        let client = BitgetPublicWebSocket::new_uta("SPOT", Duration::from_secs(1)).expect("uta");
+        let client = BitgetPublicWebSocket::new("SPOT", Duration::from_secs(1)).expect("uta");
         assert!(client.is_uta_v3());
         let arg = client
             .arg("publicTrade", "BTC-USDT-SPOT", None)
@@ -526,7 +523,7 @@ mod tests {
     fn liquidation_uses_futures_scope_without_symbol() {
         for inst_type in ["usdt-futures", "coin-futures", "usdc-futures"] {
             let client =
-                BitgetPublicWebSocket::new_uta(inst_type, Duration::from_secs(1)).expect("client");
+                BitgetPublicWebSocket::new(inst_type, Duration::from_secs(1)).expect("client");
             let arg = client.arg("liquidation", "", None).expect("liquidation");
             for op in ["subscribe", "unsubscribe"] {
                 assert_eq!(

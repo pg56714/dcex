@@ -213,15 +213,6 @@ impl BitgetPrivateWebSocket {
         })
     }
 
-    pub fn new_uta(
-        api_key: String,
-        api_secret: String,
-        passphrase: String,
-        timeout: Duration,
-    ) -> Result<Self> {
-        Self::with_url(api_key, api_secret, passphrase, UTA_PRIVATE_WS_URL, timeout)
-    }
-
     pub fn is_connected(&self) -> bool {
         self.connection.is_connected()
     }
@@ -489,7 +480,6 @@ fn normalize_inst_type(inst_type: &str) -> Result<String> {
         "MARGIN" | "SPOT" | "USDT-FUTURES" | "COIN-FUTURES" | "USDC-FUTURES" | UTA_INST_TYPE => {
             Ok(inst_type)
         }
-        "MIX" | "SWAP" | "FUTURES" => Ok("USDT-FUTURES".to_string()),
         _ => Err(DcexError::InvalidInput(format!(
             "unsupported Bitget WebSocket instrument type: {inst_type}"
         ))),
@@ -630,8 +620,9 @@ mod tests {
 
     #[test]
     fn builds_private_channel_arg() {
-        let arg = BitgetPrivateWebSocketArg::with_inst_id("swap", "positions-history", "default")
-            .expect("arg");
+        let arg =
+            BitgetPrivateWebSocketArg::with_inst_id("usdt-futures", "positions-history", "default")
+                .expect("arg");
         assert_eq!(arg.inst_type, "USDT-FUTURES");
         assert_eq!(arg.channel, "positions-history");
         assert_eq!(arg.inst_id.as_deref(), Some("default"));
@@ -753,12 +744,9 @@ mod tests {
     #[test]
     fn detects_uta_v3_private_url() {
         let timeout = std::time::Duration::from_secs(1);
-        let uta = BitgetPrivateWebSocket::new_uta("k".into(), "s".into(), "p".into(), timeout)
+        let uta = BitgetPrivateWebSocket::new("k".into(), "s".into(), "p".into(), timeout)
             .expect("uta client");
         assert!(uta.is_uta_v3());
-        let classic = BitgetPrivateWebSocket::new("k".into(), "s".into(), "p".into(), timeout)
-            .expect("classic client");
-        assert!(classic.is_uta_v3());
     }
 
     #[test]

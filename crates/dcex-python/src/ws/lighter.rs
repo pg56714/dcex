@@ -35,19 +35,9 @@ impl PythonLighterPublicWebSocketClient {
     }
 
     #[new]
-    #[pyo3(signature = (testnet=false, timeout=10.0, base_url=None, network=None))]
-    fn new(
-        testnet: bool,
-        timeout: f64,
-        base_url: Option<String>,
-        network: Option<&str>,
-    ) -> PyResult<Self> {
+    #[pyo3(signature = (timeout=10.0, base_url=None, network=None))]
+    fn new(timeout: f64, base_url: Option<String>, network: Option<&str>) -> PyResult<Self> {
         let timeout = websocket_timeout(timeout)?;
-        if testnet && network.is_some() {
-            return Err(PyValueError::new_err(
-                "Lighter network and testnet cannot be specified together.",
-            ));
-        }
         let network = network.map(lighter_network).transpose()?;
         let client = match (base_url, network) {
             (Some(base_url), Some(network)) => {
@@ -55,7 +45,7 @@ impl PythonLighterPublicWebSocketClient {
             }
             (Some(base_url), None) => LighterPublicWebSocket::with_url(base_url, timeout),
             (None, Some(network)) => LighterPublicWebSocket::with_network(network, timeout),
-            (None, None) => LighterPublicWebSocket::new(testnet, timeout),
+            (None, None) => LighterPublicWebSocket::with_network(LighterNetwork::Mainnet, timeout),
         }
         .map_err(to_py_runtime_error)?;
         Ok(Self {
@@ -301,7 +291,6 @@ impl PythonLighterPrivateWebSocketClient {
         account_index,
         api_key_index,
         api_private_key,
-        testnet=false,
         timeout=10.0,
         ws_base_url=None,
         http_base_url=None,
@@ -312,69 +301,30 @@ impl PythonLighterPrivateWebSocketClient {
         account_index: u64,
         api_key_index: u64,
         api_private_key: String,
-        testnet: bool,
         timeout: f64,
         ws_base_url: Option<String>,
         http_base_url: Option<String>,
         network: Option<&str>,
     ) -> PyResult<Self> {
         let timeout = websocket_timeout(timeout)?;
-        let network = network.map(lighter_network).transpose()?;
-        if network.is_some() && testnet {
-            return Err(PyValueError::new_err(
-                "Lighter network and testnet cannot be specified together.",
-            ));
-        }
+        let network = network
+            .map(lighter_network)
+            .transpose()?
+            .unwrap_or(LighterNetwork::Mainnet);
         let client = match (ws_base_url, http_base_url) {
-            (None, None) => {
-                if let Some(network) = network {
-                    LighterPrivateWebSocket::with_network(
-                        account_index,
-                        api_key_index,
-                        api_private_key,
-                        network,
-                        timeout,
-                    )
-                } else {
-                    LighterPrivateWebSocket::new(
-                        account_index,
-                        api_key_index,
-                        api_private_key,
-                        testnet,
-                        timeout,
-                    )
-                }
-            }
+            (None, None) => LighterPrivateWebSocket::with_network(
+                account_index,
+                api_key_index,
+                api_private_key,
+                network,
+                timeout,
+            ),
             (ws_base_url, http_base_url) => LighterPrivateWebSocket::with_urls(
                 account_index,
                 api_key_index,
                 api_private_key,
-                ws_base_url.unwrap_or_else(|| {
-                    network
-                        .unwrap_or({
-                            if testnet {
-                                LighterNetwork::Testnet
-                            } else {
-                                LighterNetwork::Mainnet
-                            }
-                        })
-                        .profile()
-                        .ws_url
-                        .to_string()
-                }),
-                http_base_url.unwrap_or_else(|| {
-                    network
-                        .unwrap_or({
-                            if testnet {
-                                LighterNetwork::Testnet
-                            } else {
-                                LighterNetwork::Mainnet
-                            }
-                        })
-                        .profile()
-                        .api_url
-                        .to_string()
-                }),
+                ws_base_url.unwrap_or_else(|| network.profile().ws_url.to_string()),
+                http_base_url.unwrap_or_else(|| network.profile().api_url.to_string()),
                 timeout,
             ),
         }
