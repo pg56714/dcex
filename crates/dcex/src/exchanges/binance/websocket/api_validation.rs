@@ -24,7 +24,7 @@ pub(super) fn validate(
         let field = fields
             .iter()
             .find(|f| f.name == key)
-            .ok_or_else(|| invalid(&format!("unsupported parameter {key}")))?;
+            .ok_or_else(|| invalid(&format!("unsupported parameter: {key}")))?;
         let valid = match field.kind {
             Kind::Text => value.as_str().is_some_and(|v| !v.is_empty()),
             Kind::Integer => value.as_u64().is_some(),

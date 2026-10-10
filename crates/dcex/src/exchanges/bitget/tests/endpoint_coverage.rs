@@ -387,10 +387,10 @@ where
     loop {
         match call(params.clone()).await {
             Err(crate::DcexError::InvalidInput(message))
-                if message.starts_with("unsupported parameter: ") =>
+                if message.starts_with("unsupported Bitget parameter: ") =>
             {
                 let key = message
-                    .trim_start_matches("unsupported parameter: ")
+                    .trim_start_matches("unsupported Bitget parameter: ")
                     .to_string();
                 let before = params.len();
                 params.retain(|(candidate, _)| *candidate != key);

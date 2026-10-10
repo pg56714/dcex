@@ -129,8 +129,8 @@ pub(in crate::exchanges::kraken) fn validate_batch_order(value: &Value) -> Resul
         "expiretm",
         "close",
     ];
-    if object.keys().any(|key| !allowed.contains(&key.as_str())) {
-        return Err(invalid("unsupported batch order field"));
+    if let Some(key) = object.keys().find(|key| !allowed.contains(&key.as_str())) {
+        return Err(invalid(format!("unsupported batch order field: {key}")));
     }
     for key in ["ordertype", "type", "volume"] {
         if value[key].as_str().is_none_or(|s| s.is_empty()) {
@@ -240,8 +240,10 @@ pub(in crate::exchanges::kraken) fn validate_futures_instruction(value: &Value) 
         "cancel" => &["order", "order_id", "cliOrdId"],
         _ => return Err(invalid("order must be send, edit or cancel")),
     };
-    if object.keys().any(|k| !allowed.contains(&k.as_str())) {
-        return Err(invalid("unsupported batch instruction field"));
+    if let Some(key) = object.keys().find(|k| !allowed.contains(&k.as_str())) {
+        return Err(invalid(format!(
+            "unsupported batch instruction field: {key}"
+        )));
     }
     for k in [
         "size",

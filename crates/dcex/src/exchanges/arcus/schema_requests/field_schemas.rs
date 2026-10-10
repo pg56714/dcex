@@ -62,7 +62,7 @@ impl ArcusClient {
         for (key, raw) in params {
             let schema = props
                 .get(&key)
-                .ok_or_else(|| invalid(format!("unsupported parameter {key}")))?;
+                .ok_or_else(|| invalid(format!("unsupported parameter: {key}")))?;
             let value = crate::exchanges::schema::encode(
                 &key,
                 &raw,

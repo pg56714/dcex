@@ -15,10 +15,10 @@ mod trade_operations {
             params: Vec<(String, String)>,
         ) -> Result<ValidatedResponse> {
             let values: BTreeMap<_, _> = params.into_iter().collect();
-            if values.keys().any(|key| key != "signed_transfer_json") {
-                return Err(DcexError::InvalidInput(
-                    "unknown Arcus internal transfer parameter".into(),
-                ));
+            if let Some(key) = values.keys().find(|key| *key != "signed_transfer_json") {
+                return Err(DcexError::InvalidInput(format!(
+                    "unknown Arcus internal transfer parameter: {key}"
+                )));
             }
             let body: Value = serde_json::from_str(required(&values, "signed_transfer_json")?)
                 .map_err(|error| {

@@ -51,11 +51,14 @@ impl BybitClient {
         crate::exchanges::input_contracts::pairs("bybit", name, &pairs)?;
         let mut seen = std::collections::HashSet::new();
         for (key, value) in &pairs {
-            if !endpoint.keys.contains(&key.as_str())
-                || !seen.insert(key)
-                || value.trim().is_empty()
-            {
-                return Err(invalid("unknown, duplicate or empty parameter"));
+            if !endpoint.keys.contains(&key.as_str()) {
+                return Err(invalid(format!("unsupported Bybit parameter: {key}")));
+            }
+            if !seen.insert(key) {
+                return Err(invalid(format!("duplicate Bybit parameter: {key}")));
+            }
+            if value.trim().is_empty() {
+                return Err(invalid(format!("empty Bybit parameter: {key}")));
             }
         }
         for key in endpoint.required {

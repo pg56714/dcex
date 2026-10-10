@@ -59,14 +59,18 @@ impl OkxClient {
         crate::exchanges::input_contracts::pairs("okx", name, &pairs)?;
         let mut seen = std::collections::HashSet::new();
         for (key, value) in &pairs {
-            if !e.keys.contains(&key.as_str())
-                || !seen.insert(key)
-                || (value.trim().is_empty()
-                    && !schema
-                        .as_ref()
-                        .is_some_and(|sc| sc["properties"][key]["x-allow-empty"] == true))
+            if !e.keys.contains(&key.as_str()) {
+                return Err(invalid(&format!("unsupported OKX parameter: {key}")));
+            }
+            if !seen.insert(key) {
+                return Err(invalid(&format!("duplicate OKX parameter: {key}")));
+            }
+            if value.trim().is_empty()
+                && !schema
+                    .as_ref()
+                    .is_some_and(|sc| sc["properties"][key]["x-allow-empty"] == true)
             {
-                return Err(invalid("unknown, duplicate or empty parameter"));
+                return Err(invalid(&format!("empty OKX parameter: {key}")));
             }
         }
         for key in e.required {

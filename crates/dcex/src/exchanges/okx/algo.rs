@@ -283,11 +283,11 @@ impl OkxClient {
                     let object = order
                         .as_object_mut()
                         .ok_or_else(|| invalid("cancel order must be an object"))?;
-                    if object.keys().any(|key| {
+                    if let Some(key) = object.keys().find(|key| {
                         !["instId", "product_symbol", "algoId", "algoClOrdId"]
                             .contains(&key.as_str())
                     }) {
-                        return Err(invalid("unsupported cancel algo field"));
+                        return Err(invalid(&format!("unsupported cancel algo field: {key}")));
                     }
                     if object
                         .values()
@@ -420,8 +420,8 @@ fn invalid(message: &str) -> DcexError {
     DcexError::InvalidInput(message.into())
 }
 fn allowed_params(params: &OkxParams, allowed: &[&str]) -> Result<()> {
-    if !params.without(allowed).is_empty() {
-        return Err(invalid("unsupported algo parameter"));
+    if let Some((key, _)) = params.without(allowed).first() {
+        return Err(invalid(&format!("unsupported OKX algo parameter: {key}")));
     }
     if params
         .only(allowed)

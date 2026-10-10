@@ -1365,7 +1365,7 @@ fn transfers_and_preferences_reject_malformed_fields_before_sending() {
             Kind::Public,
             "get_market_overview",
             pairs(&[("market", "BTC-USD")]),
-            "unknown or empty parameter",
+            "unknown or empty get_market_overview parameter: market",
         ),
     ];
     for (preferences, reason) in [

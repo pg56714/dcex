@@ -97,13 +97,13 @@ impl KucoinClient {
                                     "clientOidsList items must be objects".into(),
                                 )
                             })?;
-                            if item
+                            if let Some(key) = item
                                 .keys()
-                                .any(|k| !matches!(k.as_str(), "symbol" | "clientOid"))
+                                .find(|k| !matches!(k.as_str(), "symbol" | "clientOid"))
                             {
-                                return Err(DcexError::InvalidInput(
-                                    "unknown clientOidsList item field".into(),
-                                ));
+                                return Err(DcexError::InvalidInput(format!(
+                                    "unknown clientOidsList item field: {key}"
+                                )));
                             }
                             let id = item
                                 .get("clientOid")

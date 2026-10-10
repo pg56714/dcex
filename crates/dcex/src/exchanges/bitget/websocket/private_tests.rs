@@ -278,7 +278,7 @@ fn trading_validation_messages() {
         Some("spot"),
         with(json!({"leverage": "2"})),
         None,
-        "unsupported field leverage",
+        "unsupported field: leverage",
     );
     trade_rejects(
         "place-order",

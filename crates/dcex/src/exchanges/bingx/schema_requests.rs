@@ -218,10 +218,10 @@ impl BingxClient {
                     let obj = obj
                         .as_object()
                         .ok_or_else(|| invalid("TP/SL must be an object"))?;
-                    if obj.keys().any(|k| {
+                    if let Some(key) = obj.keys().find(|k| {
                         !["type", "stopPrice", "price", "workingType"].contains(&k.as_str())
                     }) {
-                        return Err(invalid("unsupported TP/SL field"));
+                        return Err(invalid(format!("unsupported TP/SL field: {key}")));
                     }
                     let kind = obj
                         .get("type")

@@ -35,7 +35,7 @@ fn choice(arg: &Map<String, Value>, key: &str, values: &[&str]) -> Result<()> {
 fn fields(arg: &Map<String, Value>, allowed: &[&str]) -> Result<()> {
     for (key, value) in arg {
         if !allowed.contains(&key.as_str()) {
-            return Err(invalid(&format!("unsupported field {key}")));
+            return Err(invalid(&format!("unsupported field: {key}")));
         }
         if key == "requestId" {
             if value
@@ -208,11 +208,11 @@ pub(super) fn uta(
                 required(arg, "price")?;
             }
             if topic == "batch-place"
-                && ["reduceOnly", "marginMode", "autoBorrow", "receiveWindow"]
+                && let Some(key) = ["reduceOnly", "marginMode", "autoBorrow", "receiveWindow"]
                     .iter()
-                    .any(|k| arg.contains_key(*k))
+                    .find(|k| arg.contains_key(**k))
             {
-                return Err(invalid("unsupported batch-place field"));
+                return Err(invalid(&format!("unsupported batch-place field: {key}")));
             }
             if let Some(window) = arg.get("receiveWindow")
                 && (request_time.is_none()

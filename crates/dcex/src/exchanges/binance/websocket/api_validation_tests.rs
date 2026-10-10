@@ -55,7 +55,12 @@ fn types_and_required_fields() {
     rejects(Spot, "order.place", missing, "side is required");
     let mut extra = spot_limit();
     extra["leverage"] = json!(5);
-    rejects(Spot, "order.place", extra, "unsupported parameter leverage");
+    rejects(
+        Spot,
+        "order.place",
+        extra,
+        "unsupported parameter: leverage",
+    );
     let mut numeric = spot_limit();
     numeric["quantity"] = json!(1);
     rejects(

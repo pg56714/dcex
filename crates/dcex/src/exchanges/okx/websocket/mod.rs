@@ -22,24 +22,28 @@ fn validate_raw_subscriptions(op: &str, args: &[serde_json::Value]) -> crate::Re
         if !object
             .get("channel")
             .is_some_and(serde_json::Value::is_string)
-            || object.iter().any(|(key, value)| {
-                ![
-                    "channel",
-                    "instType",
-                    "instFamily",
-                    "instId",
-                    "ccy",
-                    "sprdId",
-                    "algoId",
-                    "extraParams",
-                ]
-                .contains(&key.as_str())
-                    || !value.is_string()
-            })
         {
             return Err(DcexError::InvalidInput(
-                "unsupported subscription field or value type".into(),
+                "unsupported subscription field or value type: channel".into(),
             ));
+        }
+        if let Some((key, _)) = object.iter().find(|(key, value)| {
+            ![
+                "channel",
+                "instType",
+                "instFamily",
+                "instId",
+                "ccy",
+                "sprdId",
+                "algoId",
+                "extraParams",
+            ]
+            .contains(&key.as_str())
+                || !value.is_string()
+        }) {
+            return Err(DcexError::InvalidInput(format!(
+                "unsupported subscription field or value type: {key}"
+            )));
         }
     }
     Ok(())

@@ -394,7 +394,7 @@ fn validate_pov(value: &Value) -> Result<()> {
     let object = value
         .as_object()
         .ok_or_else(|| invalid("povParams must be an object"))?;
-    if object.keys().any(|key| {
+    if let Some(key) = object.keys().find(|key| {
         ![
             "mode",
             "participationRate",
@@ -403,7 +403,7 @@ fn validate_pov(value: &Value) -> Result<()> {
         ]
         .contains(&key.as_str())
     }) {
-        return Err(invalid("unsupported povParams field"));
+        return Err(invalid(&format!("unsupported povParams field: {key}")));
     }
     let rate = object
         .get("participationRate")

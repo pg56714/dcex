@@ -19,7 +19,7 @@ pub(super) fn payload(id: u64, kind: &str, payload: Value) -> Result<Value> {
             ));
         }
     } else {
-        if object.keys().any(|key| {
+        if let Some(key) = object.keys().find(|key| {
             ![
                 "action",
                 "nonce",
@@ -29,7 +29,9 @@ pub(super) fn payload(id: u64, kind: &str, payload: Value) -> Result<Value> {
             ]
             .contains(&key.as_str())
         }) {
-            return Err(invalid("unsupported signed action envelope field"));
+            return Err(invalid(&format!(
+                "unsupported signed action envelope field: {key}"
+            )));
         }
         let action = object
             .get("action")

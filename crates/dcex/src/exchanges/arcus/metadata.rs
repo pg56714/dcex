@@ -125,10 +125,11 @@ impl ArcusClient {
             ),
             _ => return Err(invalid("unknown metadata method")),
         };
-        if p.iter()
-            .any(|(k, v)| !allowed.contains(&k.as_str()) || v.is_empty())
+        if let Some((key, _)) = p
+            .iter()
+            .find(|(k, v)| !allowed.contains(&k.as_str()) || v.is_empty())
         {
-            return Err(invalid("unknown or empty parameter"));
+            return Err(invalid(format!("unknown or empty {name} parameter: {key}")));
         }
         if name == "get_user_preferences" {
             let address = p

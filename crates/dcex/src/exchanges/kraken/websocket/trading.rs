@@ -327,8 +327,10 @@ fn validate_scalars(object: &Map<String, Value>) -> Result<()> {
     Ok(())
 }
 fn allowed(object: &Map<String, Value>, keys: &[&str]) -> Result<()> {
-    if object.keys().any(|k| !keys.contains(&k.as_str())) {
-        return Err(invalid("unsupported or deprecated trading parameter"));
+    if let Some(key) = object.keys().find(|k| !keys.contains(&k.as_str())) {
+        return Err(invalid(&format!(
+            "unsupported or deprecated trading parameter: {key}"
+        )));
     }
     Ok(())
 }

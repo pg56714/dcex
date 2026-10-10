@@ -242,8 +242,8 @@ fn validate_order(
             "goodTillDate",
         ][..]
     };
-    if order.keys().any(|k| !allowed.contains(&k.as_str())) {
-        return Err(invalid("unsupported order field"));
+    if let Some(key) = order.keys().find(|k| !allowed.contains(&k.as_str())) {
+        return Err(invalid(&format!("unsupported order field: {key}")));
     }
     if !order
         .get("side")

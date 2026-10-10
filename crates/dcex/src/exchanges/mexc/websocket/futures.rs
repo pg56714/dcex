@@ -228,8 +228,8 @@ impl MexcFuturesWebSocket {
             let object = filter
                 .as_object_mut()
                 .ok_or_else(|| invalid("filter must be an object"))?;
-            if object.keys().any(|k| k != "filter" && k != "rules") {
-                return Err(invalid("unsupported filter field"));
+            if let Some(key) = object.keys().find(|k| *k != "filter" && *k != "rules") {
+                return Err(invalid(format!("unsupported filter field: {key}")));
             }
             let key = object
                 .get("filter")

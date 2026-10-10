@@ -100,24 +100,24 @@ mod legacy {
                         })?;
                         body.insert("validUntil".into(), json!(millis));
                     }
-                    if values
+                    if let Some(key) = values
                         .keys()
-                        .any(|key| key != "product_symbol" && key != "valid_until")
+                        .find(|key| *key != "product_symbol" && *key != "valid_until")
                     {
-                        return Err(DcexError::InvalidInput(
-                            "unknown Arcus cancel_all_orders parameter".into(),
-                        ));
+                        return Err(DcexError::InvalidInput(format!(
+                            "unknown Arcus cancel_all_orders parameter: {key}"
+                        )));
                     }
                     ("cancelAllOrders", "/v1/cancelAllOrders")
                 }
                 "schedule_cancel" | "disarm_scheduled_cancel" => {
-                    if values
+                    if let Some(key) = values
                         .keys()
-                        .any(|key| key != "product_symbol" && key != "time")
+                        .find(|key| *key != "product_symbol" && *key != "time")
                     {
-                        return Err(DcexError::InvalidInput(
-                            "unknown Arcus schedule_cancel parameter".into(),
-                        ));
+                        return Err(DcexError::InvalidInput(format!(
+                            "unknown Arcus schedule_cancel parameter: {key}"
+                        )));
                     }
                     if let Some(market) = values.get("product_symbol") {
                         let info = self.market_info(market).await?;
@@ -151,13 +151,13 @@ mod legacy {
                     ("scheduleCancel", "/v1/scheduleCancel")
                 }
                 "adjust_isolated_margin" => {
-                    if values
+                    if let Some(key) = values
                         .keys()
-                        .any(|key| key != "product_symbol" && key != "amount")
+                        .find(|key| *key != "product_symbol" && *key != "amount")
                     {
-                        return Err(DcexError::InvalidInput(
-                            "unknown Arcus adjust_isolated_margin parameter".into(),
-                        ));
+                        return Err(DcexError::InvalidInput(format!(
+                            "unknown Arcus adjust_isolated_margin parameter: {key}"
+                        )));
                     }
                     let info = self
                         .market_info(required(&values, "product_symbol")?)
@@ -177,12 +177,12 @@ mod legacy {
                     ("adjustIsolatedMargin", "/v1/adjustIsolatedMargin")
                 }
                 "set_leverage" => {
-                    if values.keys().any(|key| {
-                        key != "product_symbol" && key != "leverage" && key != "isolated"
+                    if let Some(key) = values.keys().find(|key| {
+                        *key != "product_symbol" && *key != "leverage" && *key != "isolated"
                     }) {
-                        return Err(DcexError::InvalidInput(
-                            "unknown Arcus set_leverage parameter".into(),
-                        ));
+                        return Err(DcexError::InvalidInput(format!(
+                            "unknown Arcus set_leverage parameter: {key}"
+                        )));
                     }
                     let info = self
                         .market_info(required(&values, "product_symbol")?)
