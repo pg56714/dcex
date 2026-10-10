@@ -1,3 +1,17 @@
+## 0.39.0 (2026-10-10)
+
+### BREAKING CHANGE
+
+- reject parameters an endpoint does not document
+
+### Fix
+
+- stop sending symbolStatus to the recent trades endpoint
+
+### Refactor
+
+- remove unused Bitget, Hyperliquid and Lighter helpers
+
 ## 0.38.0 (2026-10-09)
 
 ### BREAKING CHANGE

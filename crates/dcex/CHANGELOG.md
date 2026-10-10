@@ -1,3 +1,15 @@
+## 0.17.0 (2026-10-10)
+
+### BREAKING CHANGE
+
+- reject parameters an endpoint does not document
+
+### Fix
+
+- name the rejected key in unsupported-field errors
+- stop sending symbolStatus to the recent trades endpoint
+- validate WebSocket API requests before syncing the clock
+
 ## 0.16.0 (2026-10-09)
 
 ### BREAKING CHANGE
