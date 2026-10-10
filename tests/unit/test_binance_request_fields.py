@@ -23,7 +23,7 @@ def test_sync_binance_current_market_and_account_fields_are_forwarded() -> None:
         symbolStatus="TRADING",
     )
     client.get_spot_orderbook("BTC-USDT-SPOT", limit=100, symbolStatus="TRADING")
-    client.get_spot_trades("BTC-USDT-SPOT", limit=100, symbolStatus="TRADING")
+    client.get_spot_trades("BTC-USDT-SPOT", limit=100)
     client.get_klines(
         "BTC-USDT-SPOT",
         "1m",
@@ -49,7 +49,8 @@ def test_sync_binance_current_market_and_account_fields_are_forwarded() -> None:
         ("symbolStatus", "TRADING"),
     ]
     assert dict(calls[1]["query"])["symbolStatus"] == "TRADING"
-    assert dict(calls[2]["query"])["symbolStatus"] == "TRADING"
+    # GET /api/v3/trades documents only symbol and limit.
+    assert dict(calls[2]["query"]) == {"product_symbol": "BTC-USDT-SPOT", "limit": "100"}
     assert {"end_time", "time_zone"} <= set(dict(calls[3]["query"]))
     assert dict(calls[4]["query"])["omitZeroBalances"] == "true"
     assert {"newClientOrderId", "cancelRestrictions"} <= set(dict(calls[5]["query"]))
@@ -68,7 +69,7 @@ async def test_async_binance_current_market_and_account_fields_are_forwarded() -
         symbolStatus="TRADING",
     )
     await client.get_spot_orderbook("BTC-USDT-SPOT", limit=100, symbolStatus="TRADING")
-    await client.get_spot_trades("BTC-USDT-SPOT", limit=100, symbolStatus="TRADING")
+    await client.get_spot_trades("BTC-USDT-SPOT", limit=100)
     await client.get_klines(
         "BTC-USDT-SPOT",
         "1m",
@@ -94,7 +95,8 @@ async def test_async_binance_current_market_and_account_fields_are_forwarded() -
         ("symbolStatus", "TRADING"),
     ]
     assert dict(calls[1]["query"])["symbolStatus"] == "TRADING"
-    assert dict(calls[2]["query"])["symbolStatus"] == "TRADING"
+    # GET /api/v3/trades documents only symbol and limit.
+    assert dict(calls[2]["query"]) == {"product_symbol": "BTC-USDT-SPOT", "limit": "100"}
     assert {"end_time", "time_zone"} <= set(dict(calls[3]["query"]))
     assert dict(calls[4]["query"])["omitZeroBalances"] == "true"
     assert {"newClientOrderId", "cancelRestrictions"} <= set(dict(calls[5]["query"]))

@@ -213,7 +213,7 @@ where
             let rejected_key = wrapper
                 .keys
                 .iter()
-                .any(|key| message.ends_with(&format!("parameter: {key}")));
+                .any(|key| lower.contains("unsupported") && message.ends_with(&format!(": {key}")));
             if unknown_method || rejected_key {
                 let side = if wrapper.public { "public" } else { "private" };
                 failures.push(format!("{side} {}: {message}", wrapper.name));

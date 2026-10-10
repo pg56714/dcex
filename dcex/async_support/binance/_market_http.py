@@ -208,7 +208,6 @@ class MarketHTTP(HTTPManager):
         self,
         product_symbol: str,
         limit: int | None = None,
-        symbolStatus: str | None = None,
     ) -> dict:
         """Get recent spot trades."""
         return await self._native_public(
@@ -216,7 +215,6 @@ class MarketHTTP(HTTPManager):
             self._params(
                 product_symbol=product_symbol,
                 limit=limit,
-                symbolStatus=symbolStatus,
             ),
         )
 
