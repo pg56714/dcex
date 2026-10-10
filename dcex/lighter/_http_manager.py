@@ -255,18 +255,6 @@ class HTTPManager(BaseHTTPManager):
 
         return data
 
-    def _private_account_index(self, account_index: int | None = None) -> int:
-        resolved = self.account_index if account_index is None else account_index
-        if resolved is None:
-            raise ValueError("Lighter private requests require account_index.")
-        return int(resolved)
-
-    def _private_api_key_index(self, api_key_index: int | None = None) -> int:
-        resolved = self.api_key_index if api_key_index is None else api_key_index
-        if resolved is None:
-            raise ValueError("Lighter private requests require api_key_index.")
-        return int(resolved)
-
     def _auth_token(
         self,
         authorization: str | None = None,

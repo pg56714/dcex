@@ -86,19 +86,6 @@ class HTTPManager(BaseHTTPManager):
             )
         return True
 
-    async def _get_ptm(self) -> ProductTableManager:
-        """Lazily obtain the product table manager instance."""
-        ptm = self.ptm
-        if ptm is None:
-            ptm = await ProductTableManager.get_instance(Common.HYPERLIQUID)
-            self.ptm = ptm
-            if self._native_client is not None and hasattr(
-                self._native_client,
-                "set_product_table",
-            ):
-                self._native_client.set_product_table(ptm._native_table)
-        return ptm
-
     async def _native_public(
         self,
         method_name: str,

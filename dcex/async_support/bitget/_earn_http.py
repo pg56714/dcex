@@ -8,30 +8,6 @@ from ._http_manager import HTTPManager
 class EarnHTTP(HTTPManager):
     """Async HTTP client for Bitget Savings and On-chain Earn workflows."""
 
-    async def _savings_history_query(
-        self,
-        method_name: str,
-        period_type: str,
-        coin: str | None,
-        order_type: str | None,
-        start_time: int | None,
-        end_time: int | None,
-        limit: int | None,
-        id_less_than: str | None,
-    ) -> dict[str, Any]:
-        return await self._native_private(
-            method_name,
-            self._native_params(
-                periodType=period_type,
-                coin=coin,
-                orderType=order_type,
-                startTime=start_time,
-                endTime=end_time,
-                limit=limit,
-                idLessThan=id_less_than,
-            ),
-        )
-
     async def get_elite_earn_products(self) -> dict[str, Any]:
         return await self._native_private("get_elite_earn_products", [])
 

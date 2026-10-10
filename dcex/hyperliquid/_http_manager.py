@@ -89,17 +89,6 @@ class HTTPManager(BaseHTTPManager):
         """Exit context manager and release native resources."""
         self.close()
 
-    def _get_ptm(self) -> ProductTableManager:
-        """Lazily obtain the product table manager instance."""
-        if self.ptm is None:
-            self.ptm = ProductTableManager.get_instance(Common.HYPERLIQUID)
-            if self._native_client is not None and hasattr(
-                self._native_client,
-                "set_product_table",
-            ):
-                self._native_client.set_product_table(self.ptm._native_table)
-        return self.ptm
-
     def _native_public(
         self,
         method_name: str,
