@@ -36,9 +36,8 @@ def normalize(
     value: Any,  # noqa: ANN401
     key: str = "",
     *,
-    signed_fields: frozenset[str] = frozenset(),
     schema: dict[str, Any] | None = None,
-) -> Any:  # noqa: ANN401, ARG001
+) -> Any:  # noqa: ANN401
     """Reject lossy declared decimals; never infer a type from a field name."""
     schema = resolve_schema(schema or {})
     if isinstance(value, Enum):
@@ -130,9 +129,9 @@ def normalize_params(values: dict[str, Any]) -> dict[str, Any]:
     )
 
 
-def encode_json(value: Any, *, signed_fields: tuple[str, ...] = (), **options: Any) -> str:  # noqa: ANN401
-    """Keep the existing call signature; endpoint schemas now own signed opt-ins."""
-    return json.dumps(normalize(value, signed_fields=frozenset(signed_fields)), **options)
+def encode_json(value: Any, **options: Any) -> str:  # noqa: ANN401
+    """Serialize after rejecting lossy declared decimals."""
+    return json.dumps(normalize(value), **options)
 
 
 def wire_keywords(values: Mapping[str, Any], fields: Mapping[str, str]) -> dict[str, Any]:

@@ -225,17 +225,7 @@ impl OndoClient {
     }
 
     pub(super) async fn spot_post(&self, path: &str, body: Value) -> Result<ValidatedResponse> {
-        let body = serde_json::to_vec(&body)
-            .map_err(|error| DcexError::InvalidInput(format!("invalid Ondo JSON body: {error}")))?;
-        self.request(
-            HttpMethod::Post,
-            path,
-            Vec::new(),
-            Some(body),
-            true,
-            BTreeMap::new(),
-        )
-        .await
+        self.json_request(HttpMethod::Post, path, &body, true).await
     }
 
     async fn body_request(
@@ -246,7 +236,17 @@ impl OndoClient {
         signed: bool,
     ) -> Result<ValidatedResponse> {
         self.normalize_market_body(&mut body)?;
-        let body = serde_json::to_vec(&body)
+        self.json_request(method, path, &body, signed).await
+    }
+
+    async fn json_request(
+        &self,
+        method: HttpMethod,
+        path: &str,
+        body: &Value,
+        signed: bool,
+    ) -> Result<ValidatedResponse> {
+        let body = serde_json::to_vec(body)
             .map_err(|error| DcexError::InvalidInput(format!("invalid Ondo JSON body: {error}")))?;
         self.request(
             method,

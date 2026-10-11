@@ -108,7 +108,6 @@ fn rust_direct_clients_expose_python_method_names() {
         change_margin_type,
         close_swap_all_positions,
         close_swap_position,
-        get_account_balance,
         get_account_uid,
         get_all_account_balance,
         get_api_key_info,

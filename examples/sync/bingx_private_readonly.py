@@ -16,7 +16,7 @@ def main() -> None:
         api_secret=require_env("BINGX_API_SECRET"),
     )
 
-    balance = client.get_account_balance()
+    balance = client.get_swap_account_balance()
     print(balance)
 
     positions = client.get_open_positions(product_symbol="BTC-USDT-SWAP")

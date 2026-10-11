@@ -27,7 +27,7 @@ impl ExtendedClient {
                 self.private_get(ORDERS, params.only(&["market", "type", "side"]))
                     .await
             }
-            "get_orders_history" | "get_order_history" => {
+            "get_orders_history" => {
                 params.ensure_allowed(
                     &[
                         "id",
@@ -75,7 +75,7 @@ impl ExtendedClient {
                 let path = format!("{ORDERS}/external/{}", external_id);
                 self.private_get(&path, Vec::new()).await
             }
-            "place_order" | "create_order" => match params.body_optional()? {
+            "place_order" => match params.body_optional()? {
                 Some(body) => {
                     params.ensure_allowed(&["body"], &[])?;
                     validate_order_body(&body, self.signing_domain())?;
@@ -86,7 +86,7 @@ impl ExtendedClient {
                     self.place_signed_order(params, None).await
                 }
             },
-            "place_rfq_order" | "create_rfq_order" => match params.body_optional()? {
+            "place_rfq_order" => match params.body_optional()? {
                 Some(body) => {
                     params.ensure_allowed(&["body"], &[])?;
                     validate_order_body(&body, self.signing_domain())?;
@@ -97,11 +97,11 @@ impl ExtendedClient {
                     self.place_signed_order(params, Some(true)).await
                 }
             },
-            "place_limit_order" | "create_limit_order" => {
+            "place_limit_order" => {
                 validate_signing_params(params)?;
                 self.place_signed_order(params, None).await
             }
-            "sign_create_order" | "sign_order" => {
+            "sign_create_order" => {
                 validate_signing_params(params)?;
                 let signed = self.signed_order_from_params(params).await?;
                 return Ok(Some(signed_order_response(signed.body, signed.order_hash)));
@@ -129,7 +129,7 @@ impl ExtendedClient {
                 validate_mass_cancel_body(&body)?;
                 self.private_post_value(MASS_CANCEL, body, Vec::new()).await
             }
-            "set_deadmanswitch" | "set_deadman_switch" => {
+            "set_deadmanswitch" => {
                 params.ensure_allowed(&["countdownTime"], &[])?;
                 params.required_u64_range("countdownTime", 0, u64::MAX)?;
                 self.request(

@@ -188,12 +188,6 @@ fn only_the_official_trade_url_syncs_the_server_clock() {
         )
         .unwrap()
     };
-    let official =
-        BybitPrivateWebSocket::new_trade("k".into(), "s".into(), Duration::from_secs(1)).unwrap();
-    assert_eq!(
-        official.clock.url(),
-        Some("https://api.bybit.com/v5/market/time")
-    );
     assert_eq!(
         build("wss://stream.bybit.com/v5/trade/").clock.url(),
         Some("https://api.bybit.com/v5/market/time")

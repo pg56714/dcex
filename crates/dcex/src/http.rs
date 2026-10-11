@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 use std::future::Future;
-use std::sync::{Arc, OnceLock, mpsc};
+use std::sync::{OnceLock, mpsc};
 use std::time::Duration;
 
 use reqwest::header::{HeaderName, HeaderValue};
@@ -314,8 +314,6 @@ fn shared_runtime() -> &'static Runtime {
             .expect("failed to initialize dcex Tokio runtime")
     })
 }
-
-pub type SharedAsyncHttpClient = Arc<AsyncHttpClient>;
 
 #[cfg(test)]
 mod tests {

@@ -160,32 +160,6 @@ fn private_argument_builders() {
         json(OkxPrivateWebSocketArg::with_inst_id("positions", "BTC-USDT-SWAP").unwrap()),
         json!({"channel": "positions", "instId": "BTC-USDT-SWAP"})
     );
-    assert_eq!(
-        json(
-            OkxPrivateWebSocketArg::with_inst_type_and_ccy("balance_and_position", "SWAP", "BTC")
-                .unwrap()
-        ),
-        json!({"channel": "balance_and_position", "instType": "SWAP", "ccy": "BTC"})
-    );
-    assert_eq!(
-        json(
-            OkxPrivateWebSocketArg::with_inst_id_and_ccy("account-greeks", "BTC-USD-SWAP", "BTC")
-                .unwrap()
-        ),
-        json!({"channel": "account-greeks", "instId": "BTC-USD-SWAP", "ccy": "BTC"})
-    );
-    assert_eq!(
-        json(
-            OkxPrivateWebSocketArg::with_inst_type_and_id_and_ccy(
-                "orders",
-                "SWAP",
-                "BTC-USDT-SWAP",
-                "USDT"
-            )
-            .unwrap()
-        ),
-        json!({"channel": "orders", "instType": "SWAP", "instId": "BTC-USDT-SWAP", "ccy": "USDT"})
-    );
     assert!(OkxPrivateWebSocketArg::new(" ").is_err());
     assert!(OkxPrivateWebSocketArg::with_inst_id("positions", " ").is_err());
     assert!(OkxPrivateWebSocketArg::with_ccy("account", " ").is_err());

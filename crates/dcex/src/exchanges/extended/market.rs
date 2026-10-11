@@ -53,13 +53,13 @@ impl ExtendedClient {
                 self.public_get(ASSETS, params.only(&["asset", "type", "collateral"]))
                     .await
             }
-            "get_market_stats" | "get_market_statistics" => {
+            "get_market_statistics" => {
                 self.validate_market_params(&params, &[])?;
                 let market = self.required_market(&params)?;
                 self.public_get(&format!("/api/v1/info/markets/{market}/stats"), Vec::new())
                     .await
             }
-            "get_order_book" | "get_orderbook" => {
+            "get_order_book" => {
                 self.validate_market_params(&params, &[])?;
                 let market = self.required_market(&params)?;
                 self.public_get(

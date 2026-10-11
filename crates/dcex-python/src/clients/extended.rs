@@ -13,7 +13,6 @@ impl PythonExtendedHttpClient {
         stark_private_key=None,
         stark_public_key=None,
         vault_number=None,
-        client_id=None,
         timeout=10.0,
         base_url=None,
         user_agent="dcex-rust/0.1".to_string()
@@ -24,7 +23,6 @@ impl PythonExtendedHttpClient {
         stark_private_key: Option<String>,
         stark_public_key: Option<String>,
         vault_number: Option<u64>,
-        client_id: Option<String>,
         timeout: f64,
         base_url: Option<String>,
         user_agent: String,
@@ -36,7 +34,6 @@ impl PythonExtendedHttpClient {
                 stark_private_key,
                 stark_public_key,
                 vault_number,
-                client_id,
                 timeout,
                 base_url.unwrap_or_else(|| "https://api.starknet.extended.exchange".to_string()),
                 user_agent,

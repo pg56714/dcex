@@ -52,12 +52,6 @@ impl OkxClient {
                 self.get_request(ENTRUSTED_SUBACCOUNT_LIST, params.only(&["subAcct"]))
                     .await
             }
-            "get_subaccount_interest_limits" => {
-                params.ensure_allowed(&["subAcct", "ccy"])?;
-                params.required("subAcct")?;
-                self.get_request(SUBACCOUNT_INTEREST_LIMITS, params.only(&["subAcct", "ccy"]))
-                    .await
-            }
             _ => return Ok(None),
         };
         Ok(Some(result?))

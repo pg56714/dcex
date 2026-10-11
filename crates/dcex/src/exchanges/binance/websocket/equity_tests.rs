@@ -37,10 +37,6 @@ fn convenience_constructors_target_the_documented_streams() {
         url(BinanceEquityWebSocket::trading_status("AAPL-USDC-EQUITY", t).unwrap()),
         format!("{BASE}/AAPL@tradingStatus")
     );
-    assert_eq!(
-        url(BinanceEquityWebSocket::order_reports("lk-1", t).unwrap()),
-        format!("{BASE}/lk-1@orderReport")
-    );
     // The documented camelCase names select the same streams.
     for (stream, symbol, interval, key, path) in [
         (

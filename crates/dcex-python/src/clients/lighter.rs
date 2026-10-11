@@ -268,28 +268,6 @@ impl PythonLighterHttpClient {
         .map_err(to_py_runtime_error)
     }
 
-    #[pyo3(signature = (deadline=None, api_key_index=None))]
-    fn create_auth_token_async<'py>(
-        &self,
-        py: Python<'py>,
-        deadline: Option<u64>,
-        api_key_index: Option<u64>,
-    ) -> PyResult<Bound<'py, PyAny>> {
-        let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            match (deadline, api_key_index) {
-                (None, None) => client.create_auth_token(),
-                (Some(deadline), None) => client.create_auth_token_with_deadline(deadline),
-                (None, Some(api_key_index)) => {
-                    client.create_auth_token_with_api_key_index(api_key_index)
-                }
-                (Some(deadline), Some(api_key_index)) => client
-                    .create_auth_token_with_deadline_and_api_key_index(deadline, api_key_index),
-            }
-            .map_err(to_py_runtime_error)
-        })
-    }
-
     fn check_client(&self, py: Python<'_>) -> PyResult<Option<String>> {
         py.allow_threads(|| self.client.check_client_blocking())
             .map_err(to_py_runtime_error)

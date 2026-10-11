@@ -1002,15 +1002,6 @@ async fn every_typed_request_reaches_dispatch() {
     note(
         &mut called,
         &mut failures,
-        "place_coin_futures_limit_order",
-        client
-            .place_coin_futures_limit_order("BTCUSDT", "BUY", "1", "1")
-            .send()
-            .await,
-    );
-    note(
-        &mut called,
-        &mut failures,
         "get_convert_pairs",
         client.get_convert_pairs().send().await,
     );
@@ -1827,23 +1818,8 @@ async fn every_typed_request_reaches_dispatch() {
     note(
         &mut called,
         &mut failures,
-        "get_pm_um_algo_order_by_client_id",
-        client.get_pm_um_algo_order_by_client_id("1").send().await,
-    );
-    note(
-        &mut called,
-        &mut failures,
         "cancel_pm_um_algo_order",
         client.cancel_pm_um_algo_order("1").send().await,
-    );
-    note(
-        &mut called,
-        &mut failures,
-        "cancel_pm_um_algo_order_by_client_id",
-        client
-            .cancel_pm_um_algo_order_by_client_id("1")
-            .send()
-            .await,
     );
     note(
         &mut called,

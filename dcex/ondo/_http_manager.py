@@ -8,8 +8,8 @@ import os
 from dataclasses import dataclass, field
 from typing import Any
 
+from dcex._input_codec import normalize_params
 from dcex._input_validation import normalize_endpoint
-from dcex._schema_codec import normalize_params
 
 from .._native_http import load_native, request_native_json
 from ..base.http_manager import BaseHTTPManager

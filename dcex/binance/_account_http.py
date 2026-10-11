@@ -1,13 +1,12 @@
 from typing import Any, cast
 
-from dcex._schema_codec import normalize_params
+from dcex._input_codec import normalize_params
 
 from .._native_http import request_native_json
 from ..utils.errors import FailedRequestError
 from ..utils.helpers import generate_timestamp
 from ._http_manager import HTTPManager
 from ._transfers_http import AccountHTTPTransfersHTTP
-from .enums import BinanceProductType
 
 
 class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
@@ -55,13 +54,6 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
                 value = str(value).lower()
             params.append((key, str(value)))
         return params
-
-    @staticmethod
-    def _ensure_futures_listen_key(market_type: str) -> None:
-        if str(market_type) == BinanceProductType.SPOT.value:
-            raise NotImplementedError(
-                "Binance Spot user data streams are subscribed through the WebSocket API."
-            )
 
     def get_spot_fee_rates(self, product_symbol: str) -> dict[str, Any]:
         """Retrieve current Binance Spot maker and taker fee rates."""
@@ -204,62 +196,6 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
                 "get_funding_wallet",
                 self._params(asset=asset, needBtcValuation=needBtcValuation),
             ),
-        )
-
-    def get_listen_key(self, market_type: str = BinanceProductType.SWAP) -> str:
-        """
-        Start a futures user data stream and return its listen key.
-
-        Args:
-            market_type: Market type. Only "swap" is supported by this REST endpoint.
-
-        Returns:
-            str: User data stream listen key.
-        """
-        self._ensure_futures_listen_key(market_type)
-        res = self._native_private("create_futures_listen_key", [])
-        return res["listenKey"]
-
-    def keep_alive_listen_key(
-        self,
-        listen_key: str,
-        market_type: str = BinanceProductType.SWAP,
-    ) -> dict:
-        """
-        Keep a futures user data stream alive.
-
-        Args:
-            listen_key: User data stream listen key.
-            market_type: Market type. Only "swap" is supported by this REST endpoint.
-
-        Returns:
-            dict: Binance response.
-        """
-        self._ensure_futures_listen_key(market_type)
-        return self._native_private(
-            "keep_alive_futures_listen_key",
-            self._params(listenKey=listen_key),
-        )
-
-    def close_listen_key(
-        self,
-        listen_key: str,
-        market_type: str = BinanceProductType.SWAP,
-    ) -> dict:
-        """
-        Close a futures user data stream.
-
-        Args:
-            listen_key: User data stream listen key.
-            market_type: Market type. Only "swap" is supported by this REST endpoint.
-
-        Returns:
-            dict: Binance response.
-        """
-        self._ensure_futures_listen_key(market_type)
-        return self._native_private(
-            "close_futures_listen_key",
-            self._params(listenKey=listen_key),
         )
 
     def get_all_margin_assets(self) -> list[dict[str, Any]]:

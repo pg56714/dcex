@@ -93,14 +93,15 @@ impl ArcusClient {
         self.execute(request).await
     }
 
+    /// Market metadata for signing and local order checks. The market list is cached for
+    /// a few minutes and refetched at once when a symbol is not in it (a new listing).
     pub(super) async fn market_info(&self, product_symbol: &str) -> Result<Value> {
         let resolved = self.exchange_symbol(product_symbol)?;
         let product_symbol = resolved.as_str();
-        let response = self.public_request("get_markets", vec![]).await?;
-        response.data["markets"]
-            .as_array()
-            .and_then(|markets| {
-                markets.iter().find(|market| {
+        let find = |markets: &[Value]| {
+            markets
+                .iter()
+                .find(|market| {
                     let id_match = market["marketId"]
                         .as_u64()
                         .is_some_and(|id| id.to_string() == product_symbol);
@@ -111,10 +112,30 @@ impl ArcusClient {
                     });
                     id_match || symbol_match
                 })
-            })
-            .cloned()
-            .ok_or_else(|| {
-                DcexError::InvalidInput(format!("unknown Arcus market: {product_symbol}"))
-            })
+                .cloned()
+        };
+        if let Some(market) = self.cached_markets().and_then(|markets| find(&markets)) {
+            return Ok(market);
+        }
+        let response = self.public_request("get_markets", vec![]).await?;
+        let markets = std::sync::Arc::new(
+            response.data["markets"]
+                .as_array()
+                .cloned()
+                .unwrap_or_default(),
+        );
+        if let Ok(mut cache) = self.markets.lock() {
+            *cache = Some((std::time::Instant::now(), markets.clone()));
+        }
+        find(&markets).ok_or_else(|| {
+            DcexError::InvalidInput(format!("unknown Arcus market: {product_symbol}"))
+        })
+    }
+
+    fn cached_markets(&self) -> Option<std::sync::Arc<Vec<Value>>> {
+        const MAX_AGE: std::time::Duration = std::time::Duration::from_secs(300);
+        let cache = self.markets.lock().ok()?;
+        let (fetched, markets) = cache.as_ref()?;
+        (fetched.elapsed() < MAX_AGE).then(|| markets.clone())
     }
 }

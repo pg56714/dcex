@@ -5,7 +5,7 @@ import logging
 from dataclasses import dataclass, field
 from typing import Any, Self, cast
 
-from dcex._schema_codec import normalize_params
+from dcex._input_codec import normalize_params
 
 from ..._native_http import NativeResponse, load_native, native_body_text, request_native_json_async
 from ...base.http_manager import BaseHTTPManager
@@ -59,9 +59,7 @@ class HTTPManager(BaseHTTPManager):
             self.ptm = ptm
         domain = DOMAIN_TESTNET if self.testnet else DOMAIN_MAINNET
         self.endpoint = HTTP_URL.format(SUBDOMAIN=self.subdomain, DOMAIN=domain, TLD=self.tld)
-        native_client_type = getattr(_native, "HyperliquidHttpClient", None)
-        if native_client_type is None:
-            raise RuntimeError("The dcex native extension is required.")
+        native_client_type = _native.HyperliquidHttpClient
         if self._native_client is None:
             self._native_client = native_client_type(
                 testnet=self.testnet,
@@ -70,12 +68,7 @@ class HTTPManager(BaseHTTPManager):
                 timeout=self.timeout,
                 endpoint=self.endpoint,
             )
-        if (
-            self.preload_product_table
-            and self._native_client is not None
-            and hasattr(self._native_client, "set_product_table")
-            and ptm is not None
-        ):
+        if self.preload_product_table and self._native_client is not None and ptm is not None:
             self._native_client.set_product_table(ptm._native_table)
         return self
 
@@ -94,10 +87,6 @@ class HTTPManager(BaseHTTPManager):
         """Call a Rust-backed Hyperliquid public method and decode its JSON body."""
         if self._native_client is None:
             raise RuntimeError("Hyperliquid native client is required for public methods.")
-        if not hasattr(self._native_client, "public_request_json_async"):
-            raise RuntimeError(
-                "Hyperliquid native client public_request_json_async is unavailable."
-            )
         try:
             response, data = await request_native_json_async(
                 self._native_client,
@@ -123,10 +112,6 @@ class HTTPManager(BaseHTTPManager):
         """Call a Rust-backed Hyperliquid private method and decode its JSON body."""
         if self._native_client is None:
             raise RuntimeError("Hyperliquid native client is required for private methods.")
-        if not hasattr(self._native_client, "private_request_json_async"):
-            raise RuntimeError(
-                "Hyperliquid native client private_request_json_async is unavailable."
-            )
         try:
             response, data = await request_native_json_async(
                 self._native_client,

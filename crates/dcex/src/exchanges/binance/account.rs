@@ -4,9 +4,9 @@ pub(in crate::exchanges::binance) use super::params::{
     BinanceFundingWalletParams, BinanceIncomeHistoryParams, BinanceWalletBalanceParams,
     push_optional, push_optional_display,
 };
-pub(in crate::exchanges::binance) use crate::Result;
 pub(in crate::exchanges::binance) use crate::exchange::ValidatedResponse;
 pub(in crate::exchanges::binance) use crate::http::HttpMethod;
+pub(in crate::exchanges::binance) use crate::{DcexError, Result};
 
 impl BinanceClient {
     pub async fn get_spot_fee_rates(&self, product_symbol: &str) -> Result<ValidatedResponse> {
@@ -41,15 +41,23 @@ impl BinanceClient {
         market_type: &str,
         omit_zero_balances: Option<&str>,
     ) -> Result<ValidatedResponse> {
-        let (market, path) = if market_type == "spot" {
-            (BinanceMarket::Spot, SPOT_ACCOUNT_BALANCE)
-        } else {
-            (BinanceMarket::Futures, FUTURES_ACCOUNT_BALANCE)
+        let (market, path) = match super::params::market_from_type(market_type)? {
+            BinanceMarket::Spot => (BinanceMarket::Spot, SPOT_ACCOUNT_BALANCE),
+            BinanceMarket::Futures => (BinanceMarket::Futures, FUTURES_ACCOUNT_BALANCE),
+            _ => {
+                return Err(DcexError::InvalidInput(
+                    "Binance get_account_balance supports market_type spot or swap".to_string(),
+                ));
+            }
         };
-        let mut params = Vec::new();
-        if market == BinanceMarket::Spot {
-            push_optional(&mut params, "omitZeroBalances", omit_zero_balances);
+        // omitZeroBalances is documented for the Spot account only.
+        if market != BinanceMarket::Spot && omit_zero_balances.is_some() {
+            return Err(DcexError::InvalidInput(
+                "Binance omitZeroBalances applies to market_type=spot only".to_string(),
+            ));
         }
+        let mut params = Vec::new();
+        push_optional(&mut params, "omitZeroBalances", omit_zero_balances);
         self.request(HttpMethod::Get, market, path, params, true)
             .await
     }

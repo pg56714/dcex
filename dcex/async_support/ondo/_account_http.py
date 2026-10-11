@@ -21,21 +21,6 @@ class AccountHTTP(AccountHTTPWithdrawalsHTTP, HTTPManager):
     async def get_deposits(self) -> Any:
         return await self._native_private("get_deposits")
 
-    async def get_klines(
-        self,
-        market: str,
-        resolution: str,
-        from_time: int,
-        to_time: int,
-    ) -> Any:
-        return await self._native_private(
-            "get_klines",
-            market=market,
-            resolution=resolution,
-            from_time=from_time,
-            to_time=to_time,
-        )
-
     async def get_leverage(self, market: str | None = None) -> Any:
         return await self._native_private("get_leverage", market=market)
 

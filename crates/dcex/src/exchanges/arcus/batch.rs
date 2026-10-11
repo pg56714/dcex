@@ -5,7 +5,7 @@ mod trade_operations {
     use crate::exchanges::arcus::client::ArcusClient;
     use crate::exchanges::arcus::params::required;
     use crate::exchanges::arcus::signing::timestamp_ns;
-    use crate::exchanges::arcus::trade::{MODIFY_ORDER_KEYS, PLACE_ORDER_KEYS};
+    use crate::exchanges::arcus::trade::{CANCEL_ORDER_KEYS, MODIFY_ORDER_KEYS, PLACE_ORDER_KEYS};
 
     use crate::http::{HttpMethod, HttpRequest};
     use crate::{DcexError, Result};
@@ -104,7 +104,7 @@ mod trade_operations {
                                 || matches!(key.as_str(), "tpsl_type" | "stop_price")
                         }
                         "modify_order" => MODIFY_ORDER_KEYS.contains(&key.as_str()),
-                        _ => matches!(key.as_str(), "product_symbol" | "order_id"),
+                        _ => CANCEL_ORDER_KEYS.contains(&key.as_str()),
                     };
                     if !known {
                         return Err(DcexError::InvalidInput(format!(

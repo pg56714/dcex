@@ -5,7 +5,7 @@ Ordinary REST endpoints use the shared request engine in
 required and duplicate fields, recursive JSON constraints, arrays, and form
 encoding. `input_contracts.json` is the explicit input-schema source shared by
 Rust `input_contracts.rs` and Python `_input_codec.py` / `_input_validation.py`.
-The `_schema_codec.py` module retains compatible imports. Python validates
+Python validates
 declared endpoint inputs before conversion to native string pairs.
 
 Exchange adapters retain host selection, symbol conversion, authentication,

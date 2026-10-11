@@ -387,12 +387,6 @@ fn private_order_routes_match_official_paths() {
             "GET",
             "/v1/perps/orders?startTime=1&endTime=2",
         ),
-        private(
-            "get_open_orders",
-            &[("market", MARKET)],
-            "GET",
-            "/v1/perps/orders?market=AAPL-USD.P&status=open",
-        ),
         private_body(
             "place_order",
             &[
@@ -428,7 +422,6 @@ fn private_order_routes_match_official_paths() {
             "DELETE",
             "/v1/perps/orders?market=AAPL-USD.P",
         ),
-        private("cancel_open_orders", &[], "DELETE", "/v1/perps/orders"),
         private_body(
             "place_batch_orders",
             &[(
@@ -726,7 +719,7 @@ fn private_account_routes_match_official_paths() {
             "/v1/perps/candles?market=AAPL-USD.P&resolution=1H&from=1&to=2",
         ),
         private(
-            "get_klines",
+            "get_candles",
             &[
                 ("product_symbol", "BTC-USD-SWAP"),
                 ("resolution", "1D"),

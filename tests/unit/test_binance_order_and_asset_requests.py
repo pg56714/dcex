@@ -93,27 +93,6 @@ async def test_binance_order_and_asset_names_and_fields(asynchronous, method, kw
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("asynchronous", [False, True])
-@pytest.mark.parametrize(
-    "method,verb",
-    [("get_listen_key", "POST"), ("keep_alive_listen_key", "PUT"), ("close_listen_key", "DELETE")],
-)
-async def test_binance_listen_key_alias_wire(asynchronous, method, verb):
-    with _http_server({"listenKey": "key1"}) as (base, received):
-        async with batch_client(asynchronous, base) as client:
-            result = await invoke(
-                client, method, **{} if method == "get_listen_key" else {"listen_key": "key1"}
-            )
-        request = received.get_nowait()
-        assert received.empty()
-        assert request["method"] == verb
-        assert request["path"] == "/fapi/v1/listenKey"
-        assert request["body"] == ""
-        assert request["api_key"] == "key"
-        assert result == ("key1" if method == "get_listen_key" else {"listenKey": "key1"})
-
-
-@pytest.mark.asyncio
-@pytest.mark.parametrize("asynchronous", [False, True])
 @pytest.mark.parametrize("action,verb", [("place", "POST"), ("cancel", "DELETE"), ("get", "GET")])
 async def test_coin_algo_passthrough_wire(asynchronous, action, verb):
     import hashlib

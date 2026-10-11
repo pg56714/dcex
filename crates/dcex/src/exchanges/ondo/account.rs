@@ -149,7 +149,7 @@ impl OndoClient {
                 };
                 self.private_post(path, body).await
             }
-            "get_klines" | "get_candles" => {
+            "get_candles" => {
                 params.ensure_allowed(&["market", "product_symbol", "resolution", "from", "to"])?;
                 params.ensure_required(&["resolution", "from", "to"])?;
                 params.ensure_time_order("from", "to")?;

@@ -3,7 +3,7 @@
 from json import dumps
 from typing import Any
 
-from dcex._schema_codec import normalize_params
+from dcex._input_codec import normalize_params
 
 from .._market_http import MarketHTTP
 from .._trade_http import TradeHTTP

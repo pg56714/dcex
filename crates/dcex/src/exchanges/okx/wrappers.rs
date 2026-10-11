@@ -143,7 +143,6 @@ get_spread_order_history_archive(),
         get_saving_balance(),
         purchase_redeem_savings(ccy => "ccy", amt => "amt", side => "side"),
         // Deprecated: set-lending-rate is no longer in the OKX v5 docs.
-        set_savings_lending_rate(ccy => "ccy", rate => "rate"),
         get_savings_lending_history(),
         set_auto_earn(ccy => "ccy", action => "action"),
         get_staking_offers(),
@@ -170,7 +169,6 @@ get_spread_order_history_archive(),
 
         get_entrusted_subaccount_list(),
         // Deprecated: subaccount/interest-limits is no longer in the OKX v5 docs.
-        get_subaccount_interest_limits(sub_account => "subAcct"),
         get_flexible_loan_borrow_currencies(),
         get_flexible_loan_collateral_assets(),
         get_flexible_loan_max_loan(borrow_ccy => "borrowCcy", supported_collateral => "supCollateral"),

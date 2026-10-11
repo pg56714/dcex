@@ -3,7 +3,7 @@
 一般 REST 端點使用 `crates/dcex/src/exchanges/schema.rs` 的共用請求引擎，
 集中處理欄位型別、十進位格式、必填與重複欄位、遞迴 JSON 約束、陣列及表單編碼。
 `input_contracts.json` 是 Rust `input_contracts.rs` 與 Python `_input_codec.py`／
-`_input_validation.py` 共用的明確輸入 schema 來源；`_schema_codec.py` 保留相容匯入。
+`_input_validation.py` 共用的明確輸入 schema 來源。
 Python 在轉成 native 字串參數前，依端點宣告檢查原始值。
 
 交易所 adapter 保留主機選擇、商品代碼轉換、認證、跨欄位業務條件，以及官方指定的

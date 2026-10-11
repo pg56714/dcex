@@ -65,7 +65,6 @@ impl ExtendedClient {
         stark_private_key: Option<String>,
         stark_public_key: Option<String>,
         vault_number: Option<u64>,
-        client_id: Option<String>,
         timeout: Duration,
         base_url: String,
         user_agent: String,
@@ -89,7 +88,6 @@ impl ExtendedClient {
                     stark_private_key,
                     stark_public_key,
                     vault_number,
-                    client_id,
                 ))
             }
             (None, None, None) => None,

@@ -137,7 +137,7 @@ class OndoAdapter(CexAdapter):
         ]
 
     async def open_orders(self):
-        return rows(await self.call("get_open_orders"))
+        return rows(await self.call("get_orders", status="open"))
 
     async def available(self):
         return decimal((await self.call("get_balance"))["availableMargin"])

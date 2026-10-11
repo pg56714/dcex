@@ -51,7 +51,6 @@ impl std::error::Error for DcexError {}
 
 pub type Result<T> = std::result::Result<T, DcexError>;
 
-pub mod address;
 pub mod decimal;
 pub mod order_side;
 pub mod sanitization;

@@ -1213,16 +1213,26 @@ fn transfers_and_preferences_reject_malformed_fields_before_sending() {
         (
             Kind::Private,
             "submit_internal_transfer",
-            transfer(json!({"signature": {"r": "0x1", "s": "0x2", "v": "0x1b"}})),
-            "signature r must be 32-byte hex",
+            transfer(json!({"memo": "x"})),
+            "unsupported Arcus transfer field: memo",
         ),
         (
             Kind::Private,
             "submit_internal_transfer",
-            transfer(
-                json!({"signature": {"r": format!("0x{}", "ab".repeat(32)), "s": format!("0x{}", "cd".repeat(32)), "v": "0x00"}}),
-            ),
-            "signature v must be 0x1b or 0x1c",
+            transfer(json!({"signature": {"r": "0x0", "s": "0x2", "v": "0x1b"}})),
+            "invalid transfer signature r",
+        ),
+        (
+            Kind::Private,
+            "submit_internal_transfer",
+            transfer(json!({"signature": {"r": "0x1", "s": "1".repeat(65), "v": "0x1b"}})),
+            "invalid transfer signature s",
+        ),
+        (
+            Kind::Private,
+            "submit_internal_transfer",
+            transfer(json!({"signature": {"r": "0x1", "s": "0x2", "v": "0x123456789"}})),
+            "invalid transfer signature v",
         ),
     ];
     for (kind, name, params, reason) in cases {

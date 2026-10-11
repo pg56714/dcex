@@ -142,7 +142,6 @@ fn client(base_url: &str) -> ExtendedClient {
         Some(STARK_PRIVATE_KEY.to_string()),
         Some(STARK_PUBLIC_KEY.to_string()),
         Some(VAULT),
-        None,
         Duration::from_secs(10),
         base_url.to_string(),
         "dcex-test".to_string(),
@@ -283,13 +282,13 @@ fn public_info_routes_match_official_paths() {
             "/api/v1/info/assets/BTC/price",
         ),
         public(
-            "get_market_stats",
+            "get_market_statistics",
             &[("product_symbol", "BTC-USD")],
             "GET",
             "/api/v1/info/markets/BTC-USD/stats",
         ),
         public(
-            "get_orderbook",
+            "get_order_book",
             &[("market", "ETH-USD")],
             "GET",
             "/api/v1/info/markets/ETH-USD/orderbook",
@@ -345,14 +344,19 @@ fn public_info_routes_match_official_paths() {
 #[test]
 fn private_account_routes_match_official_paths() {
     assert_cases(&[
-        private("get_account_info", &[], "GET", "/api/v1/user/account/info"),
         private(
             "get_account_details",
             &[],
             "GET",
             "/api/v1/user/account/info",
         ),
-        private("get_accounts", &[], "GET", "/api/v1/user/accounts"),
+        private(
+            "get_account_details",
+            &[],
+            "GET",
+            "/api/v1/user/account/info",
+        ),
+        private("get_sub_accounts", &[], "GET", "/api/v1/user/accounts"),
         private("get_sub_accounts", &[], "GET", "/api/v1/user/accounts"),
         private("get_balance", &[], "GET", "/api/v1/user/balance"),
         private(
@@ -401,7 +405,7 @@ fn private_account_routes_match_official_paths() {
             "/api/v1/user/trades?market=BTC-USD&type=LIQUIDATION&side=SELL",
         ),
         private(
-            "get_fills",
+            "get_trades_history",
             &[("cursor", "9")],
             "GET",
             "/api/v1/user/trades?cursor=9",
@@ -464,7 +468,7 @@ fn private_order_routes_match_official_paths() {
             "/api/v1/user/orders/history?id=1&id=2&sort=UPDATED_AT",
         ),
         private(
-            "get_order_history",
+            "get_orders_history",
             &[("externalId", "abc"), ("limit", "3")],
             "GET",
             "/api/v1/user/orders/history?externalId=abc&limit=3",
@@ -506,7 +510,7 @@ fn private_order_routes_match_official_paths() {
             "/api/v1/user/order/massCancel",
         ),
         private(
-            "set_deadman_switch",
+            "set_deadmanswitch",
             &[("countdownTime", "0")],
             "POST",
             "/api/v1/user/deadmanswitch?countdownTime=0",
@@ -558,7 +562,7 @@ fn presigned_order(order_type: &str, time_in_force: &str) -> Value {
 fn presigned_order_body_is_posted_verbatim() {
     for (name, order_type, tif) in [
         ("place_order", "LIMIT", "GTT"),
-        ("create_order", "MARKET", "IOC"),
+        ("place_order", "MARKET", "IOC"),
     ] {
         let order = presigned_order(order_type, tif);
         let (result, requests) = run(

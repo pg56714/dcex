@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 from typing import Any, Literal, Self, cast
 from urllib.parse import parse_qsl, urlencode
 
-from dcex._schema_codec import normalize_params
+from dcex._input_codec import normalize_params
 
 from ..._native_http import NativeResponse, load_native, native_body_text, request_native_json_async
 from ...base.http_manager import BaseHTTPManager
@@ -64,9 +64,7 @@ class HTTPManager(BaseHTTPManager):
         self._logger = self._setup_logger(self.logger)
         if self.preload_product_table:
             self.ptm = await ProductTableManager.get_instance(Common.BITGET)
-        native_client_type = getattr(_native, "BitgetHttpClient", None)
-        if native_client_type is None:
-            raise RuntimeError("The dcex native extension is required.")
+        native_client_type = _native.BitgetHttpClient
         if self._native_client is None:
             self._native_client = native_client_type(
                 api_key=self.api_key,

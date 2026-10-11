@@ -113,16 +113,6 @@ impl BinanceClient {
         )
     }
 
-    pub fn get_pm_um_algo_order_by_client_id(
-        &self,
-        client_algo_id: &str,
-    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
-        self.pm_request(
-            "get_pm_um_algo_order",
-            vec![("clientAlgoId".into(), client_algo_id.into())],
-        )
-    }
-
     pub fn cancel_pm_um_algo_order(
         &self,
         algo_id: &str,
@@ -130,16 +120,6 @@ impl BinanceClient {
         self.pm_request(
             "cancel_pm_um_algo_order",
             vec![("algoId".into(), algo_id.into())],
-        )
-    }
-
-    pub fn cancel_pm_um_algo_order_by_client_id(
-        &self,
-        client_algo_id: &str,
-    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
-        self.pm_request(
-            "cancel_pm_um_algo_order",
-            vec![("clientAlgoId".into(), client_algo_id.into())],
         )
     }
 

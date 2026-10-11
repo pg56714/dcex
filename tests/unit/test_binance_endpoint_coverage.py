@@ -647,28 +647,3 @@ async def test_async_convert_wrappers_reach_official_paths(
     query = dict(parse_qsl(split.query))
     query.update(dict(parse_qsl(request["body"])))
     assert ("signature" in query) is signed
-
-
-@pytest.mark.parametrize("method", ["keep_alive_listen_key", "close_listen_key"])
-def test_sync_futures_listen_key_calls_send_no_parameters(method: str) -> None:
-    """PUT/DELETE /fapi/v1/listenKey take no parameters; the key is not sent."""
-    native = pytest.importorskip("dcex._native")
-    with _http_server() as (base_url, received):
-        client = Client(api_key="api-key", api_secret="api-secret", preload_product_table=False)
-        client._native_client = native.BinanceHttpClient(
-            api_key="api-key",
-            api_secret="api-secret",
-            timeout=10,
-            spot_base_url=base_url,
-            futures_base_url=base_url,
-        )
-        try:
-            getattr(client, method)("listen-key")
-        finally:
-            client.close()
-        request = _last_business_request(received)
-        from tests.unit.wire_contracts import assert_wire_contract
-        assert_wire_contract("binance", method, request)
-
-    assert request["path"] == "/fapi/v1/listenKey"
-    assert request["body"] == ""

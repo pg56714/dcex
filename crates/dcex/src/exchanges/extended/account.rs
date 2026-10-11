@@ -75,11 +75,11 @@ impl ExtendedClient {
                     .await
                 }
             }
-            "get_account_info" | "get_account_details" => {
+            "get_account_details" => {
                 params.ensure_allowed(&[], &[])?;
                 self.private_get(ACCOUNT_INFO, Vec::new()).await
             }
-            "get_accounts" | "get_sub_accounts" => {
+            "get_sub_accounts" => {
                 params.ensure_allowed(&[], &[])?;
                 self.private_get(ACCOUNTS, Vec::new()).await
             }
@@ -160,7 +160,7 @@ impl ExtendedClient {
                 )
                 .await
             }
-            "get_trades_history" | "get_fills" => {
+            "get_trades_history" => {
                 validate_history_params(params, &["market", "type", "side", "cursor", "limit"])?;
                 params.optional_one_of("type", &["TRADE", "LIQUIDATION", "DELEVERAGE"])?;
                 params.optional_one_of("side", &["BUY", "SELL"])?;

@@ -1,6 +1,5 @@
 use super::client::{BinanceClient, BinanceMarket};
 use super::endpoints::*;
-use super::params::ensure_futures_listen_key_market;
 use crate::Result;
 use crate::exchange::ValidatedResponse;
 use crate::http::HttpMethod;
@@ -38,32 +37,5 @@ impl BinanceClient {
             Vec::new(),
         )
         .await
-    }
-
-    pub async fn get_listen_key(&self, market_type: &str) -> Result<ValidatedResponse> {
-        ensure_futures_listen_key_market(market_type)?;
-        self.create_futures_listen_key().await
-    }
-
-    /// Mirrors the Python signature; `_listen_key` is not sent because the
-    /// endpoint acts on the account's active listen key.
-    pub async fn keep_alive_listen_key(
-        &self,
-        _listen_key: &str,
-        market_type: &str,
-    ) -> Result<ValidatedResponse> {
-        ensure_futures_listen_key_market(market_type)?;
-        self.keep_alive_futures_listen_key().await
-    }
-
-    /// Mirrors the Python signature; `_listen_key` is not sent because the
-    /// endpoint acts on the account's active listen key.
-    pub async fn close_listen_key(
-        &self,
-        _listen_key: &str,
-        market_type: &str,
-    ) -> Result<ValidatedResponse> {
-        ensure_futures_listen_key_market(market_type)?;
-        self.close_futures_listen_key().await
     }
 }

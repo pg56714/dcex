@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 from typing import Any, cast
 from urllib.parse import urlsplit
 
-from dcex._schema_codec import normalize_params
+from dcex._input_codec import normalize_params
 
 from .._native_http import NativeResponse, load_native, request_native_json
 from ..base.http_manager import BaseHTTPManager
@@ -21,8 +21,6 @@ _native = load_native()
 
 def sign_message(message: str, private_key: str) -> str:
     """Sign an Aster V3 EIP-712 message using the Rust native extension."""
-    if not hasattr(_native, "aster_sign_message"):
-        raise RuntimeError("Aster native signing is required.")
     return str(_native.aster_sign_message(message, private_key))
 
 
@@ -73,9 +71,7 @@ class HTTPManager(BaseHTTPManager):
             self.prediction_base_url = (
                 "https://papi.asterdex-testnet.com" if spot_testnet else "https://papi.asterdex.com"
             )
-        native_client_type = getattr(_native, "AsterHttpClient", None)
-        if native_client_type is None:
-            raise RuntimeError("The dcex native extension is required.")
+        native_client_type = _native.AsterHttpClient
         self._native_client = native_client_type(
             user_address=self.user_address,
             signer_address=self.signer_address,
@@ -87,10 +83,7 @@ class HTTPManager(BaseHTTPManager):
         )
         if self.preload_product_table:
             self.ptm = ProductTableManager.get_instance(Common.ASTER)
-            if self._native_client is not None and hasattr(
-                self._native_client,
-                "set_product_table",
-            ):
+            if self._native_client is not None:
                 self._native_client.set_product_table(self.ptm._native_table)
 
     def reserve_nonce(self) -> int:
@@ -116,9 +109,6 @@ class HTTPManager(BaseHTTPManager):
         if self._native_client is None:
             raise RuntimeError("Aster native client is required.")
         method = "private_request" if private else "public_request"
-        json_method = f"{method}_json"
-        if not hasattr(self._native_client, json_method):
-            raise RuntimeError(f"Aster native client {json_method} is unavailable.")
         request_summary = self._native_request_summary(method_name, params)
         try:
             response, data = request_native_json(self._native_client, method, method_name, params)

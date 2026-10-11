@@ -43,7 +43,6 @@ def test_sync_okx_subaccount_wrappers_forward_official_fields() -> None:
         loanTrans=False,
     )
     client.get_entrusted_subaccount_list("alpha")
-    client.get_subaccount_interest_limits("alpha", ccy="USDT")
 
     assert native.calls[0] == (
         "get_subaccount_list",
@@ -54,7 +53,7 @@ def test_sync_okx_subaccount_wrappers_forward_official_fields() -> None:
         ("ccy", '["BTC","USDT"]'),
     ]
     assert native.calls[4][1][-1] == ("loanTrans", "false")
-    assert native.calls[-1][1] == [("subAcct", "alpha"), ("ccy", "USDT")]
+    assert native.calls[-1] == ("get_entrusted_subaccount_list", [("subAcct", "alpha")])
 
 
 @pytest.mark.asyncio
@@ -70,11 +69,7 @@ async def test_async_okx_subaccount_wrappers_forward_official_fields() -> None:
     await client.get_subaccount_funding_balance("alpha", ["USDT"])
     await client.get_subaccount_bills("alpha", type="1")
     await client.get_entrusted_subaccount_list()
-    await client.get_subaccount_interest_limits("alpha", ccy="USDT")
 
     assert native.calls[0] == ("get_subaccount_list", [("subAcct", "alpha")])
     assert native.calls[2][1] == [("subAcct", "alpha"), ("ccy", '["USDT"]')]
-    assert native.calls[-1] == (
-        "get_subaccount_interest_limits",
-        [("subAcct", "alpha"), ("ccy", "USDT")],
-    )
+    assert native.calls[-1] == ("get_entrusted_subaccount_list", [])

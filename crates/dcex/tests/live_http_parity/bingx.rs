@@ -121,7 +121,6 @@ async fn bingx_private_read_live_parity() -> dcex::Result<()> {
     run_private_cases(
         &["BINGX_API_KEY", "BINGX_API_SECRET"],
         vec![
-            Case::new("get_account_balance", &[]),
             Case::new("get_swap_account_balance", &[]),
             Case::new("get_spot_account_balance", &[]),
             Case::new("get_fund_account_balance", &[("asset", "USDT")]),
@@ -170,7 +169,6 @@ async fn bingx_private_read_live_parity() -> dcex::Result<()> {
                     client,
                     case,
                     [
-                        get_account_balance,
                         get_account_uid,
                         get_all_account_balance,
                         get_asset_transfer_records,

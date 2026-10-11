@@ -257,6 +257,10 @@ impl ArcusSpotClient {
     }
 
     async fn verify_rpc_chain(&self) -> Result<()> {
+        use std::sync::atomic::Ordering;
+        if self.rpc_chain_verified.load(Ordering::Relaxed) {
+            return Ok(());
+        }
         let result = self.rpc_call("eth_chainId", json!([])).await?;
         let chain_id: u64 = parse_quantity(&result)?.try_into().map_err(|_| {
             DcexError::Decode("Arcus wallet RPC returned an invalid chain ID".into())
@@ -267,6 +271,7 @@ impl ArcusSpotClient {
                 self.chain_id
             )));
         }
+        self.rpc_chain_verified.store(true, Ordering::Relaxed);
         Ok(())
     }
 
@@ -568,17 +573,14 @@ mod tests {
 
     #[test]
     fn reads_spot_wallet_balances_and_permit2_allowance() {
+        // The chain ID is verified once per RPC URL, before the first query.
         let (rpc_url, server) = rpc_server(vec![
             json!("0x1237"),
             json!("0xde0b6b3a7640000"),
-            json!("0x1237"),
             json!("0x64"),
-            json!("0x1237"),
             json!("0xff"),
-            json!("0x1237"),
             json!("0x0"),
             json!("0x2a"),
-            json!("0x1237"),
             json!([]),
         ]);
         let wallet = format!("0x{}", "11".repeat(20));
@@ -624,23 +626,24 @@ mod tests {
         })
         .unwrap();
         let requests = server.join().unwrap();
-        assert_eq!(requests.len(), 11);
+        assert_eq!(requests.len(), 7);
+        assert_eq!(requests[0]["method"], "eth_chainId");
         assert_eq!(requests[1]["method"], "eth_getBalance");
-        assert_eq!(requests[3]["method"], "eth_call");
+        assert_eq!(requests[2]["method"], "eth_call");
         assert!(
-            requests[3]["params"][0]["data"]
+            requests[2]["params"][0]["data"]
                 .as_str()
                 .unwrap()
                 .starts_with("0x70a08231")
         );
         assert!(
-            requests[5]["params"][0]["data"]
+            requests[3]["params"][0]["data"]
                 .as_str()
                 .unwrap()
                 .starts_with("0xdd62ed3e")
         );
-        assert_eq!(requests[10]["method"], "eth_getLogs");
-        assert_eq!(requests[10]["params"][0]["fromBlock"], "0x64");
+        assert_eq!(requests[6]["method"], "eth_getLogs");
+        assert_eq!(requests[6]["params"][0]["fromBlock"], "0x64");
     }
 
     #[test]
@@ -797,11 +800,8 @@ mod tests {
         let (rpc_url, server) = rpc_server(vec![
             json!("0x1237"),
             json!({"status": "0x1"}),
-            json!("0x1237"),
             json!("0x10"),
-            json!("0x1237"),
             json!({"raw": {"jsonrpc": "2.0", "id": 1, "error": {"code": -32000}}}),
-            json!("0x1237"),
             json!({"raw": {"jsonrpc": "2.0", "id": 1}}),
         ]);
         let client = wallet_client(rpc_url);
@@ -833,7 +833,7 @@ mod tests {
             Ok::<(), DcexError>(())
         })
         .unwrap();
-        assert_eq!(server.join().unwrap().len(), 8);
+        assert_eq!(server.join().unwrap().len(), 5);
     }
 
     #[test]

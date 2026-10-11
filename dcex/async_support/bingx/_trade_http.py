@@ -3,7 +3,7 @@
 from decimal import Decimal
 from typing import Any
 
-from dcex._schema_codec import normalize_params, wire_keywords
+from dcex._input_codec import normalize_params, wire_keywords
 
 from ..._operation_guards import require_confirmation, require_scope
 from ._batch_http import TradeHTTPBatchHTTP

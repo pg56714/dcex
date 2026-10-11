@@ -8,10 +8,6 @@ pub fn sha256(data: &[u8]) -> [u8; 32] {
     Sha256::digest(data).into()
 }
 
-pub fn sha512_hex(data: &[u8]) -> String {
-    hex::encode(Sha512::digest(data))
-}
-
 pub fn hmac_sha256(secret: &[u8], message: &[u8]) -> Result<[u8; 32]> {
     let mut mac = Hmac::<Sha256>::new_from_slice(secret)
         .map_err(|error| DcexError::InvalidInput(error.to_string()))?;
@@ -32,10 +28,6 @@ pub fn hmac_sha256_hex(secret: &[u8], message: &[u8]) -> Result<String> {
 
 pub fn hmac_sha256_base64(secret: &[u8], message: &[u8]) -> Result<String> {
     Ok(base64::engine::general_purpose::STANDARD.encode(hmac_sha256(secret, message)?))
-}
-
-pub fn hmac_sha512_hex(secret: &[u8], message: &[u8]) -> Result<String> {
-    Ok(hex::encode(hmac_sha512(secret, message)?))
 }
 
 pub fn hmac_sha512_base64(secret: &[u8], message: &[u8]) -> Result<String> {

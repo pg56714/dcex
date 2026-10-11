@@ -39,7 +39,6 @@ def test_sync_okx_finance_wrappers_forward_official_fields() -> None:
 
     client.get_saving_balance("USDT")
     client.purchase_redeem_savings("USDT", "1", "purchase", rate="0.01")
-    client.set_savings_lending_rate("USDT", "0.01")
     client.get_public_borrow_history("USDT", limit=20)
     client.set_auto_earn("USDT", "turn_on", earnType="0")
     client.purchase_staking("product", [{"ccy": "ETH", "amt": "1"}], term="30")
@@ -70,16 +69,16 @@ def test_sync_okx_finance_wrappers_forward_official_fields() -> None:
         "purchase_redeem_savings",
         [("ccy", "USDT"), ("amt", "1"), ("side", "purchase"), ("rate", "0.01")],
     )
-    assert native.calls[5][2][1] == ("investData", '[{"ccy":"ETH","amt":"1"}]')
-    assert native.calls[6][2][-1] == ("allowEarlyRedeem", "true")
-    assert native.calls[9][0] == "public"
-    assert native.calls[11][2][1] == (
+    assert native.calls[4][2][1] == ("investData", '[{"ccy":"ETH","amt":"1"}]')
+    assert native.calls[5][2][-1] == ("allowEarlyRedeem", "true")
+    assert native.calls[8][0] == "public"
+    assert native.calls[10][2][1] == (
         "supCollateral",
         '[{"ccy":"BTC","amt":"0.1"}]',
     )
-    assert native.calls[13][2][-1] == ("eMode", "true")
-    assert native.calls[16][0] == "private"
-    assert native.calls[17][2] == [
+    assert native.calls[12][2][-1] == ("eMode", "true")
+    assert native.calls[15][0] == "private"
+    assert native.calls[16][2] == [
         ("productId", "product"),
         ("notionalSz", "10"),
         ("notionalCcy", "USDT"),

@@ -3,7 +3,7 @@
 from json import dumps
 from typing import Any
 
-from dcex._schema_codec import encode_json, normalize_params
+from dcex._input_codec import encode_json, normalize_params
 
 from .._native_http import request_native_json
 from ..enums import OrderSide

@@ -1,5 +1,4 @@
 //! Compatibility exports for shared utility functions.
-pub use crate::address::address_to_bytes;
 pub(crate) use crate::decimal::is_positive_plain_decimal;
 pub use crate::decimal::{get_decimal_places, reverse_decimal_places};
 pub use crate::exchange::exchange_names;

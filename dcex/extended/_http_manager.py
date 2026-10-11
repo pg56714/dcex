@@ -7,7 +7,7 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import Any, cast
 
-from dcex._schema_codec import normalize_params
+from dcex._input_codec import normalize_params
 
 from .._native_http import NativeResponse, load_native, native_body_text, request_native_json
 from ..base.http_manager import BaseHTTPManager
@@ -47,7 +47,6 @@ class HTTPManager(BaseHTTPManager):
     stark_private_key: str | None = field(default=None, repr=False)
     stark_public_key: str | None = field(default=None, repr=False)
     vault_number: int | None = field(default=None, repr=False)
-    client_id: str | None = field(default=None, repr=False)
     timeout: int = field(default=10)
     user_agent: str = field(default="dcex-python/0.1")
     logger: logging.Logger | None = field(default=None)
@@ -65,32 +64,20 @@ class HTTPManager(BaseHTTPManager):
             self.stark_public_key or os.getenv("EXTENDED_STARK_PUBLIC_KEY") or None
         )
         self.vault_number = self.vault_number or _env_int("EXTENDED_VAULT_NUMBER")
-        self.client_id = self.client_id or os.getenv("EXTENDED_CLIENT_ID") or None
-        native_client_type = getattr(_native, "ExtendedHttpClient", None)
-        if native_client_type is None:
-            raise RuntimeError("The dcex native extension is required.")
-        try:
-            self._native_client = native_client_type(
-                api_key=self.api_key,
-                stark_private_key=self.stark_private_key,
-                stark_public_key=self.stark_public_key,
-                vault_number=self.vault_number,
-                client_id=self.client_id,
-                timeout=self.timeout,
-                base_url=self.base_url,
-                user_agent=self.user_agent,
-            )
-        except TypeError:
-            self._native_client = native_client_type(
-                api_key=self.api_key,
-                timeout=self.timeout,
-                base_url=self.base_url,
-                user_agent=self.user_agent,
-            )
+        native_client_type = _native.ExtendedHttpClient
+        self._native_client = native_client_type(
+            api_key=self.api_key,
+            stark_private_key=self.stark_private_key,
+            stark_public_key=self.stark_public_key,
+            vault_number=self.vault_number,
+            timeout=self.timeout,
+            base_url=self.base_url,
+            user_agent=self.user_agent,
+        )
         if self.preload_product_table:
             self.ptm = ProductTableManager.get_instance(Common.EXTENDED)
             native_client = self._native_client
-            if native_client is not None and hasattr(native_client, "set_product_table"):
+            if native_client is not None:
                 native_client.set_product_table(self.ptm._native_table)
 
     def _uses_native_transport(self) -> bool:

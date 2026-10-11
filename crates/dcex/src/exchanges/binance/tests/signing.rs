@@ -230,12 +230,7 @@ fn futures_listen_key_keepalive_and_close_send_no_parameters() {
         )
         .expect("client");
 
-        block_on(async move {
-            client
-                .private_request(name, vec![("listenKey".to_string(), "k".to_string())])
-                .await
-        })
-        .expect("response");
+        block_on(async move { client.private_request(name, Vec::new()).await }).expect("response");
 
         assert_eq!(
             handle.join().expect("server"),

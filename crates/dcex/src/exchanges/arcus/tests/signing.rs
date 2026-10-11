@@ -332,8 +332,8 @@ fn batch_cancel_signs_each_element_with_shared_timestamp() {
     let listener = TcpListener::bind("127.0.0.1:0").expect("bind");
     let base_url = format!("http://{}", listener.local_addr().expect("address"));
     let server = thread::spawn(move || {
-        let mut posted = None;
-        for _ in 0..3 {
+        let (mut posted, mut market_fetches) = (None, 0);
+        while posted.is_none() {
             let (mut stream, _) = listener.accept().expect("accept");
             stream
                 .set_read_timeout(Some(Duration::from_secs(10)))
@@ -365,6 +365,7 @@ fn batch_cancel_signs_each_element_with_shared_timestamp() {
             }
             let request = String::from_utf8(raw).expect("request");
             let response = if request.starts_with("GET ") {
+                market_fetches += 1;
                 r#"{"markets":[{"marketId":7,"marketDisplayName":"BTC-USD"}]}"#
             } else {
                 posted = Some(request);
@@ -377,6 +378,8 @@ fn batch_cancel_signs_each_element_with_shared_timestamp() {
             )
             .expect("response");
         }
+        // Market metadata is cached across the batch elements.
+        assert_eq!(market_fetches, 1);
         posted.expect("batch POST")
     });
     let key = SigningKey::from_bytes(&[3u8; 32]);
@@ -398,7 +401,7 @@ fn batch_cancel_signs_each_element_with_shared_timestamp() {
                 "batch_cancel_orders",
                 vec![(
                     "cancels".into(),
-                    r#"[{"product_symbol":"BTC-USD","order_id":"one"},{"product_symbol":"BTC-USD","order_id":"two"}]"#.into(),
+                    r#"[{"product_symbol":"BTC-USD","order_id":"one"},{"product_symbol":"BTC-USD","client_order_id":"two"}]"#.into(),
                 )],
             )
             .await
@@ -428,7 +431,11 @@ fn batch_cancel_signs_each_element_with_shared_timestamp() {
         .expect("header signature");
     assert_eq!(cancels[0]["signature"], header_signature.trim());
     for (index, item) in cancels.iter().enumerate() {
-        assert_eq!(item["orderId"], ["one", "two"][index]);
+        // The first element cancels by server id, the second by client id.
+        let (kind, field, canonical_key) =
+            [("orderId", "orderId", "id"), ("clientId", "clientId", "c")][index];
+        assert_eq!(item["kind"], kind);
+        assert_eq!(item[field], ["one", "two"][index]);
         assert_eq!(item["timestamp"], timestamp);
         let signature: [u8; 64] = hex::decode(item["signature"].as_str().unwrap())
             .expect("hex")
@@ -438,7 +445,7 @@ fn batch_cancel_signs_each_element_with_shared_timestamp() {
         canonical.insert("ad", json!(address));
         canonical.insert("ai", json!(0));
         canonical.insert("ct", json!(timestamp));
-        canonical.insert("id", json!(["one", "two"][index]));
+        canonical.insert(canonical_key, json!(["one", "two"][index]));
         canonical.insert("m", json!(7));
         canonical.insert("op", json!(2));
         canonical.insert("v", json!(1));

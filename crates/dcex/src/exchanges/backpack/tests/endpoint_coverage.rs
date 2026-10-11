@@ -984,35 +984,14 @@ async fn every_typed_request_reaches_dispatch() {
     note(
         &mut called,
         &mut failures,
-        "submit_rfq_with_execution_mode",
-        client
-            .submit_rfq_with_execution_mode("BTCUSDT", "BUY", "1")
-            .send()
-            .await,
-    );
-    note(
-        &mut called,
-        &mut failures,
         "accept_rfq_quote",
         client.accept_rfq_quote("1", "1").send().await,
     );
     note(
         &mut called,
         &mut failures,
-        "accept_rfq_quote_by_client_id",
-        client.accept_rfq_quote_by_client_id(1, "1").send().await,
-    );
-    note(
-        &mut called,
-        &mut failures,
         "cancel_rfq",
         client.cancel_rfq("1").send().await,
-    );
-    note(
-        &mut called,
-        &mut failures,
-        "cancel_rfq_by_client_id",
-        client.cancel_rfq_by_client_id(1).send().await,
     );
     note(
         &mut called,

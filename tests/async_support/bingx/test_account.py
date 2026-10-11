@@ -37,12 +37,6 @@ async def test_get_swap_account_balance(client):
     assert res is not None
 
 
-@pytest.mark.asyncio
-@pytest.mark.private
-async def test_get_account_balance(client):
-    res = await client.get_account_balance()
-    assert res is not None
-
 
 @pytest.mark.asyncio
 @pytest.mark.private

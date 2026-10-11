@@ -341,7 +341,7 @@ def test_arcus_perps_signed_order_and_cancel_routes_are_complete(
         assert json.loads(placed["body"])["marketId"] == 1
 
         client.cancel_order("BTC-USD-SWAP", "order-1")
-        assert urlsplit(received.get_nowait()["path"]).path == "/v1/markets"
+        # The market list fetched for the order is reused by the cancel.
         cancelled = received.get_nowait()
         assert urlsplit(cancelled["path"]).path == "/v1/cancelOrder"
         assert json.loads(cancelled["body"])["orderId"] == "order-1"

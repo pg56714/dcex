@@ -2,7 +2,7 @@
 
 from typing import Any
 
-from dcex._schema_codec import normalize_params
+from dcex._input_codec import normalize_params
 
 from ..._native_http import request_native_json_async
 from ._http_manager import HTTPManager

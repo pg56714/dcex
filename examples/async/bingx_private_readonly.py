@@ -17,7 +17,7 @@ async def main() -> None:
         api_secret=require_env("BINGX_API_SECRET"),
     )
     try:
-        balance = await client.get_account_balance()
+        balance = await client.get_swap_account_balance()
         print(balance)
 
         positions = await client.get_open_positions(product_symbol="BTC-USDT-SWAP")

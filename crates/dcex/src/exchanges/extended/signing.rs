@@ -24,12 +24,7 @@ pub struct ExtendedSigningCredentials {
 }
 
 impl ExtendedSigningCredentials {
-    pub fn new(
-        stark_private_key: String,
-        stark_public_key: String,
-        vault_number: u64,
-        _client_id: Option<String>,
-    ) -> Self {
+    pub fn new(stark_private_key: String, stark_public_key: String, vault_number: u64) -> Self {
         Self {
             stark_private_key,
             stark_public_key,
@@ -848,7 +843,6 @@ mod tests {
                 "0x1".to_string(),
                 "0x1ef15c18599971b7beced415a40f0c7deacfd9b0d1819e03d723d8bc943cfca".to_string(),
                 4_272_448_241_247_734_333,
-                None,
             ),
             StarknetDomain::mainnet(),
         )

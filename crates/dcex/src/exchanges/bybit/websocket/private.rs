@@ -27,10 +27,6 @@ impl BybitPrivateWebSocket {
         Self::with_url(api_key, api_secret, PRIVATE_WS_URL.to_string(), timeout)
     }
 
-    pub fn new_trade(api_key: String, api_secret: String, timeout: Duration) -> Result<Self> {
-        Self::with_url(api_key, api_secret, TRADE_WS_URL.to_string(), timeout)
-    }
-
     /// Correct trade-order `X-BAPI-TIMESTAMP` headers with this REST time URL, fetched once
     /// before the first order. The official trade URL uses Bybit's time endpoint; other
     /// URLs use the local clock unless this is called.

@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 from typing import Any, Literal, Self, cast
 from urllib.parse import urlencode
 
-from dcex._schema_codec import normalize_params
+from dcex._input_codec import normalize_params
 
 from ..._native_http import NativeResponse, load_native, native_body_text, request_native_json_async
 from ...base.http_manager import BaseHTTPManager
@@ -84,9 +84,7 @@ class HTTPManager(BaseHTTPManager):
         if self.base_url is None:
             self.base_url = resolved_network.api_url
         self._logger = self._setup_logger(self.logger)
-        native_client_type = getattr(_native, "LighterHttpClient", None)
-        if native_client_type is None:
-            raise RuntimeError("The dcex native extension is required.")
+        native_client_type = _native.LighterHttpClient
         if self._native_client is None:
             self._native_client = native_client_type(
                 timeout=self.timeout,
@@ -105,10 +103,7 @@ class HTTPManager(BaseHTTPManager):
             and self.ptm is None
         ):
             self.ptm = await ProductTableManager.get_instance(Common.LIGHTER)
-            if self._native_client is not None and hasattr(
-                self._native_client,
-                "set_product_table",
-            ):
+            if self._native_client is not None:
                 self._native_client.set_product_table(self.ptm._native_table)
         return self
 
@@ -152,9 +147,8 @@ class HTTPManager(BaseHTTPManager):
             await self.async_init()
         native_client = self._native_client
         method = "private_request" if private else "public_request"
-        json_method = f"{method}_json_async"
-        if native_client is None or not hasattr(native_client, json_method):
-            raise RuntimeError(f"Lighter native client {json_method} is unavailable.")
+        if native_client is None:
+            raise RuntimeError("Lighter native client is closed.")
         try:
             response, data = await request_native_json_async(
                 native_client,
@@ -197,12 +191,12 @@ class HTTPManager(BaseHTTPManager):
         if self._native_client is None:
             await self.async_init()
         native_client = self._native_client
-        if native_client is not None and hasattr(native_client, "sign_request_async"):
-            return cast(
-                tuple[Any, Any, Any, Any],
-                await native_client.sign_request_async(method_name, params),
-            )
-        raise RuntimeError("Lighter native client sign_request_async is unavailable.")
+        if native_client is None:
+            raise RuntimeError("Lighter native client is closed.")
+        return cast(
+            tuple[Any, Any, Any, Any],
+            await native_client.sign_request_async(method_name, params),
+        )
 
     async def _request(
         self,
@@ -290,17 +284,17 @@ class HTTPManager(BaseHTTPManager):
         if authorization:
             return authorization
         native_client = self._native_client
-        if native_client is not None and hasattr(native_client, "create_auth_token"):
-            return str(native_client.create_auth_token(deadline, api_key_index))
-        raise RuntimeError("Lighter native client create_auth_token is unavailable.")
+        if native_client is None:
+            raise RuntimeError("Lighter native client is closed.")
+        return str(native_client.create_auth_token(deadline, api_key_index))
 
     async def _native_check_client(self) -> str | None:
         if self._native_client is None:
             await self.async_init()
         native_client = self._native_client
-        if native_client is not None and hasattr(native_client, "check_client_async"):
-            return cast(str | None, await native_client.check_client_async())
-        raise RuntimeError("Lighter native client check_client_async is unavailable.")
+        if native_client is None:
+            raise RuntimeError("Lighter native client is closed.")
+        return cast(str | None, await native_client.check_client_async())
 
     async def close(self) -> None:
         """Release native HTTP resources held by the Rust extension."""

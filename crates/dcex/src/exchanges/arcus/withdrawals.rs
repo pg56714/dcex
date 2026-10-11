@@ -1,16 +1,7 @@
 //! Fund movement and batch request implementations.
 
 use super::ArcusClient;
-use crate::{Result, exchange::ValidatedResponse};
-impl ArcusClient {
-    pub(super) async fn withdrawal_schema_request(
-        &self,
-        name: &str,
-        params: Vec<(String, String)>,
-    ) -> Result<ValidatedResponse> {
-        self.field_schema_request(name, params).await
-    }
-}
+use crate::Result;
 
 use crate::exchanges::arcus::params::invalid;
 use serde_json::{Value, json};

@@ -71,10 +71,6 @@ async fn authenticated_channels_carry_a_fresh_auth_token() {
         .await
         .unwrap();
     client.subscribe_rfq().await.unwrap();
-    client
-        .subscribe_private_market_channel("trade", 4)
-        .await
-        .unwrap();
     for channel in [
         "account_market/3/12",
         "account_tx/12",
@@ -88,7 +84,6 @@ async fn authenticated_channels_carry_a_fresh_auth_token() {
         "account_all_assets/12",
         "account_spot_avg_entry_prices/12",
         "rfq",
-        "trade/4",
     ] {
         let frame = peer.next_json().await;
         assert_eq!(frame["type"], "subscribe", "{channel}");

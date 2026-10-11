@@ -2,7 +2,7 @@
 
 from typing import Any
 
-from dcex._schema_codec import wire_keywords
+from dcex._input_codec import wire_keywords
 
 from ._http_manager import HTTPManager
 

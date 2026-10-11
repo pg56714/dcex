@@ -8,7 +8,7 @@ import pytest
 
 from dcex._input_codec import CATALOG
 from dcex._input_validation import normalize_endpoint
-from dcex._schema_codec import encode_json, normalize
+from dcex._input_codec import encode_json, normalize
 
 EXCHANGES = [
     "arcus",
@@ -127,7 +127,7 @@ def test_documented_signed_delta_and_market_selector_survive_boundary():
 
 
 def test_signed_payloads_preserve_decimals_without_accepting_floats():
-    assert json.loads(encode_json({"size": Decimal("-1.25")}, signed_fields=("size",))) == {
+    assert json.loads(encode_json({"size": Decimal("-1.25")})) == {
         "size": "-1.25"
     }
     with pytest.raises(ValueError, match="float"):

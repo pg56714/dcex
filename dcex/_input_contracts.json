@@ -25036,15 +25036,6 @@
           }
         }
       },
-      "set_savings_lending_rate": {
-        "type": "object",
-        "properties": {
-          "rate": {
-            "type": "string",
-            "format": "decimal"
-          }
-        }
-      },
       "get_active_staking_orders": {
         "type": "object",
         "properties": {}
@@ -25979,15 +25970,7 @@
         "type": "object",
         "properties": {}
       },
-      "get_open_orders": {
-        "type": "object",
-        "properties": {}
-      },
       "get_fills_by_order": {
-        "type": "object",
-        "properties": {}
-      },
-      "cancel_open_orders": {
         "type": "object",
         "properties": {}
       },

@@ -236,13 +236,13 @@ impl BinanceClient {
                 params.ensure_allowed(&[])?;
                 self.create_futures_listen_key().await
             }
-            // A caller-supplied `listenKey` is ignored: these endpoints take no parameters.
+            // The documented PUT/DELETE take no parameters.
             "keep_alive_futures_listen_key" => {
-                params.ensure_allowed(&["listenKey"])?;
+                params.ensure_allowed(&[])?;
                 self.keep_alive_futures_listen_key().await
             }
             "close_futures_listen_key" => {
-                params.ensure_allowed(&["listenKey"])?;
+                params.ensure_allowed(&[])?;
                 self.close_futures_listen_key().await
             }
             "set_leverage" => {

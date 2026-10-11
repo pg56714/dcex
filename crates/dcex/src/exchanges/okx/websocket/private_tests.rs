@@ -41,9 +41,6 @@ async fn convenience_channels_send_documented_args() {
     let (mut ws, mut peer) = logged_in().await;
     ws.subscribe_orders().await.unwrap();
     ws.subscribe_orders_for_type("SWAP").await.unwrap();
-    ws.subscribe_orders_for_family("FUTURES", "BTC-USD")
-        .await
-        .unwrap();
     ws.subscribe_orders_for_instrument("SPOT", "BTC-USDT")
         .await
         .unwrap();
@@ -54,7 +51,6 @@ async fn convenience_channels_send_documented_args() {
     for arg in [
         json!({"channel": "orders", "instType": "ANY"}),
         json!({"channel": "orders", "instType": "SWAP"}),
-        json!({"channel": "orders", "instType": "FUTURES", "instFamily": "BTC-USD"}),
         json!({"channel": "orders", "instType": "SPOT", "instId": "BTC-USDT"}),
         json!({"channel": "account"}),
         json!({"channel": "account", "ccy": "BTC"}),

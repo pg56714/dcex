@@ -58,67 +58,6 @@ impl PythonBinanceHttpClient {
         self.client.set_product_table(table.table.clone());
     }
 
-    #[pyo3(signature = (method, market, path, params=None, signed=true))]
-    fn request(
-        &self,
-        py: Python<'_>,
-        method: &str,
-        market: &str,
-        path: String,
-        params: Option<Vec<(String, String)>>,
-        signed: bool,
-    ) -> PyResult<PythonHttpResponse> {
-        let method = http_method(method)?;
-        let market = binance_market(market)?;
-        py.allow_threads(|| {
-            self.client
-                .request_blocking(method, market, path, params.unwrap_or_default(), signed)
-        })
-        .map_err(to_py_runtime_error)
-        .and_then(python_validated_response)
-    }
-
-    #[pyo3(signature = (method, market, path, params=None, signed=true))]
-    fn request_async<'py>(
-        &self,
-        py: Python<'py>,
-        method: &str,
-        market: &str,
-        path: String,
-        params: Option<Vec<(String, String)>>,
-        signed: bool,
-    ) -> PyResult<Bound<'py, PyAny>> {
-        let client = self.client.clone();
-        let method = http_method(method)?;
-        let market = binance_market(market)?;
-        let params = params.unwrap_or_default();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            client
-                .request(method, market, path, params, signed)
-                .await
-                .map_err(to_py_runtime_error)
-                .and_then(python_validated_response)
-        })
-    }
-
-    #[pyo3(signature = (method, market, path, params=None, signed=true))]
-    fn request_raw_json(
-        &self,
-        py: Python<'_>,
-        method: &str,
-        market: &str,
-        path: String,
-        params: Option<Vec<(String, String)>>,
-        signed: bool,
-    ) -> PyResult<PythonJsonResponse> {
-        let client = self.client.clone();
-        let method = http_method(method)?;
-        let market = binance_market(market)?;
-        python_json_http_request(py, move || {
-            client.request_raw_blocking(method, market, path, params.unwrap_or_default(), signed)
-        })
-    }
-
     #[pyo3(signature = (method, path, params=None, signed=true))]
     fn request_raw_auto_json(
         &self,
@@ -132,27 +71,6 @@ impl PythonBinanceHttpClient {
         let method = http_method(method)?;
         python_json_http_request(py, move || {
             client.request_raw_auto_blocking(method, path, params.unwrap_or_default(), signed)
-        })
-    }
-
-    #[pyo3(signature = (method, market, path, params=None, signed=true))]
-    fn request_raw_json_async<'py>(
-        &self,
-        py: Python<'py>,
-        method: &str,
-        market: &str,
-        path: String,
-        params: Option<Vec<(String, String)>>,
-        signed: bool,
-    ) -> PyResult<Bound<'py, PyAny>> {
-        let client = self.client.clone();
-        let method = http_method(method)?;
-        let market = binance_market(market)?;
-        let params = params.unwrap_or_default();
-        python_json_http_request_async(py, async move {
-            client
-                .request_raw(method, market, path, params, signed)
-                .await
         })
     }
 

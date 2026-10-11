@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 from typing import Any, Literal, Self, cast
 from urllib.parse import urlencode
 
-from dcex._schema_codec import normalize_params
+from dcex._input_codec import normalize_params
 
 from .._native_http import NativeResponse, load_native, native_body_text, request_native_json
 from ..base.http_manager import BaseHTTPManager
@@ -84,9 +84,7 @@ class HTTPManager(BaseHTTPManager):
         self.network = resolved_network
         if self.base_url is None:
             self.base_url = resolved_network.api_url
-        native_client_type = getattr(_native, "LighterHttpClient", None)
-        if native_client_type is None:
-            raise RuntimeError("The dcex native extension is required.")
+        native_client_type = _native.LighterHttpClient
         self._native_client = native_client_type(
             timeout=self.timeout,
             base_url=self.base_url,
@@ -103,10 +101,7 @@ class HTTPManager(BaseHTTPManager):
             and self.base_url == Network.MAINNET.api_url
         ):
             self.ptm = ProductTableManager.get_instance(Common.LIGHTER)
-            if self._native_client is not None and hasattr(
-                self._native_client,
-                "set_product_table",
-            ):
+            if self._native_client is not None:
                 self._native_client.set_product_table(self.ptm._native_table)
 
     def _uses_native_transport(self) -> bool:
@@ -139,9 +134,8 @@ class HTTPManager(BaseHTTPManager):
         """Call a Rust-backed Lighter method and decode its JSON body."""
         native_client = self._native_client
         method = "private_request" if private else "public_request"
-        json_method = f"{method}_json"
-        if native_client is None or not hasattr(native_client, json_method):
-            raise RuntimeError(f"Lighter native client {json_method} is unavailable.")
+        if native_client is None:
+            raise RuntimeError("Lighter native client is closed.")
         try:
             response, data = request_native_json(native_client, method, method_name, params)
         except RuntimeError as exc:
@@ -177,9 +171,9 @@ class HTTPManager(BaseHTTPManager):
     ) -> tuple[Any, Any, Any, Any]:
         """Sign a Lighter transaction via Rust."""
         native_client = self._native_client
-        if native_client is not None and hasattr(native_client, "sign_request"):
-            return cast(tuple[Any, Any, Any, Any], native_client.sign_request(method_name, params))
-        raise RuntimeError("Lighter native client sign_request is unavailable.")
+        if native_client is None:
+            raise RuntimeError("Lighter native client is closed.")
+        return cast(tuple[Any, Any, Any, Any], native_client.sign_request(method_name, params))
 
     def _request(
         self,
@@ -265,15 +259,15 @@ class HTTPManager(BaseHTTPManager):
         if authorization:
             return authorization
         native_client = self._native_client
-        if native_client is not None and hasattr(native_client, "create_auth_token"):
-            return str(native_client.create_auth_token(deadline, api_key_index))
-        raise RuntimeError("Lighter native client create_auth_token is unavailable.")
+        if native_client is None:
+            raise RuntimeError("Lighter native client is closed.")
+        return str(native_client.create_auth_token(deadline, api_key_index))
 
     def _native_check_client(self) -> str | None:
         native_client = self._native_client
-        if native_client is not None and hasattr(native_client, "check_client"):
-            return cast(str | None, native_client.check_client())
-        raise RuntimeError("Lighter native client check_client is unavailable.")
+        if native_client is None:
+            raise RuntimeError("Lighter native client is closed.")
+        return cast(str | None, native_client.check_client())
 
     def close(self) -> None:
         """Release native HTTP resources held by the Rust extension."""

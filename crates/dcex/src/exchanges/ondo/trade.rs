@@ -54,14 +54,8 @@ impl OndoClient {
                 )
                 .await
             }
-            "get_open_orders" => {
-                params.ensure_allowed(&["market"])?;
-                let mut query = params.only(&["market"]);
-                query.push(("status".to_string(), "open".to_string()));
-                self.private_get(ORDERS, query).await
-            }
             "place_order" => self.private_post(ORDERS, self.order_body(params)?).await,
-            "cancel_all_orders" | "cancel_open_orders" => {
+            "cancel_all_orders" => {
                 params.ensure_allowed(&["market"])?;
                 self.private_delete(ORDERS, params.only(&["market"])).await
             }

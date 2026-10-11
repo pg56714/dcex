@@ -1,8 +1,5 @@
 pub const BASE_URL: &str = "https://api.ondoperps.xyz";
-pub const SANDBOX_BASE_URL: &str = "https://api.ondoperps-sandbox.xyz";
 pub const WS_URL: &str = "wss://api.ondoperps.xyz/ws";
-pub const SANDBOX_WS_URL: &str = "wss://api.ondoperps-sandbox.xyz/ws";
-
 pub(super) const STATUS: &str = "/status";
 pub(super) const HELLO: &str = "/hello";
 pub(super) const ACCOUNT: &str = "/v1/account";

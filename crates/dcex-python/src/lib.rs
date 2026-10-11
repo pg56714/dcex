@@ -7,7 +7,7 @@ use dcex::exchange::ValidatedResponse;
 use dcex::exchanges::arcus::{ArcusClient, ArcusSpotClient};
 use dcex::exchanges::aster::{AsterClient, AsterMarket};
 use dcex::exchanges::backpack::{BackpackClient, SignaturePayload};
-use dcex::exchanges::binance::{BinanceClient, BinanceMarket};
+use dcex::exchanges::binance::BinanceClient;
 use dcex::exchanges::bingx::BingxClient;
 use dcex::exchanges::bitget::BitgetClient;
 use dcex::exchanges::bybit::BybitClient;
@@ -21,9 +21,7 @@ use dcex::exchanges::lighter::{
 use dcex::exchanges::mexc::{MexcApi, MexcClient};
 use dcex::exchanges::okx::OkxClient;
 use dcex::exchanges::ondo::OndoClient;
-use dcex::http::{
-    AsyncHttpClient, BlockingHttpClient, HttpMethod, HttpRequest, HttpResponse, block_on,
-};
+use dcex::http::{HttpMethod, HttpResponse, block_on};
 use dcex::lighter;
 use dcex::product_table::{MarketInfo, ProductFilter, ProductTable};
 use pyo3::IntoPyObjectExt;
@@ -105,30 +103,7 @@ fn http_method(method: &str) -> PyResult<HttpMethod> {
     }
 }
 
-fn http_request(
-    method: &str,
-    base_url: String,
-    path: String,
-    query: Option<Vec<(String, String)>>,
-    headers: Option<BTreeMap<String, String>>,
-    body: Option<Vec<u8>>,
-) -> PyResult<HttpRequest> {
-    let mut request = HttpRequest::new(http_method(method)?, base_url, path);
-    request.query = query.unwrap_or_default();
-    request.headers = headers.unwrap_or_default();
-    if let Some(body) = body {
-        request = request.raw(body);
-    }
-    Ok(request)
-}
-
-type PythonHttpResponse = (u16, BTreeMap<String, String>, Py<PyBytes>);
 type PythonJsonResponse = (u16, BTreeMap<String, String>, Py<PyAny>);
-
-fn python_http_response(response: HttpResponse) -> PythonHttpResponse {
-    let body = Python::with_gil(|py| PyBytes::new(py, &response.body).unbind());
-    (response.status, response.headers, body)
-}
 
 fn python_json_http_response(response: HttpResponse) -> PyResult<PythonJsonResponse> {
     let HttpResponse {
@@ -144,13 +119,6 @@ fn python_json_http_response(response: HttpResponse) -> PyResult<PythonJsonRespo
         Python::with_gil(|py| json_value_to_py(py, &data))?
     };
     Ok((status, headers, body))
-}
-
-fn python_validated_response(response: ValidatedResponse) -> PyResult<PythonHttpResponse> {
-    let body = serde_json::to_vec(&response.data)
-        .map_err(|error| PyRuntimeError::new_err(error.to_string()))?;
-    let body = Python::with_gil(|py| PyBytes::new(py, &body).unbind());
-    Ok((response.status, response.headers, body))
 }
 
 fn python_validated_json_response(response: ValidatedResponse) -> PyResult<PythonJsonResponse> {
@@ -257,19 +225,6 @@ where
     })
 }
 
-fn binance_market(market: &str) -> PyResult<BinanceMarket> {
-    match market.to_ascii_lowercase().as_str() {
-        "equity" | "stock" => Ok(BinanceMarket::Equity),
-        "futures" | "future" | "swap" => Ok(BinanceMarket::Futures),
-        "option" | "options" => Ok(BinanceMarket::Options),
-        "portfolio_margin" | "pm" => Ok(BinanceMarket::PortfolioMargin),
-        "spot" | "wallet" => Ok(BinanceMarket::Spot),
-        _ => Err(PyValueError::new_err(format!(
-            "unsupported Binance market: {market}"
-        ))),
-    }
-}
-
 fn parse_json_body(body: Option<Vec<u8>>) -> PyResult<Option<serde_json::Value>> {
     body.map(|body| {
         serde_json::from_slice(&body).map_err(|error| PyValueError::new_err(error.to_string()))
@@ -367,8 +322,6 @@ mod bybit_ws;
 mod extended_client;
 #[path = "ws/extended.rs"]
 mod extended_ws;
-#[path = "clients/http.rs"]
-mod http_client;
 #[path = "clients/hyperliquid.rs"]
 mod hyperliquid_client;
 #[path = "ws/hyperliquid.rs"]
@@ -417,7 +370,6 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     extended_ws::register(m)?;
     hyperliquid_client::register(m)?;
     hyperliquid_ws::register(m)?;
-    http_client::register(m)?;
     kraken_client::register(m)?;
     kraken_ws::register(m)?;
     kucoin_client::register(m)?;

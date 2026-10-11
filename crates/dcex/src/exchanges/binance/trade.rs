@@ -697,7 +697,7 @@ impl BinanceClient {
         // An explicit market_type narrows symbol resolution; otherwise the symbol decides.
         let market = match (request.product_symbol, request.market_type) {
             (Some(product_symbol), Some(market_type)) => {
-                let market = market_from_type(market_type);
+                let market = market_from_type(market_type)?;
                 if self.product_table.is_none()
                     && is_canonical_product_symbol(product_symbol)
                     && market_for_product_symbol_fallback(product_symbol) != market
@@ -709,7 +709,7 @@ impl BinanceClient {
                 market
             }
             (Some(product_symbol), None) => self.generic_market(product_symbol)?,
-            (None, market_type) => market_from_type(market_type.unwrap_or("spot")),
+            (None, market_type) => market_from_type(market_type.unwrap_or("spot"))?,
         };
         let params = if let Some(product_symbol) = request.product_symbol {
             vec![(
@@ -1081,6 +1081,13 @@ impl BinanceClient {
         let path = if market == BinanceMarket::Spot {
             SPOT_ORDER
         } else {
+            // USD-M DELETE/GET /fapi/v1/order take symbol plus orderId or origClientOrderId.
+            if request.new_client_order_id.is_some() || request.cancel_restrictions.is_some() {
+                return Err(DcexError::InvalidInput(
+                    "Binance USD-M order lookup supports orderId or origClientOrderId only."
+                        .to_string(),
+                ));
+            }
             FUTURES_ORDER
         };
         let mut params = vec![("symbol".to_string(), self.exchange_symbol(product_symbol)?)];

@@ -68,7 +68,8 @@ fn immediate_rfq_requires_price() {
     let client = BackpackClient::public(5_000, Duration::from_secs(10)).expect("client");
     let error = crate::http::block_on(async move {
         client
-            .submit_rfq_with_execution_mode("BTC-USDC-SPOT", "Bid", "Immediate")
+            .submit_rfq("BTC-USDC-SPOT", "Bid")
+            .execution_mode("Immediate")
             .quantity("0.5")
             .await
     })
@@ -82,7 +83,13 @@ fn rfq_actions_accept_client_id_identifiers() {
     let accept_client = BackpackClient::public(5_000, Duration::from_secs(10)).expect("client");
     let accept_error = crate::http::block_on(async move {
         accept_client
-            .accept_rfq_quote_by_client_id(42, "quote-id")
+            .private_request(
+                "accept_rfq_quote",
+                vec![
+                    ("clientId".to_string(), "42".to_string()),
+                    ("quoteId".to_string(), "quote-id".to_string()),
+                ],
+            )
             .await
     })
     .expect_err("valid clientId accept should reach credential validation");
@@ -93,9 +100,15 @@ fn rfq_actions_accept_client_id_identifiers() {
     );
 
     let cancel_client = BackpackClient::public(5_000, Duration::from_secs(10)).expect("client");
-    let cancel_error =
-        crate::http::block_on(async move { cancel_client.cancel_rfq_by_client_id(42).await })
-            .expect_err("valid clientId cancel should reach credential validation");
+    let cancel_error = crate::http::block_on(async move {
+        cancel_client
+            .private_request(
+                "cancel_rfq",
+                vec![("clientId".to_string(), "42".to_string())],
+            )
+            .await
+    })
+    .expect_err("valid clientId cancel should reach credential validation");
     assert!(
         cancel_error
             .to_string()

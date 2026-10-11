@@ -2146,8 +2146,7 @@
       "python_sync": true,
       "python_async": true,
       "methods": [
-        "close_futures_listen_key",
-        "close_listen_key"
+        "close_futures_listen_key"
       ],
       "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
       "evidence": [
@@ -2171,8 +2170,7 @@
       "python_sync": true,
       "python_async": true,
       "methods": [
-        "create_futures_listen_key",
-        "get_listen_key"
+        "create_futures_listen_key"
       ],
       "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
       "evidence": [
@@ -2196,8 +2194,7 @@
       "python_sync": true,
       "python_async": true,
       "methods": [
-        "keep_alive_futures_listen_key",
-        "keep_alive_listen_key"
+        "keep_alive_futures_listen_key"
       ],
       "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
       "evidence": [
@@ -44211,7 +44208,6 @@
       "python_sync": true,
       "python_async": true,
       "methods": [
-        "get_account_balance",
         "get_swap_account_balance"
       ],
       "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
@@ -73173,7 +73169,6 @@
       "python_sync": true,
       "python_async": true,
       "methods": [
-        "get_open_orders",
         "get_orders"
       ],
       "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
@@ -73198,8 +73193,7 @@
       "python_sync": true,
       "python_async": true,
       "methods": [
-        "cancel_all_orders",
-        "cancel_open_orders"
+        "cancel_all_orders"
       ],
       "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
       "evidence": [
@@ -73607,8 +73601,7 @@
       "python_sync": true,
       "python_async": true,
       "methods": [
-        "get_candles",
-        "get_klines"
+        "get_candles"
       ],
       "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
       "evidence": [

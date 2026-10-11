@@ -28,14 +28,8 @@ class TradeHTTP(TradeHTTPBatchHTTP, HTTPManager):
             endTime=endTime,
         )
 
-    def get_open_orders(self, market: str | None = None) -> Any:
-        return self._native_private("get_open_orders", market=market)
-
     def get_fills_by_order(self, orderID: str) -> Any:
         return self._native_private("get_fills_by_order", orderID=orderID)
-
-    def cancel_open_orders(self, market: str | None = None) -> Any:
-        return self._native_private("cancel_open_orders", market=market)
 
     def place_twap_order(
         self,

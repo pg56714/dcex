@@ -714,13 +714,13 @@ fn account_wallet_and_stream_routes_match_official_paths() {
         ),
         private(
             "keep_alive_futures_listen_key",
-            &[("listenKey", "k")],
+            &[],
             "PUT",
             "/fapi/v1/listenKey",
         ),
         private(
             "close_futures_listen_key",
-            &[("listenKey", "k")],
+            &[],
             "DELETE",
             "/fapi/v1/listenKey",
         ),

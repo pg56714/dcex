@@ -9,13 +9,6 @@ from ._transfers_http import AccountHTTPTransfersHTTP
 class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
     """HTTP client for BingX account-related API endpoints backed by Rust."""
 
-    def get_account_balance(self, recv_window: int | None = None) -> dict[str, Any]:
-        """Get account balance."""
-        return self._native_private(
-            "get_account_balance",
-            self._native_params(recvWindow=recv_window),
-        )
-
     def get_swap_account_balance(self, recv_window: int | None = None) -> dict[str, Any]:
         """Get swap account balance."""
         return self._native_private(

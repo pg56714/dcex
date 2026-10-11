@@ -189,71 +189,47 @@ impl MexcClient {
                     .await
             }
             "test_spot_order" => {
-                self.spot_order_from_params(SPOT_TEST_ORDER, params, None, None, None)
+                self.spot_order_from_params(SPOT_TEST_ORDER, params, None, None)
                     .await
             }
             "place_spot_order" => {
-                self.spot_order_from_params(SPOT_ORDER, params, None, None, None)
+                self.spot_order_from_params(SPOT_ORDER, params, None, None)
                     .await
             }
             "place_spot_limit_order" => {
-                self.spot_order_from_params(SPOT_ORDER, params, None, Some("LIMIT"), Some("GTC"))
+                self.spot_order_from_params(SPOT_ORDER, params, None, Some("LIMIT"))
                     .await
             }
             "place_spot_limit_buy_order" => {
-                self.spot_order_from_params(
-                    SPOT_ORDER,
-                    params,
-                    Some("BUY"),
-                    Some("LIMIT"),
-                    Some("GTC"),
-                )
-                .await
+                self.spot_order_from_params(SPOT_ORDER, params, Some("BUY"), Some("LIMIT"))
+                    .await
             }
             "place_spot_limit_sell_order" => {
-                self.spot_order_from_params(
-                    SPOT_ORDER,
-                    params,
-                    Some("SELL"),
-                    Some("LIMIT"),
-                    Some("GTC"),
-                )
-                .await
+                self.spot_order_from_params(SPOT_ORDER, params, Some("SELL"), Some("LIMIT"))
+                    .await
             }
             "place_spot_post_only_limit_order" => {
-                self.spot_order_from_params(SPOT_ORDER, params, None, Some("LIMIT_MAKER"), None)
+                self.spot_order_from_params(SPOT_ORDER, params, None, Some("LIMIT_MAKER"))
                     .await
             }
             "place_spot_post_only_limit_buy_order" => {
-                self.spot_order_from_params(
-                    SPOT_ORDER,
-                    params,
-                    Some("BUY"),
-                    Some("LIMIT_MAKER"),
-                    None,
-                )
-                .await
+                self.spot_order_from_params(SPOT_ORDER, params, Some("BUY"), Some("LIMIT_MAKER"))
+                    .await
             }
             "place_spot_post_only_limit_sell_order" => {
-                self.spot_order_from_params(
-                    SPOT_ORDER,
-                    params,
-                    Some("SELL"),
-                    Some("LIMIT_MAKER"),
-                    None,
-                )
-                .await
+                self.spot_order_from_params(SPOT_ORDER, params, Some("SELL"), Some("LIMIT_MAKER"))
+                    .await
             }
             "place_spot_market_order" => {
-                self.spot_order_from_params(SPOT_ORDER, params, None, Some("MARKET"), None)
+                self.spot_order_from_params(SPOT_ORDER, params, None, Some("MARKET"))
                     .await
             }
             "place_spot_market_buy_order" => {
-                self.spot_order_from_params(SPOT_ORDER, params, Some("BUY"), Some("MARKET"), None)
+                self.spot_order_from_params(SPOT_ORDER, params, Some("BUY"), Some("MARKET"))
                     .await
             }
             "place_spot_market_sell_order" => {
-                self.spot_order_from_params(SPOT_ORDER, params, Some("SELL"), Some("MARKET"), None)
+                self.spot_order_from_params(SPOT_ORDER, params, Some("SELL"), Some("MARKET"))
                     .await
             }
             "place_spot_batch_orders" => {
@@ -1006,7 +982,6 @@ impl MexcClient {
         params: &MexcParams,
         side_override: Option<&str>,
         type_override: Option<&str>,
-        _default_time_in_force: Option<&str>,
     ) -> Result<ValidatedResponse> {
         params.ensure_allowed(&[
             "product_symbol",

@@ -303,7 +303,7 @@ fn cases() -> Vec<Case> {
         ),
         (
             "extended",
-            "get_orderbook",
+            "get_order_book",
             "product_symbol",
             None,
             "BTC-USD",

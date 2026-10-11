@@ -6,10 +6,13 @@ use crate::http::{HttpMethod, HttpRequest};
 use serde_json::Value;
 
 use crate::exchanges::arcus::params::invalid;
+/// A 20-byte EVM address: 40 hex digits with an optional 0x/0X prefix.
 fn address(value: &str) -> bool {
-    value
+    let digits = value
         .strip_prefix("0x")
-        .is_some_and(|s| s.len() == 40 && s.bytes().all(|b| b.is_ascii_hexdigit()))
+        .or_else(|| value.strip_prefix("0X"))
+        .unwrap_or(value);
+    digits.len() == 40 && digits.bytes().all(|b| b.is_ascii_hexdigit())
 }
 impl ArcusClient {
     pub(super) async fn api_keys_request(

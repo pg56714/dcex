@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 from typing import Any, Literal, Self, cast
 from urllib.parse import urlencode
 
-from dcex._schema_codec import normalize_params
+from dcex._input_codec import normalize_params
 
 from ..._native_http import NativeResponse, load_native, native_body_text, request_native_json_async
 from ...base.http_manager import BaseHTTPManager
@@ -84,9 +84,7 @@ class HTTPManager(BaseHTTPManager):
     async def async_init(self) -> Self:
         """Initialize async HTTP manager."""
         self._logger = self._setup_logger(self.logger)
-        native_client_type = getattr(_native, "BackpackHttpClient", None)
-        if native_client_type is None:
-            raise RuntimeError("The dcex native extension is required.")
+        native_client_type = _native.BackpackHttpClient
         if self._native_client is None:
             self._native_client = native_client_type(
                 api_key=self.api_key,
@@ -97,10 +95,7 @@ class HTTPManager(BaseHTTPManager):
             )
         if self.preload_product_table:
             self.ptm = await ProductTableManager.get_instance(Common.BACKPACK)
-            if self._native_client is not None and hasattr(
-                self._native_client,
-                "set_product_table",
-            ):
+            if self._native_client is not None:
                 self._native_client.set_product_table(self.ptm._native_table)
         return self
 
@@ -121,8 +116,6 @@ class HTTPManager(BaseHTTPManager):
             await self.async_init()
         if self._native_client is None:
             raise RuntimeError("Backpack native client is required for public methods.")
-        if not hasattr(self._native_client, "public_request_json_async"):
-            raise RuntimeError("Backpack native client public_request_json_async is unavailable.")
         try:
             response, data = await request_native_json_async(
                 self._native_client,
@@ -150,8 +143,6 @@ class HTTPManager(BaseHTTPManager):
             await self.async_init()
         if self._native_client is None:
             raise RuntimeError("Backpack native client is required for private methods.")
-        if not hasattr(self._native_client, "private_request_json_async"):
-            raise RuntimeError("Backpack native client private_request_json_async is unavailable.")
         try:
             response, data = await request_native_json_async(
                 self._native_client,

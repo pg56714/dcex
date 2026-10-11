@@ -255,12 +255,6 @@ const PRIVATE_ROUTES: &[Case] = &[
     ),
     // Account / wallet / sub-accounts.
     (
-        "get_account_balance",
-        &[],
-        "GET",
-        "/openApi/swap/v3/user/balance",
-    ),
-    (
         "get_swap_account_balance",
         &[("recvWindow", "5000")],
         "GET",

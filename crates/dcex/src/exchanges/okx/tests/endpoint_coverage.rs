@@ -2621,12 +2621,6 @@ const CASES: &[Case] = &[
         "/api/v5/users/entrust-subaccount-list",
         &[],
     ),
-    get(
-        "get_subaccount_interest_limits",
-        &[("subAcct", "alpha")],
-        "/api/v5/account/subaccount/interest-limits",
-        &["subAcct=alpha"],
-    ),
     // Financial products: simple earn, staking, loans, dual investment, OKUSD.
     get(
         "get_saving_balance",
@@ -2639,12 +2633,6 @@ const CASES: &[Case] = &[
         &[("ccy", "USDT"), ("amt", "1"), ("side", "purchase")],
         "/api/v5/finance/savings/purchase-redempt",
         &[r#""side":"purchase""#],
-    ),
-    post(
-        "set_savings_lending_rate",
-        &[("ccy", "USDT"), ("rate", "0.01")],
-        "/api/v5/finance/savings/set-lending-rate",
-        &[r#""rate":"0.01""#],
     ),
     get(
         "get_savings_lending_history",

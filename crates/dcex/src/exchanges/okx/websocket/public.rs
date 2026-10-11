@@ -55,14 +55,6 @@ impl OkxWebSocketArg {
         Self::with_filters(channel, Some(inst_type.into()), None, None)
     }
 
-    /// Builds an arg for channels keyed by `instFamily`, e.g. `opt-summary`.
-    pub fn with_inst_family(
-        channel: impl Into<String>,
-        inst_family: impl Into<String>,
-    ) -> Result<Self> {
-        Self::with_filters(channel, None, Some(inst_family.into()), None)
-    }
-
     /// Builds an arg with any combination of the documented public filters
     /// (`instType`, `instFamily`, `instId`).
     pub fn with_filters(
@@ -566,11 +558,6 @@ mod tests {
             instruments.to_json(),
             json!({"channel": "instruments", "instType": "SPOT"})
         );
-        let summary = OkxWebSocketArg::with_inst_family("opt-summary", "btc-usd").expect("arg");
-        assert_eq!(
-            summary.to_json(),
-            json!({"channel": "opt-summary", "instFamily": "BTC-USD"})
-        );
         let option_trades = OkxWebSocketArg::with_filters(
             "option-trades",
             Some("OPTION".to_string()),
@@ -592,7 +579,6 @@ mod tests {
             assert!(arg.to_json().get("instId").is_none());
         }
         assert!(OkxWebSocketArg::with_inst_type("instruments", " ").is_err());
-        assert!(OkxWebSocketArg::with_inst_family("opt-summary", "BTC/USD").is_err());
     }
 
     #[test]

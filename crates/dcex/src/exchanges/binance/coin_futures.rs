@@ -193,27 +193,6 @@ impl BinanceClient {
         )
     }
 
-    pub fn place_coin_futures_limit_order(
-        &self,
-        symbol: &str,
-        side: &str,
-        quantity: &str,
-        price: &str,
-    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
-        crate::exchanges::ExchangeMethodRequest::private(
-            self,
-            "place_coin_futures_order",
-            vec![
-                ("symbol".into(), symbol.into()),
-                ("side".into(), side.into()),
-                ("type".into(), "LIMIT".into()),
-                ("quantity".into(), quantity.into()),
-                ("price".into(), price.into()),
-                ("timeInForce".into(), "GTC".into()),
-            ],
-        )
-    }
-
     pub(super) async fn coin_futures_public_request(
         &self,
         name: &str,

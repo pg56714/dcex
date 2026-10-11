@@ -30,9 +30,7 @@ class LighterCredentials:
 
     def __post_init__(self) -> None:
         """Validate credentials with the Rust core."""
-        native_type = getattr(_native, "LighterCredentials", None)
-        if native_type is None:
-            raise RuntimeError("The dcex native extension is required.")
+        native_type = _native.LighterCredentials
         native_type(
             account_index=self.account_index,
             api_key_index=self.api_key_index,
@@ -43,9 +41,7 @@ class LighterCredentials:
     def from_env(cls, network: Network | str = Network.MAINNET) -> "LighterCredentials":
         """Load credentials using the selected network's environment prefix."""
         resolved_network = normalize_network(network)
-        native_type = getattr(_native, "LighterCredentials", None)
-        if native_type is None:
-            raise RuntimeError("The dcex native extension is required.")
+        native_type = _native.LighterCredentials
         credentials: Any = native_type.from_env(resolved_network.value)
         return cls(
             account_index=int(credentials.account_index),

@@ -48,7 +48,7 @@ async fn hyperliquid_account_read_live_parity() -> dcex::Result<()> {
         return Ok(());
     };
     let client =
-        HyperliquidClient::for_wallet_address(false, keys[0].clone(), Duration::from_secs(20))?;
+        HyperliquidClient::new(false, Some(keys[0].clone()), None, Duration::from_secs(20))?;
     run_private_cases(
         &["HYPERLIQUID_WALLET_ADDRESS"],
         vec![

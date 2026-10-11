@@ -19,17 +19,6 @@ pub struct KrakenPrivateWebSocket {
 }
 
 impl KrakenPrivateWebSocket {
-    /// Create a token-authenticated connection to the dedicated L3 feed.
-    pub fn new_level3(api_key: String, api_secret: String, timeout: Duration) -> Result<Self> {
-        Self::with_urls(
-            api_key,
-            api_secret,
-            timeout,
-            SPOT_HTTP_BASE_URL,
-            "wss://ws-l3.kraken.com/v2",
-        )
-    }
-
     /// Subscribe on an L3 connection. Read per-symbol acknowledgements with recv.
     pub async fn subscribe_level3(
         &mut self,

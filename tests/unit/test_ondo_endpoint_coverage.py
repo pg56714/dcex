@@ -226,7 +226,7 @@ CASES = [
         startTime=1,
         endTime=2,
     ),
-    case("get_open_orders", "/v1/perps/orders?market=AAPL-USD.P&status=open", market=MARKET),
+    case("get_orders", "/v1/perps/orders?market=AAPL-USD.P&status=open", market=MARKET, status="open"),
     case(
         "place_order",
         "/v1/perps/orders",
@@ -246,7 +246,6 @@ CASES = [
     case("batch_cancel_orders", "/v1/perps/orders/batch?orderIDs=o1,o2", orderIDs=["o1", "o2"]),
     case("cancel_order", "/v1/perps/orders/o1", orderID="o1"),
     case("cancel_all_orders", "/v1/perps/orders?market=AAPL-USD.P", market=MARKET),
-    case("cancel_open_orders", "/v1/perps/orders"),
     case("get_order", "/v1/perps/orders/o1", orderID="o1"),
     case("get_fills_by_order", "/v1/perps/orders/o1/fills", orderID="o1"),
     case(
@@ -308,14 +307,6 @@ CASES = [
     case("get_order_summaries", "/v1/perps/orders_summaries"),
     case("get_portfolio_summary", "/v1/portfolio/summary"),
     case("get_portfolio_summary_graph", "/v1/portfolio/summary/graph?range=30d", range_="30d"),
-    case(
-        "get_klines",
-        "/v1/perps/candles?market=AAPL-USD.P&resolution=1H&from=1&to=2",
-        market=MARKET,
-        resolution="1H",
-        from_time=1,
-        to_time=2,
-    ),
     case(
         "get_candles",
         "/v1/perps/candles?market=BTC-USD.P&resolution=1D&from=1&to=2",

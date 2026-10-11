@@ -117,7 +117,7 @@ class DexMock:
                 if ex == "extended"
                 else {"availableMargin": "20"}
             )
-        if method in {"get_positions", "get_open_orders", "open_orders"}:
+        if method in {"get_positions", "get_open_orders", "get_orders", "open_orders"}:
             return []
         if method == "get_account_active_orders":
             return {"orders": []}

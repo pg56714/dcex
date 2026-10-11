@@ -2205,7 +2205,6 @@ CASES: tuple[Case, ...] = (
         body={"from": "6", "to": "18", "fromSubAccount": "alpha", "toSubAccount": "beta"},
     ),
     get("get_entrusted_subaccount_list", "/api/v5/users/entrust-subaccount-list"),
-    get("get_subaccount_interest_limits", "/api/v5/account/subaccount/interest-limits", "alpha"),
     # Financial products.
     get("get_saving_balance", "/api/v5/finance/savings/balance"),
     post(
@@ -2215,7 +2214,6 @@ CASES: tuple[Case, ...] = (
         "1",
         "purchase",
     ),
-    post("set_savings_lending_rate", "/api/v5/finance/savings/set-lending-rate", "USDT", "0.01"),
     get("get_savings_lending_history", "/api/v5/finance/savings/lending-history"),
     pub("get_public_borrow_info", "/api/v5/finance/savings/lending-rate-summary"),
     pub("get_public_borrow_history", "/api/v5/finance/savings/lending-rate-history"),
@@ -2583,29 +2581,6 @@ def test_sync_cancel_all_orders_batches_only_matching_pending_orders() -> None:
         {"instId": SWAP, "ordId": "3"},
     ]
     assert result["data"] == [{"sCode": "0"}]
-
-
-@pytest.mark.parametrize(
-    ("module_path", "method_name"),
-    [
-        ("dcex.okx._finance_http:FinanceHTTP", "set_savings_lending_rate"),
-        ("dcex.okx._subaccount_http:SubaccountHTTP", "get_subaccount_interest_limits"),
-        ("dcex.async_support.okx._finance_http:FinanceHTTP", "set_savings_lending_rate"),
-        (
-            "dcex.async_support.okx._subaccount_http:SubaccountHTTP",
-            "get_subaccount_interest_limits",
-        ),
-    ],
-)
-def test_undocumented_okx_wrappers_are_marked_deprecated(
-    module_path: str, method_name: str
-) -> None:
-    import importlib
-
-    module_name, class_name = module_path.split(":")
-    method = getattr(getattr(importlib.import_module(module_name), class_name), method_name)
-    assert method.__doc__ is not None
-    assert "Deprecated" in method.__doc__
 
 
 @pytest.mark.asyncio

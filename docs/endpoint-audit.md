@@ -31,11 +31,11 @@ Method counts include aliases and signing helpers, not endpoints.
 
 | Exchange | Public methods | Implemented rows | Pending rows |
 | --- | ---: | ---: | ---: |
-| [binance](official-endpoint-inventory/binance.json) | 753 | 748 | 0 |
+| [binance](official-endpoint-inventory/binance.json) | 750 | 748 | 0 |
 | [bybit](official-endpoint-inventory/bybit.json) | 453 | 439 | 0 |
-| [okx](official-endpoint-inventory/okx.json) | 405 | 389 | 0 |
+| [okx](official-endpoint-inventory/okx.json) | 403 | 389 | 0 |
 | [bitget](official-endpoint-inventory/bitget.json) | 328 | 328 | 0 |
-| [bingx](official-endpoint-inventory/bingx.json) | 200 | 182 | 0 |
+| [bingx](official-endpoint-inventory/bingx.json) | 199 | 182 | 0 |
 | [kraken](official-endpoint-inventory/kraken.json) | 170 | 154 | 0 |
 | [mexc](official-endpoint-inventory/mexc.json) | 177 | 157 | 0 |
 | [kucoin](official-endpoint-inventory/kucoin.json) | 365 | 340 | 0 |
@@ -44,7 +44,7 @@ Method counts include aliases and signing helpers, not endpoints.
 | [backpack](official-endpoint-inventory/backpack.json) | 80 | 77 | 0 |
 | [aster](official-endpoint-inventory/aster.json) | 157 | 153 | 0 |
 | [extended](official-endpoint-inventory/extended.json) | 71 | 72 | 0 |
-| [ondo](official-endpoint-inventory/ondo.json) | 95 | 90 | 0 |
+| [ondo](official-endpoint-inventory/ondo.json) | 92 | 90 | 0 |
 | [arcus](official-endpoint-inventory/arcus.json) | 78 | 65 | 0 |
 
 ## Verification and limits

@@ -11,14 +11,13 @@ use crate::{DcexError, Result};
 
 impl BinanceClient {
     pub async fn get_server_time(&self, market_type: &str) -> Result<ValidatedResponse> {
-        let (market, path) = match market_type.to_ascii_lowercase().as_str() {
-            "equity" | "stock" => (BinanceMarket::Equity, SPOT_SERVER_TIME),
-            "option" | "options" => (BinanceMarket::Options, OPTIONS_SERVER_TIME),
-            "spot" => (BinanceMarket::Spot, SPOT_SERVER_TIME),
-            "coin_futures" | "coin-m" | "coinm" | "delivery" => {
-                (BinanceMarket::CoinFutures, COIN_FUTURES_SERVER_TIME)
-            }
-            _ => (BinanceMarket::Futures, FUTURES_SERVER_TIME),
+        let market = super::params::market_from_type(market_type)?;
+        let path = match market {
+            BinanceMarket::Options => OPTIONS_SERVER_TIME,
+            BinanceMarket::CoinFutures => COIN_FUTURES_SERVER_TIME,
+            BinanceMarket::Futures => FUTURES_SERVER_TIME,
+            // Spot, Equity and the spot-hosted APIs share the spot server clock.
+            _ => SPOT_SERVER_TIME,
         };
         self.request(HttpMethod::Get, market, path, Vec::new(), false)
             .await
@@ -238,9 +237,13 @@ impl BinanceClient {
                     .to_string(),
             ));
         }
-        if market == BinanceMarket::Spot {
-            push_optional(&mut params, "timeZone", request.time_zone.as_deref());
+        // timeZone is documented for Spot klines only.
+        if market != BinanceMarket::Spot && request.time_zone.is_some() {
+            return Err(DcexError::InvalidInput(
+                "Binance timeZone applies to Spot klines only".to_string(),
+            ));
         }
+        push_optional(&mut params, "timeZone", request.time_zone.as_deref());
         let path = if market == BinanceMarket::Spot {
             SPOT_KLINES
         } else {

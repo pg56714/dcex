@@ -148,7 +148,6 @@ crate::exchanges::impl_exchange_method_wrappers! {
         close_swap_all_positions(),
         close_swap_position(position_id => "positionId"),
         close_listen_key(listen_key => "listenKey"),
-        get_account_balance(),
         get_account_uid(),
         get_all_account_balance(),
         get_api_key_info(uid => "uid"),

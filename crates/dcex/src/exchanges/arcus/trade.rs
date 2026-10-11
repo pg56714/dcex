@@ -23,6 +23,13 @@ pub(in crate::exchanges::arcus) const PLACE_ORDER_KEYS: &[&str] = &[
     "reduce_only",
     "client_order_id",
 ];
+/// Fields of a signed cancelOrder: exactly one of order_id or client_order_id.
+pub(in crate::exchanges::arcus) const CANCEL_ORDER_KEYS: &[&str] = &[
+    "product_symbol",
+    "order_id",
+    "client_order_id",
+    "valid_until",
+];
 /// Fields the signed modifyOrder payload is built from.
 pub(in crate::exchanges::arcus) const MODIFY_ORDER_KEYS: &[&str] = &[
     "product_symbol",
@@ -80,12 +87,7 @@ impl ArcusClient {
         let allowed: &[&str] = match method_name {
             "place_order" => PLACE_ORDER_KEYS,
             "modify_order" => MODIFY_ORDER_KEYS,
-            "cancel_order" => &[
-                "product_symbol",
-                "order_id",
-                "client_order_id",
-                "valid_until",
-            ],
+            "cancel_order" => CANCEL_ORDER_KEYS,
             _ => &[],
         };
         if !allowed.is_empty()

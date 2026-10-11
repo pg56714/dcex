@@ -1382,14 +1382,6 @@ impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
         self.param("walletType", value)
     }
 
-    pub fn optional_param<T: ToString>(self, key: impl Into<String>, value: Option<T>) -> Self {
-        if let Some(value) = value {
-            self.param(key, value)
-        } else {
-            self
-        }
-    }
-
     pub async fn send(self) -> Result<ValidatedResponse> {
         if let Some(error) = self.invalid_input {
             return Err(error);

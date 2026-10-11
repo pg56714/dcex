@@ -28,14 +28,6 @@ impl OkxClient {
                 self.post_request(SAVINGS_PURCHASE_REDEMPT, Value::Object(body))
                     .await
             }
-            "set_savings_lending_rate" => {
-                params.ensure_allowed(&["ccy", "rate"])?;
-                self.post_request(
-                    SAVINGS_SET_LENDING_RATE,
-                    Value::Object(params.required_body(&["ccy", "rate"])?),
-                )
-                .await
-            }
             "get_savings_lending_history" => {
                 params.ensure_allowed(&["ccy", "after", "before", "limit"])?;
                 self.get_request(

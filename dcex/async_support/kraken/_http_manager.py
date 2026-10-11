@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 from typing import Any, Literal, Self, cast
 from urllib.parse import urlencode
 
-from dcex._schema_codec import normalize_params
+from dcex._input_codec import normalize_params
 
 from ..._native_http import NativeResponse, load_native, native_body_text, request_native_json_async
 from ...base.http_manager import BaseHTTPManager
@@ -88,9 +88,7 @@ class HTTPManager(BaseHTTPManager):
     async def async_init(self) -> Self:
         """Initialize async HTTP manager."""
         self._logger = self._setup_logger(self.logger)
-        native_client_type = getattr(_native, "KrakenHttpClient", None)
-        if native_client_type is None:
-            raise RuntimeError("The dcex native extension is required.")
+        native_client_type = _native.KrakenHttpClient
         if self._native_client is None:
             self._native_client = native_client_type(
                 spot_api_key=self._spot_api_key,

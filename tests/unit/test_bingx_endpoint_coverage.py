@@ -120,7 +120,6 @@ ROUTES: dict[str, tuple[str, str]] = {
     "get_spot_book_ticker": ("GET", "/openApi/spot/v2/quote/bookTicker"),
     "get_spot_price_ticker": ("GET", "/openApi/spot/v2/quote/price"),
     # Account / wallet / sub-accounts.
-    "get_account_balance": ("GET", "/openApi/swap/v3/user/balance"),
     "get_swap_account_balance": ("GET", "/openApi/swap/v3/user/balance"),
     "get_swap_commission_rate": ("GET", "/openApi/swap/v2/user/commissionRate"),
     "get_spot_account_balance": ("GET", "/openApi/spot/v1/account/balance"),

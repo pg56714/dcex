@@ -37,7 +37,7 @@ impl BingxClient {
         params: &BingxParams,
     ) -> Result<Option<ValidatedResponse>> {
         let result = match method_name {
-            "get_account_balance" | "get_swap_account_balance" => {
+            "get_swap_account_balance" => {
                 params.ensure_allowed(&["recvWindow"])?;
                 validate_recv_window(params)?;
                 self.private_get(SWAP_ACCOUNT_BALANCE, params.only(&["recvWindow"]))

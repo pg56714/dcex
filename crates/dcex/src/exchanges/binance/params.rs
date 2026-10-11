@@ -319,18 +319,20 @@ pub(super) fn market_for_product_symbol_fallback(product_symbol: &str) -> Binanc
     }
 }
 
-pub(super) fn market_from_type(market_type: &str) -> BinanceMarket {
-    if market_type.eq_ignore_ascii_case("equity") || market_type.eq_ignore_ascii_case("stock") {
-        BinanceMarket::Equity
-    } else if market_type.eq_ignore_ascii_case("option")
-        || market_type.eq_ignore_ascii_case("options")
-    {
-        BinanceMarket::Options
-    } else if market_type.eq_ignore_ascii_case("spot") {
-        BinanceMarket::Spot
-    } else {
-        BinanceMarket::Futures
-    }
+/// The library's market_type selector; an unknown value is an error, never a default market.
+pub(super) fn market_from_type(market_type: &str) -> Result<BinanceMarket> {
+    Ok(match market_type {
+        "spot" => BinanceMarket::Spot,
+        "swap" => BinanceMarket::Futures,
+        "options" => BinanceMarket::Options,
+        "coin_futures" => BinanceMarket::CoinFutures,
+        "equity" => BinanceMarket::Equity,
+        _ => {
+            return Err(DcexError::InvalidInput(format!(
+                "unsupported Binance market_type: {market_type}; expected spot, swap, options, coin_futures or equity"
+            )));
+        }
+    })
 }
 
 pub(super) fn normalize_order_side(side: &str) -> Result<String> {
@@ -342,16 +344,6 @@ pub(super) fn normalize_order_side(side: &str) -> Result<String> {
         Err(DcexError::InvalidInput(format!(
             "unsupported Binance order side: {side}"
         )))
-    }
-}
-
-pub(super) fn ensure_futures_listen_key_market(market_type: &str) -> Result<()> {
-    if market_type.eq_ignore_ascii_case("spot") {
-        Err(DcexError::InvalidInput(
-            "Binance Spot user data streams are subscribed through the WebSocket API.".to_string(),
-        ))
-    } else {
-        Ok(())
     }
 }
 

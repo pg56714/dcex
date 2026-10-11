@@ -303,21 +303,6 @@ def route_evidence() -> tuple[RouteEvidence, ...]:
             "test_report_zip_preserves_binary_and_checks_api_errors",
         ),
     ]
-    for name, verb in [
-        ("get_listen_key", "POST"),
-        ("keep_alive_listen_key", "PUT"),
-        ("close_listen_key", "DELETE"),
-    ]:
-        extras.append(
-            (
-                "binance",
-                name,
-                verb,
-                "/fapi/v1/listenKey",
-                "test_binance_order_and_asset_requests",
-                "test_binance_listen_key_alias_wire",
-            )
-        )
     for name, path in [
         ("get_tokens", "/v1/tokens"),
         ("get_price", "/v1/price"),

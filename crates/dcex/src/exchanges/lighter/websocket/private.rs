@@ -8,7 +8,7 @@ use crate::ws::{WebSocketConfig, WebSocketConnection};
 use super::super::chains::LighterNetwork;
 use super::super::client::LighterClient;
 use super::super::credentials::LighterCredentials;
-use super::{account_channel, market_channel, subscription_payload};
+use super::{account_channel, subscription_payload};
 
 pub struct LighterPrivateWebSocket {
     connection: WebSocketConnection,
@@ -241,15 +241,6 @@ impl LighterPrivateWebSocket {
 
     pub async fn subscribe_rfq(&mut self) -> Result<()> {
         self.subscribe_authenticated("rfq").await
-    }
-
-    pub async fn subscribe_private_market_channel(
-        &mut self,
-        prefix: &str,
-        market_id: u64,
-    ) -> Result<()> {
-        self.subscribe_authenticated(&market_channel(prefix, market_id)?)
-            .await
     }
 
     pub async fn recv(&mut self) -> Result<Value> {

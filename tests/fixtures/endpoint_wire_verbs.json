@@ -289,7 +289,6 @@
   "ondo": {
     "batch_cancel_orders": "DELETE",
     "cancel_all_orders": "DELETE",
-    "cancel_open_orders": "DELETE",
     "cancel_order": "DELETE",
     "cancel_twap_order": "DELETE",
     "complete_address_book_challenge": "POST",
@@ -315,7 +314,6 @@
     "get_funding_fee_payments": "GET",
     "get_funding_rate_history": "GET",
     "get_funding_rates": "GET",
-    "get_klines": "GET",
     "get_leverage": "GET",
     "get_liquidation_history": "GET",
     "get_login_challenge": "POST",
@@ -324,7 +322,6 @@
     "get_max_order_size": "GET",
     "get_open_interest": "GET",
     "get_open_order_counts": "GET",
-    "get_open_orders": "GET",
     "get_order": "GET",
     "get_order_summaries": "GET",
     "get_orders": "GET",

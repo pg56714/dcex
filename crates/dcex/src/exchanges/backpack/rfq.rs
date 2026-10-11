@@ -29,16 +29,6 @@ impl BackpackClient {
         )
     }
 
-    pub fn submit_rfq_with_execution_mode(
-        &self,
-        product_symbol: &str,
-        side: &str,
-        execution_mode: &str,
-    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
-        self.submit_rfq(product_symbol, side)
-            .execution_mode(execution_mode)
-    }
-
     pub fn accept_rfq_quote(
         &self,
         rfq_id: &str,
@@ -54,37 +44,11 @@ impl BackpackClient {
         )
     }
 
-    pub fn accept_rfq_quote_by_client_id(
-        &self,
-        client_id: u32,
-        quote_id: &str,
-    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
-        crate::exchanges::ExchangeMethodRequest::private(
-            self,
-            "accept_rfq_quote",
-            vec![
-                ("clientId".to_string(), client_id.to_string()),
-                ("quoteId".to_string(), quote_id.to_string()),
-            ],
-        )
-    }
-
     pub fn cancel_rfq(&self, rfq_id: &str) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
         crate::exchanges::ExchangeMethodRequest::private(
             self,
             "cancel_rfq",
             vec![("rfqId".to_string(), rfq_id.to_string())],
-        )
-    }
-
-    pub fn cancel_rfq_by_client_id(
-        &self,
-        client_id: u32,
-    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
-        crate::exchanges::ExchangeMethodRequest::private(
-            self,
-            "cancel_rfq",
-            vec![("clientId".to_string(), client_id.to_string())],
         )
     }
 

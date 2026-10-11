@@ -31,18 +31,6 @@ class FinanceHTTP(HTTPManager):
             self._native_params(ccy=ccy, amt=amt, side=side, rate=rate),
         )
 
-    def set_savings_lending_rate(self, ccy: str, rate: str) -> dict[str, Any]:
-        """
-        Set the Simple Earn lending rate.
-
-        Deprecated: ``POST /api/v5/finance/savings/set-lending-rate`` is no longer
-        listed in the OKX v5 API docs. Kept for backward compatibility and may be
-        rejected by OKX.
-        """
-        return self._native_private(
-            "set_savings_lending_rate", self._native_params(ccy=ccy, rate=rate)
-        )
-
     def get_savings_lending_history(
         self,
         ccy: str | None = None,

@@ -4,7 +4,7 @@
 from json import dumps
 from typing import Any
 
-from dcex._schema_codec import encode_json
+from dcex._input_codec import encode_json
 
 from ._batch_http import TradeHTTPBatchHTTP
 from ._http_manager import HTTPManager
@@ -1266,9 +1266,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         """
         return await self._native_private(
             "simulate_futures_portfolio",
-            self._native_params(
-                json=encode_json(portfolio, signed_fields=("size",), separators=(",", ":"))
-            ),
+            self._native_params(json=encode_json(portfolio, separators=(",", ":"))),
         )
 
     async def check_futures_api_key(self) -> dict[str, Any]:
@@ -1884,11 +1882,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         """
         return await self._native_private(
             "create_user_rfq",
-            self._native_params(
-                json=encode_json(
-                    request, signed_fields=("size",), separators=(",", ":"), allow_nan=False
-                )
-            ),
+            self._native_params(json=encode_json(request, separators=(",", ":"), allow_nan=False)),
         )
 
     async def get_open_rfqs(self) -> Any:  # noqa: ANN401

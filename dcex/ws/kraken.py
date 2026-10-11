@@ -3,8 +3,8 @@
 import json
 from typing import Any
 
+from dcex._input_codec import encode_json
 from dcex._input_validation import normalize_endpoint
-from dcex._schema_codec import encode_json
 
 from .._native_http import load_native
 from ._base import AsyncWebSocketMixin

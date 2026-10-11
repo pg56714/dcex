@@ -3,9 +3,9 @@
 import json
 from typing import Any
 
+from .._input_codec import encode_json
 from .._input_validation import normalize_endpoint
 from .._native_http import load_native
-from .._schema_codec import encode_json
 from ._base import AsyncWebSocketMixin
 
 _native = load_native()

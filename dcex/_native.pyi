@@ -6,7 +6,6 @@ from typing import Any
 
 NativeHeaders = dict[str, str]
 NativeParams = list[tuple[str, str]]
-NativeResponse = tuple[int, NativeHeaders, bytes]
 NativeJsonResponse = tuple[int, NativeHeaders, Any]
 LighterSignedTransaction = tuple[int, str, str, str | None]
 
@@ -70,47 +69,6 @@ class ProductTable:
         product_type: str | None = None,
         exchange_type: str | None = None,
     ) -> list[str]: ...
-
-class HttpClient:
-    """Low-level native HTTP client."""
-
-    def __init__(self, timeout: float = 10.0) -> None: ...
-    def request(
-        self,
-        method: str,
-        base_url: str,
-        path: str,
-        query: NativeParams | None = None,
-        headers: NativeHeaders | None = None,
-        body: bytes | None = None,
-    ) -> NativeResponse: ...
-    def request_json(
-        self,
-        method: str,
-        base_url: str,
-        path: str,
-        query: NativeParams | None = None,
-        headers: NativeHeaders | None = None,
-        body: bytes | None = None,
-    ) -> NativeJsonResponse: ...
-    async def request_async(
-        self,
-        method: str,
-        base_url: str,
-        path: str,
-        query: NativeParams | None = None,
-        headers: NativeHeaders | None = None,
-        body: bytes | None = None,
-    ) -> NativeResponse: ...
-    async def request_json_async(
-        self,
-        method: str,
-        base_url: str,
-        path: str,
-        query: NativeParams | None = None,
-        headers: NativeHeaders | None = None,
-        body: bytes | None = None,
-    ) -> NativeJsonResponse: ...
 
 class _NativeExchangeClient:
     """Common methods exposed by exchange-specific native clients."""
@@ -273,8 +231,6 @@ class BackpackPrivateWebSocketClient:
     async def recv(self) -> bytes: ...
 
 class BinanceHttpClient(_NativeExchangeClient):
-    def request(self, *args: object, **kwargs: object) -> NativeResponse: ...
-    async def request_async(self, *args: object, **kwargs: object) -> NativeResponse: ...
     def request_raw_auto_json(self, *args: object, **kwargs: object) -> NativeJsonResponse: ...
     async def request_raw_auto_json_async(
         self, *args: object, **kwargs: object
@@ -490,7 +446,6 @@ class ExtendedHttpClient(_NativeExchangeClient):
         stark_private_key: str | None = None,
         stark_public_key: str | None = None,
         vault_number: int | None = None,
-        client_id: str | None = None,
         timeout: float = 10.0,
         base_url: str | None = None,
         user_agent: str = "dcex-rust/0.1",
@@ -721,9 +676,6 @@ class LighterHttpClient(_NativeExchangeClient):
         self, method_name: str, params: NativeParams | None = None
     ) -> LighterSignedTransaction: ...
     def create_auth_token(
-        self, deadline: int | None = None, api_key_index: int | None = None
-    ) -> str: ...
-    async def create_auth_token_async(
         self, deadline: int | None = None, api_key_index: int | None = None
     ) -> str: ...
     def check_client(self) -> str | None: ...
@@ -979,7 +931,6 @@ def get_decimal_places(value: float) -> int: ...
 def reverse_decimal_places(decimal_places: int) -> float: ...
 def bybit_convert_timeframe(timeframe: str) -> str: ...
 def kucoin_convert_timeframe(timeframe: str) -> str: ...
-def address_to_bytes(address: str) -> bytes: ...
 def sanitize_url(url: str) -> str: ...
 def sanitize_message(message: str) -> str: ...
 def sanitize_request(request: str) -> str: ...

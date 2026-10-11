@@ -37,7 +37,6 @@ async def test_subaccount_read_endpoints(client):
         return
 
     sub_account = accounts["data"][0]["subAcct"]
-    _assert_ok(await client.get_subaccount_interest_limits(sub_account))
     _assert_ok(await client.get_subaccount_trading_balance(sub_account))
     _assert_ok(await client.get_subaccount_funding_balance(sub_account))
     _assert_ok(await client.get_subaccount_bills(sub_account, limit=20))

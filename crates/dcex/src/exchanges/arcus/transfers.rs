@@ -1,5 +1,6 @@
 //! Same-wallet collateral transfers.
 mod trade_operations {
+    use super::strip_hex_prefix;
     use crate::exchange::ValidatedResponse;
     use crate::exchanges::arcus::client::ArcusClient;
     use crate::exchanges::arcus::params::required;
@@ -27,27 +28,37 @@ mod trade_operations {
             let object = body.as_object().ok_or_else(|| {
                 DcexError::InvalidInput("Arcus internal transfer must be an object".into())
             })?;
+            const FIELDS: &[&str] = &[
+                "ethereumAddress",
+                "fromAccountIndex",
+                "toAccountIndex",
+                "amount",
+                "nonce",
+                "signature",
+            ];
+            if let Some(key) = object.keys().find(|key| !FIELDS.contains(&key.as_str())) {
+                return Err(DcexError::InvalidInput(format!(
+                    "unsupported Arcus transfer field: {key}"
+                )));
+            }
             let transfer_address = object
                 .get("ethereumAddress")
                 .and_then(Value::as_str)
                 .ok_or_else(|| {
                     DcexError::InvalidInput("transfer ethereumAddress is required".into())
                 })?;
-            if transfer_address.len() != 42
-                || !transfer_address.starts_with("0x")
-                || !transfer_address[2..]
-                    .bytes()
-                    .all(|byte| byte.is_ascii_hexdigit())
+            // 40 hex digits with an optional 0x/0X prefix.
+            let transfer_hex = strip_hex_prefix(transfer_address);
+            if transfer_hex.len() != 40
+                || !transfer_hex.bytes().all(|byte| byte.is_ascii_hexdigit())
             {
                 return Err(DcexError::InvalidInput(
                     "invalid transfer ethereumAddress".into(),
                 ));
             }
-            if self
-                .address
-                .as_deref()
-                .is_some_and(|address| !address.eq_ignore_ascii_case(transfer_address))
-            {
+            if self.address.as_deref().is_some_and(|address| {
+                !strip_hex_prefix(address).eq_ignore_ascii_case(transfer_hex)
+            }) {
                 return Err(DcexError::InvalidInput(
                     "transfer ethereumAddress does not match configured wallet".into(),
                 ));
@@ -95,28 +106,33 @@ mod trade_operations {
                 .get("signature")
                 .and_then(Value::as_object)
                 .ok_or_else(|| DcexError::InvalidInput("transfer signature is required".into()))?;
-            for component in ["r", "s"] {
-                let valid = signature
+            if let Some(key) = signature
+                .keys()
+                .find(|key| !matches!(key.as_str(), "r" | "s" | "v"))
+            {
+                return Err(DcexError::InvalidInput(format!(
+                    "unsupported Arcus transfer signature field: {key}"
+                )));
+            }
+            // r and s are nonzero values of up to 32 bytes; v is a raw, legacy or EIP-155
+            // recovery value of up to 4 bytes. Each is hex with an optional 0x prefix.
+            for (component, max_digits, nonzero) in
+                [("r", 64, true), ("s", 64, true), ("v", 8, false)]
+            {
+                let digits = signature
                     .get(component)
                     .and_then(Value::as_str)
-                    .is_some_and(|value| {
-                        value.len() == 66
-                            && value.starts_with("0x")
-                            && value[2..].bytes().all(|byte| byte.is_ascii_hexdigit())
-                    });
-                if !valid {
+                    .map(strip_hex_prefix)
+                    .unwrap_or_default();
+                if digits.is_empty()
+                    || digits.len() > max_digits
+                    || !digits.bytes().all(|byte| byte.is_ascii_hexdigit())
+                    || (nonzero && digits.bytes().all(|byte| byte == b'0'))
+                {
                     return Err(DcexError::InvalidInput(format!(
-                        "transfer signature {component} must be 32-byte hex"
+                        "invalid transfer signature {component}"
                     )));
                 }
-            }
-            if !matches!(
-                signature.get("v").and_then(Value::as_str),
-                Some("0x1b" | "0x1c")
-            ) {
-                return Err(DcexError::InvalidInput(
-                    "transfer signature v must be 0x1b or 0x1c".into(),
-                ));
             }
             self.execute(
                 HttpRequest::new(HttpMethod::Post, &self.base_url, "/v1/transfer").json(body),
@@ -124,6 +140,13 @@ mod trade_operations {
             .await
         }
     }
+}
+
+fn strip_hex_prefix(value: &str) -> &str {
+    value
+        .strip_prefix("0x")
+        .or_else(|| value.strip_prefix("0X"))
+        .unwrap_or(value)
 }
 
 mod wrappers {

@@ -71,10 +71,6 @@ impl BinanceEquityWebSocket {
         Self::new("trading_status", Some(product_symbol), None, None, timeout)
     }
 
-    pub fn order_reports(listen_key: &str, timeout: Duration) -> Result<Self> {
-        Self::new("order_report", None, None, Some(listen_key), timeout)
-    }
-
     pub fn url(&self) -> &str {
         &self.connection.config().url
     }

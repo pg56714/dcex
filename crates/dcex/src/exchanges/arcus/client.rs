@@ -20,7 +20,13 @@ pub struct ArcusClient {
     pub(super) account_index: u8,
     pub(super) signing_key: Option<SigningKey>,
     pub(super) api_key: Option<String>,
+    /// Market metadata (id, tick/step sizes, order limits) shared by clones.
+    pub(super) markets: MarketCache,
 }
+
+pub(super) type MarketCache = std::sync::Arc<
+    std::sync::Mutex<Option<(std::time::Instant, std::sync::Arc<Vec<serde_json::Value>>)>>,
+>;
 
 impl ArcusClient {
     pub(crate) const INPUT_EXCHANGE: &'static str = "arcus";
@@ -83,6 +89,7 @@ impl ArcusClient {
             account_index,
             signing_key,
             api_key,
+            markets: MarketCache::default(),
         })
     }
 
@@ -155,6 +162,9 @@ pub(super) mod spot {
         pub(in crate::exchanges::arcus) chain_id: u64,
         api_key: Option<String>,
         pub(in crate::exchanges::arcus) rpc_url: String,
+        /// Set once the RPC endpoint has reported the selected chain ID.
+        pub(in crate::exchanges::arcus) rpc_chain_verified:
+            std::sync::Arc<std::sync::atomic::AtomicBool>,
         pub(in crate::exchanges::arcus) wallet_address: Option<String>,
     }
 
@@ -173,6 +183,7 @@ pub(super) mod spot {
                     "https://rpc.mainnet.chain.robinhood.com"
                 }
                 .into(),
+                rpc_chain_verified: Default::default(),
                 wallet_address: None,
             })
         }
@@ -186,6 +197,7 @@ pub(super) mod spot {
                 ));
             }
             self.rpc_url = rpc_url;
+            self.rpc_chain_verified = Default::default();
             Ok(self)
         }
 

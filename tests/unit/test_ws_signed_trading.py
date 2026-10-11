@@ -228,5 +228,6 @@ async def test_arcus_native_signing_to_websocket_preserves_typed_signature(
         requests = []
         while not received.empty():
             requests.append(received.get_nowait())
-        assert len(requests) == 3
+        # Three signed frames share one cached market lookup.
+        assert len(requests) == 1
         assert all(request["path"] == "/v1/markets" for request in requests)

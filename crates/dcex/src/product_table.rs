@@ -75,10 +75,6 @@ impl ProductTable {
         &self.rows
     }
 
-    pub fn into_rows(self) -> Vec<MarketInfo> {
-        self.rows
-    }
-
     pub async fn fetch(
         exchange: Option<crate::exchange::Exchange>,
         timeout: std::time::Duration,

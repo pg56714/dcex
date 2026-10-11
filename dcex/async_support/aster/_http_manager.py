@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 from typing import Any, Self, cast
 from urllib.parse import urlsplit
 
-from dcex._schema_codec import normalize_params
+from dcex._input_codec import normalize_params
 
 from ..._native_http import NativeResponse, load_native, request_native_json_async
 from ...aster._http_manager import (
@@ -57,9 +57,7 @@ class HTTPManager(BaseHTTPManager):
             self.prediction_base_url = (
                 "https://papi.asterdex-testnet.com" if spot_testnet else "https://papi.asterdex.com"
             )
-        native_client_type = getattr(_native, "AsterHttpClient", None)
-        if native_client_type is None:
-            raise RuntimeError("The dcex native extension is required.")
+        native_client_type = _native.AsterHttpClient
         if self._native_client is None:
             self._native_client = native_client_type(
                 user_address=self.user_address,
@@ -72,10 +70,7 @@ class HTTPManager(BaseHTTPManager):
             )
         if self.preload_product_table:
             self.ptm = await ProductTableManager.get_instance(Common.ASTER)
-            if self._native_client is not None and hasattr(
-                self._native_client,
-                "set_product_table",
-            ):
+            if self._native_client is not None:
                 self._native_client.set_product_table(self.ptm._native_table)
         return self
 
@@ -104,9 +99,6 @@ class HTTPManager(BaseHTTPManager):
         if self._native_client is None:
             raise RuntimeError("Aster native client is required.")
         method = "private_request" if private else "public_request"
-        json_method = f"{method}_json_async"
-        if not hasattr(self._native_client, json_method):
-            raise RuntimeError(f"Aster native client {json_method} is unavailable.")
         request_summary = self._native_request_summary(method_name, params)
         try:
             response, data = await request_native_json_async(

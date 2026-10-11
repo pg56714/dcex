@@ -34,11 +34,6 @@ def test_get_swap_account_balance(client):
     assert res is not None
 
 
-@pytest.mark.private
-def test_get_account_balance(client):
-    res = client.get_account_balance()
-    assert res is not None
-
 
 @pytest.mark.private
 def test_get_spot_account_balance(client):

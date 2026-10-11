@@ -10,7 +10,7 @@ import logging
 from dataclasses import dataclass, field
 from typing import Any, cast
 
-from dcex._schema_codec import normalize_params
+from dcex._input_codec import normalize_params
 
 from .._native_http import NativeResponse, load_native, native_body_text, request_native_json
 from ..base.http_manager import BaseHTTPManager
@@ -74,9 +74,7 @@ class HTTPManager(BaseHTTPManager):
 
         subdomain = SUBDOMAIN_TESTNET if self.testnet else SUBDOMAIN_MAINNET
         self.endpoint = HTTP_URL.format(SUBDOMAIN=subdomain, DOMAIN=self.domain, TLD=self.tld)
-        native_client_type = getattr(_native, "BybitHttpClient", None)
-        if native_client_type is None:
-            raise RuntimeError("The dcex native extension is required.")
+        native_client_type = _native.BybitHttpClient
         self._native_client = native_client_type(
             api_key=self.api_key,
             api_secret=self.api_secret,

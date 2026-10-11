@@ -360,9 +360,12 @@ def _drain(received: queue.Queue[dict[str, Any]]) -> list[dict[str, Any]]:
 
 def _assert_wire(wire: WireCase, requests: list[dict[str, Any]]) -> dict[str, Any]:
     paths = [urlsplit(request["path"]).path for request in requests]
-    assert paths[: wire.lookups] == ["/v1/markets"] * wire.lookups, paths
-    assert len(requests) == wire.lookups + 1, paths
-    assert all(request["method"] == "GET" for request in requests[: wire.lookups])
+    # Market metadata is cached per client, so a lookup happens at most once.
+    lookups = paths[:-1].count("/v1/markets")
+    assert lookups <= wire.lookups, paths
+    assert paths[:lookups] == ["/v1/markets"] * lookups, paths
+    assert len(requests) == lookups + 1, paths
+    assert all(request["method"] == "GET" for request in requests[:lookups])
     final = requests[-1]
     from tests.unit.wire_contracts import assert_wire_contract
     assert_wire_contract("arcus", wire.method, final)

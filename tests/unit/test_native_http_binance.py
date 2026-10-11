@@ -32,10 +32,9 @@ def test_native_binance_signed_request() -> None:
             spot_base_url=base_url,
             futures_base_url=base_url,
         )
-        status, _headers, body = client.request(
+        status, _headers, body = client.request_raw_auto_json(
             "GET",
-            "spot",
-            "/test",
+            "/api/v3/account",
             [("symbol", "BTCUSDT")],
             True,
         )
@@ -49,7 +48,7 @@ def test_native_binance_signed_request() -> None:
     ).hexdigest()
 
     assert status == 200
-    assert json.loads(body) == {"ok": True}
+    assert body == {"ok": True}
     assert request["api_key"] == "api-key"
     assert "timestamp=" in signed_query
     assert "recvWindow=5000" in signed_query
@@ -86,17 +85,16 @@ async def test_native_binance_async_public_request() -> None:
             spot_base_url=base_url,
             futures_base_url=base_url,
         )
-        status, _headers, body = await client.request_async(
+        status, _headers, body = await client.request_raw_auto_json_async(
             "GET",
-            "futures",
-            "/test",
+            "/fapi/v1/ticker/price",
             [("symbol", "ETHUSDT")],
             False,
         )
 
     assert status == 200
-    assert json.loads(body) == {"ok": True}
-    assert received.get_nowait()["path"] == "/test?symbol=ETHUSDT"
+    assert body == {"ok": True}
+    assert received.get_nowait()["path"] == "/fapi/v1/ticker/price?symbol=ETHUSDT"
 
 
 @pytest.mark.asyncio

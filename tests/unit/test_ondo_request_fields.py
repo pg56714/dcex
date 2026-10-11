@@ -94,12 +94,12 @@ def test_async_ondo_methods_match_sync_wire_fields() -> None:
         client = await AsyncClient(preload_product_table=False).async_init()
         native = _AsyncNative()
         client._native_client = native
-        assert await client.get_klines("AAPL-USD.P", "1H", 100, 200) == {"success": True}
+        assert await client.get_candles("AAPL-USD.P", "1H", 100, 200) == {"success": True}
         assert await client.get_depth("AAPL-USD.P", 10) == {"success": True}
         assert native.calls == [
             (
                 "private",
-                "get_klines",
+                "get_candles",
                 [
                     ("market", "AAPL-USD.P"),
                     ("resolution", "1H"),

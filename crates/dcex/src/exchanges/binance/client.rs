@@ -400,28 +400,6 @@ impl BinanceClient {
         self.api_key_request(method, market, path, params).await
     }
 
-    pub fn request_blocking(
-        &self,
-        method: HttpMethod,
-        market: BinanceMarket,
-        path: impl Into<String>,
-        params: Vec<(String, String)>,
-        signed: bool,
-    ) -> Result<ValidatedResponse> {
-        let client = self.clone();
-        let path = path.into();
-        block_on(async move { client.request(method, market, path, params, signed).await })
-    }
-
-    pub fn get_server_time_blocking(
-        &self,
-        market_type: impl Into<String>,
-    ) -> Result<ValidatedResponse> {
-        let client = self.clone();
-        let market_type = market_type.into();
-        block_on(async move { client.get_server_time(&market_type).await })
-    }
-
     pub fn request_raw_blocking(
         &self,
         method: HttpMethod,
