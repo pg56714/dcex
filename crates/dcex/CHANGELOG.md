@@ -1,3 +1,14 @@
+## 0.18.0 (2026-10-11)
+
+### BREAKING CHANGE
+
+- remove aliases, dead code and silently dropped parameters
+- align 14 exchanges with their latest official docs
+
+### Feat
+
+- load selected Hyperliquid perp DEXs in parallel
+
 ## 0.17.0 (2026-10-10)
 
 ### BREAKING CHANGE
