@@ -36,13 +36,21 @@ pub(crate) async fn fetch_product_rows(
     }
 }
 
+pub(crate) async fn fetch_hyperliquid_rows(
+    perp_dexs: Option<&[String]>,
+    timeout: Duration,
+) -> Result<Vec<MarketInfo>> {
+    let client = crate::exchanges::hyperliquid::HyperliquidClient::public(false, timeout)?;
+    exchanges::fetch_hyperliquid(&client, perp_dexs).await
+}
+
 async fn fetch_exchange_rows(exchange: Exchange, timeout: Duration) -> Result<Vec<MarketInfo>> {
     use self::exchanges as fetch;
     use crate::exchanges::{
         arcus::ArcusClient, aster::AsterClient, backpack::BackpackClient, binance::BinanceClient,
         bingx::BingxClient, bitget::BitgetClient, bybit::BybitClient, extended::ExtendedClient,
-        hyperliquid::HyperliquidClient, kraken::KrakenClient, kucoin::KucoinClient,
-        mexc::MexcClient, okx::OkxClient, ondo::OndoClient,
+        kraken::KrakenClient, kucoin::KucoinClient, mexc::MexcClient, okx::OkxClient,
+        ondo::OndoClient,
     };
     match exchange {
         Exchange::Arcus => fetch::fetch_arcus(&ArcusClient::public(timeout)?).await,
@@ -62,9 +70,7 @@ async fn fetch_exchange_rows(exchange: Exchange, timeout: Duration) -> Result<Ve
         Exchange::Bitget => fetch::fetch_bitget(&BitgetClient::public(timeout)?).await,
         Exchange::Bybit => fetch::fetch_bybit(&BybitClient::public(5_000, false, timeout)?).await,
         Exchange::Extended => fetch::fetch_extended(&ExtendedClient::public(timeout)?).await,
-        Exchange::Hyperliquid => {
-            fetch::fetch_hyperliquid(&HyperliquidClient::public(false, timeout)?).await
-        }
+        Exchange::Hyperliquid => fetch_hyperliquid_rows(None, timeout).await,
         Exchange::KuCoin => fetch::fetch_kucoin(&KucoinClient::public(timeout)?).await,
         Exchange::Kraken => fetch::fetch_kraken(&KrakenClient::public(timeout)?).await,
         Exchange::Lighter => fetch::fetch_lighter(timeout).await,

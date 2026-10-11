@@ -134,6 +134,24 @@ print(table.get_product_symbol("binance", "BTCUSDT", product_type="swap"))
 print(table.rows()[0])
 ```
 
+Hyperliquid 預設載入第一個永續 DEX、現貨，以及所有 builder 部署的（HIP-3）永續 DEX。傳入 `perp_dexs` 可只載入要交易的 builder DEX；名稱取自 `get_perp_dexs`，未知名稱會被拒絕，asset id 與載入完整表時相同：
+
+```python
+from dcex.hyperliquid import Client
+
+client = Client(perp_dexs=["xyz"])
+table = ProductTableManager.get_instance("hyperliquid", perp_dexs=["xyz"])
+```
+
+## Lighter nonce
+
+所有 Lighter 交易方法都接受 `nonce`。不帶時，dcex 會向交易所查詢下一個 nonce，每筆交易多一次請求。交易系統通常自行管理 nonce：
+
+- 每個 API key 用 `get_next_nonce(api_key_index=...)` 讀取一次起始值。
+- 在本地遞增，每筆交易傳入 `nonce=`；多個 task 共用同一把 key 時要加鎖。
+- 交易失敗或出現 nonce 錯誤後，重新讀取 `get_next_nonce`；被拒絕的交易可能不會用掉 nonce。
+- 每個程序使用自己的 `api_key_index`，nonce 才不會互相衝突。
+
 ## 更多範例與開發
 
 可執行範例位於 [Python 同步](examples/sync)、[Python 非同步及 WebSocket](examples/async) 與 [Rust](crates/dcex/examples)。範例以公開資料或唯讀帳戶查詢為主；私人 HTTP 範例需憑證，私人資料流範例需憑證或使用者地址。

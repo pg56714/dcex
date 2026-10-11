@@ -84,6 +84,17 @@ impl ProductTable {
             .map(Self::new)
     }
 
+    /// Hyperliquid's table limited to the named builder-deployed (HIP-3) perp DEXs; the
+    /// first perp DEX and spot always load. Unknown names are rejected.
+    pub async fn fetch_hyperliquid(
+        perp_dexs: Option<&[String]>,
+        timeout: std::time::Duration,
+    ) -> Result<Self> {
+        fetch::fetch_hyperliquid_rows(perp_dexs, timeout)
+            .await
+            .map(Self::new)
+    }
+
     pub fn get(&self, key: &str, filter: ProductFilter<'_>) -> Result<String> {
         let matches = self
             .rows

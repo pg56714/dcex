@@ -298,7 +298,11 @@ def test_failed_sync_initialization_is_not_cached(monkeypatch: pytest.MonkeyPatc
     key = "binance"
     original = ProductTableManager._instance.pop(key, None)
 
-    def fail_initialize(self: ProductTableManager, exchange_name: str | None = None) -> None:
+    def fail_initialize(
+        self: ProductTableManager,
+        exchange_name: str | None = None,
+        perp_dexs: list[str] | None = None,
+    ) -> None:
         raise ProductTableError("boom")
 
     monkeypatch.setattr(ProductTableManager, "_initialize", fail_initialize)
@@ -323,6 +327,7 @@ async def test_failed_async_initialization_is_not_cached(
     async def fail_initialize(
         self: AsyncProductTableManager,
         exchange_name: str | None = None,
+        perp_dexs: list[str] | None = None,
     ) -> None:
         raise ProductTableError("boom")
 
@@ -431,3 +436,57 @@ async def test_async_product_table_propagates_exchange_cancellation(
 
     with pytest.raises(asyncio.CancelledError):
         await AsyncProductTableManager()._fetch_product_tables()
+
+
+def test_hyperliquid_perp_dexs_get_their_own_cached_table(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    calls: list[tuple[str | None, list[str] | None]] = []
+
+    def fetch_product_table(
+        exchange_name: str | None = None, perp_dexs: list[str] | None = None
+    ) -> _native.ProductTable:
+        calls.append((exchange_name, perp_dexs))
+        return _native.ProductTable([_ROWS[0]])
+
+    monkeypatch.setattr(sync_manager._native, "fetch_product_table", fetch_product_table)
+    monkeypatch.setattr(ProductTableManager, "_instance", {})
+
+    full = ProductTableManager.get_instance("hyperliquid")
+    some = ProductTableManager.get_instance("hyperliquid", perp_dexs=["xyz", "abc"])
+    same = ProductTableManager.get_instance("hyperliquid", perp_dexs=["abc", "xyz", "abc"])
+
+    assert full is not some
+    assert some is same
+    assert calls == [("hyperliquid", None), ("hyperliquid", ["xyz", "abc"])]
+    with pytest.raises(ProductTableError, match="list of DEX names"):
+        ProductTableManager.get_instance("hyperliquid", perp_dexs="xyz")  # type: ignore[arg-type]
+
+
+@pytest.mark.asyncio
+async def test_async_hyperliquid_perp_dexs_reach_the_native_fetch(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    calls: list[tuple[str | None, list[str] | None]] = []
+
+    async def fetch_product_table_async(
+        exchange_name: str | None = None, perp_dexs: list[str] | None = None
+    ) -> _native.ProductTable:
+        calls.append((exchange_name, perp_dexs))
+        return _native.ProductTable([_ROWS[0]])
+
+    monkeypatch.setattr(
+        async_manager._native, "fetch_product_table_async", fetch_product_table_async
+    )
+    monkeypatch.setattr(AsyncProductTableManager, "_instance", {})
+
+    await AsyncProductTableManager.get_instance("hyperliquid", perp_dexs=["xyz"])
+
+    assert calls == [("hyperliquid", ["xyz"])]
+
+
+def test_native_fetch_rejects_perp_dexs_outside_hyperliquid() -> None:
+    with pytest.raises(ValueError, match="only supported for exchange_name='hyperliquid'"):
+        _native.fetch_product_table("binance", perp_dexs=["xyz"])
+    with pytest.raises(ValueError, match="only supported"):
+        _native.fetch_product_table(None, perp_dexs=[])

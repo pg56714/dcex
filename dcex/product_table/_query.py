@@ -10,6 +10,17 @@ class ProductTableError(Exception):
     """Exception raised for product table related errors."""
 
 
+def instance_key(
+    exchange_name: str | None, perp_dexs: list[str] | None
+) -> str | tuple[str | None, tuple[str, ...]] | None:
+    """Cache tables per exchange and, for Hyperliquid, per set of builder perp DEXs."""
+    if perp_dexs is None:
+        return exchange_name
+    if isinstance(perp_dexs, str):
+        raise ProductTableError("perp_dexs must be a list of DEX names, not a string")
+    return (exchange_name, tuple(sorted(set(perp_dexs))))
+
+
 class ProductTableQueryMixin:
     """Expose the existing Python query API through the Rust product table."""
 

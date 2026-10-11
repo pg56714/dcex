@@ -44,6 +44,8 @@ class HTTPManager(BaseHTTPManager):
     logger: logging.Logger | None = field(default=None)
     ptm: ProductTableManager | None = field(init=False, default=None)
     preload_product_table: bool = field(default=True)
+    # Builder-deployed (HIP-3) perp DEXs to load into the product table; None loads all.
+    perp_dexs: list[str] | None = field(default=None)
     _native_client: Any | None = field(default=None, init=False, repr=False)
 
     def __post_init__(self) -> None:
@@ -60,7 +62,7 @@ class HTTPManager(BaseHTTPManager):
             endpoint=self.endpoint,
         )
         if self.preload_product_table:
-            self.ptm = ProductTableManager.get_instance(Common.HYPERLIQUID)
+            self.ptm = ProductTableManager.get_instance(Common.HYPERLIQUID, self.perp_dexs)
             if self._native_client is not None:
                 self._native_client.set_product_table(self.ptm._native_table)
 

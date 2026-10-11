@@ -1,7 +1,7 @@
 """Async product table manager module."""
 
 from ... import _native
-from ...product_table._query import ProductTableError, ProductTableQueryMixin
+from ...product_table._query import ProductTableError, ProductTableQueryMixin, instance_key
 from ...registry import ASYNC_EXCHANGES
 from . import fetch
 
@@ -30,12 +30,16 @@ class ProductTableManager(ProductTableQueryMixin):
     _instance = {}
 
     @classmethod
-    async def get_instance(cls, exchange_name: str | None = None) -> "ProductTableManager":
+    async def get_instance(
+        cls, exchange_name: str | None = None, perp_dexs: list[str] | None = None
+    ) -> "ProductTableManager":
         """
         Get or create a ProductTableManager instance.
 
         Args:
             exchange_name: Optional exchange name to filter data for specific exchange.
+            perp_dexs: Hyperliquid only. Builder-deployed (HIP-3) perp DEXs to load; the
+                first perp DEX and spot always load. None loads every DEX.
 
         Returns:
             ProductTableManager instance.
@@ -48,23 +52,28 @@ class ProductTableManager(ProductTableQueryMixin):
                     f"Invalid exchange_name: {exchange_name}. Valid: {sorted(valid_names)}"
                 )
 
-        if exchange_name not in cls._instance:
+        key = instance_key(exchange_name, perp_dexs)
+        if key not in cls._instance:
             instance = cls()
-            await instance._initialize(exchange_name=exchange_name)
-            cls._instance[exchange_name] = instance
-        return cls._instance[exchange_name]
+            await instance._initialize(exchange_name=exchange_name, perp_dexs=perp_dexs)
+            cls._instance[key] = instance
+        return cls._instance[key]
 
-    async def _initialize(self, exchange_name: str | None = None) -> None:
+    async def _initialize(
+        self, exchange_name: str | None = None, perp_dexs: list[str] | None = None
+    ) -> None:
         """
         Initialize the product table by fetching data from valid exchanges.
 
         Args:
             exchange_name: Optional exchange name to filter data for specific exchange.
         """
-        self.product_table = await self._fetch_product_tables(exchange_name)
+        self.product_table = await self._fetch_product_tables(exchange_name, perp_dexs)
         self._build_indexes()
 
-    async def _fetch_product_tables(self, exchange_name: str | None = None) -> _native.ProductTable:
+    async def _fetch_product_tables(
+        self, exchange_name: str | None = None, perp_dexs: list[str] | None = None
+    ) -> _native.ProductTable:
         """
         Fetch product tables from the Rust core.
 
@@ -75,14 +84,19 @@ class ProductTableManager(ProductTableQueryMixin):
             Product rows containing all product information.
         """
         try:
-            table = await _native.fetch_product_table_async(exchange_name)
+            if perp_dexs is None:
+                table = await _native.fetch_product_table_async(exchange_name)
+            else:
+                table = await _native.fetch_product_table_async(exchange_name, perp_dexs=perp_dexs)
         except (RuntimeError, ValueError) as exc:
             raise ProductTableError(str(exc)) from exc
         if table.height == 0:
             raise ProductTableError("Failed to fetch product tables from any exchange")
         return table
 
-    async def refresh(self, exchange_name: str | None = None) -> None:
+    async def refresh(
+        self, exchange_name: str | None = None, perp_dexs: list[str] | None = None
+    ) -> None:
         """
         Refresh product table and indexes.
         If exchange_name is provided, only that exchange is fetched.
@@ -93,4 +107,4 @@ class ProductTableManager(ProductTableQueryMixin):
                 raise ProductTableError(
                     f"Invalid exchange_name: {exchange_name}. Valid: {sorted(valid_names)}"
                 )
-        await self._initialize(exchange_name=exchange_name)
+        await self._initialize(exchange_name=exchange_name, perp_dexs=perp_dexs)

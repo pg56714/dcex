@@ -232,7 +232,7 @@ fetch_case!(extended_rows, "extended", extended, |c| {
     fetch::fetch_extended(&c)
 });
 fetch_case!(hyperliquid_rows, "hyperliquid", hyperliquid, |c| {
-    fetch::fetch_hyperliquid(&c)
+    fetch::fetch_hyperliquid(&c, None)
 });
 fetch_case!(kraken_rows, "kraken", kraken, |c| fetch::fetch_kraken(&c));
 fetch_case!(kucoin_rows, "kucoin", kucoin, |c| fetch::fetch_kucoin(&c));
@@ -242,3 +242,37 @@ fetch_case!(lighter_rows, "lighter", lighter, |c| {
 fetch_case!(mexc_rows, "mexc", mexc, |c| fetch::fetch_mexc(&c));
 fetch_case!(okx_rows, "okx", okx, |c| fetch::fetch_okx(&c));
 fetch_case!(ondo_rows, "ondo", ondo, |c| fetch::fetch_ondo(&c));
+
+#[tokio::test]
+async fn hyperliquid_perp_dexs_limits_builder_dexs_and_keeps_asset_ids() {
+    let (url, seen) = serve(fixture("hyperliquid"));
+    let client = hyperliquid(&url);
+
+    let rows = fetch::fetch_hyperliquid(&client, Some(&[]))
+        .await
+        .expect("rows");
+    assert!(rows.iter().any(|row| row.product_symbol == "BTC-USD-SWAP"));
+    assert!(rows.iter().any(|row| row.product_type == "spot"));
+    assert!(!rows.iter().any(|row| row.exchange_symbol.contains("xyz:")));
+    assert!(
+        !seen
+            .lock()
+            .expect("log")
+            .iter()
+            .any(|key| key.contains("\"dex\""))
+    );
+
+    let rows = fetch::fetch_hyperliquid(&client, Some(&["xyz".to_string()]))
+        .await
+        .expect("rows");
+    let first = rows
+        .iter()
+        .find(|row| row.exchange_symbol.contains("xyz:"))
+        .expect("xyz row");
+    assert!(first.exchange_symbol.ends_with(", 110000]"), "{first:?}");
+
+    let error = fetch::fetch_hyperliquid(&client, Some(&["nope".to_string()]))
+        .await
+        .expect_err("unknown DEX");
+    assert!(error.to_string().contains("\"nope\""), "{error}");
+}

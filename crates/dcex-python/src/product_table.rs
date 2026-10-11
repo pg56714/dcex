@@ -372,34 +372,58 @@ fn normalize_index(index: isize, len: usize) -> PyResult<usize> {
     Ok(normalized as usize)
 }
 
+/// `perp_dexs` applies to Hyperliquid only: the builder-deployed perp DEXs to load.
+fn fetch_scope(
+    exchange_name: Option<&str>,
+    perp_dexs: Option<Vec<String>>,
+) -> PyResult<(Option<dcex::exchange::Exchange>, Option<Vec<String>>)> {
+    let exchange = exchange_name.map(exchange_from_name).transpose()?;
+    if perp_dexs.is_some() && exchange != Some(dcex::exchange::Exchange::Hyperliquid) {
+        return Err(PyValueError::new_err(
+            "perp_dexs is only supported for exchange_name='hyperliquid'",
+        ));
+    }
+    Ok((exchange, perp_dexs))
+}
+
+async fn fetch_table(
+    exchange: Option<dcex::exchange::Exchange>,
+    perp_dexs: Option<Vec<String>>,
+    timeout: std::time::Duration,
+) -> dcex::Result<ProductTable> {
+    match perp_dexs {
+        Some(perp_dexs) => ProductTable::fetch_hyperliquid(Some(&perp_dexs), timeout).await,
+        None => ProductTable::fetch(exchange, timeout).await,
+    }
+}
+
 #[pyfunction]
-#[pyo3(signature = (exchange_name=None, timeout=10.0))]
+#[pyo3(signature = (exchange_name=None, timeout=10.0, perp_dexs=None))]
 fn fetch_product_table(
     py: Python<'_>,
     exchange_name: Option<&str>,
     timeout: f64,
+    perp_dexs: Option<Vec<String>>,
 ) -> PyResult<PythonProductTable> {
     let timeout = http_timeout(timeout)?;
-    let exchange = exchange_name.map(exchange_from_name).transpose()?;
-    py.allow_threads(|| block_on(async move { ProductTable::fetch(exchange, timeout).await }))
+    let (exchange, perp_dexs) = fetch_scope(exchange_name, perp_dexs)?;
+    py.allow_threads(|| block_on(fetch_table(exchange, perp_dexs, timeout)))
         .map(|table| PythonProductTable { table })
         .map_err(to_py_runtime_error)
 }
 
 #[pyfunction]
-#[pyo3(signature = (exchange_name=None, timeout=10.0))]
+#[pyo3(signature = (exchange_name=None, timeout=10.0, perp_dexs=None))]
 fn fetch_product_table_async<'py>(
     py: Python<'py>,
     exchange_name: Option<String>,
     timeout: f64,
+    perp_dexs: Option<Vec<String>>,
 ) -> PyResult<Bound<'py, PyAny>> {
     let timeout = http_timeout(timeout)?;
-    let exchange = exchange_name
-        .as_deref()
-        .map(exchange_from_name)
-        .transpose()?;
+    let (exchange, perp_dexs) = fetch_scope(exchange_name.as_deref(), perp_dexs)?;
     pyo3_async_runtimes::tokio::future_into_py(py, async move {
-        ProductTable::fetch(exchange, timeout)
+        fetch_table(exchange, perp_dexs, timeout)
             .await
             .map(|table| PythonProductTable { table })
             .map_err(to_py_runtime_error)

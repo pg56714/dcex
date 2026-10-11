@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::time::Duration;
 
+use futures_util::future::try_join_all;
 use serde_json::Value;
 
 use crate::exchanges::arcus::ArcusClient;
@@ -815,25 +816,50 @@ pub(super) fn extended_market_info(market: &Value) -> Result<MarketInfo> {
     })
 }
 
-pub(super) async fn fetch_hyperliquid(client: &HyperliquidClient) -> Result<Vec<MarketInfo>> {
-    let perpetual = client.public_request("get_meta", Vec::new()).await?;
-    let perpetual_dexs = client.public_request("get_perp_dexs", Vec::new()).await?;
-    let spot = client.public_request("get_spot_meta", Vec::new()).await?;
-    let mut rows = Vec::new();
-    append_hyperliquid_perpetual_rows(&mut rows, &perpetual, 0)?;
-    for (dex_index, dex) in value_array(Some(&perpetual_dexs.data))
+/// The first perp DEX and spot always load; `perp_dexs` limits which builder-deployed
+/// (HIP-3) DEXs follow, and `None` loads them all.
+pub(super) async fn fetch_hyperliquid(
+    client: &HyperliquidClient,
+    perp_dexs: Option<&[String]>,
+) -> Result<Vec<MarketInfo>> {
+    let (perpetual, perpetual_dexs, spot) = tokio::try_join!(
+        client.public_request("get_meta", Vec::new()),
+        client.public_request("get_perp_dexs", Vec::new()),
+        client.public_request("get_spot_meta", Vec::new()),
+    )?;
+    // Asset ids depend on each DEX's position in the full perpDexs list, not the filter.
+    let available = value_array(Some(&perpetual_dexs.data))
         .iter()
         .enumerate()
         .skip(1)
+        .filter_map(|(dex_index, dex)| Some((dex_index, non_empty_string(dex, "name")?)))
+        .collect::<Vec<_>>();
+    if let Some(unknown) = perp_dexs
+        .unwrap_or_default()
+        .iter()
+        .find(|name| !available.iter().any(|(_, dex)| dex == *name))
     {
-        let Some(dex_name) = non_empty_string(dex, "name") else {
-            continue;
-        };
+        let names = available.iter().map(|(_, dex)| dex.as_str());
+        return Err(DcexError::InvalidInput(format!(
+            "unknown Hyperliquid perp DEX: {unknown:?}; available: {}",
+            names.collect::<Vec<_>>().join(", ")
+        )));
+    }
+    let selected = available
+        .into_iter()
+        .filter(|(_, dex)| perp_dexs.is_none_or(|names| names.contains(dex)));
+    let builder_metadata = try_join_all(selected.map(|(dex_index, dex)| async move {
         let metadata = client
-            .public_request("get_meta", vec![("dex".to_string(), dex_name)])
+            .public_request("get_meta", vec![("dex".to_string(), dex)])
             .await?;
-        let asset_offset = 100_000 + dex_index as u64 * 10_000;
-        append_hyperliquid_perpetual_rows(&mut rows, &metadata, asset_offset)?;
+        Ok::<_, DcexError>((100_000 + dex_index as u64 * 10_000, metadata))
+    }))
+    .await?;
+
+    let mut rows = Vec::new();
+    append_hyperliquid_perpetual_rows(&mut rows, &perpetual, 0)?;
+    for (asset_offset, metadata) in &builder_metadata {
+        append_hyperliquid_perpetual_rows(&mut rows, metadata, *asset_offset)?;
     }
     append_hyperliquid_spot_rows(&mut rows, &spot)?;
     Ok(rows)

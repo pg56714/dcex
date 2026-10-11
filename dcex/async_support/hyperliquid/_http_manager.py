@@ -43,6 +43,8 @@ class HTTPManager(BaseHTTPManager):
     logger: logging.Logger | None = field(default=None)
     ptm: ProductTableManager | None = field(init=False, default=None)
     preload_product_table: bool = field(default=True)
+    # Builder-deployed (HIP-3) perp DEXs to load into the product table; None loads all.
+    perp_dexs: list[str] | None = field(default=None)
     _native_client: Any | None = field(default=None, init=False, repr=False)
 
     async def async_init(self) -> Self:
@@ -55,7 +57,7 @@ class HTTPManager(BaseHTTPManager):
         self._logger = self._setup_logger(self.logger)
         ptm: ProductTableManager | None = None
         if self.preload_product_table:
-            ptm = await ProductTableManager.get_instance(Common.HYPERLIQUID)
+            ptm = await ProductTableManager.get_instance(Common.HYPERLIQUID, self.perp_dexs)
             self.ptm = ptm
         domain = DOMAIN_TESTNET if self.testnet else DOMAIN_MAINNET
         self.endpoint = HTTP_URL.format(SUBDOMAIN=self.subdomain, DOMAIN=domain, TLD=self.tld)

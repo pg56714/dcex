@@ -136,6 +136,24 @@ print(table.get_product_symbol("binance", "BTCUSDT", product_type="swap"))
 print(table.rows()[0])
 ```
 
+Hyperliquid loads its first perp DEX, spot and every builder-deployed (HIP-3) perp DEX by default. Pass `perp_dexs` to load only the builder DEXs you trade; names come from `get_perp_dexs`, unknown names are rejected, and asset ids stay the same as with the full table:
+
+```python
+from dcex.hyperliquid import Client
+
+client = Client(perp_dexs=["xyz"])
+table = ProductTableManager.get_instance("hyperliquid", perp_dexs=["xyz"])
+```
+
+## Lighter nonces
+
+Every Lighter transaction method accepts `nonce`. Without it, dcex asks the exchange for the next nonce, which costs one request per transaction. Trading systems usually keep the nonce themselves:
+
+- Read the starting value once per API key with `get_next_nonce(api_key_index=...)`.
+- Increment it locally and pass `nonce=` with each transaction, holding a lock if several tasks share the key.
+- After a failed transaction or a nonce error, read `get_next_nonce` again; a rejected transaction may not consume its nonce.
+- Give each process its own `api_key_index` so their nonces never collide.
+
 ## More examples and development
 
 Runnable examples are in [Python sync](examples/sync), [Python async and WebSocket](examples/async), and [Rust](crates/dcex/examples). They focus on public data or read-only account queries. Private HTTP examples require credentials; private stream examples require credentials or a user address.
