@@ -220,6 +220,12 @@ where
             }
         }
     }
+    let python_rejected = replay_python_keys(exchange, &mut call).await;
+    assert!(
+        python_rejected.is_empty(),
+        "{exchange} {client}: the dispatch rejects keys its Python wrappers send:\n{}",
+        python_rejected.join("\n")
+    );
     assert!(
         failures.is_empty(),
         "{exchange} {client}: {} of {} typed wrappers do not reach dispatch:\n{}",
@@ -232,6 +238,50 @@ where
         "{exchange} {client}: wrappers sent a request with an undocumented key:\n{}",
         unknown_accepted.join("\n")
     );
+}
+
+/// Replay every Python wrapper's dispatched keys (`python_dispatch_keys.json`, kept current
+/// by `tests/unit/test_python_dispatch_keys.py`) and report each key the dispatch rejects.
+/// Methods another client of the same exchange owns are skipped.
+async fn replay_python_keys<F, Fut, T>(exchange: &str, call: &mut F) -> Vec<String>
+where
+    F: FnMut(&'static str, bool, Vec<(String, String)>) -> Fut,
+    Fut: Future<Output = Result<T>>,
+{
+    let table: serde_json::Value =
+        serde_json::from_str(include_str!("python_dispatch_keys.json")).expect("dispatch keys");
+    let entries = table
+        .get(exchange)
+        .and_then(serde_json::Value::as_object)
+        .unwrap_or_else(|| panic!("{exchange}: no Python dispatch keys recorded"));
+    let mut rejected = Vec::new();
+    for (entry, keys) in entries {
+        let (side, name) = entry.split_once(' ').expect("side and method");
+        let name: &'static str = Box::leak(name.to_string().into_boxed_str());
+        let keys: Vec<String> = keys
+            .as_array()
+            .expect("key list")
+            .iter()
+            .map(|key| key.as_str().expect("key").to_string())
+            .collect();
+        let params = keys
+            .iter()
+            .map(|key| (key.clone(), placeholder(key)))
+            .collect();
+        if let Err(DcexError::InvalidInput(message) | DcexError::Runtime(message)) =
+            call(name, side == "public", params).await
+        {
+            let lower = message.to_ascii_lowercase();
+            if lower.contains("unsupported")
+                && keys
+                    .iter()
+                    .any(|key| message.ends_with(&format!(": {key}")))
+            {
+                rejected.push(format!("{entry}: {message}"));
+            }
+        }
+    }
+    rejected
 }
 
 /// Hand-written methods returning `ExchangeMethodRequest` (outside the wrapper macro)
@@ -346,12 +396,7 @@ pub(crate) fn instant_server() -> String {
                 );
                 let _ = write!(
                     stream,
-                    "HTTP/1.1 200 OK
-Content-Type: application/json
-Content-Length: {}
-Connection: close
-
-{body}",
+                    "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}",
                     body.len()
                 );
             });
@@ -362,11 +407,7 @@ Connection: close
 
 fn request_complete(request: &[u8]) -> bool {
     let text = String::from_utf8_lossy(request);
-    let Some((head, body)) = text.split_once(
-        "
-
-",
-    ) else {
+    let Some((head, body)) = text.split_once("\r\n\r\n") else {
         return false;
     };
     let length = head
