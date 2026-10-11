@@ -34,6 +34,7 @@ impl AsterClient {
                     "canPerpTrade",
                     "canWithdraw",
                     "ipWhitelist",
+                    "agentCode",
                     "signature",
                 ],
                 &[

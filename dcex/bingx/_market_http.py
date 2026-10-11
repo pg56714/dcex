@@ -85,15 +85,15 @@ class MarketHTTP(HTTPManager):
         self,
         product_symbol: str,
         *,
-        depth: int,
+        limit: int | None = None,
         type_: str = "step0",
     ) -> dict:
-        """Get spot v2 aggregated order book data; BingX requires ``depth``."""
+        """Get spot v2 aggregated order book data (up to 1024 levels per side)."""
         return self._native_public(
             "get_spot_orderbook_v2",
             self._native_params(
                 product_symbol=product_symbol,
-                depth=depth,
+                limit=limit,
                 type_=type_,
             ),
         )
@@ -127,6 +127,7 @@ class MarketHTTP(HTTPManager):
         start_time: int | None = None,
         end_time: int | None = None,
         limit: int | None = None,
+        time_zone: int | None = None,
     ) -> dict:
         """Get kline/candlestick data."""
         return self._native_public(
@@ -137,6 +138,7 @@ class MarketHTTP(HTTPManager):
                 startTime=start_time,
                 endTime=end_time,
                 limit=limit,
+                timeZone=time_zone,
             ),
         )
 
@@ -147,6 +149,7 @@ class MarketHTTP(HTTPManager):
         start_time: int | None = None,
         end_time: int | None = None,
         limit: int | None = None,
+        time_zone: int | None = None,
     ) -> dict:
         """Get spot kline/candlestick data."""
         return self._native_public(
@@ -157,26 +160,7 @@ class MarketHTTP(HTTPManager):
                 startTime=start_time,
                 endTime=end_time,
                 limit=limit,
-            ),
-        )
-
-    def get_spot_kline_v2(
-        self,
-        product_symbol: str,
-        interval: str,
-        start_time: int | None = None,
-        end_time: int | None = None,
-        limit: int | None = None,
-    ) -> dict:
-        """Get spot v2 kline/candlestick data."""
-        return self._native_public(
-            "get_spot_kline_v2",
-            self._native_params(
-                product_symbol=product_symbol,
-                interval=interval,
-                startTime=start_time,
-                endTime=end_time,
-                limit=limit,
+                timeZone=time_zone,
             ),
         )
 
@@ -265,9 +249,9 @@ class MarketHTTP(HTTPManager):
 
     def get_spot_book_ticker(
         self,
-        product_symbol: str,
+        product_symbol: str | None = None,
     ) -> dict:
-        """Get spot best bid/ask ticker."""
+        """Get spot best bid/ask ticker; omit product_symbol for every symbol."""
         return self._native_public(
             "get_spot_book_ticker",
             self._native_params(product_symbol=product_symbol),
@@ -275,9 +259,9 @@ class MarketHTTP(HTTPManager):
 
     def get_spot_price_ticker(
         self,
-        product_symbol: str,
+        product_symbol: str | None = None,
     ) -> dict:
-        """Get spot latest price ticker."""
+        """Get spot latest price ticker; omit product_symbol for every symbol."""
         return self._native_public(
             "get_spot_price_ticker",
             self._native_params(product_symbol=product_symbol),
@@ -324,6 +308,7 @@ class MarketHTTP(HTTPManager):
         end_time: int | None = None,
         limit: int | None = None,
         recv_window: int | None = None,
+        time_zone: int | None = None,
     ) -> dict[str, Any]:
         """Get coin swap kline.
 
@@ -342,6 +327,7 @@ class MarketHTTP(HTTPManager):
                 endTime=end_time,
                 limit=limit,
                 recvWindow=recv_window,
+                timeZone=time_zone,
             ),
         )
 
@@ -401,11 +387,10 @@ class MarketHTTP(HTTPManager):
         start_time: int | None = None,
         end_time: int | None = None,
         limit: int | None = None,
-        recv_window: int | None = None,
     ) -> dict[str, Any]:
         """Get spot historical kline.
 
-        GET /openApi/market/his/v1/kline.
+        GET /openApi/spot/v2/quote/historicalKlines.
 
         Source:
         https://github.com/BingX-API/api-ai-skills/blob/main/skills/spot-market/api-reference.md
@@ -419,7 +404,6 @@ class MarketHTTP(HTTPManager):
                 startTime=start_time,
                 endTime=end_time,
                 limit=limit,
-                recvWindow=recv_window,
             ),
         )
 
@@ -442,16 +426,13 @@ class MarketHTTP(HTTPManager):
         product_symbol: str,
         limit: int | None = None,
         from_id: str | None = None,
-        recv_window: int | None = None,
     ) -> dict[str, Any]:
         """Get spot historical trades.
 
-        GET /openApi/market/his/v1/trade. Timestamps use milliseconds."""
+        GET /openApi/spot/v2/quote/historicalTrades. Timestamps use milliseconds."""
         return self._native_public(
             "get_spot_historical_trades",
-            self._native_params(
-                product_symbol=product_symbol, limit=limit, fromId=from_id, recvWindow=recv_window
-            ),
+            self._native_params(product_symbol=product_symbol, limit=limit, fromId=from_id),
         )
 
     def get_swap_historical_trades(

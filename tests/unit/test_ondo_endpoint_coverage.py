@@ -35,6 +35,14 @@ RUST_DIR = Path(__file__).resolve().parents[2] / "crates" / "dcex" / "src" / "ex
 RUST_SOURCE = "\n".join(path.read_text(encoding="utf-8") for path in RUST_DIR.glob("*.rs"))
 MARKET = "AAPL-USD.P"
 DESTINATION = {"id": "acct", "wallet": "margin"}
+# Unauthenticated Spot market data; every other Spot route is signed.
+PUBLIC_SPOT = {
+    "get_spot_depth",
+    "get_spot_trades",
+    "get_spot_symbol_info",
+    "get_spot_price_history",
+    "get_spot_ticker",
+}
 
 
 @dataclass(frozen=True)
@@ -134,11 +142,80 @@ CASES = [
         from_time=1,
         to_time=2,
     ),
-    # Public spot endpoints observed on the service; private spot remains blocked.
+    # Spot
     case("get_spot_depth", "/v1/spot/depth?market=SPY-USDC", market="SPY-USDC-SPOT"),
     case("get_spot_trades", "/v1/spot/trades?market=SPY-USDC", market="SPY-USDC"),
     case("get_spot_symbol_info", "/v1/spot/symbol_info"),
-    case("get_spot_price_history", "/v1/spot/history?symbol=SPYUSDC&resolution=60&from=1&to=2", symbol="SPYUSDC", resolution="60", from_time=1, to_time=2),
+    case("get_spot_ticker", "/v1/spot/ticker?sparkline=true", sparkline=True),
+    case(
+        "place_spot_order",
+        "/v1/spot/orders",
+        {"market": "SPY-USDC", "side": "buy", "price": "500", "size": "1"},
+        market="SPY-USDC",
+        side="buy",
+        price="500",
+        size="1",
+    ),
+    case(
+        "place_spot_order_delayed",
+        "/v1/spot/orders/delayed",
+        {"market": "SPY-USDC", "side": "sell", "type": "market", "size": "1"},
+        market="SPY-USDC",
+        side="sell",
+        type="market",
+        size="1",
+    ),
+    case(
+        "place_spot_batch_orders_delayed",
+        "/v1/spot/orders/batch/delayed",
+        {"orders": [{"market": "SPY-USDC", "side": "buy", "price": "1", "size": "2"}]},
+        orders=[{"market": "SPY-USDC", "side": "buy", "price": "1", "size": "2"}],
+    ),
+    case(
+        "place_spot_batch_orders",
+        "/v1/spot/orders/batch",
+        {"orders": [{"market": "SPY-USDC", "side": "sell", "price": "1", "size": "1"}]},
+        orders=[{"market": "SPY-USDC", "side": "sell", "price": "1", "size": "1"}],
+    ),
+    case("cancel_spot_batch_orders", "/v1/spot/orders/batch?orderIDs=o1,o2", orderIDs=["o1", "o2"]),
+    case("get_spot_orders", "/v1/spot/orders?status=open", status="open"),
+    case("cancel_spot_orders", "/v1/spot/orders?market=SPY-USDC", market="SPY-USDC"),
+    case("cancel_spot_orders", "/v1/spot/orders", all_symbols=True),
+    case("get_spot_order", "/v1/spot/orders/o1", orderID="o1"),
+    case("cancel_spot_order", "/v1/spot/orders/o1", orderID="o1"),
+    case("get_spot_order_fills", "/v1/spot/orders/o1/fills", orderID="o1"),
+    case("get_spot_fills", "/v1/spot/fills?limit=2", limit=2),
+    case("export_spot_orders_csv", "/v1/spot/orders/csv?startTime=1", startTime=1),
+    case("export_spot_fills_csv", "/v1/spot/fills/csv?endTime=2", endTime=2),
+    case(
+        "get_spot_candles",
+        "/v1/spot/candles?market=SPY-USDC&resolution=1&countback=5&to=2",
+        market="SPY-USDC",
+        resolution="1",
+        countback=5,
+        to_time=2,
+    ),
+    case("get_spot_balances", "/v1/spot/balances"),
+    case("get_spot_transfers", "/v1/spot/transfers?limit=3", limit=3),
+    case(
+        "create_spot_transfer",
+        "/v1/spot/transfers",
+        {"from": {"wallet": "margin"}, "to": {"wallet": "spot"}, "symbol": "USDC", "amount": "5"},
+        from_wallet="margin",
+        to_wallet="spot",
+        symbol="USDC",
+        amount="5",
+    ),
+    case("get_builder_code_stats", "/v1/builder_code/stats?startTime=1", startTime=1),
+    case("get_builder_code_fills", "/v1/builder_code/fills"),
+    case(
+        "get_spot_price_history",
+        "/v1/spot/history?symbol=SPYUSDC&resolution=60&from=1&to=2",
+        symbol="SPYUSDC",
+        resolution="60",
+        from_time=1,
+        to_time=2,
+    ),
     # Orders
     case(
         "get_orders",
@@ -353,10 +430,11 @@ def _drain(received: queue.Queue[dict[str, Any]]) -> list[dict[str, Any]]:
 def _assert_request(wire: WireCase, requests: list[dict[str, Any]]) -> None:
     assert len(requests) == 1, requests
     request = requests[0]
-    if wire.method.startswith("get_spot_"):
+    if wire.method in PUBLIC_SPOT:
         assert not any(key.lower().startswith("ondo-") for key in request)
         assert request["authorization"] is None
     from tests.unit.wire_contracts import assert_wire_contract
+
     assert_wire_contract("ondo", wire.method, request)
     assert request["method"] == EXPECTED_VERBS[wire.method]
     assert unquote(request["path"]) == wire.target
@@ -389,6 +467,24 @@ def test_every_endpoint_wrapper_has_a_wire_case() -> None:
     assert _wrapper_names() - {wire.method for wire in CASES} == set()
     for wire in CASES:
         assert f'"{wire.method}"' in RUST_SOURCE, wire.method
+
+
+def test_spot_cancel_all_requires_explicit_scope(
+    server: tuple[str, queue.Queue[dict[str, Any]]],
+) -> None:
+    """Omitting market cancels every Spot order, so it needs all_symbols=True."""
+    base_url, received = server
+    _drain(received)
+    client = Client(**_client_kwargs(base_url))
+    try:
+        for kwargs in ({}, {"market": "SPY-USDC", "all_symbols": True}):
+            with pytest.raises(ValueError, match="all_symbols"):
+                client.cancel_spot_orders(**kwargs)
+        with pytest.raises(ValueError, match="all_symbols"):
+            client._native_private("cancel_spot_orders")
+    finally:
+        client.close()
+    assert _drain(received) == []
 
 
 @pytest.mark.parametrize("wire", CASES, ids=[wire.id for wire in CASES])
@@ -455,8 +551,17 @@ async def test_spot_symbols_cannot_reach_perpetual_order_transport(asynchronous,
     _drain(received)
     client = (AsyncClient if asynchronous else Client)(**_client_kwargs(base_url))
     try:
-        with pytest.raises(ValueError, match=r"Ondo -SPOT symbols are only valid for spot endpoints"):
-            result = getattr(client, method)(market="SPY-USDC-SPOT", **(dict(side="buy", type="limit", price="1", size="1") if method == "place_order" else {}))
+        with pytest.raises(
+            ValueError, match=r"Ondo -SPOT symbols are only valid for spot endpoints"
+        ):
+            result = getattr(client, method)(
+                market="SPY-USDC-SPOT",
+                **(
+                    dict(side="buy", type="limit", price="1", size="1")
+                    if method == "place_order"
+                    else {}
+                ),
+            )
             if asynchronous:
                 await result
         assert received.empty()

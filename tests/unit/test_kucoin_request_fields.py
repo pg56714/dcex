@@ -20,7 +20,7 @@ from tests.unit.native_http_helpers import _http_server
 
 CURRENT_FIELDS = {
     "get_spot_instrument_info": {"market"},
-    "get_futures_orderbook": {"product_symbol", "depth"},
+    "get_futures_orderbook": {"product_symbol", "size"},
     "get_futures_open_interest": {
         "product_symbol",
         "interval",

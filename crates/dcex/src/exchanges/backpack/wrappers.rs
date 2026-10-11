@@ -14,6 +14,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_order_book_depth(product_symbol => "product_symbol"),
         get_market_sessions(),
         get_market_holidays(),
+        get_stock_indicative_quote(symbol => "symbol", side => "side", quantity => "quantity"),
         get_securities(),
         get_rfq_constraints(product_symbol => "product_symbol", session_name => "sessionName"),
         get_mark_prices(),
@@ -70,8 +71,6 @@ crate::exchanges::impl_exchange_method_wrappers! {
 }
 
 crate::exchanges::impl_exchange_method_wrappers! { @extend; BackpackClient; public [
-get_prediction_events(),
-get_prediction_tags(),
 get_vaults(),
 get_vault_history(interval => "interval"),
 ]; private [

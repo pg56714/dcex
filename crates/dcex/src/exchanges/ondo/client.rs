@@ -213,6 +213,31 @@ impl OndoClient {
             .await
     }
 
+    /// Spot routes take the native Spot market name, so `market` is sent as given.
+    pub(super) async fn spot_query(
+        &self,
+        method: HttpMethod,
+        path: &str,
+        params: Vec<(String, String)>,
+    ) -> Result<ValidatedResponse> {
+        self.request(method, path, params, None, true, BTreeMap::new())
+            .await
+    }
+
+    pub(super) async fn spot_post(&self, path: &str, body: Value) -> Result<ValidatedResponse> {
+        let body = serde_json::to_vec(&body)
+            .map_err(|error| DcexError::InvalidInput(format!("invalid Ondo JSON body: {error}")))?;
+        self.request(
+            HttpMethod::Post,
+            path,
+            Vec::new(),
+            Some(body),
+            true,
+            BTreeMap::new(),
+        )
+        .await
+    }
+
     async fn body_request(
         &self,
         method: HttpMethod,

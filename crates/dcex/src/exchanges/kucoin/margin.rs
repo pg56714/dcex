@@ -93,12 +93,13 @@ impl KucoinClient {
                     "currency",
                     "size",
                     "isIsolated",
+                    "isHf",
                     "product_symbol",
                     "symbol",
                 ])?;
                 params.required("currency")?;
                 validate_positive_number(params, "size")?;
-                let mut body = params.body(&["currency", "size"], &[], &["isIsolated"])?;
+                let mut body = params.body(&["currency", "size"], &[], &["isIsolated", "isHf"])?;
                 insert_optional_margin_symbol(self, params, &mut body)?;
                 self.private_post(KucoinMarket::Spot, MARGIN_REPAY, Value::Object(body))
                     .await

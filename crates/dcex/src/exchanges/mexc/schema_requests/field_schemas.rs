@@ -106,6 +106,40 @@ impl MexcClient {
                 .await
                 .map(Some);
         }
+        if name == "get_rebate_affiliate_list" {
+            // memberInfo is a request header; the remaining fields are the query.
+            const QUERY: &[&str] = &[
+                "page",
+                "pageSize",
+                "startTime",
+                "endTime",
+                "subUid",
+                "pUid",
+                "currencyId",
+                "recvWindow",
+            ];
+            p.ensure_allowed(&[QUERY, &["memberInfo"]].concat())?;
+            let member_info = p.required("memberInfo")?;
+            if member_info.trim().is_empty() {
+                return Err(invalid("memberInfo is required"));
+            }
+            for key in ["startTime", "endTime"] {
+                validate_u64_range(p, key, 0, u64::MAX)?;
+                p.required(key)?;
+            }
+            validate_u64_range(p, "page", 1, u64::MAX)?;
+            validate_u64_range(p, "pageSize", 1, u64::MAX)?;
+            validate_u64_range(p, "recvWindow", 1, 60_000)?;
+            return self
+                .spot_private_with_headers(
+                    HttpMethod::Get,
+                    "/api/v3/rebate/affiliate/list",
+                    p.only(QUERY),
+                    vec![("memberInfo".to_string(), member_info.to_string())],
+                )
+                .await
+                .map(Some);
+        }
         let Some(e) = endpoints().get(name) else {
             return Ok(None);
         };

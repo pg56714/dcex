@@ -131,3 +131,31 @@ fn stock_rfq_rejects_quote_quantity() {
 
     assert!(error.to_string().contains("require quantity"));
 }
+
+#[test]
+fn rfq_order_expiry_requires_an_immediate_priced_rfq() {
+    let submit = |mode: &str, price: Option<&str>| {
+        let client = BackpackClient::public(5_000, Duration::from_secs(1)).expect("client");
+        let mut params = vec![
+            ("product_symbol".to_string(), "SOL-USDC-RFQ".to_string()),
+            ("side".to_string(), "Bid".to_string()),
+            ("executionMode".to_string(), mode.to_string()),
+            ("quantity".to_string(), "1".to_string()),
+            ("orderExpiryTime".to_string(), "1790000000000".to_string()),
+        ];
+        if let Some(price) = price {
+            params.push(("price".to_string(), price.to_string()));
+        }
+        crate::http::block_on(async move { client.private_request("submit_rfq", params).await })
+            .expect_err("no credentials or invalid expiry")
+            .to_string()
+    };
+    for error in [
+        submit("AwaitAccept", None),
+        submit("AwaitAccept", Some("100")),
+    ] {
+        assert!(error.contains("orderExpiryTime requires"), "{error}");
+    }
+    // A valid expiry passes validation and only then fails for missing credentials.
+    assert!(!submit("Immediate", Some("100")).contains("orderExpiryTime"));
+}

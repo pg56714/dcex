@@ -15,7 +15,14 @@ impl OndoClient {
         let params = OndoParams::from_pairs(params);
         let response = match method_name {
             "get_spot_depth" | "get_spot_trades" => {
-                params.ensure_allowed(&["market", "product_symbol"])?;
+                let paging: &[&str] = if method_name == "get_spot_depth" {
+                    &["depth"]
+                } else {
+                    &["cursor", "limit"]
+                };
+                params.ensure_allowed(&[&["market", "product_symbol"], paging].concat())?;
+                params.optional_u64_range("depth", 1, 100)?;
+                params.optional_u64_range("limit", 1, 1000)?;
                 let raw = params
                     .get("market")
                     .or_else(|| params.get("product_symbol"))
@@ -37,16 +44,29 @@ impl OndoClient {
                 } else {
                     SPOT_TRADES
                 };
-                self.spot_public_get(path, vec![("market".into(), market)])
-                    .await
+                let mut query = vec![("market".into(), market)];
+                query.extend(params.only(paging));
+                self.spot_public_get(path, query).await
             }
             "get_spot_symbol_info" => {
                 params.ensure_allowed(&[])?;
                 self.spot_public_get(SPOT_SYMBOL_INFO, vec![]).await
             }
+            "get_spot_ticker" => {
+                params.ensure_allowed(&["sparkline"])?;
+                params.optional_bool("sparkline")?;
+                self.spot_public_get(SPOT_TICKER, params.only(&["sparkline"]))
+                    .await
+            }
             "get_spot_price_history" => {
-                params.ensure_allowed(&["symbol", "resolution", "from", "to"])?;
-                params.ensure_required(&["symbol", "resolution", "from", "to"])?;
+                params.ensure_allowed(&["symbol", "resolution", "from", "to", "countback"])?;
+                params.ensure_required(&["symbol", "resolution", "to"])?;
+                if params.get("from").is_some() == params.get("countback").is_some() {
+                    return Err(DcexError::InvalidInput(
+                        "Ondo spot history requires exactly one of from or countback".into(),
+                    ));
+                }
+                params.optional_u64_range("countback", 1, u64::MAX)?;
                 let symbol = params.required("symbol")?;
                 if !symbol
                     .bytes()
@@ -61,7 +81,7 @@ impl OndoClient {
                 params.ensure_time_order("from", "to")?;
                 self.spot_public_get(
                     SPOT_HISTORY,
-                    params.only(&["symbol", "resolution", "from", "to"]),
+                    params.only(&["symbol", "resolution", "from", "to", "countback"]),
                 )
                 .await
             }

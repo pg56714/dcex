@@ -252,6 +252,49 @@ impl HyperliquidClient {
         self.submit_action(action, params).await
     }
 
+    /// Field order follows the documented action: it is part of the signed msgpack payload.
+    pub(in crate::exchanges::hyperliquid) async fn place_trailing_stop_order_from_params(
+        &self,
+        params: &HyperliquidParams,
+    ) -> Result<ValidatedResponse> {
+        let retracement = match (params.get("retracementPct"), params.get("retracementPx")) {
+            (Some(_), None) => object(vec![(
+                "pct",
+                string(&format!("{}%", params.positive_decimal("retracementPct")?)),
+            )]),
+            (None, Some(_)) => object(vec![(
+                "px",
+                string(params.positive_decimal("retracementPx")?),
+            )]),
+            _ => {
+                return Err(DcexError::InvalidInput(
+                    "Hyperliquid trailing stop requires exactly one of retracementPct or retracementPx"
+                        .to_string(),
+                ));
+            }
+        };
+        let activation = match params.get("activationPx") {
+            Some(_) => string(params.positive_decimal("activationPx")?),
+            None => OrderedValue::Null,
+        };
+        let action = object(vec![
+            ("type", string("trailingStop")),
+            (
+                "asset",
+                uint(self.asset_id(params.required("product_symbol")?)?),
+            ),
+            ("isBuy", bool_value(params.required_bool("isBuy")?)),
+            ("sz", string(params.positive_decimal("size")?)),
+            (
+                "reduceOnly",
+                bool_value(params.required_bool("reduceOnly")?),
+            ),
+            ("retracement", retracement),
+            ("activationPx", activation),
+        ]);
+        self.submit_action(action, params).await
+    }
+
     pub(in crate::exchanges::hyperliquid) async fn cancel_twap_order_from_params(
         &self,
         params: &HyperliquidParams,
@@ -868,6 +911,17 @@ pub(in crate::exchanges::hyperliquid) fn validate_private_params(
             "reduceOnly",
             "minutes",
             "randomize",
+            "vaultAddress",
+            "expiresAfter",
+        ],
+        "place_trailing_stop_order" => &[
+            "product_symbol",
+            "isBuy",
+            "size",
+            "reduceOnly",
+            "retracementPct",
+            "retracementPx",
+            "activationPx",
             "vaultAddress",
             "expiresAfter",
         ],

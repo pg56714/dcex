@@ -72,11 +72,11 @@ impl BitgetClient {
                 .await
             }
             "get_crypto_loan_borrow_history" => {
-                params.ensure_allowed(&["startTime", "endTime"], false)?;
-                params.required("startTime")?;
-                params.required("endTime")?;
                 let mut fields = HISTORY_FIELDS.to_vec();
                 fields.push("status");
+                params.ensure_allowed(&fields, false)?;
+                params.required("startTime")?;
+                params.required("endTime")?;
                 self.get_private(CRYPTO_LOAN_BORROW_HISTORY, params.only(&fields))
                     .await
             }
@@ -156,11 +156,11 @@ impl BitgetClient {
                 .await
             }
             "get_crypto_loan_liquidations" => {
-                params.ensure_allowed(&["startTime", "endTime"], false)?;
-                params.required("startTime")?;
-                params.required("endTime")?;
                 let mut fields = HISTORY_FIELDS.to_vec();
                 fields.push("status");
+                params.ensure_allowed(&fields, false)?;
+                params.required("startTime")?;
+                params.required("endTime")?;
                 self.get_private(CRYPTO_LOAN_REDUCES, params.only(&fields))
                     .await
             }

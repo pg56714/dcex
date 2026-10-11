@@ -161,7 +161,8 @@
     "public": false,
     "keys": [
       "acctLv",
-      "lever"
+      "lever",
+      "riskOffsetType"
     ],
     "required": [
       "acctLv"
@@ -174,6 +175,14 @@
         "lever": {
           "type": "string",
           "format": "decimal"
+        },
+        "riskOffsetType": {
+          "type": "string",
+          "description": "Portfolio-margin risk offset mode; one of the documented values 1 to 4."
+        },
+        "risk_offset_type": {
+          "type": "string",
+          "description": "Portfolio-margin risk offset mode; one of the documented values 1 to 4."
         }
       }
     }
@@ -188,6 +197,20 @@
     ],
     "required": [
       "acctLv"
+    ],
+    "bools": [],
+    "schema": null
+  },
+  {
+    "name": "activate_account_feature",
+    "path": "/api/v5/account/activate-feature",
+    "post": true,
+    "public": false,
+    "keys": [
+      "feature"
+    ],
+    "required": [
+      "feature"
     ],
     "bools": [],
     "schema": null

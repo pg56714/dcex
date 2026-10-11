@@ -12,7 +12,6 @@ async def test_perpetual_reference_data():
     client = Client(timeout=20)
     try:
         assert isinstance(await client.get_markets(), dict | list)
-        assert isinstance(await client.get_spot_assets(), dict | list)
     finally:
         await client.close()
 

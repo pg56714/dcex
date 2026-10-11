@@ -12,7 +12,9 @@
       "requestAmount",
       "fromCoinType",
       "toCoinType",
-      "requestId"
+      "requestId",
+      "paramType",
+      "paramValue"
     ],
     "required": [
       "accountType",
@@ -32,6 +34,22 @@
         "request_amount": {
           "type": "string",
           "format": "decimal"
+        },
+        "paramType": {
+          "type": "string",
+          "description": "Broker attribution: paramType opFrom with the broker identifier in paramValue."
+        },
+        "param_type": {
+          "type": "string",
+          "description": "Broker attribution: paramType opFrom with the broker identifier in paramValue."
+        },
+        "paramValue": {
+          "type": "string",
+          "description": "Broker attribution: paramType opFrom with the broker identifier in paramValue."
+        },
+        "param_value": {
+          "type": "string",
+          "description": "Broker attribution: paramType opFrom with the broker identifier in paramValue."
         }
       }
     }

@@ -257,7 +257,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
                 wire_keywords(
                     locals(),
                     {
-                        "cancelReplaceMode": "cancel_replace_mode",
+                        "CancelReplaceMode": "cancel_replace_mode",
                         "cancelOrderId": "cancel_order_id",
                         "cancelClientOrderID": "cancel_client_order_id",
                         "cancelRestrictions": "cancel_restrictions",
@@ -1344,8 +1344,8 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
     def get_swap_position_history(
         self,
         product_symbol: str,
-        start_ts: int,
-        end_ts: int,
+        start_time: int,
+        end_time: int,
         *,
         currency: str | None = None,
         position_id: int | None = None,
@@ -1353,15 +1353,15 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         page_size: int | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
-        """Call ``GET /openApi/swap/v1/trade/positionHistory``."""
+        """Call ``GET /openApi/swap/v2/trade/positionHistory``."""
         return self._native_private(
             "get_swap_position_history",
             self._native_call_params(
                 wire_keywords(
                     locals(),
                     {
-                        "startTs": "start_ts",
-                        "endTs": "end_ts",
+                        "startTime": "start_time",
+                        "endTime": "end_time",
                         "positionId": "position_id",
                         "pageIndex": "page_index",
                         "pageSize": "page_size",
@@ -1439,7 +1439,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         product_symbol: str,
         side: str,
         type_: str,
-        position_side: str | None = None,
+        position_side: str,
         quantity: str | None = None,
         price: str | None = None,
         stop_price: str | None = None,
@@ -1452,7 +1452,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
     ) -> dict[str, Any]:
         """Place coin swap order.
 
-        POST /openApi/cswap/v1/trade/order.
+        POST /openApi/cswap/v2/trade/order.
 
         Source:
         https://github.com/BingX-API/api-ai-skills/blob/main/skills/cswap-trade/api-reference.md
@@ -1512,7 +1512,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
     ) -> dict[str, Any]:
         """Cancel coin swap all orders.
 
-        POST /openApi/cswap/v1/trade/allOpenOrders.
+        DELETE /openApi/cswap/v1/trade/allOpenOrders.
 
         Provide product_symbol, or all_symbols=True to cancel Coin-M orders across all symbols.
 
@@ -1819,6 +1819,40 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             self._native_params(product_symbol=product_symbol, recvWindow=recv_window),
         )
 
+    def create_swap_signal(
+        self,
+        *,
+        product_symbol: str,
+        side: str,
+        entry_price: str,
+        tp_price: str | None = None,
+        sl_price: str | None = None,
+        leverage: int | None = None,
+        size_pct: int | None = None,
+        recv_window: int | None = None,
+    ) -> dict[str, Any]:
+        """Publish a perpetual futures signal; ``side`` is ``long`` or ``short``.
+
+        POST /openApi/social/v1/swap/signal.
+
+        Source:
+        https://bingx-api.github.io/docs-v3/ ("Create Signal")
+
+        """
+        return self._native_private(
+            "create_swap_signal",
+            self._native_params(
+                product_symbol=product_symbol,
+                side=side,
+                entryPrice=entry_price,
+                tpPrice=tp_price,
+                slPrice=sl_price,
+                leverage=leverage,
+                sizePct=size_pct,
+                recvWindow=recv_window,
+            ),
+        )
+
     def place_spot_oco(
         self,
         *,
@@ -1882,7 +1916,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
     def get_spot_oco(
         self,
         *,
-        order_list_id: str | None = None,
+        order_id: str | None = None,
         client_order_id: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
@@ -1891,13 +1925,13 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         GET /openApi/spot/v1/oco/orderList.
 
         Source:
-        https://github.com/BingX-API/api-ai-skills/blob/main/skills/spot-trade/api-reference.md
+        https://bingx-api.github.io/docs-v3/#/en/Spot/Trades%20Endpoints/Query%20an%20OCO%20Order%20List
 
         """
         return self._native_private(
             "get_spot_oco",
             self._native_params(
-                orderListId=order_list_id, clientOrderId=client_order_id, recvWindow=recv_window
+                orderId=order_id, clientOrderId=client_order_id, recvWindow=recv_window
             ),
         )
 

@@ -3,7 +3,9 @@ pub(in crate::exchanges::kraken) use crate::exchange::ValidatedResponse;
 
 pub(in crate::exchanges::kraken) use super::client::{KrakenAuth, KrakenClient};
 pub(in crate::exchanges::kraken) use super::endpoints::*;
-pub(in crate::exchanges::kraken) use super::params::{KrakenParams, push_optional};
+pub(in crate::exchanges::kraken) use super::params::{
+    KrakenParams, push_optional, require_cursor_mode,
+};
 
 impl KrakenClient {
     pub(super) async fn account_private_request(
@@ -13,20 +15,20 @@ impl KrakenClient {
     ) -> Result<Option<ValidatedResponse>> {
         let result = match method_name {
             "get_spot_account_balance" => {
-                params.ensure_allowed(&["rebase_multiplier"])?;
+                params.ensure_allowed(&["rebase_multiplier", "account_id"])?;
                 self.private_post(
                     KrakenAuth::Spot,
                     SPOT_BALANCE,
-                    params.only(&["rebase_multiplier"]),
+                    params.only(&["rebase_multiplier", "account_id"]),
                 )
                 .await
             }
             "get_spot_trade_balance" => {
-                params.ensure_allowed(&["asset", "rebase_multiplier"])?;
+                params.ensure_allowed(&["asset", "rebase_multiplier", "account_id"])?;
                 self.private_post(
                     KrakenAuth::Spot,
                     SPOT_TRADE_BALANCE,
-                    params.only(&["asset", "rebase_multiplier"]),
+                    params.only(&["asset", "rebase_multiplier", "account_id"]),
                 )
                 .await
             }
@@ -36,34 +38,37 @@ impl KrakenClient {
                     "docalcs",
                     "consolidation",
                     "rebase_multiplier",
+                    "account_id",
                 ])?;
                 self.private_post(
                     KrakenAuth::Spot,
                     SPOT_OPEN_POSITIONS,
-                    params.only(&["txid", "docalcs", "consolidation", "rebase_multiplier"]),
+                    params.only(&[
+                        "txid",
+                        "docalcs",
+                        "consolidation",
+                        "rebase_multiplier",
+                        "account_id",
+                    ]),
                 )
                 .await
             }
             "get_spot_ledgers" => {
-                params.ensure_allowed(&[
+                const FIELDS: &[&str] = &[
                     "asset",
                     "aclass",
                     "start",
                     "end",
                     "ofs",
                     "without_count",
+                    "with_cursor",
+                    "cursor",
                     "rebase_multiplier",
-                    "type",
-                ])?;
-                let mut query = params.only(&[
-                    "asset",
-                    "aclass",
-                    "start",
-                    "end",
-                    "ofs",
-                    "without_count",
-                    "rebase_multiplier",
-                ]);
+                    "account_id",
+                ];
+                params.ensure_allowed(&[FIELDS, &["type"]].concat())?;
+                require_cursor_mode(params)?;
+                let mut query = params.only(FIELDS);
                 push_optional(&mut query, "type", params.get("type"));
                 self.private_post(KrakenAuth::Spot, SPOT_LEDGERS, query)
                     .await

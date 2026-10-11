@@ -18,7 +18,7 @@ from tests.unit.endpoint_wrapper_helpers import (
 from tests.unit.native_http_helpers import _http_server
 
 CURRENT_FIELDS = {
-    "get_spot_orderbook_v2": {"depth", "product_symbol", "type_"},
+    "get_spot_orderbook_v2": {"limit", "product_symbol", "type_"},
     "get_spot_public_trades": {"product_symbol", "limit"},
     "get_spot_ticker": {"product_symbol"},
     "get_asset_transfer_records": {
@@ -29,7 +29,7 @@ CURRENT_FIELDS = {
         "recv_window",
         "start_time",
         "to_account",
-        "transfer_id",
+        "tran_id",
     },
     "place_spot_order": {"recv_window", "stop_price", "new_client_order_id", "quote_order_qty"},
     "cancel_spot_order": {"client_order_id", "cancel_restrictions", "order_id"},
@@ -74,7 +74,7 @@ def test_sync_bingx_forwards_official_spot_fields() -> None:
     client = _client_class("sync", "bingx")(**_client_kwargs("bingx"))
     calls = _wire_sync(client)
 
-    client.get_spot_orderbook_v2("BTC-USDT-SPOT", depth=50, type_="step2")
+    client.get_spot_orderbook_v2("BTC-USDT-SPOT", limit=50, type_="step2")
     client.place_spot_limit_buy_order(
         "BTC-USDT-SPOT",
         quantity="0.001",
@@ -86,7 +86,7 @@ def test_sync_bingx_forwards_official_spot_fields() -> None:
     assert dict(calls[0]["query"]) == {
         "product_symbol": "BTC-USDT-SPOT",
         "type": "step2",
-        "depth": "50",
+        "limit": "50",
     }
     assert dict(calls[1]["query"])["newClientOrderId"] == "client_1"
     assert dict(calls[1]["query"])["recvWindow"] == "5000"
@@ -154,29 +154,30 @@ def test_native_bingx_uses_official_wire_fields() -> None:
         )
         client.private_request_json(
             "get_asset_transfer_records",
-            [("transferId", "123")],
+            [("tranId", "123")],
         )
 
     post_only = dict(parse_qsl(urlsplit(received.get_nowait()["path"]).query))
     transfer = dict(parse_qsl(urlsplit(received.get_nowait()["path"]).query))
     assert post_only["timeInForce"] == "PostOnly"
-    assert transfer["transferId"] == "123"
+    assert transfer["tranId"] == "123"
 
 
-def test_native_bingx_spot_v2_depth_uses_underscore_symbol() -> None:
+def test_native_bingx_spot_v2_depth_uses_the_quote_route() -> None:
     with _http_server({"code": 0, "data": {}}) as (base_url, received):
         client = _native_client(base_url)
         client.public_request_json(
             "get_spot_orderbook_v2",
             [
                 ("product_symbol", "BTC-USDT-SPOT"),
-                ("depth", "20"),
+                ("limit", "20"),
                 ("type", "step1"),
             ],
         )
 
-    query = dict(parse_qsl(urlsplit(received.get_nowait()["path"]).query))
-    assert query == {"depth": "20", "symbol": "BTC_USDT", "type": "step1"}
+    request = urlsplit(received.get_nowait()["path"])
+    assert request.path == "/openApi/spot/v2/quote/depth"
+    assert dict(parse_qsl(request.query)) == {"limit": "20", "symbol": "BTC-USDT", "type": "step1"}
 
 
 def test_native_bingx_accepts_current_swap_trigger_order_type() -> None:
@@ -215,7 +216,7 @@ def test_native_bingx_accepts_current_swap_trigger_order_type() -> None:
         (
             "get_asset_transfer_records",
             [],
-            "either transferId or both fromAccount and toAccount",
+            "either tranId or both fromAccount and toAccount",
         ),
         (
             "get_spot_order_history",

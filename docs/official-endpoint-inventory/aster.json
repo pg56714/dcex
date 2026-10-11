@@ -1870,6 +1870,13 @@
       "channel": "Payload: ACCOUNT\\_UPDATE",
       "host": "aster-finance-spot-api-v3",
       "official_source": "https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-spot-api-v3.md#L2139"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v3/prediction/transactionHistory",
+      "title": "Query transaction records",
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#query-transaction-records",
+      "host": "papi"
     }
   ]
 }

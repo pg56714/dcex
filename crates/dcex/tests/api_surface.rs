@@ -133,7 +133,6 @@ fn rust_direct_clients_expose_python_method_names() {
         get_spot_commission_rate,
         get_spot_instrument_info,
         get_spot_kline,
-        get_spot_kline_v2,
         get_spot_my_trades,
         get_spot_open_orders,
         get_spot_order,

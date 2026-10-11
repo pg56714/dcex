@@ -111,8 +111,6 @@ CASES: tuple[Case, ...] = (
         "POST /api/v1/borrowLend",
         body={"quantity": "1", "side": "Borrow", "symbol": "BTC"},
     ),
-    Case("get_prediction_events", {}, "GET /api/v1/prediction", signed=False, query={}),
-    Case("get_prediction_tags", {}, "GET /api/v1/prediction/tags", signed=False, query={}),
     Case("get_vaults", {}, "GET /api/v1/vaults", signed=False, query={}),
     Case(
         "vault_mint",
@@ -240,8 +238,15 @@ CASES: tuple[Case, ...] = (
         query={"symbol": "BTC_USDC"},
         signed=False,
     ),
-    Case("get_market_sessions", {}, "GET /api/v1/market-sessions", signed=False),
-    Case("get_market_holidays", {}, "GET /api/v1/market-holidays", signed=False),
+    Case("get_market_sessions", {}, "GET /api/v1/stockSessions", signed=False),
+    Case(
+        "get_stock_indicative_quote",
+        {"symbol": "AAPL", "side": "Bid", "quantity": "1.5"},
+        "GET /api/v1/stockIndicativeQuote",
+        signed=False,
+        query={"symbol": "AAPL", "side": "Bid", "quantity": "1.5"},
+    ),
+    Case("get_market_holidays", {}, "GET /api/v1/stockHolidays", signed=False),
     Case("get_securities", {}, "GET /api/v1/securities", signed=False),
     Case(
         "get_mark_prices",
@@ -485,12 +490,6 @@ CASES: tuple[Case, ...] = (
         {"quote_id": "q1", "rfq_id": "r1"},
         "POST /api/v1/rfq/accept",
         body={"quoteId": "q1", "rfqId": "r1"},
-    ),
-    Case(
-        "refresh_rfq",
-        {"rfq_id": "r1"},
-        "POST /api/v1/rfq/refresh",
-        body={"rfqId": "r1"},
     ),
     Case(
         "cancel_rfq",

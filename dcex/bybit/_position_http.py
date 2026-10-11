@@ -33,12 +33,17 @@ class PositionHTTP(HTTPManager):
     def set_leverage(
         self,
         product_symbol: str,
-        leverage: str,
+        buyLeverage: str,
+        sellLeverage: str,
     ) -> dict[str, Any]:
-        """Set leverage for a product."""
+        """Set the buy and sell leverage of a product (equal in one-way mode)."""
         return self._native_private(
             "set_leverage",
-            self._native_params(product_symbol=product_symbol, leverage=leverage),
+            self._native_params(
+                product_symbol=product_symbol,
+                buyLeverage=buyLeverage,
+                sellLeverage=sellLeverage,
+            ),
         )
 
     def switch_position_mode(

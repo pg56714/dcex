@@ -37,6 +37,7 @@ class AccountHTTPTransfersHTTP(HTTPManager):
         fromAccount: str | None = None,
         toAccount: str | None = None,
         recvWindow: int | None = None,
+        clientTranId: str | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Transfer assets among a MEXC master account and its sub-accounts."""
         return await self._native_private(
@@ -49,6 +50,7 @@ class AccountHTTPTransfersHTTP(HTTPManager):
                 asset=asset,
                 amount=amount,
                 recvWindow=recvWindow,
+                clientTranId=clientTranId,
             ),
         )
 
@@ -63,6 +65,7 @@ class AccountHTTPTransfersHTTP(HTTPManager):
         page: int | None = None,
         limit: int | None = None,
         recvWindow: int | None = None,
+        clientTranId: str | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Retrieve MEXC master/sub-account universal-transfer history."""
         return await self._native_private(
@@ -77,6 +80,7 @@ class AccountHTTPTransfersHTTP(HTTPManager):
                 page=page,
                 limit=limit,
                 recvWindow=recvWindow,
+                clientTranId=clientTranId,
             ),
         )
 

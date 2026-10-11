@@ -1638,6 +1638,13 @@ fn prediction_routes_use_dedicated_host() {
         ),
         private("get_prediction_account", &[], "GET", "/api/v3/account", &[]),
         private(
+            "get_prediction_transaction_history",
+            &[("asset", "USDT"), ("limit", "10")],
+            "GET",
+            "/api/v3/prediction/transactionHistory",
+            &["asset", "limit"],
+        ),
+        private(
             "get_prediction_user_trades",
             &[],
             "GET",

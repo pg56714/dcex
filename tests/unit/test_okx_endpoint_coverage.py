@@ -1505,6 +1505,14 @@ CASES: tuple[Case, ...] = (
         body={"acctLv": "2", "lever": "5"},
     ),
     Case(
+        "activate_account_feature",
+        "POST",
+        "/api/v5/account/activate-feature",
+        kwargs={"feature": "1"},
+        signed=True,
+        body={"feature": "1"},
+    ),
+    Case(
         "precheck_account_level_switch",
         "GET",
         "/api/v5/account/set-account-switch-precheck",

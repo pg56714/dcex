@@ -2939,6 +2939,36 @@
       "channel": "public-transaction",
       "host": "public",
       "official_source": "https://bybit-exchange.github.io/docs/v5/rfq/websocket/public/public-transaction"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/earn/flexible-saving/auto-savings",
+      "title": "Get Auto Savings",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/earn/flexible-saving/auto-savings"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/earn/flexible-saving/auto-savings",
+      "title": "Set Auto Savings",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/earn/flexible-saving/auto-savings"
+    },
+    {
+      "method": "POST",
+      "path": "/v5/fht/compliance/tax/private/batch_create",
+      "title": "Batch Request Export Reports",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/tax/batch-create"
+    },
+    {
+      "method": "GET",
+      "path": "/v5/fht/compliance/tax/private/batch_query",
+      "title": "Batch Query Export Reports",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/tax/batch-query"
+    },
+    {
+      "method": "POST",
+      "path": "/fht/compliance/tax/v3/private/registertime",
+      "title": "Get User Register Date",
+      "official_source": "https://bybit-exchange.github.io/docs/v5/tax/register-time"
     }
   ]
 }

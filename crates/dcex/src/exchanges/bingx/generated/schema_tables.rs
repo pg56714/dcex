@@ -79,6 +79,7 @@ pub(super) fn endpoint(name: &str) -> Option<&'static Endpoint> {
         "create_sub_account_deposit_address",
         "reverse_swap_position",
         "adjust_simulated_trading_balance",
+        "create_swap_signal",
         "set_sub_account_transfer_authorization",
         "get_internal_transfer_records",
         "get_sub_account_internal_transfer_records",

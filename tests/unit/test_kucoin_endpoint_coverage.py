@@ -2056,7 +2056,7 @@ CASES: tuple[Case, ...] = (
     ),
     Case(
         "get_spot_orderbook",
-        {"product_symbol": SPOT, "depth": 100},
+        {"product_symbol": SPOT, "size": 100},
         "GET /api/v1/market/orderbook/level2_100",
         query={"symbol": "BTC-USDT"},
         signed=False,
@@ -2107,7 +2107,7 @@ CASES: tuple[Case, ...] = (
     ),
     Case(
         "get_futures_orderbook",
-        {"product_symbol": SWAP, "depth": "100"},
+        {"product_symbol": SWAP, "size": "100"},
         "GET /api/v1/level2/depth100",
         host="futures",
         query={"symbol": "XBTUSDTM"},

@@ -160,11 +160,14 @@ async def test_kraken_zero_volume_closing_order_reaches_wire(asynchronous, nativ
         if asynchronous:
             await client.async_init()
         try:
-            kwargs = dict(product_symbol="BTC-USD", side="sell", ordertype="settle-position" if settle else "market", volume="0", leverage="2")
+            # The native dispatch takes Kraken's wire name for the order direction.
+            side_key = "type" if native else "side"
+            kwargs = {"product_symbol": "BTC-USD", side_key: "sell", "ordertype": "settle-position" if settle else "market", "volume": "0", "leverage": "2"}
             if not settle:
                 kwargs["reduce_only"] = True
+            rejected = {"product_symbol": "BTC-USD", side_key: "buy", "ordertype": "limit", "price": "100", "volume": "0"}
             with pytest.raises(ValueError, match="positive plain decimal"):
-                await invoke(client, "place_spot_order", dict(product_symbol="BTC-USD", side="buy", ordertype="limit", price="100", volume="0"), native)
+                await invoke(client, "place_spot_order", rejected, native)
             assert received.empty()
             await invoke(client, "place_spot_order", kwargs, native)
             request = received.get(timeout=10)

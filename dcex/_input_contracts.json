@@ -1721,15 +1721,6 @@
           }
         }
       },
-      "get_prediction_events": {
-        "type": "object",
-        "properties": {
-          "offset": {
-            "type": "integer",
-            "description": "skips an integer number of prediction events records before returning the next page."
-          }
-        }
-      },
       "get_rfq_history": {
         "type": "object",
         "properties": {
@@ -1879,6 +1870,15 @@
           "offset": {
             "type": "integer",
             "description": "skips an integer number of strategy history records before returning the next page."
+          }
+        }
+      },
+      "get_stock_indicative_quote": {
+        "type": "object",
+        "properties": {
+          "quantity": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       }
@@ -8109,95 +8109,6 @@
           }
         }
       },
-      "post_cswap_v2_trade_order": {
-        "type": "object",
-        "properties": {
-          "price": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "quantity": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "stopLoss": {
-            "type": "object",
-            "properties": {
-              "price": {
-                "type": "number",
-                "format": "decimal",
-                "x-positive": true
-              },
-              "stopPrice": {
-                "type": "number",
-                "format": "decimal",
-                "x-positive": true
-              }
-            },
-            "x-empty-as-absent": true,
-            "x-nonempty-object": true
-          },
-          "stopPrice": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "stop_loss": {
-            "type": "object",
-            "properties": {
-              "price": {
-                "type": "number",
-                "format": "decimal",
-                "x-positive": true
-              },
-              "stopPrice": {
-                "type": "number",
-                "format": "decimal",
-                "x-positive": true
-              }
-            },
-            "x-empty-as-absent": true,
-            "x-nonempty-object": true
-          },
-          "stop_price": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "takeProfit": {
-            "type": "object",
-            "properties": {
-              "price": {
-                "type": "number",
-                "format": "decimal",
-                "x-positive": true
-              },
-              "stopPrice": {
-                "type": "number",
-                "format": "decimal",
-                "x-positive": true
-              }
-            },
-            "x-empty-as-absent": true,
-            "x-nonempty-object": true
-          },
-          "take_profit": {
-            "type": "object",
-            "properties": {
-              "price": {
-                "type": "number",
-                "format": "decimal",
-                "x-positive": true
-              },
-              "stopPrice": {
-                "type": "number",
-                "format": "decimal",
-                "x-positive": true
-              }
-            },
-            "x-empty-as-absent": true,
-            "x-nonempty-object": true
-          }
-        }
-      },
       "post_wealth_v1_product_dual_currency_order": {
         "type": "object",
         "properties": {
@@ -9296,10 +9207,6 @@
           }
         }
       },
-      "delete_cswap_v1_trade_all_open_orders": {
-        "type": "object",
-        "properties": {}
-      },
       "get_copy_trading_v1_spot_history_order": {
         "type": "object",
         "properties": {
@@ -9566,6 +9473,44 @@
           "duration": {
             "type": "integer",
             "description": "For post wealth v1 product dual currency invest asset list, specifies a scheduling duration or timestamp in the endpoint time unit."
+          }
+        }
+      },
+      "create_swap_signal": {
+        "type": "object",
+        "properties": {
+          "entryPrice": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "entry_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "tpPrice": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "tp_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "slPrice": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "sl_price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "leverage": {
+            "type": "integer"
+          },
+          "sizePct": {
+            "type": "integer"
+          },
+          "size_pct": {
+            "type": "integer"
           }
         }
       }
@@ -13161,6 +13106,22 @@
           "request_amount": {
             "type": "string",
             "format": "decimal"
+          },
+          "paramType": {
+            "type": "string",
+            "description": "Broker attribution: paramType opFrom with the broker identifier in paramValue."
+          },
+          "param_type": {
+            "type": "string",
+            "description": "Broker attribution: paramType opFrom with the broker identifier in paramValue."
+          },
+          "paramValue": {
+            "type": "string",
+            "description": "Broker attribution: paramType opFrom with the broker identifier in paramValue."
+          },
+          "param_value": {
+            "type": "string",
+            "description": "Broker attribution: paramType opFrom with the broker identifier in paramValue."
           }
         }
       },
@@ -14769,6 +14730,22 @@
             }
           }
         }
+      },
+      "create_tax_report_batch": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "Report items, each naming a documented report type and its period."
+          }
+        }
+      },
+      "get_tax_report_batch": {
+        "type": "object",
+        "properties": {}
       }
     },
     "extended": {
@@ -15575,6 +15552,50 @@
             "type": "object",
             "properties": {
               "amount": {
+                "format": "decimal"
+              }
+            }
+          }
+        }
+      },
+      "place_trailing_stop_order": {
+        "type": "object",
+        "properties": {
+          "size": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "retracementPct": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "retracementPx": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "activationPx": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "action": {
+            "type": "object",
+            "properties": {
+              "sz": {
+                "format": "decimal"
+              },
+              "retracement": {
+                "type": "object",
+                "properties": {
+                  "px": {
+                    "format": "decimal"
+                  },
+                  "pct": {
+                    "format": "decimal",
+                    "x-percent": true
+                  }
+                }
+              },
+              "activationPx": {
                 "format": "decimal"
               }
             }
@@ -16973,6 +16994,31 @@
             "description": "set_futures_self_trade_strategy/strategy: selects the strategy category used by the endpoint."
           }
         }
+      },
+      "get_futures_transfers": {
+        "type": "object",
+        "properties": {}
+      },
+      "set_futures_options_mm_greek_limits": {
+        "type": "object",
+        "properties": {
+          "deltaLimit": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "delta_limit": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "vegaLimit": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "vega_limit": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
       }
     },
     "kucoin": {
@@ -17297,6 +17343,14 @@
           "leverage": {
             "type": "string",
             "format": "decimal"
+          },
+          "fundsType": {
+            "type": "string",
+            "description": "Copy-trading funds account for the position; selects a documented enumeration."
+          },
+          "funds_type": {
+            "type": "string",
+            "description": "Copy-trading funds account for the position; selects a documented enumeration."
           }
         }
       },
@@ -17355,6 +17409,14 @@
           "marginMode": {
             "type": "string",
             "description": "selects cross or isolated margin using the documented integer enumeration."
+          },
+          "fundsType": {
+            "type": "string",
+            "description": "Copy-trading funds account for the position; selects a documented enumeration."
+          },
+          "funds_type": {
+            "type": "string",
+            "description": "Copy-trading funds account for the position; selects a documented enumeration."
           }
         }
       },
@@ -18099,6 +18161,14 @@
           "marginMode": {
             "type": "string",
             "description": "selects cross or isolated margin using the documented integer enumeration."
+          },
+          "fundsType": {
+            "type": "string",
+            "description": "Copy-trading funds account for the position; selects a documented enumeration."
+          },
+          "funds_type": {
+            "type": "string",
+            "description": "Copy-trading funds account for the position; selects a documented enumeration."
           }
         }
       },
@@ -18153,6 +18223,14 @@
           "withdraw_amount": {
             "type": "string",
             "format": "decimal"
+          },
+          "fundsType": {
+            "type": "string",
+            "description": "Copy-trading funds account for the position; selects a documented enumeration."
+          },
+          "funds_type": {
+            "type": "string",
+            "description": "Copy-trading funds account for the position; selects a documented enumeration."
           }
         }
       },
@@ -18720,11 +18798,19 @@
       },
       "get_spot_orderbook": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "size": {
+            "type": "integer"
+          }
+        }
       },
       "get_futures_orderbook": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "size": {
+            "type": "integer"
+          }
+        }
       },
       "cancel_spot_order": {
         "type": "object",
@@ -19184,11 +19270,29 @@
       },
       "delete_v1_copy_trade_futures_orders": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "fundsType": {
+            "type": "string",
+            "description": "Copy-trading funds account for the position; selects a documented enumeration."
+          },
+          "funds_type": {
+            "type": "string",
+            "description": "Copy-trading funds account for the position; selects a documented enumeration."
+          }
+        }
       },
       "delete_v1_copy_trade_futures_orders_client_order": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "fundsType": {
+            "type": "string",
+            "description": "Copy-trading funds account for the position; selects a documented enumeration."
+          },
+          "funds_type": {
+            "type": "string",
+            "description": "Copy-trading funds account for the position; selects a documented enumeration."
+          }
+        }
       },
       "post_v2_copy_trade_futures_change_cross_user_leverage": {
         "type": "object",
@@ -19196,6 +19300,14 @@
           "leverage": {
             "type": "string",
             "format": "decimal"
+          },
+          "fundsType": {
+            "type": "string",
+            "description": "Copy-trading funds account for the position; selects a documented enumeration."
+          },
+          "funds_type": {
+            "type": "string",
+            "description": "Copy-trading funds account for the position; selects a documented enumeration."
           }
         }
       },
@@ -19209,7 +19321,16 @@
       },
       "get_v1_copy_trade_futures_position_margin_max_withdraw_margin": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "fundsType": {
+            "type": "string",
+            "description": "Copy-trading funds account for the position; selects a documented enumeration."
+          },
+          "funds_type": {
+            "type": "string",
+            "description": "Copy-trading funds account for the position; selects a documented enumeration."
+          }
+        }
       },
       "add_futures_isolated_margin": {
         "type": "object",
@@ -19226,6 +19347,14 @@
           "margin": {
             "format": "decimal",
             "x-positive": true
+          },
+          "fundsType": {
+            "type": "string",
+            "description": "Copy-trading funds account for the position; selects a documented enumeration."
+          },
+          "funds_type": {
+            "type": "string",
+            "description": "Copy-trading funds account for the position; selects a documented enumeration."
           }
         }
       },
@@ -19805,6 +19934,40 @@
           "marginMode": {
             "type": "string",
             "description": "selects cross or isolated margin using the documented integer enumeration."
+          },
+          "fundsType": {
+            "type": "string",
+            "description": "Copy-trading funds account for the position; selects a documented enumeration."
+          },
+          "funds_type": {
+            "type": "string",
+            "description": "Copy-trading funds account for the position; selects a documented enumeration."
+          }
+        }
+      },
+      "post_v1_copy_trade_futures_position_margin_auto_deposit_status": {
+        "type": "object",
+        "properties": {
+          "fundsType": {
+            "type": "string",
+            "description": "Copy-trading funds account for the position; selects a documented enumeration."
+          },
+          "funds_type": {
+            "type": "string",
+            "description": "Copy-trading funds account for the position; selects a documented enumeration."
+          }
+        }
+      },
+      "post_v2_copy_trade_position_switch_position_mode": {
+        "type": "object",
+        "properties": {
+          "fundsType": {
+            "type": "string",
+            "description": "Copy-trading funds account for the position; selects a documented enumeration."
+          },
+          "funds_type": {
+            "type": "string",
+            "description": "Copy-trading funds account for the position; selects a documented enumeration."
           }
         }
       }
@@ -21786,6 +21949,17 @@
           "page_size": {
             "type": "integer",
             "description": "limits the number of rebate affiliate subaffiliates records per response page; this integer counts records."
+          }
+        }
+      },
+      "get_rebate_affiliate_list": {
+        "type": "object",
+        "properties": {
+          "page_size": {
+            "type": "integer"
+          },
+          "pageSize": {
+            "type": "integer"
           }
         }
       }
@@ -25280,6 +25454,14 @@
           "lever": {
             "type": "string",
             "format": "decimal"
+          },
+          "riskOffsetType": {
+            "type": "string",
+            "description": "Portfolio-margin risk offset mode; one of the documented values 1 to 4."
+          },
+          "risk_offset_type": {
+            "type": "string",
+            "description": "Portfolio-margin risk offset mode; one of the documented values 1 to 4."
           }
         }
       },
@@ -25918,6 +26100,151 @@
             "type": "integer"
           },
           "to_time": {
+            "type": "integer"
+          }
+        }
+      },
+      "place_spot_order": {
+        "type": "object",
+        "properties": {
+          "price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "size": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "place_spot_order_delayed": {
+        "type": "object",
+        "properties": {
+          "price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "size": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "place_spot_batch_orders": {
+        "type": "object",
+        "properties": {
+          "orders": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "size": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          }
+        }
+      },
+      "place_spot_batch_orders_delayed": {
+        "type": "object",
+        "properties": {
+          "orders": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "size": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          }
+        }
+      },
+      "cancel_spot_batch_orders": {
+        "type": "object",
+        "properties": {
+          "orderIDs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Spot order IDs, or client IDs with the client: prefix; no quantities.",
+            "x-delimited-string": true
+          }
+        }
+      },
+      "create_spot_transfer": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "cancel_spot_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "cancel_spot_orders": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_order": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_order_fills": {
+        "type": "object",
+        "properties": {}
+      },
+      "get_spot_orders": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer"
+          },
+          "startTime": {
+            "type": "integer"
+          },
+          "endTime": {
+            "type": "integer"
+          }
+        }
+      },
+      "get_spot_transfers": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer"
+          },
+          "startTime": {
+            "type": "integer"
+          },
+          "endTime": {
+            "type": "integer"
+          }
+        }
+      },
+      "export_spot_orders_csv": {
+        "type": "object",
+        "properties": {
+          "startTime": {
+            "type": "integer"
+          },
+          "endTime": {
             "type": "integer"
           }
         }

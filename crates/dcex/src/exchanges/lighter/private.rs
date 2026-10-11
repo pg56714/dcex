@@ -138,6 +138,7 @@ impl LighterClient {
                     "stats_start_timestamp",
                     "stats_end_timestamp",
                     "limit",
+                    "is_eligible",
                 ]),
                 auth_header_from_params(&params, self.auto_auth(&params)?)?,
             ),
@@ -177,6 +178,7 @@ impl LighterClient {
                     &[
                         "account_index",
                         "market_id",
+                        "market_ids",
                         "cursor",
                         "limit",
                         "side",
@@ -195,7 +197,12 @@ impl LighterClient {
                 PARTNER_STATS,
                 self.account_query(
                     &params,
-                    &["account_index", "start_timestamp", "end_timestamp"],
+                    &[
+                        "account_index",
+                        "start_timestamp",
+                        "end_timestamp",
+                        "period",
+                    ],
                 )?,
                 BTreeMap::new(),
             ),

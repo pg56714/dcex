@@ -1099,6 +1099,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPWithdrawalsHTTP, TradeHTTPTransfers
         vol: str,
         stopLossPrice: str | None = None,
         takeProfitPrice: str | None = None,
+        mtoken: str | None = None,
     ) -> dict[str, Any] | list[Any]:
         """MEXC Contract place contract position tpsl."""
         return await self._native_private(
@@ -1110,6 +1111,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPWithdrawalsHTTP, TradeHTTPTransfers
                 vol=vol,
                 stopLossPrice=stopLossPrice,
                 takeProfitPrice=takeProfitPrice,
+                mtoken=mtoken,
             ),
         )
 
@@ -1692,10 +1694,17 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPWithdrawalsHTTP, TradeHTTPTransfers
         self,
         *,
         member_info: str,
+        start_time: int,
+        end_time: int,
+        page: int | None = None,
+        page_size: int | None = None,
+        sub_uid: str | None = None,
+        p_uid: str | None = None,
+        currency_id: str | None = None,
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
-        GET /api/v3/rebate/affiliate/list.
+        GET /api/v3/rebate/affiliate/list; ``member_info`` is sent as the memberInfo header.
 
         Source: https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-direct-subaffiliate-data-affiliate-only
         """
@@ -1704,6 +1713,13 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPWithdrawalsHTTP, TradeHTTPTransfers
             self._native_params(
                 **{
                     "memberInfo": member_info,
+                    "startTime": start_time,
+                    "endTime": end_time,
+                    "page": page,
+                    "pageSize": page_size,
+                    "subUid": sub_uid,
+                    "pUid": p_uid,
+                    "currencyId": currency_id,
                     "recvWindow": recv_window,
                 }
             ),

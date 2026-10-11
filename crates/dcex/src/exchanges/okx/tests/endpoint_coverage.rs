@@ -1526,6 +1526,14 @@ const CASES: &[Case] = &[
         expect: &[],
     },
     Case {
+        name: "activate_account_feature",
+        public: false,
+        params: &[("feature", "1")],
+        method: "POST",
+        path: "/api/v5/account/activate-feature",
+        expect: &[],
+    },
+    Case {
         name: "precheck_account_level_switch",
         public: false,
         params: &[("acctLv", "3")],

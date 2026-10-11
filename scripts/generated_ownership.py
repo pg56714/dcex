@@ -7,10 +7,7 @@ from scripts.generation import own_directory
 SCHEMA_JOBS = [
     (exchange, "schema_requests", "table_*", "schema_tables")
     for exchange in ("binance", "bitget", "bybit", "bingx", "kucoin", "kraken", "okx")
-] + [
-    ("backpack", topic, f"table_{topic}", f"{topic}_schema")
-    for topic in ("prediction", "borrow_lend")
-]
+] + [("backpack", topic, f"table_{topic}", f"{topic}_schema") for topic in ("borrow_lend",)]
 
 
 def schema_output_names(exchange: str) -> tuple[str, ...]:

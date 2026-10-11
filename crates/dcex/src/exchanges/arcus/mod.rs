@@ -5,7 +5,6 @@ mod client;
 mod api_keys;
 mod endpoints;
 mod market;
-mod metadata;
 mod params;
 mod private;
 mod signing;

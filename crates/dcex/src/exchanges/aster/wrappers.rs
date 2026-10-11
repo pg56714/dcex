@@ -182,6 +182,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_prediction_settlement_histories(),
         get_prediction_account(),
         get_prediction_user_trades(),
+        get_prediction_transaction_history(),
         create_prediction_listen_key(),
         update_prediction_listen_key(listen_key => "listenKey"),
         cancel_prediction_listen_key(listen_key => "listenKey"),

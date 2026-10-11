@@ -2,16 +2,16 @@
   "reviewed": "2026-09-30",
   "source_file": "dcex 端點覆蓋表.html",
   "source_sha256": "6479d7c578f35b2bd9b6a243c37b239dbea399f17054dbecd1edfe98ffd92e07",
-  "row_count": 4861,
+  "row_count": 4891,
   "note": "All documented endpoints are in scope. Every official inventory row has an explicit disposition; no pending rows remain. Rows may group or duplicate operations; counts are not an endpoint coverage percentage. Implemented/protocol mean offline wire evidence, not live certification. Documentation-only sections and incomplete official contracts have explicit reasons.",
   "counts": {
     "protocol": 395,
     "partial": 1,
-    "implemented": 3411,
-    "superseded": 980,
-    "unavailable": 26,
+    "implemented": 3423,
+    "superseded": 989,
+    "unavailable": 42,
     "unverified": 11,
-    "blocked": 37
+    "blocked": 30
   },
   "rows": [
     {
@@ -43859,7 +43859,7 @@
       "exchange": "bingx",
       "kind": "REST",
       "category": "Swap trade",
-      "endpoint": "GET /openApi/swap/v1/trade/positionHistory",
+      "endpoint": "GET /openApi/swap/v2/trade/positionHistory",
       "source_status": "missing",
       "status": "implemented",
       "rust": true,
@@ -43872,8 +43872,8 @@
       "evidence": [
         "tests/unit/test_bingx_endpoint_coverage.py"
       ],
-      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/swap-trade/api-reference.md#L909",
-      "path": "/openApi/swap/v1/trade/positionHistory",
+      "official_source": "https://bingx-api.github.io/docs-v3/",
+      "path": "/openApi/swap/v2/trade/positionHistory",
       "http_method": "GET"
     },
     {
@@ -44529,20 +44529,19 @@
       "category": "Coin-M trade",
       "endpoint": "POST /openApi/cswap/v1/trade/order",
       "source_status": "missing",
-      "status": "implemented",
-      "rust": true,
-      "python_sync": true,
-      "python_async": true,
-      "methods": [
-        "place_coin_swap_order"
-      ],
-      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
-      "evidence": [
-        "tests/unit/test_bingx_endpoint_coverage.py"
-      ],
+      "status": "superseded",
+      "rust": false,
+      "python_sync": false,
+      "python_async": false,
+      "methods": [],
+      "note": "docs-v3 documents POST /openApi/cswap/v2/trade/order; place_coin_swap_order now calls it.",
+      "evidence": [],
       "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/cswap-trade/api-reference.md#L11",
       "path": "/openApi/cswap/v1/trade/order",
-      "http_method": "POST"
+      "http_method": "POST",
+      "superseded_by": [
+        3826
+      ]
     },
     {
       "row": 1890,
@@ -44621,20 +44620,19 @@
       "category": "Coin-M trade",
       "endpoint": "POST /openApi/cswap/v1/trade/allOpenOrders",
       "source_status": "missing",
-      "status": "implemented",
-      "rust": true,
-      "python_sync": true,
-      "python_async": true,
-      "methods": [
-        "cancel_coin_swap_all_orders"
-      ],
-      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
-      "evidence": [
-        "tests/unit/test_bingx_endpoint_coverage.py"
-      ],
+      "status": "superseded",
+      "rust": false,
+      "python_sync": false,
+      "python_async": false,
+      "methods": [],
+      "note": "docs-v3 documents DELETE /openApi/cswap/v1/trade/allOpenOrders; cancel_coin_swap_all_orders now calls it.",
+      "evidence": [],
       "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/cswap-trade/api-reference.md#L122",
       "path": "/openApi/cswap/v1/trade/allOpenOrders",
-      "http_method": "POST"
+      "http_method": "POST",
+      "superseded_by": [
+        3829
+      ]
     },
     {
       "row": 1894,
@@ -44970,7 +44968,7 @@
       "exchange": "bingx",
       "kind": "REST",
       "category": "Spot market",
-      "endpoint": "GET /openApi/spot/v1/market/trades",
+      "endpoint": "GET /openApi/spot/v2/quote/trades",
       "source_status": "supported",
       "status": "implemented",
       "rust": true,
@@ -44983,8 +44981,8 @@
       "evidence": [
         "tests/unit/test_bingx_endpoint_coverage.py"
       ],
-      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/spot-market/api-reference.md#L94",
-      "path": "/openApi/spot/v1/market/trades",
+      "official_source": "https://bingx-api.github.io/docs-v3/",
+      "path": "/openApi/spot/v2/quote/trades",
       "http_method": "GET"
     },
     {
@@ -45016,22 +45014,21 @@
       "exchange": "bingx",
       "kind": "REST",
       "category": "Spot market",
-      "endpoint": "GET /openApi/spot/v2/market/kline",
+      "endpoint": "GET /openApi/spot/v2/quote/klines",
       "source_status": "supported",
       "status": "implemented",
       "rust": true,
       "python_sync": true,
       "python_async": true,
       "methods": [
-        "get_spot_kline",
-        "get_spot_kline_v2"
+        "get_spot_kline"
       ],
       "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
       "evidence": [
         "tests/unit/test_bingx_endpoint_coverage.py"
       ],
-      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/spot-market/api-reference.md#L121",
-      "path": "/openApi/spot/v2/market/kline",
+      "official_source": "https://bingx-api.github.io/docs-v3/",
+      "path": "/openApi/spot/v2/quote/klines",
       "http_method": "GET"
     },
     {
@@ -45058,7 +45055,7 @@
       "exchange": "bingx",
       "kind": "REST",
       "category": "Spot market",
-      "endpoint": "GET /openApi/spot/v1/ticker/24hr",
+      "endpoint": "GET /openApi/spot/v2/quote/ticker",
       "source_status": "supported",
       "status": "implemented",
       "rust": true,
@@ -45071,8 +45068,8 @@
       "evidence": [
         "tests/unit/test_bingx_endpoint_coverage.py"
       ],
-      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/spot-market/api-reference.md#L157",
-      "path": "/openApi/spot/v1/ticker/24hr",
+      "official_source": "https://bingx-api.github.io/docs-v3/",
+      "path": "/openApi/spot/v2/quote/ticker",
       "http_method": "GET"
     },
     {
@@ -45081,7 +45078,7 @@
       "exchange": "bingx",
       "kind": "REST",
       "category": "Spot market",
-      "endpoint": "GET /openApi/spot/v2/market/depth",
+      "endpoint": "GET /openApi/spot/v2/quote/depth",
       "source_status": "supported",
       "status": "implemented",
       "rust": true,
@@ -45094,8 +45091,8 @@
       "evidence": [
         "tests/unit/test_bingx_endpoint_coverage.py"
       ],
-      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/spot-market/api-reference.md#L68",
-      "path": "/openApi/spot/v2/market/depth",
+      "official_source": "https://bingx-api.github.io/docs-v3/",
+      "path": "/openApi/spot/v2/quote/depth",
       "http_method": "GET"
     },
     {
@@ -45104,7 +45101,7 @@
       "exchange": "bingx",
       "kind": "REST",
       "category": "Spot market",
-      "endpoint": "GET /openApi/spot/v2/ticker/price",
+      "endpoint": "GET /openApi/spot/v2/quote/price",
       "source_status": "supported",
       "status": "implemented",
       "rust": true,
@@ -45117,8 +45114,8 @@
       "evidence": [
         "tests/unit/test_bingx_endpoint_coverage.py"
       ],
-      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/spot-market/api-reference.md#L192",
-      "path": "/openApi/spot/v2/ticker/price",
+      "official_source": "https://bingx-api.github.io/docs-v3/",
+      "path": "/openApi/spot/v2/quote/price",
       "http_method": "GET"
     },
     {
@@ -45127,7 +45124,7 @@
       "exchange": "bingx",
       "kind": "REST",
       "category": "Spot market",
-      "endpoint": "GET /openApi/spot/v1/ticker/bookTicker",
+      "endpoint": "GET /openApi/spot/v2/quote/bookTicker",
       "source_status": "supported",
       "status": "implemented",
       "rust": true,
@@ -45140,8 +45137,8 @@
       "evidence": [
         "tests/unit/test_bingx_endpoint_coverage.py"
       ],
-      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/spot-market/api-reference.md#L226",
-      "path": "/openApi/spot/v1/ticker/bookTicker",
+      "official_source": "https://bingx-api.github.io/docs-v3/",
+      "path": "/openApi/spot/v2/quote/bookTicker",
       "http_method": "GET"
     },
     {
@@ -45150,7 +45147,7 @@
       "exchange": "bingx",
       "kind": "REST",
       "category": "Spot market",
-      "endpoint": "GET /openApi/market/his/v1/kline",
+      "endpoint": "GET /openApi/spot/v2/quote/historicalKlines",
       "source_status": "missing",
       "status": "implemented",
       "rust": true,
@@ -45163,8 +45160,8 @@
       "evidence": [
         "tests/unit/test_bingx_endpoint_coverage.py"
       ],
-      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/spot-market/api-reference.md#L254",
-      "path": "/openApi/market/his/v1/kline",
+      "official_source": "https://bingx-api.github.io/docs-v3/",
+      "path": "/openApi/spot/v2/quote/historicalKlines",
       "http_method": "GET"
     },
     {
@@ -45173,7 +45170,7 @@
       "exchange": "bingx",
       "kind": "REST",
       "category": "Spot market",
-      "endpoint": "GET /openApi/market/his/v1/trade",
+      "endpoint": "GET /openApi/spot/v2/quote/historicalTrades",
       "source_status": "missing",
       "status": "implemented",
       "rust": true,
@@ -45186,8 +45183,8 @@
       "evidence": [
         "tests/unit/test_bingx_endpoint_coverage.py"
       ],
-      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/spot-market/api-reference.md#L287",
-      "path": "/openApi/market/his/v1/trade",
+      "official_source": "https://bingx-api.github.io/docs-v3/",
+      "path": "/openApi/spot/v2/quote/historicalTrades",
       "http_method": "GET"
     },
     {
@@ -52545,7 +52542,7 @@
       "exchange": "mexc",
       "kind": "REST",
       "category": "Futures trading",
-      "endpoint": "POST /api/v1/private/order/open_order_total_count",
+      "endpoint": "GET /api/v1/private/order/open_order_total_count",
       "source_status": "supported",
       "status": "superseded",
       "rust": false,
@@ -52558,7 +52555,7 @@
       ],
       "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/query-in-flight-order-counts",
       "path": "/api/v1/private/order/open_order_total_count",
-      "http_method": "POST",
+      "http_method": "GET",
       "superseded_reason": "Live route serves GET only; see the observed GET row."
     },
     {
@@ -66349,17 +66346,13 @@
       "category": "Markets",
       "endpoint": "GET /api/v1/prediction",
       "source_status": "missing",
-      "status": "implemented",
-      "rust": true,
-      "python_sync": true,
-      "python_async": true,
-      "methods": [
-        "get_prediction_events"
-      ],
-      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
-      "evidence": [
-        "tests/unit/test_backpack_endpoint_coverage.py"
-      ],
+      "status": "unavailable",
+      "rust": false,
+      "python_sync": false,
+      "python_async": false,
+      "methods": [],
+      "note": "Removed from the official documentation (checked 2026-10-10); wrapper removed.",
+      "evidence": [],
       "official_source": "https://docs.backpack.exchange/#tag/Markets/operation/get_prediction_events",
       "path": "/api/v1/prediction",
       "http_method": "GET"
@@ -66372,17 +66365,13 @@
       "category": "Markets",
       "endpoint": "GET /api/v1/prediction/tags",
       "source_status": "missing",
-      "status": "implemented",
-      "rust": true,
-      "python_sync": true,
-      "python_async": true,
-      "methods": [
-        "get_prediction_tags"
-      ],
-      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
-      "evidence": [
-        "tests/unit/test_backpack_endpoint_coverage.py"
-      ],
+      "status": "unavailable",
+      "rust": false,
+      "python_sync": false,
+      "python_async": false,
+      "methods": [],
+      "note": "Removed from the official documentation (checked 2026-10-10); wrapper removed.",
+      "evidence": [],
       "official_source": "https://docs.backpack.exchange/#tag/Markets/operation/get_prediction_tags",
       "path": "/api/v1/prediction/tags",
       "http_method": "GET"
@@ -66393,7 +66382,7 @@
       "exchange": "backpack",
       "kind": "REST",
       "category": "Markets",
-      "endpoint": "GET /api/v1/market-sessions",
+      "endpoint": "GET /api/v1/stockSessions",
       "source_status": "supported",
       "status": "implemented",
       "rust": true,
@@ -66407,7 +66396,7 @@
         "tests/unit/test_backpack_endpoint_coverage.py"
       ],
       "official_source": "https://docs.backpack.exchange/#tag/Markets/operation/get_market_sessions",
-      "path": "/api/v1/market-sessions",
+      "path": "/api/v1/stockSessions",
       "http_method": "GET"
     },
     {
@@ -66416,7 +66405,7 @@
       "exchange": "backpack",
       "kind": "REST",
       "category": "Markets",
-      "endpoint": "GET /api/v1/market-holidays",
+      "endpoint": "GET /api/v1/stockHolidays",
       "source_status": "supported",
       "status": "implemented",
       "rust": true,
@@ -66430,7 +66419,7 @@
         "tests/unit/test_backpack_endpoint_coverage.py"
       ],
       "official_source": "https://docs.backpack.exchange/#tag/Markets/operation/get_market_holidays",
-      "path": "/api/v1/market-holidays",
+      "path": "/api/v1/stockHolidays",
       "http_method": "GET"
     },
     {
@@ -66787,18 +66776,14 @@
       "kind": "REST",
       "category": "RFQ",
       "endpoint": "POST /api/v1/rfq/refresh",
-      "source_status": "supported",
-      "status": "implemented",
-      "rust": true,
-      "python_sync": true,
-      "python_async": true,
-      "methods": [
-        "refresh_rfq"
-      ],
-      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
-      "evidence": [
-        "tests/unit/test_backpack_endpoint_coverage.py"
-      ],
+      "source_status": "missing",
+      "status": "unavailable",
+      "rust": false,
+      "python_sync": false,
+      "python_async": false,
+      "methods": [],
+      "note": "Removed from the official documentation (checked 2026-10-10); wrapper removed.",
+      "evidence": [],
       "official_source": "https://docs.backpack.exchange/#tag/RFQ/operation/refresh_rfq",
       "path": "/api/v1/rfq/refresh",
       "http_method": "POST"
@@ -74391,18 +74376,14 @@
       "kind": "REST",
       "category": "Read",
       "endpoint": "GET /v1/spotAssets",
-      "source_status": "supported",
-      "status": "implemented",
-      "rust": true,
-      "python_sync": true,
-      "python_async": true,
-      "methods": [
-        "get_spot_assets"
-      ],
-      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
-      "evidence": [
-        "tests/unit/test_arcus_endpoint_coverage.py"
-      ],
+      "source_status": "missing",
+      "status": "unavailable",
+      "rust": false,
+      "python_sync": false,
+      "python_async": false,
+      "methods": [],
+      "note": "Removed from the official documentation (checked 2026-10-10); wrapper removed.",
+      "evidence": [],
       "official_source": "https://docs.arcus.xyz/api-reference/public/get-spot-collateral-assets",
       "path": "/v1/spotAssets",
       "http_method": "GET"
@@ -74414,18 +74395,14 @@
       "kind": "REST",
       "category": "Read",
       "endpoint": "GET /v1/compliance",
-      "source_status": "rust-only",
-      "status": "implemented",
-      "rust": true,
-      "python_sync": true,
-      "python_async": true,
-      "methods": [
-        "get_compliance"
-      ],
-      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
-      "evidence": [
-        "tests/unit/test_arcus_endpoint_coverage.py"
-      ],
+      "source_status": "missing",
+      "status": "unavailable",
+      "rust": false,
+      "python_sync": false,
+      "python_async": false,
+      "methods": [],
+      "note": "Removed from the official documentation (checked 2026-10-10); wrapper removed.",
+      "evidence": [],
       "official_source": "https://docs.arcus.xyz/api-reference/public/get-compliance-status",
       "path": "/v1/compliance",
       "http_method": "GET"
@@ -74667,18 +74644,14 @@
       "kind": "REST",
       "category": "Read",
       "endpoint": "GET /v1/spotFills",
-      "source_status": "rust-only",
-      "status": "implemented",
-      "rust": true,
-      "python_sync": true,
-      "python_async": true,
-      "methods": [
-        "get_spot_fills"
-      ],
-      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
-      "evidence": [
-        "tests/unit/test_arcus_endpoint_coverage.py"
-      ],
+      "source_status": "missing",
+      "status": "unavailable",
+      "rust": false,
+      "python_sync": false,
+      "python_async": false,
+      "methods": [],
+      "note": "Removed from the official documentation (checked 2026-10-10); wrapper removed.",
+      "evidence": [],
       "official_source": "https://docs.arcus.xyz/api-reference/public/get-spot-fills",
       "path": "/v1/spotFills",
       "http_method": "GET"
@@ -74759,18 +74732,14 @@
       "kind": "REST",
       "category": "Read",
       "endpoint": "GET /v1/interest",
-      "source_status": "rust-only",
-      "status": "implemented",
-      "rust": true,
-      "python_sync": true,
-      "python_async": true,
-      "methods": [
-        "get_interest"
-      ],
-      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
-      "evidence": [
-        "tests/unit/test_arcus_endpoint_coverage.py"
-      ],
+      "source_status": "missing",
+      "status": "unavailable",
+      "rust": false,
+      "python_sync": false,
+      "python_async": false,
+      "methods": [],
+      "note": "Removed from the official documentation (checked 2026-10-10); wrapper removed.",
+      "evidence": [],
       "official_source": "https://docs.arcus.xyz/api-reference/public/get-interest-payments",
       "path": "/v1/interest",
       "http_method": "GET"
@@ -74874,18 +74843,14 @@
       "kind": "REST",
       "category": "Read",
       "endpoint": "GET /v1/spotPositions",
-      "source_status": "rust-only",
-      "status": "implemented",
-      "rust": true,
-      "python_sync": true,
-      "python_async": true,
-      "methods": [
-        "get_spot_positions"
-      ],
-      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
-      "evidence": [
-        "tests/unit/test_arcus_endpoint_coverage.py"
-      ],
+      "source_status": "missing",
+      "status": "unavailable",
+      "rust": false,
+      "python_sync": false,
+      "python_async": false,
+      "methods": [],
+      "note": "Removed from the official documentation (checked 2026-10-10); wrapper removed.",
+      "evidence": [],
       "official_source": "https://docs.arcus.xyz/api-reference/public/get-spot-positions",
       "path": "/v1/spotPositions",
       "http_method": "GET"
@@ -75408,17 +75373,8 @@
       "python_sync": false,
       "python_async": false,
       "methods": [],
-      "note": "Grouped row split into explicit verb/path/operation rows. See rows 3686, 3687, 3688, 3689.",
-      "evidence": [
-        "dcex/arcus/_market_http.py::MarketHTTP.get_market_metadata",
-        "dcex/arcus/_market_http.py::MarketHTTP.get_market_overview",
-        "dcex/arcus/_market_http.py::MarketHTTP.get_spot_market_overview",
-        "dcex/arcus/_market_http.py::MarketHTTP.get_metadata_candles",
-        "dcex/async_support/arcus/_market_http.py::MarketHTTP.get_market_metadata",
-        "dcex/async_support/arcus/_market_http.py::MarketHTTP.get_market_overview",
-        "dcex/async_support/arcus/_market_http.py::MarketHTTP.get_spot_market_overview",
-        "dcex/async_support/arcus/_market_http.py::MarketHTTP.get_metadata_candles"
-      ],
+      "note": "Grouped row split into explicit verb/path/operation rows 3686, 3687, 3688, 3689; the official documentation no longer lists them (checked 2026-10-10).",
+      "evidence": [],
       "official_source": "https://docs.arcus.xyz/api-reference/marketmetadata/get-market-metadata",
       "official_sources": [
         "https://docs.arcus.xyz/api-reference/marketmetadata/get-market-metadata",
@@ -75426,7 +75382,7 @@
         "https://docs.arcus.xyz/api-reference/marketmetadata/get-spot-candles",
         "https://docs.arcus.xyz/api-reference/marketmetadata/get-spot-market-overview"
       ],
-      "superseded_reason": "Grouped row split into explicit verb/path/operation rows. See rows 3686, 3687, 3688, 3689."
+      "superseded_reason": "Grouped row split into explicit verb/path/operation rows 3686, 3687, 3688, 3689; the official documentation no longer lists them (checked 2026-10-10)."
     },
     {
       "row": 3169,
@@ -75441,22 +75397,15 @@
       "python_sync": false,
       "python_async": false,
       "methods": [],
-      "note": "Grouped row split into explicit verb/path/operation rows. See rows 3690, 3691, 3692.",
-      "evidence": [
-        "dcex/arcus/_account_http.py::AccountHTTP.get_user_preferences",
-        "dcex/arcus/_account_http.py::AccountHTTP.upsert_user_preferences",
-        "dcex/arcus/_account_http.py::AccountHTTP.delete_user_preference_signed",
-        "dcex/async_support/arcus/_account_http.py::AccountHTTP.get_user_preferences",
-        "dcex/async_support/arcus/_account_http.py::AccountHTTP.upsert_user_preferences",
-        "dcex/async_support/arcus/_account_http.py::AccountHTTP.delete_user_preference_signed"
-      ],
+      "note": "Grouped row split into explicit verb/path/operation rows 3690, 3691, 3692; the official documentation no longer lists them (checked 2026-10-10).",
+      "evidence": [],
       "official_source": "https://docs.arcus.xyz/api-reference/userpreferences/delete-a-user-preference",
       "official_sources": [
         "https://docs.arcus.xyz/api-reference/userpreferences/delete-a-user-preference",
         "https://docs.arcus.xyz/api-reference/userpreferences/get-user-preferences",
         "https://docs.arcus.xyz/api-reference/userpreferences/upsert-user-preferences"
       ],
-      "superseded_reason": "Grouped row split into explicit verb/path/operation rows. See rows 3690, 3691, 3692."
+      "superseded_reason": "Grouped row split into explicit verb/path/operation rows 3690, 3691, 3692; the official documentation no longer lists them (checked 2026-10-10)."
     },
     {
       "row": 3170,
@@ -87590,17 +87539,13 @@
       "category": "Metadata",
       "endpoint": "GET /v1/api-meta/markets",
       "source_status": "missing",
-      "status": "implemented",
-      "rust": true,
-      "python_sync": true,
-      "python_async": true,
-      "methods": [
-        "get_market_metadata"
-      ],
-      "note": "Split from grouped row 3168; exact verb/path and typed operation verified by the cited offline suites.",
-      "evidence": [
-        "tests/unit/test_arcus_endpoint_coverage.py"
-      ],
+      "status": "unavailable",
+      "rust": false,
+      "python_sync": false,
+      "python_async": false,
+      "methods": [],
+      "note": "Removed from the official documentation (checked 2026-10-10); wrapper removed.",
+      "evidence": [],
       "official_source": "https://docs.arcus.xyz/api-reference/marketmetadata/get-market-metadata",
       "http_method": "GET",
       "path": "/v1/api-meta/markets"
@@ -87613,17 +87558,13 @@
       "category": "Metadata",
       "endpoint": "GET /v1/api-meta/overview",
       "source_status": "missing",
-      "status": "implemented",
-      "rust": true,
-      "python_sync": true,
-      "python_async": true,
-      "methods": [
-        "get_market_overview"
-      ],
-      "note": "Split from grouped row 3168; exact verb/path and typed operation verified by the cited offline suites.",
-      "evidence": [
-        "tests/unit/test_arcus_endpoint_coverage.py"
-      ],
+      "status": "unavailable",
+      "rust": false,
+      "python_sync": false,
+      "python_async": false,
+      "methods": [],
+      "note": "Removed from the official documentation (checked 2026-10-10); wrapper removed.",
+      "evidence": [],
       "official_source": "https://docs.arcus.xyz/api-reference/marketmetadata/get-market-overview",
       "http_method": "GET",
       "path": "/v1/api-meta/overview"
@@ -87636,17 +87577,13 @@
       "category": "Metadata",
       "endpoint": "GET /v1/api-meta/spot/overview",
       "source_status": "missing",
-      "status": "implemented",
-      "rust": true,
-      "python_sync": true,
-      "python_async": true,
-      "methods": [
-        "get_spot_market_overview"
-      ],
-      "note": "Split from grouped row 3168; exact verb/path and typed operation verified by the cited offline suites.",
-      "evidence": [
-        "tests/unit/test_arcus_endpoint_coverage.py"
-      ],
+      "status": "unavailable",
+      "rust": false,
+      "python_sync": false,
+      "python_async": false,
+      "methods": [],
+      "note": "Removed from the official documentation (checked 2026-10-10); wrapper removed.",
+      "evidence": [],
       "official_source": "https://docs.arcus.xyz/api-reference/marketmetadata/get-spot-market-overview",
       "http_method": "GET",
       "path": "/v1/api-meta/spot/overview"
@@ -87659,17 +87596,13 @@
       "category": "Metadata",
       "endpoint": "GET /v1/api-meta/candles",
       "source_status": "missing",
-      "status": "implemented",
-      "rust": true,
-      "python_sync": true,
-      "python_async": true,
-      "methods": [
-        "get_metadata_candles"
-      ],
-      "note": "Split from grouped row 3168; exact verb/path and typed operation verified by the cited offline suites.",
-      "evidence": [
-        "tests/unit/test_arcus_endpoint_coverage.py"
-      ],
+      "status": "unavailable",
+      "rust": false,
+      "python_sync": false,
+      "python_async": false,
+      "methods": [],
+      "note": "Removed from the official documentation (checked 2026-10-10); wrapper removed.",
+      "evidence": [],
       "official_source": "https://docs.arcus.xyz/api-reference/marketmetadata/get-spot-candles",
       "http_method": "GET",
       "path": "/v1/api-meta/candles"
@@ -87682,17 +87615,13 @@
       "category": "Prefs",
       "endpoint": "GET /v1/api-meta/userPreferences",
       "source_status": "missing",
-      "status": "implemented",
-      "rust": true,
-      "python_sync": true,
-      "python_async": true,
-      "methods": [
-        "get_user_preferences"
-      ],
-      "note": "Split from grouped row 3169; exact verb/path and typed operation verified by the cited offline suites.",
-      "evidence": [
-        "tests/unit/test_arcus_endpoint_coverage.py"
-      ],
+      "status": "unavailable",
+      "rust": false,
+      "python_sync": false,
+      "python_async": false,
+      "methods": [],
+      "note": "Removed from the official documentation (checked 2026-10-10); wrapper removed.",
+      "evidence": [],
       "official_source": "https://docs.arcus.xyz/api-reference/userpreferences/get-user-preferences",
       "http_method": "GET",
       "path": "/v1/api-meta/userPreferences"
@@ -87705,17 +87634,13 @@
       "category": "Prefs",
       "endpoint": "PATCH /v1/api-meta/userPreferences",
       "source_status": "missing",
-      "status": "implemented",
-      "rust": true,
-      "python_sync": true,
-      "python_async": true,
-      "methods": [
-        "upsert_user_preferences"
-      ],
-      "note": "Split from grouped row 3169; exact verb/path and typed operation verified by the cited offline suites.",
-      "evidence": [
-        "tests/unit/test_arcus_endpoint_coverage.py"
-      ],
+      "status": "unavailable",
+      "rust": false,
+      "python_sync": false,
+      "python_async": false,
+      "methods": [],
+      "note": "Removed from the official documentation (checked 2026-10-10); wrapper removed.",
+      "evidence": [],
       "official_source": "https://docs.arcus.xyz/api-reference/userpreferences/upsert-user-preferences",
       "http_method": "PATCH",
       "path": "/v1/api-meta/userPreferences"
@@ -87728,17 +87653,13 @@
       "category": "Prefs",
       "endpoint": "DELETE /v1/api-meta/userPreferences",
       "source_status": "missing",
-      "status": "implemented",
-      "rust": true,
-      "python_sync": true,
-      "python_async": true,
-      "methods": [
-        "delete_user_preference_signed"
-      ],
-      "note": "Split from grouped row 3169; exact verb/path and typed operation verified by the cited offline suites.",
-      "evidence": [
-        "tests/unit/test_arcus_endpoint_coverage.py"
-      ],
+      "status": "unavailable",
+      "rust": false,
+      "python_sync": false,
+      "python_async": false,
+      "methods": [],
+      "note": "Removed from the official documentation (checked 2026-10-10); wrapper removed.",
+      "evidence": [],
       "official_source": "https://docs.arcus.xyz/api-reference/userpreferences/delete-a-user-preference",
       "http_method": "DELETE",
       "path": "/v1/api-meta/userPreferences"
@@ -90908,7 +90829,7 @@
       "python_sync": true,
       "python_async": true,
       "methods": [
-        "post_cswap_v2_trade_order"
+        "place_coin_swap_order"
       ],
       "note": "Dedicated Rust and sync/async Python wrappers; official request fields, HTTP verb, query/body, host selection, and authentication verified by offline wire tests. Not tested with a live account.",
       "evidence": [
@@ -90927,21 +90848,19 @@
       "category": "Official documentation inventory",
       "endpoint": "GET /openApi/spot/v2/quote/price",
       "source_status": "official inventory",
-      "status": "implemented",
-      "rust": true,
-      "python_sync": true,
-      "python_async": true,
-      "methods": [
-        "get_spot_v2_quote_price"
-      ],
-      "note": "Dedicated Rust and sync/async Python wrappers; official request fields, HTTP verb, query/body, host selection, and authentication verified by offline wire tests. Not tested with a live account.",
+      "status": "superseded",
+      "rust": false,
+      "python_sync": false,
+      "python_async": false,
+      "methods": [],
+      "note": "Duplicate of row 1914; get_spot_price_ticker sends this official route.",
       "evidence": [
-        "crates/dcex/src/exchanges/bingx/schema_requests/request_tables.rs",
-        "tests/unit/test_bingx_schema_requests.py::test_inventory_wire"
+        "tests/unit/test_bingx_endpoint_coverage.py"
       ],
       "official_source": "https://bingx-api.github.io/docs-v3/#/en/Spot/Market%20Data/Symbol%20Price%20Ticker",
       "http_method": "GET",
-      "path": "/openApi/spot/v2/quote/price"
+      "path": "/openApi/spot/v2/quote/price",
+      "superseded_by": 1914
     },
     {
       "row": 3828,
@@ -90980,7 +90899,7 @@
       "python_sync": true,
       "python_async": true,
       "methods": [
-        "delete_cswap_v1_trade_all_open_orders"
+        "cancel_coin_swap_all_orders"
       ],
       "note": "Dedicated Rust and sync/async Python wrappers; official request fields, HTTP verb, query/body, host selection, and authentication verified by offline wire tests. Not tested with a live account.",
       "evidence": [
@@ -91047,21 +90966,19 @@
       "category": "Official documentation inventory",
       "endpoint": "GET /openApi/spot/v2/quote/bookTicker",
       "source_status": "official inventory",
-      "status": "implemented",
-      "rust": true,
-      "python_sync": true,
-      "python_async": true,
-      "methods": [
-        "get_spot_v2_quote_book_ticker"
-      ],
-      "note": "Dedicated Rust and sync/async Python wrappers; official request fields, HTTP verb, query/body, host selection, and authentication verified by offline wire tests. Not tested with a live account.",
+      "status": "superseded",
+      "rust": false,
+      "python_sync": false,
+      "python_async": false,
+      "methods": [],
+      "note": "Duplicate of row 1915; get_spot_book_ticker sends this official route.",
       "evidence": [
-        "crates/dcex/src/exchanges/bingx/schema_requests/request_tables.rs",
-        "tests/unit/test_bingx_schema_requests.py::test_inventory_wire"
+        "tests/unit/test_bingx_endpoint_coverage.py"
       ],
       "official_source": "https://bingx-api.github.io/docs-v3/#/en/Spot/Market%20Data/Symbol%20Order%20Book%20Ticker",
       "http_method": "GET",
-      "path": "/openApi/spot/v2/quote/bookTicker"
+      "path": "/openApi/spot/v2/quote/bookTicker",
+      "superseded_by": 1915
     },
     {
       "row": 3833,
@@ -91191,21 +91108,19 @@
       "category": "Official documentation inventory",
       "endpoint": "GET /openApi/spot/v2/quote/depth",
       "source_status": "official inventory",
-      "status": "implemented",
-      "rust": true,
-      "python_sync": true,
-      "python_async": true,
-      "methods": [
-        "get_spot_v2_quote_depth"
-      ],
-      "note": "Dedicated Rust and sync/async Python wrappers; official request fields, HTTP verb, query/body, host selection, and authentication verified by offline wire tests. Not tested with a live account.",
+      "status": "superseded",
+      "rust": false,
+      "python_sync": false,
+      "python_async": false,
+      "methods": [],
+      "note": "Duplicate of row 1913; get_spot_orderbook_v2 sends this official route.",
       "evidence": [
-        "crates/dcex/src/exchanges/bingx/schema_requests/request_tables.rs",
-        "tests/unit/test_bingx_schema_requests.py::test_inventory_wire"
+        "tests/unit/test_bingx_endpoint_coverage.py"
       ],
       "official_source": "https://bingx-api.github.io/docs-v3/#/en/Spot/Market%20Data/Order%20Book%20aggregation",
       "http_method": "GET",
-      "path": "/openApi/spot/v2/quote/depth"
+      "path": "/openApi/spot/v2/quote/depth",
+      "superseded_by": 1913
     },
     {
       "row": 3839,
@@ -91335,21 +91250,19 @@
       "category": "Official documentation inventory",
       "endpoint": "GET /openApi/spot/v2/quote/historicalTrades",
       "source_status": "official inventory",
-      "status": "implemented",
-      "rust": true,
-      "python_sync": true,
-      "python_async": true,
-      "methods": [
-        "get_spot_v2_quote_historical_trades"
-      ],
-      "note": "Dedicated Rust and sync/async Python wrappers; official request fields, HTTP verb, query/body, host selection, and authentication verified by offline wire tests. Not tested with a live account.",
+      "status": "superseded",
+      "rust": false,
+      "python_sync": false,
+      "python_async": false,
+      "methods": [],
+      "note": "Duplicate of row 1917; get_spot_historical_trades sends this official route.",
       "evidence": [
-        "crates/dcex/src/exchanges/bingx/schema_requests/request_tables.rs",
-        "tests/unit/test_bingx_schema_requests.py::test_inventory_wire"
+        "tests/unit/test_bingx_endpoint_coverage.py"
       ],
       "official_source": "https://bingx-api.github.io/docs-v3/#/en/Spot/Market%20Data/Historical%20Trades",
       "http_method": "GET",
-      "path": "/openApi/spot/v2/quote/historicalTrades"
+      "path": "/openApi/spot/v2/quote/historicalTrades",
+      "superseded_by": 1917
     },
     {
       "row": 3845,
@@ -91383,21 +91296,19 @@
       "category": "Official documentation inventory",
       "endpoint": "GET /openApi/spot/v2/quote/klines",
       "source_status": "official inventory",
-      "status": "implemented",
-      "rust": true,
-      "python_sync": true,
-      "python_async": true,
-      "methods": [
-        "get_spot_v2_quote_klines"
-      ],
-      "note": "Dedicated Rust and sync/async Python wrappers; official request fields, HTTP verb, query/body, host selection, and authentication verified by offline wire tests. Not tested with a live account.",
+      "status": "superseded",
+      "rust": false,
+      "python_sync": false,
+      "python_async": false,
+      "methods": [],
+      "note": "Duplicate of row 1910; get_spot_kline sends this official route.",
       "evidence": [
-        "crates/dcex/src/exchanges/bingx/schema_requests/request_tables.rs",
-        "tests/unit/test_bingx_schema_requests.py::test_inventory_wire"
+        "tests/unit/test_bingx_endpoint_coverage.py"
       ],
       "official_source": "https://bingx-api.github.io/docs-v3/#/en/Spot/Market%20Data/Kline%2FCandlestick%20Data",
       "http_method": "GET",
-      "path": "/openApi/spot/v2/quote/klines"
+      "path": "/openApi/spot/v2/quote/klines",
+      "superseded_by": 1910
     },
     {
       "row": 3847,
@@ -91503,21 +91414,19 @@
       "category": "Official documentation inventory",
       "endpoint": "GET /openApi/spot/v2/quote/ticker",
       "source_status": "official inventory",
-      "status": "implemented",
-      "rust": true,
-      "python_sync": true,
-      "python_async": true,
-      "methods": [
-        "get_spot_v2_quote_ticker"
-      ],
-      "note": "Dedicated Rust and sync/async Python wrappers; official request fields, HTTP verb, query/body, host selection, and authentication verified by offline wire tests. Not tested with a live account.",
+      "status": "superseded",
+      "rust": false,
+      "python_sync": false,
+      "python_async": false,
+      "methods": [],
+      "note": "Duplicate of row 1912; get_spot_ticker sends this official route.",
       "evidence": [
-        "crates/dcex/src/exchanges/bingx/schema_requests/request_tables.rs",
-        "tests/unit/test_bingx_schema_requests.py::test_inventory_wire"
+        "tests/unit/test_bingx_endpoint_coverage.py"
       ],
       "official_source": "https://bingx-api.github.io/docs-v3/#/en/Spot/Market%20Data/24hr%20Ticker%20Price%20Change%20Statistics",
       "http_method": "GET",
-      "path": "/openApi/spot/v2/quote/ticker"
+      "path": "/openApi/spot/v2/quote/ticker",
+      "superseded_by": 1912
     },
     {
       "row": 3852,
@@ -91551,21 +91460,19 @@
       "category": "Official documentation inventory",
       "endpoint": "GET /openApi/spot/v2/quote/historicalKlines",
       "source_status": "official inventory",
-      "status": "implemented",
-      "rust": true,
-      "python_sync": true,
-      "python_async": true,
-      "methods": [
-        "get_spot_v2_quote_historical_klines"
-      ],
-      "note": "Dedicated Rust and sync/async Python wrappers; official request fields, HTTP verb, query/body, host selection, and authentication verified by offline wire tests. Not tested with a live account.",
+      "status": "superseded",
+      "rust": false,
+      "python_sync": false,
+      "python_async": false,
+      "methods": [],
+      "note": "Duplicate of row 1916; get_spot_historical_kline sends this official route.",
       "evidence": [
-        "crates/dcex/src/exchanges/bingx/schema_requests/request_tables.rs",
-        "tests/unit/test_bingx_schema_requests.py::test_inventory_wire"
+        "tests/unit/test_bingx_endpoint_coverage.py"
       ],
       "official_source": "https://bingx-api.github.io/docs-v3/#/en/Spot/Market%20Data/Historical%20K-line",
       "http_method": "GET",
-      "path": "/openApi/spot/v2/quote/historicalKlines"
+      "path": "/openApi/spot/v2/quote/historicalKlines",
+      "superseded_by": 1916
     },
     {
       "row": 3854,
@@ -115782,17 +115689,20 @@
       "kind": "REST",
       "category": "Spot private operations awaiting specification",
       "endpoint": "POST /v1/spot/orders",
-      "source_status": "unpublished API specification",
-      "status": "blocked",
-      "rust": false,
-      "python_sync": false,
-      "python_async": false,
-      "methods": [],
-      "note": "Official spot API specification remains unpublished as of 2026-09-30. This planned place operation has provisional method/path only; no method name, private request, signature assumption or live order is established.",
-      "evidence": [
-        "https://docs.ondoperps.xyz/spot-trading"
+      "source_status": "supported",
+      "status": "implemented",
+      "rust": true,
+      "python_sync": true,
+      "python_async": true,
+      "methods": [
+        "place_spot_order"
       ],
-      "official_source": "https://docs.ondoperps.xyz/spot-trading",
+      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "evidence": [
+        "crates/dcex/src/exchanges/ondo/tests/endpoint_coverage.rs",
+        "tests/unit/test_ondo_endpoint_coverage.py"
+      ],
+      "official_source": "https://docs.ondoperps.xyz/api-reference/rest-spec.json",
       "http_method": "POST",
       "path": "/v1/spot/orders"
     },
@@ -115803,17 +115713,20 @@
       "kind": "REST",
       "category": "Spot private operations awaiting specification",
       "endpoint": "DELETE /v1/spot/orders",
-      "source_status": "unpublished API specification",
-      "status": "blocked",
-      "rust": false,
-      "python_sync": false,
-      "python_async": false,
-      "methods": [],
-      "note": "Official spot API specification remains unpublished as of 2026-09-30. This planned cancel operation has provisional method/path only; no method name, private request, signature assumption or live order is established.",
-      "evidence": [
-        "https://docs.ondoperps.xyz/spot-trading"
+      "source_status": "supported",
+      "status": "implemented",
+      "rust": true,
+      "python_sync": true,
+      "python_async": true,
+      "methods": [
+        "cancel_spot_orders"
       ],
-      "official_source": "https://docs.ondoperps.xyz/spot-trading",
+      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "evidence": [
+        "crates/dcex/src/exchanges/ondo/tests/endpoint_coverage.rs",
+        "tests/unit/test_ondo_endpoint_coverage.py"
+      ],
+      "official_source": "https://docs.ondoperps.xyz/api-reference/rest-spec.json",
       "http_method": "DELETE",
       "path": "/v1/spot/orders"
     },
@@ -115824,17 +115737,20 @@
       "kind": "REST",
       "category": "Spot private operations awaiting specification",
       "endpoint": "GET /v1/spot/orders",
-      "source_status": "unpublished API specification",
-      "status": "blocked",
-      "rust": false,
-      "python_sync": false,
-      "python_async": false,
-      "methods": [],
-      "note": "Official spot API specification remains unpublished as of 2026-09-30. This planned query operation has provisional method/path only; no method name, private request, signature assumption or live order is established.",
-      "evidence": [
-        "https://docs.ondoperps.xyz/spot-trading"
+      "source_status": "supported",
+      "status": "implemented",
+      "rust": true,
+      "python_sync": true,
+      "python_async": true,
+      "methods": [
+        "get_spot_orders"
       ],
-      "official_source": "https://docs.ondoperps.xyz/spot-trading",
+      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "evidence": [
+        "crates/dcex/src/exchanges/ondo/tests/endpoint_coverage.rs",
+        "tests/unit/test_ondo_endpoint_coverage.py"
+      ],
+      "official_source": "https://docs.ondoperps.xyz/api-reference/rest-spec.json",
       "http_method": "GET",
       "path": "/v1/spot/orders"
     },
@@ -115845,17 +115761,20 @@
       "kind": "REST",
       "category": "Spot private operations awaiting specification",
       "endpoint": "POST /v1/spot/orders/batch",
-      "source_status": "unpublished API specification",
-      "status": "blocked",
-      "rust": false,
-      "python_sync": false,
-      "python_async": false,
-      "methods": [],
-      "note": "Official spot API specification remains unpublished as of 2026-09-30. This planned batch placement operation has provisional method/path only; no method name, private request, signature assumption or live order is established.",
-      "evidence": [
-        "https://docs.ondoperps.xyz/spot-trading"
+      "source_status": "supported",
+      "status": "implemented",
+      "rust": true,
+      "python_sync": true,
+      "python_async": true,
+      "methods": [
+        "place_spot_batch_orders"
       ],
-      "official_source": "https://docs.ondoperps.xyz/spot-trading",
+      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "evidence": [
+        "crates/dcex/src/exchanges/ondo/tests/endpoint_coverage.rs",
+        "tests/unit/test_ondo_endpoint_coverage.py"
+      ],
+      "official_source": "https://docs.ondoperps.xyz/api-reference/rest-spec.json",
       "http_method": "POST",
       "path": "/v1/spot/orders/batch"
     },
@@ -115866,17 +115785,20 @@
       "kind": "REST",
       "category": "Spot private operations awaiting specification",
       "endpoint": "DELETE /v1/spot/orders/batch",
-      "source_status": "unpublished API specification",
-      "status": "blocked",
-      "rust": false,
-      "python_sync": false,
-      "python_async": false,
-      "methods": [],
-      "note": "Official spot API specification remains unpublished as of 2026-09-30. This planned batch cancellation operation has provisional method/path only; no method name, private request, signature assumption or live order is established.",
-      "evidence": [
-        "https://docs.ondoperps.xyz/spot-trading"
+      "source_status": "supported",
+      "status": "implemented",
+      "rust": true,
+      "python_sync": true,
+      "python_async": true,
+      "methods": [
+        "cancel_spot_batch_orders"
       ],
-      "official_source": "https://docs.ondoperps.xyz/spot-trading",
+      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "evidence": [
+        "crates/dcex/src/exchanges/ondo/tests/endpoint_coverage.rs",
+        "tests/unit/test_ondo_endpoint_coverage.py"
+      ],
+      "official_source": "https://docs.ondoperps.xyz/api-reference/rest-spec.json",
       "http_method": "DELETE",
       "path": "/v1/spot/orders/batch"
     },
@@ -115887,17 +115809,20 @@
       "kind": "REST",
       "category": "Spot private operations awaiting specification",
       "endpoint": "GET /v1/spot/fills",
-      "source_status": "unpublished API specification",
-      "status": "blocked",
-      "rust": false,
-      "python_sync": false,
-      "python_async": false,
-      "methods": [],
-      "note": "Official spot API specification remains unpublished as of 2026-09-30. This planned fills operation has provisional method/path only; no method name, private request, signature assumption or live order is established.",
-      "evidence": [
-        "https://docs.ondoperps.xyz/spot-trading"
+      "source_status": "supported",
+      "status": "implemented",
+      "rust": true,
+      "python_sync": true,
+      "python_async": true,
+      "methods": [
+        "get_spot_fills"
       ],
-      "official_source": "https://docs.ondoperps.xyz/spot-trading",
+      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "evidence": [
+        "crates/dcex/src/exchanges/ondo/tests/endpoint_coverage.rs",
+        "tests/unit/test_ondo_endpoint_coverage.py"
+      ],
+      "official_source": "https://docs.ondoperps.xyz/api-reference/rest-spec.json",
       "http_method": "GET",
       "path": "/v1/spot/fills"
     },
@@ -115908,17 +115833,20 @@
       "kind": "REST",
       "category": "Spot private operations awaiting specification",
       "endpoint": "GET /v1/spot/candles",
-      "source_status": "unpublished API specification",
-      "status": "blocked",
-      "rust": false,
-      "python_sync": false,
-      "python_async": false,
-      "methods": [],
-      "note": "Official spot API specification remains unpublished as of 2026-09-30. This planned candles operation has provisional method/path only; no method name, private request, signature assumption or live order is established.",
-      "evidence": [
-        "https://docs.ondoperps.xyz/spot-trading"
+      "source_status": "supported",
+      "status": "implemented",
+      "rust": true,
+      "python_sync": true,
+      "python_async": true,
+      "methods": [
+        "get_spot_candles"
       ],
-      "official_source": "https://docs.ondoperps.xyz/spot-trading",
+      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "evidence": [
+        "crates/dcex/src/exchanges/ondo/tests/endpoint_coverage.rs",
+        "tests/unit/test_ondo_endpoint_coverage.py"
+      ],
+      "official_source": "https://docs.ondoperps.xyz/api-reference/rest-spec.json",
       "http_method": "GET",
       "path": "/v1/spot/candles"
     },
@@ -116010,6 +115938,715 @@
       "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/query-in-flight-order-counts",
       "path": "/api/v1/private/order/open_order_total_count",
       "http_method": "GET"
+    },
+    {
+      "row": 4862,
+      "source_index": 4861,
+      "exchange": "okx",
+      "kind": "REST",
+      "category": "Trading Account",
+      "endpoint": "POST /api/v5/account/activate-feature",
+      "source_status": "supported",
+      "status": "implemented",
+      "rust": true,
+      "python_sync": true,
+      "python_async": true,
+      "methods": [
+        "activate_account_feature"
+      ],
+      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "evidence": [
+        "tests/unit/test_okx_endpoint_coverage.py",
+        "crates/dcex/src/exchanges/okx/tests/endpoint_coverage.rs"
+      ],
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-activate-feature",
+      "http_method": "POST",
+      "path": "/api/v5/account/activate-feature"
+    },
+    {
+      "row": 4863,
+      "source_index": 4862,
+      "exchange": "aster",
+      "kind": "REST",
+      "category": "Prediction",
+      "endpoint": "GET /api/v3/prediction/transactionHistory",
+      "source_status": "supported",
+      "status": "implemented",
+      "rust": true,
+      "python_sync": true,
+      "python_async": true,
+      "methods": [
+        "get_prediction_transaction_history"
+      ],
+      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "evidence": [
+        "crates/dcex/src/exchanges/aster/tests/endpoint_coverage.rs",
+        "tests/unit/test_aster_endpoint_coverage.py"
+      ],
+      "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#query-transaction-records",
+      "http_method": "GET",
+      "path": "/api/v3/prediction/transactionHistory",
+      "host": "papi"
+    },
+    {
+      "row": 4864,
+      "source_index": 4863,
+      "exchange": "bingx",
+      "kind": "REST",
+      "category": "Copy trading",
+      "endpoint": "POST /openApi/social/v1/swap/signal",
+      "source_status": "supported",
+      "status": "implemented",
+      "rust": true,
+      "python_sync": true,
+      "python_async": true,
+      "methods": [
+        "create_swap_signal"
+      ],
+      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "evidence": [
+        "tests/unit/test_bingx_endpoint_coverage.py"
+      ],
+      "official_source": "https://bingx-api.github.io/docs-v3/",
+      "http_method": "POST",
+      "path": "/openApi/social/v1/swap/signal"
+    },
+    {
+      "row": 4865,
+      "source_index": 4864,
+      "exchange": "bybit",
+      "kind": "REST",
+      "category": "Get Auto Savings",
+      "endpoint": "GET /v5/earn/flexible-saving/auto-savings",
+      "source_status": "supported",
+      "status": "implemented",
+      "rust": true,
+      "python_sync": true,
+      "python_async": true,
+      "methods": [
+        "get_earn_auto_savings"
+      ],
+      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "evidence": [
+        "tests/unit/test_bybit_schema_requests.py"
+      ],
+      "official_source": "https://bybit-exchange.github.io/docs/v5/earn/flexible-saving/auto-savings",
+      "http_method": "GET",
+      "path": "/v5/earn/flexible-saving/auto-savings"
+    },
+    {
+      "row": 4866,
+      "source_index": 4865,
+      "exchange": "bybit",
+      "kind": "REST",
+      "category": "Set Auto Savings",
+      "endpoint": "POST /v5/earn/flexible-saving/auto-savings",
+      "source_status": "supported",
+      "status": "implemented",
+      "rust": true,
+      "python_sync": true,
+      "python_async": true,
+      "methods": [
+        "set_earn_auto_savings"
+      ],
+      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "evidence": [
+        "tests/unit/test_bybit_schema_requests.py"
+      ],
+      "official_source": "https://bybit-exchange.github.io/docs/v5/earn/flexible-saving/auto-savings",
+      "http_method": "POST",
+      "path": "/v5/earn/flexible-saving/auto-savings"
+    },
+    {
+      "row": 4867,
+      "source_index": 4866,
+      "exchange": "bybit",
+      "kind": "REST",
+      "category": "Batch Request Export Reports",
+      "endpoint": "POST /v5/fht/compliance/tax/private/batch_create",
+      "source_status": "supported",
+      "status": "implemented",
+      "rust": true,
+      "python_sync": true,
+      "python_async": true,
+      "methods": [
+        "create_tax_report_batch"
+      ],
+      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "evidence": [
+        "tests/unit/test_bybit_schema_requests.py"
+      ],
+      "official_source": "https://bybit-exchange.github.io/docs/v5/tax/batch-create",
+      "http_method": "POST",
+      "path": "/v5/fht/compliance/tax/private/batch_create"
+    },
+    {
+      "row": 4868,
+      "source_index": 4867,
+      "exchange": "bybit",
+      "kind": "REST",
+      "category": "Batch Query Export Reports",
+      "endpoint": "GET /v5/fht/compliance/tax/private/batch_query",
+      "source_status": "supported",
+      "status": "implemented",
+      "rust": true,
+      "python_sync": true,
+      "python_async": true,
+      "methods": [
+        "get_tax_report_batch"
+      ],
+      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "evidence": [
+        "tests/unit/test_bybit_schema_requests.py"
+      ],
+      "official_source": "https://bybit-exchange.github.io/docs/v5/tax/batch-query",
+      "http_method": "GET",
+      "path": "/v5/fht/compliance/tax/private/batch_query"
+    },
+    {
+      "row": 4869,
+      "source_index": 4868,
+      "exchange": "bybit",
+      "kind": "REST",
+      "category": "Get User Register Date",
+      "endpoint": "POST /fht/compliance/tax/v3/private/registertime",
+      "source_status": "supported",
+      "status": "implemented",
+      "rust": true,
+      "python_sync": true,
+      "python_async": true,
+      "methods": [
+        "get_tax_register_time"
+      ],
+      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "evidence": [
+        "tests/unit/test_bybit_schema_requests.py"
+      ],
+      "official_source": "https://bybit-exchange.github.io/docs/v5/tax/register-time",
+      "http_method": "POST",
+      "path": "/fht/compliance/tax/v3/private/registertime"
+    },
+    {
+      "row": 4870,
+      "source_index": 4869,
+      "exchange": "kraken",
+      "kind": "REST",
+      "category": "Futures account",
+      "endpoint": "GET /derivatives/api/v3/options-mm-greek-limits",
+      "source_status": "supported",
+      "status": "implemented",
+      "rust": true,
+      "python_sync": true,
+      "python_async": true,
+      "methods": [
+        "get_futures_options_mm_greek_limits"
+      ],
+      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "evidence": [
+        "tests/unit/test_kraken_endpoint_coverage.py",
+        "crates/dcex/src/exchanges/kraken/tests/endpoint_coverage.rs"
+      ],
+      "official_source": "https://docs.kraken.com/api-reference/account-information/get-options-mm-greek-limits",
+      "http_method": "GET",
+      "path": "/derivatives/api/v3/options-mm-greek-limits"
+    },
+    {
+      "row": 4871,
+      "source_index": 4870,
+      "exchange": "kraken",
+      "kind": "REST",
+      "category": "Futures account",
+      "endpoint": "PUT /derivatives/api/v3/options-mm-greek-limits",
+      "source_status": "supported",
+      "status": "implemented",
+      "rust": true,
+      "python_sync": true,
+      "python_async": true,
+      "methods": [
+        "set_futures_options_mm_greek_limits"
+      ],
+      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "evidence": [
+        "tests/unit/test_kraken_endpoint_coverage.py",
+        "crates/dcex/src/exchanges/kraken/tests/endpoint_coverage.rs"
+      ],
+      "official_source": "https://docs.kraken.com/api-reference/account-information/set-options-mm-greek-limits",
+      "http_method": "PUT",
+      "path": "/derivatives/api/v3/options-mm-greek-limits"
+    },
+    {
+      "row": 4872,
+      "source_index": 4871,
+      "exchange": "kraken",
+      "kind": "REST",
+      "category": "Futures account",
+      "endpoint": "DELETE /derivatives/api/v3/options-mm-greek-limits",
+      "source_status": "supported",
+      "status": "implemented",
+      "rust": true,
+      "python_sync": true,
+      "python_async": true,
+      "methods": [
+        "delete_futures_options_mm_greek_limits"
+      ],
+      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "evidence": [
+        "tests/unit/test_kraken_endpoint_coverage.py",
+        "crates/dcex/src/exchanges/kraken/tests/endpoint_coverage.rs"
+      ],
+      "official_source": "https://docs.kraken.com/api-reference/account-information/delete-options-mm-greek-limits",
+      "http_method": "DELETE",
+      "path": "/derivatives/api/v3/options-mm-greek-limits"
+    },
+    {
+      "row": 4873,
+      "source_index": 4872,
+      "exchange": "kraken",
+      "kind": "REST",
+      "category": "Futures account",
+      "endpoint": "GET /derivatives/api/v3/transfers",
+      "source_status": "supported",
+      "status": "implemented",
+      "rust": true,
+      "python_sync": true,
+      "python_async": true,
+      "methods": [
+        "get_futures_transfers"
+      ],
+      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "evidence": [
+        "tests/unit/test_kraken_endpoint_coverage.py",
+        "crates/dcex/src/exchanges/kraken/tests/endpoint_coverage.rs"
+      ],
+      "official_source": "https://docs.kraken.com/api-reference/transfers/get-transfers",
+      "http_method": "GET",
+      "path": "/derivatives/api/v3/transfers"
+    },
+    {
+      "row": 4874,
+      "source_index": 4873,
+      "exchange": "kraken",
+      "kind": "REST",
+      "category": "Affiliate",
+      "endpoint": "GET /affiliate/v1/cpa-progress",
+      "source_status": "supported",
+      "status": "implemented",
+      "rust": true,
+      "python_sync": true,
+      "python_async": true,
+      "methods": [
+        "get_affiliate_cpa_progress"
+      ],
+      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "evidence": [
+        "tests/unit/test_kraken_endpoint_coverage.py"
+      ],
+      "official_source": "https://docs.kraken.com/api-reference/affiliate/get-cpa-progress",
+      "http_method": "GET",
+      "path": "/affiliate/v1/cpa-progress"
+    },
+    {
+      "row": 4875,
+      "source_index": 4874,
+      "exchange": "kraken",
+      "kind": "REST",
+      "category": "Affiliate",
+      "endpoint": "GET /affiliate/v1/payout-history",
+      "source_status": "supported",
+      "status": "implemented",
+      "rust": true,
+      "python_sync": true,
+      "python_async": true,
+      "methods": [
+        "get_affiliate_payout_history"
+      ],
+      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "evidence": [
+        "tests/unit/test_kraken_endpoint_coverage.py"
+      ],
+      "official_source": "https://docs.kraken.com/api-reference/affiliate/get-payout-history",
+      "http_method": "GET",
+      "path": "/affiliate/v1/payout-history"
+    },
+    {
+      "row": 4876,
+      "source_index": 4875,
+      "exchange": "kraken",
+      "kind": "REST",
+      "category": "Portfolio margining",
+      "endpoint": "POST /derivatives/api/v3/portfolio-margining/simulate-iv",
+      "source_status": "supported",
+      "status": "unavailable",
+      "rust": false,
+      "python_sync": false,
+      "python_async": false,
+      "methods": [],
+      "note": "Official spec marks this x-internalOnly and available only in Kraken pre-prod environments.",
+      "evidence": [],
+      "official_source": "https://docs.kraken.com/api-reference/account-information/simulate-iv",
+      "http_method": "POST",
+      "path": "/derivatives/api/v3/portfolio-margining/simulate-iv"
+    },
+    {
+      "row": 4877,
+      "source_index": 4876,
+      "exchange": "backpack",
+      "kind": "REST",
+      "category": "Markets",
+      "endpoint": "GET /api/v1/stockIndicativeQuote",
+      "source_status": "supported",
+      "status": "implemented",
+      "rust": true,
+      "python_sync": true,
+      "python_async": true,
+      "methods": [
+        "get_stock_indicative_quote"
+      ],
+      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "evidence": [
+        "tests/unit/test_backpack_endpoint_coverage.py"
+      ],
+      "official_source": "https://docs.backpack.exchange/#tag/Markets/operation/get_stock_indicative_quote",
+      "http_method": "GET",
+      "path": "/api/v1/stockIndicativeQuote"
+    },
+    {
+      "row": 4878,
+      "source_index": 4877,
+      "exchange": "ondo",
+      "kind": "REST",
+      "category": "Spot",
+      "endpoint": "GET /v1/spot/ticker",
+      "source_status": "supported",
+      "status": "implemented",
+      "rust": true,
+      "python_sync": true,
+      "python_async": true,
+      "methods": [
+        "get_spot_ticker"
+      ],
+      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "evidence": [
+        "crates/dcex/src/exchanges/ondo/tests/endpoint_coverage.rs",
+        "tests/unit/test_ondo_endpoint_coverage.py"
+      ],
+      "official_source": "https://docs.ondoperps.xyz/api-reference/rest-spec.json",
+      "http_method": "GET",
+      "path": "/v1/spot/ticker"
+    },
+    {
+      "row": 4879,
+      "source_index": 4878,
+      "exchange": "ondo",
+      "kind": "REST",
+      "category": "Spot",
+      "endpoint": "POST /v1/spot/orders/delayed",
+      "source_status": "supported",
+      "status": "implemented",
+      "rust": true,
+      "python_sync": true,
+      "python_async": true,
+      "methods": [
+        "place_spot_order_delayed"
+      ],
+      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "evidence": [
+        "crates/dcex/src/exchanges/ondo/tests/endpoint_coverage.rs",
+        "tests/unit/test_ondo_endpoint_coverage.py"
+      ],
+      "official_source": "https://docs.ondoperps.xyz/api-reference/rest-spec.json",
+      "http_method": "POST",
+      "path": "/v1/spot/orders/delayed"
+    },
+    {
+      "row": 4880,
+      "source_index": 4879,
+      "exchange": "ondo",
+      "kind": "REST",
+      "category": "Spot",
+      "endpoint": "POST /v1/spot/orders/batch/delayed",
+      "source_status": "supported",
+      "status": "implemented",
+      "rust": true,
+      "python_sync": true,
+      "python_async": true,
+      "methods": [
+        "place_spot_batch_orders_delayed"
+      ],
+      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "evidence": [
+        "crates/dcex/src/exchanges/ondo/tests/endpoint_coverage.rs",
+        "tests/unit/test_ondo_endpoint_coverage.py"
+      ],
+      "official_source": "https://docs.ondoperps.xyz/api-reference/rest-spec.json",
+      "http_method": "POST",
+      "path": "/v1/spot/orders/batch/delayed"
+    },
+    {
+      "row": 4881,
+      "source_index": 4880,
+      "exchange": "ondo",
+      "kind": "REST",
+      "category": "Spot",
+      "endpoint": "GET /v1/spot/orders/{orderID}",
+      "source_status": "supported",
+      "status": "implemented",
+      "rust": true,
+      "python_sync": true,
+      "python_async": true,
+      "methods": [
+        "get_spot_order"
+      ],
+      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "evidence": [
+        "crates/dcex/src/exchanges/ondo/tests/endpoint_coverage.rs",
+        "tests/unit/test_ondo_endpoint_coverage.py"
+      ],
+      "official_source": "https://docs.ondoperps.xyz/api-reference/rest-spec.json",
+      "http_method": "GET",
+      "path": "/v1/spot/orders/{orderID}"
+    },
+    {
+      "row": 4882,
+      "source_index": 4881,
+      "exchange": "ondo",
+      "kind": "REST",
+      "category": "Spot",
+      "endpoint": "DELETE /v1/spot/orders/{orderID}",
+      "source_status": "supported",
+      "status": "implemented",
+      "rust": true,
+      "python_sync": true,
+      "python_async": true,
+      "methods": [
+        "cancel_spot_order"
+      ],
+      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "evidence": [
+        "crates/dcex/src/exchanges/ondo/tests/endpoint_coverage.rs",
+        "tests/unit/test_ondo_endpoint_coverage.py"
+      ],
+      "official_source": "https://docs.ondoperps.xyz/api-reference/rest-spec.json",
+      "http_method": "DELETE",
+      "path": "/v1/spot/orders/{orderID}"
+    },
+    {
+      "row": 4883,
+      "source_index": 4882,
+      "exchange": "ondo",
+      "kind": "REST",
+      "category": "Spot",
+      "endpoint": "GET /v1/spot/orders/{orderID}/fills",
+      "source_status": "supported",
+      "status": "implemented",
+      "rust": true,
+      "python_sync": true,
+      "python_async": true,
+      "methods": [
+        "get_spot_order_fills"
+      ],
+      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "evidence": [
+        "crates/dcex/src/exchanges/ondo/tests/endpoint_coverage.rs",
+        "tests/unit/test_ondo_endpoint_coverage.py"
+      ],
+      "official_source": "https://docs.ondoperps.xyz/api-reference/rest-spec.json",
+      "http_method": "GET",
+      "path": "/v1/spot/orders/{orderID}/fills"
+    },
+    {
+      "row": 4884,
+      "source_index": 4883,
+      "exchange": "ondo",
+      "kind": "REST",
+      "category": "Spot",
+      "endpoint": "GET /v1/spot/orders/csv",
+      "source_status": "supported",
+      "status": "implemented",
+      "rust": true,
+      "python_sync": true,
+      "python_async": true,
+      "methods": [
+        "export_spot_orders_csv"
+      ],
+      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "evidence": [
+        "crates/dcex/src/exchanges/ondo/tests/endpoint_coverage.rs",
+        "tests/unit/test_ondo_endpoint_coverage.py"
+      ],
+      "official_source": "https://docs.ondoperps.xyz/api-reference/rest-spec.json",
+      "http_method": "GET",
+      "path": "/v1/spot/orders/csv"
+    },
+    {
+      "row": 4885,
+      "source_index": 4884,
+      "exchange": "ondo",
+      "kind": "REST",
+      "category": "Spot",
+      "endpoint": "GET /v1/spot/fills/csv",
+      "source_status": "supported",
+      "status": "implemented",
+      "rust": true,
+      "python_sync": true,
+      "python_async": true,
+      "methods": [
+        "export_spot_fills_csv"
+      ],
+      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "evidence": [
+        "crates/dcex/src/exchanges/ondo/tests/endpoint_coverage.rs",
+        "tests/unit/test_ondo_endpoint_coverage.py"
+      ],
+      "official_source": "https://docs.ondoperps.xyz/api-reference/rest-spec.json",
+      "http_method": "GET",
+      "path": "/v1/spot/fills/csv"
+    },
+    {
+      "row": 4886,
+      "source_index": 4885,
+      "exchange": "ondo",
+      "kind": "REST",
+      "category": "Spot",
+      "endpoint": "GET /v1/spot/balances",
+      "source_status": "supported",
+      "status": "implemented",
+      "rust": true,
+      "python_sync": true,
+      "python_async": true,
+      "methods": [
+        "get_spot_balances"
+      ],
+      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "evidence": [
+        "crates/dcex/src/exchanges/ondo/tests/endpoint_coverage.rs",
+        "tests/unit/test_ondo_endpoint_coverage.py"
+      ],
+      "official_source": "https://docs.ondoperps.xyz/api-reference/rest-spec.json",
+      "http_method": "GET",
+      "path": "/v1/spot/balances"
+    },
+    {
+      "row": 4887,
+      "source_index": 4886,
+      "exchange": "ondo",
+      "kind": "REST",
+      "category": "Spot",
+      "endpoint": "GET /v1/spot/transfers",
+      "source_status": "supported",
+      "status": "implemented",
+      "rust": true,
+      "python_sync": true,
+      "python_async": true,
+      "methods": [
+        "get_spot_transfers"
+      ],
+      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "evidence": [
+        "crates/dcex/src/exchanges/ondo/tests/endpoint_coverage.rs",
+        "tests/unit/test_ondo_endpoint_coverage.py"
+      ],
+      "official_source": "https://docs.ondoperps.xyz/api-reference/rest-spec.json",
+      "http_method": "GET",
+      "path": "/v1/spot/transfers"
+    },
+    {
+      "row": 4888,
+      "source_index": 4887,
+      "exchange": "ondo",
+      "kind": "REST",
+      "category": "Spot",
+      "endpoint": "POST /v1/spot/transfers",
+      "source_status": "supported",
+      "status": "implemented",
+      "rust": true,
+      "python_sync": true,
+      "python_async": true,
+      "methods": [
+        "create_spot_transfer"
+      ],
+      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "evidence": [
+        "crates/dcex/src/exchanges/ondo/tests/endpoint_coverage.rs",
+        "tests/unit/test_ondo_endpoint_coverage.py"
+      ],
+      "official_source": "https://docs.ondoperps.xyz/api-reference/rest-spec.json",
+      "http_method": "POST",
+      "path": "/v1/spot/transfers"
+    },
+    {
+      "row": 4889,
+      "source_index": 4888,
+      "exchange": "ondo",
+      "kind": "REST",
+      "category": "Spot",
+      "endpoint": "GET /v1/builder_code/stats",
+      "source_status": "supported",
+      "status": "implemented",
+      "rust": true,
+      "python_sync": true,
+      "python_async": true,
+      "methods": [
+        "get_builder_code_stats"
+      ],
+      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "evidence": [
+        "crates/dcex/src/exchanges/ondo/tests/endpoint_coverage.rs",
+        "tests/unit/test_ondo_endpoint_coverage.py"
+      ],
+      "official_source": "https://docs.ondoperps.xyz/api-reference/rest-spec.json",
+      "http_method": "GET",
+      "path": "/v1/builder_code/stats"
+    },
+    {
+      "row": 4890,
+      "source_index": 4889,
+      "exchange": "ondo",
+      "kind": "REST",
+      "category": "Spot",
+      "endpoint": "GET /v1/builder_code/fills",
+      "source_status": "supported",
+      "status": "implemented",
+      "rust": true,
+      "python_sync": true,
+      "python_async": true,
+      "methods": [
+        "get_builder_code_fills"
+      ],
+      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "evidence": [
+        "crates/dcex/src/exchanges/ondo/tests/endpoint_coverage.rs",
+        "tests/unit/test_ondo_endpoint_coverage.py"
+      ],
+      "official_source": "https://docs.ondoperps.xyz/api-reference/rest-spec.json",
+      "http_method": "GET",
+      "path": "/v1/builder_code/fills"
+    },
+    {
+      "row": 4891,
+      "source_index": 4890,
+      "exchange": "hyperliquid",
+      "kind": "REST",
+      "category": "Trading",
+      "endpoint": "trailingStop",
+      "source_status": "supported",
+      "status": "implemented",
+      "rust": true,
+      "python_sync": true,
+      "python_async": true,
+      "methods": [
+        "place_trailing_stop_order"
+      ],
+      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "evidence": [
+        "tests/unit/test_hyperliquid_endpoint_coverage.py"
+      ],
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint",
+      "http_method": "POST",
+      "path": "/exchange",
+      "actions": [
+        "trailingStop"
+      ]
     }
   ],
   "verification": {

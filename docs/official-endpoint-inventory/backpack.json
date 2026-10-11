@@ -143,13 +143,13 @@
     },
     {
       "method": "GET",
-      "path": "/api/v1/market-sessions",
+      "path": "/api/v1/stockSessions",
       "official_source": "https://docs.backpack.exchange/#tag/Markets/operation/get_market_sessions",
       "operation_id": "get_market_sessions"
     },
     {
       "method": "GET",
-      "path": "/api/v1/market-holidays",
+      "path": "/api/v1/stockHolidays",
       "official_source": "https://docs.backpack.exchange/#tag/Markets/operation/get_market_holidays",
       "operation_id": "get_market_holidays"
     },
@@ -501,6 +501,13 @@
       "channel": "Streams",
       "title": "Streams",
       "official_source": "https://docs.backpack.exchange/#tag/Streams"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/stockIndicativeQuote",
+      "title": "Get indicative stock quote",
+      "official_source": "https://docs.backpack.exchange/#tag/Markets/operation/get_stock_indicative_quote",
+      "operation_id": "get_stock_indicative_quote"
     }
   ]
 }

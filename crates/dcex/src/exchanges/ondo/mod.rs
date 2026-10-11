@@ -5,6 +5,7 @@ mod market;
 mod params;
 mod private;
 mod signing;
+mod spot;
 mod trade;
 pub mod websocket;
 mod wrappers;

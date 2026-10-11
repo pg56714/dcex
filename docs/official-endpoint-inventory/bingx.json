@@ -1045,43 +1045,43 @@
     },
     {
       "method": "GET",
-      "path": "/openApi/spot/v2/market/depth",
-      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/spot-market/api-reference.md#L68"
+      "path": "/openApi/spot/v2/quote/depth",
+      "official_source": "https://bingx-api.github.io/docs-v3/"
     },
     {
       "method": "GET",
-      "path": "/openApi/spot/v1/market/trades",
-      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/spot-market/api-reference.md#L94"
+      "path": "/openApi/spot/v2/quote/trades",
+      "official_source": "https://bingx-api.github.io/docs-v3/"
     },
     {
       "method": "GET",
-      "path": "/openApi/spot/v2/market/kline",
-      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/spot-market/api-reference.md#L121"
+      "path": "/openApi/spot/v2/quote/klines",
+      "official_source": "https://bingx-api.github.io/docs-v3/"
     },
     {
       "method": "GET",
-      "path": "/openApi/spot/v1/ticker/24hr",
-      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/spot-market/api-reference.md#L157"
+      "path": "/openApi/spot/v2/quote/ticker",
+      "official_source": "https://bingx-api.github.io/docs-v3/"
     },
     {
       "method": "GET",
-      "path": "/openApi/spot/v2/ticker/price",
-      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/spot-market/api-reference.md#L192"
+      "path": "/openApi/spot/v2/quote/price",
+      "official_source": "https://bingx-api.github.io/docs-v3/"
     },
     {
       "method": "GET",
-      "path": "/openApi/spot/v1/ticker/bookTicker",
-      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/spot-market/api-reference.md#L226"
+      "path": "/openApi/spot/v2/quote/bookTicker",
+      "official_source": "https://bingx-api.github.io/docs-v3/"
     },
     {
       "method": "GET",
-      "path": "/openApi/market/his/v1/kline",
-      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/spot-market/api-reference.md#L254"
+      "path": "/openApi/spot/v2/quote/historicalKlines",
+      "official_source": "https://bingx-api.github.io/docs-v3/"
     },
     {
       "method": "GET",
-      "path": "/openApi/market/his/v1/trade",
-      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/spot-market/api-reference.md#L287"
+      "path": "/openApi/spot/v2/quote/historicalTrades",
+      "official_source": "https://bingx-api.github.io/docs-v3/"
     },
     {
       "method": "POST",
@@ -1274,8 +1274,8 @@
     },
     {
       "method": "GET",
-      "path": "/openApi/swap/v1/trade/positionHistory",
-      "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/swap-trade/api-reference.md#L909"
+      "path": "/openApi/swap/v2/trade/positionHistory",
+      "official_source": "https://bingx-api.github.io/docs-v3/"
     },
     {
       "method": "POST",
@@ -1293,6 +1293,12 @@
       "path": "wss://open-api-swap.bingx.com/swap-market",
       "channel": "Subscribe to Book Ticker Streams",
       "official_source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/swap-ws-market/api-reference.md#L264"
+    },
+    {
+      "method": "POST",
+      "path": "/openApi/social/v1/swap/signal",
+      "title": "Create Signal",
+      "official_source": "https://bingx-api.github.io/docs-v3/"
     }
   ],
   "reviewed": "2026-09-28"

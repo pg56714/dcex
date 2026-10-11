@@ -48,7 +48,6 @@ class AccountHTTPTransfersHTTP(HTTPManager):
         self,
         from_account: str | None = None,
         to_account: str | None = None,
-        transfer_id: int | str | None = None,
         tran_id: int | str | None = None,
         start_time: int | None = None,
         end_time: int | None = None,
@@ -62,7 +61,6 @@ class AccountHTTPTransfersHTTP(HTTPManager):
             self._native_params(
                 fromAccount=from_account,
                 toAccount=to_account,
-                transferId=transfer_id,
                 tranId=tran_id,
                 startTime=start_time,
                 endTime=end_time,
@@ -170,7 +168,6 @@ class TradeHTTPTransfersHTTP(HTTPManager):
         self,
         *,
         coin: str,
-        id: str | None = None,
         transfer_client_id: str | None = None,
         start_time: int | None = None,
         end_time: int | None = None,
@@ -185,7 +182,6 @@ class TradeHTTPTransfersHTTP(HTTPManager):
             "get_internal_transfer_records",
             self._native_params(
                 coin=coin,
-                id=id,
                 transferClientId=transfer_client_id,
                 startTime=start_time,
                 endTime=end_time,

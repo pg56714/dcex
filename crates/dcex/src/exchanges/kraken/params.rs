@@ -105,6 +105,32 @@ pub(super) fn require_one_identifier(params: &KrakenParams, keys: &[&str]) -> Re
     )))
 }
 
+/// `cursor` pages only exist in cursor mode, which `with_cursor=true` selects.
+pub(super) fn require_cursor_mode(params: &KrakenParams) -> Result<()> {
+    match params.get("with_cursor") {
+        None | Some("true" | "false") => {}
+        Some(_) => return Err(invalid("with_cursor must be true or false")),
+    }
+    if params.get("cursor").is_some() && params.get("with_cursor") != Some("true") {
+        return Err(invalid("cursor requires with_cursor=true"));
+    }
+    Ok(())
+}
+
+/// `limit` is an integer from 1 to the route's documented maximum.
+pub(super) fn require_limit(params: &KrakenParams, maximum: u64) -> Result<()> {
+    match params.get("limit") {
+        Some(limit)
+            if !limit
+                .parse::<u64>()
+                .is_ok_and(|value| (1..=maximum).contains(&value)) =>
+        {
+            Err(invalid(format!("limit must be from 1 to {maximum}")))
+        }
+        _ => Ok(()),
+    }
+}
+
 pub(in crate::exchanges::kraken) fn invalid(message: impl std::fmt::Display) -> crate::DcexError {
     crate::DcexError::InvalidInput(format!("Kraken: {message}"))
 }

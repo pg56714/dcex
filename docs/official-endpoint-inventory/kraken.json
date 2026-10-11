@@ -1217,6 +1217,55 @@
       "host": "spot-websocket-v2",
       "channel": "trade",
       "official_source": "https://docs.kraken.com/exchange/api-reference/spot-websocket-v2/trade"
+    },
+    {
+      "method": "GET",
+      "path": "/derivatives/api/v3/options-mm-greek-limits",
+      "title": "Get options MM greek limits",
+      "official_source": "https://docs.kraken.com/api-reference/account-information/get-options-mm-greek-limits",
+      "spec": "/openapi/futures-rest.yaml"
+    },
+    {
+      "method": "PUT",
+      "path": "/derivatives/api/v3/options-mm-greek-limits",
+      "title": "Update options MM greek limits for a currency",
+      "official_source": "https://docs.kraken.com/api-reference/account-information/set-options-mm-greek-limits",
+      "spec": "/openapi/futures-rest.yaml"
+    },
+    {
+      "method": "DELETE",
+      "path": "/derivatives/api/v3/options-mm-greek-limits",
+      "title": "Delete options MM greek limits",
+      "official_source": "https://docs.kraken.com/api-reference/account-information/delete-options-mm-greek-limits",
+      "spec": "/openapi/futures-rest.yaml"
+    },
+    {
+      "method": "GET",
+      "path": "/derivatives/api/v3/transfers",
+      "title": "List deposits and withdrawals (transfers)",
+      "official_source": "https://docs.kraken.com/api-reference/transfers/get-transfers",
+      "spec": "/openapi/futures-rest.yaml"
+    },
+    {
+      "method": "GET",
+      "path": "/affiliate/v1/cpa-progress",
+      "title": "Get CPA Progress",
+      "official_source": "https://docs.kraken.com/api-reference/affiliate/get-cpa-progress",
+      "spec": "/openapi/affiliate-rest.yaml"
+    },
+    {
+      "method": "GET",
+      "path": "/affiliate/v1/payout-history",
+      "title": "Get Payout History",
+      "official_source": "https://docs.kraken.com/api-reference/affiliate/get-payout-history",
+      "spec": "/openapi/affiliate-rest.yaml"
+    },
+    {
+      "method": "POST",
+      "path": "/derivatives/api/v3/portfolio-margining/simulate-iv",
+      "title": "Calculate the IV for options at a specific price",
+      "official_source": "https://docs.kraken.com/api-reference/account-information/simulate-iv",
+      "spec": "/openapi/futures-rest.yaml"
     }
   ],
   "reviewed": "2026-09-28"

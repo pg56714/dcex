@@ -314,29 +314,6 @@
     }
   },
   {
-    "name": "get_rebate_affiliate_list",
-    "method": "GET",
-    "path": "/api/v3/rebate/affiliate/list",
-    "fields": [
-      {
-        "name": "memberInfo",
-        "python_name": "member_info",
-        "type": "string",
-        "required": true,
-        "description": "memberInfo"
-      },
-      {
-        "name": "recvWindow",
-        "python_name": "recv_window",
-        "type": "long",
-        "required": false,
-        "description": "Signature validity window in milliseconds, up to 60000."
-      }
-    ],
-    "title": "Get Direct Sub-affiliate Data",
-    "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-direct-subaffiliate-data-affiliate-only"
-  },
-  {
     "name": "get_rebate_affiliate_subaffiliates",
     "method": "GET",
     "path": "/api/v3/rebate/affiliate/subaffiliates",

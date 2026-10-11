@@ -83,22 +83,26 @@ class AccountHTTP(AccountHTTPTransfersHTTP, AccountHTTPWithdrawalsHTTP, HTTPMana
     async def get_spot_account_balance(
         self,
         rebase_multiplier: str | None = None,
+        account_id: str | None = None,
     ) -> dict[str, Any]:
         """Retrieve Kraken spot account balances."""
         return await self._native_private(
             "get_spot_account_balance",
-            self._native_params(rebase_multiplier=rebase_multiplier),
+            self._native_params(rebase_multiplier=rebase_multiplier, account_id=account_id),
         )
 
     async def get_spot_trade_balance(
         self,
         asset: str | None = None,
         rebase_multiplier: str | None = None,
+        account_id: str | None = None,
     ) -> dict[str, Any]:
         """Retrieve Kraken spot trade balance."""
         return await self._native_private(
             "get_spot_trade_balance",
-            self._native_params(asset=asset, rebase_multiplier=rebase_multiplier),
+            self._native_params(
+                asset=asset, rebase_multiplier=rebase_multiplier, account_id=account_id
+            ),
         )
 
     async def get_spot_open_positions(
@@ -107,6 +111,7 @@ class AccountHTTP(AccountHTTPTransfersHTTP, AccountHTTPWithdrawalsHTTP, HTTPMana
         docalcs: bool | None = None,
         consolidation: str | None = None,
         rebase_multiplier: str | None = None,
+        account_id: str | None = None,
     ) -> dict[str, Any]:
         """Retrieve Kraken spot margin open positions."""
         return await self._native_private(
@@ -116,6 +121,7 @@ class AccountHTTP(AccountHTTPTransfersHTTP, AccountHTTPWithdrawalsHTTP, HTTPMana
                 docalcs=docalcs,
                 consolidation=consolidation,
                 rebase_multiplier=rebase_multiplier,
+                account_id=account_id,
             ),
         )
 
@@ -129,6 +135,9 @@ class AccountHTTP(AccountHTTPTransfersHTTP, AccountHTTPWithdrawalsHTTP, HTTPMana
         ofs: int | None = None,
         without_count: bool | None = None,
         rebase_multiplier: str | None = None,
+        account_id: str | None = None,
+        with_cursor: bool | None = None,
+        cursor: str | None = None,
     ) -> dict[str, Any]:
         """Retrieve Kraken spot ledger entries."""
         return await self._native_private(
@@ -142,6 +151,9 @@ class AccountHTTP(AccountHTTPTransfersHTTP, AccountHTTPWithdrawalsHTTP, HTTPMana
                 ofs=ofs,
                 without_count=without_count,
                 rebase_multiplier=rebase_multiplier,
+                account_id=account_id,
+                with_cursor=with_cursor,
+                cursor=cursor,
             ),
         )
 

@@ -31,7 +31,7 @@ class GeneratedWithdrawalsHTTP(TradeHTTP):
         )
 
     def get_v1_copy_trade_futures_position_margin_max_withdraw_margin(
-        self, *, symbol: str, position_side: str | None = None
+        self, *, symbol: str, position_side: str | None = None, funds_type: str | None = None
     ) -> Any:  # noqa: ANN401
         """
         Get Max Withdraw Margin.
@@ -40,11 +40,16 @@ class GeneratedWithdrawalsHTTP(TradeHTTP):
         """
         return self._native_private(
             "get_v1_copy_trade_futures_position_margin_max_withdraw_margin",
-            self._native_params(symbol=symbol, positionSide=position_side),
+            self._native_params(symbol=symbol, positionSide=position_side, fundsType=funds_type),
         )
 
     def post_v1_copy_trade_futures_position_margin_withdraw_margin(
-        self, *, symbol: str, withdraw_amount: str, position_side: str | None = None
+        self,
+        *,
+        symbol: str,
+        withdraw_amount: str,
+        position_side: str | None = None,
+        funds_type: str | None = None,
     ) -> Any:  # noqa: ANN401
         """
         Remove Isolated Margin.
@@ -54,6 +59,9 @@ class GeneratedWithdrawalsHTTP(TradeHTTP):
         return self._native_private(
             "post_v1_copy_trade_futures_position_margin_withdraw_margin",
             self._native_params(
-                symbol=symbol, withdrawAmount=withdraw_amount, positionSide=position_side
+                symbol=symbol,
+                withdrawAmount=withdraw_amount,
+                positionSide=position_side,
+                fundsType=funds_type,
             ),
         )

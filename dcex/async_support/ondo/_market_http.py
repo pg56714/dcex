@@ -99,25 +99,39 @@ class MarketHTTP(HTTPManager):
             "complete_login_challenge", id=id, signature=signature, source=source
         )
 
-    async def get_spot_depth(self, market: str) -> Any:
-        """Read spot depth using BASE-QUOTE or BASE-QUOTE-SPOT."""
-        return await self._native_public("get_spot_depth", market=market)
+    async def get_spot_depth(self, market: str, depth: int | None = None) -> Any:
+        """Read spot depth (1 to 100 levels) using BASE-QUOTE or BASE-QUOTE-SPOT."""
+        return await self._native_public("get_spot_depth", market=market, depth=depth)
 
-    async def get_spot_trades(self, market: str) -> Any:
-        """Read public spot trades without account authentication."""
-        return await self._native_public("get_spot_trades", market=market)
+    async def get_spot_trades(
+        self, market: str, cursor: str | None = None, limit: int | None = None
+    ) -> Any:
+        """Read public spot trades; pass the previous nextCursor to page back."""
+        return await self._native_public(
+            "get_spot_trades", market=market, cursor=cursor, limit=limit
+        )
+
+    async def get_spot_ticker(self, sparkline: bool | None = None) -> Any:
+        """GET /v1/spot/ticker: 24h statistics for every Spot market, optionally with sparklines."""
+        return await self._native_public("get_spot_ticker", sparkline=sparkline)
 
     async def get_spot_symbol_info(self) -> Any:
         """List spot TradingView symbols such as SPYUSDC."""
         return await self._native_public("get_spot_symbol_info")
 
     async def get_spot_price_history(
-        self, symbol: str, resolution: str, from_time: int, to_time: int
+        self,
+        symbol: str,
+        resolution: str,
+        to_time: int,
+        from_time: int | None = None,
+        countback: int | None = None,
     ) -> Any:
-        """Read spot history with a TradingView symbol and Unix-second bounds."""
+        """Read spot history ending at ``to_time``; give exactly one of from_time or countback."""
         return await self._native_public(
             "get_spot_price_history",
             symbol=symbol,
             resolution=resolution,
+            countback=countback,
             **{"from": from_time, "to": to_time},
         )

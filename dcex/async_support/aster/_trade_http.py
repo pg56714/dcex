@@ -25,6 +25,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         newClientOrderId: str | None = None,
         stopPrice: str | None = None,
         nonce: int | None = None,
+        selfTradingProtectionMode: int | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Place an Aster spot order."""
         return await self._native_private(
@@ -40,6 +41,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
                 price=price,
                 newClientOrderId=newClientOrderId,
                 stopPrice=stopPrice,
+                selfTradingProtectionMode=selfTradingProtectionMode,
             ),
         )
 
@@ -632,6 +634,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         can_withdraw: bool,
         signature: str,
         ip_whitelist: str | None = None,
+        agent_code: str | None = None,
     ) -> dict[str, Any] | list[Any]:
         """
         POST /fapi/v3/registerAndApproveAgent. Supply wallet signatures created exactly as
@@ -651,6 +654,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
                 canWithdraw=can_withdraw,
                 ipWhitelist=ip_whitelist,
                 signature=signature,
+                agentCode=agent_code,
             ),
         )
 
@@ -838,6 +842,31 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
     async def get_prediction_account(self) -> dict[str, Any] | list[Any]:
         """GET /api/v3/account on the prediction host. Use native prediction symbols."""
         return await self._native_private("get_prediction_account", self._native_params())
+
+    async def get_prediction_transaction_history(
+        self,
+        *,
+        asset: str | None = None,
+        type_: str | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        limit: int | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """
+        GET /api/v3/prediction/transactionHistory; without a time range only 7 days return.
+
+        Source: https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md
+        """
+        return await self._native_private(
+            "get_prediction_transaction_history",
+            self._native_params(
+                asset=asset,
+                type_=type_,
+                startTime=start_time,
+                endTime=end_time,
+                limit=limit,
+            ),
+        )
 
     async def get_prediction_user_trades(
         self,

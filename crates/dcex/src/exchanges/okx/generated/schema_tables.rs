@@ -47,6 +47,7 @@ pub(super) fn endpoint(name: &str) -> Option<&'static RiskEndpoint> {
         "set_risk_offset_amount",
         "preset_account_level_switch",
         "precheck_account_level_switch",
+        "activate_account_feature",
         "set_collateral_assets",
         "set_trading_config",
         "precheck_delta_neutral",

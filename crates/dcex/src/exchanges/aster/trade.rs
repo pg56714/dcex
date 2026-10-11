@@ -647,10 +647,25 @@ pub(in crate::exchanges::aster) fn validate_private_params(
         }
         "modify_futures_position_margin" => {
             params.ensure_allowed(
-                &["product_symbol", "symbol", "positionSide", "amount", "type"],
+                &[
+                    "product_symbol",
+                    "symbol",
+                    "positionSide",
+                    "amount",
+                    "type",
+                    "clientTranId",
+                ],
                 &[],
             )?;
             validate_symbol_alias(params, true)?;
+            if params
+                .get("clientTranId")
+                .is_some_and(|id| id.is_empty() || id.len() > 64)
+            {
+                return Err(DcexError::InvalidInput(
+                    "Aster clientTranId must be 1 to 64 characters".into(),
+                ));
+            }
             params.optional_one_of("positionSide", &["BOTH", "LONG", "SHORT"])?;
             params.required_positive_decimal("amount")?;
             params.required_one_of("type", &["1", "2"])
@@ -684,6 +699,7 @@ pub(in crate::exchanges::aster) fn validate_private_params(
                 &[
                     "product_symbol",
                     "symbol",
+                    "orderId",
                     "startTime",
                     "endTime",
                     "fromId",
@@ -787,11 +803,13 @@ pub(in crate::exchanges::aster) fn validate_private_params(
                     "price",
                     "newClientOrderId",
                     "stopPrice",
+                    "selfTradingProtectionMode",
                 ],
                 &[],
             )?;
             validate_symbol_alias(params, true)?;
             params.optional_u64_range("nonce", 1, u64::MAX)?;
+            params.optional_one_of("selfTradingProtectionMode", &["1", "2", "4", "8"])?;
             validate_spot_order(params)
         }
         "cancel_spot_order"

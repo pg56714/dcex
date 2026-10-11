@@ -25,18 +25,21 @@ impl BybitClient {
                 self.get_positions_from_params(params).await
             }
             "set_leverage" => {
-                params.ensure_allowed(&["product_symbol", "category", "leverage"])?;
+                params.ensure_allowed(&[
+                    "product_symbol",
+                    "category",
+                    "buyLeverage",
+                    "sellLeverage",
+                ])?;
                 let product_symbol = params.required("product_symbol")?;
                 let mut body = Map::new();
                 self.insert_symbol_category(&mut body, product_symbol, params.get("category"))?;
-                body.insert(
-                    "buyLeverage".to_string(),
-                    Value::String(params.required("leverage")?.to_string()),
-                );
-                body.insert(
-                    "sellLeverage".to_string(),
-                    Value::String(params.required("leverage")?.to_string()),
-                );
+                for key in ["buyLeverage", "sellLeverage"] {
+                    body.insert(
+                        key.to_string(),
+                        Value::String(params.required(key)?.to_string()),
+                    );
+                }
                 self.post_request(SET_LEVERAGE, body).await
             }
             "set_trading_stop" => {
@@ -62,12 +65,17 @@ impl BybitClient {
                 self.post_request(SET_TRADING_STOP, body).await
             }
             "add_position_margin" => {
-                params.ensure_allowed(&["product_symbol", "category", "margin"])?;
+                params.ensure_allowed(&["positionIdx", "product_symbol", "category", "margin"])?;
                 let body = self.position_margin_body_from_params(params)?;
                 self.post_request(ADD_POSITION_MARGIN, body).await
             }
             "set_auto_add_margin" => {
-                params.ensure_allowed(&["product_symbol", "category", "autoAddMargin"])?;
+                params.ensure_allowed(&[
+                    "positionIdx",
+                    "product_symbol",
+                    "category",
+                    "autoAddMargin",
+                ])?;
                 let body = self.auto_add_margin_body_from_params(params)?;
                 self.post_request(SET_AUTO_ADD_MARGIN, body).await
             }

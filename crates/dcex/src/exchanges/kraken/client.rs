@@ -263,6 +263,21 @@ impl KrakenClient {
                     ));
                 }
                 let (api_key, api_secret) = self.spot_credentials()?;
+                // account_id selects a wallet as a query parameter; like the official SDK, the
+                // signed path is the request URI including that query.
+                let (query, params): (Vec<_>, Vec<_>) =
+                    params.into_iter().partition(|(key, _)| key == "account_id");
+                if query.iter().any(|(_, value)| value.trim().is_empty()) {
+                    return Err(DcexError::InvalidInput(
+                        "Kraken account_id must not be empty".into(),
+                    ));
+                }
+                let path = if query.is_empty() {
+                    path
+                } else {
+                    format!("{path}?{}", encode_params(&query))
+                };
+                request.path.clone_from(&path);
                 if let Some(json_body) = json_body {
                     if !params.is_empty() {
                         return Err(DcexError::InvalidInput(

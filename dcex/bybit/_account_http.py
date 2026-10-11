@@ -24,7 +24,7 @@ class AccountHTTP(
 
     def get_borrow_history(
         self,
-        coin: str | None = None,
+        currency: str | None = None,
         startTime: int | None = None,
         endTime: int | None = None,
         limit: int = 20,
@@ -34,7 +34,7 @@ class AccountHTTP(
         return self._native_private(
             "get_borrow_history",
             self._native_params(
-                coin=coin,
+                currency=currency,
                 startTime=startTime,
                 endTime=endTime,
                 limit=limit,
@@ -134,7 +134,7 @@ class AccountHTTP(
         self,
         accountType: str | None = None,
         category: str | None = None,
-        coin: str | None = None,
+        currency: str | None = None,
         baseCoin: str | None = None,
         type_: str | None = None,
         transSubType: str | None = None,
@@ -149,7 +149,7 @@ class AccountHTTP(
             self._native_params(
                 accountType=accountType,
                 category=category,
-                coin=coin,
+                currency=currency,
                 baseCoin=baseCoin,
                 type=type_,
                 transSubType=transSubType,
@@ -318,6 +318,8 @@ class AccountHTTP(
         from_coin_type: str | None = None,
         to_coin_type: str | None = None,
         request_id: str | None = None,
+        param_type: str | None = None,
+        param_value: str | None = None,
     ) -> dict[str, Any]:
         """
         Request convert quote; see
@@ -334,6 +336,8 @@ class AccountHTTP(
                 fromCoinType=from_coin_type,
                 toCoinType=to_coin_type,
                 requestId=request_id,
+                paramType=param_type,
+                paramValue=param_value,
             ),
         )
 

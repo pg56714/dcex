@@ -71,12 +71,12 @@ impl BybitClient {
                     .await
             }
             "get_borrow_history" => {
-                params.ensure_allowed(&["limit", "coin", "startTime", "endTime", "cursor"])?;
+                params.ensure_allowed(&["limit", "currency", "startTime", "endTime", "cursor"])?;
                 let mut query = vec![(
                     "limit".to_string(),
                     params.get("limit").unwrap_or("20").to_string(),
                 )];
-                push_optional(&mut query, "currency", params.get("coin"));
+                push_optional(&mut query, "currency", params.get("currency"));
                 push_optional(&mut query, "startTime", params.get("startTime"));
                 push_optional(&mut query, "endTime", params.get("endTime"));
                 push_optional(&mut query, "cursor", params.get("cursor"));
@@ -197,7 +197,7 @@ impl BybitClient {
                     "limit",
                     "accountType",
                     "category",
-                    "coin",
+                    "currency",
                     "baseCoin",
                     "type",
                     "transSubType",
@@ -211,7 +211,7 @@ impl BybitClient {
                 )];
                 push_optional(&mut query, "accountType", params.get("accountType"));
                 push_optional(&mut query, "category", params.get("category"));
-                push_optional(&mut query, "currency", params.get("coin"));
+                push_optional(&mut query, "currency", params.get("currency"));
                 push_optional(&mut query, "baseCoin", params.get("baseCoin"));
                 push_optional(&mut query, "type", params.get("type"));
                 push_optional(&mut query, "transSubType", params.get("transSubType"));

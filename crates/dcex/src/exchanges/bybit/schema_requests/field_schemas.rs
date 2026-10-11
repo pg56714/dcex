@@ -64,7 +64,8 @@ impl BybitClient {
         let body = schema::request(&endpoint.fields, &pairs)?;
         validate_conditions(&endpoint.path, &body)?;
         let result = if endpoint.method == "GET" {
-            self.request(HttpMethod::Get, &endpoint.path, pairs, None, !public)
+            let query = repeated_query(&endpoint.fields, pairs)?;
+            self.request(HttpMethod::Get, &endpoint.path, query, None, !public)
                 .await?
         } else {
             let bytes = serde_json::to_vec(&body).map_err(|e| DcexError::Decode(e.to_string()))?;
@@ -81,6 +82,24 @@ impl BybitClient {
     }
 }
 
+/// GET array fields travel as repeated query parameters (`coins=BTC&coins=ETH`).
+fn repeated_query(fields: &[Field], pairs: Vec<(String, String)>) -> Result<Vec<(String, String)>> {
+    let mut query = Vec::with_capacity(pairs.len());
+    for (key, value) in pairs {
+        if !fields.iter().any(|f| f.name == key && f.kind == "array") {
+            query.push((key, value));
+            continue;
+        }
+        let items: Vec<String> = serde_json::from_str(&value)
+            .map_err(|_| invalid(format!("{key} must be a JSON array of strings")))?;
+        if items.is_empty() || items.len() > 50 || items.iter().any(String::is_empty) {
+            return Err(invalid(format!("{key} requires 1 to 50 non-empty values")));
+        }
+        query.extend(items.into_iter().map(|item| (key.clone(), item)));
+    }
+    Ok(query)
+}
+
 fn validate_conditions(path: &str, body: &Map<String, Value>) -> Result<()> {
     let text = |key: &str| body.get(key).and_then(Value::as_str);
     let require = |key: &str| {
@@ -90,6 +109,32 @@ fn validate_conditions(path: &str, body: &Map<String, Value>) -> Result<()> {
             Err(invalid(format!("{key} is required")))
         }
     };
+    if path == "/v5/fht/compliance/tax/private/batch_create" {
+        let items = body.get("items").and_then(Value::as_array);
+        if !items.is_some_and(|items| {
+            !items.is_empty()
+                && items.iter().all(|item| {
+                    item.get("type")
+                        .and_then(Value::as_str)
+                        .is_some_and(|t| !t.is_empty())
+                        && item.get("number").is_some_and(Value::is_string)
+                })
+        }) {
+            return Err(invalid(
+                "items requires objects with a type and a number (\"\" when type=ALL)",
+            ));
+        }
+        if let (Some(start), Some(end)) = (
+            body.get("startTime").and_then(Value::as_i64),
+            body.get("endTime").and_then(Value::as_i64),
+        ) && end <= start
+        {
+            return Err(invalid("endTime must be later than startTime"));
+        }
+        if text("exportFileType").is_some_and(|kind| !matches!(kind, "orc" | "csv")) {
+            return Err(invalid("exportFileType must be orc or csv"));
+        }
+    }
     if path == "/v5/asset/withdraw/create" {
         if body.get("forceChain").and_then(Value::as_i64) != Some(2) {
             require("chain")?;
@@ -147,6 +192,8 @@ fn load_schemas() -> Vec<Endpoint> {
         include_str!("../schemas/compliance.json"),
         include_str!("../schemas/referral.json"),
         include_str!("../schemas/subaccount.json"),
+        include_str!("../schemas/earn.json"),
+        include_str!("../schemas/tax.json"),
     ]
     .into_iter()
     .flat_map(|raw| serde_json::from_str::<Vec<Endpoint>>(raw).expect("checked endpoint schemas"))

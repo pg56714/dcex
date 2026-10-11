@@ -70,14 +70,6 @@ async fn bingx_public_live_parity() -> dcex::Result<()> {
                     ("limit", "2"),
                 ],
             ),
-            Case::new(
-                "get_spot_kline_v2",
-                &[
-                    ("product_symbol", BTC_USDT_SPOT),
-                    ("interval", "1m"),
-                    ("limit", "2"),
-                ],
-            ),
             Case::new("get_spot_ticker", &[("product_symbol", BTC_USDT_SPOT)]),
             Case::new("get_spot_book_ticker", &[("product_symbol", BTC_USDT_SPOT)]),
             Case::new(
@@ -100,7 +92,6 @@ async fn bingx_public_live_parity() -> dcex::Result<()> {
                         get_spot_book_ticker,
                         get_spot_instrument_info,
                         get_spot_kline,
-                        get_spot_kline_v2,
                         get_spot_orderbook,
                         get_spot_orderbook_v2,
                         get_spot_price_ticker,

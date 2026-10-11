@@ -178,6 +178,34 @@ const ROUTE_CASES: &[(bool, &str, &[(&str, &str)], &str, &str)] = &[
     ),
     (
         false,
+        "get_futures_options_mm_greek_limits",
+        &[],
+        "GET",
+        "/derivatives/api/v3/options-mm-greek-limits",
+    ),
+    (
+        false,
+        "set_futures_options_mm_greek_limits",
+        &[("currency", "BTC"), ("deltaLimit", "10")],
+        "PUT",
+        "/derivatives/api/v3/options-mm-greek-limits",
+    ),
+    (
+        false,
+        "delete_futures_options_mm_greek_limits",
+        &[("currency", "BTC")],
+        "DELETE",
+        "/derivatives/api/v3/options-mm-greek-limits",
+    ),
+    (
+        false,
+        "get_futures_transfers",
+        &[("lastTransferTime", "2026-01-01T00:00:00.000Z")],
+        "GET",
+        "/derivatives/api/v3/transfers",
+    ),
+    (
+        false,
         "create_spot_subaccount",
         &[("username", "trader1"), ("email", "trader@example.com")],
         "POST",
@@ -688,7 +716,7 @@ const ROUTE_CASES: &[(bool, &str, &[(&str, &str)], &str, &str)] = &[
         "place_spot_order",
         &[
             ("product_symbol", "BTC-USD-SPOT"),
-            ("side", "buy"),
+            ("type", "buy"),
             ("ordertype", "limit"),
             ("volume", "0.01"),
             ("price", "100"),
@@ -701,7 +729,7 @@ const ROUTE_CASES: &[(bool, &str, &[(&str, &str)], &str, &str)] = &[
         "place_spot_market_order",
         &[
             ("product_symbol", "BTC-USD-SPOT"),
-            ("side", "buy"),
+            ("type", "buy"),
             ("volume", "0.01"),
         ],
         "POST",
@@ -726,7 +754,7 @@ const ROUTE_CASES: &[(bool, &str, &[(&str, &str)], &str, &str)] = &[
         "place_spot_limit_order",
         &[
             ("product_symbol", "BTC-USD-SPOT"),
-            ("side", "buy"),
+            ("type", "buy"),
             ("volume", "0.01"),
             ("price", "100"),
         ],
@@ -760,7 +788,7 @@ const ROUTE_CASES: &[(bool, &str, &[(&str, &str)], &str, &str)] = &[
         "place_spot_post_only_limit_order",
         &[
             ("product_symbol", "BTC-USD-SPOT"),
-            ("side", "sell"),
+            ("type", "sell"),
             ("volume", "0.01"),
             ("price", "100"),
         ],

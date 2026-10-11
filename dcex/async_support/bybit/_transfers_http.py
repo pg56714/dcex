@@ -26,7 +26,7 @@ class AccountHTTPTransfersHTTP(HTTPManager):
             raise ValueError("coins must contain no more than 20 coins.")
         return await self._native_private(
             "get_transferable_amount",
-            self._native_params(coins=",".join(coins)),
+            self._native_params(coinName=",".join(coins)),
         )
 
 

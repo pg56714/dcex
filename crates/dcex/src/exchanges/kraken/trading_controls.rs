@@ -41,7 +41,7 @@ impl KrakenClient {
                     .await?
             }
             "get_spot_extended_balance" => {
-                params.ensure_allowed(&["rebase_multiplier"])?;
+                params.ensure_allowed(&["rebase_multiplier", "account_id"])?;
                 if params
                     .get("rebase_multiplier")
                     .is_some_and(|v| !["base", "rebased"].contains(&v))
@@ -51,7 +51,7 @@ impl KrakenClient {
                 self.private_post(
                     KrakenAuth::Spot,
                     "/0/private/BalanceEx",
-                    params.only(&["rebase_multiplier"]),
+                    params.only(&["rebase_multiplier", "account_id"]),
                 )
                 .await?
             }

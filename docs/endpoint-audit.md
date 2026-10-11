@@ -2,7 +2,7 @@
 
 **English** | [繁體中文](endpoint-audit.zh_tw.md)
 
-Reviewed: 2026-09-30. The original report contained 3,180 rows; the reconciled ledger contains 4,861 rows, with official documentation inventories for all 15 exchanges.
+Reviewed: 2026-09-30. The original report contained 3,180 rows; the reconciled ledger contains 4,891 rows, with official documentation inventories for all 15 exchanges.
 
 All documented endpoints are in scope, including withdrawals, address management, market making, RFQ, broker, referral and partner operations. All 111 originally excluded rows have been addressed; there are no scope exclusions. This does not mean every newly discovered endpoint is implemented.
 
@@ -16,12 +16,12 @@ Historical, grouped and overlapping rows prevent converting these counts into an
 
 | Status | Rows | Definition |
 | --- | ---: | --- |
-| `implemented` | 3,411 | Exact offline HTTP route and public Rust/Python wrappers |
+| `implemented` | 3,423 | Exact offline HTTP route and public Rust/Python wrappers |
 | `protocol` | 395 | Asynchronous WebSocket protocol support with cited offline evidence; no live certification |
-| `superseded` | 980 | Historical or grouped row replaced by explicit current rows |
-| `unavailable` | 26 | Retired/unavailable operation, or documentation-only section with no endpoint |
+| `superseded` | 989 | Historical or grouped row replaced by explicit current rows |
+| `unavailable` | 42 | Retired/unavailable operation, or documentation-only section with no endpoint |
 | `unverified` | 11 | Wrapper exists, but part of the official specification is incomplete |
-| `blocked` | 37 | Required signing or authorization specification is missing |
+| `blocked` | 30 | Required signing or authorization specification is missing |
 | `partial` | 1 | Grouped capability still has a documented gap |
 | `pending` | 0 | Documented operation awaiting implementation or dedicated verification |
 
@@ -32,20 +32,20 @@ Method counts include aliases and signing helpers, not endpoints.
 | Exchange | Public methods | Implemented rows | Pending rows |
 | --- | ---: | ---: | ---: |
 | [binance](official-endpoint-inventory/binance.json) | 753 | 748 | 0 |
-| [bybit](official-endpoint-inventory/bybit.json) | 448 | 434 | 0 |
-| [okx](official-endpoint-inventory/okx.json) | 404 | 388 | 0 |
+| [bybit](official-endpoint-inventory/bybit.json) | 453 | 439 | 0 |
+| [okx](official-endpoint-inventory/okx.json) | 405 | 389 | 0 |
 | [bitget](official-endpoint-inventory/bitget.json) | 328 | 328 | 0 |
-| [bingx](official-endpoint-inventory/bingx.json) | 209 | 190 | 0 |
-| [kraken](official-endpoint-inventory/kraken.json) | 164 | 148 | 0 |
+| [bingx](official-endpoint-inventory/bingx.json) | 200 | 182 | 0 |
+| [kraken](official-endpoint-inventory/kraken.json) | 170 | 154 | 0 |
 | [mexc](official-endpoint-inventory/mexc.json) | 177 | 157 | 0 |
 | [kucoin](official-endpoint-inventory/kucoin.json) | 365 | 340 | 0 |
-| [hyperliquid](official-endpoint-inventory/hyperliquid.json) | 145 | 118 | 0 |
+| [hyperliquid](official-endpoint-inventory/hyperliquid.json) | 146 | 119 | 0 |
 | [lighter](official-endpoint-inventory/lighter.json) | 133 | 110 | 0 |
-| [backpack](official-endpoint-inventory/backpack.json) | 82 | 79 | 0 |
-| [aster](official-endpoint-inventory/aster.json) | 156 | 152 | 0 |
+| [backpack](official-endpoint-inventory/backpack.json) | 80 | 77 | 0 |
+| [aster](official-endpoint-inventory/aster.json) | 157 | 153 | 0 |
 | [extended](official-endpoint-inventory/extended.json) | 71 | 72 | 0 |
-| [ondo](official-endpoint-inventory/ondo.json) | 75 | 70 | 0 |
-| [arcus](official-endpoint-inventory/arcus.json) | 90 | 77 | 0 |
+| [ondo](official-endpoint-inventory/ondo.json) | 95 | 90 | 0 |
+| [arcus](official-endpoint-inventory/arcus.json) | 78 | 65 | 0 |
 
 ## Verification and limits
 

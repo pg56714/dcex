@@ -140,11 +140,14 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
         self,
         product_symbol: str | None = None,
         recv_window: int | None = None,
+        currency: str | None = None,
     ) -> dict[str, Any]:
         """Get open positions."""
         return await self._native_private(
             "get_open_positions",
-            self._native_params(product_symbol=product_symbol, recvWindow=recv_window),
+            self._native_params(
+                product_symbol=product_symbol, recvWindow=recv_window, currency=currency
+            ),
         )
 
     async def get_fund_flow(
@@ -155,6 +158,7 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
         end_time: int | None = None,
         limit: int | None = None,
         recv_window: int | None = None,
+        currency: str | None = None,
     ) -> dict[str, Any]:
         """Get fund flow."""
         return await self._native_private(
@@ -166,6 +170,7 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
                 endTime=end_time,
                 limit=limit,
                 recvWindow=recv_window,
+                currency=currency,
             ),
         )
 

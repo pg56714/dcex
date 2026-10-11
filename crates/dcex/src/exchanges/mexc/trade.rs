@@ -588,6 +588,7 @@ impl MexcClient {
                     "takeProfitOrderPrice",
                     "stopLossType",
                     "stopLossOrderPrice",
+                    "mtoken",
                 ])?;
                 for key in ["lossTrend", "profitTrend", "positionId", "vol"] {
                     params.required(key)?;
@@ -612,6 +613,7 @@ impl MexcClient {
                         "takeProfitOrderPrice",
                         "stopLossType",
                         "stopLossOrderPrice",
+                        "mtoken",
                     ],
                     &[
                         "lossTrend",
@@ -713,10 +715,8 @@ impl MexcClient {
                 self.contract_post_json(path, Value::Object(body)).await
             }
             "cancel_contract_order" => {
-                params.ensure_allowed(&["order_id", "orderId"])?;
-                let order_id = params
-                    .required("order_id")
-                    .or_else(|_| params.required("orderId"))?;
+                params.ensure_allowed(&["order_id"])?;
+                let order_id = params.required("order_id")?;
                 self.contract_post_json(
                     CONTRACT_CANCEL_ORDERS,
                     Value::Array(vec![Value::String(order_id.to_string())]),
@@ -789,26 +789,17 @@ impl MexcClient {
                 self.contract_get(CONTRACT_HISTORY_ORDERS, query).await
             }
             "get_contract_order_by_external_id" => {
-                params.ensure_allowed(&[
-                    "product_symbol",
-                    "symbol",
-                    "external_oid",
-                    "externalOid",
-                ])?;
+                params.ensure_allowed(&["product_symbol", "symbol", "external_oid"])?;
                 let symbol = self.required_contract_symbol(params)?;
-                let external_oid = params
-                    .required("external_oid")
-                    .or_else(|_| params.required("externalOid"))?;
+                let external_oid = params.required("external_oid")?;
                 let path = CONTRACT_EXTERNAL_ORDER
                     .replace("{symbol}", &symbol)
                     .replace("{external_oid}", external_oid);
                 self.contract_get(&path, Vec::new()).await
             }
             "get_contract_order" => {
-                params.ensure_allowed(&["order_id", "orderId"])?;
-                let order_id = params
-                    .required("order_id")
-                    .or_else(|_| params.required("orderId"))?;
+                params.ensure_allowed(&["order_id"])?;
+                let order_id = params.required("order_id")?;
                 let path = CONTRACT_ORDER.replace("{order_id}", order_id);
                 self.contract_get(&path, Vec::new()).await
             }
@@ -827,10 +818,8 @@ impl MexcClient {
                 .await
             }
             "get_contract_order_deal_details" => {
-                params.ensure_allowed(&["order_id", "orderId"])?;
-                let order_id = params
-                    .required("order_id")
-                    .or_else(|_| params.required("orderId"))?;
+                params.ensure_allowed(&["order_id"])?;
+                let order_id = params.required("order_id")?;
                 let path = CONTRACT_ORDER_DEAL_DETAILS.replace("{order_id}", order_id);
                 self.contract_get(&path, Vec::new()).await
             }

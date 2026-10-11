@@ -557,6 +557,20 @@ fn exchange_actions_match_official_wire_format() {
             json!({"type": "twapCancel", "a": 1, "t": 9}),
         ),
         (
+            "place_trailing_stop_order",
+            vec![
+                ("product_symbol", ETH),
+                ("isBuy", "false"),
+                ("size", "0.5"),
+                ("reduceOnly", "true"),
+                ("retracementPct", "1.5"),
+            ],
+            json!({
+                "type": "trailingStop", "asset": 1, "isBuy": false, "sz": "0.5",
+                "reduceOnly": true, "retracement": {"pct": "1.5%"}, "activationPx": null
+            }),
+        ),
+        (
             "place_future_limit_order",
             vec![
                 ("product_symbol", ETH),

@@ -141,7 +141,14 @@ impl BackpackClient {
             "get_deposits" => {
                 self.private_get(
                     DEPOSITS,
-                    params.only(&["from", "to", "limit", "offset", "excludePlatform"]),
+                    params.only(&[
+                        "from",
+                        "to",
+                        "limit",
+                        "offset",
+                        "excludePlatform",
+                        "transactionHash",
+                    ]),
                     "depositQueryAll",
                 )
                 .await
@@ -286,8 +293,17 @@ impl BackpackClient {
                 validate_history_pagination(params)
             }
             "get_deposits" => {
-                params
-                    .ensure_allowed(&["from", "to", "limit", "offset", "excludePlatform"], &[])?;
+                params.ensure_allowed(
+                    &[
+                        "from",
+                        "to",
+                        "limit",
+                        "offset",
+                        "excludePlatform",
+                        "transactionHash",
+                    ],
+                    &[],
+                )?;
                 params.ensure_time_order("from", "to")?;
                 params.optional_bool("excludePlatform")?;
                 validate_history_pagination(params)

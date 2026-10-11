@@ -80,7 +80,12 @@ impl ArcusClient {
         let allowed: &[&str] = match method_name {
             "place_order" => PLACE_ORDER_KEYS,
             "modify_order" => MODIFY_ORDER_KEYS,
-            "cancel_order" => &["product_symbol", "order_id"],
+            "cancel_order" => &[
+                "product_symbol",
+                "order_id",
+                "client_order_id",
+                "valid_until",
+            ],
             _ => &[],
         };
         if !allowed.is_empty()
@@ -330,16 +335,7 @@ impl ArcusClient {
                     body["stopPrice"] = json!(stop);
                 }
                 if let Some(client_id) = values.get("client_order_id") {
-                    if client_id.is_empty()
-                        || client_id.len() > 36
-                        || !client_id.bytes().all(|byte| {
-                            byte.is_ascii_alphanumeric() || byte == b'-' || byte == b'_'
-                        })
-                    {
-                        return Err(DcexError::InvalidInput(
-                            "invalid Arcus client_order_id".into(),
-                        ));
-                    }
+                    validate_client_id(client_id)?;
                     canonical.insert("c", json!(client_id));
                     body["clientId"] = json!(client_id);
                 }
@@ -364,17 +360,37 @@ impl ArcusClient {
                 }
             }
             "cancel_order" => {
-                let order_id = required(values, "order_id")?;
-                canonical.insert("id", json!(order_id));
+                // Exactly one identifier: the server id signs as `id`, a client id as `c`.
+                let (kind, value) = match (values.get("order_id"), values.get("client_order_id")) {
+                    (Some(order_id), None) => {
+                        canonical.insert("id", json!(order_id));
+                        ("orderId", order_id)
+                    }
+                    (None, Some(client_id)) => {
+                        validate_client_id(client_id)?;
+                        canonical.insert("c", json!(client_id));
+                        ("clientId", client_id)
+                    }
+                    _ => {
+                        return Err(DcexError::InvalidInput(
+                                "Arcus cancel_order requires exactly one of order_id or client_order_id"
+                                    .into(),
+                            ));
+                    }
+                };
                 canonical.insert("op", json!(2));
-                (
-                    "/v1/cancelOrder",
-                    json!({
-                        "address": address, "accountIndex": self.account_index,
-                        "marketId": market_id, "kind": "orderId",
-                        "orderId": order_id, "timestamp": timestamp,
-                    }),
-                )
+                let mut body = json!({
+                    "address": address, "accountIndex": self.account_index,
+                    "marketId": market_id, "kind": kind, kind: value,
+                    "timestamp": timestamp,
+                });
+                if let Some(valid_until) = values.get("valid_until") {
+                    let millis = valid_until.parse::<u64>().map_err(|_| {
+                        DcexError::InvalidInput("invalid Arcus valid_until epoch ms".into())
+                    })?;
+                    body["validUntil"] = json!(millis);
+                }
+                ("/v1/cancelOrder", body)
             }
             _ => {
                 return Err(DcexError::InvalidInput(format!(
@@ -387,4 +403,19 @@ impl ArcusClient {
         let signature = hex::encode(key.sign(&message).to_bytes());
         Ok((path, body, signature))
     }
+}
+
+/// A client order id is 1 to 36 characters of `[A-Za-z0-9_-]`.
+fn validate_client_id(client_id: &str) -> Result<()> {
+    if client_id.is_empty()
+        || client_id.len() > 36
+        || !client_id
+            .bytes()
+            .all(|byte| byte.is_ascii_alphanumeric() || byte == b'-' || byte == b'_')
+    {
+        return Err(DcexError::InvalidInput(
+            "invalid Arcus client_order_id".into(),
+        ));
+    }
+    Ok(())
 }

@@ -3,7 +3,9 @@ use crate::exchange::ValidatedResponse;
 
 use super::client::{KrakenAuth, KrakenClient};
 use super::endpoints::*;
-use super::params::{KrakenParams, push_optional, require_one_identifier};
+use super::params::{
+    KrakenParams, push_optional, require_cursor_mode, require_limit, require_one_identifier,
+};
 
 impl KrakenClient {
     pub(super) async fn trade_private_request(
@@ -53,13 +55,24 @@ impl KrakenClient {
                     .await
             }
             "get_spot_open_orders" => {
-                params.ensure_allowed(&["trades", "userref", "cl_ord_id", "rebase_multiplier"])?;
-                self.private_post(
-                    KrakenAuth::Spot,
-                    SPOT_OPEN_ORDERS,
-                    params.only(&["trades", "userref", "cl_ord_id", "rebase_multiplier"]),
-                )
-                .await
+                const FIELDS: &[&str] = &[
+                    "trades",
+                    "userref",
+                    "cl_ord_id",
+                    "consolidate_taker",
+                    "with_cursor",
+                    "cursor",
+                    "limit",
+                    "rebase_multiplier",
+                    "account_id",
+                ];
+                params.ensure_allowed(FIELDS)?;
+                require_cursor_mode(params)?;
+                // Cursor pages hold at most 100 orders; a plain list caps limit at 1000.
+                let cursor = params.get("with_cursor") == Some("true");
+                require_limit(params, if cursor { 100 } else { 1000 })?;
+                self.private_post(KrakenAuth::Spot, SPOT_OPEN_ORDERS, params.only(FIELDS))
+                    .await
             }
             "get_spot_closed_orders" => {
                 params.ensure_allowed(&[
@@ -72,8 +85,12 @@ impl KrakenClient {
                     "closetime",
                     "consolidate_taker",
                     "without_count",
+                    "with_cursor",
+                    "cursor",
                     "rebase_multiplier",
+                    "account_id",
                 ])?;
+                require_cursor_mode(params)?;
                 self.private_post(
                     KrakenAuth::Spot,
                     SPOT_CLOSED_ORDERS,
@@ -87,7 +104,10 @@ impl KrakenClient {
                         "closetime",
                         "consolidate_taker",
                         "without_count",
+                        "with_cursor",
+                        "cursor",
                         "rebase_multiplier",
+                        "account_id",
                     ]),
                 )
                 .await
@@ -97,8 +117,10 @@ impl KrakenClient {
                     "txid",
                     "trades",
                     "userref",
+                    "cl_ord_id",
                     "consolidate_taker",
                     "rebase_multiplier",
+                    "account_id",
                 ])?;
                 self.private_post(
                     KrakenAuth::Spot,
@@ -107,34 +129,43 @@ impl KrakenClient {
                         "txid",
                         "trades",
                         "userref",
+                        "cl_ord_id",
                         "consolidate_taker",
                         "rebase_multiplier",
+                        "account_id",
                     ]),
                 )
                 .await
             }
             "get_spot_trade_history" => {
-                params.ensure_allowed(&[
+                const FIELDS: &[&str] = &[
                     "trades",
                     "start",
                     "end",
                     "ofs",
                     "without_count",
+                    "with_cursor",
+                    "cursor",
+                    "limit",
                     "consolidate_taker",
                     "ledgers",
+                    "pair",
+                    "aclass",
                     "rebase_multiplier",
-                    "type",
-                ])?;
-                let mut query = params.only(&[
-                    "trades",
-                    "start",
-                    "end",
-                    "ofs",
-                    "without_count",
-                    "consolidate_taker",
-                    "ledgers",
-                    "rebase_multiplier",
-                ]);
+                    "account_id",
+                ];
+                params.ensure_allowed(&[FIELDS, &["type"]].concat())?;
+                require_cursor_mode(params)?;
+                require_limit(params, 100)?;
+                // ofs is the offset pager; cursor mode requires it absent or 0.
+                if params.get("with_cursor") == Some("true")
+                    && params.get("ofs").is_some_and(|ofs| ofs != "0")
+                {
+                    return Err(super::params::invalid(
+                        "ofs must be absent or 0 with with_cursor=true",
+                    ));
+                }
+                let mut query = params.only(FIELDS);
                 push_optional(&mut query, "type", params.get("type"));
                 self.private_post(KrakenAuth::Spot, SPOT_TRADES_HISTORY, query)
                     .await
@@ -366,7 +397,7 @@ impl KrakenClient {
         oflags: Option<&str>,
     ) -> Result<ValidatedResponse> {
         params.ensure_allowed(SPOT_ORDER_KEYS)?;
-        reject_override_conflict(params, "side", side)?;
+        reject_override_conflict(params, "type", side)?;
         reject_override_conflict(params, "ordertype", ordertype)?;
         validate_optional_bool(params, "reduce_only")?;
         validate_optional_bool(params, "validate")?;
@@ -377,7 +408,7 @@ impl KrakenClient {
         }
         let effective_side = match side {
             Some(side) => side,
-            None => params.required("side")?,
+            None => params.required("type")?,
         };
         validate_allowed("Spot order side", effective_side, &["buy", "sell"])?;
         let effective_ordertype = match ordertype {
@@ -453,7 +484,7 @@ impl KrakenClient {
         }
         let mut query = Vec::new();
         self.push_required_product_symbol(&mut query, params, "pair", "")?;
-        push_required_or_override(&mut query, "type", side, params, "side")?;
+        push_required_or_override(&mut query, "type", side, params, "type")?;
         push_required_or_override(&mut query, "ordertype", ordertype, params, "ordertype")?;
         push_required_param(&mut query, params, "volume")?;
         push_optional(&mut query, "price", params.get("price"));
@@ -657,7 +688,7 @@ impl KrakenClient {
 /// Documented AddOrder fields: <https://docs.kraken.com/api/docs/rest-api/add-order>.
 const SPOT_ORDER_KEYS: &[&str] = &[
     "product_symbol",
-    "side",
+    "type",
     "ordertype",
     "volume",
     "price",

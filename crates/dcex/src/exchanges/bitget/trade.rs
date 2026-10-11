@@ -249,6 +249,10 @@ impl BitgetClient {
                         "triggerPrice",
                         "triggerOrderType",
                         "triggerOrderPrice",
+                        "ocoParams",
+                        "trailingStopParams",
+                        "icebergParams",
+                        "twapParams",
                         "product_symbol",
                         "symbol",
                         "productType",
@@ -279,6 +283,7 @@ impl BitgetClient {
                     "triggerOrderType",
                     "triggerOrderPrice",
                 ]);
+                insert_strategy_params(params, &mut body)?;
                 self.insert_required_product_symbol(&mut body, params)?;
                 self.post_private(UTA_PLACE_STRATEGY_ORDER, Value::Object(body))
                     .await
@@ -416,6 +421,115 @@ pub(in crate::exchanges::bitget) fn require_uta_symbol(params: &BitgetParams) ->
     require_one_identifier(params, &["product_symbol", "symbol"])
 }
 
+/// Strategy types whose settings travel as an array of objects:
+/// (type, field, documented item fields, required item fields).
+const STRATEGY_PARAMS: &[(&str, &str, &[&str], &[&str])] = &[
+    (
+        "oco",
+        "ocoParams",
+        &[
+            "ocoLimitPrice",
+            "ocoTriggerPrice",
+            "ocoOrderType",
+            "ocoOrderPrice",
+        ],
+        &["ocoLimitPrice", "ocoTriggerPrice", "ocoOrderType"],
+    ),
+    (
+        "trailing_stop",
+        "trailingStopParams",
+        &[
+            "activationPrice",
+            "activationType",
+            "trailType",
+            "trailVariance",
+            "preOrderType",
+            "preOrderPrice",
+        ],
+        &[
+            "activationPrice",
+            "activationType",
+            "trailType",
+            "trailVariance",
+            "preOrderType",
+        ],
+    ),
+    (
+        "iceberg",
+        "icebergParams",
+        &[
+            "splitMode",
+            "qtyPerOrder",
+            "splitOrderNumbers",
+            "orderPreference",
+            "executionStrategy",
+            "fixedDistanceType",
+            "distance",
+            "fixedPrice",
+            "priceLimit",
+        ],
+        &["splitMode", "orderPreference"],
+    ),
+    (
+        "twap",
+        "twapParams",
+        &[
+            "duration",
+            "interval",
+            "orderType",
+            "limitOffsetType",
+            "limitOffsetPercentage",
+            "limitOffsetSpread",
+            "twapTriggerPrice",
+            "twapTerminationPrice",
+        ],
+        &["duration", "interval"],
+    ),
+];
+
+/// Insert the settings array the strategy `type` requires, rejecting arrays for other types.
+fn insert_strategy_params(
+    params: &BitgetParams,
+    body: &mut serde_json::Map<String, Value>,
+) -> Result<()> {
+    use super::params::schema_invalid;
+
+    let kind = params.get("type").unwrap_or("tpsl");
+    for (strategy, field, documented, required) in STRATEGY_PARAMS {
+        let Some(value) = params.json_optional(field)? else {
+            if kind == *strategy {
+                return Err(schema_invalid(format!(
+                    "{field} is required for type={strategy}"
+                )));
+            }
+            continue;
+        };
+        if kind != *strategy {
+            return Err(schema_invalid(format!("{field} requires type={strategy}")));
+        }
+        let items = value
+            .as_array()
+            .filter(|items| !items.is_empty())
+            .ok_or_else(|| schema_invalid(format!("{field} must be a non-empty JSON array")))?;
+        for item in items {
+            let object = item
+                .as_object()
+                .ok_or_else(|| schema_invalid(format!("{field} items must be JSON objects")))?;
+            if let Some(key) = object
+                .keys()
+                .find(|key| !documented.contains(&key.as_str()))
+            {
+                return Err(schema_invalid(format!("unsupported {field} field: {key}")));
+            }
+            if let Some(key) = required.iter().find(|key| !object.contains_key(**key)) {
+                return Err(schema_invalid(format!("{field} items require {key}")));
+            }
+        }
+        body.insert((*field).to_string(), value);
+    }
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -433,6 +547,37 @@ mod tests {
                 .map(|(key, value)| ((*key).to_string(), (*value).to_string())),
         );
         BitgetParams::from_pairs(pairs)
+    }
+
+    #[test]
+    fn strategy_settings_follow_the_strategy_type() {
+        let insert = |items: &[(&str, &str)]| {
+            let mut body = serde_json::Map::new();
+            insert_strategy_params(&uta(items), &mut body).map(|()| body)
+        };
+        let oco = r#"[{"ocoLimitPrice":"1","ocoTriggerPrice":"2","ocoOrderType":"limit"}]"#;
+        let body = insert(&[("type", "oco"), ("ocoParams", oco)]).expect("oco settings");
+        assert_eq!(body["ocoParams"][0]["ocoTriggerPrice"], "2");
+        assert!(
+            insert(&[("ocoParams", oco)]).is_err(),
+            "settings need their type"
+        );
+        assert!(
+            insert(&[("type", "twap")]).is_err(),
+            "type needs its settings"
+        );
+        for broken in [
+            "[]",
+            "{}",
+            r#"[{"ocoLimitPrice":"1","ocoTriggerPrice":"2"}]"#,
+            r#"[{"ocoLimitPrice":"1","ocoTriggerPrice":"2","ocoOrderType":"limit","x":"1"}]"#,
+        ] {
+            assert!(
+                insert(&[("type", "oco"), ("ocoParams", broken)]).is_err(),
+                "{broken}"
+            );
+        }
+        assert!(insert(&[]).expect("plain tpsl").is_empty());
     }
 
     #[test]

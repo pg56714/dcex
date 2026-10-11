@@ -9,6 +9,7 @@ from .broker_http import GeneratedBrokerHTTP
 from .card_http import GeneratedCardHTTP
 from .compliance_http import GeneratedComplianceHTTP
 from .convert_http import GeneratedConvertHTTP
+from .earn_http import GeneratedEarnHTTP
 from .event_http import GeneratedEventHTTP
 from .fiat_http import GeneratedFiatHTTP
 from .file_upload_http import GeneratedFileUploadHTTP
@@ -18,6 +19,7 @@ from .pwm_http import GeneratedPwmHTTP
 from .referral_http import GeneratedReferralHTTP
 from .stocks_http import GeneratedStocksHTTP
 from .subaccount_http import GeneratedSubaccountHTTP
+from .tax_http import GeneratedTaxHTTP
 from .trading_http import GeneratedTradingHTTP
 from .transfers_http import GeneratedTransfersHTTP
 from .withdrawals_http import GeneratedWithdrawalsHTTP
@@ -32,6 +34,7 @@ class GeneratedHTTP(
     GeneratedCardHTTP,
     GeneratedComplianceHTTP,
     GeneratedConvertHTTP,
+    GeneratedEarnHTTP,
     GeneratedEventHTTP,
     GeneratedFiatHTTP,
     GeneratedFileUploadHTTP,
@@ -41,6 +44,7 @@ class GeneratedHTTP(
     GeneratedReferralHTTP,
     GeneratedStocksHTTP,
     GeneratedSubaccountHTTP,
+    GeneratedTaxHTTP,
     GeneratedTradingHTTP,
     GeneratedTransfersHTTP,
     GeneratedWithdrawalsHTTP,

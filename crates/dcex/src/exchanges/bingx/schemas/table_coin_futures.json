@@ -46,6 +46,7 @@
       "startTime",
       "endTime",
       "limit",
+      "timeZone",
       "recvWindow"
     ],
     "required": [
@@ -56,6 +57,7 @@
       "startTime",
       "endTime",
       "limit",
+      "timeZone",
       "recvWindow"
     ]
   },
@@ -103,7 +105,7 @@
   },
   {
     "name": "place_coin_swap_order",
-    "path": "/openApi/cswap/v1/trade/order",
+    "path": "/openApi/cswap/v2/trade/order",
     "verb": "POST",
     "public": false,
     "fields": [
@@ -124,7 +126,8 @@
     "required": [
       "product_symbol",
       "side",
-      "type"
+      "type",
+      "positionSide"
     ],
     "integers": [
       "recvWindow"
@@ -245,7 +248,7 @@
   {
     "name": "cancel_coin_swap_all_orders",
     "path": "/openApi/cswap/v1/trade/allOpenOrders",
-    "verb": "POST",
+    "verb": "DELETE",
     "public": false,
     "fields": [
       "product_symbol",

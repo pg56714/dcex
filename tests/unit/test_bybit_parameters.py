@@ -108,10 +108,10 @@ def test_sync_bybit_transferable_amount_validates_and_sends_coins() -> None:
 
     manager.get_transferable_amount(["BTC", "ETH"])
     assert captured["method_name"] == "get_transferable_amount"
-    assert captured["params"] == [("coins", "BTC,ETH")]
+    assert captured["params"] == [("coinName", "BTC,ETH")]
 
     manager.get_transferable_amount("USDT")
-    assert captured["params"] == [("coins", "USDT")]
+    assert captured["params"] == [("coinName", "USDT")]
 
     with pytest.raises(ValueError, match="at least one"):
         manager.get_transferable_amount([])
@@ -167,10 +167,10 @@ async def test_async_bybit_transferable_amount_validates_and_sends_coins() -> No
 
     await manager.get_transferable_amount(["BTC", "ETH"])
     assert captured["method_name"] == "get_transferable_amount"
-    assert captured["params"] == [("coins", "BTC,ETH")]
+    assert captured["params"] == [("coinName", "BTC,ETH")]
 
     await manager.get_transferable_amount("USDT")
-    assert captured["params"] == [("coins", "USDT")]
+    assert captured["params"] == [("coinName", "USDT")]
 
     with pytest.raises(ValueError, match="at least one"):
         await manager.get_transferable_amount([])

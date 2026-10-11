@@ -712,7 +712,7 @@
       "source_sha256": "1f10781892a59f07da02f8cc07800d8a1755284dde13581149b42e7333c16c41"
     },
     {
-      "method": "POST",
+      "method": "GET",
       "path": "/api/v1/private/order/open_order_total_count",
       "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/query-in-flight-order-counts",
       "source_sha256": "2eeb36a8af6f7801da27e3b76c24bd97c55b48c5934a784f0238503c8ecbf096"

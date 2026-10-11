@@ -231,9 +231,11 @@ class FinanceHTTP(HTTPManager):
     async def get_flexible_loan_borrow_currencies(self) -> dict[str, Any]:
         return await self._native_private("get_flexible_loan_borrow_currencies", [])
 
-    async def get_flexible_loan_collateral_assets(self, ccy: str | None = None) -> dict[str, Any]:
+    async def get_flexible_loan_collateral_assets(
+        self, ccy: str | None = None, ordId: str | None = None
+    ) -> dict[str, Any]:
         return await self._native_private(
-            "get_flexible_loan_collateral_assets", self._native_params(ccy=ccy)
+            "get_flexible_loan_collateral_assets", self._native_params(ccy=ccy, ordId=ordId)
         )
 
     async def get_flexible_loan_max_loan(
@@ -244,14 +246,20 @@ class FinanceHTTP(HTTPManager):
             self._native_params(borrowCcy=borrowCcy, supCollateral=supCollateral),
         )
 
-    async def get_flexible_loan_max_collateral_redeem(self, ccy: str) -> dict[str, Any]:
+    async def get_flexible_loan_max_collateral_redeem(
+        self, ccy: str, ordId: str | None = None
+    ) -> dict[str, Any]:
         return await self._native_private(
             "get_flexible_loan_max_collateral_redeem",
-            self._native_params(ccy=ccy),
+            self._native_params(ccy=ccy, ordId=ordId),
         )
 
     async def adjust_flexible_loan_collateral(
-        self, type: str, collateralCcy: str, collateralAmt: str
+        self,
+        type: str,
+        collateralCcy: str,
+        collateralAmt: str,
+        ordId: str | None = None,
     ) -> dict[str, Any]:
         return await self._native_private(
             "adjust_flexible_loan_collateral",
@@ -259,6 +267,7 @@ class FinanceHTTP(HTTPManager):
                 type=type,
                 collateralCcy=collateralCcy,
                 collateralAmt=collateralAmt,
+                ordId=ordId,
             ),
         )
 
@@ -274,10 +283,11 @@ class FinanceHTTP(HTTPManager):
         after: str | None = None,
         before: str | None = None,
         limit: int | None = None,
+        ordId: str | None = None,
     ) -> dict[str, Any]:
         return await self._native_private(
             "get_flexible_loan_history",
-            self._native_params(type=type, after=after, before=before, limit=limit),
+            self._native_params(type=type, after=after, before=before, limit=limit, ordId=ordId),
         )
 
     async def get_flexible_loan_interest_accrued(

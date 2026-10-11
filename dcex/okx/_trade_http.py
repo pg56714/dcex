@@ -1292,6 +1292,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         rfq_sz_ccy: str,
         cl_q_req_id: str | None = None,
         convert_mode: str | None = None,
+        tag: str | None = None,
     ) -> dict[str, Any]:
         """Estimate convert quote through ``POST /api/v5/asset/convert/estimate-quote``."""
         return self._native_private(
@@ -1304,6 +1305,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
                 rfqSzCcy=rfq_sz_ccy,
                 clQReqId=cl_q_req_id,
                 convertMode=convert_mode,
+                tag=tag,
             ),
         )
 
@@ -1317,6 +1319,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         sz_ccy: str,
         cl_t_req_id: str | None = None,
         convert_mode: str | None = None,
+        tag: str | None = None,
     ) -> dict[str, Any]:
         """Execute convert trade through ``POST /api/v5/asset/convert/trade``."""
         return self._native_private(
@@ -1330,6 +1333,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
                 szCcy=sz_ccy,
                 clTReqId=cl_t_req_id,
                 convertMode=convert_mode,
+                tag=tag,
             ),
         )
 
@@ -1368,8 +1372,23 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         """
         return self._native_private("set_auto_loan", self._native_params(autoLoan=auto_loan))
 
+    def activate_account_feature(self, feature: str) -> dict[str, Any]:
+        """
+        POST /api/v5/account/activate-feature; ``feature`` 1 enables USDC order book trading.
+
+        Call it only after order placement returns error 54109.
+        Source: https://www.okx.com/docs-v5/en/#trading-account-rest-api-activate-feature
+        """
+        return self._native_private(
+            "activate_account_feature", self._native_params(feature=feature)
+        )
+
     def preset_account_level_switch(
-        self, *, acct_lv: str, lever: str | None = None
+        self,
+        *,
+        acct_lv: str,
+        lever: str | None = None,
+        risk_offset_type: str | None = None,
     ) -> dict[str, Any]:
         """
         POST /api/v5/account/account-level-switch-preset.
@@ -1377,7 +1396,8 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         Source: https://www.okx.com/docs-v5/en/#trading-account-rest-api-preset-account-mode-switch
         """
         return self._native_private(
-            "preset_account_level_switch", self._native_params(acctLv=acct_lv, lever=lever)
+            "preset_account_level_switch",
+            self._native_params(acctLv=acct_lv, lever=lever, riskOffsetType=risk_offset_type),
         )
 
     def precheck_account_level_switch(self, *, acct_lv: str) -> dict[str, Any]:

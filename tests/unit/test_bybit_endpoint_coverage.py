@@ -1363,7 +1363,8 @@ CASES: tuple[RouteCase, ...] = (
         "/v5/position/set-leverage",
         LINEAR,
         "5",
-        body={"symbol": "BTCUSDT", "buyLeverage": "5", "sellLeverage": "5"},
+        "6",
+        body={"symbol": "BTCUSDT", "buyLeverage": "5", "sellLeverage": "6"},
     ),
     _post(
         "switch_position_mode",

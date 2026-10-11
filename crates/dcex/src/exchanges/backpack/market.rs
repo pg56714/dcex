@@ -20,12 +20,6 @@ impl BackpackClient {
             return Ok(response);
         }
         if let Some(response) = self
-            .prediction_schema_request(method_name, &params, true)
-            .await?
-        {
-            return Ok(response);
-        }
-        if let Some(response) = self
             .vault_schema_request(method_name, &params, true)
             .await?
         {
@@ -68,6 +62,13 @@ impl BackpackClient {
             }
             "get_market_sessions" => self.public_get(MARKET_SESSIONS, Vec::new()).await,
             "get_market_holidays" => self.public_get(MARKET_HOLIDAYS, Vec::new()).await,
+            "get_stock_indicative_quote" => {
+                self.public_get(
+                    STOCK_INDICATIVE_QUOTE,
+                    params.only(&["symbol", "side", "quantity"]),
+                )
+                .await
+            }
             "get_securities" => self.public_get(SECURITIES, Vec::new()).await,
             "get_rfq_constraints" => {
                 let selector = params.required_any(&["product_symbol", "symbol"])?;
@@ -186,6 +187,20 @@ impl BackpackClient {
             | "ping"
             | "get_time"
             | "get_wallets" => params.ensure_allowed(&[], &[]),
+            "get_stock_indicative_quote" => {
+                // A public stock ticker such as AAPL or AAPL.US, not a market symbol.
+                params.ensure_allowed(&["symbol", "side", "quantity"], &[])?;
+                for key in ["symbol", "side", "quantity"] {
+                    params.required(key)?;
+                }
+                params.optional_one_of("side", &["Bid", "Ask"])?;
+                if !crate::common::is_positive_plain_decimal(params.required("quantity")?) {
+                    return Err(DcexError::InvalidInput(
+                        "Backpack quantity must be a positive decimal".to_string(),
+                    ));
+                }
+                Ok(())
+            }
             "get_rfq_constraints" => {
                 params.ensure_allowed(&["product_symbol", "symbol", "sessionName"], &[])?;
                 validate_symbol_selector(params, true)?;

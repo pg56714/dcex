@@ -19,9 +19,6 @@ impl ArcusClient {
         if super::schema_requests::field_schemas::handles(method_name, true) {
             return self.field_schema_request(method_name, params).await;
         }
-        if super::metadata::handles(method_name, true) {
-            return self.metadata_request(method_name, params).await;
-        }
         if method_name == "get_api_keys" {
             return self.api_keys_request(method_name, params).await;
         }

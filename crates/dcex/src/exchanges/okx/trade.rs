@@ -199,6 +199,7 @@ impl OkxClient {
             }
             "get_order_list" => {
                 params.ensure_allowed(&[
+                    "product_symbol",
                     "instType",
                     "instFamily",
                     "ordType",
@@ -211,6 +212,7 @@ impl OkxClient {
             }
             "get_orders_history" => {
                 params.ensure_allowed(&[
+                    "product_symbol",
                     "instType",
                     "instFamily",
                     "ordType",
@@ -227,6 +229,7 @@ impl OkxClient {
             }
             "get_orders_history_archive" => {
                 params.ensure_allowed(&[
+                    "product_symbol",
                     "instType",
                     "instFamily",
                     "ordType",
@@ -243,6 +246,7 @@ impl OkxClient {
             }
             "get_fills" => {
                 params.ensure_allowed(&[
+                    "product_symbol",
                     "instType",
                     "instFamily",
                     "ordId",
@@ -257,6 +261,7 @@ impl OkxClient {
             }
             "get_fills_history" => {
                 params.ensure_allowed(&[
+                    "product_symbol",
                     "instType",
                     "instFamily",
                     "ordId",

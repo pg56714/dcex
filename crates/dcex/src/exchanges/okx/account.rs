@@ -17,7 +17,7 @@ impl OkxClient {
     ) -> Result<Option<ValidatedResponse>> {
         let result = match method_name {
             "get_account_instruments" => {
-                params.ensure_allowed(&["instType", "instFamily", "seriesId"])?;
+                params.ensure_allowed(&["product_symbol", "instType", "instFamily", "seriesId"])?;
                 let mut query = vec![(
                     "instType".to_string(),
                     params.required("instType")?.to_string(),
@@ -34,7 +34,7 @@ impl OkxClient {
                 self.get_request(ACCOUNT_BALANCE, query).await
             }
             "get_positions" => {
-                params.ensure_allowed(&["instType", "posId"])?;
+                params.ensure_allowed(&["product_symbol", "instType", "posId"])?;
                 let mut query = Vec::new();
                 push_optional(&mut query, "instType", params.get("instType"));
                 push_optional(&mut query, "posId", params.get("posId"));
@@ -43,7 +43,14 @@ impl OkxClient {
             }
             "get_positions_history" => {
                 params.ensure_allowed(&[
-                    "instType", "posId", "mgnMode", "type", "after", "before", "limit",
+                    "product_symbol",
+                    "instType",
+                    "posId",
+                    "mgnMode",
+                    "type",
+                    "after",
+                    "before",
+                    "limit",
                 ])?;
                 let mut query = params.only(&[
                     "instType", "posId", "mgnMode", "type", "after", "before", "limit",
@@ -58,8 +65,18 @@ impl OkxClient {
             }
             "get_account_bills" => {
                 params.ensure_allowed(&[
-                    "instType", "ccy", "mgnMode", "ctType", "type", "subType", "after", "before",
-                    "begin", "end", "limit",
+                    "product_symbol",
+                    "instType",
+                    "ccy",
+                    "mgnMode",
+                    "ctType",
+                    "type",
+                    "subType",
+                    "after",
+                    "before",
+                    "begin",
+                    "end",
+                    "limit",
                 ])?;
                 let mut query = params.only(&[
                     "instType", "ccy", "mgnMode", "ctType", "type", "subType", "after", "before",
@@ -70,8 +87,18 @@ impl OkxClient {
             }
             "get_account_bills_archive" => {
                 params.ensure_allowed(&[
-                    "instType", "ccy", "mgnMode", "ctType", "type", "subType", "after", "before",
-                    "begin", "end", "limit",
+                    "product_symbol",
+                    "instType",
+                    "ccy",
+                    "mgnMode",
+                    "ctType",
+                    "type",
+                    "subType",
+                    "after",
+                    "before",
+                    "begin",
+                    "end",
+                    "limit",
                 ])?;
                 let mut query = params.only(&[
                     "instType", "ccy", "mgnMode", "ctType", "type", "subType", "after", "before",
@@ -200,7 +227,7 @@ impl OkxClient {
             | "get_swap_fee_rates"
             | "get_futures_fee_rates"
             | "get_option_fee_rates" => {
-                params.ensure_allowed(&["instFamily", "groupId"])?;
+                params.ensure_allowed(&["product_symbol", "instFamily", "groupId"])?;
                 let inst_type = match method_name {
                     "get_spot_fee_rates" => "SPOT",
                     "get_margin_fee_rates" => "MARGIN",
@@ -216,7 +243,15 @@ impl OkxClient {
                 self.get_request(ACCOUNT_TRADE_FEE, query).await
             }
             "get_interest_accrued" => {
-                params.ensure_allowed(&["type", "ccy", "mgnMode", "after", "before", "limit"])?;
+                params.ensure_allowed(&[
+                    "product_symbol",
+                    "type",
+                    "ccy",
+                    "mgnMode",
+                    "after",
+                    "before",
+                    "limit",
+                ])?;
                 let mut query =
                     params.only(&["type", "ccy", "mgnMode", "after", "before", "limit"]);
                 self.push_inst_id(&mut query, params, "product_symbol")?;

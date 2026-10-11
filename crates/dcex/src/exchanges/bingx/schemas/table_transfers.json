@@ -28,7 +28,6 @@
     "public": false,
     "fields": [
       "coin",
-      "id",
       "transferClientId",
       "startTime",
       "endTime",

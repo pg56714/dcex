@@ -621,65 +621,58 @@
     {
       "method": "POST",
       "path": "/v1/spot/orders",
-      "official_source": "https://docs.ondoperps.xyz/spot-trading",
-      "operation_id": "",
-      "status": "blocked",
-      "source_status": "planned operation; API specification unpublished",
-      "note": "Official spot API specification remains unpublished as of 2026-09-30. This planned place operation has provisional method/path only; no method name, private request, signature assumption or live order is established."
+      "official_source": "https://docs.ondoperps.xyz/api-reference/rest-spec.json",
+      "operation_id": "postSpotOrders",
+      "status": "supported",
+      "source_status": "official REST specification"
     },
     {
       "method": "DELETE",
       "path": "/v1/spot/orders",
-      "official_source": "https://docs.ondoperps.xyz/spot-trading",
-      "operation_id": "",
-      "status": "blocked",
-      "source_status": "planned operation; API specification unpublished",
-      "note": "Official spot API specification remains unpublished as of 2026-09-30. This planned cancel operation has provisional method/path only; no method name, private request, signature assumption or live order is established."
+      "official_source": "https://docs.ondoperps.xyz/api-reference/rest-spec.json",
+      "operation_id": "deleteSpotOrders",
+      "status": "supported",
+      "source_status": "official REST specification"
     },
     {
       "method": "GET",
       "path": "/v1/spot/orders",
-      "official_source": "https://docs.ondoperps.xyz/spot-trading",
-      "operation_id": "",
-      "status": "blocked",
-      "source_status": "planned operation; API specification unpublished",
-      "note": "Official spot API specification remains unpublished as of 2026-09-30. This planned query operation has provisional method/path only; no method name, private request, signature assumption or live order is established."
+      "official_source": "https://docs.ondoperps.xyz/api-reference/rest-spec.json",
+      "operation_id": "getSpotOrders",
+      "status": "supported",
+      "source_status": "official REST specification"
     },
     {
       "method": "POST",
       "path": "/v1/spot/orders/batch",
-      "official_source": "https://docs.ondoperps.xyz/spot-trading",
-      "operation_id": "",
-      "status": "blocked",
-      "source_status": "planned operation; API specification unpublished",
-      "note": "Official spot API specification remains unpublished as of 2026-09-30. This planned batch placement operation has provisional method/path only; no method name, private request, signature assumption or live order is established."
+      "official_source": "https://docs.ondoperps.xyz/api-reference/rest-spec.json",
+      "operation_id": "postSpotOrdersBatch",
+      "status": "supported",
+      "source_status": "official REST specification"
     },
     {
       "method": "DELETE",
       "path": "/v1/spot/orders/batch",
-      "official_source": "https://docs.ondoperps.xyz/spot-trading",
-      "operation_id": "",
-      "status": "blocked",
-      "source_status": "planned operation; API specification unpublished",
-      "note": "Official spot API specification remains unpublished as of 2026-09-30. This planned batch cancellation operation has provisional method/path only; no method name, private request, signature assumption or live order is established."
+      "official_source": "https://docs.ondoperps.xyz/api-reference/rest-spec.json",
+      "operation_id": "deleteSpotOrdersBatch",
+      "status": "supported",
+      "source_status": "official REST specification"
     },
     {
       "method": "GET",
       "path": "/v1/spot/fills",
-      "official_source": "https://docs.ondoperps.xyz/spot-trading",
-      "operation_id": "",
-      "status": "blocked",
-      "source_status": "planned operation; API specification unpublished",
-      "note": "Official spot API specification remains unpublished as of 2026-09-30. This planned fills operation has provisional method/path only; no method name, private request, signature assumption or live order is established."
+      "official_source": "https://docs.ondoperps.xyz/api-reference/rest-spec.json",
+      "operation_id": "getSpotFills",
+      "status": "supported",
+      "source_status": "official REST specification"
     },
     {
       "method": "GET",
       "path": "/v1/spot/candles",
-      "official_source": "https://docs.ondoperps.xyz/spot-trading",
-      "operation_id": "",
-      "status": "blocked",
-      "source_status": "planned operation; API specification unpublished",
-      "note": "Official spot API specification remains unpublished as of 2026-09-30. This planned candles operation has provisional method/path only; no method name, private request, signature assumption or live order is established."
+      "official_source": "https://docs.ondoperps.xyz/api-reference/rest-spec.json",
+      "operation_id": "getSpotCandles",
+      "status": "supported",
+      "source_status": "official REST specification"
     },
     {
       "method": "WS",
@@ -713,6 +706,97 @@
       "status": "protocol",
       "source_status": "observed public channel",
       "note": "Read-only Rust probe on 2026-09-30 with TLS verification and no login received a subscription acknowledgement for SPY-USDC. No trade event arrived within the 10-second observation window. An unsupported-channel control was rejected. The public channel is observed; no official spot WS specification or private spot contract is inferred."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/spot/ticker",
+      "title": "Get Spot tickers",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/rest-spec.json",
+      "operation_id": "getSpotTicker"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/spot/orders/delayed",
+      "title": "Place Spot order (delayed)",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/rest-spec.json",
+      "operation_id": "postSpotOrdersDelayed"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/spot/orders/batch/delayed",
+      "title": "Place Spot batch (delayed)",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/rest-spec.json",
+      "operation_id": "postSpotOrdersBatchDelayed"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/spot/orders/{orderID}",
+      "title": "Get Spot order",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/rest-spec.json",
+      "operation_id": "getSpotOrdersOrderID"
+    },
+    {
+      "method": "DELETE",
+      "path": "/v1/spot/orders/{orderID}",
+      "title": "Cancel Spot order",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/rest-spec.json",
+      "operation_id": "deleteSpotOrdersOrderID"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/spot/orders/{orderID}/fills",
+      "title": "Get Spot order fills",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/rest-spec.json",
+      "operation_id": "getSpotOrdersOrderIDFills"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/spot/orders/csv",
+      "title": "Export Spot orders",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/rest-spec.json",
+      "operation_id": "getSpotOrdersCsv"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/spot/fills/csv",
+      "title": "Export Spot fills",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/rest-spec.json",
+      "operation_id": "getSpotFillsCsv"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/spot/balances",
+      "title": "Get Spot balances",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/rest-spec.json",
+      "operation_id": "getSpotBalances"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/spot/transfers",
+      "title": "List Spot transfers",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/rest-spec.json",
+      "operation_id": "getSpotTransfers"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/spot/transfers",
+      "title": "Create Spot transfer",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/rest-spec.json",
+      "operation_id": "postSpotTransfers"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/builder_code/stats",
+      "title": "Get Builder Code Statistics",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/rest-spec.json",
+      "operation_id": "getBuilderCodeStats"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/builder_code/fills",
+      "title": "Get Recent Builder Code Fills",
+      "official_source": "https://docs.ondoperps.xyz/api-reference/rest-spec.json",
+      "operation_id": "getBuilderCodeFills"
     }
   ],
   "spot_spec_checked": "2026-09-30",

@@ -119,6 +119,7 @@ class AccountHTTP(AccountHTTPWithdrawalsHTTP, HTTPManager):
         limit: int | None = None,
         offset: int | None = None,
         excludePlatform: bool | None = None,
+        transactionHash: str | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack deposit history."""
         return self._native_private(

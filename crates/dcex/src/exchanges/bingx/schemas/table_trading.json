@@ -56,5 +56,69 @@
         }
       }
     }
+  },
+  {
+    "name": "create_swap_signal",
+    "path": "/openApi/social/v1/swap/signal",
+    "verb": "POST",
+    "public": false,
+    "fields": [
+      "product_symbol",
+      "side",
+      "entryPrice",
+      "tpPrice",
+      "slPrice",
+      "leverage",
+      "sizePct",
+      "recvWindow"
+    ],
+    "required": [
+      "product_symbol",
+      "side",
+      "entryPrice"
+    ],
+    "integers": [
+      "leverage",
+      "sizePct",
+      "recvWindow"
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "entryPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "entry_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "tpPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "tp_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "slPrice": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "sl_price": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "leverage": {
+          "type": "integer"
+        },
+        "sizePct": {
+          "type": "integer"
+        },
+        "size_pct": {
+          "type": "integer"
+        }
+      }
+    }
   }
 ]

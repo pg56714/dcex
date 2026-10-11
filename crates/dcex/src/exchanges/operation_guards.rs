@@ -41,12 +41,13 @@ pub(super) fn validate(
                 | "cancel_margin_oco_orders"
         ),
         "backpack" => method == "cancel_open_strategies",
+        "ondo" => method == "cancel_spot_orders",
         _ => false,
     };
     if scoped {
         let all = take_flag(&mut params, "all_symbols")?;
         let symbol = params.iter().any(|(k, v)| {
-            matches!(k.as_str(), "product_symbol" | "symbol") && !v.trim().is_empty()
+            matches!(k.as_str(), "product_symbol" | "symbol" | "market") && !v.trim().is_empty()
         });
         let symbols = params
             .iter()

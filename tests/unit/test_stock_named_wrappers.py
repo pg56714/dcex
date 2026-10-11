@@ -97,13 +97,12 @@ def test_backpack_rfq_named_sync_methods() -> None:
         ],
     )
     client.accept_rfq_quote("quote-1", rfq_id="rfq-1")
-    client.refresh_rfq("rfq-1")
     client.cancel_rfq(rfq_id="rfq-1")
     client.get_rfq_history()
     client.get_quote_history()
     client.get_rfq_fill_history()
     client.get_quote_fill_history()
-    assert client._native_private.call_count == 9
+    assert client._native_private.call_count == 8
     with pytest.raises(ValueError, match="exactly one"):
         client.accept_rfq_quote("quote-1")
     with pytest.raises(ValueError, match="exactly one"):
@@ -118,12 +117,11 @@ async def test_backpack_rfq_named_async_methods() -> None:
     await client.get_rfqs()
     await client.submit_rfq("AAPL_USDC_RFQ", "Ask", quantity="2")
     await client.accept_rfq_quote("quote-1", client_id=1)
-    await client.refresh_rfq("rfq-1")
     await client.cancel_rfq(client_id=1)
     await client.get_rfq_history()
     await client.get_quote_history()
     await client.get_rfq_fill_history()
     await client.get_quote_fill_history()
-    assert client._native_private.await_count == 9
+    assert client._native_private.await_count == 8
     with pytest.raises(ValueError, match="exactly one"):
         await client.cancel_rfq()

@@ -697,6 +697,19 @@ WRAPPER_CASES = [
         "twapCancel",
     ),
     _action(
+        "place_trailing_stop_order",
+        (ETH, False, "0.5", True, None, "10", "2500"),
+        [
+            ("product_symbol", ETH),
+            ("isBuy", "false"),
+            ("size", "0.5"),
+            ("reduceOnly", "true"),
+            ("retracementPx", "10"),
+            ("activationPx", "2500"),
+        ],
+        "trailingStop",
+    ),
+    _action(
         "transfer_usdc_spot_perp",
         ("1", True, 1700000000000, SIGNATURE, "0xa4b1"),
         [
@@ -870,6 +883,7 @@ def test_wrapper_params_reach_official_wire_type(case: WrapperCase) -> None:
     assert requests
     last = requests[-1]
     from tests.unit.wire_contracts import assert_wire_contract
+
     assert_wire_contract("hyperliquid", case.method, last)
     payload = json.loads(last["body"])
     assert last["method"] == "POST"

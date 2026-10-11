@@ -63,25 +63,25 @@ mod account_requests {
                 params.ensure_allowed(&[
                     "fromAccount",
                     "toAccount",
-                    "transferId",
+                    "tranId",
                     "startTime",
                     "endTime",
                     "pageIndex",
                     "pageSize",
                     "recvWindow",
                 ])?;
-                if params.get("transferId").is_none() {
-                    require_pair_or_identifier(params, "fromAccount", "toAccount", "transferId")?;
+                if params.get("tranId").is_none() {
+                    require_pair_or_identifier(params, "fromAccount", "toAccount", "tranId")?;
                 }
                 validate_u64_range(params, "pageIndex", 1, u64::MAX)?;
                 validate_u64_range(params, "pageSize", 1, 100)?;
-                validate_u64_range(params, "transferId", 1, u64::MAX)?;
+                validate_u64_range(params, "tranId", 1, u64::MAX)?;
                 validate_time_range(params, "startTime", "endTime", None)?;
                 validate_recv_window(params)?;
                 let query = params.only(&[
                     "fromAccount",
                     "toAccount",
-                    "transferId",
+                    "tranId",
                     "startTime",
                     "endTime",
                     "pageIndex",

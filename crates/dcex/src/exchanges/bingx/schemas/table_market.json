@@ -1,7 +1,7 @@
 [
   {
     "name": "get_spot_historical_kline",
-    "path": "/openApi/market/his/v1/kline",
+    "path": "/openApi/spot/v2/quote/historicalKlines",
     "verb": "GET",
     "public": true,
     "fields": [
@@ -9,8 +9,7 @@
       "interval",
       "startTime",
       "endTime",
-      "limit",
-      "recvWindow"
+      "limit"
     ],
     "required": [
       "product_symbol",
@@ -19,8 +18,7 @@
     "integers": [
       "startTime",
       "endTime",
-      "limit",
-      "recvWindow"
+      "limit"
     ]
   },
   {
@@ -48,21 +46,19 @@
   },
   {
     "name": "get_spot_historical_trades",
-    "path": "/openApi/market/his/v1/trade",
+    "path": "/openApi/spot/v2/quote/historicalTrades",
     "verb": "GET",
     "public": true,
     "fields": [
       "product_symbol",
       "limit",
-      "fromId",
-      "recvWindow"
+      "fromId"
     ],
     "required": [
       "product_symbol"
     ],
     "integers": [
-      "limit",
-      "recvWindow"
+      "limit"
     ]
   },
   {

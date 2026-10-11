@@ -30,6 +30,7 @@ def _params(**kwargs: object) -> list[tuple[str, str]]:
             "to_time": "to",
             "range_": "range",
             "from_wallet": "from",
+            "to_wallet": "to",
         }.get(key, key)
         if isinstance(value, bool):
             encoded = str(value).lower()

@@ -1,0 +1,112 @@
+[
+  {
+    "method": "POST",
+    "path": "/v5/fht/compliance/tax/private/batch_create",
+    "title": "Batch Request Export Reports",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/tax/batch-create",
+    "name": "create_tax_report_batch",
+    "public": false,
+    "fields": [
+      {
+        "name": "startTime",
+        "python_name": "start_time",
+        "type": "integer",
+        "required": true,
+        "description": "Report start, UNIX seconds"
+      },
+      {
+        "name": "endTime",
+        "python_name": "end_time",
+        "type": "integer",
+        "required": true,
+        "description": "Report end, UNIX seconds; at most 12 months after startTime"
+      },
+      {
+        "name": "items",
+        "python_name": "items",
+        "type": "array<object>",
+        "required": true,
+        "description": "Reports to export: objects with type and number"
+      },
+      {
+        "name": "sourceInstitution",
+        "python_name": "source_institution",
+        "type": "string",
+        "required": false,
+        "description": "Identifier of the requesting institution"
+      },
+      {
+        "name": "exportFileType",
+        "python_name": "export_file_type",
+        "type": "string",
+        "required": false,
+        "description": "orc (default) or csv"
+      }
+    ],
+    "example": {
+      "startTime": 1714521600,
+      "endTime": 1717199999,
+      "items": [
+        {
+          "type": "TRADE",
+          "number": "1"
+        }
+      ]
+    },
+    "has_example": true,
+    "source_file": "v5/tax/batch-create.mdx",
+    "spec_commit": "59e3d457dea6b419a14987c19a3aabf4ffb38238",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "description": "Report items, each naming a documented report type and its period."
+        }
+      }
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/v5/fht/compliance/tax/private/batch_query",
+    "title": "Batch Query Export Reports",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/tax/batch-query",
+    "name": "get_tax_report_batch",
+    "public": false,
+    "fields": [
+      {
+        "name": "batchId",
+        "python_name": "batch_id",
+        "type": "string",
+        "required": true,
+        "description": "Batch ID returned by batch_create"
+      }
+    ],
+    "example": {
+      "batchId": "6f1b4c8e-0a1d-4c9e-9f3a-2b7c5d8e1f20"
+    },
+    "has_example": true,
+    "source_file": "v5/tax/batch-query.mdx",
+    "spec_commit": "59e3d457dea6b419a14987c19a3aabf4ffb38238",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/fht/compliance/tax/v3/private/registertime",
+    "title": "Get User Register Date",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/tax/register-time",
+    "name": "get_tax_register_time",
+    "public": false,
+    "fields": [],
+    "example": {},
+    "has_example": true,
+    "source_file": "v5/tax/register-time.mdx",
+    "spec_commit": "59e3d457dea6b419a14987c19a3aabf4ffb38238"
+  }
+]

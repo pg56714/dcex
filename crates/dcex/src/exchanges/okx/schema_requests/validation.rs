@@ -273,9 +273,12 @@ pub(super) fn validate(name: &str, p: &OkxParams) -> Result<()> {
         }
         "preset_account_level_switch" => {
             enumeration(p, "acctLv", &["2", "3", "4"])?;
+            enumeration(p, "riskOffsetType", &["1", "2", "3", "4"])?;
             positive(p, "lever")?;
         }
         "precheck_account_level_switch" => enumeration(p, "acctLv", &["1", "2", "3", "4"])?,
+        // 1: USDC order book trading, needed only after order placement returns 54109.
+        "activate_account_feature" => enumeration(p, "feature", &["1"])?,
         "set_trading_config" => {
             enumeration(p, "type", &["stgyType"])?;
             enumeration(p, "stgyType", &["0", "1"])?;

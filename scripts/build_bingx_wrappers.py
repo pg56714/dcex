@@ -34,6 +34,23 @@ def field_kind(field: dict[str, Any]) -> str:
 
 # Documented but absent live: BingX answers 100400 "this api is not exist" (2026-10-05).
 UNAVAILABLE_PATHS = {"/openApi/copyTrading/v1/swap/trace/currentTrack"}
+# Routes the hand-written methods already send (with product_symbol mapping).
+HAND_WRITTEN_PATHS = {
+    *(
+        f"/openApi/spot/v2/quote/{route}"
+        for route in (
+            "price",
+            "bookTicker",
+            "depth",
+            "historicalTrades",
+            "klines",
+            "ticker",
+            "historicalKlines",
+        )
+    ),
+    "/openApi/cswap/v2/trade/order",
+    "/openApi/cswap/v1/trade/allOpenOrders",
+}
 # Documented as optional but required live (100400 "Missing required parameter", 2026-10-05).
 REQUIRED_LIVE = {
     "/openApi/agent/v1/asset/partnerData": {"startTime", "endTime", "pageIndex", "pageSize"}
@@ -49,7 +66,7 @@ def main() -> None:
     )
     specs = []
     for op in operations:
-        if op["path"] in UNAVAILABLE_PATHS:
+        if op["path"] in UNAVAILABLE_PATHS | HAND_WRITTEN_PATHS:
             continue
         fields = [
             {**f, "kind": field_kind(f)} for f in op["parameters"] if f["name"] != "timestamp"
@@ -57,18 +74,6 @@ def main() -> None:
         for field in fields:
             if field["name"] in REQUIRED_LIVE.get(op["path"], ()):
                 field["required"] = True
-        if op["path"] == "/openApi/cswap/v2/trade/order":
-            for field in fields:
-                if field["name"] in {"takeProfit", "stopLoss"}:
-                    field["schema"] = {
-                        "type": "object",
-                        "properties": {
-                            "type": {"type": "string"},
-                            "stopPrice": {"type": "number"},
-                            "price": {"type": "number"},
-                            "workingType": {"type": "string"},
-                        },
-                    }
         if op["path"].startswith("/api/lindorm/"):
             fields += [
                 {"name": name, "kind": "str", "required": True}

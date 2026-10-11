@@ -34,7 +34,10 @@ WRAPPER_FILES = (
     "_market_http.py",
     "_trade_http.py",
 )
-WRAPPER_FILES += tuple(str(p.relative_to(ROOT / "dcex/bingx")) for p in sorted((ROOT / "dcex/bingx/_generated").glob("*_http.py")))
+WRAPPER_FILES += tuple(
+    str(p.relative_to(ROOT / "dcex/bingx"))
+    for p in sorted((ROOT / "dcex/bingx/_generated").glob("*_http.py"))
+)
 
 SPOT_ORDER = ("POST", "/openApi/spot/v1/trade/order")
 SWAP_ORDER = ("POST", "/openApi/swap/v2/trade/order")
@@ -50,9 +53,9 @@ ROUTES: dict[str, tuple[str, str]] = {
     "get_coin_swap_premium_index": ("GET", "/openApi/cswap/v1/market/premiumIndex"),
     "get_coin_swap_open_interest": ("GET", "/openApi/cswap/v1/market/openInterest"),
     "get_coin_swap_ticker": ("GET", "/openApi/cswap/v1/market/ticker"),
-    "place_coin_swap_order": ("POST", "/openApi/cswap/v1/trade/order"),
+    "place_coin_swap_order": ("POST", "/openApi/cswap/v2/trade/order"),
     "cancel_coin_swap_order": ("DELETE", "/openApi/cswap/v1/trade/cancelOrder"),
-    "cancel_coin_swap_all_orders": ("POST", "/openApi/cswap/v1/trade/allOpenOrders"),
+    "cancel_coin_swap_all_orders": ("DELETE", "/openApi/cswap/v1/trade/allOpenOrders"),
     "close_coin_swap_all_positions": ("POST", "/openApi/cswap/v1/trade/closeAllPositions"),
     "get_coin_swap_open_orders": ("GET", "/openApi/cswap/v1/trade/openOrders"),
     "get_coin_swap_order": ("GET", "/openApi/cswap/v1/trade/orderDetail"),
@@ -67,7 +70,8 @@ ROUTES: dict[str, tuple[str, str]] = {
     "get_coin_swap_commission_rate": ("GET", "/openApi/cswap/v1/user/commissionRate"),
     "get_coin_swap_balance": ("GET", "/openApi/cswap/v1/user/balance"),
     "get_coin_swap_positions": ("GET", "/openApi/cswap/v1/user/positions"),
-    "get_spot_historical_kline": ("GET", "/openApi/market/his/v1/kline"),
+    "get_spot_historical_kline": ("GET", "/openApi/spot/v2/quote/historicalKlines"),
+    "create_swap_signal": ("POST", "/openApi/social/v1/swap/signal"),
     "place_spot_oco": ("POST", "/openApi/spot/v1/oco/order"),
     "cancel_spot_oco": ("POST", "/openApi/spot/v1/oco/cancel"),
     "get_spot_oco": ("GET", "/openApi/spot/v1/oco/orderList"),
@@ -91,7 +95,7 @@ ROUTES: dict[str, tuple[str, str]] = {
     "get_swap_margin_assets": ("GET", "/openApi/swap/v1/user/marginAssets"),
     "get_swap_full_orders": ("GET", "/openApi/swap/v1/trade/fullOrder"),
     "get_swap_fill_history": ("GET", "/openApi/swap/v2/trade/fillHistory"),
-    "get_swap_position_history": ("GET", "/openApi/swap/v1/trade/positionHistory"),
+    "get_swap_position_history": ("GET", "/openApi/swap/v2/trade/positionHistory"),
     "get_swap_margin_history": ("GET", "/openApi/swap/v1/positionMargin/history"),
     "get_swap_maintenance_margin_ratios": ("GET", "/openApi/swap/v1/maintMarginRatio"),
     "set_swap_auto_add_margin": ("POST", "/openApi/swap/v1/trade/autoAddMargin"),
@@ -100,13 +104,11 @@ ROUTES: dict[str, tuple[str, str]] = {
     "get_spot_instrument_info": ("GET", "/openApi/spot/v1/common/symbols"),
     "get_orderbook": ("GET", "/openApi/swap/v2/quote/depth"),
     "get_spot_orderbook": ("GET", "/openApi/spot/v1/market/depth"),
-    "get_spot_orderbook_v2": ("GET", "/openApi/spot/v2/market/depth"),
+    "get_spot_orderbook_v2": ("GET", "/openApi/spot/v2/quote/depth"),
     "get_public_trades": ("GET", "/openApi/swap/v2/quote/trades"),
-    "get_spot_public_trades": ("GET", "/openApi/spot/v1/market/trades"),
+    "get_spot_public_trades": ("GET", "/openApi/spot/v2/quote/trades"),
     "get_kline": ("GET", "/openApi/swap/v3/quote/klines"),
-    # BingX only documents the v2 spot kline route; get_spot_kline uses it too.
-    "get_spot_kline": ("GET", "/openApi/spot/v2/market/kline"),
-    "get_spot_kline_v2": ("GET", "/openApi/spot/v2/market/kline"),
+    "get_spot_kline": ("GET", "/openApi/spot/v2/quote/klines"),
     "get_open_interest": ("GET", "/openApi/swap/v2/quote/openInterest"),
     "get_mark_price_kline": ("GET", "/openApi/swap/v1/market/markPriceKlines"),
     "get_ticker": ("GET", "/openApi/swap/v2/quote/ticker"),
@@ -114,9 +116,9 @@ ROUTES: dict[str, tuple[str, str]] = {
     "get_swap_funding_rate": ("GET", "/openApi/swap/v2/quote/fundingRate"),
     "get_swap_book_ticker": ("GET", "/openApi/swap/v2/quote/bookTicker"),
     "get_swap_trading_rules": ("GET", "/openApi/swap/v1/tradingRules"),
-    "get_spot_ticker": ("GET", "/openApi/spot/v1/ticker/24hr"),
-    "get_spot_book_ticker": ("GET", "/openApi/spot/v1/ticker/bookTicker"),
-    "get_spot_price_ticker": ("GET", "/openApi/spot/v2/ticker/price"),
+    "get_spot_ticker": ("GET", "/openApi/spot/v2/quote/ticker"),
+    "get_spot_book_ticker": ("GET", "/openApi/spot/v2/quote/bookTicker"),
+    "get_spot_price_ticker": ("GET", "/openApi/spot/v2/quote/price"),
     # Account / wallet / sub-accounts.
     "get_account_balance": ("GET", "/openApi/swap/v3/user/balance"),
     "get_swap_account_balance": ("GET", "/openApi/swap/v3/user/balance"),
@@ -240,6 +242,7 @@ VALUES: dict[str, Any] = {
     "interval": "1m",
     "depth": 20,
     "cancelReplaceMode": "STOP_ON_FAILURE",
+    "CancelReplaceMode": "STOP_ON_FAILURE",
     "positionSide": "LONG",
     "positionId": 1,
     "orderIds": [1, 2],
@@ -391,9 +394,9 @@ CONTROL_CASES = [
     ),
     (
         "get_swap_position_history",
-        {"product_symbol": "BTC-USDT", "startTs": 1700000000000, "endTs": 1700000100000},
+        {"product_symbol": "BTC-USDT", "startTime": 1700000000000, "endTime": 1700000100000},
         "GET",
-        "/openApi/swap/v1/trade/positionHistory",
+        "/openApi/swap/v2/trade/positionHistory",
     ),
     (
         "get_swap_margin_history",
@@ -536,9 +539,15 @@ ADDITIONAL_CASES = [
     ),
     (
         "place_coin_swap_order",
-        {"product_symbol": "BTC-USD", "side": "SELL", "type_": "MARKET", "quantity": "1"},
+        {
+            "product_symbol": "BTC-USD",
+            "side": "SELL",
+            "type_": "MARKET",
+            "position_side": "SHORT",
+            "quantity": "1",
+        },
         "POST",
-        "/openApi/cswap/v1/trade/order",
+        "/openApi/cswap/v2/trade/order",
     ),
     (
         "cancel_coin_swap_order",
@@ -549,7 +558,7 @@ ADDITIONAL_CASES = [
     (
         "cancel_coin_swap_all_orders",
         {"product_symbol": "BTC-USD"},
-        "POST",
+        "DELETE",
         "/openApi/cswap/v1/trade/allOpenOrders",
     ),
     (
@@ -630,7 +639,13 @@ ADDITIONAL_CASES = [
         "get_spot_historical_kline",
         {"product_symbol": "BTC-USDT-SPOT", "interval": "1m"},
         "GET",
-        "/openApi/market/his/v1/kline",
+        "/openApi/spot/v2/quote/historicalKlines",
+    ),
+    (
+        "create_swap_signal",
+        {"product_symbol": "BTC-USDT", "side": "long", "entry_price": "100000"},
+        "POST",
+        "/openApi/social/v1/swap/signal",
     ),
     (
         "place_spot_oco",
@@ -646,7 +661,7 @@ ADDITIONAL_CASES = [
         "/openApi/spot/v1/oco/order",
     ),
     ("cancel_spot_oco", {"order_id": "1"}, "POST", "/openApi/spot/v1/oco/cancel"),
-    ("get_spot_oco", {"order_list_id": "1"}, "GET", "/openApi/spot/v1/oco/orderList"),
+    ("get_spot_oco", {"order_id": "1"}, "GET", "/openApi/spot/v1/oco/orderList"),
     (
         "get_spot_open_oco",
         {"page_index": 1, "page_size": 20},
@@ -672,6 +687,7 @@ ADDITIONAL_FIELDS = {
         "symbol": "BTC-USD",
         "side": "SELL",
         "type": "MARKET",
+        "positionSide": "SHORT",
         "quantity": "1",
     },
     "cancel_coin_swap_order": {"symbol": "BTC-USD", "orderId": "1"},
@@ -696,6 +712,7 @@ ADDITIONAL_FIELDS = {
     "get_coin_swap_balance": {"symbol": "BTC-USD"},
     "get_coin_swap_positions": {"symbol": "BTC-USD"},
     "get_spot_historical_kline": {"symbol": "BTC-USDT", "interval": "1m"},
+    "create_swap_signal": {"symbol": "BTC-USDT", "side": "long", "entryPrice": "100000"},
     "place_spot_oco": {
         "symbol": "BTC-USDT",
         "side": "SELL",
@@ -705,7 +722,7 @@ ADDITIONAL_FIELDS = {
         "orderPrice": "89",
     },
     "cancel_spot_oco": {"orderId": "1"},
-    "get_spot_oco": {"orderListId": "1"},
+    "get_spot_oco": {"orderId": "1"},
     "get_spot_open_oco": {"pageIndex": "1", "pageSize": "20"},
     "get_spot_oco_history": {"pageIndex": "1", "pageSize": "20"},
     "get_deposit_history": {},
@@ -729,6 +746,7 @@ PUBLIC_METHODS.difference_update(
         "get_coin_swap_commission_rate",
         "get_coin_swap_balance",
         "get_coin_swap_positions",
+        "create_swap_signal",
         "place_spot_oco",
         "cancel_spot_oco",
         "get_spot_oco",
@@ -790,7 +808,7 @@ ADDITIONAL_CASES.extend(
             "get_spot_historical_trades",
             {"product_symbol": "BTC-USDT-SPOT"},
             "GET",
-            "/openApi/market/his/v1/trade",
+            "/openApi/spot/v2/quote/historicalTrades",
         ),
         ("get_coin_network_config", {}, "GET", "/openApi/wallets/v1/capital/config/getall"),
         (
@@ -920,7 +938,7 @@ ADDITIONAL_FIELDS.update(
 )
 ROUTES.update(
     {
-        "get_spot_historical_trades": ("GET", "/openApi/market/his/v1/trade"),
+        "get_spot_historical_trades": ("GET", "/openApi/spot/v2/quote/historicalTrades"),
         "get_coin_network_config": ("GET", "/openApi/wallets/v1/capital/config/getall"),
         "get_deposit_addresses": ("GET", "/openApi/wallets/v1/capital/deposit/address"),
         "get_deposit_risk_records": ("GET", "/openApi/wallets/v1/capital/deposit/riskRecords"),
@@ -1120,6 +1138,7 @@ def _drain(received: "queue.Queue[dict[str, Any]]") -> None:
 
 def _assert_route(name: str, request: dict[str, Any]) -> None:
     from tests.unit.wire_contracts import assert_wire_contract
+
     assert_wire_contract("bingx", name, request)
     assert (request["method"], request["path"]) == ROUTES[name], name
     fields = request["query"]
@@ -1271,20 +1290,10 @@ def test_sync_helpers_pin_side_type_and_time_in_force(
     query = received.get(timeout=10)["query"]
     assert query["type"] == "LIMIT"
 
-    client.get_spot_orderbook_v2(product_symbol="BTC-USDT-SPOT", depth=20)
+    client.get_spot_orderbook_v2(product_symbol="BTC-USDT-SPOT", limit=20)
     query = received.get(timeout=10)["query"]
-    assert query["symbol"] == "BTC_USDT"
+    assert query["symbol"] == "BTC-USDT"
     assert query["type"] == "step0"
-
-
-def test_spot_orderbook_v2_requires_depth() -> None:
-    """BingX documents depth as required for the aggregated spot order book."""
-    from dcex.async_support.bingx.client import Client as AsyncClient
-    from dcex.bingx.client import Client
-
-    for client_class in (Client, AsyncClient):
-        parameter = inspect.signature(client_class.get_spot_orderbook_v2).parameters["depth"]
-        assert parameter.default is inspect.Parameter.empty
 
 
 # Official request tables list no timestamp only for these public spot routes.
@@ -1294,6 +1303,11 @@ PUBLIC_WITHOUT_TIMESTAMP = {
     "get_spot_orderbook_v2",
     "get_spot_price_ticker",
     "get_spot_book_ticker",
+    "get_spot_ticker",
+    "get_spot_public_trades",
+    "get_spot_kline",
+    "get_spot_historical_kline",
+    "get_spot_historical_trades",
 }
 
 
@@ -1353,7 +1367,7 @@ def test_public_routes_send_documented_timestamp(
         ("amend_swap_order", {"product_symbol": "BTC-USDT", "quantity": "1"}),
         (
             "get_swap_position_history",
-            {"product_symbol": "BTC-USDT", "start_ts": 1, "end_ts": 8000000000},
+            {"product_symbol": "BTC-USDT", "start_time": 1, "end_time": 8000000000},
         ),
         ("set_swap_asset_mode", {"asset_mode": "invalid", "confirm": True}),
     ],

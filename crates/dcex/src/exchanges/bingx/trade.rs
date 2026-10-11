@@ -133,7 +133,7 @@ impl BingxClient {
                     "cancelOrderId",
                     "cancelClientOrderID",
                     "cancelRestrictions",
-                    "cancelReplaceMode",
+                    "CancelReplaceMode",
                     "side",
                     "type",
                     "timeInForce",
@@ -154,7 +154,7 @@ impl BingxClient {
                 )?;
                 validate_enum(
                     params,
-                    "cancelReplaceMode",
+                    "CancelReplaceMode",
                     &["STOP_ON_FAILURE", "ALLOW_FAILURE"],
                 )?;
                 // Live cancelReplace rejects anything but an empty, IOC or POC timeInForce.
@@ -163,7 +163,7 @@ impl BingxClient {
                     "cancelOrderId",
                     "cancelClientOrderID",
                     "cancelRestrictions",
-                    "cancelReplaceMode",
+                    "CancelReplaceMode",
                     "timeInForce",
                     "quantity",
                     "quoteOrderQty",

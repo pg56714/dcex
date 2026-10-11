@@ -46,12 +46,8 @@ impl KucoinClient {
             "get_spot_all_tickers" => (KucoinMarket::Spot, SPOT_ALL_TICKERS.to_string(), false),
             "get_spot_orderbook" => {
                 self.normalize_symbol_query(&mut params, false)?;
-                let depth = take_param(&mut params, "depth").unwrap_or_else(|| "20".to_string());
-                (
-                    KucoinMarket::Spot,
-                    format!("{SPOT_ORDERBOOK}{depth}"),
-                    false,
-                )
+                let size = take_param(&mut params, "size").unwrap_or_else(|| "20".to_string());
+                (KucoinMarket::Spot, format!("{SPOT_ORDERBOOK}{size}"), false)
             }
             "get_spot_public_trades" => {
                 self.normalize_symbol_query(&mut params, false)?;
@@ -87,8 +83,8 @@ impl KucoinClient {
             }
             "get_futures_orderbook" => {
                 self.normalize_symbol_query(&mut params, true)?;
-                let path = take_param(&mut params, "depth")
-                    .map(|depth| format!("/api/v1/level2/depth{depth}"))
+                let path = take_param(&mut params, "size")
+                    .map(|size| format!("/api/v1/level2/depth{size}"))
                     .unwrap_or_else(|| FUTURES_ORDERBOOK.to_string());
                 (KucoinMarket::Futures, path, false)
             }
@@ -213,9 +209,9 @@ impl KucoinClient {
         match method_name {
             "get_spot_instrument_info" => params.ensure_allowed(&["market"]),
             "get_spot_orderbook" => {
-                params.ensure_allowed(&["product_symbol", "symbol", "depth"])?;
+                params.ensure_allowed(&["product_symbol", "symbol", "size"])?;
                 params.required_any(&["product_symbol", "symbol"])?;
-                validate_enum(&params, "depth", &["20", "100"])
+                validate_enum(&params, "size", &["20", "100"])
             }
             "get_spot_ticker" | "get_spot_public_trades" => {
                 params.ensure_allowed(&["product_symbol", "symbol"])?;
@@ -242,10 +238,10 @@ impl KucoinClient {
                 Ok(())
             }
             "get_futures_orderbook" => {
-                params.ensure_allowed(&["product_symbol", "symbol", "depth"])?;
+                params.ensure_allowed(&["product_symbol", "symbol", "size"])?;
                 // Live 400100 "Symbol parameter cannot be left empty" for the full snapshot too.
                 params.required_any(&["product_symbol", "symbol"])?;
-                validate_enum(&params, "depth", &["20", "100"])?;
+                validate_enum(&params, "size", &["20", "100"])?;
                 Ok(())
             }
             "get_futures_kline" => {

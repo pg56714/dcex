@@ -27,6 +27,7 @@ class GeneratedCopyTradingHTTP(TradeHTTP):
         time_in_force: str | None = None,
         post_only: bool | None = None,
         position_side: str | None = None,
+        funds_type: str | None = None,
     ) -> Any:  # noqa: ANN401
         """
         Add Order.
@@ -52,6 +53,7 @@ class GeneratedCopyTradingHTTP(TradeHTTP):
                 timeInForce=time_in_force,
                 postOnly=post_only,
                 positionSide=position_side,
+                fundsType=funds_type,
             ),
         )
 
@@ -121,6 +123,7 @@ class GeneratedCopyTradingHTTP(TradeHTTP):
         trigger_stop_up_price: str | None = None,
         trigger_stop_down_price: str | None = None,
         position_side: str | None = None,
+        funds_type: str | None = None,
     ) -> Any:  # noqa: ANN401
         """
         Add Take Profit And Stop Loss Order.
@@ -146,21 +149,25 @@ class GeneratedCopyTradingHTTP(TradeHTTP):
                 triggerStopUpPrice=trigger_stop_up_price,
                 triggerStopDownPrice=trigger_stop_down_price,
                 positionSide=position_side,
+                fundsType=funds_type,
             ),
         )
 
-    async def delete_v1_copy_trade_futures_orders(self, *, order_id: str | None = None) -> Any:  # noqa: ANN401
+    async def delete_v1_copy_trade_futures_orders(
+        self, *, order_id: str | None = None, funds_type: str | None = None
+    ) -> Any:  # noqa: ANN401
         """
         Cancel Order By OrderId.
 
         Source: https://www.kucoin.com/docs-new/rest/copy-trading/cancel-order-by-orderid
         """
         return await self._native_private(
-            "delete_v1_copy_trade_futures_orders", self._native_params(orderId=order_id)
+            "delete_v1_copy_trade_futures_orders",
+            self._native_params(orderId=order_id, fundsType=funds_type),
         )
 
     async def delete_v1_copy_trade_futures_orders_client_order(
-        self, *, symbol: str, client_oid: str
+        self, *, symbol: str, client_oid: str, funds_type: str | None = None
     ) -> Any:  # noqa: ANN401
         """
         Cancel Order By ClientOid.
@@ -169,11 +176,11 @@ class GeneratedCopyTradingHTTP(TradeHTTP):
         """
         return await self._native_private(
             "delete_v1_copy_trade_futures_orders_client_order",
-            self._native_params(symbol=symbol, clientOid=client_oid),
+            self._native_params(symbol=symbol, clientOid=client_oid, fundsType=funds_type),
         )
 
     async def get_v1_copy_trade_futures_get_max_open_size(
-        self, *, symbol: str, price: str, leverage: int
+        self, *, symbol: str, price: str, leverage: int, funds_type: str | None = None
     ) -> Any:  # noqa: ANN401
         """
         Get Max Open Size.
@@ -182,11 +189,19 @@ class GeneratedCopyTradingHTTP(TradeHTTP):
         """
         return await self._native_private(
             "get_v1_copy_trade_futures_get_max_open_size",
-            self._native_params(symbol=symbol, price=price, leverage=leverage),
+            self._native_params(
+                symbol=symbol, price=price, leverage=leverage, fundsType=funds_type
+            ),
         )
 
     async def post_v1_copy_trade_futures_position_margin_deposit_margin(
-        self, *, symbol: str, margin: str, biz_no: str, position_side: str | None = None
+        self,
+        *,
+        symbol: str,
+        margin: str,
+        biz_no: str,
+        position_side: str | None = None,
+        funds_type: str | None = None,
     ) -> Any:  # noqa: ANN401
         """
         Add Isolated Margin.
@@ -196,7 +211,11 @@ class GeneratedCopyTradingHTTP(TradeHTTP):
         return await self._native_private(
             "post_v1_copy_trade_futures_position_margin_deposit_margin",
             self._native_params(
-                symbol=symbol, margin=margin, bizNo=biz_no, positionSide=position_side
+                symbol=symbol,
+                margin=margin,
+                bizNo=biz_no,
+                positionSide=position_side,
+                fundsType=funds_type,
             ),
         )
 
@@ -214,7 +233,12 @@ class GeneratedCopyTradingHTTP(TradeHTTP):
         )
 
     async def post_v1_copy_trade_futures_position_margin_auto_deposit_status(
-        self, *, symbol: str, status: bool, position_side: str | None = None
+        self,
+        *,
+        symbol: str,
+        status: bool,
+        position_side: str | None = None,
+        funds_type: str | None = None,
     ) -> Any:  # noqa: ANN401
         """
         Modify Isolated Margin Auto-Deposit Status.
@@ -223,11 +247,13 @@ class GeneratedCopyTradingHTTP(TradeHTTP):
         """
         return await self._native_private(
             "post_v1_copy_trade_futures_position_margin_auto_deposit_status",
-            self._native_params(symbol=symbol, status=status, positionSide=position_side),
+            self._native_params(
+                symbol=symbol, status=status, positionSide=position_side, fundsType=funds_type
+            ),
         )
 
     async def post_v1_copy_trade_futures_position_change_margin_mode(
-        self, *, symbol: str, margin_mode: str
+        self, *, symbol: str, margin_mode: str, funds_type: str | None = None
     ) -> Any:  # noqa: ANN401
         """
         Switch Margin Mode.
@@ -236,11 +262,11 @@ class GeneratedCopyTradingHTTP(TradeHTTP):
         """
         return await self._native_private(
             "post_v1_copy_trade_futures_position_change_margin_mode",
-            self._native_params(symbol=symbol, marginMode=margin_mode),
+            self._native_params(symbol=symbol, marginMode=margin_mode, fundsType=funds_type),
         )
 
     async def post_v2_copy_trade_futures_change_cross_user_leverage(
-        self, *, symbol: str, leverage: str
+        self, *, symbol: str, leverage: str, funds_type: str | None = None
     ) -> Any:  # noqa: ANN401
         """
         Modify Cross Margin Leverage.
@@ -249,7 +275,7 @@ class GeneratedCopyTradingHTTP(TradeHTTP):
         """
         return await self._native_private(
             "post_v2_copy_trade_futures_change_cross_user_leverage",
-            self._native_params(symbol=symbol, leverage=leverage),
+            self._native_params(symbol=symbol, leverage=leverage, fundsType=funds_type),
         )
 
     async def post_v2_copy_trade_get_cross_mode_margin_requirement(
@@ -265,7 +291,9 @@ class GeneratedCopyTradingHTTP(TradeHTTP):
             self._native_params(symbol=symbol, leverage=leverage, positionValue=position_value),
         )
 
-    async def post_v2_copy_trade_position_switch_position_mode(self, *, position_mode: str) -> Any:  # noqa: ANN401
+    async def post_v2_copy_trade_position_switch_position_mode(
+        self, *, position_mode: str, funds_type: str | None = None
+    ) -> Any:  # noqa: ANN401
         """
         Switch Position Mode.
 
@@ -273,5 +301,5 @@ class GeneratedCopyTradingHTTP(TradeHTTP):
         """
         return await self._native_private(
             "post_v2_copy_trade_position_switch_position_mode",
-            self._native_params(positionMode=position_mode),
+            self._native_params(positionMode=position_mode, fundsType=funds_type),
         )

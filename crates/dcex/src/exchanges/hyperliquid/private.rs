@@ -147,6 +147,9 @@ impl HyperliquidClient {
             "update_isolated_margin" => self.update_isolated_margin_from_params(&params).await,
             "place_twap_order" => self.place_twap_order_from_params(&params).await,
             "cancel_twap_order" => self.cancel_twap_order_from_params(&params).await,
+            "place_trailing_stop_order" => {
+                self.place_trailing_stop_order_from_params(&params).await
+            }
             _ => Err(DcexError::InvalidInput(format!(
                 "unsupported Hyperliquid private method: {method_name}"
             ))),

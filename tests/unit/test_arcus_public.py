@@ -91,13 +91,11 @@ def test_arcus_sync_public_market_parameters() -> None:
     native = _Native()
     client._native_client = native
     assert client.get_markets() == {"ok": True}
-    assert client.get_spot_assets() == {"ok": True}
     assert client.get_fee_tiers() == {"ok": True}
     assert client.get_bbo("BTC-USD") == {"ok": True}
     assert client.get_l2_orderbook("BTC-USD", 5) == {"ok": True}
     assert native.calls == [
         ("get_markets", []),
-        ("get_spot_assets", []),
         ("get_fee_tiers", []),
         ("get_bbo", [("market", "BTC-USD")]),
         ("get_l2_orderbook", [("market", "BTC-USD"), ("nLevels", "5")]),

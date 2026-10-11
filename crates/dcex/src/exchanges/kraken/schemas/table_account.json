@@ -299,7 +299,8 @@
     "auth": "KrakenAuth::Spot",
     "public": false,
     "allowed": [
-      "rebase_multiplier"
+      "rebase_multiplier",
+      "account_id"
     ],
     "fields": [
       {
@@ -310,6 +311,13 @@
           "rebased",
           "base"
         ],
+        "minimum": 0
+      },
+      {
+        "key": "account_id",
+        "kind": "string",
+        "required": false,
+        "values": [],
         "minimum": 0
       }
     ],
@@ -324,7 +332,8 @@
     "allowed": [
       "id",
       "trades",
-      "rebase_multiplier"
+      "rebase_multiplier",
+      "account_id"
     ],
     "fields": [
       {
@@ -349,6 +358,13 @@
           "rebased",
           "base"
         ],
+        "minimum": 0
+      },
+      {
+        "key": "account_id",
+        "kind": "string",
+        "required": false,
+        "values": [],
         "minimum": 0
       }
     ],
@@ -531,5 +547,116 @@
       }
     ],
     "symbol_key": null
+  },
+  {
+    "name": "get_futures_options_mm_greek_limits",
+    "path": "/derivatives/api/v3/options-mm-greek-limits",
+    "method": "HttpMethod::Get",
+    "auth": "KrakenAuth::Futures",
+    "public": false,
+    "allowed": [],
+    "fields": [],
+    "symbol_key": null
+  },
+  {
+    "name": "set_futures_options_mm_greek_limits",
+    "path": "/derivatives/api/v3/options-mm-greek-limits",
+    "method": "HttpMethod::Put",
+    "auth": "KrakenAuth::Futures",
+    "public": false,
+    "allowed": [
+      "currency",
+      "deltaLimit",
+      "vegaLimit"
+    ],
+    "fields": [
+      {
+        "key": "currency",
+        "kind": "string",
+        "required": true,
+        "values": [],
+        "minimum": 0
+      },
+      {
+        "key": "deltaLimit",
+        "kind": "string",
+        "required": false,
+        "values": [],
+        "minimum": 0
+      },
+      {
+        "key": "vegaLimit",
+        "kind": "string",
+        "required": false,
+        "values": [],
+        "minimum": 0
+      }
+    ],
+    "symbol_key": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "deltaLimit": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "delta_limit": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "vegaLimit": {
+          "type": "string",
+          "format": "decimal"
+        },
+        "vega_limit": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    }
+  },
+  {
+    "name": "delete_futures_options_mm_greek_limits",
+    "path": "/derivatives/api/v3/options-mm-greek-limits",
+    "method": "HttpMethod::Delete",
+    "auth": "KrakenAuth::Futures",
+    "public": false,
+    "allowed": [
+      "currency"
+    ],
+    "fields": [
+      {
+        "key": "currency",
+        "kind": "string",
+        "required": false,
+        "values": [],
+        "minimum": 0
+      }
+    ],
+    "symbol_key": null
+  },
+  {
+    "name": "get_futures_transfers",
+    "path": "/derivatives/api/v3/transfers",
+    "method": "HttpMethod::Get",
+    "auth": "KrakenAuth::Futures",
+    "public": false,
+    "allowed": [
+      "lastTransferTime"
+    ],
+    "fields": [
+      {
+        "key": "lastTransferTime",
+        "kind": "string",
+        "required": false,
+        "values": [],
+        "minimum": 0
+      }
+    ],
+    "symbol_key": null,
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
   }
 ]

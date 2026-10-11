@@ -17,13 +17,12 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_open_interest(product_symbol => "product_symbol"),
         get_orderbook(product_symbol => "product_symbol"),
         get_public_trades(product_symbol => "product_symbol"),
-        get_spot_book_ticker(product_symbol => "product_symbol"),
+        get_spot_book_ticker(),
         get_spot_instrument_info(),
         get_spot_kline(product_symbol => "product_symbol", interval => "interval"),
-        get_spot_kline_v2(product_symbol => "product_symbol", interval => "interval"),
         get_spot_orderbook(product_symbol => "product_symbol"),
-        get_spot_orderbook_v2(product_symbol => "product_symbol", depth => "depth"),
-        get_spot_price_ticker(product_symbol => "product_symbol"),
+        get_spot_orderbook_v2(product_symbol => "product_symbol"),
+        get_spot_price_ticker(),
         get_spot_public_trades(product_symbol => "product_symbol"),
         get_spot_ticker(),
         get_swap_instrument_info(),
@@ -35,7 +34,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
     ];
     private [
 
-        place_coin_swap_order(product_symbol => "product_symbol", side => "side", type_ => "type"),
+        place_coin_swap_order(product_symbol => "product_symbol", side => "side", type_ => "type", position_side => "positionSide"),
         cancel_coin_swap_order(product_symbol => "product_symbol"),
         cancel_coin_swap_all_orders(),
         close_coin_swap_all_positions(),
@@ -120,8 +119,8 @@ crate::exchanges::impl_exchange_method_wrappers! {
         ),
         get_swap_position_history(
             product_symbol => "product_symbol",
-            start_ts => "startTs",
-            end_ts => "endTs"
+            start_time => "startTime",
+            end_time => "endTime"
         ),
         get_swap_margin_history(
             product_symbol => "product_symbol",
@@ -179,10 +178,11 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_swap_commission_rate(),
 
         keep_alive_listen_key(listen_key => "listenKey"),
+        create_swap_signal(product_symbol => "product_symbol", side => "side", entry_price => "entryPrice"),
 
         replace_spot_order(
             product_symbol => "product_symbol",
-            cancel_replace_mode => "cancelReplaceMode",
+            cancel_replace_mode => "CancelReplaceMode",
             side => "side",
             type_ => "type"
         ),

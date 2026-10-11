@@ -292,6 +292,32 @@
             }
           ]
         }
+      },
+      {
+        "name": "fundsType",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Type of funds used for the position or order.",
+          "enum": [
+            "selfFunds",
+            "leadTrial"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "selfFunds",
+              "name": "",
+              "description": "Own funds"
+            },
+            {
+              "value": "leadTrial",
+              "name": "",
+              "description": "Lead trading trial funds"
+            }
+          ],
+          "default": "selfFunds"
+        }
       }
     ],
     "json_body": true,
@@ -337,6 +363,14 @@
         "marginMode": {
           "type": "string",
           "description": "selects cross or isolated margin using the documented integer enumeration."
+        },
+        "fundsType": {
+          "type": "string",
+          "description": "Copy-trading funds account for the position; selects a documented enumeration."
+        },
+        "funds_type": {
+          "type": "string",
+          "description": "Copy-trading funds account for the position; selects a documented enumeration."
         }
       }
     }
@@ -961,6 +995,32 @@
             }
           ]
         }
+      },
+      {
+        "name": "fundsType",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "selfFunds",
+            "leadTrial"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "selfFunds",
+              "name": "",
+              "description": "Own funds"
+            },
+            {
+              "value": "leadTrial",
+              "name": "",
+              "description": "Lead trading trial funds"
+            }
+          ],
+          "default": "selfFunds",
+          "description": "Type of funds used for the position or order."
+        }
       }
     ],
     "json_body": true,
@@ -1014,6 +1074,14 @@
         "marginMode": {
           "type": "string",
           "description": "selects cross or isolated margin using the documented integer enumeration."
+        },
+        "fundsType": {
+          "type": "string",
+          "description": "Copy-trading funds account for the position; selects a documented enumeration."
+        },
+        "funds_type": {
+          "type": "string",
+          "description": "Copy-trading funds account for the position; selects a documented enumeration."
         }
       }
     }
@@ -1031,6 +1099,31 @@
         "schema": {
           "type": "string"
         }
+      },
+      {
+        "name": "fundsType",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "selfFunds",
+            "leadTrial"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "selfFunds",
+              "name": "",
+              "description": "Own funds"
+            },
+            {
+              "value": "leadTrial",
+              "name": "",
+              "description": "Lead trading trial funds"
+            }
+          ],
+          "default": "selfFunds"
+        }
       }
     ],
     "json_body": false,
@@ -1040,7 +1133,16 @@
     "confirm": false,
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "fundsType": {
+          "type": "string",
+          "description": "Copy-trading funds account for the position; selects a documented enumeration."
+        },
+        "funds_type": {
+          "type": "string",
+          "description": "Copy-trading funds account for the position; selects a documented enumeration."
+        }
+      }
     }
   },
   {
@@ -1064,6 +1166,31 @@
         "schema": {
           "type": "string"
         }
+      },
+      {
+        "name": "fundsType",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "selfFunds",
+            "leadTrial"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "selfFunds",
+              "name": "",
+              "description": "Own funds"
+            },
+            {
+              "value": "leadTrial",
+              "name": "",
+              "description": "Lead trading trial funds"
+            }
+          ],
+          "default": "selfFunds"
+        }
       }
     ],
     "json_body": false,
@@ -1073,7 +1200,16 @@
     "confirm": false,
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "fundsType": {
+          "type": "string",
+          "description": "Copy-trading funds account for the position; selects a documented enumeration."
+        },
+        "funds_type": {
+          "type": "string",
+          "description": "Copy-trading funds account for the position; selects a documented enumeration."
+        }
+      }
     }
   },
   {
@@ -1110,6 +1246,31 @@
         "schema": {
           "type": "integer"
         }
+      },
+      {
+        "name": "fundsType",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "selfFunds",
+            "leadTrial"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "selfFunds",
+              "name": "",
+              "description": "Own funds"
+            },
+            {
+              "value": "leadTrial",
+              "name": "",
+              "description": "Lead trading trial funds"
+            }
+          ],
+          "default": "selfFunds"
+        }
       }
     ],
     "json_body": false,
@@ -1127,6 +1288,14 @@
         "leverage": {
           "type": "string",
           "format": "decimal"
+        },
+        "fundsType": {
+          "type": "string",
+          "description": "Copy-trading funds account for the position; selects a documented enumeration."
+        },
+        "funds_type": {
+          "type": "string",
+          "description": "Copy-trading funds account for the position; selects a documented enumeration."
         }
       }
     }
@@ -1175,6 +1344,31 @@
             }
           ]
         }
+      },
+      {
+        "name": "fundsType",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "selfFunds",
+            "leadTrial"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "selfFunds",
+              "name": "",
+              "description": "Own funds"
+            },
+            {
+              "value": "leadTrial",
+              "name": "",
+              "description": "Lead trading trial funds"
+            }
+          ],
+          "default": "selfFunds"
+        }
       }
     ],
     "json_body": false,
@@ -1184,7 +1378,16 @@
     "confirm": false,
     "input_schema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "fundsType": {
+          "type": "string",
+          "description": "Copy-trading funds account for the position; selects a documented enumeration."
+        },
+        "funds_type": {
+          "type": "string",
+          "description": "Copy-trading funds account for the position; selects a documented enumeration."
+        }
+      }
     }
   },
   {
@@ -1250,6 +1453,32 @@
             }
           ]
         }
+      },
+      {
+        "name": "fundsType",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "selfFunds",
+            "leadTrial"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "selfFunds",
+              "name": "",
+              "description": "Own funds"
+            },
+            {
+              "value": "leadTrial",
+              "name": "",
+              "description": "Lead trading trial funds"
+            }
+          ],
+          "default": "selfFunds",
+          "description": "Funds type. Defaults to selfFunds when omitted or empty."
+        }
       }
     ],
     "json_body": true,
@@ -1263,6 +1492,14 @@
         "margin": {
           "format": "decimal",
           "x-positive": true
+        },
+        "fundsType": {
+          "type": "string",
+          "description": "Copy-trading funds account for the position; selects a documented enumeration."
+        },
+        "funds_type": {
+          "type": "string",
+          "description": "Copy-trading funds account for the position; selects a documented enumeration."
         }
       }
     }
@@ -1321,6 +1558,32 @@
             }
           ]
         }
+      },
+      {
+        "name": "fundsType",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "selfFunds",
+            "leadTrial"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "selfFunds",
+              "name": "",
+              "description": "Own funds"
+            },
+            {
+              "value": "leadTrial",
+              "name": "",
+              "description": "Lead trading trial funds"
+            }
+          ],
+          "default": "selfFunds",
+          "description": "Funds type. Defaults to selfFunds when omitted or empty."
+        }
       }
     ],
     "json_body": true,
@@ -1338,6 +1601,14 @@
         "withdraw_amount": {
           "type": "string",
           "format": "decimal"
+        },
+        "fundsType": {
+          "type": "string",
+          "description": "Copy-trading funds account for the position; selects a documented enumeration."
+        },
+        "funds_type": {
+          "type": "string",
+          "description": "Copy-trading funds account for the position; selects a documented enumeration."
         }
       }
     }
@@ -1431,13 +1702,52 @@
             }
           ]
         }
+      },
+      {
+        "name": "fundsType",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "selfFunds",
+            "leadTrial"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "selfFunds",
+              "name": "",
+              "description": "Own funds"
+            },
+            {
+              "value": "leadTrial",
+              "name": "",
+              "description": "Lead trading trial funds"
+            }
+          ],
+          "default": "selfFunds",
+          "description": "Funds type. Defaults to selfFunds when omitted or empty."
+        }
       }
     ],
     "json_body": true,
     "source": "https://www.kucoin.com/docs-new/rest/copy-trading/modify-isolated-margin-auto-deposit-status",
     "summary": "Modify Isolated Margin Auto-Deposit Status",
     "withdrawal": false,
-    "confirm": false
+    "confirm": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "fundsType": {
+          "type": "string",
+          "description": "Copy-trading funds account for the position; selects a documented enumeration."
+        },
+        "funds_type": {
+          "type": "string",
+          "description": "Copy-trading funds account for the position; selects a documented enumeration."
+        }
+      }
+    }
   },
   {
     "name": "post_v1_copy_trade_futures_position_change_margin_mode",
@@ -1478,6 +1788,32 @@
             }
           ]
         }
+      },
+      {
+        "name": "fundsType",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "selfFunds",
+            "leadTrial"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "selfFunds",
+              "name": "",
+              "description": "Own funds"
+            },
+            {
+              "value": "leadTrial",
+              "name": "",
+              "description": "Lead trading trial funds"
+            }
+          ],
+          "default": "selfFunds",
+          "description": "Funds type. Defaults to selfFunds when omitted or empty."
+        }
       }
     ],
     "json_body": true,
@@ -1495,6 +1831,14 @@
         "marginMode": {
           "type": "string",
           "description": "selects cross or isolated margin using the documented integer enumeration."
+        },
+        "fundsType": {
+          "type": "string",
+          "description": "Copy-trading funds account for the position; selects a documented enumeration."
+        },
+        "funds_type": {
+          "type": "string",
+          "description": "Copy-trading funds account for the position; selects a documented enumeration."
         }
       }
     }
@@ -1522,6 +1866,32 @@
           "type": "string",
           "description": "Leverage multiple"
         }
+      },
+      {
+        "name": "fundsType",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "selfFunds",
+            "leadTrial"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "selfFunds",
+              "name": "",
+              "description": "Own funds"
+            },
+            {
+              "value": "leadTrial",
+              "name": "",
+              "description": "Lead trading trial funds"
+            }
+          ],
+          "default": "selfFunds",
+          "description": "Funds type. Defaults to selfFunds when omitted or empty."
+        }
       }
     ],
     "json_body": true,
@@ -1535,6 +1905,14 @@
         "leverage": {
           "type": "string",
           "format": "decimal"
+        },
+        "fundsType": {
+          "type": "string",
+          "description": "Copy-trading funds account for the position; selects a documented enumeration."
+        },
+        "funds_type": {
+          "type": "string",
+          "description": "Copy-trading funds account for the position; selects a documented enumeration."
         }
       }
     }
@@ -1626,12 +2004,51 @@
             }
           ]
         }
+      },
+      {
+        "name": "fundsType",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "selfFunds",
+            "leadTrial"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "selfFunds",
+              "name": "",
+              "description": "Own funds"
+            },
+            {
+              "value": "leadTrial",
+              "name": "",
+              "description": "Lead trading trial funds"
+            }
+          ],
+          "default": "selfFunds",
+          "description": "Funds type. Defaults to selfFunds when omitted or empty."
+        }
       }
     ],
     "json_body": true,
     "source": "https://www.kucoin.com/docs-new/rest/copy-trading/switch-position-mode",
     "summary": "Switch Position Mode",
     "withdrawal": false,
-    "confirm": false
+    "confirm": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "fundsType": {
+          "type": "string",
+          "description": "Copy-trading funds account for the position; selects a documented enumeration."
+        },
+        "funds_type": {
+          "type": "string",
+          "description": "Copy-trading funds account for the position; selects a documented enumeration."
+        }
+      }
+    }
   }
 ]

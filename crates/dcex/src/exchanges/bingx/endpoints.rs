@@ -68,9 +68,9 @@ pub(super) const SWAP_MARK_PRICE_KLINE: &str = "/openApi/swap/v1/market/markPric
 
 pub(super) const SPOT_SYMBOLS: &str = "/openApi/spot/v1/common/symbols";
 pub(super) const SPOT_ORDERBOOK: &str = "/openApi/spot/v1/market/depth";
-pub(super) const SPOT_ORDERBOOK_V2: &str = "/openApi/spot/v2/market/depth";
-pub(super) const SPOT_PUBLIC_TRADE: &str = "/openApi/spot/v1/market/trades";
-pub(super) const SPOT_KLINE_V2: &str = "/openApi/spot/v2/market/kline";
-pub(super) const SPOT_TICKER: &str = "/openApi/spot/v1/ticker/24hr";
-pub(super) const SPOT_BOOK_TICKER: &str = "/openApi/spot/v1/ticker/bookTicker";
-pub(super) const SPOT_PRICE_TICKER: &str = "/openApi/spot/v2/ticker/price";
+pub(super) const SPOT_ORDERBOOK_V2: &str = "/openApi/spot/v2/quote/depth";
+pub(super) const SPOT_PUBLIC_TRADE: &str = "/openApi/spot/v2/quote/trades";
+pub(super) const SPOT_KLINE: &str = "/openApi/spot/v2/quote/klines";
+pub(super) const SPOT_TICKER: &str = "/openApi/spot/v2/quote/ticker";
+pub(super) const SPOT_BOOK_TICKER: &str = "/openApi/spot/v2/quote/bookTicker";
+pub(super) const SPOT_PRICE_TICKER: &str = "/openApi/spot/v2/quote/price";

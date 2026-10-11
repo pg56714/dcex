@@ -125,7 +125,6 @@ impl BingxClient {
 fn load_schemas() -> Vec<Endpoint> {
     [
         include_str!("../schemas/affiliate.json"),
-        include_str!("../schemas/coin_futures.json"),
         include_str!("../schemas/market.json"),
         include_str!("../schemas/copy_trading.json"),
         include_str!("../schemas/earn.json"),

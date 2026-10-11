@@ -99,6 +99,7 @@ impl BybitClient {
                     "orderLinkId",
                     "accountType",
                     "stakeAmount",
+                    "redeemShares",
                 ])?;
                 let product_id = positive_product_id(params.required("productId")?)?;
                 let order_type = params.required("orderType")?;

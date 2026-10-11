@@ -228,7 +228,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
     def place_uta_strategy_order(
         self, category: str, product_symbol: str, **params: object
     ) -> dict[str, Any]:
-        """Place a Bitget UTA TP/SL or trigger strategy order."""
+        """Place a UTA strategy order: tpsl, trigger, oco, trailing_stop, iceberg or twap."""
         return self._native_private(
             "place_uta_strategy_order",
             self._native_params(category=category, product_symbol=product_symbol, **params),
@@ -474,11 +474,13 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             ),
         )
 
-    def get_uta_fee_rate(self, product_symbol: str, category: str) -> dict[str, Any]:
+    def get_uta_fee_rate(
+        self, product_symbol: str, category: str, rpi_flag: str | None = None
+    ) -> dict[str, Any]:
         """Call ``GET /api/v3/account/fee-rate``."""
         return self._native_private(
             "get_uta_fee_rate",
-            self._native_params(product_symbol=product_symbol, category=category),
+            self._native_params(product_symbol=product_symbol, category=category, rpiFlag=rpi_flag),
         )
 
     def set_uta_collateral_type(

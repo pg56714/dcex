@@ -1146,6 +1146,13 @@
       "path": "/exchange",
       "action": "gossipPriorityBid",
       "official_source": "https://github.com/hyperliquid-dex/hyperliquid-python-sdk/blob/2fdb18f9517675ea03695a0962bd19eece9c83f0/hyperliquid/exchange.py#L1225"
+    },
+    {
+      "method": "POST",
+      "path": "/exchange",
+      "title": "Place a trailing stop",
+      "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint",
+      "action": "trailingStop"
     }
   ]
 }

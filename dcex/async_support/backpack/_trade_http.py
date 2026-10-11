@@ -38,6 +38,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPWithdrawalsHTTP, HTTPManager):
         execution_mode: str = "AwaitAccept",
         price: str | None = None,
         client_id: int | None = None,
+        order_expiry_time: int | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Submit an RFQ. Stock RFQs require quantity, not quote_quantity."""
         return await self._native_private(
@@ -50,6 +51,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPWithdrawalsHTTP, HTTPManager):
                 executionMode=execution_mode,
                 price=price,
                 clientId=client_id,
+                orderExpiryTime=order_expiry_time,
             ),
         )
 
@@ -67,10 +69,6 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPWithdrawalsHTTP, HTTPManager):
             "accept_rfq_quote",
             self._native_params(quoteId=quote_id, rfqId=rfq_id, clientId=client_id),
         )
-
-    async def refresh_rfq(self, rfq_id: str) -> dict[str, Any] | list[Any] | str:
-        """Refresh an RFQ."""
-        return await self._native_private("refresh_rfq", self._native_params(rfqId=rfq_id))
 
     async def cancel_rfq(
         self, *, rfq_id: str | None = None, client_id: int | None = None

@@ -70,11 +70,6 @@ def test_get_spot_kline(client):
     assert res is not None
 
 
-def test_get_spot_kline_v2(client):
-    res = client.get_spot_kline_v2("BTC-USDT-SPOT", "1h", limit=5)
-    assert res is not None
-
-
 def test_get_spot_ticker(client):
     res = client.get_spot_ticker("BTC-USDT-SPOT")
     assert res is not None

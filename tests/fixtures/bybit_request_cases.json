@@ -2648,6 +2648,92 @@
       "wire": {},
       "source": "https://bybit-exchange.github.io/docs/v5/user/referral-code",
       "note": "Official HTTP request example."
+    },
+    {
+      "name": "get_earn_auto_savings",
+      "method": "GET",
+      "path": "/v5/earn/flexible-saving/auto-savings",
+      "signed": true,
+      "kwargs": {
+        "coins": [
+          "BTC"
+        ]
+      },
+      "wire": {
+        "coins": "BTC"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/earn/flexible-saving/auto-savings",
+      "note": "Offline fixture based on official parameter table; repeated coins query."
+    },
+    {
+      "name": "set_earn_auto_savings",
+      "method": "POST",
+      "path": "/v5/earn/flexible-saving/auto-savings",
+      "signed": true,
+      "kwargs": {
+        "coin": "USDT",
+        "is_selected": true,
+        "purchase_immediately": false
+      },
+      "wire": {
+        "coin": "USDT",
+        "isSelected": true,
+        "purchaseImmediately": false
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/earn/flexible-saving/auto-savings",
+      "note": "Official HTTP request example."
+    },
+    {
+      "name": "create_tax_report_batch",
+      "method": "POST",
+      "path": "/v5/fht/compliance/tax/private/batch_create",
+      "signed": true,
+      "kwargs": {
+        "start_time": 1714521600,
+        "end_time": 1717199999,
+        "items": [
+          {
+            "type": "TRADE",
+            "number": "1"
+          }
+        ]
+      },
+      "wire": {
+        "startTime": 1714521600,
+        "endTime": 1717199999,
+        "items": [
+          {
+            "type": "TRADE",
+            "number": "1"
+          }
+        ]
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/tax/batch-create",
+      "note": "Offline fixture based on official parameter table."
+    },
+    {
+      "name": "get_tax_report_batch",
+      "method": "GET",
+      "path": "/v5/fht/compliance/tax/private/batch_query",
+      "signed": true,
+      "kwargs": {
+        "batch_id": "6f1b4c8e-0a1d-4c9e-9f3a-2b7c5d8e1f20"
+      },
+      "wire": {
+        "batchId": "6f1b4c8e-0a1d-4c9e-9f3a-2b7c5d8e1f20"
+      },
+      "source": "https://bybit-exchange.github.io/docs/v5/tax/batch-query",
+      "note": "Offline fixture based on official parameter table."
+    },
+    {
+      "name": "get_tax_register_time",
+      "method": "POST",
+      "path": "/fht/compliance/tax/v3/private/registertime",
+      "signed": true,
+      "kwargs": {},
+      "wire": {},
+      "source": "https://bybit-exchange.github.io/docs/v5/tax/register-time",
+      "note": "Official HTTP request example."
     }
   ]
 }

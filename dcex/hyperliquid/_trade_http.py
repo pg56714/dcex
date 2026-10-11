@@ -261,6 +261,25 @@ class TradeHTTP(TradeHTTPTransfersHTTP, TradeHTTPBatchHTTP, TradeHTTPWithdrawals
         """Place a TWAP order."""
         return self._native_private("place_twap_order", self._native_params(**locals()))
 
+    def place_trailing_stop_order(
+        self,
+        product_symbol: str,
+        isBuy: bool,
+        size: str,
+        reduceOnly: bool,
+        retracementPct: str | None = None,
+        retracementPx: str | None = None,
+        activationPx: str | None = None,
+        vaultAddress: str | None = None,
+        expiresAfter: int | None = None,
+    ) -> dict[str, Any]:
+        """
+        Place a trailing stop; give retracementPct (e.g. ``"1.5"`` for 1.5%) or retracementPx.
+
+        Source: https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint
+        """
+        return self._native_private("place_trailing_stop_order", self._native_params(**locals()))
+
     def cancel_twap_order(
         self,
         product_symbol: str,

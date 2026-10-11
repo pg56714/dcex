@@ -48,7 +48,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             "place_spot_order",
             self._native_params(
                 product_symbol=product_symbol,
-                side=side,
+                type=side,
                 ordertype=ordertype,
                 volume=volume,
                 price=price,
@@ -89,7 +89,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             "place_spot_market_order",
             self._native_params(
                 product_symbol=product_symbol,
-                side=side,
+                type=side,
                 volume=volume,
                 cl_ord_id=cl_ord_id,
                 validate=validate,
@@ -148,7 +148,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             "place_spot_limit_order",
             self._native_params(
                 product_symbol=product_symbol,
-                side=side,
+                type=side,
                 volume=volume,
                 price=price,
                 timeinforce=timeinforce,
@@ -216,7 +216,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             "place_spot_post_only_limit_order",
             self._native_params(
                 product_symbol=product_symbol,
-                side=side,
+                type=side,
                 volume=volume,
                 price=price,
                 cl_ord_id=cl_ord_id,
@@ -270,6 +270,11 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         userref: int | None = None,
         cl_ord_id: str | None = None,
         rebase_multiplier: str | None = None,
+        account_id: str | None = None,
+        consolidate_taker: bool | None = None,
+        with_cursor: bool | None = None,
+        cursor: str | None = None,
+        limit: int | None = None,
     ) -> dict[str, Any]:
         """Retrieve Kraken spot open orders."""
         return self._native_private(
@@ -279,6 +284,11 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
                 userref=userref,
                 cl_ord_id=cl_ord_id,
                 rebase_multiplier=rebase_multiplier,
+                account_id=account_id,
+                consolidate_taker=consolidate_taker,
+                with_cursor=with_cursor,
+                cursor=cursor,
+                limit=limit,
             ),
         )
 
@@ -294,6 +304,9 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         consolidate_taker: bool | None = None,
         without_count: bool | None = None,
         rebase_multiplier: str | None = None,
+        account_id: str | None = None,
+        with_cursor: bool | None = None,
+        cursor: str | None = None,
     ) -> dict[str, Any]:
         """Retrieve Kraken spot closed orders."""
         return self._native_private(
@@ -309,6 +322,9 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
                 consolidate_taker=consolidate_taker,
                 without_count=without_count,
                 rebase_multiplier=rebase_multiplier,
+                account_id=account_id,
+                with_cursor=with_cursor,
+                cursor=cursor,
             ),
         )
 
@@ -319,6 +335,8 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         userref: int | None = None,
         consolidate_taker: bool | None = None,
         rebase_multiplier: str | None = None,
+        account_id: str | None = None,
+        cl_ord_id: str | None = None,
     ) -> dict[str, Any]:
         """Query Kraken spot order info by transaction id."""
         return self._native_private(
@@ -329,6 +347,8 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
                 userref=userref,
                 consolidate_taker=consolidate_taker,
                 rebase_multiplier=rebase_multiplier,
+                account_id=account_id,
+                cl_ord_id=cl_ord_id,
             ),
         )
 
@@ -343,6 +363,12 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         consolidate_taker: bool | None = None,
         ledgers: bool | None = None,
         rebase_multiplier: str | None = None,
+        account_id: str | None = None,
+        with_cursor: bool | None = None,
+        cursor: str | None = None,
+        limit: int | None = None,
+        pair: str | None = None,
+        aclass: str | None = None,
     ) -> dict[str, Any]:
         """Retrieve Kraken spot trades/fills history."""
         return self._native_private(
@@ -357,6 +383,12 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
                 consolidate_taker=consolidate_taker,
                 ledgers=ledgers,
                 rebase_multiplier=rebase_multiplier,
+                account_id=account_id,
+                with_cursor=with_cursor,
+                cursor=cursor,
+                limit=limit,
+                pair=pair,
+                aclass=aclass,
             ),
         )
 
@@ -689,10 +721,13 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             "cancel_futures_all_orders_after", self._native_params(timeout=timeout)
         )
 
-    def get_spot_extended_balance(self, *, rebase_multiplier: str | None = None) -> dict[str, Any]:
+    def get_spot_extended_balance(
+        self, *, rebase_multiplier: str | None = None, account_id: str | None = None
+    ) -> dict[str, Any]:
         """Get balances including credits, used credit and funds held for trading."""
         return self._native_private(
-            "get_spot_extended_balance", self._native_params(rebase_multiplier=rebase_multiplier)
+            "get_spot_extended_balance",
+            self._native_params(rebase_multiplier=rebase_multiplier, account_id=account_id),
         )
 
     def get_futures_leverage_preferences(self) -> dict[str, Any]:
@@ -715,7 +750,13 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         )
 
     def get_spot_trades_info(
-        self, *, txid: str, trades: bool | None = None, rebase_multiplier: str | None = None
+        self,
+        *,
+        txid: str,
+        trades: bool | None = None,
+        rebase_multiplier: str | None = None,
+        account_id: str | None = None,
+        ledgers: bool | None = None,
     ) -> dict[str, Any]:
         """
         POST /0/private/QueryTrades.
@@ -724,7 +765,13 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         """
         return self._native_private(
             "get_spot_trades_info",
-            self._native_params(txid=txid, trades=trades, rebase_multiplier=rebase_multiplier),
+            self._native_params(
+                txid=txid,
+                trades=trades,
+                rebase_multiplier=rebase_multiplier,
+                account_id=account_id,
+                ledgers=ledgers,
+            ),
         )
 
     def get_futures_account_log_csv(self, *, conversion_details: bool | None = None) -> str:
@@ -1009,18 +1056,21 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         """
         return self._native_private("get_spot_api_key_info", self._native_params(otp=otp))
 
-    def get_spot_credit_lines(self, *, rebase_multiplier: str | None = None) -> dict[str, Any]:
+    def get_spot_credit_lines(
+        self, *, rebase_multiplier: str | None = None, account_id: str | None = None
+    ) -> dict[str, Any]:
         """
         POST /0/private/CreditLines.
 
         Source: https://docs.kraken.com/api-reference/account-data/get-credit-lines
         """
         return self._native_private(
-            "get_spot_credit_lines", self._native_params(rebase_multiplier=rebase_multiplier)
+            "get_spot_credit_lines",
+            self._native_params(rebase_multiplier=rebase_multiplier, account_id=account_id),
         )
 
     def get_spot_order_amends(
-        self, *, order_id: str, rebase_multiplier: str | None = None
+        self, *, order_id: str, rebase_multiplier: str | None = None, account_id: str | None = None
     ) -> dict[str, Any]:
         """
         POST /0/private/OrderAmends.
@@ -1029,7 +1079,9 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         """
         return self._native_private(
             "get_spot_order_amends",
-            self._native_params(order_id=order_id, rebase_multiplier=rebase_multiplier),
+            self._native_params(
+                order_id=order_id, rebase_multiplier=rebase_multiplier, account_id=account_id
+            ),
         )
 
     def get_spot_wallet_accounts(self) -> dict[str, Any]:
@@ -1041,7 +1093,12 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         return self._native_private("get_spot_wallet_accounts", self._native_params())
 
     def get_spot_ledger_entries(
-        self, *, ledger_ids: str, trades: bool | None = None, rebase_multiplier: str | None = None
+        self,
+        *,
+        ledger_ids: str,
+        trades: bool | None = None,
+        rebase_multiplier: str | None = None,
+        account_id: str | None = None,
     ) -> dict[str, Any]:
         """
         POST /0/private/QueryLedgers.
@@ -1050,7 +1107,12 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         """
         return self._native_private(
             "get_spot_ledger_entries",
-            self._native_params(id=ledger_ids, trades=trades, rebase_multiplier=rebase_multiplier),
+            self._native_params(
+                id=ledger_ids,
+                trades=trades,
+                rebase_multiplier=rebase_multiplier,
+                account_id=account_id,
+            ),
         )
 
     def get_futures_portfolio_margin_parameters(self) -> dict[str, Any]:
@@ -1231,6 +1293,38 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
             self._native_params(symbol=symbol, pnlPreference=pnl_preference),
         )
 
+    def get_futures_options_mm_greek_limits(self) -> dict[str, Any]:
+        """GET /derivatives/api/v3/options-mm-greek-limits."""
+        return self._native_private("get_futures_options_mm_greek_limits", self._native_params())
+
+    def set_futures_options_mm_greek_limits(
+        self,
+        *,
+        currency: str,
+        delta_limit: str | None = None,
+        vega_limit: str | None = None,
+    ) -> dict[str, Any]:
+        """PUT /derivatives/api/v3/options-mm-greek-limits for one base currency."""
+        return self._native_private(
+            "set_futures_options_mm_greek_limits",
+            self._native_params(currency=currency, deltaLimit=delta_limit, vegaLimit=vega_limit),
+        )
+
+    def delete_futures_options_mm_greek_limits(
+        self, *, currency: str | None = None
+    ) -> dict[str, Any]:
+        """DELETE /derivatives/api/v3/options-mm-greek-limits; omit currency to clear all."""
+        return self._native_private(
+            "delete_futures_options_mm_greek_limits", self._native_params(currency=currency)
+        )
+
+    def get_futures_transfers(self, *, last_transfer_time: str | None = None) -> dict[str, Any]:
+        """GET /derivatives/api/v3/transfers (deposits and withdrawals)."""
+        return self._native_private(
+            "get_futures_transfers",
+            self._native_params(lastTransferTime=last_transfer_time),
+        )
+
     def create_spot_subaccount(self, *, username: str, email: str) -> dict[str, Any]:
         """
 
@@ -1294,6 +1388,29 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
                 cancel_response=cancel_response,
                 validate=validate,
             ),
+        )
+
+    def get_affiliate_cpa_progress(self, *, iiban: str, otp: str | None = None) -> Any:  # noqa: ANN401
+        """
+        GET /affiliate/v1/cpa-progress for one IIBAN returned by daily activity.
+
+        Source: https://docs.kraken.com/api-reference/affiliate/get-cpa-progress
+        """
+        return self._native_private(
+            "get_affiliate_cpa_progress", self._native_params(iiban=iiban, otp=otp)
+        )
+
+    def get_affiliate_payout_history(
+        self, *, cursor: str | None = None, limit: int | None = None, otp: str | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /affiliate/v1/payout-history, newest first; pass next_cursor to page back.
+
+        Source: https://docs.kraken.com/api-reference/affiliate/get-payout-history
+        """
+        return self._native_private(
+            "get_affiliate_payout_history",
+            self._native_params(cursor=cursor, limit=limit, otp=otp),
         )
 
     def get_affiliate_daily_activity(

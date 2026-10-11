@@ -219,6 +219,13 @@ CASES = [
     priv("get_prediction_settlement_histories", "/api/v3/prediction/settlementHistories", {}, **{}),
     priv("get_prediction_account", "/api/v3/account", {}, **{}),
     priv("get_prediction_user_trades", "/api/v3/userTrades", {}, **{}),
+    priv(
+        "get_prediction_transaction_history",
+        "/api/v3/prediction/transactionHistory",
+        {"asset": "USDT", "limit": "10"},
+        asset="USDT",
+        limit=10,
+    ),
     priv("create_prediction_listen_key", "/api/v3/listenKey", {}, **{}),
     priv(
         "update_prediction_listen_key",

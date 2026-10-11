@@ -20,6 +20,36 @@
     "body": null
   },
   {
+    "name": "get_affiliate_cpa_progress",
+    "method": "GET",
+    "path": "/affiliate/v1/cpa-progress",
+    "auth": "header",
+    "kwargs": {
+      "iiban": "AA00 0000 0000 0000",
+      "otp": "123456"
+    },
+    "query": {
+      "iiban": "AA00 0000 0000 0000"
+    },
+    "body": null
+  },
+  {
+    "name": "get_affiliate_payout_history",
+    "method": "GET",
+    "path": "/affiliate/v1/payout-history",
+    "auth": "header",
+    "kwargs": {
+      "cursor": "cursor-1",
+      "limit": 20,
+      "otp": "123456"
+    },
+    "query": {
+      "cursor": "cursor-1",
+      "limit": "20"
+    },
+    "body": null
+  },
+  {
     "name": "add_assignment_program",
     "method": "POST",
     "path": "/derivatives/api/v3/assignmentprogram/add",

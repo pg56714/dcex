@@ -195,7 +195,7 @@ mod business_methods {
             get_rebate_affiliate_commission(start_time => "startTime", end_time => "endTime"),
             get_rebate_affiliate_referral(),
             get_rebate_affiliate_withdraw(),
-            get_rebate_affiliate_list(member_info => "memberInfo"),
+            get_rebate_affiliate_list(member_info => "memberInfo", start_time => "startTime", end_time => "endTime"),
             get_rebate_tax_query(),
             get_rebate_detail(),
             get_rebate_detail_kickback(),

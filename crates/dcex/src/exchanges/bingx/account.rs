@@ -173,10 +173,12 @@ impl BingxClient {
                     .await
             }
             "get_open_positions" => {
-                params.ensure_allowed(&["product_symbol", "symbol", "recvWindow"])?;
+                params.ensure_allowed(&["product_symbol", "symbol", "currency", "recvWindow"])?;
                 validate_recv_window(params)?;
+                validate_enum(params, "currency", &["USDT", "USDC"])?;
                 let mut query = Vec::new();
                 self.push_optional_symbol(&mut query, params)?;
+                push_optional(&mut query, "currency", params.get("currency"));
                 push_optional(&mut query, "recvWindow", params.get("recvWindow"));
                 self.private_get(SWAP_OPEN_POSITIONS, query).await
             }
@@ -184,12 +186,14 @@ impl BingxClient {
                 params.ensure_allowed(&[
                     "product_symbol",
                     "symbol",
+                    "currency",
                     "incomeType",
                     "startTime",
                     "endTime",
                     "limit",
                     "recvWindow",
                 ])?;
+                validate_enum(params, "currency", &["USDT", "USDC"])?;
                 validate_enum(params, "incomeType", INCOME_TYPES)?;
                 validate_u64_range(params, "limit", 1, 1000)?;
                 validate_time_range(params, "startTime", "endTime", None)?;
@@ -197,6 +201,7 @@ impl BingxClient {
                 let mut query = Vec::new();
                 self.push_optional_symbol(&mut query, params)?;
                 query.extend(params.only(&[
+                    "currency",
                     "incomeType",
                     "startTime",
                     "endTime",

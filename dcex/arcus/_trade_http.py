@@ -102,10 +102,20 @@ class TradeHTTP(HTTPManager):
             client_order_id=client_order_id,
         )
 
-    def cancel_order(self, product_symbol: str, order_id: str) -> Any:  # noqa: ANN401
-        """Submit an order cancellation."""
+    def cancel_order(
+        self,
+        product_symbol: str,
+        order_id: str | None = None,
+        client_order_id: str | None = None,
+        valid_until: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """Cancel by server ``order_id`` or by ``client_order_id``; give exactly one."""
         return self.private_request(
-            "cancel_order", product_symbol=product_symbol, order_id=order_id
+            "cancel_order",
+            product_symbol=product_symbol,
+            order_id=order_id,
+            client_order_id=client_order_id,
+            valid_until=valid_until,
         )
 
 

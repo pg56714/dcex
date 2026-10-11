@@ -193,6 +193,34 @@ impl MexcClient {
             .await
     }
 
+    /// A signed Spot request that also carries documented request headers.
+    pub(super) async fn spot_private_with_headers(
+        &self,
+        method: HttpMethod,
+        path: &str,
+        params: Vec<(String, String)>,
+        headers: Vec<(String, String)>,
+    ) -> Result<ValidatedResponse> {
+        let timestamp_ms = self.timestamp(MexcApi::Spot, true).await?;
+        let mut request = self.build_request(
+            method,
+            MexcApi::Spot,
+            path,
+            params,
+            None,
+            true,
+            timestamp_ms,
+        )?;
+        request.headers.extend(headers);
+        let response = self.transport.execute(request).await?;
+        let data = validate_response(&response)?;
+        Ok(ValidatedResponse {
+            status: response.status,
+            headers: response.headers,
+            data,
+        })
+    }
+
     pub(super) async fn contract_get(
         &self,
         path: &str,

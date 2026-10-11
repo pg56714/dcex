@@ -92,6 +92,20 @@ impl OndoParams {
         Ok(())
     }
 
+    pub(super) fn optional_u64_range(&self, key: &str, minimum: u64, maximum: u64) -> Result<()> {
+        if let Some(value) = self.get(key) {
+            let number = value.parse::<u64>().map_err(|error| {
+                DcexError::InvalidInput(format!("invalid Ondo integer {key}: {error}"))
+            })?;
+            if !(minimum..=maximum).contains(&number) {
+                return Err(DcexError::InvalidInput(format!(
+                    "Ondo {key} must be from {minimum} to {maximum}"
+                )));
+            }
+        }
+        Ok(())
+    }
+
     pub(super) fn ensure_time_order(&self, start: &str, end: &str) -> Result<()> {
         let start_value = self
             .get(start)

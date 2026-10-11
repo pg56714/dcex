@@ -3908,5 +3908,55 @@
       }
     ],
     "official_source": "https://www.bitget.com/docs/catalog/earn/onchain-earn#get-elite-records"
+  },
+  {
+    "source": {
+      "exchange": "bingx",
+      "http_method": "POST",
+      "path": "/openApi/cswap/v1/trade/order",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bingx",
+        "http_method": "POST",
+        "path": "/openApi/cswap/v2/trade/order",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://bingx-api.github.io/docs-v3/"
+  },
+  {
+    "source": {
+      "exchange": "bingx",
+      "http_method": "POST",
+      "path": "/openApi/cswap/v1/trade/allOpenOrders",
+      "host": null,
+      "channel": null,
+      "actions": null,
+      "tx_types": null,
+      "operation": null
+    },
+    "targets": [
+      {
+        "exchange": "bingx",
+        "http_method": "DELETE",
+        "path": "/openApi/cswap/v1/trade/allOpenOrders",
+        "host": null,
+        "channel": null,
+        "actions": null,
+        "tx_types": null,
+        "operation": null
+      }
+    ],
+    "official_source": "https://bingx-api.github.io/docs-v3/"
   }
 ]

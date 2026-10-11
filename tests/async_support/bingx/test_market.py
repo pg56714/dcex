@@ -85,12 +85,6 @@ async def test_get_spot_kline(client):
 
 
 @pytest.mark.asyncio
-async def test_get_spot_kline_v2(client):
-    res = await client.get_spot_kline_v2("BTC-USDT-SPOT", "1h", limit=5)
-    assert res is not None
-
-
-@pytest.mark.asyncio
 async def test_get_spot_ticker(client):
     res = await client.get_spot_ticker("BTC-USDT-SPOT")
     assert res is not None

@@ -18,6 +18,9 @@ impl OndoClient {
         if let Some(response) = self.trade_private_request(method_name, &params).await? {
             return Ok(response);
         }
+        if let Some(response) = self.spot_private_request(method_name, &params).await? {
+            return Ok(response);
+        }
         Err(DcexError::InvalidInput(format!(
             "unsupported Ondo private method: {method_name}"
         )))

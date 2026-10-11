@@ -85,6 +85,20 @@ class MarketHTTP(HTTPManager):
         """Retrieve Backpack market closures and shortened trading days."""
         return self._native_public("get_market_holidays", [])
 
+    def get_stock_indicative_quote(
+        self, symbol: str, side: str, quantity: str
+    ) -> dict[str, Any] | list[Any] | str:
+        """
+        Indicative RFQ quote for a stock ticker such as ``AAPL`` or ``AAPL.US``.
+
+        ``side`` is ``Bid`` or ``Ask`` as the requester sees it.
+        Source: https://docs.backpack.exchange/#tag/Markets/operation/get_stock_indicative_quote
+        """
+        return self._native_public(
+            "get_stock_indicative_quote",
+            self._native_params(symbol=symbol, side=side, quantity=quantity),
+        )
+
     def get_securities(self) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack securities."""
         return self._native_public("get_securities", [])
@@ -220,41 +234,6 @@ class MarketHTTP(HTTPManager):
             "get_historical_trades",
             self._native_params(product_symbol=product_symbol, limit=limit, offset=offset),
         )
-
-    def get_prediction_events(
-        self,
-        *,
-        symbol: str | None = None,
-        tag_slug: str | None = None,
-        event_slug: str | None = None,
-        series_slug: str | None = None,
-        resolved: bool | None = None,
-        sort_by: str | None = None,
-        sort_direction: str | None = None,
-        limit: int | None = None,
-        offset: int | None = None,
-    ) -> Any:  # noqa: ANN401
-        """GET /api/v1/prediction. Native asset symbols; vault operator permissions may apply."""
-        return self._native_public(
-            "get_prediction_events",
-            self._native_params(
-                symbol=symbol,
-                tagSlug=tag_slug,
-                eventSlug=event_slug,
-                seriesSlug=series_slug,
-                resolved=resolved,
-                sortBy=sort_by,
-                sortDirection=sort_direction,
-                limit=limit,
-                offset=offset,
-            ),
-        )
-
-    def get_prediction_tags(self) -> Any:  # noqa: ANN401
-        """
-        GET /api/v1/prediction/tags. Native asset symbols; vault operator permissions may apply.
-        """
-        return self._native_public("get_prediction_tags", self._native_params())
 
     def get_vaults(self) -> Any:  # noqa: ANN401
         """GET /api/v1/vaults. Native asset symbols; vault operator permissions may apply."""

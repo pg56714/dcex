@@ -28,12 +28,6 @@ impl BackpackClient {
             return Ok(response);
         }
         if let Some(response) = self
-            .prediction_schema_request(method_name, &params, false)
-            .await?
-        {
-            return Ok(response);
-        }
-        if let Some(response) = self
             .vault_schema_request(method_name, &params, false)
             .await?
         {

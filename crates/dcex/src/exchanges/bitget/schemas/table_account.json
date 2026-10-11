@@ -24,7 +24,8 @@
     "public": false,
     "fields": [
       "symbol",
-      "category"
+      "category",
+      "rpiFlag"
     ],
     "required": [
       "symbol",

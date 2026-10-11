@@ -144,10 +144,10 @@ impl BingxClient {
         validate_enum(
             params,
             "side",
-            if name == "set_coin_swap_leverage" {
-                &["LONG", "SHORT", "BOTH"]
-            } else {
-                &["BUY", "SELL"]
+            match name {
+                "set_coin_swap_leverage" => &["LONG", "SHORT", "BOTH"],
+                "create_swap_signal" => &["long", "short"],
+                _ => &["BUY", "SELL"],
             },
         )?;
         validate_enum(params, "positionSide", &["LONG", "SHORT", "BOTH"])?;
@@ -181,7 +181,7 @@ impl BingxClient {
             require_one_identifier(params, &["orderId", "clientOrderId"])?;
         }
         if name == "get_spot_oco" {
-            require_one_identifier(params, &["orderListId", "clientOrderId"])?;
+            require_one_identifier(params, &["orderId", "clientOrderId"])?;
         }
         if name == "adjust_coin_swap_position_margin" {
             validate_enum(params, "type", &["1", "2"])?;
@@ -258,6 +258,13 @@ impl BingxClient {
                 }
             }
         }
+        if name == "create_swap_signal" {
+            for key in ["entryPrice", "tpPrice", "slPrice"] {
+                validate_positive_number(params, key)?;
+            }
+            validate_u64_range(params, "sizePct", 1, 100)?;
+            validate_u64_range(params, "leverage", 1, u64::MAX)?;
+        }
         if name == "place_spot_oco" {
             if params
                 .get("listClientOrderId")
@@ -281,28 +288,23 @@ impl BingxClient {
         }
         let mut query = params.only(e.fields);
         if name == "place_coin_swap_order" {
-            static COIN_SCHEMA: std::sync::LazyLock<Value> = std::sync::LazyLock::new(|| {
-                serde_json::from_str(include_str!("schemas/coin_futures.json"))
-                    .expect("coin schema")
+            // Documented TP/SL object; prices travel as JSON numbers.
+            static SHAPE: std::sync::LazyLock<Value> = std::sync::LazyLock::new(|| {
+                serde_json::json!({
+                    "type": "object",
+                    "properties": {
+                        "type": {"type": "string"},
+                        "stopPrice": {"type": "number"},
+                        "price": {"type": "number"},
+                        "workingType": {"type": "string"},
+                    },
+                })
             });
-            let order = COIN_SCHEMA
-                .as_array()
-                .expect("coin endpoints")
-                .iter()
-                .find(|row| row["name"] == "post_cswap_v2_trade_order")
-                .expect("coin order schema");
             for (key, raw) in &mut query {
                 if matches!(key.as_str(), "takeProfit" | "stopLoss") {
-                    let field = order["fields"]
-                        .as_array()
-                        .expect("coin fields")
-                        .iter()
-                        .find(|field| field["name"] == *key)
-                        .expect("TP/SL schema");
                     let value =
                         serde_json::from_str(raw).map_err(|_| invalid("invalid TP/SL JSON"))?;
-                    *raw = crate::exchanges::schema::encode_shape(value, &field["schema"], key)?
-                        .to_string();
+                    *raw = crate::exchanges::schema::encode_shape(value, &SHAPE, key)?.to_string();
                 }
             }
         }
@@ -382,7 +384,8 @@ impl BingxClient {
             ));
         }
         Ok(Some(if public {
-            if name != "get_swap_server_time" {
+            // The spot v2 quote request tables list no timestamp.
+            if name != "get_swap_server_time" && !e.path.starts_with("/openApi/spot/v2/quote/") {
                 query.push(("timestamp".into(), unix_timestamp_ms()?.to_string()));
             }
             self.public_get(e.path, query).await?

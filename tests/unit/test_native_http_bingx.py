@@ -185,16 +185,20 @@ async def test_async_bingx_public_wrapper_uses_native_dispatcher() -> None:
         await client.async_init()
         result = await client.get_spot_orderbook_v2(
             "ETH-USDT-SPOT",
-            depth=10,
+            limit=10,
             type_="step1",
         )
 
     await client.close()
     assert result == {"code": 0, "data": []}
     assert client.last_response_headers["x-response"] == "native"
-    assert received.get_nowait()["path"] == (
-        "/openApi/spot/v2/market/depth?depth=10&symbol=ETH_USDT&type=step1"
-    )
+    path = received.get_nowait()["path"]
+    assert urlsplit(path).path == "/openApi/spot/v2/quote/depth"
+    assert dict(parse_qsl(urlsplit(path).query)) == {
+        "limit": "10",
+        "symbol": "ETH-USDT",
+        "type": "step1",
+    }
 
 
 def test_native_bingx_private_spot_order_uses_dispatcher() -> None:

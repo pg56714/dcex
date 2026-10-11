@@ -126,6 +126,12 @@ crate::exchanges::impl_exchange_method_wrappers! {
             minutes => "minutes",
             randomize => "randomize"
         ),
+        place_trailing_stop_order(
+            product_symbol => "product_symbol",
+            is_buy => "isBuy",
+            size => "size",
+            reduce_only => "reduceOnly"
+        ),
         schedule_cancel(),
 
 

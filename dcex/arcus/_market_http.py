@@ -14,10 +14,6 @@ class MarketHTTP(HTTPManager):
         """Get all perpetual markets."""
         return self.public_request("get_markets")
 
-    def get_spot_assets(self) -> Any:  # noqa: ANN401
-        """Get lending collateral assets; these are not RFQ spot pairs."""
-        return self.public_request("get_spot_assets")
-
     def get_fee_tiers(self) -> Any:  # noqa: ANN401
         """Get exchange-wide perpetual fee tiers."""
         return self.public_request("get_fee_tiers")
@@ -75,31 +71,6 @@ class MarketHTTP(HTTPManager):
                 "address": address or self.address,
                 "accountIndex": self.account_index if account_index is None else account_index,
                 "market": market,
-                "from": start_time,
-                "to": end_time,
-                "limit": limit,
-            },
-        )
-
-    def get_interest(
-        self,
-        *,
-        address: str | None = None,
-        account_index: int | None = None,
-        start_time: int | None = None,
-        end_time: int | None = None,
-        limit: int | None = None,
-    ) -> Any:  # noqa: ANN401
-        """
-        GET /v1/interest; time bounds use epoch microseconds.
-
-        Source: https://docs.arcus.xyz/api-reference/public/get-interest-payments.md
-        """
-        return self.public_request(
-            "get_interest",
-            **{
-                "address": address or self.address,
-                "accountIndex": self.account_index if account_index is None else account_index,
                 "from": start_time,
                 "to": end_time,
                 "limit": limit,
@@ -189,39 +160,6 @@ class MarketHTTP(HTTPManager):
         Source: https://docs.arcus.xyz/api-reference/public/service-info.md
         """
         return self.public_request("get_service_info", **{})
-
-    def get_market_metadata(self, *, market: str | None = None) -> Any:  # noqa: ANN401
-        """Public market metadata."""
-        return self.public_request("get_market_metadata", market=market)
-
-    def get_market_overview(self) -> Any:  # noqa: ANN401
-        """Public consolidated market overview."""
-        return self.public_request("get_market_overview")
-
-    def get_spot_market_overview(self) -> Any:  # noqa: ANN401
-        """Public spot universe and reference data."""
-        return self.public_request("get_spot_market_overview")
-
-    def get_metadata_candles(
-        self,
-        *,
-        market: str,
-        timeframe: str,
-        to: int,
-        from_: int | None = None,
-        countback: int | None = None,
-    ) -> Any:  # noqa: ANN401
-        """Metadata candles: timestamps use seconds; from_ or countback is required."""
-        return self.public_request(
-            "get_metadata_candles",
-            **{
-                "market": market,
-                "timeframe": timeframe,
-                "to": to,
-                "from": from_,
-                "countback": countback,
-            },
-        )
 
     def get_leaderboard(
         self,

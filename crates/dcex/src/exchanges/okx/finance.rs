@@ -222,9 +222,12 @@ impl OkxClient {
                     .await
             }
             "get_flexible_loan_collateral_assets" => {
-                params.ensure_allowed(&["ccy"])?;
-                self.get_request(FLEXIBLE_LOAN_COLLATERAL_ASSETS, params.only(&["ccy"]))
-                    .await
+                params.ensure_allowed(&["ccy", "ordId"])?;
+                self.get_request(
+                    FLEXIBLE_LOAN_COLLATERAL_ASSETS,
+                    params.only(&["ccy", "ordId"]),
+                )
+                .await
             }
             "get_flexible_loan_max_loan" => {
                 params.ensure_allowed(&["borrowCcy", "supCollateral"])?;
@@ -245,28 +248,26 @@ impl OkxClient {
                     .await
             }
             "get_flexible_loan_max_collateral_redeem" => {
-                params.ensure_allowed(&["ccy"])?;
+                params.ensure_allowed(&["ccy", "ordId"])?;
                 params.required("ccy")?;
-                self.get_request(FLEXIBLE_LOAN_MAX_COLLATERAL_REDEEM, params.only(&["ccy"]))
-                    .await
+                self.get_request(
+                    FLEXIBLE_LOAN_MAX_COLLATERAL_REDEEM,
+                    params.only(&["ccy", "ordId"]),
+                )
+                .await
             }
             "adjust_flexible_loan_collateral" => {
-                params.ensure_allowed(&["type", "collateralCcy", "collateralAmt"])?;
+                params.ensure_allowed(&["type", "collateralCcy", "collateralAmt", "ordId"])?;
                 let adjustment_type = params.required("type")?;
                 if !["add", "reduce"].contains(&adjustment_type) {
                     return Err(DcexError::InvalidInput(
                         "type must be add or reduce".to_string(),
                     ));
                 }
-                self.post_request(
-                    FLEXIBLE_LOAN_ADJUST_COLLATERAL,
-                    Value::Object(params.required_body(&[
-                        "type",
-                        "collateralCcy",
-                        "collateralAmt",
-                    ])?),
-                )
-                .await
+                let mut body = params.required_body(&["type", "collateralCcy", "collateralAmt"])?;
+                insert_optional_string(&mut body, "ordId", params.get("ordId"));
+                self.post_request(FLEXIBLE_LOAN_ADJUST_COLLATERAL, Value::Object(body))
+                    .await
             }
             "get_flexible_loan_info" => {
                 params.ensure_allowed(&["ordId"])?;
@@ -274,10 +275,10 @@ impl OkxClient {
                     .await
             }
             "get_flexible_loan_history" => {
-                params.ensure_allowed(&["type", "after", "before", "limit"])?;
+                params.ensure_allowed(&["ordId", "type", "after", "before", "limit"])?;
                 self.get_request(
                     FLEXIBLE_LOAN_HISTORY,
-                    params.only(&["type", "after", "before", "limit"]),
+                    params.only(&["ordId", "type", "after", "before", "limit"]),
                 )
                 .await
             }

@@ -82,7 +82,7 @@
     "verb": "GET",
     "public": false,
     "fields": [
-      "orderListId",
+      "orderId",
       "clientOrderId",
       "recvWindow"
     ],

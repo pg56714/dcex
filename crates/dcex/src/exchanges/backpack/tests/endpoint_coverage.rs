@@ -62,8 +62,6 @@ const SPOT: &str = "BTC-USDC-SPOT";
 const RFQ: &str = "AAPL.US-USDC-RFQ";
 
 const PUBLIC_CASES: &[Case] = &[
-    public("get_prediction_events", &[], "GET /api/v1/prediction"),
-    public("get_prediction_tags", &[], "GET /api/v1/prediction/tags"),
     public("get_vaults", &[], "GET /api/v1/vaults"),
     public(
         "get_vault_history",
@@ -107,8 +105,13 @@ const PUBLIC_CASES: &[Case] = &[
         &[("product_symbol", SPOT), ("limit", "5")],
         "GET /api/v1/depth?symbol=BTC_USDC",
     ),
-    public("get_market_sessions", &[], "GET /api/v1/market-sessions"),
-    public("get_market_holidays", &[], "GET /api/v1/market-holidays"),
+    public("get_market_sessions", &[], "GET /api/v1/stockSessions"),
+    public(
+        "get_stock_indicative_quote",
+        &[("symbol", "AAPL"), ("side", "Bid"), ("quantity", "1.5")],
+        "GET /api/v1/stockIndicativeQuote",
+    ),
+    public("get_market_holidays", &[], "GET /api/v1/stockHolidays"),
     public("get_securities", &[], "GET /api/v1/securities"),
     public(
         "get_mark_prices",
@@ -468,12 +471,6 @@ const PRIVATE_CASES: &[Case] = &[
         "POST /api/v1/rfq/accept",
     ),
     private(
-        "refresh_rfq",
-        "rfqRefresh",
-        &[("rfqId", "r1")],
-        "POST /api/v1/rfq/refresh",
-    ),
-    private(
         "cancel_rfq",
         "rfqCancel",
         &[("rfqId", "r1")],
@@ -793,7 +790,6 @@ const RFQ_DISPATCH_NAMES: &[&str] = &[
     "get_rfqs",
     "submit_rfq",
     "accept_rfq_quote",
-    "refresh_rfq",
     "cancel_rfq",
     "get_rfq_history",
     "get_quote_history",
@@ -1005,12 +1001,6 @@ async fn every_typed_request_reaches_dispatch() {
         &mut failures,
         "accept_rfq_quote_by_client_id",
         client.accept_rfq_quote_by_client_id(1, "1").send().await,
-    );
-    note(
-        &mut called,
-        &mut failures,
-        "refresh_rfq",
-        client.refresh_rfq("1").send().await,
     );
     note(
         &mut called,

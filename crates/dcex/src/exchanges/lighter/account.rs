@@ -241,9 +241,11 @@ impl LighterClient {
                     "stats_start_timestamp",
                     "stats_end_timestamp",
                     "limit",
+                    "is_eligible",
                     "authorization",
                 ])?;
                 params.required("l1_address")?;
+                params.optional_one_of("is_eligible", &["true", "false"])?;
                 params.optional_u64_range("limit", 1, 300)?;
                 validate_optional_timestamp_pair(
                     params,
@@ -287,6 +289,7 @@ impl LighterClient {
                 params.ensure_allowed(&[
                     "account_index",
                     "market_id",
+                    "market_ids",
                     "product_symbol",
                     "cursor",
                     "limit",
@@ -297,6 +300,13 @@ impl LighterClient {
                 ])?;
                 self.validate_private_account(params)?;
                 validate_market_selector(params, false)?;
+                if let Some(ids) = params.get("market_ids")
+                    && !ids.split(',').all(|id| id.trim().parse::<i16>().is_ok())
+                {
+                    return Err(DcexError::InvalidInput(
+                        "Lighter market_ids must be comma-separated market ids".to_string(),
+                    ));
+                }
                 params.required_u64_range("limit", 1, 100)?;
                 params.optional_one_of("side", &["long", "short", "all"])?;
                 validate_optional_timestamp_pair(params, "start_timestamp", "end_timestamp")?;
@@ -315,8 +325,14 @@ impl LighterClient {
                 validate_optional_nonempty(params, &["cursor", "auth", "authorization"])
             }
             "get_partner_stats" => {
-                params.ensure_allowed(&["account_index", "start_timestamp", "end_timestamp"])?;
+                params.ensure_allowed(&[
+                    "account_index",
+                    "start_timestamp",
+                    "end_timestamp",
+                    "period",
+                ])?;
                 self.validate_private_account(params)?;
+                validate_optional_nonempty(params, &["period"])?;
                 validate_optional_timestamp_pair(params, "start_timestamp", "end_timestamp")
             }
             "get_next_nonce" => {

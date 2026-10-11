@@ -18,9 +18,6 @@ impl ArcusClient {
         if super::schema_requests::field_schemas::handles(method_name, false) {
             return self.field_schema_request(method_name, params).await;
         }
-        if super::metadata::handles(method_name, false) {
-            return self.metadata_request(method_name, params).await;
-        }
         if matches!(
             method_name,
             "create_api_key_signed" | "revoke_api_key_signed"

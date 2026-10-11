@@ -166,7 +166,9 @@
     "allowed": [
       "txid",
       "trades",
-      "rebase_multiplier"
+      "ledgers",
+      "rebase_multiplier",
+      "account_id"
     ],
     "fields": [
       {
@@ -184,6 +186,13 @@
         "minimum": 0
       },
       {
+        "key": "ledgers",
+        "kind": "boolean",
+        "required": false,
+        "values": [],
+        "minimum": 0
+      },
+      {
         "key": "rebase_multiplier",
         "kind": "string",
         "required": false,
@@ -191,6 +200,13 @@
           "rebased",
           "base"
         ],
+        "minimum": 0
+      },
+      {
+        "key": "account_id",
+        "kind": "string",
+        "required": false,
+        "values": [],
         "minimum": 0
       }
     ],
@@ -424,7 +440,8 @@
     "public": false,
     "allowed": [
       "order_id",
-      "rebase_multiplier"
+      "rebase_multiplier",
+      "account_id"
     ],
     "fields": [
       {
@@ -442,6 +459,13 @@
           "rebased",
           "base"
         ],
+        "minimum": 0
+      },
+      {
+        "key": "account_id",
+        "kind": "string",
+        "required": false,
+        "values": [],
         "minimum": 0
       }
     ],

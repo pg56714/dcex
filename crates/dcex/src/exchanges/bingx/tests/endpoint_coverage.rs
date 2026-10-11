@@ -133,9 +133,9 @@ const PUBLIC_ROUTES: &[Case] = &[
     ),
     (
         "get_spot_orderbook_v2",
-        &[SPOT, ("depth", "20")],
+        &[SPOT, ("limit", "20")],
         "GET",
-        "/openApi/spot/v2/market/depth",
+        "/openApi/spot/v2/quote/depth",
     ),
     (
         "get_public_trades",
@@ -147,7 +147,7 @@ const PUBLIC_ROUTES: &[Case] = &[
         "get_spot_public_trades",
         &[SPOT, ("limit", "5")],
         "GET",
-        "/openApi/spot/v1/market/trades",
+        "/openApi/spot/v2/quote/trades",
     ),
     (
         "get_kline",
@@ -159,13 +159,7 @@ const PUBLIC_ROUTES: &[Case] = &[
         "get_spot_kline",
         &[SPOT, ("interval", "1m")],
         "GET",
-        "/openApi/spot/v2/market/kline",
-    ),
-    (
-        "get_spot_kline_v2",
-        &[SPOT, ("interval", "1m")],
-        "GET",
-        "/openApi/spot/v2/market/kline",
+        "/openApi/spot/v2/quote/klines",
     ),
     (
         "get_open_interest",
@@ -213,19 +207,19 @@ const PUBLIC_ROUTES: &[Case] = &[
         "get_spot_ticker",
         &[SPOT],
         "GET",
-        "/openApi/spot/v1/ticker/24hr",
+        "/openApi/spot/v2/quote/ticker",
     ),
     (
         "get_spot_book_ticker",
         &[SPOT],
         "GET",
-        "/openApi/spot/v1/ticker/bookTicker",
+        "/openApi/spot/v2/quote/bookTicker",
     ),
     (
         "get_spot_price_ticker",
         &[SPOT],
         "GET",
-        "/openApi/spot/v2/ticker/price",
+        "/openApi/spot/v2/quote/price",
     ),
 ];
 
@@ -476,7 +470,7 @@ const PRIVATE_ROUTES: &[Case] = &[
         &[
             SPOT,
             ("cancelOrderId", "123"),
-            ("cancelReplaceMode", "STOP_ON_FAILURE"),
+            ("CancelReplaceMode", "STOP_ON_FAILURE"),
             ("side", "BUY"),
             ("type", "LIMIT"),
             ("quantity", "0.1"),
@@ -777,26 +771,20 @@ fn public_dispatch_names_reach_documented_routes() {
             recorded.get("signature").is_none(),
             "{name}: must be unsigned"
         );
-        let expected_symbol = if *name == "get_spot_orderbook_v2" {
-            "BTC_USDT"
-        } else {
-            "BTC-USDT"
-        };
-        assert_eq!(
-            recorded.get("symbol"),
-            Some(expected_symbol),
-            "{name}: symbol"
-        );
+        assert_eq!(recorded.get("symbol"), Some("BTC-USDT"), "{name}: symbol");
     }
 }
 
 #[test]
 fn public_routes_send_timestamp_where_documented_required() {
-    // The official request tables list no timestamp only for these spot routes.
+    // The official request tables list no timestamp for the spot quote routes.
     const WITHOUT_TIMESTAMP: &[&str] = &[
-        "/openApi/spot/v2/market/depth",
-        "/openApi/spot/v2/ticker/price",
-        "/openApi/spot/v1/ticker/bookTicker",
+        "/openApi/spot/v2/quote/depth",
+        "/openApi/spot/v2/quote/price",
+        "/openApi/spot/v2/quote/bookTicker",
+        "/openApi/spot/v2/quote/ticker",
+        "/openApi/spot/v2/quote/trades",
+        "/openApi/spot/v2/quote/klines",
     ];
     let (url, receiver) = recording_server();
     let client =
@@ -822,7 +810,7 @@ fn public_routes_send_timestamp_where_documented_required() {
 }
 
 #[test]
-fn spot_orderbook_v2_requires_depth() {
+fn spot_orderbook_v2_limits_depth_to_1024_levels() {
     let client = BingxClient::with_base_url(
         None,
         None,
@@ -834,12 +822,12 @@ fn spot_orderbook_v2_requires_depth() {
         client
             .public_request(
                 "get_spot_orderbook_v2",
-                owned(&[("product_symbol", "BTC-USDT-SPOT")]),
+                owned(&[("product_symbol", "BTC-USDT-SPOT"), ("limit", "1025")]),
             )
             .await
     })
-    .expect_err("depth is required");
-    assert!(error.to_string().contains("depth"), "{error}");
+    .expect_err("limit above 1024");
+    assert!(error.to_string().contains("limit"), "{error}");
 }
 
 #[test]
@@ -970,13 +958,9 @@ fn identifier_lists_and_client_ids_use_official_keys() {
     let recorded = next(&receiver, "cancel_spot_batch_orders");
     assert_eq!(recorded.get("orderIds"), Some("1,2"));
 
-    private_call(
-        &client,
-        "get_asset_transfer_records",
-        &[("transferId", "9")],
-    );
+    private_call(&client, "get_asset_transfer_records", &[("tranId", "9")]);
     let recorded = next(&receiver, "get_asset_transfer_records");
-    assert_eq!(recorded.get("transferId"), Some("9"));
+    assert_eq!(recorded.get("tranId"), Some("9"));
 
     private_call(&client, "keep_alive_listen_key", &[("listenKey", "abc")]);
     let recorded = next(&receiver, "keep_alive_listen_key");
@@ -1063,7 +1047,7 @@ fn invalid_parameters_fail_before_transport() {
     for (name, params) in [
         ("get_orderbook", vec![SWAP, ("limit", "7")]),
         ("get_kline", vec![SWAP, ("interval", "2m")]),
-        ("get_spot_orderbook_v2", vec![SPOT, ("depth", "0")]),
+        ("get_spot_orderbook_v2", vec![SPOT, ("limit", "0")]),
         ("get_nope", vec![]),
     ] {
         let client = client.clone();
@@ -1501,8 +1485,8 @@ async fn swap_trading_controls_use_documented_parameters() {
             "get_swap_position_history",
             vec![
                 ("product_symbol".into(), "BTC-USDT".into()),
-                ("startTs".into(), "1700000000000".into()),
-                ("endTs".into(), "1700000100000".into()),
+                ("startTime".into(), "1700000000000".into()),
+                ("endTime".into(), "1700000100000".into()),
             ],
         )
         .await
@@ -1514,7 +1498,7 @@ async fn swap_trading_controls_use_documented_parameters() {
             request.path.as_str(),
             request.api_key_header
         ),
-        ("GET", "/openApi/swap/v1/trade/positionHistory", true)
+        ("GET", "/openApi/swap/v2/trade/positionHistory", true)
     );
     assert!(
         request
@@ -1524,12 +1508,12 @@ async fn swap_trading_controls_use_documented_parameters() {
     assert!(
         request
             .query
-            .contains(&("startTs".into(), "1700000000000".into()))
+            .contains(&("startTime".into(), "1700000000000".into()))
     );
     assert!(
         request
             .query
-            .contains(&("endTs".into(), "1700000100000".into()))
+            .contains(&("endTime".into(), "1700000100000".into()))
     );
     client
         .private_request(
@@ -1643,7 +1627,7 @@ fn coin_swap_and_oco_routes_match_official_paths() {
             "get_spot_historical_trades",
             &[("product_symbol", "BTC-USDT-SPOT")],
             "GET",
-            "/openApi/market/his/v1/trade",
+            "/openApi/spot/v2/quote/historicalTrades",
         ),
         (
             false,
@@ -1866,10 +1850,11 @@ fn coin_swap_and_oco_routes_match_official_paths() {
                 ("product_symbol", "BTC-USD"),
                 ("side", "SELL"),
                 ("type", "MARKET"),
+                ("positionSide", "SHORT"),
                 ("quantity", "1"),
             ],
             "POST",
-            "/openApi/cswap/v1/trade/order",
+            "/openApi/cswap/v2/trade/order",
         ),
         (
             false,
@@ -1882,7 +1867,7 @@ fn coin_swap_and_oco_routes_match_official_paths() {
             false,
             "cancel_coin_swap_all_orders",
             &[("product_symbol", "BTC-USD")],
-            "POST",
+            "DELETE",
             "/openApi/cswap/v1/trade/allOpenOrders",
         ),
         (
@@ -1997,7 +1982,19 @@ fn coin_swap_and_oco_routes_match_official_paths() {
             "get_spot_historical_kline",
             &[("product_symbol", "BTC-USDT-SPOT"), ("interval", "1m")],
             "GET",
-            "/openApi/market/his/v1/kline",
+            "/openApi/spot/v2/quote/historicalKlines",
+        ),
+        (
+            false,
+            "create_swap_signal",
+            &[
+                ("product_symbol", "BTC-USDT"),
+                ("side", "long"),
+                ("entryPrice", "100000"),
+                ("sizePct", "10"),
+            ],
+            "POST",
+            "/openApi/social/v1/swap/signal",
         ),
         (
             false,
@@ -2023,7 +2020,7 @@ fn coin_swap_and_oco_routes_match_official_paths() {
         (
             false,
             "get_spot_oco",
-            &[("orderListId", "1")],
+            &[("orderId", "1")],
             "GET",
             "/openApi/spot/v1/oco/orderList",
         ),
@@ -2151,6 +2148,7 @@ fn coin_swap_attached_tpsl_preserves_fractional_json_numbers() {
             ("product_symbol", "BTC-USD"),
             ("side", "BUY"),
             ("type", "MARKET"),
+            ("positionSide", "LONG"),
             ("quantity", "1"),
             (
                 "takeProfit",
@@ -2164,7 +2162,7 @@ fn coin_swap_attached_tpsl_preserves_fractional_json_numbers() {
     );
     let request = next(&receiver, "place_coin_swap_order");
     assert_eq!(request.method, "POST");
-    assert_eq!(request.path, "/openApi/cswap/v1/trade/order");
+    assert_eq!(request.path, "/openApi/cswap/v2/trade/order");
     for (field, key, expected) in [
         ("takeProfit", "stopPrice", "61000.5"),
         ("takeProfit", "price", "61000.125000000000000001"),

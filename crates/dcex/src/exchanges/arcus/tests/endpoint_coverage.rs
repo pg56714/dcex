@@ -194,8 +194,6 @@ const PUBLIC_CASES: &[(&str, &[(&str, &str)], &str)] = &[
     ("get_markets", &[], "/v1/markets"),
     ("get_fee_tiers", &[], "/v1/feetiers"),
     ("get_commission_rates", &[], "/v1/commissionrates"),
-    ("get_spot_assets", &[], "/v1/spotAssets"),
-    ("get_compliance", &[], "/v1/compliance"),
     ("get_bbo", &[("market", "BTC-USD")], "/v1/bbo/BTC-USD"),
     (
         "get_l2_orderbook",
@@ -279,11 +277,6 @@ const PUBLIC_CASES: &[(&str, &[(&str, &str)], &str)] = &[
         "/v1/funding?address=0x4444444444444444444444444444444444444444",
     ),
     (
-        "get_interest",
-        &[("address", ADDRESS)],
-        "/v1/interest?address=0x4444444444444444444444444444444444444444",
-    ),
-    (
         "get_funding_rates",
         &[("market", "BTC-USD")],
         "/v1/fundingRates?market=BTC-USD",
@@ -297,16 +290,6 @@ const PUBLIC_CASES: &[(&str, &[(&str, &str)], &str)] = &[
         "get_rate_limit",
         &[("address", ADDRESS)],
         "/v1/rateLimit?address=0x4444444444444444444444444444444444444444",
-    ),
-    (
-        "get_spot_positions",
-        &[("address", ADDRESS)],
-        "/v1/spotPositions?address=0x4444444444444444444444444444444444444444",
-    ),
-    (
-        "get_spot_fills",
-        &[("address", ADDRESS)],
-        "/v1/spotFills?address=0x4444444444444444444444444444444444444444",
     ),
 ];
 
@@ -822,81 +805,6 @@ fn wallet_key_administration_preserves_scope_and_caller_signature() {
     assert!(requests.is_empty());
 }
 
-#[test]
-fn metadata_routes_and_preference_signature_are_exact() {
-    for (name, params, target) in [
-        (
-            "get_market_metadata",
-            vec![("market", "BTC-USD")],
-            "/v1/api-meta/markets?market=BTC-USD",
-        ),
-        ("get_market_overview", vec![], "/v1/api-meta/overview"),
-        (
-            "get_spot_market_overview",
-            vec![],
-            "/v1/api-meta/spot/overview",
-        ),
-        (
-            "get_user_preferences",
-            vec![],
-            "/v1/api-meta/userPreferences?address=0x4444444444444444444444444444444444444444",
-        ),
-        (
-            "get_metadata_candles",
-            vec![
-                ("market", "BTC-USD"),
-                ("timeframe", "1m"),
-                ("to", "1700000060"),
-                ("countback", "10"),
-            ],
-            "/v1/api-meta/candles?countback=10&market=BTC-USD&timeframe=1m&to=1700000060",
-        ),
-    ] {
-        let (result, requests) = run(Kind::Public, name, pairs(&params));
-        result.unwrap();
-        assert_eq!(requests.len(), 1);
-        assert_eq!(line(&requests[0]), format!("GET {target} HTTP/1.1"));
-    }
-    let (result, requests) = run(
-        Kind::Private,
-        "upsert_user_preferences",
-        pairs(&[("preferences", r#"{"colorTheme":"dark"}"#)]),
-    );
-    result.unwrap();
-    let request = &requests[0];
-    assert!(line(request).starts_with("PATCH /v1/api-meta/userPreferences "));
-    let timestamp = header(request, "X-Timestamp").unwrap();
-    let message = format!("{}userPreferences{{\"colorTheme\":\"dark\"}}", timestamp);
-    let pubkey: [u8; 32] = hex::decode(header(request, "X-API-Key").unwrap())
-        .unwrap()
-        .try_into()
-        .unwrap();
-    let sig = ed25519_dalek::Signature::from_slice(
-        &hex::decode(header(request, "X-Signature").unwrap()).unwrap(),
-    )
-    .unwrap();
-    ed25519_dalek::VerifyingKey::from_bytes(&pubkey)
-        .unwrap()
-        .verify_strict(message.as_bytes(), &sig)
-        .unwrap();
-    let sig = "11".repeat(64);
-    let (result, requests) = run(
-        Kind::Private,
-        "delete_user_preference_signed",
-        pairs(&[
-            ("key", "colorTheme"),
-            ("timestamp", "1700000000000000000"),
-            ("signature", &sig),
-        ]),
-    );
-    result.unwrap();
-    assert_eq!(
-        line(&requests[0]),
-        "DELETE /v1/api-meta/userPreferences?key=colorTheme HTTP/1.1"
-    );
-    assert_eq!(header(&requests[0], "X-Signature"), Some(sig.as_str()));
-}
-
 #[tokio::test]
 async fn every_typed_wrapper_reaches_dispatch() {
     // The typed Rust methods must reach the same dispatch Python calls by name.
@@ -1253,7 +1161,7 @@ fn transfers_and_preferences_reject_malformed_fields_before_sending() {
     let other = format!("0x{}", "55".repeat(20));
     let long_nonce = "1".repeat(65);
     type Case<'a> = (Kind, &'a str, Vec<(String, String)>, &'a str);
-    let mut cases: Vec<Case> = vec![
+    let cases: Vec<Case> = vec![
         (
             Kind::Private,
             "submit_internal_transfer",
@@ -1316,93 +1224,7 @@ fn transfers_and_preferences_reject_malformed_fields_before_sending() {
             ),
             "signature v must be 0x1b or 0x1c",
         ),
-        (
-            Kind::Public,
-            "get_user_preferences",
-            pairs(&[("address", "0x12")]),
-            "invalid address",
-        ),
-        (
-            Kind::Public,
-            "get_metadata_candles",
-            pairs(&[("market", "BTC-USD"), ("to", "1")]),
-            "market, timeframe and to are required",
-        ),
-        (
-            Kind::Public,
-            "get_metadata_candles",
-            pairs(&[
-                ("market", "BTC-USD"),
-                ("timeframe", "1m"),
-                ("to", "1700000000000"),
-                ("countback", "1"),
-            ]),
-            "timestamps must be seconds",
-        ),
-        (
-            Kind::Public,
-            "get_metadata_candles",
-            pairs(&[
-                ("market", "BTC-USD"),
-                ("timeframe", "1m"),
-                ("to", "1"),
-                ("countback", "2000"),
-            ]),
-            "countback must be 1..1500",
-        ),
-        (
-            Kind::Public,
-            "get_metadata_candles",
-            pairs(&[
-                ("market", "BTC-USD"),
-                ("timeframe", "1m"),
-                ("to", "1"),
-                ("from", "2"),
-            ]),
-            "from must not exceed to",
-        ),
-        (
-            Kind::Public,
-            "get_market_overview",
-            pairs(&[("market", "BTC-USD")]),
-            "unknown or empty get_market_overview parameter: market",
-        ),
     ];
-    for (preferences, reason) in [
-        (json!({}), "exceed documented size limits"),
-        (json!({"theme": "dark"}), "unknown preference key"),
-        (
-            json!({"favoritedMarkets": ["BTC"]}),
-            "invalid preference value type",
-        ),
-        (
-            json!({"favoriteSpotMarkets": [1]}),
-            "invalid preference value type",
-        ),
-        (
-            json!({"disabledAlerts": [true]}),
-            "invalid preference value type",
-        ),
-        (
-            json!({"lastSignedTOS": "now"}),
-            "invalid preference value type",
-        ),
-        (
-            json!({"isSpotLayoutLocked": "yes"}),
-            "invalid preference value type",
-        ),
-        (
-            json!({"subaccountPreferences": {"x": {"name": "a"}}}),
-            "invalid preference value type",
-        ),
-    ] {
-        cases.push((
-            Kind::Private,
-            "upsert_user_preferences",
-            vec![("preferences".to_string(), preferences.to_string())],
-            reason,
-        ));
-    }
     for (kind, name, params, reason) in cases {
         let (result, requests) = run(kind, name, params);
         let error = result.expect_err(reason);
@@ -1412,17 +1234,4 @@ fn transfers_and_preferences_reject_malformed_fields_before_sending() {
         );
         assert!(requests.is_empty(), "{name} sent {requests:?}");
     }
-    // Valid preference shapes for every typed key are accepted.
-    let (result, _) = run(
-        Kind::Private,
-        "upsert_user_preferences",
-        vec![(
-            "preferences".to_string(),
-            json!({"favoritedMarkets": [1], "favoritePerpMarkets": ["BTC-USD"],
-                   "disabledAlerts": ["fills", 3], "lastSignedTOS": 1, "isPerpLayoutFlex": true,
-                   "subaccountPreferences": {"1": {"name": "main"}}})
-            .to_string(),
-        )],
-    );
-    result.expect("typed preferences");
 }

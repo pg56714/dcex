@@ -45,7 +45,7 @@ fn with_base(
 fn single_orders_reject_inconsistent_fields_before_network() {
     let spot_base = [
         ("product_symbol", "BTC-USD-SPOT"),
-        ("side", "buy"),
+        ("type", "buy"),
         ("volume", "1"),
     ];
     let futures_base = [
@@ -344,4 +344,48 @@ fn batch_instructions_are_validated_field_by_field() {
         let error = validate_futures_instruction(&with(base, changes)).expect_err(expected);
         assert!(error.to_string().contains(expected), "{error}");
     }
+}
+
+#[test]
+fn cursor_pages_require_cursor_mode() {
+    let request = |pairs: &[(&str, &str)]| {
+        let client = KrakenClient::public(Duration::from_secs(1)).expect("client");
+        let params = pairs
+            .iter()
+            .map(|(key, value)| ((*key).to_string(), (*value).to_string()))
+            .collect();
+        crate::http::block_on(async move {
+            client
+                .private_request("get_spot_closed_orders", params)
+                .await
+        })
+        .expect_err("no credentials or invalid cursor")
+        .to_string()
+    };
+    assert!(request(&[("cursor", "c1")]).contains("cursor requires with_cursor=true"));
+    assert!(request(&[("with_cursor", "yes")]).contains("with_cursor must be true or false"));
+    assert!(!request(&[("with_cursor", "true"), ("cursor", "c1")]).contains("cursor"));
+}
+
+#[test]
+fn page_limits_follow_each_route() {
+    let request = |method: &str, pairs: &[(&str, &str)]| {
+        let client = KrakenClient::public(Duration::from_secs(1)).expect("client");
+        let method = method.to_string();
+        let params = pairs
+            .iter()
+            .map(|(key, value)| ((*key).to_string(), (*value).to_string()))
+            .collect();
+        crate::http::block_on(async move { client.private_request(&method, params).await })
+            .expect_err("no credentials or invalid page")
+            .to_string()
+    };
+    let open = "get_spot_open_orders";
+    assert!(request(open, &[("with_cursor", "true"), ("limit", "101")]).contains("1 to 100"));
+    assert!(!request(open, &[("limit", "1000")]).contains("limit"));
+    assert!(request(open, &[("limit", "0")]).contains("1 to 1000"));
+    let history = "get_spot_trade_history";
+    assert!(request(history, &[("limit", "101")]).contains("1 to 100"));
+    assert!(request(history, &[("with_cursor", "true"), ("ofs", "50")]).contains("ofs"));
+    assert!(!request(history, &[("with_cursor", "true"), ("ofs", "0")]).contains("ofs"));
 }

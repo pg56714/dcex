@@ -2821,6 +2821,12 @@
       "channel": "funding-account-websocket-withdrawal-info-channel",
       "title": "Withdrawal info channel",
       "official_source": "https://www.okx.com/docs-v5/en/#funding-account-websocket-withdrawal-info-channel"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v5/account/activate-feature",
+      "title": "Activate feature",
+      "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-activate-feature"
     }
   ]
 }

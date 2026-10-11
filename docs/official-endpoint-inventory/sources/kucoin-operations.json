@@ -4250,6 +4250,27 @@
                 "description": "SHORT for short position in hedge mode."
               }
             ]
+          },
+          "fundsType": {
+            "type": "string",
+            "description": "Type of funds used for the position or order.",
+            "enum": [
+              "selfFunds",
+              "leadTrial"
+            ],
+            "x-apidog-enum": [
+              {
+                "value": "selfFunds",
+                "name": "",
+                "description": "Own funds"
+              },
+              {
+                "value": "leadTrial",
+                "name": "",
+                "description": "Lead trading trial funds"
+              }
+            ],
+            "default": "selfFunds"
           }
         },
         "x-apidog-orders": [
@@ -4268,7 +4289,8 @@
           "price",
           "size",
           "timeInForce",
-          "postOnly"
+          "postOnly",
+          "fundsType"
         ],
         "required": [
           "clientOid",
@@ -4282,13 +4304,13 @@
       "examples": [
         {
           "name": "Example 1",
-          "value": "{\n    \"clientOid\": \"ea391ca47fb2448095b6d1aaf968baf8\",\n    \"symbol\": \"XBTUSDTM\",\n    \"marginMode\": \"CROSS\",\n    \"leverage\": 12,\n    \"positionSide\": \"LONG\",\n    \"side\": \"buy\",\n    \"type\": \"market\",\n    \"size\": 1,\n    \"timeInForce\": \"GTC\",\n    \"reduceOnly\": false,\n    \"remark\": \"order_remarks\"\n}",
+          "value": "{\n    \"clientOid\": \"ea391ca47fb2448095b6d1aaf968baf8\",\n    \"symbol\": \"XBTUSDTM\",\n    \"marginMode\": \"CROSS\",\n    \"leverage\": 12,\n    \"positionSide\": \"LONG\",\n    \"side\": \"buy\",\n    \"type\": \"market\",\n    \"size\": 1,\n    \"timeInForce\": \"GTC\",\n    \"reduceOnly\": false,\n    \"remark\": \"order_remarks\",\n    \"fundsType\": \"selfFunds\"\n}",
           "mediaType": "application/json",
           "key": "0"
         }
       ],
       "oasExtensions": "",
-      "data": "{\n    \"clientOid\": \"ea391ca47fb2448095b6d1aaf968baf8\",\n    \"symbol\": \"XBTUSDTM\",\n    \"marginMode\": \"CROSS\",\n    \"leverage\": 12,\n    \"positionSide\": \"LONG\",\n    \"side\": \"buy\",\n    \"type\": \"market\",\n    \"size\": 1,\n    \"timeInForce\": \"GTC\",\n    \"reduceOnly\": false,\n    \"remark\": \"order_remarks\"\n}"
+      "data": "{\n    \"clientOid\": \"ea391ca47fb2448095b6d1aaf968baf8\",\n    \"symbol\": \"XBTUSDTM\",\n    \"marginMode\": \"CROSS\",\n    \"leverage\": 12,\n    \"positionSide\": \"LONG\",\n    \"side\": \"buy\",\n    \"type\": \"market\",\n    \"size\": 1,\n    \"timeInForce\": \"GTC\",\n    \"reduceOnly\": false,\n    \"remark\": \"order_remarks\",\n    \"fundsType\": \"selfFunds\"\n}"
     },
     "codeSamples": [],
     "customApiFields": {
@@ -4798,6 +4820,27 @@
                 "description": "SHORT for short position in hedge mode."
               }
             ]
+          },
+          "fundsType": {
+            "type": "string",
+            "enum": [
+              "selfFunds",
+              "leadTrial"
+            ],
+            "x-apidog-enum": [
+              {
+                "value": "selfFunds",
+                "name": "",
+                "description": "Own funds"
+              },
+              {
+                "value": "leadTrial",
+                "name": "",
+                "description": "Lead trading trial funds"
+              }
+            ],
+            "default": "selfFunds",
+            "description": "Type of funds used for the position or order."
           }
         },
         "x-apidog-orders": [
@@ -4816,7 +4859,8 @@
           "price",
           "size",
           "timeInForce",
-          "postOnly"
+          "postOnly",
+          "fundsType"
         ],
         "required": [
           "clientOid",
@@ -4831,13 +4875,13 @@
       "examples": [
         {
           "name": "Example 1",
-          "value": "{\n    \"clientOid\": \"fa928420a7a0411cb50835e14d123943\",\n    \"symbol\": \"XBTUSDTM\",\n    \"marginMode\": \"CROSS\",\n    \"leverage\": 12,\n    \"positionSide\": \"LONG\",\n    \"side\": \"buy\",\n    \"type\": \"market\",\n    \"size\": 1,\n    \"stopPriceType\": \"TP\",\n    \"triggerStopUpPrice\": \"111000\",\n    \"triggerStopDownPrice\": \"100000\",\n    \"timeInForce\": \"GTC\",\n    \"reduceOnly\": false,\n    \"remark\": \"order_remarks\"\n}",
+          "value": "{\n    \"clientOid\": \"fa928420a7a0411cb50835e14d123943\",\n    \"symbol\": \"XBTUSDTM\",\n    \"marginMode\": \"CROSS\",\n    \"leverage\": 12,\n    \"positionSide\": \"LONG\",\n    \"side\": \"buy\",\n    \"type\": \"market\",\n    \"size\": 1,\n    \"stopPriceType\": \"TP\",\n    \"triggerStopUpPrice\": \"111000\",\n    \"triggerStopDownPrice\": \"100000\",\n    \"timeInForce\": \"GTC\",\n    \"reduceOnly\": false,\n    \"remark\": \"order_remarks\",\n    \"fundsType\": \"selfFunds\"\n}",
           "mediaType": "application/json",
           "key": "0"
         }
       ],
       "oasExtensions": "",
-      "data": "{\n    \"clientOid\": \"fa928420a7a0411cb50835e14d123943\",\n    \"symbol\": \"XBTUSDTM\",\n    \"marginMode\": \"CROSS\",\n    \"leverage\": 12,\n    \"positionSide\": \"LONG\",\n    \"side\": \"buy\",\n    \"type\": \"market\",\n    \"size\": 1,\n    \"stopPriceType\": \"TP\",\n    \"triggerStopUpPrice\": \"111000\",\n    \"triggerStopDownPrice\": \"100000\",\n    \"timeInForce\": \"GTC\",\n    \"reduceOnly\": false,\n    \"remark\": \"order_remarks\"\n}"
+      "data": "{\n    \"clientOid\": \"fa928420a7a0411cb50835e14d123943\",\n    \"symbol\": \"XBTUSDTM\",\n    \"marginMode\": \"CROSS\",\n    \"leverage\": 12,\n    \"positionSide\": \"LONG\",\n    \"side\": \"buy\",\n    \"type\": \"market\",\n    \"size\": 1,\n    \"stopPriceType\": \"TP\",\n    \"triggerStopUpPrice\": \"111000\",\n    \"triggerStopDownPrice\": \"100000\",\n    \"timeInForce\": \"GTC\",\n    \"reduceOnly\": false,\n    \"remark\": \"order_remarks\",\n    \"fundsType\": \"selfFunds\"\n}"
     },
     "codeSamples": [],
     "customApiFields": {
@@ -4873,6 +4917,36 @@
           "type": "string",
           "isCommonParameter": false,
           "value": "263485113055133696"
+        },
+        {
+          "required": false,
+          "description": "Funds type. Defaults to selfFunds when omitted or empty.",
+          "type": "string",
+          "id": "83lcRpia9d",
+          "enable": true,
+          "name": "fundsType",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "selfFunds",
+              "leadTrial"
+            ],
+            "x-apidog-enum": [
+              {
+                "value": "selfFunds",
+                "name": "",
+                "description": "Own funds"
+              },
+              {
+                "value": "leadTrial",
+                "name": "",
+                "description": "Lead trading trial funds"
+              }
+            ],
+            "default": "selfFunds"
+          },
+          "isCommonParameter": false,
+          "value": null
         }
       ],
       "path": [],
@@ -4887,11 +4961,9 @@
         "properties": {},
         "x-apidog-orders": []
       },
-      "examples": [],
       "mediaType": "",
+      "examples": [],
       "oasExtensions": "",
-      "required": false,
-      "additionalContentTypes": [],
       "data": ""
     },
     "codeSamples": [],
@@ -4939,6 +5011,36 @@
           "type": "string",
           "isCommonParameter": false,
           "value": "5c52e11203aa677f331e493fb"
+        },
+        {
+          "required": false,
+          "description": "Funds type. Defaults to selfFunds when omitted or empty.",
+          "type": "string",
+          "id": "HdpWcBmOqO",
+          "enable": true,
+          "name": "fundsType",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "selfFunds",
+              "leadTrial"
+            ],
+            "x-apidog-enum": [
+              {
+                "value": "selfFunds",
+                "name": "",
+                "description": "Own funds"
+              },
+              {
+                "value": "leadTrial",
+                "name": "",
+                "description": "Lead trading trial funds"
+              }
+            ],
+            "default": "selfFunds"
+          },
+          "isCommonParameter": false,
+          "value": null
         }
       ],
       "path": [],
@@ -4953,11 +5055,9 @@
         "properties": {},
         "x-apidog-orders": []
       },
-      "examples": [],
       "mediaType": "",
+      "examples": [],
       "oasExtensions": "",
-      "required": false,
-      "additionalContentTypes": [],
       "data": ""
     },
     "codeSamples": [],
@@ -5027,6 +5127,36 @@
           },
           "isCommonParameter": false,
           "value": null
+        },
+        {
+          "required": false,
+          "description": "Funds type. Defaults to selfFunds when omitted or empty.",
+          "type": "string",
+          "id": "4T5VOIjnj8",
+          "enable": true,
+          "name": "fundsType",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "selfFunds",
+              "leadTrial"
+            ],
+            "x-apidog-enum": [
+              {
+                "value": "selfFunds",
+                "name": "",
+                "description": "Own funds"
+              },
+              {
+                "value": "leadTrial",
+                "name": "",
+                "description": "Lead trading trial funds"
+              }
+            ],
+            "default": "selfFunds"
+          },
+          "isCommonParameter": false,
+          "value": null
         }
       ],
       "path": [],
@@ -5041,11 +5171,9 @@
         "properties": {},
         "x-apidog-orders": []
       },
-      "examples": [],
       "mediaType": "",
+      "examples": [],
       "oasExtensions": "",
-      "required": false,
-      "additionalContentTypes": [],
       "data": ""
     },
     "codeSamples": [],
@@ -5114,6 +5242,36 @@
                 "description": "SHORT for short position in hedge mode."
               }
             ]
+          },
+          "isCommonParameter": false,
+          "value": null
+        },
+        {
+          "required": false,
+          "description": "Funds type. Defaults to selfFunds when omitted or empty.",
+          "type": "string",
+          "id": "drCTeUnQTQ",
+          "enable": true,
+          "name": "fundsType",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "selfFunds",
+              "leadTrial"
+            ],
+            "x-apidog-enum": [
+              {
+                "value": "selfFunds",
+                "name": "",
+                "description": "Own funds"
+              },
+              {
+                "value": "leadTrial",
+                "name": "",
+                "description": "Lead trading trial funds"
+              }
+            ],
+            "default": "selfFunds"
           },
           "isCommonParameter": false,
           "value": null
@@ -5207,13 +5365,35 @@
                 "description": "SHORT for short position in hedge mode."
               }
             ]
+          },
+          "fundsType": {
+            "type": "string",
+            "enum": [
+              "selfFunds",
+              "leadTrial"
+            ],
+            "x-apidog-enum": [
+              {
+                "value": "selfFunds",
+                "name": "",
+                "description": "Own funds"
+              },
+              {
+                "value": "leadTrial",
+                "name": "",
+                "description": "Lead trading trial funds"
+              }
+            ],
+            "default": "selfFunds",
+            "description": "Funds type. Defaults to selfFunds when omitted or empty."
           }
         },
         "x-apidog-orders": [
           "symbol",
           "margin",
           "positionSide",
-          "bizNo"
+          "bizNo",
+          "fundsType"
         ],
         "required": [
           "symbol",
@@ -5224,14 +5404,14 @@
       "mediaType": "",
       "examples": [
         {
-          "value": "{\n  \"symbol\": \"XBTUSDTM\",\n  \"margin\": 3,\n  \"positionSide\": \"LONG\",\n  \"bizNo\": \"112233\"\n}",
+          "value": "{\n  \"symbol\": \"XBTUSDTM\",\n  \"margin\": 3,\n  \"positionSide\": \"LONG\",\n  \"bizNo\": \"112233\",\n  \"fundsType\": \"selfFunds\"\n}",
           "mediaType": "application/json",
           "name": "Example 1",
           "key": "0"
         }
       ],
       "oasExtensions": "",
-      "data": "{\n  \"symbol\": \"XBTUSDTM\",\n  \"margin\": 3,\n  \"positionSide\": \"LONG\",\n  \"bizNo\": \"112233\"\n}"
+      "data": "{\n  \"symbol\": \"XBTUSDTM\",\n  \"margin\": 3,\n  \"positionSide\": \"LONG\",\n  \"bizNo\": \"112233\",\n  \"fundsType\": \"selfFunds\"\n}"
     },
     "codeSamples": [],
     "customApiFields": {
@@ -5300,12 +5480,34 @@
                 "description": "SHORT for short position in hedge mode."
               }
             ]
+          },
+          "fundsType": {
+            "type": "string",
+            "enum": [
+              "selfFunds",
+              "leadTrial"
+            ],
+            "x-apidog-enum": [
+              {
+                "value": "selfFunds",
+                "name": "",
+                "description": "Own funds"
+              },
+              {
+                "value": "leadTrial",
+                "name": "",
+                "description": "Lead trading trial funds"
+              }
+            ],
+            "default": "selfFunds",
+            "description": "Funds type. Defaults to selfFunds when omitted or empty."
           }
         },
         "x-apidog-orders": [
           "symbol",
           "positionSide",
-          "withdrawAmount"
+          "withdrawAmount",
+          "fundsType"
         ],
         "required": [
           "symbol",
@@ -5316,13 +5518,13 @@
       "examples": [
         {
           "name": "Example 1",
-          "value": "{\n    \"symbol\": \"XBTUSDTM\",\n    \"positionSide\": \"LONG\",\n    \"withdrawAmount\": 0.0000001\n}",
+          "value": "{\n    \"symbol\": \"XBTUSDTM\",\n    \"positionSide\": \"LONG\",\n    \"withdrawAmount\": 0.0000001,\n    \"fundsType\": \"selfFunds\"\n}",
           "mediaType": "application/json",
           "key": "0"
         }
       ],
       "oasExtensions": "",
-      "data": "{\n    \"symbol\": \"XBTUSDTM\",\n    \"positionSide\": \"LONG\",\n    \"withdrawAmount\": 0.0000001\n}"
+      "data": "{\n    \"symbol\": \"XBTUSDTM\",\n    \"positionSide\": \"LONG\",\n    \"withdrawAmount\": 0.0000001,\n    \"fundsType\": \"selfFunds\"\n}"
     },
     "codeSamples": [],
     "customApiFields": {
@@ -5462,12 +5664,34 @@
                 "description": "SHORT for short position in hedge mode."
               }
             ]
+          },
+          "fundsType": {
+            "type": "string",
+            "enum": [
+              "selfFunds",
+              "leadTrial"
+            ],
+            "x-apidog-enum": [
+              {
+                "value": "selfFunds",
+                "name": "",
+                "description": "Own funds"
+              },
+              {
+                "value": "leadTrial",
+                "name": "",
+                "description": "Lead trading trial funds"
+              }
+            ],
+            "default": "selfFunds",
+            "description": "Funds type. Defaults to selfFunds when omitted or empty."
           }
         },
         "x-apidog-orders": [
           "symbol",
           "status",
-          "positionSide"
+          "positionSide",
+          "fundsType"
         ],
         "required": [
           "symbol",
@@ -5478,13 +5702,13 @@
       "examples": [
         {
           "name": "Example 1",
-          "value": "{\n  \"symbol\": \"XBTUSDTM\",\n  \"status\": true,\n  \"positionSide\": \"LONG\"\n}",
+          "value": "{\n  \"symbol\": \"XBTUSDTM\",\n  \"status\": true,\n  \"positionSide\": \"LONG\",\n  \"fundsType\": \"selfFunds\"\n}",
           "mediaType": "application/json",
           "key": "0"
         }
       ],
       "oasExtensions": "",
-      "data": "{\n  \"symbol\": \"XBTUSDTM\",\n  \"status\": true,\n  \"positionSide\": \"LONG\"\n}"
+      "data": "{\n  \"symbol\": \"XBTUSDTM\",\n  \"status\": true,\n  \"positionSide\": \"LONG\",\n  \"fundsType\": \"selfFunds\"\n}"
     },
     "codeSamples": [],
     "customApiFields": {
@@ -5543,30 +5767,50 @@
                 "description": "Cross Margin MOde"
               }
             ]
+          },
+          "fundsType": {
+            "type": "string",
+            "enum": [
+              "selfFunds",
+              "leadTrial"
+            ],
+            "x-apidog-enum": [
+              {
+                "value": "selfFunds",
+                "name": "",
+                "description": "Own funds"
+              },
+              {
+                "value": "leadTrial",
+                "name": "",
+                "description": "Lead trading trial funds"
+              }
+            ],
+            "default": "selfFunds",
+            "description": "Funds type. Defaults to selfFunds when omitted or empty."
           }
         },
         "x-apidog-orders": [
           "symbol",
-          "marginMode"
+          "marginMode",
+          "fundsType"
         ],
         "required": [
           "symbol",
           "marginMode"
         ]
       },
+      "mediaType": "",
       "examples": [
         {
-          "value": "{\n  \"symbol\": \"XBTUSDTM\",\n  \"marginMode\": \"CROSS\"\n}",
+          "value": "{\n  \"symbol\": \"XBTUSDTM\",\n  \"marginMode\": \"CROSS\",\n  \"fundsType\": \"selfFunds\"\n}",
           "mediaType": "application/json",
           "name": "Example 1",
           "key": "0"
         }
       ],
-      "mediaType": "",
       "oasExtensions": "",
-      "required": false,
-      "additionalContentTypes": [],
-      "data": "{\n  \"symbol\": \"XBTUSDTM\",\n  \"marginMode\": \"CROSS\"\n}"
+      "data": "{\n  \"symbol\": \"XBTUSDTM\",\n  \"marginMode\": \"CROSS\",\n  \"fundsType\": \"selfFunds\"\n}"
     },
     "codeSamples": [],
     "customApiFields": {
@@ -5609,17 +5853,40 @@
           "leverage": {
             "type": "string",
             "description": "Leverage multiple"
+          },
+          "fundsType": {
+            "type": "string",
+            "enum": [
+              "selfFunds",
+              "leadTrial"
+            ],
+            "x-apidog-enum": [
+              {
+                "value": "selfFunds",
+                "name": "",
+                "description": "Own funds"
+              },
+              {
+                "value": "leadTrial",
+                "name": "",
+                "description": "Lead trading trial funds"
+              }
+            ],
+            "default": "selfFunds",
+            "description": "Funds type. Defaults to selfFunds when omitted or empty."
           }
         },
         "x-apidog-orders": [
           "symbol",
-          "leverage"
+          "leverage",
+          "fundsType"
         ],
         "required": [
           "symbol",
           "leverage"
         ]
       },
+      "mediaType": "",
       "examples": [
         {
           "name": "Example 1",
@@ -5628,10 +5895,7 @@
           "key": "0"
         }
       ],
-      "mediaType": "",
       "oasExtensions": "",
-      "required": false,
-      "additionalContentTypes": [],
       "data": "{\n  \"symbol\": \"XBTUSDTM\",\n  \"leverage\": \"15\"\n}"
     },
     "codeSamples": [],
@@ -5757,10 +6021,32 @@
                 "description": "two-way position"
               }
             ]
+          },
+          "fundsType": {
+            "type": "string",
+            "enum": [
+              "selfFunds",
+              "leadTrial"
+            ],
+            "x-apidog-enum": [
+              {
+                "value": "selfFunds",
+                "name": "",
+                "description": "Own funds"
+              },
+              {
+                "value": "leadTrial",
+                "name": "",
+                "description": "Lead trading trial funds"
+              }
+            ],
+            "default": "selfFunds",
+            "description": "Funds type. Defaults to selfFunds when omitted or empty."
           }
         },
         "x-apidog-orders": [
-          "positionMode"
+          "positionMode",
+          "fundsType"
         ],
         "required": [
           "positionMode"
@@ -5770,13 +6056,13 @@
       "examples": [
         {
           "name": "Example 1",
-          "value": "{\n    \"positionMode\": \"0\"\n}",
+          "value": "{\n    \"positionMode\": \"0\",\n    \"fundsType\": \"selfFunds\"\n}",
           "mediaType": "application/json",
           "key": "0"
         }
       ],
       "oasExtensions": "",
-      "data": "{\n    \"positionMode\": \"0\"\n}"
+      "data": "{\n    \"positionMode\": \"0\",\n    \"fundsType\": \"selfFunds\"\n}"
     },
     "codeSamples": [],
     "customApiFields": {

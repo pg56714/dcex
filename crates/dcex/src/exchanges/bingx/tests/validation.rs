@@ -17,7 +17,7 @@ fn spot_cancel_replace_uses_official_path_and_required_fields() {
                 vec![
                     ("product_symbol".into(), "BTC-USDT-SPOT".into()),
                     ("cancelOrderId".into(), "123".into()),
-                    ("cancelReplaceMode".into(), "STOP_ON_FAILURE".into()),
+                    ("CancelReplaceMode".into(), "STOP_ON_FAILURE".into()),
                     ("side".into(), "BUY".into()),
                     ("type".into(), "LIMIT".into()),
                     ("quantity".into(), "0.1".into()),
@@ -33,7 +33,7 @@ fn spot_cancel_replace_uses_official_path_and_required_fields() {
         "{line}"
     );
     assert!(line.contains("cancelOrderId=123"), "{line}");
-    assert!(line.contains("cancelReplaceMode=STOP_ON_FAILURE"), "{line}");
+    assert!(line.contains("CancelReplaceMode=STOP_ON_FAILURE"), "{line}");
     assert!(line.contains("symbol=BTC-USDT"), "{line}");
 }
 

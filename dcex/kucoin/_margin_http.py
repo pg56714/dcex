@@ -145,6 +145,7 @@ class MarginHTTP(HTTPManager):
         size: str,
         isIsolated: bool | None = None,
         product_symbol: str | None = None,
+        isHf: bool | None = None,
     ) -> dict[str, Any]:
         """Repay a cross- or isolated-margin liability."""
         return self._native_private(
@@ -154,6 +155,7 @@ class MarginHTTP(HTTPManager):
                 size=size,
                 isIsolated=isIsolated,
                 product_symbol=product_symbol,
+                isHf=isHf,
             ),
         )
 

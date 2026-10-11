@@ -8,7 +8,7 @@ use super::params::{
 };
 
 /// Public market paths whose official request tables mark `timestamp` as required.
-/// Spot v2 depth, spot price ticker and spot book ticker do not list it.
+/// The spot v2 quote routes do not list it.
 const TIMESTAMP_REQUIRED_PATHS: &[&str] = &[
     SWAP_INSTRUMENT_INFO,
     SWAP_ORDERBOOK,
@@ -23,9 +23,6 @@ const TIMESTAMP_REQUIRED_PATHS: &[&str] = &[
     SWAP_MARK_PRICE_KLINE,
     SPOT_SYMBOLS,
     SPOT_ORDERBOOK,
-    SPOT_PUBLIC_TRADE,
-    SPOT_KLINE_V2,
-    SPOT_TICKER,
 ];
 
 const KLINE_INTERVALS: &[&str] = &[
@@ -83,28 +80,17 @@ impl BingxClient {
             "get_orderbook" => self.depth_get(SWAP_ORDERBOOK, &params, "limit", None).await,
             "get_spot_orderbook" => self.depth_get(SPOT_ORDERBOOK, &params, "limit", None).await,
             "get_spot_orderbook_v2" => {
-                params.ensure_allowed(&["product_symbol", "symbol", "depth", "type"])?;
+                params.ensure_allowed(&["product_symbol", "symbol", "limit", "type"])?;
                 let type_ = params.get("type").unwrap_or("step0").to_string();
                 validate_enum(
                     &params,
                     "type",
                     &["step0", "step1", "step2", "step3", "step4", "step5"],
                 )?;
-                let depth = params.get("depth").ok_or_else(|| {
-                    DcexError::InvalidInput("missing required parameter: depth".to_string())
-                })?;
-                depth
-                    .parse::<u64>()
-                    .ok()
-                    .filter(|value| *value > 0)
-                    .ok_or_else(|| {
-                        DcexError::InvalidInput(
-                            "BingX parameter depth must be a positive integer".to_string(),
-                        )
-                    })?;
+                validate_u64_range(&params, "limit", 1, 1024)?;
                 let mut query = Vec::new();
-                self.push_required_spot_v2_depth_symbol(&mut query, &params)?;
-                query.push(("depth".to_string(), depth.to_string()));
+                self.push_required_symbol(&mut query, &params)?;
+                push_optional_value(&mut query, "limit", params.get("limit"));
                 query.push(("type".to_string(), type_));
                 self.market_get(SPOT_ORDERBOOK_V2, query).await
             }
@@ -121,8 +107,7 @@ impl BingxClient {
                 self.market_get(SPOT_PUBLIC_TRADE, query).await
             }
             "get_kline" => self.kline_get(SWAP_KLINE, &params).await,
-            // BingX only documents the v2 spot kline route; keep both names on it.
-            "get_spot_kline" | "get_spot_kline_v2" => self.kline_get(SPOT_KLINE_V2, &params).await,
+            "get_spot_kline" => self.kline_get(SPOT_KLINE, &params).await,
             "get_open_interest" => {
                 params.ensure_allowed(&["product_symbol", "symbol"])?;
                 let mut query = Vec::new();
@@ -179,13 +164,13 @@ impl BingxClient {
             "get_spot_book_ticker" => {
                 params.ensure_allowed(&["product_symbol", "symbol"])?;
                 let mut query = Vec::new();
-                self.push_required_symbol(&mut query, &params)?;
+                self.push_optional_symbol(&mut query, &params)?;
                 self.market_get(SPOT_BOOK_TICKER, query).await
             }
             "get_spot_price_ticker" => {
                 params.ensure_allowed(&["product_symbol", "symbol"])?;
                 let mut query = Vec::new();
-                self.push_required_symbol(&mut query, &params)?;
+                self.push_optional_symbol(&mut query, &params)?;
                 self.market_get(SPOT_PRICE_TICKER, query).await
             }
             _ => Err(DcexError::InvalidInput(format!(
@@ -223,14 +208,29 @@ impl BingxClient {
     }
 
     async fn kline_get(&self, path: &str, params: &BingxParams) -> Result<ValidatedResponse> {
-        params.ensure_allowed(&[
-            "product_symbol",
-            "symbol",
-            "interval",
-            "startTime",
-            "endTime",
-            "limit",
-        ])?;
+        // Only the swap and spot kline routes document a timeZone offset.
+        let zoned = matches!(path, SWAP_KLINE | SPOT_KLINE);
+        params.ensure_allowed(if zoned {
+            &[
+                "product_symbol",
+                "symbol",
+                "interval",
+                "startTime",
+                "endTime",
+                "limit",
+                "timeZone",
+            ]
+        } else {
+            &[
+                "product_symbol",
+                "symbol",
+                "interval",
+                "startTime",
+                "endTime",
+                "limit",
+            ]
+        })?;
+        validate_enum(params, "timeZone", &["0", "8"])?;
         validate_enum(params, "interval", KLINE_INTERVALS)?;
         validate_time_range(params, "startTime", "endTime", None)?;
         validate_u64_range(params, "limit", 1, 1440)?;
@@ -243,6 +243,7 @@ impl BingxClient {
         push_optional_value(&mut query, "startTime", params.get("startTime"));
         push_optional_value(&mut query, "endTime", params.get("endTime"));
         push_optional_value(&mut query, "limit", params.get("limit"));
+        push_optional_value(&mut query, "timeZone", params.get("timeZone"));
         self.market_get(path, query).await
     }
 
@@ -256,17 +257,6 @@ impl BingxClient {
             push_timestamp(&mut query)?;
         }
         self.public_get(path, query).await
-    }
-
-    fn push_required_spot_v2_depth_symbol(
-        &self,
-        query: &mut Vec<(String, String)>,
-        params: &BingxParams,
-    ) -> Result<()> {
-        let product_symbol = params.required_any(&["product_symbol", "symbol"])?;
-        let symbol = self.exchange_symbol(product_symbol)?.replace('-', "_");
-        query.push(("symbol".to_string(), symbol));
-        Ok(())
     }
 }
 

@@ -105,34 +105,6 @@ CASES = [
         sort_by="pnl",
         limit=10,
     ),
-    read("get_market_metadata", "/v1/api-meta/markets", {"market": "BTC-USD"}, market="BTC-USD"),
-    read("get_market_overview", "/v1/api-meta/overview"),
-    read("get_spot_market_overview", "/v1/api-meta/spot/overview"),
-    read(
-        "get_metadata_candles",
-        "/v1/api-meta/candles",
-        {"market": "BTC-USD", "timeframe": "1m", "to": "1700000060", "countback": "10"},
-        market="BTC-USD",
-        timeframe="1m",
-        to=1700000060,
-        countback=10,
-    ),
-    read("get_user_preferences", "/v1/api-meta/userPreferences", {"address": ADDRESS}),
-    WireCase(
-        "upsert_user_preferences",
-        {"preferences": {"colorTheme": "dark", "favoritePerpMarkets": ["BTC-USD"]}},
-        "/v1/api-meta/userPreferences",
-        {},
-        {"colorTheme": "dark", "favoritePerpMarkets": ["BTC-USD"]},
-        signed=True,
-    ),
-    WireCase(
-        "delete_user_preference_signed",
-        {"key": "colorTheme", "timestamp": 1700000000000000000, "signature": "11" * 64},
-        "/v1/api-meta/userPreferences",
-        {"key": "colorTheme"},
-        signed=True,
-    ),
     read("get_api_keys", "/v1/apiKeys", {"address": ADDRESS}),
     read("get_api_keys", "/v1/apiKeys", {"address": ADDRESS, "accountIndex": "2"}, account_index=2),
     WireCase(
@@ -142,7 +114,6 @@ CASES = [
         "revoke_api_key_signed", {"body": WALLET_KEY_BODY}, "/v1/revokeApiKey", {}, WALLET_KEY_BODY
     ),
     read("get_markets", "/v1/markets"),
-    read("get_spot_assets", "/v1/spotAssets"),
     read("get_fee_tiers", "/v1/feetiers"),
     read("get_bbo", "/v1/bbo/BTC-USD", market="BTC-USD"),
     read(
@@ -243,7 +214,6 @@ CASES.extend(
             **{"include": ["feeTier", "volumes"], "windows": ["24h", "7d"]},
         ),
         read("get_mid_prices", "/v1/mids", {"market": "BTC-USD"}, **{"market": "BTC-USD"}),
-        read("get_compliance", "/v1/compliance", {"address": ADDRESS}, **{}),
         read("get_rate_limit", "/v1/rateLimit", {"address": ADDRESS, "accountIndex": "0"}, **{}),
         read("get_time", "/v1/time", {}, **{}),
         read(
@@ -269,18 +239,6 @@ CASES.extend(
                 "end_time": 1700000060000000,
                 "limit": 20,
             },
-        ),
-        read(
-            "get_interest",
-            "/v1/interest",
-            {
-                "address": ADDRESS,
-                "accountIndex": "0",
-                "from": "1700000000000000",
-                "to": "1700000060000000",
-                "limit": "20",
-            },
-            **{"start_time": 1700000000000000, "end_time": 1700000060000000, "limit": 20},
         ),
         read("get_live_prices", "/v1/prices", {"market": "BTC-USD"}, **{"market": "BTC-USD"}),
         read(
@@ -353,24 +311,6 @@ CASES.extend(
                 "start_time": 1700000000000000,
                 "end_time": 1700000060000000,
             },
-        ),
-        read(
-            "get_spot_fills",
-            "/v1/spotFills",
-            {
-                "address": ADDRESS,
-                "accountIndex": "0",
-                "limit": "20",
-                "from": "1700000000000000",
-                "to": "1700000060000000",
-            },
-            **{"limit": 20, "start_time": 1700000000000000, "end_time": 1700000060000000},
-        ),
-        read(
-            "get_spot_positions",
-            "/v1/spotPositions",
-            {"address": ADDRESS, "accountIndex": "0"},
-            **{},
         ),
         read("health", "/health", {}, **{}),
         read("get_service_info", "/", {}, **{}),
@@ -475,33 +415,6 @@ def _assert_wire(wire: WireCase, requests: list[dict[str, Any]]) -> dict[str, An
             assert json.loads(final["body"]) == wire.body
             return wire.body
         assert final["body"] == ""
-        return {}
-    if wire.http_method_path.startswith("/v1/api-meta/"):
-        assert query == wire.query
-        if wire.method == "upsert_user_preferences":
-            from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
-
-            assert final["method"] == "PATCH"
-            sent = json.loads(final["body"])
-            assert sent == wire.body
-            message = (
-                final["x-timestamp"]
-                + "userPreferences"
-                + json.dumps(sent, sort_keys=True, separators=(",", ":"))
-            ).encode()
-            Ed25519PublicKey.from_public_bytes(bytes.fromhex(final["x-api-key"])).verify(
-                bytes.fromhex(final["x-signature"]), message
-            )
-            return sent
-        if wire.method == "delete_user_preference_signed":
-            assert final["method"] == "DELETE"
-            assert final["x-signature"] == "11" * 64
-            assert final["x-timestamp"] == "1700000000000000000"
-            assert final["body"] == ""
-            return {}
-        assert final["method"] == "GET"
-        assert final["body"] == ""
-        assert not final.get("x-signature")
         return {}
     assert final.get("x-api-key")
     if wire.signed:

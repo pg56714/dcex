@@ -86,6 +86,7 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
         amount: str,
         type_: int,
         positionSide: str | None = None,
+        clientTranId: str | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Add or reduce isolated margin on an Aster futures position."""
         return await self._native_private(
@@ -95,6 +96,7 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
                 positionSide=positionSide,
                 amount=amount,
                 type_=type_,
+                clientTranId=clientTranId,
             ),
         )
 
@@ -135,6 +137,7 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
         endTime: int | None = None,
         fromId: int | None = None,
         limit: int | None = None,
+        orderId: int | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Retrieve Aster futures account trades."""
         return await self._native_private(
@@ -145,6 +148,7 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
                 endTime=endTime,
                 fromId=fromId,
                 limit=limit,
+                orderId=orderId,
             ),
         )
 

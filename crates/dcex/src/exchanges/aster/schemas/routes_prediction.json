@@ -575,6 +575,26 @@
     "method": "HttpMethod::Get"
   },
   {
+    "name": "get_prediction_transaction_history",
+    "path": "/api/v3/prediction/transactionHistory",
+    "is_public": false,
+    "fields": [
+      "asset",
+      "type",
+      "startTime",
+      "endTime",
+      "limit"
+    ],
+    "required": [],
+    "integers": [
+      "startTime",
+      "endTime",
+      "limit"
+    ],
+    "decimals": [],
+    "method": "HttpMethod::Get"
+  },
+  {
     "name": "create_prediction_listen_key",
     "path": "/api/v3/listenKey",
     "is_public": false,

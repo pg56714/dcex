@@ -819,6 +819,7 @@ def _route_server() -> Iterator[tuple[str, queue.Queue[dict[str, Any]]]]:
                         "contract_key": self.headers.get("ApiKey"),
                         "contract_signature": self.headers.get("Signature"),
                         "contract_timestamp": self.headers.get("Request-Time"),
+                        "member_info": self.headers.get("memberInfo"),
                     }
                 )
             data = json.dumps(payload).encode()
@@ -953,6 +954,21 @@ async def test_async_mexc_wrapper_hits_official_route(method_name: str) -> None:
             await client.close()
         requests = _endpoint_requests(received)
     _assert_route(requests, method_name)
+
+
+def test_affiliate_list_sends_member_info_as_a_header() -> None:
+    """memberInfo is documented as a request header, outside the signed query."""
+    from dcex.mexc.client import Client
+
+    with _route_server() as (base_url, received):
+        client = Client(**_client_kwargs(base_url))
+        try:
+            client.get_rebate_affiliate_list(member_info="uid-7", start_time=1, end_time=2)
+        finally:
+            client.close()
+        (request,) = [r for r in _endpoint_requests(received) if not r["sync"]]
+    assert request["member_info"] == "uid-7"
+    assert "memberInfo" not in dict(parse_qsl(urlsplit(request["path"]).query))
 
 
 def _single_request(method_name: str, **kwargs: Any) -> dict[str, Any]:

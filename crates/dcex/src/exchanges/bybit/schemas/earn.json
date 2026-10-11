@@ -1,0 +1,67 @@
+[
+  {
+    "method": "GET",
+    "path": "/v5/earn/flexible-saving/auto-savings",
+    "title": "Get Auto Savings",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/earn/flexible-saving/auto-savings",
+    "name": "get_earn_auto_savings",
+    "public": false,
+    "fields": [
+      {
+        "name": "coins",
+        "python_name": "coins",
+        "type": "array",
+        "required": false,
+        "description": "Coin names; sent as repeated query parameters, at most 50"
+      }
+    ],
+    "example": {
+      "coins": [
+        "BTC",
+        "ETH"
+      ]
+    },
+    "has_example": true,
+    "source_file": "v5/finance/earn/flexible-saving/auto-savings.mdx",
+    "spec_commit": "59e3d457dea6b419a14987c19a3aabf4ffb38238"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/earn/flexible-saving/auto-savings",
+    "title": "Set Auto Savings",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/earn/flexible-saving/auto-savings",
+    "name": "set_earn_auto_savings",
+    "public": false,
+    "fields": [
+      {
+        "name": "coin",
+        "python_name": "coin",
+        "type": "string",
+        "required": false,
+        "description": "Coin to update; omit or pass an empty string for the global setting"
+      },
+      {
+        "name": "isSelected",
+        "python_name": "is_selected",
+        "type": "boolean",
+        "required": true,
+        "description": "Whether to enable auto savings"
+      },
+      {
+        "name": "purchaseImmediately",
+        "python_name": "purchase_immediately",
+        "type": "boolean",
+        "required": false,
+        "description": "When enabling, subscribe the available Funding Account balance"
+      }
+    ],
+    "example": {
+      "coin": "USDT",
+      "isSelected": true,
+      "purchaseImmediately": false
+    },
+    "has_example": true,
+    "source_file": "v5/finance/earn/flexible-saving/auto-savings.mdx",
+    "spec_commit": "59e3d457dea6b419a14987c19a3aabf4ffb38238"
+  }
+]

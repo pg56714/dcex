@@ -62,11 +62,11 @@ class MarketHTTP(HTTPManager):
         """Retrieve ticker information for all trading pairs."""
         return self._native_public("get_spot_all_tickers", [])
 
-    def get_spot_orderbook(self, product_symbol: str, depth: int = 20) -> dict[str, Any]:
+    def get_spot_orderbook(self, product_symbol: str, size: int = 20) -> dict[str, Any]:
         """Retrieve the top 20 (default) or 100 orderbook levels for a trading pair."""
         return self._native_public(
             "get_spot_orderbook",
-            self._params(product_symbol=product_symbol, depth=depth),
+            self._params(product_symbol=product_symbol, size=size),
         )
 
     def get_spot_public_trades(self, product_symbol: str) -> dict[str, Any]:
@@ -115,14 +115,14 @@ class MarketHTTP(HTTPManager):
     def get_futures_orderbook(
         self,
         product_symbol: str,
-        depth: int | None = None,
+        size: int | None = None,
     ) -> dict[str, Any]:
         """Retrieve KuCoin futures orderbook."""
         return self._native_public(
             "get_futures_orderbook",
             self._params(
                 product_symbol=product_symbol,
-                depth=depth,
+                size=size,
             ),
         )
 

@@ -12,8 +12,6 @@ pub(super) fn public_path(method_name: &str) -> Result<&'static str> {
         "get_markets" => "/v1/markets",
         "get_fee_tiers" => "/v1/feetiers",
         "get_commission_rates" => "/v1/commissionrates",
-        "get_spot_assets" => "/v1/spotAssets",
-        "get_compliance" => "/v1/compliance",
         "get_bbo" => "/v1/bbo",
         "get_l2_orderbook" => "/v1/l2OrderBook",
         "get_mid_prices" => "/v1/mids",
@@ -32,12 +30,9 @@ pub(super) fn public_path(method_name: &str) -> Result<&'static str> {
         "get_fill" => "/v1/fill",
         "get_transfer_updates" => "/v1/accountTransferUpdates",
         "get_funding" => "/v1/funding",
-        "get_interest" => "/v1/interest",
         "get_funding_rates" => "/v1/fundingRates",
         "get_portfolio_history" => "/v1/portfolio",
         "get_rate_limit" => "/v1/rateLimit",
-        "get_spot_positions" => "/v1/spotPositions",
-        "get_spot_fills" => "/v1/spotFills",
         _ => {
             return Err(DcexError::InvalidInput(format!(
                 "unknown Arcus public method: {method_name}"

@@ -12,12 +12,12 @@ import pytest
 
 from scripts.build_bingx_wrappers import field_kind, operation_name
 from scripts.build_bitget_wrappers import snake
-from scripts.build_bingx_wrappers import UNAVAILABLE_PATHS
+from scripts.build_bingx_wrappers import HAND_WRITTEN_PATHS, UNAVAILABLE_PATHS
 from tests.unit.endpoint_wrapper_helpers import generated_method_members
 from tests.unit.native_http_helpers import _http_server
 
 ROOT = Path(__file__).resolve().parents[2]
-# Documented operations minus the ones the generator excludes as absent live.
+# Documented operations minus the ones the generator excludes (absent live or hand-written).
 OPERATIONS = [
     op
     for op in json.loads(
@@ -25,7 +25,7 @@ OPERATIONS = [
             encoding="utf8"
         )
     )
-    if op["path"] not in UNAVAILABLE_PATHS
+    if op["path"] not in UNAVAILABLE_PATHS | HAND_WRITTEN_PATHS
 ]
 NAMES = {operation_name(o) for o in OPERATIONS}
 

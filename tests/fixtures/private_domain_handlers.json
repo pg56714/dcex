@@ -210,6 +210,9 @@
     "account.rs": [
       "account_private_request"
     ],
+    "spot.rs": [
+      "spot_private_request"
+    ],
     "trade.rs": [
       "trade_private_request"
     ]

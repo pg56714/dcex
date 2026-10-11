@@ -11,6 +11,18 @@ mod account_requests {
     };
     use crate::http::HttpMethod;
 
+    /// `clientTranId` is a 32-character alphanumeric string.
+    fn validate_client_tran_id(params: &MexcParams) -> Result<()> {
+        match params.get("clientTranId") {
+            Some(id) if id.len() != 32 || !id.chars().all(|c| c.is_ascii_alphanumeric()) => {
+                Err(crate::DcexError::InvalidInput(
+                    "MEXC clientTranId must be 32 ASCII letters or digits".to_string(),
+                ))
+            }
+            _ => Ok(()),
+        }
+    }
+
     impl MexcClient {
         pub(in crate::exchanges::mexc) async fn dispatch_transfer_subaccount_assets(
             &self,
@@ -25,6 +37,7 @@ mod account_requests {
                     "toAccountType",
                     "asset",
                     "amount",
+                    "clientTranId",
                     "recvWindow",
                 ])?;
                 for key in ["fromAccountType", "toAccountType", "asset", "amount"] {
@@ -32,6 +45,7 @@ mod account_requests {
                 }
                 validate_enum(params, "fromAccountType", &["SPOT", "FUTURES"])?;
                 validate_enum(params, "toAccountType", &["SPOT", "FUTURES"])?;
+                validate_client_tran_id(params)?;
                 self.spot_private(
                     HttpMethod::Post,
                     SPOT_SUBACCOUNT_UNIVERSAL_TRANSFER,
@@ -42,6 +56,7 @@ mod account_requests {
                         "toAccountType",
                         "asset",
                         "amount",
+                        "clientTranId",
                         "recvWindow",
                     ]),
                 )
@@ -63,12 +78,14 @@ mod account_requests {
                     "endTime",
                     "page",
                     "limit",
+                    "clientTranId",
                     "recvWindow",
                 ])?;
                 params.required("fromAccountType")?;
                 params.required("toAccountType")?;
                 validate_enum(params, "fromAccountType", &["SPOT", "FUTURES"])?;
                 validate_enum(params, "toAccountType", &["SPOT", "FUTURES"])?;
+                validate_client_tran_id(params)?;
                 validate_u64_range(params, "page", 1, u64::MAX)?;
                 validate_u64_range(params, "limit", 1, 500)?;
                 self.spot_private(
@@ -83,6 +100,7 @@ mod account_requests {
                         "endTime",
                         "page",
                         "limit",
+                        "clientTranId",
                         "recvWindow",
                     ]),
                 )

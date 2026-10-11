@@ -135,7 +135,6 @@ impl BybitClient {
                 self.post_request(SPREAD_CANCEL_ALL_ORDERS, body).await
             }
             "get_spread_open_orders" | "get_spread_order_history" | "get_spread_trade_history" => {
-                params.ensure_allowed(&["limit"])?;
                 if let Some(limit) = params.get("limit") {
                     let limit = limit.parse::<u64>().map_err(|_| {
                         DcexError::InvalidInput("Bybit spread limit must be an integer".into())
@@ -175,6 +174,7 @@ impl BybitClient {
                         "cursor",
                     ][..],
                 };
+                params.ensure_allowed(fields)?;
                 let path = match method_name {
                     "get_spread_open_orders" => SPREAD_OPEN_ORDERS,
                     "get_spread_order_history" => SPREAD_ORDER_HISTORY,

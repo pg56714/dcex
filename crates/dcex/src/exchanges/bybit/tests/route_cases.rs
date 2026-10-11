@@ -1583,7 +1583,11 @@ pub(super) const CASES: &[RouteCase] = &[
     RouteCase {
         public: false,
         name: "set_leverage",
-        params: &[("product_symbol", "BTC-USDT-SWAP"), ("leverage", "5")],
+        params: &[
+            ("product_symbol", "BTC-USDT-SWAP"),
+            ("buyLeverage", "5"),
+            ("sellLeverage", "5"),
+        ],
         verb: "POST",
         path: "/v5/position/set-leverage",
     },
@@ -1645,7 +1649,7 @@ pub(super) const CASES: &[RouteCase] = &[
     RouteCase {
         public: false,
         name: "get_transferable_amount",
-        params: &[("coins", "USDT,BTC")],
+        params: &[("coinName", "USDT,BTC")],
         verb: "GET",
         path: "/v5/account/withdrawal",
     },
@@ -1659,7 +1663,7 @@ pub(super) const CASES: &[RouteCase] = &[
     RouteCase {
         public: false,
         name: "get_borrow_history",
-        params: &[("coin", "USDT"), ("limit", "20")],
+        params: &[("currency", "USDT"), ("limit", "20")],
         verb: "GET",
         path: "/v5/account/borrow-history",
     },

@@ -69,14 +69,6 @@ impl BackpackClient {
         )
     }
 
-    pub fn refresh_rfq(&self, rfq_id: &str) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
-        crate::exchanges::ExchangeMethodRequest::private(
-            self,
-            "refresh_rfq",
-            vec![("rfqId".to_string(), rfq_id.to_string())],
-        )
-    }
-
     pub fn cancel_rfq(&self, rfq_id: &str) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
         crate::exchanges::ExchangeMethodRequest::private(
             self,
@@ -140,13 +132,6 @@ impl BackpackClient {
                 insert_optional_integer(&mut body, "clientId", params.get("clientId"));
                 insert_required_string(&mut body, "quoteId", params.required("quoteId")?);
                 self.private_post_value(RFQ_ACCEPT, Value::Object(body), "quoteAccept")
-                    .await
-            }
-            "refresh_rfq" => {
-                params.ensure_allowed(&["rfqId"], &[])?;
-                let mut body = Map::new();
-                insert_required_string(&mut body, "rfqId", params.required("rfqId")?);
-                self.private_post_value(RFQ_REFRESH, Value::Object(body), "rfqRefresh")
                     .await
             }
             "cancel_rfq" => {
@@ -232,10 +217,12 @@ impl BackpackClient {
                 "autoLendRedeem",
                 "autoBorrow",
                 "autoBorrowRepay",
+                "orderExpiryTime",
             ],
             &[],
         )?;
         super::market::validate_symbol_selector(params, true)?;
+        params.optional_u64_range("orderExpiryTime", 1, u64::MAX)?;
         params.ensure_exactly_one(&["quantity", "quoteQuantity"])?;
         params.required("side")?;
         params.optional_one_of("side", &["Bid", "Ask"])?;
@@ -253,6 +240,14 @@ impl BackpackClient {
         if execution_mode == "Immediate" && params.get("price").is_none() {
             return Err(DcexError::InvalidInput(
                 "Backpack RFQ executionMode=Immediate requires price.".to_string(),
+            ));
+        }
+        if params.get("orderExpiryTime").is_some()
+            && (execution_mode != "Immediate" || params.get("price").is_none())
+        {
+            return Err(DcexError::InvalidInput(
+                "Backpack RFQ orderExpiryTime requires executionMode=Immediate and price."
+                    .to_string(),
             ));
         }
         if params.get("price").is_some() && execution_mode != "Immediate" {
@@ -281,7 +276,7 @@ impl BackpackClient {
                 "side",
                 "executionMode",
             ],
-            &["clientId"],
+            &["clientId", "orderExpiryTime"],
             &[
                 "autoLend",
                 "autoLendRedeem",

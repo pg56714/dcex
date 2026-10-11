@@ -19,6 +19,7 @@ pub(super) static ENDPOINTS: std::sync::LazyLock<Vec<Endpoint>> = std::sync::Laz
         name: row["name"].as_str().expect("schema name"),
         path: row["path"].as_str().expect("schema path"),
         method: match row["method"].as_str().expect("schema method") {
+            "HttpMethod::Delete" => HttpMethod::Delete,
             "HttpMethod::Get" => HttpMethod::Get,
             "HttpMethod::Post" => HttpMethod::Post,
             "HttpMethod::Put" => HttpMethod::Put,

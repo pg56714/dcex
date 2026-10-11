@@ -23,7 +23,7 @@ async def test_coin_swap_tpsl_exact_number_wire(asynchronous):
             await client.async_init()
         try:
             response = client.place_coin_swap_order(
-                product_symbol="BTC-USD", side="BUY", type_="MARKET", quantity="1",
+                product_symbol="BTC-USD", side="BUY", type_="MARKET", position_side="LONG", quantity="1",
                 take_profit={"type": "TAKE_PROFIT", "stopPrice": "61000.5", "price": Decimal("61000.125000000000000001")},
                 stop_loss={"type": "STOP_MARKET", "stopPrice": Decimal("59000.75")},
             )
@@ -31,7 +31,7 @@ async def test_coin_swap_tpsl_exact_number_wire(asynchronous):
                 await response
             request = received.get_nowait()
             assert request["method"] == "POST"
-            assert urlsplit(request["path"]).path == "/openApi/cswap/v1/trade/order"
+            assert urlsplit(request["path"]).path == "/openApi/cswap/v2/trade/order"
             params = parse_qs(urlsplit(request["path"]).query or request["body"])
             tp = json.loads(params["takeProfit"][0], parse_float=Decimal)
             sl = json.loads(params["stopLoss"][0], parse_float=Decimal)

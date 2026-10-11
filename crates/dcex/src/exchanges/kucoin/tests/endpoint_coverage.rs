@@ -412,7 +412,7 @@ const PUBLIC_CASES: &[Case] = &[
     public(
         "get_futures_orderbook",
         Host::Futures,
-        &[("product_symbol", SWAP), ("depth", "20")],
+        &[("product_symbol", SWAP), ("size", "20")],
         "GET /api/v1/level2/depth20?symbol=XBTUSDTM",
     ),
     public(
@@ -2743,7 +2743,7 @@ async fn spot_orderbook_selects_documented_depth() {
     let case = public(
         "get_spot_orderbook",
         Host::Spot,
-        &[("product_symbol", SPOT), ("depth", "100")],
+        &[("product_symbol", SPOT), ("size", "100")],
         "GET /api/v1/market/orderbook/level2_100?symbol=BTC-USDT",
     );
     let request = run_case(&case).await;
@@ -2754,12 +2754,12 @@ async fn spot_orderbook_selects_documented_depth() {
             "get_spot_orderbook",
             vec![
                 ("product_symbol".into(), SPOT.into()),
-                ("depth".into(), "50".into()),
+                ("size".into(), "50".into()),
             ],
         )
         .await
-        .expect_err("unsupported depth");
-    assert!(error.to_string().contains("depth"));
+        .expect_err("unsupported size");
+    assert!(error.to_string().contains("size"));
 }
 
 #[tokio::test]

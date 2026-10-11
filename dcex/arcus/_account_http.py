@@ -90,14 +90,6 @@ class AccountHTTP(HTTPManager):
             },
         )
 
-    def get_compliance(self, *, address: str | None = None) -> Any:  # noqa: ANN401
-        """
-        GET /v1/compliance; time bounds use epoch microseconds.
-
-        Source: https://docs.arcus.xyz/api-reference/public/get-compliance-status.md
-        """
-        return self.public_request("get_compliance", **{"address": address or self.address})
-
     def get_rate_limit(
         self, *, address: str | None = None, account_index: int | None = None
     ) -> Any:  # noqa: ANN401
@@ -178,47 +170,6 @@ class AccountHTTP(HTTPManager):
             },
         )
 
-    def get_spot_fills(
-        self,
-        *,
-        address: str | None = None,
-        account_index: int | None = None,
-        limit: int | None = None,
-        start_time: int | None = None,
-        end_time: int | None = None,
-    ) -> Any:  # noqa: ANN401
-        """
-        GET /v1/spotFills; time bounds use epoch microseconds.
-
-        Source: https://docs.arcus.xyz/api-reference/public/get-spot-fills.md
-        """
-        return self.public_request(
-            "get_spot_fills",
-            **{
-                "address": address or self.address,
-                "accountIndex": self.account_index if account_index is None else account_index,
-                "limit": limit,
-                "from": start_time,
-                "to": end_time,
-            },
-        )
-
-    def get_spot_positions(
-        self, *, address: str | None = None, account_index: int | None = None
-    ) -> Any:  # noqa: ANN401
-        """
-        GET /v1/spotPositions; time bounds use epoch microseconds.
-
-        Source: https://docs.arcus.xyz/api-reference/public/get-spot-positions.md
-        """
-        return self.public_request(
-            "get_spot_positions",
-            **{
-                "address": address or self.address,
-                "accountIndex": self.account_index if account_index is None else account_index,
-            },
-        )
-
     def get_api_keys(self, *, address: str | None = None, account_index: int | None = None) -> Any:  # noqa: ANN401
         """List API keys; omitting account_index lists every subaccount scope."""
         return self.public_request(
@@ -240,23 +191,6 @@ class AccountHTTP(HTTPManager):
         """Revoke an API key with a caller wallet-authorized signed body."""
         return self.private_request(
             "revoke_api_key_signed", body=json.dumps(body, separators=(",", ":"), allow_nan=False)
-        )
-
-    def get_user_preferences(self, *, address: str | None = None) -> Any:  # noqa: ANN401
-        """Public preferences for the selected wallet."""
-        return self.public_request("get_user_preferences", address=address or self.address)
-
-    def upsert_user_preferences(self, preferences: dict[str, Any]) -> Any:  # noqa: ANN401
-        """Patch preferences with the native Ed25519 signing key; no address in the body."""
-        return self.private_request(
-            "upsert_user_preferences",
-            preferences=json.dumps(preferences, separators=(",", ":"), allow_nan=False),
-        )
-
-    def delete_user_preference_signed(self, *, key: str, timestamp: int, signature: str) -> Any:  # noqa: ANN401
-        """Delete a preference using caller signing headers; timestamp is nanoseconds."""
-        return self.private_request(
-            "delete_user_preference_signed", key=key, timestamp=timestamp, signature=signature
         )
 
 

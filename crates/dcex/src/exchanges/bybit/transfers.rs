@@ -14,18 +14,18 @@ mod account_requests {
             _method_name: &str,
             params: &BybitParams,
         ) -> Result<ValidatedResponse> {
-            params.ensure_allowed(&["coins"])?;
+            params.ensure_allowed(&["coinName"])?;
             {
-                let coins = params.required("coins")?;
+                let coins = params.required("coinName")?;
                 if coins.is_empty() {
                     return Err(DcexError::InvalidInput(
-                        "coins must contain at least one coin.".to_string(),
+                        "coinName must contain at least one coin.".to_string(),
                     ));
                 }
                 let count = coins.split(',').filter(|coin| !coin.is_empty()).count();
                 if count > 20 {
                     return Err(DcexError::InvalidInput(
-                        "coins must contain no more than 20 coins.".to_string(),
+                        "coinName must contain no more than 20 coins.".to_string(),
                     ));
                 }
                 self.get_request(
@@ -202,7 +202,7 @@ mod wrappers {
     create_internal_transfer(coin => "coin", amount => "amount", from_account_type => "fromAccountType", to_account_type => "toAccountType"),
     create_universal_transfer(coin => "coin", amount => "amount", from_member_id => "fromMemberId", to_member_id => "toMemberId", from_account_type => "fromAccountType", to_account_type => "toAccountType"),
     get_internal_transfer_records(),
-    get_transferable_amount(coins => "coins"),
+    get_transferable_amount(coin_name => "coinName"),
     get_transferable_coin(from_account_type => "fromAccountType", to_account_type => "toAccountType"),
     get_universal_transfer_records()
      ];

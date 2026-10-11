@@ -132,6 +132,7 @@ class AccountHTTP(AccountHTTPWithdrawalsHTTP, AccountHTTPTransfersHTTP, HTTPMana
         limit: int | None = None,
         authorization: str | None = None,
         auth: str | None = None,
+        is_eligible: bool | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Retrieve Lighter user referral records."""
         return await self._native_private(
@@ -149,6 +150,7 @@ class AccountHTTP(AccountHTTPWithdrawalsHTTP, AccountHTTPTransfersHTTP, HTTPMana
         start_timestamp: int | None = None,
         end_timestamp: int | None = None,
         authorization: str | None = None,
+        market_ids: str | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Retrieve Lighter position funding records."""
         return await self._native_private("get_position_funding", self._native_params(**locals()))
@@ -169,6 +171,7 @@ class AccountHTTP(AccountHTTPWithdrawalsHTTP, AccountHTTPTransfersHTTP, HTTPMana
         account_index: int | None = None,
         start_timestamp: int | None = None,
         end_timestamp: int | None = None,
+        period: str | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Retrieve Lighter partner statistics."""
         return await self._native_private("get_partner_stats", self._native_params(**locals()))

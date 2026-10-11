@@ -190,19 +190,19 @@ impl BingxClient {
                 &["product_symbol", "startTs", "endTs"],
             ),
             "get_swap_position_history" => (
-                "/openApi/swap/v1/trade/positionHistory",
+                "/openApi/swap/v2/trade/positionHistory",
                 false,
                 &[
                     "product_symbol",
                     "currency",
                     "positionId",
-                    "startTs",
-                    "endTs",
+                    "startTime",
+                    "endTime",
                     "pageIndex",
                     "pageSize",
                     "recvWindow",
                 ],
-                &["product_symbol", "startTs", "endTs"],
+                &["product_symbol", "startTime", "endTime"],
             ),
             "get_swap_margin_history" => (
                 "/openApi/swap/v1/positionMargin/history",
@@ -250,9 +250,12 @@ impl BingxClient {
             params.required(key)?;
         }
         validate_u64_range(params, "recvWindow", 1, 5000)?;
-        for key in ["orderId", "positionId", "pageIndex"] {
+        for key in ["orderId", "positionId"] {
             validate_u64_range(params, key, 1, u64::MAX)?;
         }
+        // Position history pages are numbered from 0; the other paged routes from 1.
+        let first_page = u64::from(name != "get_swap_position_history");
+        validate_u64_range(params, "pageIndex", first_page, u64::MAX)?;
         validate_u64_range(params, "lastFillId", 0, u64::MAX)?;
         validate_u64_range(
             params,
@@ -268,23 +271,19 @@ impl BingxClient {
             params,
             "pageSize",
             1,
-            if ["get_swap_position_history", "get_swap_margin_history"].contains(&name) {
+            if name == "get_swap_margin_history" {
                 100
             } else {
                 1000
             },
         )?;
-        validate_time_range(params, "startTime", "endTime", None)?;
         validate_time_range(
             params,
-            "startTs",
-            "endTs",
-            if name == "get_swap_position_history" {
-                Some(90 * 86_400_000)
-            } else {
-                None
-            },
+            "startTime",
+            "endTime",
+            (name == "get_swap_position_history").then_some(90 * 86_400_000),
         )?;
+        validate_time_range(params, "startTs", "endTs", None)?;
         validate_enum(params, "currency", &["USDT", "USDC"])?;
         validate_enum(params, "positionSide", &["LONG", "SHORT"])?;
         validate_enum(params, "side", &["BUY", "SELL"])?;

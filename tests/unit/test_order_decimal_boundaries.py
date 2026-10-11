@@ -83,7 +83,8 @@ async def test_kraken_convenience_zero_volume_never_reaches_wire(asynchronous, n
             parameters = inspect.signature(getattr(client, method)).parameters
             args = dict(product_symbol="XBTUSD", volume="0")
             if "side" in parameters:
-                args["side"] = "buy"
+                # The native dispatch takes Kraken's wire name for the order direction.
+                args["type" if native else "side"] = "buy"
             if "limit" in method:
                 args["price"] = "60000"
             if method == "edit_spot_order":
@@ -166,7 +167,7 @@ async def test_zero_limit_price_rejected_before_wire(asynchronous, native, excha
         target, field = (args if method == "place_order" else args["orders"][0]), "px"
         response = {"code": "0", "data": []}
     else:
-        args = dict(product_symbol="XBTUSD", side="buy", ordertype="limit", volume="1", price="0")
+        args = {"product_symbol": "XBTUSD", "type" if native else "side": "buy", "ordertype": "limit", "volume": "1", "price": "0"}
         target, field = args, "price"
         response = {"error": [], "result": {}}
     with _http_server(response) as (base, received):

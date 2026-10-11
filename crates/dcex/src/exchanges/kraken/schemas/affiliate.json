@@ -89,5 +89,71 @@
       }
     ],
     "official_source": "https://docs.kraken.com/api-reference/affiliate/get-daily-activity"
+  },
+  {
+    "name": "get_affiliate_cpa_progress",
+    "method": "GET",
+    "path": "/affiliate/v1/cpa-progress",
+    "auth": "header",
+    "fields": [
+      {
+        "name": "iiban",
+        "location": "query",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "minLength": 14
+        }
+      },
+      {
+        "name": "otp",
+        "location": "header",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    ],
+    "official_source": "https://docs.kraken.com/api-reference/affiliate/get-cpa-progress"
+  },
+  {
+    "name": "get_affiliate_payout_history",
+    "method": "GET",
+    "path": "/affiliate/v1/payout-history",
+    "auth": "header",
+    "fields": [
+      {
+        "name": "cursor",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      {
+        "name": "limit",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "format": "int32",
+          "minimum": 1,
+          "maximum": 200,
+          "default": 50
+        }
+      },
+      {
+        "name": "otp",
+        "location": "header",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    ],
+    "official_source": "https://docs.kraken.com/api-reference/affiliate/get-payout-history"
   }
 ]
