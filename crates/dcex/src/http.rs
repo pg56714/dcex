@@ -111,8 +111,26 @@ impl HttpResponse {
         String::from_utf8(self.body.clone()).map_err(|error| DcexError::Decode(error.to_string()))
     }
 
+    /// An empty 2xx body is a success without data (`null`); an empty error body
+    /// reports its HTTP status rather than a JSON parse failure.
     pub fn json(&self) -> Result<Value> {
-        serde_json::from_slice(&self.body).map_err(|error| DcexError::Decode(error.to_string()))
+        if self.body.iter().all(u8::is_ascii_whitespace) {
+            if (200..300).contains(&self.status) {
+                return Ok(Value::Null);
+            }
+            return Err(DcexError::HttpStatus {
+                status: self.status,
+                message: format!("HTTP {} with an empty response body", self.status),
+                headers: self.header_pairs(),
+            });
+        }
+        serde_json::from_slice(&self.body).map_err(|error| {
+            DcexError::Decode(format!(
+                "{error} (HTTP {}, {} body bytes)",
+                self.status,
+                self.body.len()
+            ))
+        })
     }
 
     pub fn header_pairs(&self) -> Vec<(String, String)> {
@@ -200,6 +218,19 @@ fn scalar(value: &Value) -> Option<String> {
     }
 }
 
+/// reqwest's top-level message ("error sending request for url ...") hides the cause,
+/// such as a timeout or a connection reset; append each source in the chain.
+fn transport_error(error: reqwest::Error) -> DcexError {
+    let mut message = error.to_string();
+    let mut source = std::error::Error::source(&error);
+    while let Some(cause) = source {
+        message.push_str(": ");
+        message.push_str(&cause.to_string());
+        source = cause.source();
+    }
+    DcexError::Transport(message)
+}
+
 #[derive(Clone)]
 pub struct AsyncHttpClient {
     client: Client,
@@ -207,8 +238,11 @@ pub struct AsyncHttpClient {
 
 impl AsyncHttpClient {
     pub fn new(timeout: Duration) -> Result<Self> {
+        // Some exchange CDNs (Lighter's explorer, for one) reject requests without a
+        // User-Agent; a request's own User-Agent header still takes precedence.
         let client = Client::builder()
             .timeout(timeout)
+            .user_agent(concat!("dcex/", env!("CARGO_PKG_VERSION")))
             .build()
             .map_err(|error| DcexError::Transport(error.to_string()))?;
         Ok(Self { client })
@@ -244,10 +278,7 @@ impl AsyncHttpClient {
             RequestBody::Raw(value) => builder.body(value),
         };
 
-        let response = builder
-            .send()
-            .await
-            .map_err(|error| DcexError::Transport(error.to_string()))?;
+        let response = builder.send().await.map_err(transport_error)?;
         let status = response.status().as_u16();
         let headers = response
             .headers()
@@ -259,11 +290,7 @@ impl AsyncHttpClient {
                 )
             })
             .collect();
-        let body = response
-            .bytes()
-            .await
-            .map_err(|error| DcexError::Transport(error.to_string()))?
-            .to_vec();
+        let body = response.bytes().await.map_err(transport_error)?.to_vec();
         Ok(HttpResponse {
             status,
             headers,
@@ -359,6 +386,87 @@ X-Test: yes\r\nContent-Length: 11\r\nConnection: close\r\n\r\n{\"ok\":true}",
         let raw_request = handle.join().expect("server");
         assert!(raw_request.starts_with("GET /test?symbol=BTCUSDT HTTP/1.1"));
         assert!(raw_request.to_ascii_lowercase().contains("x-api-key: key"));
+        assert!(
+            raw_request
+                .to_ascii_lowercase()
+                .contains(concat!("user-agent: dcex/", env!("CARGO_PKG_VERSION")))
+        );
+    }
+
+    #[tokio::test]
+    async fn transport_errors_name_their_cause() {
+        let listener = TcpListener::bind("127.0.0.1:0").expect("bind");
+        let address = listener.local_addr().expect("address");
+        // Accept and hold the connection without answering.
+        let handle = thread::spawn(move || listener.accept().map(|(stream, _)| stream));
+        let client = AsyncHttpClient::new(Duration::from_millis(200)).expect("client");
+        let error = client
+            .execute(HttpRequest::new(
+                HttpMethod::Get,
+                format!("http://{address}"),
+                "/slow",
+            ))
+            .await
+            .expect_err("timeout");
+        drop(handle.join());
+        let message = error.to_string();
+        assert!(message.contains(": "), "{message}");
+        assert!(
+            message.to_ascii_lowercase().contains("timed out"),
+            "{message}"
+        );
+    }
+
+    #[test]
+    fn empty_bodies_report_success_or_status() {
+        let response = |status: u16, body: &[u8]| HttpResponse {
+            status,
+            headers: BTreeMap::new(),
+            body: body.to_vec(),
+        };
+        assert_eq!(
+            response(200, b"").json().expect("empty success"),
+            Value::Null
+        );
+        assert_eq!(
+            response(
+                204, b"
+"
+            )
+            .json()
+            .expect("blank success"),
+            Value::Null
+        );
+        let error = response(404, b"").json().expect_err("empty error body");
+        assert!(
+            matches!(error, DcexError::HttpStatus { status: 404, .. }),
+            "{error}"
+        );
+        let error = response(404, b"<html>").json().expect_err("html body");
+        assert!(
+            error.to_string().contains("(HTTP 404, 6 body bytes)"),
+            "{error}"
+        );
+    }
+
+    #[tokio::test]
+    async fn request_user_agent_replaces_the_default() {
+        let (base_url, handle) = server();
+        let client = AsyncHttpClient::new(Duration::from_secs(10)).expect("client");
+        client
+            .execute(
+                HttpRequest::new(HttpMethod::Get, base_url, "/ua").header("User-Agent", "own/1"),
+            )
+            .await
+            .expect("response");
+
+        let raw_request = handle.join().expect("server").to_ascii_lowercase();
+        assert_eq!(
+            raw_request.matches("user-agent:").count(),
+            1,
+            "{raw_request}"
+        );
+        assert!(raw_request.contains("user-agent: own/1"));
     }
 
     #[test]
