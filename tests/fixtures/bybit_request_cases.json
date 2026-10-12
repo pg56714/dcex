@@ -2246,20 +2246,6 @@
       "note": "Official HTTP request example."
     },
     {
-      "name": "get_spot_lever_token_info",
-      "method": "GET",
-      "path": "/v5/spot-lever-token/info",
-      "signed": false,
-      "kwargs": {
-        "lt_coin": "BTC3L"
-      },
-      "wire": {
-        "ltCoin": "BTC3L"
-      },
-      "source": "https://bybit-exchange.github.io/docs/v5/lt/leverage-token-info",
-      "note": "Official HTTP request example."
-    },
-    {
       "name": "request_ins_loan_association_uid",
       "method": "POST",
       "path": "/v5/ins-loan/association-uid",

@@ -52,7 +52,6 @@ fn every_endpoint_constant_has_a_route_case() {
         include_str!("../schemas/table_announcements.json"),
         include_str!("../schemas/table_api_keys.json"),
         include_str!("../schemas/table_convert.json"),
-        include_str!("../schemas/table_leveraged_tokens.json"),
         include_str!("../schemas/table_loan.json"),
         include_str!("../schemas/table_margin.json"),
         include_str!("../schemas/table_market.json"),

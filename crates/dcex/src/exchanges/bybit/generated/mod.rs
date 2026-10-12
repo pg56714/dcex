@@ -11,7 +11,6 @@ mod earn;
 mod event;
 mod fiat;
 mod file_upload;
-mod leveraged_tokens;
 mod loan;
 mod pwm;
 mod referral;

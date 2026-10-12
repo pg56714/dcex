@@ -16,10 +16,10 @@ Historical, grouped and overlapping rows prevent converting these counts into an
 
 | Status | Rows | Definition |
 | --- | ---: | --- |
-| `implemented` | 3,423 | Exact offline HTTP route and public Rust/Python wrappers |
+| `implemented` | 3,418 | Exact offline HTTP route and public Rust/Python wrappers |
 | `protocol` | 395 | Asynchronous WebSocket protocol support with cited offline evidence; no live certification |
 | `superseded` | 989 | Historical or grouped row replaced by explicit current rows |
-| `unavailable` | 42 | Retired/unavailable operation, or documentation-only section with no endpoint |
+| `unavailable` | 47 | Retired/unavailable operation, or documentation-only section with no endpoint |
 | `unverified` | 11 | Wrapper exists, but part of the official specification is incomplete |
 | `blocked` | 30 | Required signing or authorization specification is missing |
 | `partial` | 1 | Grouped capability still has a documented gap |
@@ -32,7 +32,7 @@ Method counts include aliases and signing helpers, not endpoints.
 | Exchange | Public methods | Implemented rows | Pending rows |
 | --- | ---: | ---: | ---: |
 | [binance](official-endpoint-inventory/binance.json) | 750 | 748 | 0 |
-| [bybit](official-endpoint-inventory/bybit.json) | 453 | 439 | 0 |
+| [bybit](official-endpoint-inventory/bybit.json) | 448 | 434 | 0 |
 | [okx](official-endpoint-inventory/okx.json) | 403 | 389 | 0 |
 | [bitget](official-endpoint-inventory/bitget.json) | 328 | 328 | 0 |
 | [bingx](official-endpoint-inventory/bingx.json) | 199 | 182 | 0 |

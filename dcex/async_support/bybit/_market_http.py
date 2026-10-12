@@ -566,16 +566,6 @@ class MarketHTTP(HTTPManager):
             self._native_params(vipLevel=vip_level, currency=currency),
         )
 
-    async def get_spot_lever_token_reference(self, *, lt_coin: str) -> dict[str, Any]:
-        """
-        GET /v5/spot-lever-token/reference.
-
-        Decimal amounts are strings. Source: https://github.com/bybit-exchange/docs/blob/master/docs/v5/lt/leverage-token-reference.mdx
-        """
-        return await self._native_public(
-            "get_spot_lever_token_reference", self._native_params(ltCoin=lt_coin)
-        )
-
     async def get_server_time(self) -> dict[str, Any]:
         """Retrieve the exchange server time."""
         return await self._native_public("get_server_time", [])

@@ -380,7 +380,6 @@ fn validate(name: &str, p: &BybitParams) -> Result<()> {
             "get_crypto_loan_flexible_borrow_history" => 100,
             "get_crypto_loan_flexible_repayment_history" => 100,
             "get_crypto_loan_common_adjustment_history" => 100,
-            "get_spot_lever_token_order_record" => 500,
             _ => return Err(invalid("limit is not supported for this endpoint")),
         };
         if !limit.parse::<u64>().is_ok_and(|n| (1..=max).contains(&n)) {

@@ -185,7 +185,6 @@ fn load_schemas() -> Vec<Endpoint> {
         include_str!("../schemas/event.json"),
         include_str!("../schemas/file_upload.json"),
         include_str!("../schemas/pwm.json"),
-        include_str!("../schemas/leveraged_tokens.json"),
         include_str!("../schemas/loan.json"),
         include_str!("../schemas/convert.json"),
         include_str!("../schemas/stocks.json"),

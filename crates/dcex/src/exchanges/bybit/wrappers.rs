@@ -347,14 +347,6 @@ crypto_loan_common_max_loan(currency => "currency"),
 get_crypto_loan_common_max_collateral_amount(currency => "currency"),
 ]; }
 
-crate::exchanges::impl_exchange_method_wrappers! { @extend; BybitClient; public [
-get_spot_lever_token_reference(lt_coin => "ltCoin"),
-]; private [
-get_spot_lever_token_order_record(),
-spot_lever_token_purchase(lt_coin => "ltCoin",lt_amount => "ltAmount"),
-spot_lever_token_redeem(lt_coin => "ltCoin",quantity => "quantity"),
-]; }
-
 crate::exchanges::impl_exchange_method_wrappers! {@extend;BybitClient;public [];private [get_fixed_loan_supply_contract_info()];}
 
 crate::exchanges::impl_exchange_method_wrappers! {@extend;BybitClient;public [get_server_time()];private [];}

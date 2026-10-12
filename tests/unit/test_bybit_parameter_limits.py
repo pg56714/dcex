@@ -11,7 +11,6 @@ import pytest
     [
         ("get_crypto_loan_borrow_history", 100),
         ("get_crypto_loan_common_adjustment_history", 100),
-        ("get_spot_lever_token_order_record", 500),
     ],
 )
 def test_bybit_endpoint_specific_page_limit(method, limit):

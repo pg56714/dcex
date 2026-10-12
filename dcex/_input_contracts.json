@@ -13494,28 +13494,6 @@
           }
         }
       },
-      "spot_lever_token_purchase": {
-        "type": "object",
-        "properties": {
-          "ltAmount": {
-            "type": "string",
-            "format": "decimal"
-          },
-          "lt_amount": {
-            "type": "string",
-            "format": "decimal"
-          }
-        }
-      },
-      "spot_lever_token_redeem": {
-        "type": "object",
-        "properties": {
-          "quantity": {
-            "type": "string",
-            "format": "decimal"
-          }
-        }
-      },
       "stake_alpha_lp": {
         "type": "object",
         "properties": {
@@ -14095,10 +14073,6 @@
         "properties": {}
       },
       "get_crypto_loan_fixed_supply_order_info": {
-        "type": "object",
-        "properties": {}
-      },
-      "get_spot_lever_token_order_record": {
         "type": "object",
         "properties": {}
       },

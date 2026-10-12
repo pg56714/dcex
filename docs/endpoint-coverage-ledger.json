@@ -7,9 +7,9 @@
   "counts": {
     "protocol": 395,
     "partial": 1,
-    "implemented": 3423,
+    "implemented": 3418,
     "superseded": 989,
-    "unavailable": 42,
+    "unavailable": 47,
     "unverified": 11,
     "blocked": 30
   },
@@ -21174,17 +21174,13 @@
       "category": "Leveraged tokens",
       "endpoint": "GET /v5/spot-lever-token/order-record",
       "source_status": "missing",
-      "status": "implemented",
-      "rust": true,
-      "python_sync": true,
-      "python_async": true,
-      "methods": [
-        "get_spot_lever_token_order_record"
-      ],
-      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
-      "evidence": [
-        "tests/unit/test_bybit_endpoint_coverage.py"
-      ],
+      "status": "unavailable",
+      "rust": false,
+      "python_sync": false,
+      "python_async": false,
+      "methods": [],
+      "note": "Bybit terminated the leveraged token API service on 4 July 2025 (V5 changelog, 2025-06-30); /v5/spot-lever-token routes return HTTP 404.",
+      "evidence": [],
       "official_source": "https://bybit-exchange.github.io/docs/v5/lt/order-record",
       "path": "/v5/spot-lever-token/order-record",
       "http_method": "GET"
@@ -21197,17 +21193,13 @@
       "category": "Leveraged tokens",
       "endpoint": "GET /v5/spot-lever-token/reference",
       "source_status": "missing",
-      "status": "implemented",
-      "rust": true,
-      "python_sync": true,
-      "python_async": true,
-      "methods": [
-        "get_spot_lever_token_reference"
-      ],
-      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
-      "evidence": [
-        "tests/unit/test_bybit_endpoint_coverage.py"
-      ],
+      "status": "unavailable",
+      "rust": false,
+      "python_sync": false,
+      "python_async": false,
+      "methods": [],
+      "note": "Bybit terminated the leveraged token API service on 4 July 2025 (V5 changelog, 2025-06-30); /v5/spot-lever-token routes return HTTP 404.",
+      "evidence": [],
       "official_source": "https://bybit-exchange.github.io/docs/v5/lt/leverage-token-reference",
       "path": "/v5/spot-lever-token/reference",
       "http_method": "GET"
@@ -21220,17 +21212,13 @@
       "category": "Leveraged tokens",
       "endpoint": "POST /v5/spot-lever-token/purchase",
       "source_status": "missing",
-      "status": "implemented",
-      "rust": true,
-      "python_sync": true,
-      "python_async": true,
-      "methods": [
-        "spot_lever_token_purchase"
-      ],
-      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
-      "evidence": [
-        "tests/unit/test_bybit_endpoint_coverage.py"
-      ],
+      "status": "unavailable",
+      "rust": false,
+      "python_sync": false,
+      "python_async": false,
+      "methods": [],
+      "note": "Bybit terminated the leveraged token API service on 4 July 2025 (V5 changelog, 2025-06-30); /v5/spot-lever-token routes return HTTP 404.",
+      "evidence": [],
       "official_source": "https://bybit-exchange.github.io/docs/v5/lt/purchase",
       "path": "/v5/spot-lever-token/purchase",
       "http_method": "POST"
@@ -21243,17 +21231,13 @@
       "category": "Leveraged tokens",
       "endpoint": "POST /v5/spot-lever-token/redeem",
       "source_status": "missing",
-      "status": "implemented",
-      "rust": true,
-      "python_sync": true,
-      "python_async": true,
-      "methods": [
-        "spot_lever_token_redeem"
-      ],
-      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
-      "evidence": [
-        "tests/unit/test_bybit_endpoint_coverage.py"
-      ],
+      "status": "unavailable",
+      "rust": false,
+      "python_sync": false,
+      "python_async": false,
+      "methods": [],
+      "note": "Bybit terminated the leveraged token API service on 4 July 2025 (V5 changelog, 2025-06-30); /v5/spot-lever-token routes return HTTP 404.",
+      "evidence": [],
       "official_source": "https://bybit-exchange.github.io/docs/v5/lt/redeem",
       "path": "/v5/spot-lever-token/redeem",
       "http_method": "POST"
@@ -78424,17 +78408,13 @@
       "category": "Get Leverage Token Info",
       "endpoint": "GET /v5/spot-lever-token/info",
       "source_status": "official-inventory",
-      "status": "implemented",
-      "rust": true,
-      "python_sync": true,
-      "python_async": true,
-      "methods": [
-        "get_spot_lever_token_info"
-      ],
-      "note": "Verified with native Rust transport against localhost in Python sync and async tests; HTTP method, path, payload and authentication checked. No live account request was sent.",
-      "evidence": [
-        "tests/unit/test_bybit_schema_requests.py"
-      ],
+      "status": "unavailable",
+      "rust": false,
+      "python_sync": false,
+      "python_async": false,
+      "methods": [],
+      "note": "Bybit terminated the leveraged token API service on 4 July 2025 (V5 changelog, 2025-06-30); /v5/spot-lever-token routes return HTTP 404.",
+      "evidence": [],
       "official_source": "https://bybit-exchange.github.io/docs/v5/lt/leverage-token-info",
       "path": "/v5/spot-lever-token/info",
       "http_method": "GET"

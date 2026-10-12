@@ -1752,61 +1752,6 @@ class AccountHTTP(
             "get_crypto_loan_common_max_collateral_amount", self._native_params(currency=currency)
         )
 
-    def get_spot_lever_token_order_record(
-        self,
-        *,
-        lt_coin: str | None = None,
-        order_id: str | None = None,
-        start_time: int | None = None,
-        end_time: int | None = None,
-        limit: int | None = None,
-        lt_order_type: int | None = None,
-        serial_no: str | None = None,
-    ) -> dict[str, Any]:
-        """
-        GET /v5/spot-lever-token/order-record.
-
-        Decimal amounts are strings. Source: https://github.com/bybit-exchange/docs/blob/master/docs/v5/lt/order-record.mdx
-        """
-        return self._native_private(
-            "get_spot_lever_token_order_record",
-            self._native_params(
-                ltCoin=lt_coin,
-                orderId=order_id,
-                startTime=start_time,
-                endTime=end_time,
-                limit=limit,
-                ltOrderType=lt_order_type,
-                serialNo=serial_no,
-            ),
-        )
-
-    def spot_lever_token_purchase(
-        self, *, lt_coin: str, lt_amount: str, serial_no: str | None = None
-    ) -> dict[str, Any]:
-        """
-        POST /v5/spot-lever-token/purchase.
-
-        Decimal amounts are strings. Source: https://github.com/bybit-exchange/docs/blob/master/docs/v5/lt/purchase.mdx
-        """
-        return self._native_private(
-            "spot_lever_token_purchase",
-            self._native_params(ltCoin=lt_coin, ltAmount=lt_amount, serialNo=serial_no),
-        )
-
-    def spot_lever_token_redeem(
-        self, *, lt_coin: str, quantity: str, serial_no: str | None = None
-    ) -> dict[str, Any]:
-        """
-        POST /v5/spot-lever-token/redeem.
-
-        Decimal amounts are strings. Source: https://github.com/bybit-exchange/docs/blob/master/docs/v5/lt/redeem.mdx
-        """
-        return self._native_private(
-            "spot_lever_token_redeem",
-            self._native_params(ltCoin=lt_coin, quantity=quantity, serialNo=serial_no),
-        )
-
     def get_fixed_loan_supply_contract_info(
         self,
         *,

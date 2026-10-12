@@ -13,7 +13,6 @@ from .earn_http import GeneratedEarnHTTP
 from .event_http import GeneratedEventHTTP
 from .fiat_http import GeneratedFiatHTTP
 from .file_upload_http import GeneratedFileUploadHTTP
-from .leveraged_tokens_http import GeneratedLeveragedTokensHTTP
 from .loan_http import GeneratedLoanHTTP
 from .pwm_http import GeneratedPwmHTTP
 from .referral_http import GeneratedReferralHTTP
@@ -38,7 +37,6 @@ class GeneratedHTTP(
     GeneratedEventHTTP,
     GeneratedFiatHTTP,
     GeneratedFileUploadHTTP,
-    GeneratedLeveragedTokensHTTP,
     GeneratedLoanHTTP,
     GeneratedPwmHTTP,
     GeneratedReferralHTTP,
