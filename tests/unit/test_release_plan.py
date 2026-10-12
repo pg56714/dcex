@@ -5,7 +5,9 @@ from __future__ import annotations
 import pytest
 
 from scripts.release_plan import (
+    COMPONENTS,
     Commit,
+    path_matches,
     removed_exchanges,
     validate_breaking_exchange_removals,
 )
@@ -60,3 +62,22 @@ def test_unrelated_file_deletion_is_not_treated_as_exchange_removal() -> None:
         deleted_paths=("tests/unit/test_obsolete.py",),
     )
     validate_breaking_exchange_removals([commit])
+
+
+@pytest.mark.parametrize(
+    ("path", "python", "rust"),
+    (
+        ("crates/dcex/src/http.rs", True, True),
+        ("crates/dcex/Cargo.toml", True, True),
+        ("crates/dcex-python/src/lib.rs", True, False),
+        ("dcex/bybit/_market_http.py", True, False),
+        ("crates/dcex/examples/ticker.rs", False, True),
+        ("crates/dcex/tests/smoke.rs", False, True),
+        ("crates/dcex/README.md", False, True),
+        ("crates/dcex/CHANGELOG.md", False, True),
+    ),
+)
+def test_core_changes_release_both_packages(path: str, python: bool, rust: bool) -> None:
+    """Release Python for core changes the wheel compiles, but not for Rust-only files."""
+    assert path_matches(COMPONENTS["python"], path) is python
+    assert path_matches(COMPONENTS["rust"], path) is rust

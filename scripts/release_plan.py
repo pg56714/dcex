@@ -25,6 +25,7 @@ class ComponentConfig:
     include_prefixes: tuple[str, ...]
     include_files: tuple[str, ...]
     version_regex: re.Pattern[str]
+    exclude_prefixes: tuple[str, ...] = ()
 
 
 @dataclasses.dataclass(frozen=True)
@@ -52,8 +53,10 @@ COMPONENTS: dict[str, ComponentConfig] = {
         body_file="python-body.md",
         tag_prefix="",
         tag_regex=re.compile(r"^(?P<version>\d+\.\d+\.\d+)$"),
+        # The wheel compiles crates/dcex, so core changes ship in every Python release.
         include_prefixes=(
             "dcex/",
+            "crates/dcex/",
             "crates/dcex-python/",
             "examples/",
             "tests/",
@@ -69,6 +72,14 @@ COMPONENTS: dict[str, ComponentConfig] = {
             "product_table.csv",
         ),
         version_regex=re.compile(r'(?m)^(version\s*=\s*")(?P<version>[^"]+)(")$'),
+        # Rust-only docs, examples and integration tests do not reach the wheel.
+        exclude_prefixes=(
+            "crates/dcex/CHANGELOG.md",
+            "crates/dcex/README.md",
+            "crates/dcex/README.zh_tw.md",
+            "crates/dcex/examples/",
+            "crates/dcex/tests/",
+        ),
     ),
     "rust": ComponentConfig(
         name="rust",
@@ -294,6 +305,8 @@ def paths_for_commits(shas: list[str], diff_filter: str | None = None) -> dict[s
 
 def path_matches(config: ComponentConfig, path: str) -> bool:
     normalized = normalize_path(path)
+    if any(normalized.startswith(prefix) for prefix in config.exclude_prefixes):
+        return False
     return normalized in config.include_files or any(
         normalized.startswith(prefix) for prefix in config.include_prefixes
     )
