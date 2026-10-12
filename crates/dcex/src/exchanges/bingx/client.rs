@@ -22,7 +22,7 @@ use crate::product_table::ProductTable;
 use crate::{DcexError, Result};
 
 use super::endpoints::BASE_URL;
-use super::params::exchange_symbol_fallback;
+use super::params::{coin_swap_symbol_fallback, exchange_symbol_fallback};
 use super::signing::{BingxResponseValidator, BingxSigner};
 
 #[derive(Clone)]
@@ -246,6 +246,18 @@ impl BingxClient {
                 .clone());
         }
         exchange_symbol_fallback(product_symbol)
+    }
+
+    /// Coin-M symbols resolve in the separate `bingx_coinm` table namespace; without a
+    /// table, `BASE-USD-SWAP` maps to the native `BASE-USD`.
+    pub(super) fn coin_swap_symbol(&self, product_symbol: &str) -> Result<String> {
+        if let Some(table) = &self.product_table {
+            return Ok(table
+                .resolve_symbol_in("bingx_coinm", product_symbol, |_| true)?
+                .exchange_symbol
+                .clone());
+        }
+        coin_swap_symbol_fallback(product_symbol)
     }
 
     pub(super) fn push_required_symbol(

@@ -156,5 +156,32 @@
     }
    ]
   }
+ },
+ "GET /openApi/cswap/v1/market/contracts": {
+  "code": 0,
+  "msg": "",
+  "timestamp": 1791817439951,
+  "data": [
+   {
+    "symbol": "BTC-USD",
+    "pricePrecision": 1,
+    "minTickSize": "100",
+    "minTradeValue": "100",
+    "minQty": "1.00000000",
+    "status": 1,
+    "timeOnline": 1710738000000,
+    "displayName": "BTC-USD"
+   },
+   {
+    "symbol": "ETH-USD",
+    "pricePrecision": 2,
+    "minTickSize": "10",
+    "minTradeValue": "10",
+    "minQty": "1.00000000",
+    "status": 1,
+    "timeOnline": 1710738000000,
+    "displayName": "ETH-USD"
+   }
+  ]
  }
 }

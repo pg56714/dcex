@@ -276,3 +276,20 @@ async fn hyperliquid_perp_dexs_limits_builder_dexs_and_keeps_asset_ids() {
         .expect_err("unknown DEX");
     assert!(error.to_string().contains("\"nope\""), "{error}");
 }
+
+#[tokio::test]
+async fn bingx_coin_m_contracts_use_their_own_namespace() {
+    let (url, _seen) = serve(fixture("bingx"));
+    let rows = fetch::fetch_bingx(&bingx(&url)).await.expect("rows");
+    let btc = rows
+        .iter()
+        .find(|row| row.exchange == "bingx_coinm" && row.product_symbol == "BTC-USD-SWAP")
+        .expect("coin-M BTC row");
+    assert_eq!(btc.exchange_symbol, "BTC-USD");
+    assert_eq!(btc.size_per_contract, "100");
+    assert_eq!(btc.price_precision, "0.1");
+    assert!(
+        rows.iter()
+            .all(|row| row.exchange != "bingx" || row.quote_currency != "USD")
+    );
+}

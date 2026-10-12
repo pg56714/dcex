@@ -227,10 +227,14 @@ impl BingxPublicWebSocket {
     }
 
     fn symbol_for_connection(&self, product_symbol: &str) -> Result<String> {
-        // The product table has no Coin-M rows, so Coin-M connections use the native rules.
-        if let Some(table) = &self.product_table
-            && self.market != BingxPublicMarket::CoinSwap
-        {
+        if let Some(table) = &self.product_table {
+            // Coin-M rows live in the separate `bingx_coinm` namespace.
+            if self.market == BingxPublicMarket::CoinSwap {
+                return Ok(table
+                    .resolve_symbol_in("bingx_coinm", product_symbol, |_| true)?
+                    .exchange_symbol
+                    .clone());
+            }
             let kind = if self.market == BingxPublicMarket::Spot {
                 "spot"
             } else {
@@ -241,6 +245,16 @@ impl BingxPublicWebSocket {
                 .exchange_symbol
                 .clone());
         }
+        let product_symbol = match product_symbol.trim().rsplit_once('-') {
+            Some((pair, kind))
+                if self.market == BingxPublicMarket::CoinSwap
+                    && kind.eq_ignore_ascii_case("SWAP")
+                    && pair.to_ascii_uppercase().ends_with("-USD") =>
+            {
+                pair
+            }
+            _ => product_symbol,
+        };
         let (symbol, market) = normalize_product_symbol(product_symbol)?;
         if self.market == BingxPublicMarket::CoinSwap && !symbol.ends_with("-USD") {
             return Err(DcexError::InvalidInput(
@@ -403,28 +417,41 @@ mod tests {
     }
 
     #[test]
-    fn coin_swap_symbols_skip_the_usdt_margined_table() {
-        let row = |product: &str, kind: &str| crate::product_table::MarketInfo {
-            exchange: "bingx".into(),
-            product_symbol: product.into(),
-            exchange_symbol: "BTC-USDT".into(),
-            product_type: kind.into(),
-            exchange_type: kind.into(),
-            ..Default::default()
+    fn coin_swap_symbols_resolve_in_the_coin_m_namespace() {
+        let row = |exchange: &str, product: &str, native: &str, kind: &str| {
+            crate::product_table::MarketInfo {
+                exchange: exchange.into(),
+                product_symbol: product.into(),
+                exchange_symbol: native.into(),
+                product_type: kind.into(),
+                exchange_type: kind.into(),
+                ..Default::default()
+            }
         };
         let table = crate::product_table::ProductTable::new(vec![
-            row("BTC-USDT-SPOT", "spot"),
-            row("BTC-USDT-SWAP", "swap"),
+            row("bingx", "BTC-USDT-SPOT", "BTC-USDT", "spot"),
+            row("bingx", "BTC-USDT-SWAP", "BTC-USDT", "swap"),
+            row("bingx_coinm", "BTC-USD-SWAP", "BTC-USD", "swap"),
         ]);
         let coin = BingxPublicWebSocket::new_coin_swap(Duration::from_secs(1))
             .expect("client")
             .with_product_table(table.clone());
+        assert_eq!(
+            coin.symbol_for_connection("BTC-USD-SWAP").unwrap(),
+            "BTC-USD"
+        );
         assert_eq!(coin.symbol_for_connection("BTC-USD").unwrap(), "BTC-USD");
-        assert!(coin.symbol_for_connection("BTC-USDT").is_err());
+        assert!(coin.symbol_for_connection("BTC-USDT-SWAP").is_err());
         let swap = BingxPublicWebSocket::new(Duration::from_secs(1))
             .expect("client")
             .with_product_table(table);
-        assert!(swap.symbol_for_connection("BTC-USD").is_err());
+        assert!(swap.symbol_for_connection("BTC-USD-SWAP").is_err());
+        let untabled = BingxPublicWebSocket::new_coin_swap(Duration::from_secs(1)).expect("client");
+        assert_eq!(
+            untabled.symbol_for_connection("ETH-USD-SWAP").unwrap(),
+            "ETH-USD"
+        );
+        assert!(untabled.symbol_for_connection("ETH-USDT-SWAP").is_err());
     }
 
     #[test]

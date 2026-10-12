@@ -79,12 +79,24 @@ fn bingx_table() -> ProductTable {
     table(&[
         ("bingx", "BTC-USDT-SPOT", "BTC-USDT", "spot", "spot"),
         ("bingx", "BTC-USDT-SWAP", "BTC-USDT", "swap", "perpetual"),
+        (
+            "bingx_coinm",
+            "BTC-USD-SWAP",
+            "BTC-USD",
+            "swap",
+            "perpetual",
+        ),
     ])
 }
 
 #[tokio::test]
-async fn bingx_coin_margined_routes_skip_the_usdt_margined_table() {
-    for loaded in [false, true] {
+async fn bingx_coin_margined_routes_use_the_coin_m_namespace() {
+    for (loaded, symbol) in [
+        (false, "BTC-USD"),
+        (false, "BTC-USD-SWAP"),
+        (true, "BTC-USD"),
+        (true, "BTC-USD-SWAP"),
+    ] {
         let (url, capture) = server("bingx");
         let client = bingx::BingxClient::with_base_url(None, None, TIMEOUT, url).unwrap();
         let client = if loaded {
@@ -95,7 +107,7 @@ async fn bingx_coin_margined_routes_skip_the_usdt_margined_table() {
         client
             .public_request(
                 "get_coin_swap_orderbook",
-                pairs(&[("product_symbol", "BTC-USD")]),
+                pairs(&[("product_symbol", symbol)]),
             )
             .await
             .unwrap();
@@ -103,19 +115,24 @@ async fn bingx_coin_margined_routes_skip_the_usdt_margined_table() {
         assert!(wire.contains("/openApi/cswap/v1/market/depth"));
         assert!(wire.contains("symbol=BTC-USD&") || wire.contains("symbol=BTC-USD "));
     }
-    // Coin-M keeps its own native rule even with a table loaded.
-    let (listener, url) = refused_url();
-    let error = bingx::BingxClient::with_base_url(None, None, TIMEOUT, url)
-        .unwrap()
-        .with_product_table(bingx_table())
-        .public_request(
-            "get_coin_swap_orderbook",
-            pairs(&[("product_symbol", "BTC-USDT")]),
-        )
-        .await
-        .unwrap_err();
-    assert!(error.to_string().contains("BASE-USD"));
-    assert_nothing_sent(&listener);
+    // USDT-M products never reach a Coin-M route, with or without a table.
+    for (loaded, symbol) in [(false, "BTC-USDT"), (true, "BTC-USDT-SWAP")] {
+        let (listener, url) = refused_url();
+        let client = bingx::BingxClient::with_base_url(None, None, TIMEOUT, url).unwrap();
+        let client = if loaded {
+            client.with_product_table(bingx_table())
+        } else {
+            client
+        };
+        client
+            .public_request(
+                "get_coin_swap_orderbook",
+                pairs(&[("product_symbol", symbol)]),
+            )
+            .await
+            .unwrap_err();
+        assert_nothing_sent(&listener);
+    }
 }
 
 fn kraken_table() -> ProductTable {

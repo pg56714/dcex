@@ -550,16 +550,42 @@ pub(super) fn bingx_swap_market_info(market: &Value) -> Result<MarketInfo> {
     })
 }
 
+/// Coin-M contracts live in their own `bingx_coinm` namespace, as Binance COIN-M does:
+/// generic BingX routing reads `bingx` swaps as USDT-M products.
+pub(super) fn bingx_coin_swap_market_info(market: &Value) -> Result<MarketInfo> {
+    let symbol = required_string(market, "symbol")?;
+    let (base, quote) = split_last(&symbol, '-')?;
+    Ok(MarketInfo {
+        exchange: "bingx_coinm".to_string(),
+        exchange_symbol: symbol,
+        product_symbol: format!("{base}-{quote}-SWAP"),
+        product_type: "swap".to_string(),
+        exchange_type: "perpetual".to_string(),
+        price_precision: decimal_precision_or_zero(optional_i32(market, "pricePrecision")),
+        // Orders are whole contracts.
+        size_precision: "1".to_string(),
+        min_size: "1".to_string(),
+        base_currency: base,
+        quote_currency: quote,
+        min_notional: value_string(market, "minTradeValue", "0"),
+        // USD face value of one contract (100 for BTC-USD, 10 for the others).
+        size_per_contract: value_string(market, "minTickSize", "1"),
+        ..MarketInfo::default()
+    })
+}
+
 pub(super) async fn fetch_bingx(client: &BingxClient) -> Result<Vec<MarketInfo>> {
-    let swap = client
-        .public_request("get_swap_instrument_info", vec![])
-        .await?;
-    let spot = client
-        .public_request("get_spot_instrument_info", vec![])
-        .await?;
+    let (swap, coin_swap, spot) = tokio::try_join!(
+        client.public_request("get_swap_instrument_info", vec![]),
+        client.public_request("get_coin_swap_contracts", vec![]),
+        client.public_request("get_spot_instrument_info", vec![]),
+    )?;
     let mut rows = Vec::new();
     for market in response_array(&swap, &["data"]) {
         rows.push(bingx_swap_market_info(market)?);
+    }
+    for market in response_array(&coin_swap, &["data"]) {
+        rows.push(bingx_coin_swap_market_info(market)?);
     }
     let spot_data = spot.data.get("data").unwrap_or(&Value::Null);
     let spot_symbols = spot_data.get("symbols").unwrap_or(spot_data);
@@ -589,7 +615,8 @@ pub(super) async fn fetch_bingx(client: &BingxClient) -> Result<Vec<MarketInfo>>
 pub(super) fn validate_bingx_products(rows: &[MarketInfo]) -> Result<()> {
     let mut names = HashMap::new();
     for row in rows {
-        if let Some(previous) = names.insert(&row.product_symbol, &row.exchange_symbol) {
+        let key = (&row.exchange, &row.product_symbol);
+        if let Some(previous) = names.insert(key, &row.exchange_symbol) {
             return Err(DcexError::Decode(format!(
                 "duplicate BingX product symbol: {}; conflicting exchange symbols: {previous}, {}",
                 row.product_symbol, row.exchange_symbol

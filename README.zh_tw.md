@@ -125,6 +125,8 @@ PTM 將 `BTC-USDT-SWAP` 這類統一 `product_symbol` 對應到交易所原生 `
 | `min_size`、`min_notional` | 最小數量及名目金額 |
 | `size_per_contract` | 每張合約的乘數 |
 
+Binance 與 BingX 的幣本位合約放在各自的 `exchange` 命名空間 `binance_coinm`、`bingx_coinm`（例如 `BTC-USD-SWAP`），不會和 U 本位商品衝突；幣本位方法會在這裡解析商品代號。
+
 ```python
 from dcex.product_table.manager import ProductTableManager
 

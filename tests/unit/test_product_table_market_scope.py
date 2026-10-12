@@ -55,15 +55,24 @@ def test_bitget_margin_category_resolves_spot_rows():
         assert received.empty()
 
 
-def test_bingx_coin_margined_route_ignores_usdt_margined_rows():
-    table = _table(("bingx", "BTC-USDT-SWAP", "BTC-USDT", "swap", "perpetual"))
+def test_bingx_coin_margined_route_uses_coin_m_rows():
+    table = _table(
+        ("bingx", "BTC-USDT-SWAP", "BTC-USDT", "swap", "perpetual"),
+        ("bingx_coinm", "BTC-USD-SWAP", "BTC-USD", "swap", "perpetual"),
+    )
     with _http_server(GENERIC) as (base_url, received):
         client = _native.BingxHttpClient(base_url=base_url)
         client.set_product_table(table)
-        client.public_request_json("get_coin_swap_orderbook", [("product_symbol", "BTC-USD")])
-        request = received.get_nowait()
-        assert urlsplit(request["path"]).path == "/openApi/cswap/v1/market/depth"
-        assert _query(request)["symbol"] == ["BTC-USD"]
+        for symbol in ("BTC-USD-SWAP", "BTC-USD"):
+            client.public_request_json("get_coin_swap_orderbook", [("product_symbol", symbol)])
+            request = received.get_nowait()
+            assert urlsplit(request["path"]).path == "/openApi/cswap/v1/market/depth"
+            assert _query(request)["symbol"] == ["BTC-USD"]
+        with pytest.raises(ValueError, match="bingx_coinm"):
+            client.public_request_json(
+                "get_coin_swap_orderbook", [("product_symbol", "BTC-USDT-SWAP")]
+            )
+        assert received.empty()
 
 
 @pytest.mark.parametrize(
@@ -118,7 +127,9 @@ def test_binance_unscoped_native_symbol_routes_to_unique_market():
     with _http_server({}) as (base_url, received):
         client = _native.BinanceHttpClient(spot_base_url=base_url, futures_base_url=base_url)
         client.set_product_table(table)
-        client.public_request_json("get_klines", [("product_symbol", "XRPUSDT"), ("interval", "1m")])
+        client.public_request_json(
+            "get_klines", [("product_symbol", "XRPUSDT"), ("interval", "1m")]
+        )
         request = received.get_nowait()
         assert urlsplit(request["path"]).path == "/fapi/v1/klines"
         assert _query(request)["symbol"] == ["XRPUSDT"]
@@ -232,7 +243,13 @@ def test_binance_generic_order_methods_route_options_to_eapi() -> None:
         symbol = ("product_symbol", "BTC-USDT-260925-100000-C")
         cases = [
             ("get_open_orders", [symbol], "GET", "/eapi/v1/openOrders", {}),
-            ("get_open_orders", [symbol, ("orderId", "7")], "GET", "/eapi/v1/openOrders", {"orderId": ["7"]}),
+            (
+                "get_open_orders",
+                [symbol, ("orderId", "7")],
+                "GET",
+                "/eapi/v1/openOrders",
+                {"orderId": ["7"]},
+            ),
             ("get_order", [symbol, ("orderId", "7")], "GET", "/eapi/v1/order", {"orderId": ["7"]}),
             (
                 "get_order",

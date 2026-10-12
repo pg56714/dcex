@@ -85,6 +85,13 @@ pub(super) fn exchange_symbol_fallback(product_symbol: &str) -> Result<String> {
     Ok(symbol)
 }
 
+pub(super) fn coin_swap_symbol_fallback(product_symbol: &str) -> Result<String> {
+    match product_symbol.rsplit_once('-') {
+        Some((pair, "SWAP")) if pair.ends_with("-USD") => Ok(pair.to_string()),
+        _ => exchange_symbol_fallback(product_symbol),
+    }
+}
+
 pub(super) fn push_optional(query: &mut Vec<(String, String)>, key: &str, value: Option<&str>) {
     if let Some(value) = value {
         query.push((key.to_string(), value.to_string()));

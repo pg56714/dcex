@@ -127,6 +127,8 @@ PTM maps normalized `product_symbol` values, such as `BTC-USDT-SWAP`, to exchang
 | `min_size`, `min_notional` | Minimum size and notional |
 | `size_per_contract` | Contract multiplier |
 
+Binance and BingX coin-margined contracts sit in their own `exchange` namespaces, `binance_coinm` and `bingx_coinm` (for example `BTC-USD-SWAP`), so they never collide with USDT-margined products; their coin-margined methods resolve symbols there.
+
 ```python
 from dcex.product_table.manager import ProductTableManager
 
