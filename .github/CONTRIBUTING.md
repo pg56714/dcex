@@ -121,6 +121,8 @@ feat(ptm): add exchange metadata lookup
 ```
 
 Versioning and changelog updates are handled by the release workflow after changes are merged.
+Do not edit `CHANGELOG.md` or `crates/dcex/CHANGELOG.md` by hand; the `no-manual-changelog`
+pre-commit hook rejects such commits.
 
 ## Release Publishing
 
