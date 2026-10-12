@@ -1,3 +1,17 @@
+## 0.19.0 (2026-10-12)
+
+### BREAKING CHANGE
+
+- remove Bybit leveraged token endpoints
+
+### Feat
+
+- add BingX coin-margined contracts to the product table
+
+### Fix
+
+- send a User-Agent and keep the cause of HTTP failures
+
 ## 0.18.0 (2026-10-11)
 
 ### BREAKING CHANGE

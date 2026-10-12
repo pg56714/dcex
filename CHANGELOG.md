@@ -1,3 +1,18 @@
+## 0.41.0 (2026-10-12)
+
+### BREAKING CHANGE
+
+- remove Bybit leveraged token endpoints
+
+### Feat
+
+- add BingX coin-margined contracts to the product table
+
+### Fix
+
+- release Python for Rust core changes the wheel compiles
+- send a User-Agent and keep the cause of HTTP failures
+
 ## 0.40.0 (2026-10-11)
 
 ### BREAKING CHANGE
