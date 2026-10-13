@@ -101,6 +101,25 @@ class ExtendedAdapter(CexAdapter):
             raise
         return checked_id(data["id"])
 
+    async def amend(self, identifier, plan):
+        """Edit by replacement: a new order naming the resting one's external ID as cancelId."""
+        previous = self.client_order_id
+        self.client_order_id = self.fresh_client_id()
+        self.held_client_ids.append(self.client_order_id)
+        data = await self.call(
+            "place_limit_order",
+            market=self.native,
+            side="BUY",
+            qty=str(plan.size),
+            price=str(plan.price),
+            post_only=True,
+            time_in_force="GTT",
+            expiry_epoch_millis=int(time.time() * 1000) + 300000,
+            external_id=self.client_order_id,
+            cancel_id=previous,
+        )
+        return checked_id(data["id"])
+
     async def cancel(self, identifier):
         await self.call("cancel_order", id=identifier)
 

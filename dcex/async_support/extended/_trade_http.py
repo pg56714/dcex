@@ -71,6 +71,7 @@ class TradeHTTP(HTTPManager):
         fee: Any | None = None,  # noqa: ANN401
         self_trade_protection_level: str = "ACCOUNT",
         external_id: str | None = None,
+        cancel_id: str | None = None,
         builder_fee: Any | None = None,  # noqa: ANN401
         builder_id: int | None = None,
     ) -> Any:  # noqa: ANN401
@@ -92,6 +93,7 @@ class TradeHTTP(HTTPManager):
                 fee=fee,
                 selfTradeProtectionLevel=self_trade_protection_level,
                 id=external_id,
+                cancelId=cancel_id,
                 builderFee=builder_fee,
                 builderId=builder_id,
             ),
@@ -114,6 +116,7 @@ class TradeHTTP(HTTPManager):
         fee: Any | None = None,  # noqa: ANN401
         self_trade_protection_level: str = "ACCOUNT",
         external_id: str | None = None,
+        cancel_id: str | None = None,
         builder_fee: Any | None = None,  # noqa: ANN401
         builder_id: int | None = None,
     ) -> Any:  # noqa: ANN401
@@ -135,6 +138,7 @@ class TradeHTTP(HTTPManager):
                 fee=fee,
                 selfTradeProtectionLevel=self_trade_protection_level,
                 id=external_id,
+                cancelId=cancel_id,
                 builderFee=builder_fee,
                 builderId=builder_id,
             ),
@@ -158,6 +162,7 @@ class TradeHTTP(HTTPManager):
         fee: Any | None = None,  # noqa: ANN401
         self_trade_protection_level: str = "ACCOUNT",
         external_id: str | None = None,
+        cancel_id: str | None = None,
         builder_fee: Any | None = None,  # noqa: ANN401
         builder_id: int | None = None,
     ) -> Any:  # noqa: ANN401
@@ -183,6 +188,7 @@ class TradeHTTP(HTTPManager):
                 fee=fee,
                 selfTradeProtectionLevel=self_trade_protection_level,
                 id=external_id,
+                cancelId=cancel_id,
                 builderFee=builder_fee,
                 builderId=builder_id,
             ),

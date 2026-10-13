@@ -382,6 +382,9 @@ pub(super) fn build_signed_order(
             "syntheticAmount": stark_synthetic_amount.to_string(),
         }),
     );
+    if let Some(cancel_id) = spec.cancel_id {
+        body.insert("cancelId".to_string(), Value::String(cancel_id));
+    }
     if let Some(builder_fee) = spec.builder_fee {
         body.insert(
             "builderFee".to_string(),
@@ -423,6 +426,8 @@ struct ExtendedOrderSpec {
     self_trade_protection_level: String,
     nonce: u64,
     external_id: Option<String>,
+    /// External ID of the open order this one replaces; it is not part of the order hash.
+    cancel_id: Option<String>,
     builder_fee: Option<ExactDecimal>,
     builder_id: Option<u64>,
     reduce_only: bool,
@@ -467,6 +472,7 @@ impl ExtendedOrderSpec {
                 .transpose()?
                 .unwrap_or(random_nonce()?),
             external_id: params.get("id").map(ToString::to_string),
+            cancel_id: params.get("cancelId").map(ToString::to_string),
             builder_fee,
             builder_id,
             reduce_only: parse_bool(params.get("reduceOnly").unwrap_or("false"))?,
@@ -865,6 +871,50 @@ mod tests {
                 .unwrap()
                 .starts_with("0x")
         );
+    }
+
+    #[test]
+    fn cancel_id_replaces_an_order_without_changing_its_hash() {
+        let expiry = (now_ms().unwrap() + DEFAULT_ORDER_LIFETIME_MS).to_string();
+        let sign = |cancel_id: Option<&str>| {
+            let market = ExtendedMarket {
+                name: "BTC-USD".to_string(),
+                is_rfq: false,
+                l2_config: ExtendedL2Config {
+                    collateral_id: "0x555344430000000000000000000000".to_string(),
+                    collateral_resolution: 1_000_000,
+                    synthetic_id: "0x4254432d31300000000000000000000".to_string(),
+                    synthetic_resolution: 100_000_000,
+                },
+            };
+            let mut pairs = vec![
+                ("side".to_string(), "BUY".to_string()),
+                ("qty".to_string(), "0.001".to_string()),
+                ("price".to_string(), "10000".to_string()),
+                ("fee".to_string(), "0".to_string()),
+                ("expiryEpochMillis".to_string(), expiry.clone()),
+                ("nonce".to_string(), "123456".to_string()),
+            ];
+            if let Some(cancel_id) = cancel_id {
+                pairs.push(("cancelId".to_string(), cancel_id.to_string()));
+            }
+            build_signed_order(
+                &ExtendedParams::from_pairs(pairs),
+                market,
+                &ExtendedSigningCredentials::new(
+                    "0x1".to_string(),
+                    "0x1ef15c18599971b7beced415a40f0c7deacfd9b0d1819e03d723d8bc943cfca".to_string(),
+                    4_272_448_241_247_734_333,
+                ),
+                StarknetDomain::mainnet(),
+            )
+            .unwrap()
+        };
+        let original = sign(None);
+        let replacement = sign(Some("resting-order"));
+        assert!(original.body.get("cancelId").is_none());
+        assert_eq!(replacement.body["cancelId"], "resting-order");
+        assert_eq!(original.order_hash, replacement.order_hash);
     }
 
     #[test]

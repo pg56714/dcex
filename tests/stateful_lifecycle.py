@@ -57,15 +57,14 @@ def not_applicable(exchange: str, market: str, case: str) -> str | None:
         )
     elif case == "amend":
         unsupported = (
-            exchange in {"backpack", "extended", "ondo"}
+            exchange in {"backpack", "ondo"}
             or (exchange in {"mexc", "aster"} and spot)
             or (exchange == "kucoin" and not spot)
         )
     elif case not in CASES:
         raise ValueError("unknown order-test case: " + case)
-    if case == "amend" and (exchange == "extended" or (exchange == "kucoin" and not spot)):
-        # The venue can amend (Extended cancelId replace, KuCoin UTA) but this library
-        # exposes no such method for the tested account type.
+    if case == "amend" and exchange == "kucoin" and not spot:
+        # The venue can amend through KuCoin UTA, but the tested account is Classic.
         return f"N/A: {label} library has no {FEATURES[case]}"
     return f"N/A: {label} has no {FEATURES[case]}" if unsupported else None
 

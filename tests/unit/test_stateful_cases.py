@@ -539,6 +539,10 @@ class DexCaseMock(DexMock):
 
     def response(self, method, kw):
         ex = self.exchange
+        if ex == "extended" and method == "place_limit_order" and kw.get("cancel_id"):
+            # Edit by replacement: a new order ID replaces the resting one.
+            self.price, self.replaced_id = kw["price"], "456"
+            return {"id": "456"}
         if method in {"place_order", "place_limit_order", "create_order"}:
             data = super().response(method, kw)
             if ex == "hyperliquid" and self.hl_status is not None:
@@ -564,7 +568,14 @@ class DexCaseMock(DexMock):
             return data
         if ex == "hyperliquid" and method == "open_orders":
             live = self.placed and not self.cancelled
-            return [{"oid": self.new_oid, "cloid": self.cloid}] if live else []
+            row = {"oid": self.new_oid, "cloid": self.cloid, "limitPx": self.price}
+            return [row] if live else []
+        if ex == "extended" and method == "get_order" and getattr(self, "replaced_id", None):
+            data = super().response(method, kw)
+            data["id"] = kw["id"]
+            if kw["id"] != self.replaced_id:
+                data["status"] = "CANCELLED"
+            return data
         return super().response(method, kw)
 
 
@@ -619,6 +630,15 @@ async def test_dex_cases(exchange, adapter_type, market_, symbol, mode, case):
         client.hl_status = {"error": "Order could not immediately match against any resting"}
     await run_lifecycle(adapter, result, poll_delay=0, case=case)
     assert result["stage"] == "complete"
+    if exchange == "extended" and case == "amend":
+        placed = [kw for name, kw in client.calls if name == "place_limit_order"]
+        assert len(placed) == 2
+        assert placed[1]["cancel_id"] == placed[0]["external_id"]
+        assert placed[1]["external_id"] != placed[0]["external_id"]
+        assert result["order_id"] == "123->456"
+        cancelled = [kw for name, kw in client.calls if name == "cancel_order"]
+        assert [kw["id"] for kw in cancelled] == ["456"]
+        return
     kw = dex_place(client, exchange)
     if case == "ioc":
         expected = DEX_IOC.get(exchange, {"tif": "Ioc", "reduceOnly": False})
@@ -1167,9 +1187,9 @@ async def test_arcus_unqueryable_ioc_passes_on_zero_fill_acknowledgement():
     assert "not queryable; placement reported zero fill" in result["cleanup"]
 
 
-@pytest.mark.parametrize(("exchange", "market_"), [("extended", "swap"), ("kucoin", "swap")])
-def test_library_gaps_are_named(exchange, market_):
-    assert "library has no order amendment" in not_applicable(exchange, market_, "amend")
+def test_library_gaps_are_named():
+    assert "library has no order amendment" in not_applicable("kucoin", "swap", "amend")
+    assert not_applicable("extended", "swap", "amend") is None
 
 
 @pytest.mark.asyncio

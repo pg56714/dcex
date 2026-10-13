@@ -230,12 +230,21 @@ fn validate_signing_params(params: &ExtendedParams) -> Result<()> {
         "fee",
         "selfTradeProtectionLevel",
         "id",
+        "cancelId",
         "builderFee",
         "builderId",
         "market_json",
     ];
     params.ensure_allowed(ALLOWED, &[])?;
     params.ensure_exactly_one(&["market", "product_symbol"])?;
+    if params
+        .get("cancelId")
+        .is_some_and(|id| id.trim().is_empty())
+    {
+        return Err(DcexError::InvalidInput(
+            "Extended cancelId must name the order being replaced".to_string(),
+        ));
+    }
     params.required("side")?;
     params.required_positive_decimal("price")?;
     params.required_positive_decimal("qty")?;
