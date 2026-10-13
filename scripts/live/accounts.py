@@ -229,6 +229,22 @@ async def collect(exchange: str, clients: list[tuple[Any, str, str]]) -> Snapsho
         snapshot.assets.update(flex_USDT="USDT", cash_USDT="USDT")
         if "swap_USD" in snapshot.required:
             snapshot.required["flex_USDT"] = snapshot.required["swap_USD"]
+    elif exchange == "aster":
+        # Multi-Assets Mode margins USDT contracts with USDT or USDC: fund futures from
+        # spot USDT first, then spot USDC.
+        spot = await adapter.call("get_spot_account")
+        futures = await adapter.call("get_futures_account")
+        snapshot.balances["spot_USDC"] = balance(spot["balances"], "USDC", "asset", "free")
+        for asset in ("USDT", "USDC"):
+            # walletBalance is the coin held; availableBalance is trimmed by margin rules,
+            # so a completed transfer would never look fully credited.
+            account = "futures_" + asset
+            snapshot.balances[account] = balance(futures["assets"], asset, "asset", "walletBalance")
+            snapshot.assets[account] = asset
+            if "futures" in snapshot.required:
+                snapshot.required[account] = snapshot.required["futures"]
+        # The futures account balance is account-level margin in USD, not USDT alone.
+        snapshot.assets.update(spot_USDC="USDC", futures="USD")
     elif exchange == "hyperliquid" and await adapter.unified():
         snapshot.shared["perp"] = "unified account: spot USDC is perp collateral"
     return snapshot

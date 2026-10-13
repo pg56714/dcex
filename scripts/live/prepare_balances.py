@@ -58,7 +58,8 @@ ROUTES = tuple(
         ("bingx", "spot", "swap", "USDT", "perp"),
         ("hyperliquid", "spot", "perp", "USDC", "perp"),
         ("aster", "futures", "spot", "USDT", "spot"),
-        ("aster", "spot", "futures", "USDT", "perp"),
+        ("aster", "spot", "futures_USDT", "USDT", "perp"),
+        ("aster", "spot_USDC", "futures_USDC", "USDC", "perp"),
         ("kraken", "flex_USDT", "spot_USDT", "USDT", "spot"),
         ("kraken", "spot_USDT", "flex_USDT", "USDT", "perp"),
     )
@@ -99,6 +100,9 @@ def plan_transfers(
         current = after[route.destination]
         if exchange == "kraken" and stage == "perp":
             current = max(current, snapshot.balances.get("swap_USD", Decimal(0)))
+        if exchange == "aster" and stage == "perp":
+            # Both coins margin the same futures account: count them together.
+            current = after["futures_USDT"] + after["futures_USDC"]
         if current >= (required if exchange in NEED_ONLY else max(required, route.target)):
             continue
         amount = round_down(exchange, min(after[route.source], remaining))
@@ -211,7 +215,7 @@ def submit_transfer(client: Any, route: Route, amount: Decimal) -> None:  # noqa
             "aster",
             client.transfer_spot_futures(
                 amount=quantity,
-                asset="USDT",
+                asset=route.asset,
                 clientTranId=uuid4().hex,
                 kindType="FUTURE_SPOT" if route.stage == "spot" else "SPOT_FUTURE",
                 market="futures",

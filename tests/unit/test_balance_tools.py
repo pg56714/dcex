@@ -36,7 +36,16 @@ def snapshot(exchange):
             {"spot": D("11.8"), "perp": D("9")},
             {"spot": D("10.5"), "perp": D("10.3")},
         ),
-        "aster": ({"futures": D(12), "spot": D(0)}, {"spot": D(3), "futures": D(5)}),
+        "aster": (
+            {
+                "futures": D(12),
+                "spot": D(0),
+                "spot_USDC": D(0),
+                "futures_USDT": D(12),
+                "futures_USDC": D(0),
+            },
+            {"spot": D(3), "futures": D(5), "futures_USDT": D(5), "futures_USDC": D(5)},
+        ),
         "bingx": ({"fund": D("13.23"), "spot": D(0), "swap": D(0)}, {"spot": D(3), "swap": D(10)}),
     }
     balances, required = values[exchange]
@@ -93,6 +102,7 @@ class TransferMock:
                     for r in funding.ROUTES
                     if r.exchange == "aster"
                     and r.stage == ("spot" if kw["kindType"] == "FUTURE_SPOT" else "perp")
+                    and r.asset == kw["asset"]
                 )
             elif self.exchange == "binance":
                 route = next(
@@ -243,9 +253,10 @@ async def test_preview_is_read_only_and_execute_only_uses_owned_routes(
             state.balances[key] = D(0)
         state.balances[source] = D("13.2")
         stage = "spot"
-    if stage == "perp" and exchange in {"aster", "bingx"}:
-        state.balances["spot"] = D(12)
-        state.balances["futures" if exchange == "aster" else "swap"] = D(0)
+    if stage == "perp" and exchange == "aster":
+        state.balances.update(spot_USDC=D(12), futures=D(0), futures_USDT=D(0), futures_USDC=D(0))
+    if stage == "perp" and exchange == "bingx":
+        state.balances.update(spot=D(12), swap=D(0))
     if exchange == "kraken" and stage == "perp":
         state.balances.update(spot_USDT=D(25), flex_USDT=D(0))
     client = TransferMock(exchange, state)
@@ -732,11 +743,34 @@ async def test_unavailable_market_is_reported_and_does_not_block_other_stage():
     spot = next(row for row in state.markets if row["market"] == "spot")
     assert spot["status"] == "unavailable" and spot["minimum_order"] == "N/A"
     assert state.balances["spot"] == D(20) and "spot" not in state.required
-    state.balances["futures"] = D(0)
+    assert state.balances["spot"] == state.balances["spot_USDC"] == D(20)
     transfers, after = funding.plan_transfers("aster", state, "perp")
-    assert [(r.source, r.destination, q) for r, q in transfers] == [("spot", "futures", D(20))]
-    assert after["futures"] == D(20)
+    route = [(r.source, r.destination, r.asset, q) for r, q in transfers]
+    # USDT first; the shared 20 cap leaves nothing for USDC.
+    assert route == [("spot", "futures_USDT", "USDT", D(20))]
+    assert after["futures_USDT"] == D(20)
     assert funding.plan_transfers("aster", state, "spot")[0] == []
+
+
+@pytest.mark.parametrize(
+    ("usdt", "usdc", "expected"),
+    [
+        (D(25), D(5), [("USDT", D(20))]),
+        (D(3), D(12), [("USDT", D(3)), ("USDC", D(12))]),
+        (D(0), D(12), [("USDC", D(12))]),
+    ],
+)
+def test_aster_perp_funds_futures_with_usdt_then_usdc(usdt, usdc, expected):
+    state = snapshot("aster")
+    state.balances.update(spot=usdt, spot_USDC=usdc, futures_USDT=D(0), futures_USDC=D(0))
+    transfers, _ = funding.plan_transfers("aster", state, "perp")
+    assert [(route.asset, amount) for route, amount in transfers] == expected
+
+
+def test_aster_perp_counts_both_coins_already_in_futures():
+    state = snapshot("aster")
+    state.balances.update(spot=D(10), spot_USDC=D(10), futures_USDT=D(8), futures_USDC=D(12))
+    assert funding.plan_transfers("aster", state, "perp")[0] == []
 
 
 @pytest.mark.usefixtures("unavailable_aster_spot")
@@ -769,7 +803,6 @@ async def test_check_clean_exit_reflects_dirty_state_not_unavailable_markets(
 @pytest.mark.asyncio
 async def test_preview_and_execute_fund_perp_stage_when_spot_is_unavailable(monkeypatch):
     state = await collect("aster", aster_clients())
-    state.balances["futures"] = D(0)
     client = TransferMock("aster", state)
 
     async def read(*_):
@@ -783,6 +816,7 @@ async def test_preview_and_execute_fund_perp_stage_when_spot_is_unavailable(monk
         "aster", [(client, "swap", "fixture")], stage="perp", execute=True
     )
     assert [name for name, _ in client.calls] == ["transfer_spot_futures"]
+    assert client.calls[0][1]["asset"] == "USDT"
     assert result["executed"][0]["amount"] == "20"
 
 

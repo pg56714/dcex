@@ -306,11 +306,16 @@ class ExchangeMock:
                 return {"openPositions": []}
             return []
         wallet = [{"asset": "USDT", "free": "20", "availableBalance": "20"}]
-        if ex in {"binance", "aster", "mexc"}:
+        if ex == "aster":
+            wallet = [{**wallet[0], "walletBalance": "0"}]
+            # Multi-Assets Mode: spot holds USDC too; futures margin is account-level USD.
+            if method == "get_spot_account" or (spot and method != "get_futures_account"):
+                return {"balances": [*wallet, {"asset": "USDC", "free": "20"}]}
+            usdc = {"asset": "USDC", "walletBalance": "0", "availableBalance": "0"}
+            return {"availableBalance": "20", "assets": [*wallet, usdc]}
+        if ex in {"binance", "mexc"}:
             if spot:
                 return {"balances": wallet}
-            if ex == "aster":
-                return {"assets": wallet}
             return wallet if ex == "binance" else {"availableBalance": "20"}
         if ex == "bybit":
             return {

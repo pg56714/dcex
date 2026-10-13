@@ -322,13 +322,11 @@ class CexAdapter:
                 "free" if self.spot else "availableBalance",
             )
         if ex == "aster":
-            data = await self.call("get_spot_account" if self.spot else "get_futures_account")
-            return balance(
-                data["balances"] if self.spot else data["assets"],
-                coin,
-                "asset",
-                "free" if self.spot else "availableBalance",
-            )
+            if not self.spot:
+                # Account-level margin in USD, so Multi-Assets Mode counts USDC collateral too.
+                return decimal((await self.call("get_futures_account"))["availableBalance"])
+            data = await self.call("get_spot_account")
+            return balance(data["balances"], coin, "asset", "free")
         if ex == "bybit":
             data = await self.call("get_wallet_balance", coin=coin)
             wallets = rows(data["list"])
