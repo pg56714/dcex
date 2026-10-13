@@ -53,7 +53,7 @@ def not_applicable(exchange: str, market: str, case: str) -> str | None:
         unsupported = spot
     elif case == "fok":
         unsupported = exchange in {"hyperliquid", "lighter", "extended", "ondo"} or (
-            exchange == "kucoin" and not spot
+            (exchange == "kucoin" and not spot) or (exchange == "aster" and spot)
         )
     elif case == "amend":
         unsupported = (

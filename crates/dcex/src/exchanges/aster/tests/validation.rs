@@ -161,3 +161,26 @@ fn batch_amendments_normalize_symbols_and_validate_each_order() {
     )]);
     assert!(client.resolve_batch_amendments(&bad).is_err());
 }
+
+#[test]
+fn spot_orders_reject_fok_which_spot_placement_does_not_support() {
+    let order = |time_in_force: &str| {
+        AsterParams::from_pairs(
+            [
+                ("side", "BUY"),
+                ("type", "LIMIT"),
+                ("timeInForce", time_in_force),
+                ("quantity", "10"),
+                ("price", "0.5"),
+            ]
+            .map(|(key, value)| (key.to_string(), value.to_string()))
+            .to_vec(),
+        )
+    };
+    for allowed in ["GTC", "IOC", "GTX"] {
+        crate::exchanges::aster::trade::validate_spot_order(&order(allowed)).expect(allowed);
+    }
+    let error =
+        crate::exchanges::aster::trade::validate_spot_order(&order("FOK")).expect_err("spot FOK");
+    assert!(error.to_string().contains("timeInForce"), "{error}");
+}

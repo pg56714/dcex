@@ -1081,7 +1081,8 @@ pub(in crate::exchanges::aster) fn validate_spot_order(params: &AsterParams) -> 
             "TAKE_PROFIT_MARKET",
         ],
     )?;
-    params.optional_one_of("timeInForce", &["GTC", "IOC", "FOK", "GTX"])?;
+    // The official spot docs list FOK but state that spot placement rejects it (-1115).
+    params.optional_one_of("timeInForce", &["GTC", "IOC", "GTX"])?;
     for key in ["quantity", "quoteOrderQty", "price", "stopPrice"] {
         if params.get(key).is_some() {
             params.required_positive_decimal(key)?;
