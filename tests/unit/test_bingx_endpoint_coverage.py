@@ -241,7 +241,7 @@ VALUES: dict[str, Any] = {
     "interval": "1m",
     "depth": 20,
     "cancelReplaceMode": "STOP_ON_FAILURE",
-    "CancelReplaceMode": "STOP_ON_FAILURE",
+    "cancelReplaceMode": "STOP_ON_FAILURE",
     "positionSide": "LONG",
     "positionId": 1,
     "orderIds": [1, 2],

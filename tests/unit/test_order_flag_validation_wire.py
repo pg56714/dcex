@@ -154,7 +154,7 @@ BACKPACK_SPOT = [("product_symbol", "BTC-USDC-SPOT"), ("side", "Ask"), ("quantit
 BINGX_REPLACE = [
     ("symbol", "BTC-USDT"),
     ("cancelOrderId", "123"),
-    ("CancelReplaceMode", "STOP_ON_FAILURE"),
+    ("cancelReplaceMode", "STOP_ON_FAILURE"),
     ("side", "BUY"),
     ("type", "LIMIT"),
     ("quantity", "1"),

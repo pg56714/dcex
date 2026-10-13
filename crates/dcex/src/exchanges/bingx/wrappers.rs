@@ -181,7 +181,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
 
         replace_spot_order(
             product_symbol => "product_symbol",
-            cancel_replace_mode => "CancelReplaceMode",
+            cancel_replace_mode => "cancelReplaceMode",
             side => "side",
             type_ => "type"
         ),

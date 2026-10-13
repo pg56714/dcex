@@ -127,13 +127,15 @@ impl BingxClient {
                     .await
             }
             "replace_spot_order" => {
+                // The parameter table spells it CancelReplaceMode, but the official example
+                // and the live API use cancelReplaceMode; the capitalized key is ignored.
                 params.ensure_allowed(&[
                     "product_symbol",
                     "symbol",
                     "cancelOrderId",
                     "cancelClientOrderID",
                     "cancelRestrictions",
-                    "CancelReplaceMode",
+                    "cancelReplaceMode",
                     "side",
                     "type",
                     "timeInForce",
@@ -154,7 +156,7 @@ impl BingxClient {
                 )?;
                 validate_enum(
                     params,
-                    "CancelReplaceMode",
+                    "cancelReplaceMode",
                     &["STOP_ON_FAILURE", "ALLOW_FAILURE"],
                 )?;
                 // Live cancelReplace rejects anything but an empty, IOC or POC timeInForce.
@@ -163,7 +165,7 @@ impl BingxClient {
                     "cancelOrderId",
                     "cancelClientOrderID",
                     "cancelRestrictions",
-                    "CancelReplaceMode",
+                    "cancelReplaceMode",
                     "timeInForce",
                     "quantity",
                     "quoteOrderQty",

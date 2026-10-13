@@ -1170,7 +1170,7 @@
   "private post_copy_trading_v1_swap_trace_set_tpsl": ["positionId", "recvWindow", "stopLossMarkPrice", "takeProfitMarkPrice"],
   "private post_wealth_v1_product_dual_currency_invest_asset_list": ["beginDuration", "direction", "duration", "endDuration", "exerciseAsset", "investmentAsset", "pageIndex", "pageSize"],
   "private post_wealth_v1_product_dual_currency_order": ["amount", "exerciseAsset", "investmentAsset", "productId", "quoteId", "selectAccounts", "settleTargetAccount", "sku", "strikePrice"],
-  "private replace_spot_order": ["CancelReplaceMode", "cancelClientOrderID", "cancelOrderId", "cancelRestrictions", "newClientOrderId", "price", "product_symbol", "quantity", "quoteOrderQty", "recvWindow", "side", "stopPrice", "timeInForce", "type"],
+  "private replace_spot_order": ["cancelClientOrderID", "cancelOrderId", "cancelReplaceMode", "cancelRestrictions", "newClientOrderId", "price", "product_symbol", "quantity", "quoteOrderQty", "recvWindow", "side", "stopPrice", "timeInForce", "type"],
   "private replace_swap_batch_orders": ["batchOrders", "recvWindow"],
   "private reverse_swap_position": ["confirm", "product_symbol", "recvWindow", "triggerPrice", "type", "workingType"],
   "private set_coin_swap_leverage": ["leverage", "product_symbol", "recvWindow", "side"],

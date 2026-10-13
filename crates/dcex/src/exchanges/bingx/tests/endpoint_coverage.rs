@@ -464,7 +464,7 @@ const PRIVATE_ROUTES: &[Case] = &[
         &[
             SPOT,
             ("cancelOrderId", "123"),
-            ("CancelReplaceMode", "STOP_ON_FAILURE"),
+            ("cancelReplaceMode", "STOP_ON_FAILURE"),
             ("side", "BUY"),
             ("type", "LIMIT"),
             ("quantity", "0.1"),

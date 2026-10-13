@@ -257,7 +257,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
                 wire_keywords(
                     locals(),
                     {
-                        "CancelReplaceMode": "cancel_replace_mode",
+                        "cancelReplaceMode": "cancel_replace_mode",
                         "cancelOrderId": "cancel_order_id",
                         "cancelClientOrderID": "cancel_client_order_id",
                         "cancelRestrictions": "cancel_restrictions",
