@@ -182,6 +182,9 @@ class OndoAdapter(CexAdapter):
 # userAbstraction modes whose USDC perp collateral is the spot balance (official docs:
 # trading/account-abstraction-modes); "disabled"/"default" keep separate perp balances.
 UNIFIED_ABSTRACTIONS = frozenset({"unifiedAccount", "portfolioMargin"})
+# userRole costs 60 of the 1200 per-minute IP weight (official rate-limit docs) and a
+# wallet's role does not change during a run: resolve each wallet once per process.
+HYPERLIQUID_OWNERS: dict[str, str] = {}
 
 
 class HyperliquidAdapter(CexAdapter):
@@ -194,9 +197,11 @@ class HyperliquidAdapter(CexAdapter):
 
     async def owner(self):
         """Resolve an API agent wallet to the account owner that holds the balances."""
-        role = await self.call("user_role", user=self.user)
-        if role["role"] == "agent":
-            self.user = role["data"]["user"]
+        if self.user not in HYPERLIQUID_OWNERS:
+            role = await self.call("user_role", user=self.user)
+            owner = role["data"]["user"] if role["role"] == "agent" else self.user
+            HYPERLIQUID_OWNERS[self.user] = owner
+        self.user = HYPERLIQUID_OWNERS[self.user]
         return self.user
 
     async def unified(self):
@@ -293,16 +298,18 @@ class HyperliquidAdapter(CexAdapter):
         )
         if data.get("status") != "ok":
             raise LifecycleError("hyperliquid: modification was rejected")
+        # Open orders can still list the pre-modify order (old oid and price) for a moment;
+        # taking that oid would track an order that no longer rests.
         for _ in range(20):
             matching = [
                 row for row in await self.open_orders() if row.get("cloid") == self.client_order_id
             ]
             if len(matching) > 1:
                 raise LifecycleError("hyperliquid: ambiguous client ID after modification")
-            if matching:
+            if matching and decimal(matching[0]["limitPx"]) == plan.price:
                 return checked_id(matching[0]["oid"])
             await asyncio.sleep(0.25)
-        raise LifecycleError("hyperliquid: modified order not found by client ID")
+        raise LifecycleError("hyperliquid: modified order not found at the new price")
 
     async def recover_client_order(self, client_order_id):
         """Only an open order with this cloid; cleanup polls until none remains."""

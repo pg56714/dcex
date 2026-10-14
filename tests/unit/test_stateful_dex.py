@@ -9,7 +9,7 @@ from types import SimpleNamespace
 import pytest
 
 from tests.stateful_dex import ExtendedAdapter, HyperliquidAdapter, LighterAdapter, OndoAdapter
-from tests.stateful_lifecycle import LifecycleError, MarketUnavailable, run_lifecycle
+from tests.stateful_lifecycle import LifecycleError, MarketUnavailable, Plan, run_lifecycle
 from tests.stateful_runner import run_case
 
 
@@ -440,3 +440,48 @@ async def test_hyperliquid_unified_account_skips_spot_to_perp_transfer(abstracti
     assert bool(transfers) is not unified
     assert ("perp" in snapshot.shared) is unified
     assert not any("transfer" in name for name, _ in client.calls)
+
+
+@pytest.mark.asyncio
+async def test_hyperliquid_amend_waits_for_the_modified_order():
+    """Open orders may still list the pre-modify oid; only the new price identifies it."""
+    adapter = HyperliquidAdapter(
+        DexMock("hyperliquid", "async"), "hyperliquid", "swap", "BTC-USD-SWAP"
+    )
+    cloid = adapter.client_order_id
+    listings = iter(
+        [
+            [{"oid": 1, "cloid": cloid, "limitPx": "74989.0"}],
+            [{"oid": 2, "cloid": cloid, "limitPx": "74988.0"}],
+        ]
+    )
+
+    async def call(method, **_kwargs):
+        assert method == "modify_order"
+        return {"status": "ok", "response": {"type": "default"}}
+
+    async def open_orders():
+        return next(listings)
+
+    adapter.call = call
+    adapter.open_orders = open_orders
+    plan = Plan("BTC-USD-SWAP", Decimal("74988"), Decimal("0.00014"), Decimal("10"))
+    with pytest.MonkeyPatch.context() as patch:
+        patch.setattr("tests.stateful_dex.asyncio.sleep", _no_sleep)
+        assert await adapter.amend("1", plan) == "2"
+
+
+async def _no_sleep(_delay):
+    return None
+
+
+@pytest.mark.asyncio
+async def test_hyperliquid_resolves_each_wallet_role_once(monkeypatch):
+    """userRole weighs 60 of the 1200 per-minute budget; later adapters reuse the owner."""
+    monkeypatch.setattr("tests.stateful_dex.HYPERLIQUID_OWNERS", {})
+    client = DexMock("hyperliquid", "async")
+    for _ in range(3):
+        adapter = HyperliquidAdapter(client, "hyperliquid", "swap", "BTC-USD-SWAP")
+        await adapter.positions()
+        await adapter.unified()
+    assert [name for name, _ in client.calls].count("user_role") == 1
