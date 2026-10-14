@@ -1,3 +1,18 @@
+## 0.20.0 (2026-10-14)
+
+### BREAKING CHANGE
+
+- remove integration
+
+### Feat
+
+- edit Extended orders by replacement with cancel_id
+
+### Fix
+
+- reject FOK on Aster spot orders before sending
+- send BingX spot cancel-replace mode as cancelReplaceMode
+
 ## 0.19.0 (2026-10-12)
 
 ### BREAKING CHANGE
