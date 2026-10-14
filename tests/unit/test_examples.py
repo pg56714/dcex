@@ -17,7 +17,6 @@ MIGRATED_EXCHANGES = (
     "bybit",
     "hyperliquid",
     "kraken",
-    "kucoin",
     "lighter",
     "mexc",
     "okx",

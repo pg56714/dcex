@@ -14,7 +14,6 @@ use crate::exchanges::bybit::BybitClient;
 use crate::exchanges::extended::ExtendedClient;
 use crate::exchanges::hyperliquid::HyperliquidClient;
 use crate::exchanges::kraken::KrakenClient;
-use crate::exchanges::kucoin::KucoinClient;
 use crate::exchanges::lighter::{LighterClient, LighterNetwork};
 use crate::exchanges::mexc::MexcClient;
 use crate::exchanges::okx::OkxClient;
@@ -1002,72 +1001,6 @@ pub(super) fn append_hyperliquid_spot_rows(
         });
     }
     Ok(())
-}
-
-pub(super) async fn fetch_kucoin(client: &KucoinClient) -> Result<Vec<MarketInfo>> {
-    let spot = client
-        .public_request("get_spot_instrument_info", vec![])
-        .await?;
-    let futures = client
-        .public_request("get_futures_contracts", vec![])
-        .await?;
-    let mut rows = Vec::new();
-    for market in response_array(&spot, &["data"]) {
-        let base = required_string(market, "baseCurrency")?;
-        let quote = required_string(market, "quoteCurrency")?;
-        rows.push(MarketInfo {
-            exchange: "kucoin".to_string(),
-            exchange_symbol: required_string(market, "symbol")?,
-            product_symbol: format!("{base}-{quote}-SPOT"),
-            product_type: "spot".to_string(),
-            exchange_type: "spot".to_string(),
-            price_precision: value_string(market, "priceIncrement", "0"),
-            size_precision: value_string(market, "baseIncrement", "0"),
-            min_size: value_string(market, "baseMinSize", "0"),
-            base_currency: base,
-            quote_currency: quote,
-            min_notional: non_empty_string(market, "minFunds").unwrap_or_else(|| "0".to_string()),
-            size_per_contract: "1".to_string(),
-            ..MarketInfo::default()
-        });
-    }
-    for market in response_array(&futures, &["data"]) {
-        rows.push(kucoin_futures_market_info(market)?);
-    }
-    Ok(rows)
-}
-
-pub(super) fn kucoin_futures_market_info(market: &Value) -> Result<MarketInfo> {
-    let base = normalize_kucoin_currency(&required_string(market, "baseCurrency")?);
-    let quote = required_string(market, "quoteCurrency")?;
-    let symbol = required_string(market, "symbol")?;
-    let is_dated = market
-        .get("expireDate")
-        .is_some_and(|expiry| !expiry.is_null());
-    let product_type = if is_dated { "futures" } else { "swap" };
-    let product_symbol = if is_dated {
-        format!(
-            "{base}-{quote}-{}-FUTURES",
-            delivery_date(market, "expireDate")?
-        )
-    } else {
-        format!("{base}-{quote}-SWAP")
-    };
-    Ok(MarketInfo {
-        exchange: "kucoin".to_string(),
-        exchange_symbol: symbol,
-        product_symbol,
-        product_type: product_type.to_string(),
-        exchange_type: value_string(market, "type", ""),
-        price_precision: value_string(market, "tickSize", "0"),
-        size_precision: value_string(market, "lotSize", "0"),
-        min_size: value_string(market, "lotSize", "0"),
-        base_currency: base,
-        quote_currency: quote,
-        min_notional: "0".to_string(),
-        size_per_contract: value_string(market, "multiplier", "1"),
-        ..MarketInfo::default()
-    })
 }
 
 pub(super) async fn fetch_kraken(client: &KrakenClient) -> Result<Vec<MarketInfo>> {

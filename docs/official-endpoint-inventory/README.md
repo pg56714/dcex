@@ -17,7 +17,6 @@ python -m scripts.build_binance_wrappers --write
 python -m scripts.build_bingx_wrappers --write
 python -m scripts.build_bitget_wrappers --write
 python -m scripts.build_hyperliquid_wrappers --write
-python -m scripts.build_kucoin_wrappers --write
 ruff check --fix dcex
 ruff format dcex
 cargo fmt --all
@@ -27,8 +26,8 @@ python scripts/build_endpoint_docs.py --write
 ```
 
 The wrapper generators use committed schemas and require no network access.
-`collect_bitget_schemas` and `collect_kucoin_schemas` refresh public documentation
-schemas. `extract_okx_ws_schemas` accepts a downloaded official HTML snapshot.
+`collect_bitget_schemas` refreshes public documentation schemas.
+`extract_okx_ws_schemas` accepts a downloaded official HTML snapshot.
 Review schema changes and run the associated wire tests before updating ledger
 claims. Regenerating wrappers alone does not verify an endpoint.
 

@@ -44,7 +44,6 @@ Available endpoints differ by exchange. Documented withdrawal, market-maker and 
 | Kraken | Yes | Yes | Yes |
 | MEXC | Yes | Yes | Yes |
 | BingX | Yes | Yes | Yes |
-| KuCoin | Yes | Yes | Yes |
 | Hyperliquid | Yes | Yes | Yes |
 | Lighter (Mainnet + Robinhood) | Yes | Yes | Yes |
 | Backpack | Yes | Yes | Yes |
@@ -55,7 +54,7 @@ Available endpoints differ by exchange. Documented withdrawal, market-maker and 
 
 Bitget began migrating accounts to UTA on 2026-09-15. Classic-account private endpoints that Bitget rejects for UTA accounts (error 40085) have been removed; public market-data, tax and institutional-loan endpoints that still work remain. Use a UTA account for trading. See the [official UTA upgrade guide](https://www.bitget.com/docs/classic/uta-api-upgrade-guide) and [account settings](https://www.bitget.com/docs/catalog/account/account-settings).
 
-Private WebSocket support includes authenticated or address-scoped user-data streams. Binance, Bybit, Bitget, OKX, KuCoin and Kraken Spot also expose authenticated trading WebSockets.
+Private WebSocket support includes authenticated or address-scoped user-data streams. Binance, Bybit, Bitget, OKX and Kraken Spot also expose authenticated trading WebSockets.
 
 Lighter supports Mainnet and Robinhood with separate credentials; select the network for each client (Mainnet is the default). Ondo spot currently supports only public market data (depth, trades, symbol_info, history and WS spot channels); Ondo has not published its spot trading API, so private operations such as placing or cancelling orders with a `-SPOT` symbol fail locally without sending a request. Arcus Spot uses a separate RFQ router and an externally wallet-signed quote; Arcus Perps is a separate client whose private execution has not yet been live-verified.
 
@@ -97,7 +96,7 @@ async fn main() -> dcex::Result<()> {
 
 HTTP methods without required parameters need no empty parameter list. Optional parameters use builder setters such as `.limit(100)` or `.param("key", value)`.
 
-Additional profiles cover Binance Alpha, Aster Prediction, KuCoin Classic/Pro and Kraken Spot V1. Bitget SBE returns raw binary frames for caller-side decoding.
+Additional profiles cover Binance Alpha, Aster Prediction and Kraken Spot V1. Bitget SBE returns raw binary frames for caller-side decoding.
 
 Public WebSocket:
 

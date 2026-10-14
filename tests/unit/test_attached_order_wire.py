@@ -116,39 +116,6 @@ def test_okx_completeness_detects_wrong_declared_wire_names(method, kwargs, endp
 @pytest.mark.asyncio
 @pytest.mark.parametrize("asynchronous", [False, True])
 @pytest.mark.parametrize("native", [False, True], ids=["public", "native"])
-@pytest.mark.parametrize("copy_trading", [False, True])
-async def test_kucoin_margin_is_a_positive_decimal_on_the_wire(asynchronous, native, copy_trading):
-    from tests.unit.test_kucoin_endpoint_coverage import _client_kwargs
-
-    prefix = "dcex.async_support" if asynchronous else "dcex"
-    cls = importlib.import_module(f"{prefix}.kucoin.client").Client
-    method = "post_v1_copy_trade_futures_position_margin_deposit_margin" if copy_trading else "add_futures_isolated_margin"
-    symbol = dict(symbol="XBTUSDTM") if copy_trading else dict(product_symbol="BTC-USDT-SWAP")
-    with _http_server({"code": "200000", "data": {}}) as (base, received):
-        client = cls(**_client_kwargs(base, base))
-        if asynchronous:
-            await client.async_init()
-        try:
-            kwargs = dict(**symbol, margin="1.25", **({"bizNo": "1"} if native else {"biz_no": "1"}))
-            await invoke(client, method, kwargs, native)
-            request = received.get(timeout=10)
-            assert urlsplit(request["path"]).path == ("/api/v1/copy-trade/futures/position/margin/deposit-margin" if copy_trading else "/api/v1/position/margin/deposit-margin")
-            payload = json.loads(request["body"], parse_float=Decimal)
-            assert Decimal(str(payload["margin"])) == Decimal("1.25")
-            invalid_values = ["1e-7", "-1", "0"] if native else [0.1 + 0.2, "1e-7", "-1", "0"]
-            for invalid in invalid_values:
-                with pytest.raises(ValueError, match="decimal"):
-                    await invoke(client, method, {**kwargs, "margin": invalid}, native)
-                assert received.empty()
-        finally:
-            result = client.close()
-            if inspect.isawaitable(result):
-                await result
-
-
-@pytest.mark.asyncio
-@pytest.mark.parametrize("asynchronous", [False, True])
-@pytest.mark.parametrize("native", [False, True], ids=["public", "native"])
 @pytest.mark.parametrize("settle", [False, True])
 async def test_kraken_zero_volume_closing_order_reaches_wire(asynchronous, native, settle):
     from tests.unit.test_kraken_endpoint_coverage import _client_kwargs, _route_server

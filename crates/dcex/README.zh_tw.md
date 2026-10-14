@@ -41,7 +41,6 @@ cargo add tokio --features macros,rt-multi-thread
 | Kraken | 支援 | 支援 | 支援 |
 | MEXC | 支援 | 支援 | 支援 |
 | BingX | 支援 | 支援 | 支援 |
-| KuCoin | 支援 | 支援 | 支援 |
 | Hyperliquid | 支援 | 支援 | 支援 |
 | Lighter (Mainnet + Robinhood) | 支援 | 支援 | 支援 |
 | Backpack | 支援 | 支援 | 支援 |
@@ -52,7 +51,7 @@ cargo add tokio --features macros,rt-multi-thread
 
 Bitget 自 2026-09-15 起遷移至 UTA；本函式庫已移除 Bitget 對 UTA 帳戶回傳錯誤 40085 的 classic 帳戶私有端點，仍可使用的公開行情、稅務與機構借貸端點則保留。交易請使用 UTA 帳戶。參閱 [官方 UTA 升級指南](https://www.bitget.com/docs/classic/uta-api-upgrade-guide) 與 [帳戶設定](https://www.bitget.com/docs/catalog/account/account-settings)。
 
-私人 WebSocket 包含需驗證身分或指定地址的使用者資料流；Binance、Bybit、Bitget、OKX、KuCoin 與 Kraken 現貨提供交易 WebSocket；Hyperliquid 與 Lighter 可提交已簽名操作，Arcus 提供簽名請求建立介面。
+私人 WebSocket 包含需驗證身分或指定地址的使用者資料流；Binance、Bybit、Bitget、OKX 與 Kraken 現貨提供交易 WebSocket；Hyperliquid 與 Lighter 可提交已簽名操作，Arcus 提供簽名請求建立介面。
 
 Lighter 支援 Mainnet 與 Robinhood，兩者使用不同憑證；可逐一為客戶端選擇網路，預設為 Mainnet。Ondo 現貨目前僅支援公開行情（depth、trades、symbol_info、history 與 WS 現貨頻道）；官方尚未公布現貨交易 API，因此下單、撤單等私有操作傳入 `-SPOT` symbol 會在本地報錯，不會送出請求。Arcus Spot 使用獨立的 RFQ router，送出報價時須由外部錢包簽章；Arcus Perps 使用另一個客戶端，其私人交易流程尚未經實際環境驗證。
 
@@ -94,7 +93,7 @@ async fn main() -> dcex::Result<()> {
 
 沒有必填參數的 HTTP 方法不需傳入空參數列表；選填參數可使用 `.limit(100)` 或 `.param("key", value)` 等 builder 方法。
 
-另提供 Binance Alpha、Aster Prediction、KuCoin Classic／Pro 與 Kraken 現貨 V1 介面。Bitget SBE 回傳原始二進位封包，由呼叫端解碼。
+另提供 Binance Alpha、Aster Prediction 與 Kraken 現貨 V1 介面。Bitget SBE 回傳原始二進位封包，由呼叫端解碼。
 
 公開 WebSocket：
 

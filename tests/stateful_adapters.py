@@ -28,7 +28,6 @@ DISPLAY_NAMES = {
     "bitget": "Bitget",
     "bingx": "BingX",
     "mexc": "MEXC",
-    "kucoin": "KuCoin",
     "lighter": "Lighter",
     "extended": "Extended",
     "ondo": "Ondo",
@@ -87,7 +86,6 @@ def response_data(exchange, value):
         "bybit": ("retCode", "0"),
         "okx": ("code", "0"),
         "bitget": ("code", "00000"),
-        "kucoin": ("code", "200000"),
         "bingx": ("code", "0"),
         "extended": ("status", "OK"),
         "ondo": ("success", "True"),
@@ -120,7 +118,7 @@ def response_data(exchange, value):
         return value["result"]
     if exchange == "ondo":
         return value["result"]
-    if exchange in {"bingx", "bitget", "kucoin", "extended"}:
+    if exchange in {"bingx", "bitget", "extended"}:
         return value["data"]
     if exchange == "okx":
         for row in rows(value["data"]):
@@ -213,7 +211,6 @@ class CexAdapter:
             "bitget": ("clientOid", "orderId"),
             "bingx": ("clientOrderID" if self.spot else "clientOrderId", "orderId"),
             "mexc": ("clientOrderId" if self.spot else "externalOid", "orderId"),
-            "kucoin": ("clientOid", "id"),
             "backpack": ("clientId", "id"),
             "kraken": ("cl_ord_id" if self.spot else "cliOrdId", "id" if self.spot else "order_id"),
             "extended": ("externalId", "id"),
@@ -275,7 +272,7 @@ class CexAdapter:
     async def book(self):
         ex = self.exchange
         kw = {"product_symbol": self.symbol}
-        if ex in {"binance", "aster", "kucoin"}:
+        if ex in {"binance", "aster"}:
             data = await self.call(
                 "get_spot_orderbook" if self.spot else "get_futures_orderbook", **kw
             )
@@ -360,13 +357,6 @@ class CexAdapter:
                 return balance(data["balances"], coin, "asset", "free")
             return decimal(
                 (await self.call("get_contract_asset", currency=coin))["availableBalance"]
-            )
-        if ex == "kucoin":
-            if self.spot:
-                data = await self.call("get_account_balance", currency=coin, type="trade")
-                return balance(data, coin, "currency", "available")
-            return decimal(
-                (await self.call("get_futures_account", currency=coin))["availableBalance"]
             )
         if ex == "backpack":
             # Orders use autoLendRedeem, so lent USDC counts; any existing debt stops the test.
@@ -529,8 +519,6 @@ class CexAdapter:
             data, key = await self.call("get_open_positions"), "positionAmt"
         elif ex == "mexc":
             data, key = await self.call("get_contract_open_positions"), "holdVol"
-        elif ex == "kucoin":
-            data, key = await self.call("get_futures_positions"), "currentQty"
         elif ex == "backpack":
             data, key = await self.call("get_open_positions"), "netQuantity"
         elif ex == "kraken":
@@ -571,13 +559,6 @@ class CexAdapter:
                     "get_spot_open_orders" if self.spot else "get_futures_open_orders", **kw
                 )
             )
-        if ex == "kucoin":
-            data = await self.call(
-                "get_spot_open_orders" if self.spot else "get_futures_order_list",
-                **kw,
-                **({} if self.spot else {"status": "active"}),
-            )
-            return rows(data["items"])
         if ex == "kraken":
             if self.spot:
                 return [
@@ -762,34 +743,6 @@ class CexAdapter:
             )
             # MEXC returns either the order ID or {"orderId": ..., "ts": ...}.
             return checked_id(data["orderId"] if isinstance(data, dict) else data)
-        if ex == "kucoin":
-            margin = {}
-            if not self.spot:
-                # Orders must match the symbol's current margin mode (else 330005); KuCoin
-                # defaults to ISOLATED. Read the mode and its leverage; never change them.
-                mode = (await self.call("get_futures_margin_mode", **kw))["marginMode"]
-                if mode not in {"ISOLATED", "CROSS"}:
-                    raise LifecycleError(
-                        "kucoin: unknown futures margin mode; no order was submitted"
-                    )
-                leverage = Decimal(1)
-                if mode == "CROSS":
-                    cross = await self.call("get_futures_cross_margin_leverage", **kw)
-                    leverage = decimal(cross["leverage"])
-                margin = {"marginMode": mode, "leverage": str(int(leverage))}
-            data = await self.call(
-                "place_spot_order" if self.spot else "place_futures_order",
-                **kw,
-                side="buy",
-                type_="limit",
-                size=size,
-                price=price,
-                **({"timeInForce": tif} if tif else {"timeInForce": "GTC", "postOnly": True}),
-                clientOid=self.client_order_id,
-                **margin,
-                **({"reduceOnly": True} if reduce else {}),
-            )
-            return checked_id(data["orderId"])
         if ex == "backpack":
             data = await self.call(
                 "place_limit_order",
@@ -949,11 +902,6 @@ class CexAdapter:
             if isinstance(data, dict):
                 data = data.get("orderId")
             return checked_id(data if data not in (None, "", True) else identifier)
-        if ex == "kucoin" and self.spot:
-            data = await self.call(
-                "alter_spot_order", **kw, orderId=identifier, newPrice=price, newSize=size
-            )
-            return checked_id(data["newOrderId"])
         if ex == "kraken" and self.spot:
             data = await self.call(
                 "amend_spot_order", txid=identifier, limit_price=price, post_only=True
@@ -999,12 +947,6 @@ class CexAdapter:
                 data = await self.call("cancel_contract_order", order_id=identifier)
                 if not data or any(str(row["errorCode"]) != "0" for row in rows(data)):
                     raise LifecycleError("mexc: contract cancellation rejected")
-        elif ex == "kucoin":
-            await self.call(
-                "cancel_spot_order" if self.spot else "cancel_futures_order",
-                orderId=identifier,
-                **(kw if self.spot else {}),
-            )
         elif ex == "kraken":
             data = await self.call(
                 "cancel_spot_order" if self.spot else "cancel_futures_order",
@@ -1064,20 +1006,6 @@ class CexAdapter:
                 "get_spot_order" if self.spot else "get_contract_order",
                 **({**kw, "orderId": identifier} if self.spot else {"order_id": identifier}),
             )
-        elif ex == "kucoin":
-            try:
-                data = await self.call(
-                    "get_spot_order" if self.spot else "get_futures_order",
-                    **({**kw, "order_id": identifier} if self.spot else {"orderId": identifier}),
-                )
-            except LifecycleError as error:
-                # Futures orders can be invisible for a moment right after placement.
-                if "orderNotExist" in str(error):
-                    return None
-                raise
-            # KuCoin briefly returns "data": null while an order changes state; poll again.
-            if data is None:
-                return None
         elif ex == "backpack":
             data = rows(await self.call("get_open_orders", **kw))
             data = [row for row in data if str(row["id"]) == identifier]
@@ -1137,25 +1065,6 @@ def normalize_order(exchange, spot, data, identifier):
         )
     elif exchange == "mexc":
         fields = ("orderId", "symbol", "side", "orderType", "price", "vol", "dealVol", "state")
-    elif exchange == "kucoin":
-        fields = (
-            "id",
-            "symbol",
-            "side",
-            "type",
-            "price",
-            "size",
-            "dealSize",
-            "active" if spot else "isActive",
-        )
-        values = [data[key] for key in fields]
-        values[-1] = (
-            "open"
-            if values[-1] is True and (not spot or data["inOrderBook"] is True)
-            else "cancelled"
-            if values[-1] is False and data["cancelExist"] is True
-            else "closed"
-        )
     elif exchange == "backpack":
         fields = (
             "id",
@@ -1192,8 +1101,7 @@ def normalize_order(exchange, spot, data, identifier):
         )
     else:
         raise LifecycleError("unsupported order response")
-    if exchange != "kucoin":
-        values = [data[key] for key in fields]
+    values = [data[key] for key in fields]
     oid, symbol, side, kind, price, size, filled, state = values
     state = order_state(state)
     side, kind = str(side).lower(), str(kind).lower()

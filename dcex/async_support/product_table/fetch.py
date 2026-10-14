@@ -59,11 +59,6 @@ async def hyperliquid() -> ProductTable:
     return await _fetch("hyperliquid")
 
 
-async def kucoin() -> ProductTable:
-    """Fetch KuCoin product metadata."""
-    return await _fetch("kucoin")
-
-
 async def kraken() -> ProductTable:
     """Fetch Kraken product metadata."""
     return await _fetch("kraken")

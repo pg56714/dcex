@@ -25,7 +25,6 @@ async def test_runner_without_opt_in_never_imports_client(monkeypatch):
     [
         ("okx", "OKX_PASSPHRASE"),
         ("bitget", "BITGET_PASSPHRASE"),
-        ("kucoin", "KUCOIN_API_PASSPHRASE"),
     ],
 )
 def test_runner_uses_existing_passphrase_variable_names(monkeypatch, exchange, name):
@@ -36,10 +35,9 @@ def test_runner_uses_existing_passphrase_variable_names(monkeypatch, exchange, n
         runner.client_options(exchange)
 
 
-def test_market_scope_excludes_coin_margin_and_kucoin_uta():
+def test_market_scope_excludes_coin_margin():
     assert runner.MARKETS["binance"][0] == ("spot", "BTC-USDC-SPOT")
     assert runner.MARKETS["binance"][1][1].endswith("-USDT-SWAP")
-    assert [market for market, _ in runner.MARKETS["kucoin"]] == ["spot", "swap"]
 
 
 @pytest.mark.asyncio

@@ -28,10 +28,6 @@ def snapshot(exchange):
         ),
         "bybit": ({"FUND": D(15), "UNIFIED": D(0)}, {"UNIFIED": D(10)}),
         "mexc": ({"spot": D(12), "contract": D(0)}, {"spot": D(3), "contract": D(5)}),
-        "kucoin": (
-            {"main": D(12), "trade": D(0), "futures": D(0)},
-            {"trade": D(3), "futures": D(5)},
-        ),
         "hyperliquid": (
             {"spot": D("11.8"), "perp": D("9")},
             {"spot": D("10.5"), "perp": D("10.3")},
@@ -85,17 +81,6 @@ class TransferMock:
                     == {"fund": "fund", "spot": "spot", "USDTMPerp": "swap"}[kw["from_account"]]
                     and r.destination == ("spot" if kw["to_account"] == "spot" else "swap")
                 )
-            elif self.exchange == "kucoin":
-                route = next(
-                    r
-                    for r in funding.ROUTES
-                    if r.exchange == "kucoin"
-                    and r.source
-                    == {"MAIN": "main", "TRADE": "trade", "CONTRACT": "futures"}[
-                        kw["fromAccountType"]
-                    ]
-                    and r.destination == ("trade" if kw["toAccountType"] == "TRADE" else "futures")
-                )
             elif self.exchange == "aster":
                 route = next(
                     r
@@ -137,7 +122,6 @@ class TransferMock:
                 else {"error": [], "result": {"refid": "transfer-fixture"}},
                 "binance": {"tranId": "transfer-fixture"},
                 "bybit": {"retCode": 0, "result": {"status": "SUCCESS"}},
-                "kucoin": {"code": "200000", "data": {"orderId": "transfer-fixture"}},
                 "mexc": {"tranId": "transfer-fixture"},
                 "aster": {"tranId": "transfer-fixture"},
                 "hyperliquid": {"status": "ok"},
@@ -177,18 +161,18 @@ def test_shared_wallets_never_propose_transfers(exchange, stage):
 
 
 @pytest.mark.asyncio
-async def test_kucoin_multiple_sources_share_one_stage_cap(monkeypatch):
-    state = snapshot("kucoin")
-    state.balances.update(main=D(5), trade=D(25))
-    client = TransferMock("kucoin", state)
+async def test_multiple_sources_share_one_stage_cap(monkeypatch):
+    state = snapshot("bingx")
+    state.balances.update(fund=D(5), swap=D(25))
+    client = TransferMock("bingx", state)
 
     async def read(*_):
         return deepcopy(state)
 
     monkeypatch.setattr(funding, "collect", read)
-    report = await funding.prepare("kucoin", [(client, "", "")], stage="perp", execute=True)
+    report = await funding.prepare("bingx", [(client, "", "")], stage="spot", execute=True)
     assert [D(row["amount"]) for row in report["executed"]] == [D(5), D(15)]
-    assert state.balances == {"main": D(0), "trade": D(10), "futures": D(20)}
+    assert state.balances == {"fund": D(0), "spot": D(20), "swap": D(10)}
 
 
 @pytest.mark.asyncio
@@ -215,7 +199,7 @@ async def test_final_location_table_is_observed_not_projected(monkeypatch, capsy
 @pytest.mark.parametrize("stage", ["", "restore", "swap", "external"])
 def test_invalid_stages_are_rejected(stage):
     with pytest.raises(ValueError, match="stage"):
-        funding.plan_transfers("kucoin", snapshot("kucoin"), stage)
+        funding.plan_transfers("bingx", snapshot("bingx"), stage)
 
 
 @pytest.mark.parametrize(
@@ -229,9 +213,6 @@ def test_invalid_stages_are_rejected(stage):
         ("bybit", "perp"),
         ("mexc", "perp"),
         ("mexc", "contract->spot"),
-        ("kucoin", "spot"),
-        ("kucoin", "futures->spot"),
-        ("kucoin", "perp"),
         ("hyperliquid", "perp"),
         ("aster", "spot"),
         ("aster", "perp"),
@@ -285,7 +266,6 @@ async def test_preview_is_read_only_and_execute_only_uses_owned_routes(
         "binance": "create_universal_transfer",
         "bybit": "create_internal_transfer",
         "mexc": "user_universal_transfer",
-        "kucoin": "flex_transfer",
         "hyperliquid": "transfer_between_dexes",
         "aster": "transfer_spot_futures",
         "bingx": "asset_transfer",
@@ -300,12 +280,6 @@ async def test_preview_is_read_only_and_execute_only_uses_owned_routes(
             "subAccount",
             "destination",
         }
-        if exchange == "kucoin":
-            assert params["transfer_type"] == "INTERNAL"
-            assert params["fromAccountType"] == (
-                "CONTRACT" if reverse else "MAIN" if stage == "spot" else params["fromAccountType"]
-            )
-            assert params["fromAccountType"] in {"MAIN", "TRADE", "CONTRACT"}
         if exchange == "mexc":
             assert (params["fromAccountType"], params["toAccountType"]) == (
                 ("FUTURES", "SPOT") if reverse else ("SPOT", "FUTURES")
@@ -322,11 +296,11 @@ async def test_preview_is_read_only_and_execute_only_uses_owned_routes(
 
 @pytest.mark.parametrize("destination", ["external", "subaccount", "other-user", "withdraw"])
 def test_non_internal_route_rejected_without_any_client_call(destination):
-    state = snapshot("kucoin")
-    client = TransferMock("kucoin", state)
+    state = snapshot("bingx")
+    client = TransferMock("bingx", state)
     with pytest.raises(ValueError, match="non-allowlisted"):
         funding.submit_transfer(
-            client, funding.Route("kucoin", "main", destination, "USDT", D(4)), D(1)
+            client, funding.Route("bingx", "fund", destination, "USDT", D(4)), D(1)
         )
     assert not client.calls
 
@@ -339,12 +313,12 @@ def test_invalid_or_oversized_amount_rejected(amount):
 
 
 def test_less_than_twenty_moves_all_without_reserving_previous_stage():
-    state = snapshot("kucoin")
-    state.balances["main"] = D(5)
-    transfers, after = funding.plan_transfers("kucoin", state, "spot")
+    state = snapshot("bingx")
+    state.balances["fund"] = D(5)
+    transfers, after = funding.plan_transfers("bingx", state, "spot")
     assert transfers[0][1] == 5
-    assert after["main"] == 0
-    assert after["trade"] == 5
+    assert after["fund"] == 0
+    assert after["spot"] == 5
 
 
 def test_hyperliquid_perp_stage_moves_all_spot_collateral():

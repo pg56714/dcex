@@ -60,7 +60,6 @@ def test_read_verb_inside_the_name_needs_review(name: str) -> None:
     [
         "prediction_query_positions",
         "copy_trading_follower_get_current_copy",
-        "post_v2_copy_trade_get_cross_mode_margin_requirement",
     ],
 )
 def test_reviewed_reads_are_reads(name: str) -> None:

@@ -50,7 +50,6 @@ Documented withdrawal, market-maker and partner endpoints are in scope; current 
 | Kraken | Yes | Yes | Yes | Yes |
 | MEXC | Yes | Yes | Yes | Yes |
 | BingX | Yes | Yes | Yes | Yes |
-| KuCoin | Yes | Yes | Yes | Yes |
 | Hyperliquid | Yes | Yes | Yes | Yes |
 | Lighter (Mainnet + Robinhood) | Yes | Yes | Yes | Yes |
 | Backpack | Yes | Yes | Yes | Yes |
@@ -61,7 +60,7 @@ Documented withdrawal, market-maker and partner endpoints are in scope; current 
 
 Bitget began migrating accounts to UTA on 2026-09-15. Classic-account private endpoints that Bitget rejects for UTA accounts (error 40085) have been removed; public market-data, tax and institutional-loan endpoints that still work remain. Use a UTA account for trading. See the [official UTA upgrade guide](https://www.bitget.com/docs/classic/uta-api-upgrade-guide) and [account settings](https://www.bitget.com/docs/catalog/account/account-settings).
 
-Private WebSocket support includes authenticated or address-scoped user-data streams. Trading WebSocket APIs are available for Binance, Bybit, Bitget, OKX, KuCoin and Kraken Spot; Hyperliquid and Lighter accept signed actions, and Arcus provides signed request construction. Lighter Mainnet and Robinhood use separate credential profiles; select the network per client (Mainnet is the default); see [.env.example](.env.example) and the [Lighter examples](examples/async/lighter_private_readonly.py). Ondo spot currently supports only public market data (depth, trades, symbol_info, history and WS spot channels); Ondo has not published its spot trading API, so private operations such as placing or cancelling orders with a `-SPOT` symbol fail locally without sending a request.
+Private WebSocket support includes authenticated or address-scoped user-data streams. Trading WebSocket APIs are available for Binance, Bybit, Bitget, OKX and Kraken Spot; Hyperliquid and Lighter accept signed actions, and Arcus provides signed request construction. Lighter Mainnet and Robinhood use separate credential profiles; select the network per client (Mainnet is the default); see [.env.example](.env.example) and the [Lighter examples](examples/async/lighter_private_readonly.py). Ondo spot currently supports only public market data (depth, trades, symbol_info, history and WS spot channels); Ondo has not published its spot trading API, so private operations such as placing or cancelling orders with a `-SPOT` symbol fail locally without sending a request.
 
 [Endpoint coverage, limitations and verification](docs/endpoint-audit.md).
 
@@ -92,7 +91,7 @@ async def main():
 asyncio.run(main())
 ```
 
-Additional profiles cover Binance Alpha, Aster Prediction, KuCoin Classic/Pro and Kraken Spot V1. Bitget SBE returns raw binary frames for caller-side decoding.
+Additional profiles cover Binance Alpha, Aster Prediction and Kraken Spot V1. Bitget SBE returns raw binary frames for caller-side decoding.
 
 Public WebSocket:
 

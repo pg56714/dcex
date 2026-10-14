@@ -18,7 +18,6 @@ EXCHANGES = (
     "bitget",
     "bingx",
     "mexc",
-    "kucoin",
     "kraken",
     "aster",
     "arcus",
@@ -101,7 +100,7 @@ def route_evidence() -> tuple[RouteEvidence, ...]:
                     continue
                 add(exchange, match[1], match[3], match[4], file.relative_to(ROOT).as_posix())
 
-    for exchange in ("bybit", "okx", "bitget", "bingx", "mexc", "kucoin", "kraken", "backpack"):
+    for exchange in ("bybit", "okx", "bitget", "bingx", "mexc", "kraken", "backpack"):
         source = f"tests/unit/test_{exchange}_endpoint_coverage.py"
         module = importlib.import_module(source.removesuffix(".py").replace("/", "."))
         if hasattr(module, "ROUTES"):
@@ -112,7 +111,7 @@ def route_evidence() -> tuple[RouteEvidence, ...]:
                 add(exchange, name, case[1], case[2], source)
         else:
             for case in module.CASES:
-                if exchange in {"kucoin", "backpack"}:
+                if exchange == "backpack":
                     method, path = case.route.split(" ", 1)
                     add(exchange, case.method_name, method, path, source)
                 elif exchange == "bybit":
@@ -121,15 +120,6 @@ def route_evidence() -> tuple[RouteEvidence, ...]:
                     add(exchange, case.name, case.method, case.path, source)
 
     source = "tests/unit/test_binance_risk_endpoints.py"
-    module = importlib.import_module("tests.unit.test_kucoin_schema_requests")
-    for operation in module.OPERATIONS:
-        add(
-            "kucoin",
-            module.operation_name(operation),
-            operation["method"].upper(),
-            module.values_for(operation)[1],
-            "tests/unit/test_kucoin_schema_requests.py::test_inventory_wire",
-        )
     module = importlib.import_module("tests.unit.test_hyperliquid_admin_actions")
     for operation in module.OPERATIONS:
         test = "test_info_wire" if operation["public"] else "test_action_wire"

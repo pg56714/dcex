@@ -398,7 +398,7 @@ def _client_kwargs(exchange: str, client_kind: str = "client") -> dict[str, Any]
         )
     elif exchange in {"binance", "bingx", "bybit", "mexc"}:
         kwargs.update(api_key="api-key", api_secret="api-secret")
-    elif exchange in {"bitget", "okx", "kucoin"}:
+    elif exchange in {"bitget", "okx"}:
         kwargs.update(api_key="api-key", api_secret="api-secret", passphrase="passphrase")
     elif exchange == "kraken":
         kwargs.update(
@@ -492,14 +492,6 @@ def _sample_order(exchange: str) -> dict[str, Any]:
             "side": "BUY",
             "type": "LIMIT",
             "quantity": "1",
-            "price": "1",
-        }
-    if exchange == "kucoin":
-        return {
-            "symbol": "BTC-USDT-SPOT",
-            "type": "limit",
-            "side": "buy",
-            "size": "1",
             "price": "1",
         }
     if exchange == "okx":

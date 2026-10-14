@@ -18,7 +18,6 @@ from .bybit.client import Client as BybitClient
 from .extended.client import Client as ExtendedClient
 from .hyperliquid.client import Client as HyperliquidClient
 from .kraken.client import Client as KrakenClient
-from .kucoin.client import Client as KuCoinClient
 from .lighter.client import Client as LighterClient
 from .mexc.client import Client as MEXCClient
 from .okx.client import Client as OKXClient
@@ -81,11 +80,6 @@ def hyperliquid(**kwargs: Any) -> HyperliquidClient:  # noqa: ANN401
     return HyperliquidClient(**kwargs)
 
 
-def kucoin(**kwargs: Any) -> KuCoinClient:  # noqa: ANN401
-    """Create a KuCoin client instance."""
-    return KuCoinClient(**kwargs)
-
-
 def kraken(**kwargs: Any) -> KrakenClient:  # noqa: ANN401
     """Create a Kraken client instance."""
     return KrakenClient(**kwargs)
@@ -121,7 +115,6 @@ __all__ = [
     "bybit",
     "extended",
     "hyperliquid",
-    "kucoin",
     "kraken",
     "lighter",
     "mexc",

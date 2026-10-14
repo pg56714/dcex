@@ -140,13 +140,6 @@ fn bybit_convert_timeframe(timeframe: &str) -> PyResult<String> {
 }
 
 #[pyfunction]
-fn kucoin_convert_timeframe(timeframe: &str) -> PyResult<String> {
-    common::kucoin_convert_timeframe(timeframe)
-        .map(str::to_string)
-        .map_err(to_py_value_error)
-}
-
-#[pyfunction]
 fn sanitize_url(url: &str) -> String {
     common::sanitize_url(url)
 }
@@ -191,7 +184,6 @@ pub(super) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(get_decimal_places, m)?)?;
     m.add_function(wrap_pyfunction!(reverse_decimal_places, m)?)?;
     m.add_function(wrap_pyfunction!(bybit_convert_timeframe, m)?)?;
-    m.add_function(wrap_pyfunction!(kucoin_convert_timeframe, m)?)?;
     m.add_function(wrap_pyfunction!(sanitize_url, m)?)?;
     m.add_function(wrap_pyfunction!(sanitize_message, m)?)?;
     m.add_function(wrap_pyfunction!(api_error_message, m)?)?;

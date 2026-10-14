@@ -86,7 +86,6 @@ uv run --no-sync python -m scripts.build_bitget_wrappers --write
 uv run --no-sync python -m scripts.build_bybit_wrappers --write
 uv run --no-sync python -m scripts.build_bingx_wrappers --write
 uv run --no-sync python -m scripts.build_hyperliquid_wrappers --write
-uv run --no-sync python -m scripts.build_kucoin_wrappers --write
 uv run --no-sync python -m scripts.build_schema_tables --write
 uv run --no-sync ruff format dcex scripts
 uv run --no-sync ruff check dcex scripts --fix
@@ -134,11 +133,11 @@ requires percentages greater than 0 and at most 100, compared without binary flo
 [Aster futures pegOffset](https://asterdex.github.io/aster-api-website/futures-v3/account%26trades/)
 is explicitly signed: BUY offsets can be negative. Its declaration preserves this existing behavior.
 
-The completeness guard compares captured payload names from all 15 exchange
+The completeness guard compares captured payload names from all 14 exchange
 endpoint-coverage suites with nested declarations; renaming a declaration while leaving the actual wire field unchanged
 fails the test. Numeric-name exemptions require a bool/int annotation and a
 field-qualified explanation. Currency and mode selectors have explicit nondecimal
-declarations. KuCoin deposited margin is positive; Bybit added margin is a signed delta.
+declarations. Bybit added margin is a signed delta.
 
 Bybit order quantity is positive except when both `reduceOnly` and `closeOnTrigger`
 are true, using the declared `x-zero-when` sibling conditions. This preserves the

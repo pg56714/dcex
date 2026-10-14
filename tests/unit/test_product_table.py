@@ -252,7 +252,6 @@ def test_all_product_fetches_match_the_registry() -> None:
         "bybit",
         "extended",
         "hyperliquid",
-        "kucoin",
         "kraken",
         "lighter",
         "mexc",

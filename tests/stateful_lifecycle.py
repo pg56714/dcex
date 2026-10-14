@@ -53,19 +53,12 @@ def not_applicable(exchange: str, market: str, case: str) -> str | None:
         unsupported = spot
     elif case == "fok":
         unsupported = exchange in {"hyperliquid", "lighter", "extended", "ondo"} or (
-            (exchange == "kucoin" and not spot) or (exchange == "aster" and spot)
+            exchange == "aster" and spot
         )
     elif case == "amend":
-        unsupported = (
-            exchange in {"backpack", "ondo"}
-            or (exchange in {"mexc", "aster"} and spot)
-            or (exchange == "kucoin" and not spot)
-        )
+        unsupported = exchange in {"backpack", "ondo"} or (exchange in {"mexc", "aster"} and spot)
     elif case not in CASES:
         raise ValueError("unknown order-test case: " + case)
-    if case == "amend" and exchange == "kucoin" and not spot:
-        # The venue can amend through KuCoin UTA, but the tested account is Classic.
-        return f"N/A: {label} library has no {FEATURES[case]}"
     return f"N/A: {label} has no {FEATURES[case]}" if unsupported else None
 
 
@@ -96,7 +89,6 @@ REDUCE_ONLY_CODES = {
     "bybit": {"110017"},  # Reduce-only rule not satisfied / position is zero.
     "okx": {"51169", "51170"},  # No position in this direction to reduce / same direction.
     "bitget": {"22002", "25227"},  # No position to close / no position available to close.
-    "kucoin": {"300009"},  # No open positions to close.
     "mexc": {"2009"},  # Position nonexistent or closed.
     "extended": {"1137"},  # Position is missing for reduce-only order.
 }

@@ -138,16 +138,6 @@ async def test_async_extended_place_limit_order_uses_native_signing_params() -> 
             },
         ),
         (
-            "kucoin",
-            "place_futures_order",
-            {
-                "product_symbol": "BTC-USDT-SWAP",
-                "side": "buy",
-                "type_": "limit",
-                "size": "1",
-            },
-        ),
-        (
             "mexc",
             "place_contract_order",
             {

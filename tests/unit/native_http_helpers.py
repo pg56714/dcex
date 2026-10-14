@@ -72,19 +72,6 @@ def _http_server(
             ):
                 if value := self.headers.get(header):
                     request[header] = value
-            for header in (
-                "KC-API-KEY",
-                "KC-API-SIGN",
-                "KC-API-TIMESTAMP",
-                "KC-API-PASSPHRASE",
-                "KC-API-KEY-VERSION",
-                "KC-API-PARTNER",
-                "KC-API-PARTNER-SIGN",
-                "KC-BROKER-NAME",
-                "KC-API-PARTNER-VERIFY",
-            ):
-                if value := self.headers.get(header):
-                    request[header] = value
             for header in ("API-Key", "API-Sign", "APIKey", "Authent", "Nonce"):
                 if value := self.headers.get(header):
                     request[f"kraken_{header.lower()}"] = value

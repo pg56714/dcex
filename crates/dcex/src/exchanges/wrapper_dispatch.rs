@@ -162,7 +162,6 @@ const RAW_PASSTHROUGH: &[(&str, &str)] = &[
     ("aster", "get_spot_optimized_ticker_24hr"),
     ("aster", "place_spot_batch_orders_raw"),
     ("aster", "cancel_spot_batch_orders_raw"),
-    ("kucoin", "cancel_margin_stop_order_by_id_raw"),
 ];
 
 /// Call each declared wrapper the way its typed method does and report dispatch errors:
@@ -488,7 +487,6 @@ mod tests {
             "extended",
             "hyperliquid",
             "kraken",
-            "kucoin",
             "lighter",
             "mexc",
             "okx",

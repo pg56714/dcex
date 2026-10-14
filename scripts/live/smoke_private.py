@@ -176,8 +176,6 @@ REVIEWED_READS = {
     "stock_plus_stock_quotes_get_static_info",
     "stock_plus_stock_quotes_get_trade_detail",
     "tax_get_tax_records",
-    # kucoin
-    "post_v2_copy_trade_get_cross_mode_margin_requirement",
 }
 
 

@@ -49,71 +49,6 @@ async fn extended_resolves_symbols_in_the_handshake_path() {
     }
 }
 
-#[tokio::test]
-async fn kucoin_resolves_symbols_before_the_bullet_handshake() {
-    use tokio::io::{AsyncReadExt, AsyncWriteExt};
-    for case in cases().into_iter().filter(|case| case.exchange == "kucoin") {
-        let row = &case.rows[0];
-        for input in [&row.product_symbol, &row.exchange_symbol, "NOT-LISTED"] {
-            let http = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
-            let url = format!("http://{}", http.local_addr().unwrap());
-            let mut client = crate::ws::kucoin::KucoinPublicWebSocket::with_market_base_urls(
-                Duration::from_secs(2),
-                url.clone(),
-                url,
-                if row.product_type == "spot" {
-                    kucoin::KucoinMarket::Spot
-                } else {
-                    kucoin::KucoinMarket::Futures
-                },
-            )
-            .unwrap();
-            client.set_product_table(ProductTable::new(case.rows.clone()));
-            if input == "NOT-LISTED" {
-                assert!(
-                    client
-                        .subscribe_orderbook(input)
-                        .await
-                        .unwrap_err()
-                        .to_string()
-                        .contains("Cannot resolve")
-                );
-                assert!(
-                    tokio::time::timeout(Duration::from_millis(2), http.accept())
-                        .await
-                        .is_err()
-                );
-                continue;
-            }
-            let ws = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
-            let endpoint = format!("ws://{}", ws.local_addr().unwrap());
-            let bullet = tokio::spawn(async move {
-                let (mut stream, _) = http.accept().await.unwrap();
-                let mut bytes = [0; 4096];
-                assert!(stream.read(&mut bytes).await.unwrap() > 0);
-                let body = serde_json::json!({"code":"200000","data":{"token":"local-fixture","instanceServers":[{"endpoint":endpoint}]}}).to_string();
-                stream.write_all(format!("HTTP/1.1 200 OK\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}", body.len()).as_bytes()).await.unwrap();
-            });
-            let capture = tokio::spawn(async move {
-                let (stream, _) = ws.accept().await.unwrap();
-                let mut socket = tokio_tungstenite::accept_async(stream).await.unwrap();
-                socket
-                    .next()
-                    .await
-                    .unwrap()
-                    .unwrap()
-                    .into_text()
-                    .unwrap()
-                    .to_string()
-            });
-            client.connect().await.unwrap();
-            client.subscribe_orderbook(input).await.unwrap();
-            assert!(capture.await.unwrap().contains(&row.exchange_symbol));
-            bullet.await.unwrap();
-        }
-    }
-}
-
 async fn subscribe(case: &Case, url: String, symbol: &str, connect: bool) -> crate::Result<()> {
     let timeout = Duration::from_secs(2);
     let table = ProductTable::new(case.rows.clone());
@@ -233,7 +168,7 @@ async fn loaded_websocket_symbols_reach_exact_market_frames() {
     let mut failures = Vec::new();
     for mut case in cases()
         .into_iter()
-        .filter(|case| !["extended", "kucoin"].contains(&case.exchange))
+        .filter(|case| case.exchange != "extended")
     {
         for row in &mut case.rows {
             row.base_currency = "BTC".into();

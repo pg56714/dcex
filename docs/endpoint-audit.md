@@ -2,7 +2,7 @@
 
 **English** | [繁體中文](endpoint-audit.zh_tw.md)
 
-Reviewed: 2026-09-30. The original report contained 3,180 rows; the reconciled ledger contains 4,891 rows, with official documentation inventories for all 15 exchanges.
+Reviewed: 2026-09-30. The original report contained 3,180 rows; the reconciled ledger contains 4,346 rows, with official documentation inventories for all 14 exchanges.
 
 All documented endpoints are in scope, including withdrawals, address management, market making, RFQ, broker, referral and partner operations. All 111 originally excluded rows have been addressed; there are no scope exclusions. This does not mean every newly discovered endpoint is implemented.
 
@@ -16,11 +16,11 @@ Historical, grouped and overlapping rows prevent converting these counts into an
 
 | Status | Rows | Definition |
 | --- | ---: | --- |
-| `implemented` | 3,418 | Exact offline HTTP route and public Rust/Python wrappers |
-| `protocol` | 395 | Asynchronous WebSocket protocol support with cited offline evidence; no live certification |
-| `superseded` | 989 | Historical or grouped row replaced by explicit current rows |
+| `implemented` | 3,078 | Exact offline HTTP route and public Rust/Python wrappers |
+| `protocol` | 318 | Asynchronous WebSocket protocol support with cited offline evidence; no live certification |
+| `superseded` | 863 | Historical or grouped row replaced by explicit current rows |
 | `unavailable` | 47 | Retired/unavailable operation, or documentation-only section with no endpoint |
-| `unverified` | 11 | Wrapper exists, but part of the official specification is incomplete |
+| `unverified` | 9 | Wrapper exists, but part of the official specification is incomplete |
 | `blocked` | 30 | Required signing or authorization specification is missing |
 | `partial` | 1 | Grouped capability still has a documented gap |
 | `pending` | 0 | Documented operation awaiting implementation or dedicated verification |
@@ -38,7 +38,6 @@ Method counts include aliases and signing helpers, not endpoints.
 | [bingx](official-endpoint-inventory/bingx.json) | 199 | 182 | 0 |
 | [kraken](official-endpoint-inventory/kraken.json) | 170 | 154 | 0 |
 | [mexc](official-endpoint-inventory/mexc.json) | 177 | 157 | 0 |
-| [kucoin](official-endpoint-inventory/kucoin.json) | 365 | 340 | 0 |
 | [hyperliquid](official-endpoint-inventory/hyperliquid.json) | 146 | 119 | 0 |
 | [lighter](official-endpoint-inventory/lighter.json) | 133 | 110 | 0 |
 | [backpack](official-endpoint-inventory/backpack.json) | 80 | 77 | 0 |

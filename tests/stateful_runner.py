@@ -28,7 +28,6 @@ MARKETS = {
     "bitget": [("spot", "DOGE-USDT-SPOT"), ("swap", "DOGE-USDT-SWAP")],
     "bingx": [("spot", "DOGE-USDT-SPOT"), ("swap", "DOGE-USDT-SWAP")],
     "mexc": [("spot", "DOGE-USDT-SPOT"), ("swap", "DOGE-USDT-SWAP")],
-    "kucoin": [("spot", "DOGE-USDT-SPOT"), ("swap", "DOGE-USDT-SWAP")],
     "kraken": [("spot", "DOGE-USDT-SPOT"), ("swap", "DOGE-USD-SWAP")],
     "backpack": [("spot", "SOL-USDC-SPOT"), ("swap", "SOL-USDC-SWAP")],
     "aster": [("spot", "USDC-USDT-SPOT"), ("swap", "ASTER-USDT-SWAP")],
@@ -83,10 +82,8 @@ def client_options(exchange):
             "api_key": exchange.upper() + "_API_KEY",
             "api_secret": exchange.upper() + "_API_SECRET",
         }
-        if exchange in {"okx", "bitget", "kucoin"}:
-            names["passphrase"] = exchange.upper() + (
-                "_API_PASSPHRASE" if exchange == "kucoin" else "_PASSPHRASE"
-            )
+        if exchange in {"okx", "bitget"}:
+            names["passphrase"] = exchange.upper() + "_PASSPHRASE"
     missing = [name for name in names.values() if not os.getenv(name)]
     if missing:
         pytest.skip("Missing credential environment variables: " + ", ".join(missing))

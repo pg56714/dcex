@@ -5,7 +5,7 @@ pub use crate::exchange::exchange_names;
 pub use crate::order_side::OrderSide;
 pub use crate::sanitization::{sanitize_message, sanitize_request, sanitize_url};
 pub use crate::time::{format_timestamp_iso, generate_timestamp_iso, generate_timestamp_ms};
-pub use crate::timeframe::{bybit_convert_timeframe, kucoin_convert_timeframe};
+pub use crate::timeframe::bybit_convert_timeframe;
 
 #[cfg(test)]
 mod tests {

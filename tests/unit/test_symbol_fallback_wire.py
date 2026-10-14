@@ -18,7 +18,7 @@ def _client_options(exchange: str, base_url: str) -> dict[str, object]:
             options["base_api"] = base_url
         else:
             options["sync_server_time"] = False
-    if exchange in {"kraken", "kucoin"}:
+    if exchange == "kraken":
         options["futures_base_url"] = base_url
     if exchange == "mexc":
         options["contract_base_url"] = base_url
@@ -48,7 +48,6 @@ def _remove_real_credentials(monkeypatch: pytest.MonkeyPatch) -> None:
                 "BYBIT_",
                 "OKX_",
                 "KRAKEN_",
-                "KUCOIN_",
                 "BINGX_",
                 "MEXC_",
                 "ASTER_",
@@ -91,14 +90,6 @@ def _remove_real_credentials(monkeypatch: pytest.MonkeyPatch) -> None:
         ),
         ("kraken", "get_spot_ticker", {"product_symbol": "DOGE-USD-SPOT"}, "XDGUSD"),
         ("kraken", "get_spot_ticker", {"product_symbol": "AAPLx-USD-SPOT"}, "AAPLxUSD"),
-        ("kucoin", "get_spot_ticker", {"product_symbol": "BTC-USDT-SPOT"}, "BTC-USDT"),
-        ("kucoin", "get_futures_ticker", {"product_symbol": "BTC-USDT-SWAP"}, "XBTUSDTM"),
-        (
-            "kucoin",
-            "get_uta_tickers",
-            {"trade_type": "FUTURES", "product_symbol": "BTC-USDT-SWAP"},
-            "XBTUSDTM",
-        ),
         ("aster", "get_spot_orderbook", {"product_symbol": "BTC-USDT-SPOT"}, "BTCUSDT"),
         ("backpack", "get_order_book_depth", {"product_symbol": "BTC-USDC-SWAP"}, "BTC_USDC_PERP"),
     ],
@@ -117,7 +108,7 @@ async def test_public_symbol_wire(
     )
     payload = {
         "status": "OK",
-        "code": {"bitget": "00000", "kucoin": "200000"}.get(exchange, "0"),
+        "code": {"bitget": "00000"}.get(exchange, "0"),
         "retCode": 0,
         "data": [],
         "result": {},
@@ -165,7 +156,6 @@ async def test_public_symbol_wire(
         ("mexc", "get_contract_depth", {"product_symbol": "NVDA-USDT-SWAP"}),
         ("extended", "get_order_book", {"market": "AAPL-USD-SWAP"}),
         ("backpack", "get_order_book_depth", {"product_symbol": "FOMC0126H0-USDC-PREDICTION"}),
-        ("kucoin", "get_futures_ticker", {"product_symbol": "BTC-USD-261225-FUTURES"}),
     ],
 )
 @pytest.mark.asyncio

@@ -94,33 +94,3 @@ async def test_bingx_client_order_ids_wire_name(asynchronous):
     params = parse_qs(urlsplit(request["path"]).query or request["body"])
     assert params["clientOrderIDs"] == ["client-1,client-2"]
     assert "clientOrderIds" not in params
-
-
-@pytest.mark.parametrize("asynchronous", [False, True])
-@pytest.mark.parametrize(
-    "trade_type,symbol",
-    [("MARGIN", "BTC-USDT-SWAP"), ("SPOT", "XBTUSDTM"), ("FUTURES", "BTC-USDT-SPOT")],
-)
-@pytest.mark.asyncio
-async def test_kucoin_batch_cancel_rejects_market_mismatch(asynchronous, trade_type, symbol):
-    from tests.unit.test_kucoin_endpoint_coverage import _client_kwargs
-
-    prefix = "dcex.async_support" if asynchronous else "dcex"
-    cls = importlib.import_module(f"{prefix}.kucoin.client").Client
-    with _http_server() as (base, received):
-        client = cls(**_client_kwargs(base, base))
-        if asynchronous:
-            await client.async_init()
-        try:
-            with pytest.raises(ValueError, match="tradeType"):
-                await invoke(
-                    client,
-                    "batch_cancel_uta_orders",
-                    trade_type=trade_type,
-                    cancel_order_list=[{"symbol": symbol, "orderId": "123"}],
-                )
-        finally:
-            result = client.close()
-            if inspect.isawaitable(result):
-                await result
-        assert received.empty()

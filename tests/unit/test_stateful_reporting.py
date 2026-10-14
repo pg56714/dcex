@@ -52,7 +52,7 @@ def test_redaction_covers_unlabelled_base64_and_short_vault_numbers(monkeypatch)
 
 
 def test_summary_uses_only_allowlisted_fields_and_does_not_save_tracebacks(tmp_path):
-    row = initial_result("tests/sync_support/kucoin/test_stateful_trade.py::test_order[spot]")
+    row = initial_result("tests/sync_support/okx/test_stateful_trade.py::test_order[spot]")
     row.update(
         market="spot",
         stage="cancel",
@@ -71,7 +71,7 @@ def test_summary_uses_only_allowlisted_fields_and_does_not_save_tracebacks(tmp_p
     assert path is not None
     stored = json.loads(path.read_text())
     assert set(stored[0]) == set(RESULT_FIELDS)
-    assert stored[0]["exchange"] == "kucoin"
+    assert stored[0]["exchange"] == "okx"
     assert stored[0]["mode"] == "sync"
     assert stored[0]["status"] == "failed"
     assert stored[0]["stage"] == "cancel"
@@ -115,7 +115,7 @@ import pytest
 
 @pytest.mark.stateful
 def test_mock_lifecycle(stateful_result):
-    stateful_result.update(exchange="kucoin", mode="sync", market="spot", stage="cancelled", cleanup="cleanup-unconfirmed")
+    stateful_result.update(exchange="okx", mode="sync", market="spot", stage="cancelled", cleanup="cleanup-unconfirmed")
 
 def test_offline():
     pass

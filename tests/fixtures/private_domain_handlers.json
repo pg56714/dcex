@@ -158,23 +158,6 @@
       "trade_private_request"
     ]
   },
-  "kucoin": {
-    "account.rs": [
-      "account_private_request"
-    ],
-    "earn.rs": [
-      "earn_private_request"
-    ],
-    "margin.rs": [
-      "margin_private_request"
-    ],
-    "trade.rs": [
-      "trade_private_request"
-    ],
-    "uta.rs": [
-      "uta_private_request"
-    ]
-  },
   "mexc": {
     "account.rs": [
       "account_private_request"

@@ -101,12 +101,6 @@ def test_bitget_classic_routes_rejected_for_uta_are_removed(mode: str, method: s
     [
         (lambda base: _bitget(base), "get_classic_convert_currencies"),
         (
-            lambda base: native.KucoinHttpClient(
-                api_key="api-key", api_secret="secret", passphrase="pass", timeout=10, spot_base_url=base, futures_base_url=base
-            ),
-            "get_futures_24h_statistics",
-        ),
-        (
             lambda base: native.OkxHttpClient(
                 api_key="api-key",
                 api_secret="secret",
@@ -129,7 +123,7 @@ def test_authenticated_routes_are_not_reachable_as_public(factory: Any, method: 
 @pytest.mark.parametrize("mode", ["dcex", "dcex.async_support"])
 @pytest.mark.parametrize(
     ("exchange", "method"),
-    [("kucoin", "get_futures_24h_statistics"), ("okx", "get_economic_calendar")],
+    [("okx", "get_economic_calendar")],
 )
 def test_authenticated_routes_use_the_private_helper(mode: str, exchange: str, method: str) -> None:
     import inspect

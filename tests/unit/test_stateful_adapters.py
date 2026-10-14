@@ -18,7 +18,6 @@ EXCHANGES = (
     "bitget",
     "bingx",
     "mexc",
-    "kucoin",
     "backpack",
     "kraken",
 )
@@ -72,22 +71,6 @@ def order_record(exchange, spot, cancelled=False, price="90", size=".12"):
             vol=size,
             dealVol="0",
             state=4 if cancelled else 2,
-        )
-    if exchange == "kucoin":
-        return dict(
-            id="123",
-            symbol="BTCUSDT",
-            side="buy",
-            type="limit",
-            price=price,
-            size=size,
-            dealSize="0",
-            cancelExist=cancelled,
-            **(
-                {"active": not cancelled, "inOrderBook": not cancelled}
-                if spot
-                else {"isActive": not cancelled}
-            ),
         )
     if exchange == "backpack":
         return dict(
@@ -154,10 +137,8 @@ class ExchangeMock:
                 return dict(retCode=0, result=payload)
             if ex == "okx":
                 return dict(code="0", data=payload)
-            if ex in {"bitget", "kucoin", "bingx"}:
-                return dict(
-                    code={"bitget": "00000", "kucoin": "200000", "bingx": 0}[ex], data=payload
-                )
+            if ex in {"bitget", "bingx"}:
+                return dict(code={"bitget": "00000", "bingx": 0}[ex], data=payload)
             if ex == "mexc" and not self.spot:
                 return dict(success=True, code=0, data=payload)
             if ex == "kraken":
@@ -193,7 +174,6 @@ class ExchangeMock:
                 "bitget": {"orderId": "123"},
                 "bingx": {"orderId": "123"} if spot else {"order": {"orderId": "123"}},
                 "mexc": {"orderId": "123"} if spot else "123",
-                "kucoin": {"orderId": "123"},
                 "backpack": {"id": "123"},
                 "kraken": {"txid": ["123"]}
                 if spot
@@ -243,8 +223,6 @@ class ExchangeMock:
             orders = [record] if self.placed and not self.cancelled else []
             if ex in {"bybit", "bitget"}:
                 return {"list": orders}
-            if ex == "kucoin":
-                return {"items": orders}
             if ex == "bingx":
                 return {"orders": orders}
             if ex == "kraken":
@@ -341,8 +319,6 @@ class ExchangeMock:
             if method == "get_fund_account_balance":
                 return {"assets": [{"asset": "USDT", "free": "13.23", "locked": "0"}]}
             return {"balances": wallet} if spot else {"balance": {"availableMargin": "20"}}
-        if ex == "kucoin":
-            return [{"currency": "USDT", "available": "20"}] if spot else {"availableBalance": "20"}
         if ex == "backpack":
             # Orders use autoLendRedeem, so the adapter reads wallet plus lent quantity.
             return {
@@ -397,7 +373,6 @@ def test_queried_order_fields_are_not_defaulted(exchange, spot):
         ("bybit", {"retCode": 10001}),
         ("okx", {"code": "51000"}),
         ("bitget", {"code": "40085"}),
-        ("kucoin", {"code": "400100"}),
         ("bingx", {"code": 100001}),
         ("binance", {"code": -1013}),
         ("aster", {"code": -1013}),
@@ -408,13 +383,6 @@ def test_queried_order_fields_are_not_defaulted(exchange, spot):
 def test_http_success_with_exchange_rejection_fails(exchange, payload):
     with pytest.raises(LifecycleError):
         response_data(exchange, payload)
-
-
-def test_unbooked_orders_are_not_resting():
-    # Bitget "new" is a resting state (seen live on a far-from-market post-only order).
-    record = order_record("kucoin", True)
-    record["inOrderBook"] = False
-    assert normalize_order("kucoin", True, record, "123").state != "open"
 
 
 @pytest.mark.parametrize(
@@ -513,21 +481,6 @@ def test_documented_resting_states_are_open(exchange, status):
 
 
 @pytest.mark.asyncio
-async def test_kucoin_null_order_data_is_polled_again():
-    client = ExchangeMock("kucoin", True, "async")
-    original = client.payload
-
-    def payload(method, kw):
-        if method == "get_spot_order":
-            return None
-        return original(method, kw)
-
-    client.payload = payload
-    adapter = CexAdapter(client, "kucoin", "spot", "BTC-USDT-SPOT")
-    assert await adapter.order("123") is None
-
-
-@pytest.mark.asyncio
 async def test_backpack_orders_redeem_lent_funds_but_never_borrow():
     client = ExchangeMock("backpack", True, "async")
     adapter = CexAdapter(client, "backpack", "spot", "BTC-USDT-SPOT")
@@ -553,32 +506,6 @@ async def test_backpack_existing_debt_stops_before_any_order():
     with pytest.raises(LifecycleError, match="borrow liability"):
         await adapter.available()
     assert not any(name.startswith("place_") for name, _ in client.calls)
-
-
-@pytest.mark.parametrize(
-    ("mode", "leverage"), [("CROSS", "3"), ("ISOLATED", "1")], ids=["cross", "isolated"]
-)
-@pytest.mark.asyncio
-async def test_kucoin_futures_order_uses_current_margin_mode(mode, leverage):
-    # Live 330005: the order's margin mode must match the symbol's current one (default ISOLATED).
-    client = ExchangeMock("kucoin", False, "async")
-    original = client.payload
-
-    def payload(method, kw):
-        if method == "get_futures_margin_mode":
-            return {"symbol": "DOGEUSDTM", "marginMode": mode}
-        return original(method, kw)
-
-    client.payload = payload
-    adapter = CexAdapter(client, "kucoin", "swap", "DOGE-USDT-SWAP")
-    plan, _ = await adapter.prepare()
-    await adapter.place(plan)
-    params = next(kw for name, kw in client.calls if name == "place_futures_order")
-    assert (params["marginMode"], params["leverage"]) == (mode, leverage)
-    assert ("get_futures_cross_margin_leverage" in {n for n, _ in client.calls}) == (
-        mode == "CROSS"
-    )
-    assert not any(name.startswith(("set_", "modify_")) for name, _ in client.calls)
 
 
 @pytest.mark.asyncio
@@ -624,15 +551,3 @@ async def test_mexc_contract_order_id_may_be_wrapped_in_an_object():
     adapter = CexAdapter(client, "mexc", "swap", "BTC-USDT-SWAP")
     plan, _ = await adapter.prepare()
     assert await adapter.place(plan) == "861578920561512960"
-
-
-@pytest.mark.asyncio
-async def test_kucoin_futures_order_not_yet_visible_is_polled_again():
-    client = ExchangeMock("kucoin", False, "async")
-
-    def reject(**_):
-        raise RuntimeError("KUCOIN API Error: [100001] error.getOrder.orderNotExist")
-
-    client.get_futures_order = reject
-    adapter = CexAdapter(client, "kucoin", "swap", "BTC-USDT-SWAP")
-    assert await adapter.order("496075506332991488") is None

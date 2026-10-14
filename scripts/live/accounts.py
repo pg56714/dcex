@@ -39,8 +39,6 @@ def account_name(exchange: str, market: str, symbol: str) -> str:
             "backpack": "trading",
             "extended": "trading",
         }[exchange]
-    if exchange == "kucoin":
-        return "trade" if market == "spot" else "futures"
     if exchange == "mexc":
         return "spot" if market == "spot" else "contract"
     if exchange == "aster":
@@ -208,10 +206,6 @@ async def collect(exchange: str, clients: list[tuple[Any, str, str]]) -> Snapsho
         data = await adapter.call("get_coin_balance", accountType="FUND", coin="USDT")
         snapshot.balances["FUND"] = decimal(data["balance"]["transferBalance"])
         snapshot.assets["FUND"] = "USDT"
-    elif exchange == "kucoin":
-        data = await adapter.call("get_account_balance", currency="USDT", type="main")
-        snapshot.balances["main"] = balance(data, "USDT", "currency", "available")
-        snapshot.assets["main"] = "USDT"
     elif exchange == "bingx":
         data = await adapter.call("get_fund_account_balance")
         snapshot.balances["fund"] = balance(data["assets"], "USDT", "asset", "free")

@@ -10,7 +10,6 @@ import pytest
 
 from tests.unit.native_http_helpers import _http_server
 from tests.unit.test_backpack_endpoint_coverage import _client_kwargs as backpack_config
-from tests.unit.test_kucoin_endpoint_coverage import _client_kwargs as kucoin_config
 
 CASES = json.loads((Path(__file__).parents[1] / "fixtures/array_input_formats.json").read_text(encoding="utf8"))
 
@@ -23,7 +22,7 @@ def config(exchange, base):
     if exchange == "lighter":
         return dict(base_url=base, account_index=12, preload_product_table=False)
     module = importlib.import_module(f"tests.unit.test_{exchange}_endpoint_coverage")
-    return module._client_kwargs(base, base) if exchange == "kucoin" else module._client_kwargs(base)
+    return module._client_kwargs(base)
 
 
 def array_value(request, field):
@@ -72,8 +71,6 @@ async def test_each_declared_array_has_equivalent_list_and_string_wire(case, asy
         response = {"code": "00000", "data": {}}
     elif exchange == "bybit":
         response = {"retCode": 0, "result": {}}
-    elif exchange == "kucoin":
-        response = {"code": "200000", "data": {}}
     elif exchange == "okx":
         response = {"code": "0", "data": []}
     elif exchange == "kraken":
@@ -133,26 +130,21 @@ async def test_each_declared_array_has_equivalent_list_and_string_wire(case, asy
 @pytest.mark.asyncio
 @pytest.mark.parametrize("asynchronous", [False, True])
 @pytest.mark.parametrize("encoded", [False, True])
-@pytest.mark.parametrize("exchange", ["backpack", "kucoin"])
-async def test_array_and_json_string_preserve_documented_wire_shape(exchange, encoded, asynchronous):
+async def test_array_and_json_string_preserve_documented_wire_shape(encoded, asynchronous):
     prefix = "dcex.async_support" if asynchronous else "dcex"
-    cls = importlib.import_module(f"{prefix}.{exchange}.client").Client
-    response = {} if exchange == "backpack" else {"code": "200000", "data": {}}
-    with _http_server(response) as (base, received):
-        client = cls(**(backpack_config(base) if exchange == "backpack" else kucoin_config(base, base)))
+    cls = importlib.import_module(f"{prefix}.backpack.client").Client
+    with _http_server({}) as (base, received):
+        client = cls(**backpack_config(base))
         try:
             if asynchronous:
                 await client.async_init()
-            values = ["SPOT", "PERP"] if exchange == "backpack" else ["XBTUSDTM", "ETHUSDTM"]
+            values = ["SPOT", "PERP"]
             value = json.dumps(values) if encoded else values
-            result = client.get_order_history(marketType=value) if exchange == "backpack" else client.set_futures_batch_margin_mode(margin_mode="ISOLATED", symbols=value)
+            result = client.get_order_history(marketType=value)
             if inspect.isawaitable(result):
                 await result
             request = received.get(timeout=10)
-            if exchange == "backpack":
-                assert parse_qs(urlsplit(request["path"]).query)["marketType"] == values
-            else:
-                assert json.loads(request["body"])["symbols"] == values
+            assert parse_qs(urlsplit(request["path"]).query)["marketType"] == values
         finally:
             result = client.close()
             if inspect.isawaitable(result):
@@ -161,7 +153,7 @@ async def test_array_and_json_string_preserve_documented_wire_shape(exchange, en
 
 def test_array_format_fixture_covers_retained_declarations():
     from dcex._input_codec import CATALOG
-    assert len(CASES) == len({(c['exchange'], c['method'], c['field']) for c in CASES}) == 55
+    assert len(CASES) == len({(c['exchange'], c['method'], c['field']) for c in CASES}) == 51
     for case in CASES:
         field = CATALOG['exchanges'][case['exchange']][case['method']]['properties'][case['field']]
         assert field['type'] == 'array'

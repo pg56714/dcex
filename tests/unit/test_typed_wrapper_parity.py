@@ -31,7 +31,6 @@ CLIENTS = {
     "extended": "ExtendedClient",
     "hyperliquid": "HyperliquidClient",
     "kraken": "KrakenClient",
-    "kucoin": "KucoinClient",
     "lighter": "LighterClient",
     "mexc": "MexcClient",
     "okx": "OkxClient",
@@ -61,9 +60,6 @@ KNOWN: dict[tuple[str, str], tuple[set[str], set[str]]] = {
     ("okx", "cancel_spread_order"): ({"ordId"}, set()),
     ("okx", "get_spread_order"): ({"ordId"}, set()),
     # Python keeps its positional order (type_ precedes size); dispatch requires both.
-    ("kucoin", "place_futures_order"): ({"side", "size"}, set()),
-    ("kucoin", "place_futures_market_order"): ({"side", "size"}, set()),
-    ("kucoin", "test_futures_order"): ({"side", "size"}, set()),
     # Python takes the documented order body as keyword arguments.
     ("ondo", "place_order"): ({"market", "side"}, set()),
     # Python keeps all four optional (the category is derived from a unified symbol);

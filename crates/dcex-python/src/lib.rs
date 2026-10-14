@@ -14,7 +14,6 @@ use dcex::exchanges::bybit::BybitClient;
 use dcex::exchanges::extended::ExtendedClient;
 use dcex::exchanges::hyperliquid::HyperliquidClient;
 use dcex::exchanges::kraken::{KrakenAuth, KrakenClient};
-use dcex::exchanges::kucoin::{KucoinClient, KucoinMarket};
 use dcex::exchanges::lighter::{
     LighterClient, LighterContentType, LighterCredentials, LighterNetwork,
 };
@@ -242,17 +241,6 @@ fn mexc_api(api: &str) -> PyResult<MexcApi> {
     }
 }
 
-fn kucoin_market(market: &str) -> PyResult<KucoinMarket> {
-    match market.to_ascii_lowercase().as_str() {
-        "contract" | "futures" | "swap" => Ok(KucoinMarket::Futures),
-        "spot" | "wallet" => Ok(KucoinMarket::Spot),
-        "broker" => Ok(KucoinMarket::Broker),
-        _ => Err(PyValueError::new_err(format!(
-            "unsupported KuCoin market: {market}"
-        ))),
-    }
-}
-
 fn kraken_auth(auth: &str) -> PyResult<KrakenAuth> {
     match auth.to_ascii_lowercase().as_str() {
         "contract" | "futures" | "swap" => Ok(KrakenAuth::Futures),
@@ -330,10 +318,6 @@ mod hyperliquid_ws;
 mod kraken_client;
 #[path = "ws/kraken.rs"]
 mod kraken_ws;
-#[path = "clients/kucoin.rs"]
-mod kucoin_client;
-#[path = "ws/kucoin.rs"]
-mod kucoin_ws;
 #[path = "clients/lighter.rs"]
 mod lighter_client;
 #[path = "ws/lighter.rs"]
@@ -372,8 +356,6 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     hyperliquid_ws::register(m)?;
     kraken_client::register(m)?;
     kraken_ws::register(m)?;
-    kucoin_client::register(m)?;
-    kucoin_ws::register(m)?;
     lighter_client::register(m)?;
     lighter_ws::register(m)?;
     mexc_client::register(m)?;

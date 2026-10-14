@@ -106,8 +106,6 @@ FIELDS: dict[str, Fields] = {
     "okx": Fields(("ordId",), ("clOrdId",), ("state",)),
     "bitget": Fields(("orderId",), ("clientOid",), ("orderStatus", "status")),
     "mexc": Fields(("orderId",), ("externalOid",), ("state",), _MEXC_FUTURES_STATES),
-    # KuCoin's "type" carries the transition (open/match/filled/canceled).
-    "kucoin": Fields(("orderId",), ("clientOid",), ("type",)),
     "kraken": Fields(("order_id",), ("cl_ord_id",), ("order_status",)),
     "extended": Fields(("id",), ("externalId",), ("status",)),
     "ondo": Fields(("orderId", "id"), ("clientOrderId", "clientId"), ("status", "state")),
@@ -190,8 +188,6 @@ def extract_events(exchange: str, payload: object, received_at: float = 0.0) -> 
         if not order_id and not clients:
             continue
         state = normalize_state(row[status_key], spec.states)
-        if exchange == "kucoin" and state == OTHER:
-            state = normalize_state(row.get("status", ""))
         raw = str(row[status_key])[:24]
         events.append(OrderEvent(order_id, clients, state, received_at, raw))
     return events
@@ -621,8 +617,6 @@ def _ack(exchange: str, market: str) -> Callable[[object], str | None] | None:
         if exchange == "mexc":
             channel = str(p.get("channel", ""))
             return _ok_if(channel == "rs.personal.filter", channel == "rs.error")
-        if exchange == "kucoin":
-            return _ok_if(p.get("type") == "ack", p.get("type") == "error")
         if exchange == "kraken" and market == "spot":
             if p.get("method") == "subscribe":
                 return _ok_if(p.get("success") is True, p.get("success") is False)
@@ -732,14 +726,6 @@ def stream_spec(exchange: str, market: str, options: dict[str, Any]) -> StreamSp
             "FuturesPrivateClient login + set_private_filters([order])",
             lambda: ws.FuturesPrivateClient(key, secret, timeout=t),
             lambda c: c.set_private_filters([{"filter": "order"}]),
-        )
-    if exchange == "kucoin":
-        return spec(
-            "private.subscribe_orders (" + ("spot" if spot else "futures") + " tradeOrders)",
-            lambda: ws.private(
-                key, secret, o["passphrase"], timeout=t, market="spot" if spot else "futures"
-            ),
-            lambda c: c.subscribe_orders(),
         )
     if exchange == "kraken":
         if spot:

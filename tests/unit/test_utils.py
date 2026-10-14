@@ -1,15 +1,10 @@
 """Unit tests for small utility modules."""
 # ruff: noqa: D103
 
-from collections.abc import Callable
-
 import pytest
 
 from dcex.utils.decimal_utils import get_decimal_places, reverse_decimal_places
-from dcex.utils.timeframe_utils import (
-    bybit_convert_timeframe,
-    kucoin_convert_timeframe,
-)
+from dcex.utils.timeframe_utils import bybit_convert_timeframe
 
 
 @pytest.mark.parametrize(
@@ -27,29 +22,9 @@ def test_bybit_convert_timeframe(timeframe: str, expected: str) -> None:
     assert bybit_convert_timeframe(timeframe) == expected
 
 
-@pytest.mark.parametrize(
-    ("timeframe", "expected"),
-    [
-        ("1m", "1min"),
-        ("5m", "5min"),
-        ("1h", "1hour"),
-        ("1d", "1day"),
-        ("1w", "1week"),
-    ],
-)
-def test_kucoin_convert_timeframe(timeframe: str, expected: str) -> None:
-    assert kucoin_convert_timeframe(timeframe) == expected
-
-
-@pytest.mark.parametrize(
-    "converter",
-    [bybit_convert_timeframe, kucoin_convert_timeframe],
-)
-def test_timeframe_converters_reject_unknown_values(
-    converter: Callable[[str], str | int],
-) -> None:
+def test_timeframe_converter_rejects_unknown_values() -> None:
     with pytest.raises(ValueError, match="timeframe not supported"):
-        converter("2d")
+        bybit_convert_timeframe("2d")
 
 
 @pytest.mark.parametrize(

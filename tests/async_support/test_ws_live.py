@@ -23,7 +23,6 @@ from dcex.ws import (
     extended,
     hyperliquid,
     kraken,
-    kucoin,
     lighter,
     mexc,
     okx,
@@ -197,16 +196,6 @@ PUBLIC_WS_SPECS = (
         subscribe=lambda ws: ws.subscribe_trades("BTC-USD-SPOT"),
     ),
     WebSocketSpec(
-        name="kucoin",
-        factory=lambda: kucoin.public(timeout=LIVE_WS_TIMEOUT),
-        subscribe=lambda ws: ws.subscribe_trades("BTC-USDT-SPOT"),
-    ),
-    WebSocketSpec(
-        name="kucoin-futures",
-        factory=lambda: kucoin.public(market="futures", timeout=LIVE_WS_TIMEOUT),
-        subscribe=lambda ws: ws.subscribe_trades("BTC-USDT-SWAP"),
-    ),
-    WebSocketSpec(
         name="lighter",
         factory=lambda: lighter.public(
             network=Network.MAINNET,
@@ -350,29 +339,6 @@ PRIVATE_WS_SPECS = (
         factory=lambda: kraken.private(
             api_key=os.environ["KRAKEN_SPOT_API_KEY"],
             api_secret=os.environ["KRAKEN_SPOT_API_SECRET"],
-            timeout=LIVE_WS_TIMEOUT,
-        ),
-        subscribe=lambda ws: ws.subscribe_balances(),
-    ),
-    WebSocketSpec(
-        name="kucoin",
-        env=("KUCOIN_API_KEY", "KUCOIN_API_SECRET", "KUCOIN_API_PASSPHRASE"),
-        factory=lambda: kucoin.private(
-            api_key=os.environ["KUCOIN_API_KEY"],
-            api_secret=os.environ["KUCOIN_API_SECRET"],
-            passphrase=os.environ["KUCOIN_API_PASSPHRASE"],
-            timeout=LIVE_WS_TIMEOUT,
-        ),
-        subscribe=lambda ws: ws.subscribe_orders(),
-    ),
-    WebSocketSpec(
-        name="kucoin-futures",
-        env=("KUCOIN_API_KEY", "KUCOIN_API_SECRET", "KUCOIN_API_PASSPHRASE"),
-        factory=lambda: kucoin.private(
-            api_key=os.environ["KUCOIN_API_KEY"],
-            api_secret=os.environ["KUCOIN_API_SECRET"],
-            passphrase=os.environ["KUCOIN_API_PASSPHRASE"],
-            market="futures",
             timeout=LIVE_WS_TIMEOUT,
         ),
         subscribe=lambda ws: ws.subscribe_balances(),

@@ -18,7 +18,6 @@ CASES = [
     ("bitget", "client_oid", "clientOid", "orderId"),
     ("bingx", "new_client_order_id", "clientOrderID", "orderId"),
     ("mexc", "newClientOrderId", "clientOrderId", "orderId"),
-    ("kucoin", "clientOid", "clientOid", "id"),
     ("backpack", "clientId", "clientId", "id"),
     ("kraken", "cl_ord_id", "cl_ord_id", "id"),
 ]

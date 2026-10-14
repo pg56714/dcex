@@ -88,7 +88,6 @@ _PRIVATE_ENV_VARS = {
     "bitget": ("BITGET_API_KEY", "BITGET_API_SECRET", "BITGET_PASSPHRASE"),
     "bybit": ("BYBIT_API_KEY", "BYBIT_API_SECRET"),
     "extended": ("EXTENDED_API_KEY",),
-    "kucoin": ("KUCOIN_API_KEY", "KUCOIN_API_SECRET", "KUCOIN_API_PASSPHRASE"),
     "kraken": (
         "KRAKEN_SPOT_API_KEY",
         "KRAKEN_SPOT_API_SECRET",

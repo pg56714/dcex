@@ -103,7 +103,7 @@ def test_every_native_dispatch_validates_its_explicit_endpoint():
         for match in re.finditer(pattern, path.read_text(encoding="utf-8"), re.S):
             assert f'input_contracts::pairs("{path.parent.name}", method_name, &params)?;' in match[1], path
             seen.append(path.parent.name)
-    assert len(seen) == 32  # Fifteen perpetual/default clients plus Arcus spot.
+    assert len(seen) == 30  # Fourteen perpetual/default clients plus Arcus spot.
 
 
 def test_relative_prices_are_scoped_to_kraken():

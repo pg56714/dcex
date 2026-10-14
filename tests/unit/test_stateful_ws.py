@@ -268,22 +268,6 @@ async def test_stream_closed_fails_clearly():
             CANCELLED,
         ),
         (
-            "kucoin",
-            {
-                "type": "message",
-                "data": {"orderId": "1", "clientOid": "c", "type": "open", "status": "open"},
-            },
-            OPEN,
-        ),
-        (
-            "kucoin",
-            {
-                "type": "message",
-                "data": {"orderId": "1", "clientOid": "c", "type": "canceled", "status": "done"},
-            },
-            CANCELLED,
-        ),
-        (
             "kraken",
             {
                 "channel": "executions",

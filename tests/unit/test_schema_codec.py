@@ -21,7 +21,6 @@ EXCHANGES = [
     "extended",
     "hyperliquid",
     "kraken",
-    "kucoin",
     "lighter",
     "mexc",
     "okx",
@@ -102,7 +101,6 @@ def test_field_names_do_not_determine_validation_policy():
 @pytest.mark.parametrize(
     "exchange,class_name,method,args",
     [
-        ("kucoin", "ProClient", "send_operation", ("id", "uta.order")),
         ("bybit", "PrivateClient", "send_trade_order", ("order.create",)),
         ("kraken", "V1Client", "send_message", ()),
     ],

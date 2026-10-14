@@ -9,8 +9,8 @@ use std::time::Duration;
 use crate::exchanges::{
     arcus::ArcusClient, aster::AsterClient, backpack::BackpackClient, binance::BinanceClient,
     bingx::BingxClient, bitget::BitgetClient, bybit::BybitClient, extended::ExtendedClient,
-    hyperliquid::HyperliquidClient, kraken::KrakenClient, kucoin::KucoinClient,
-    lighter::LighterClient, mexc::MexcClient, okx::OkxClient, ondo::OndoClient,
+    hyperliquid::HyperliquidClient, kraken::KrakenClient, lighter::LighterClient, mexc::MexcClient,
+    okx::OkxClient, ondo::OndoClient,
 };
 
 const TIMEOUT: Duration = Duration::from_secs(10);
@@ -132,9 +132,6 @@ pub(super) fn hyperliquid(url: &str) -> HyperliquidClient {
 pub(super) fn kraken(url: &str) -> KrakenClient {
     KrakenClient::with_base_urls(None, None, None, None, TIMEOUT, url.into(), url.into()).unwrap()
 }
-pub(super) fn kucoin(url: &str) -> KucoinClient {
-    KucoinClient::with_base_urls(None, None, None, TIMEOUT, url.into(), url.into()).unwrap()
-}
 pub(super) fn lighter(url: &str) -> LighterClient {
     LighterClient::with_base_url(TIMEOUT, url.into()).unwrap()
 }
@@ -235,7 +232,6 @@ fetch_case!(hyperliquid_rows, "hyperliquid", hyperliquid, |c| {
     fetch::fetch_hyperliquid(&c, None)
 });
 fetch_case!(kraken_rows, "kraken", kraken, |c| fetch::fetch_kraken(&c));
-fetch_case!(kucoin_rows, "kucoin", kucoin, |c| fetch::fetch_kucoin(&c));
 fetch_case!(lighter_rows, "lighter", lighter, |c| {
     fetch::fetch_lighter_network(&c, LighterNetwork::Mainnet)
 });

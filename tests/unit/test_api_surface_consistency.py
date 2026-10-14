@@ -18,7 +18,6 @@ EXCHANGES = (
     "extended",
     "hyperliquid",
     "kraken",
-    "kucoin",
     "lighter",
     "mexc",
     "okx",

@@ -13,7 +13,6 @@ mod connection_tests;
 pub mod extended;
 pub mod hyperliquid;
 pub mod kraken;
-pub mod kucoin;
 pub mod lighter;
 pub mod mexc;
 pub mod okx;

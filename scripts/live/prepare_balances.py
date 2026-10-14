@@ -49,10 +49,6 @@ ROUTES = tuple(
         ("bybit", "FUND", "UNIFIED", "USDT", "perp"),
         ("mexc", "contract", "spot", "USDT", "spot"),
         ("mexc", "spot", "contract", "USDT", "perp"),
-        ("kucoin", "main", "trade", "USDT", "spot"),
-        ("kucoin", "futures", "trade", "USDT", "spot"),
-        ("kucoin", "main", "futures", "USDT", "perp"),
-        ("kucoin", "trade", "futures", "USDT", "perp"),
         ("bingx", "fund", "spot", "USDT", "spot"),
         ("bingx", "swap", "spot", "USDT", "spot"),
         ("bingx", "spot", "swap", "USDT", "perp"),
@@ -182,22 +178,6 @@ def submit_transfer(client: Any, route: Route, amount: Decimal) -> None:  # noqa
         )
         if not data["tranId"]:
             raise ValueError("MEXC transfer has no acknowledgement ID")
-    elif route.exchange == "kucoin":
-        data = response_data(
-            "kucoin",
-            client.flex_transfer(
-                currency="USDT",
-                amount=quantity,
-                fromAccountType={"main": "MAIN", "trade": "TRADE", "futures": "CONTRACT"}[
-                    route.source
-                ],
-                toAccountType="TRADE" if route.destination == "trade" else "CONTRACT",
-                transfer_type="INTERNAL",
-                clientOid=str(uuid4()),
-            ),
-        )
-        if not data["orderId"]:
-            raise ValueError("KuCoin transfer has no acknowledgement ID")
     elif route.exchange == "bingx":
         data = response_data(
             "bingx",

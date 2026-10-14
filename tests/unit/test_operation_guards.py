@@ -25,7 +25,6 @@ CONFIRMED = [
     ("bingx", "set_swap_asset_mode", {"asset_mode": "singleAsset"}),
     ("bybit", "delete_api_key", {}),
     ("bybit", "modify_api_key", {"read_only": 1}),
-    ("kucoin", "set_uta_account_mode", {"account_type": "UNIFIED"}),
     ("aster", "trigger_futures_asset_exchange", {}),
 ]
 SCOPED = [
@@ -33,10 +32,6 @@ SCOPED = [
     ("bingx", "close_coin_swap_all_positions", {}),
     ("bingx", "cancel_coin_swap_all_orders", {}),
     ("mexc", "cancel_spot_all_orders", {}),
-    ("kucoin", "cancel_spot_stop_orders", {}),
-    ("kucoin", "cancel_futures_stop_orders", {}),
-    ("kucoin", "cancel_spot_oco_orders", {}),
-    ("kucoin", "cancel_margin_oco_orders", {}),
     ("backpack", "cancel_open_strategies", {}),
 ]
 
@@ -104,85 +99,3 @@ async def test_vault_full_redemption_is_explicit(asynchronous):
     client._native_private.assert_not_called()
     await call(client, "vault_redeem", {"vault_id": 1, "all": True})
     assert dict(client._native_private.call_args.args[1])["all"] == "true"
-
-
-@pytest.mark.asyncio
-@pytest.mark.parametrize("asynchronous", [False, True])
-@pytest.mark.parametrize(
-    "exchange,method,base_kwargs,id_kwargs,path,verb",
-    [
-        (
-            "kucoin",
-            "cancel_spot_stop_orders",
-            {},
-            {"order_ids": "123,456"},
-            "/api/v1/stop-order/cancel",
-            "DELETE",
-        ),
-        (
-            "kucoin",
-            "cancel_spot_oco_orders",
-            {},
-            {"order_ids": "123,456"},
-            "/api/v3/oco/orders",
-            "DELETE",
-        ),
-        (
-            "kucoin",
-            "cancel_margin_oco_orders",
-            {},
-            {"order_ids": "123,456"},
-            "/api/v3/hf/margin/oco-order/cancel",
-            "DELETE",
-        ),
-    ],
-)
-@pytest.mark.parametrize("scope", ["ids", "symbol", "conflict"])
-async def test_id_scoped_cancel_wire(
-    asynchronous, exchange, method, base_kwargs, id_kwargs, path, verb, scope
-):
-    import importlib
-
-    helper = importlib.import_module(f"tests.unit.test_{exchange}_endpoint_coverage")
-    prefix = "dcex.async_support" if asynchronous else "dcex"
-    cls = importlib.import_module(f"{prefix}.{exchange}.client").Client
-    payload = {"code": "200000" if exchange == "kucoin" else "00000", "data": {}}
-    with _http_server(payload) as (base, received):
-        config = (
-            helper._client_kwargs(base, base)
-            if exchange == "kucoin"
-            else helper._client_kwargs(base)
-        )
-        client = cls(**config)
-        if asynchronous:
-            await client.async_init()
-        kwargs = dict(base_kwargs)
-        if scope == "ids":
-            kwargs.update(id_kwargs)
-        else:
-            kwargs["product_symbol"] = "BTC-USDT-SPOT" if exchange == "kucoin" else "BTC-USDT-SWAP"
-        try:
-            if scope == "conflict":
-                with pytest.raises(ValueError, match="exclusively"):
-                    await invoke(client, method, **kwargs, all_symbols=True)
-                assert received.empty()
-                return
-            await invoke(client, method, **kwargs)
-        finally:
-            result = client.close()
-            if inspect.isawaitable(result):
-                await result
-        request = received.get_nowait()
-        assert request["method"] == verb
-        assert urlsplit(request["path"]).path == path
-        fields = (
-            json.loads(request["body"])
-            if exchange == "bitget"
-            else dict(parse_qsl(urlsplit(request["path"]).query))
-        )
-        assert "all_symbols" not in fields
-        if scope == "ids":
-            assert "symbol" not in fields
-            assert fields["orderIdList" if exchange == "bitget" else "orderIds"] == (
-                id_kwargs.get("order_id_list") or id_kwargs["order_ids"]
-            )

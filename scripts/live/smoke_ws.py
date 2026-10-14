@@ -54,10 +54,6 @@ PUBLIC: dict[str, list[tuple[str, dict[str, Any], Subscribe]]] = {
     "extended": [("swap", {}, lambda c: c.subscribe_trades("BTC-USD"))],
     "hyperliquid": [("swap", {}, lambda c: c.subscribe_orderbook("BTC"))],
     "kraken": [("spot", {}, lambda c: c.subscribe_ticker("BTC/USD"))],
-    "kucoin": [
-        ("spot", {}, lambda c: c.subscribe_ticker("BTC-USDT-SPOT")),
-        ("swap", {"market": "futures"}, lambda c: c.subscribe_ticker("BTC-USDT-SWAP")),
-    ],
     "lighter": [("mainnet", {}, lambda c: c.subscribe_orderbook(0))],
     "mexc": [("spot", {}, lambda c: c.subscribe_book_ticker("BTC-USDT-SPOT"))],
     "okx": [("spot", {}, lambda c: c.subscribe_ticker("BTC-USDT-SPOT"))],

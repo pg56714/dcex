@@ -49,8 +49,7 @@ async fn fetch_exchange_rows(exchange: Exchange, timeout: Duration) -> Result<Ve
     use crate::exchanges::{
         arcus::ArcusClient, aster::AsterClient, backpack::BackpackClient, binance::BinanceClient,
         bingx::BingxClient, bitget::BitgetClient, bybit::BybitClient, extended::ExtendedClient,
-        kraken::KrakenClient, kucoin::KucoinClient, mexc::MexcClient, okx::OkxClient,
-        ondo::OndoClient,
+        kraken::KrakenClient, mexc::MexcClient, okx::OkxClient, ondo::OndoClient,
     };
     match exchange {
         Exchange::Arcus => fetch::fetch_arcus(&ArcusClient::public(timeout)?).await,
@@ -71,7 +70,6 @@ async fn fetch_exchange_rows(exchange: Exchange, timeout: Duration) -> Result<Ve
         Exchange::Bybit => fetch::fetch_bybit(&BybitClient::public(5_000, false, timeout)?).await,
         Exchange::Extended => fetch::fetch_extended(&ExtendedClient::public(timeout)?).await,
         Exchange::Hyperliquid => fetch_hyperliquid_rows(None, timeout).await,
-        Exchange::KuCoin => fetch::fetch_kucoin(&KucoinClient::public(timeout)?).await,
         Exchange::Kraken => fetch::fetch_kraken(&KrakenClient::public(timeout)?).await,
         Exchange::Lighter => fetch::fetch_lighter(timeout).await,
         Exchange::Mexc => fetch::fetch_mexc(&MexcClient::public(timeout)?).await,
@@ -290,14 +288,6 @@ fn bybit_product_type(category: &str, contract_type: &str) -> &'static str {
         "futures"
     } else {
         "swap"
-    }
-}
-
-fn normalize_kucoin_currency(value: &str) -> String {
-    if value == "XBT" {
-        "BTC".to_string()
-    } else {
-        value.to_string()
     }
 }
 

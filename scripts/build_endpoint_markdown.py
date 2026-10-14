@@ -92,9 +92,9 @@ def build_markdown() -> dict[Path, str]:
         )
         title = "端點覆蓋與驗證" if zh else "Endpoint coverage and verification"
         intro = (
-            f"核對日期：{d['reviewed']}。原始報表有 3,180 列；目前清冊共 {d['row_count']:,} 列，另保存 15 家交易所的官方文件清冊。"
+            f"核對日期：{d['reviewed']}。原始報表有 3,180 列；目前清冊共 {d['row_count']:,} 列，另保存 14 家交易所的官方文件清冊。"
             if zh
-            else f"Reviewed: {d['reviewed']}. The original report contained 3,180 rows; the reconciled ledger contains {d['row_count']:,} rows, with official documentation inventories for all 15 exchanges."
+            else f"Reviewed: {d['reviewed']}. The original report contained 3,180 rows; the reconciled ledger contains {d['row_count']:,} rows, with official documentation inventories for all 14 exchanges."
         )
         scope = (
             "所有官方端點均納入範圍，包含提款、地址管理、做市商、RFQ、經紀商、推薦與合作夥伴操作。原先 111 個 excluded 列已處理，沒有保留範圍排除；這不代表所有新發現端點均已實作。"

@@ -75,7 +75,6 @@ uv run --no-sync python -m scripts.build_bitget_wrappers --write
 uv run --no-sync python -m scripts.build_bybit_wrappers --write
 uv run --no-sync python -m scripts.build_bingx_wrappers --write
 uv run --no-sync python -m scripts.build_hyperliquid_wrappers --write
-uv run --no-sync python -m scripts.build_kucoin_wrappers --write
 uv run --no-sync python -m scripts.build_schema_tables --write
 uv run --no-sync ruff format dcex scripts
 uv run --no-sync ruff check dcex scripts --fix
@@ -117,7 +116,7 @@ Kraken V1 `amendOrder` 的限價／觸發價也允許相對價格。
 完整性檢查會將擷取的 OKX 批次／修改封包欄位名與巢狀宣告比較；只改宣告名稱、
 未改實際 wire 欄位時測試必須失敗。符合數值名稱模式的豁免須有 bool/int 型別註記，
 並提供包含方法／欄位識別的具體理由。幣別及模式選擇器改採明確的非 decimal 宣告。
-KuCoin 存入保證金要求正值；Bybit 增減保證金則明確允許有號差額。
+Bybit 增減保證金明確允許有號差額。
 
 Bybit 下單數量要求正值，只有 `reduceOnly` 與 `closeOnTrigger` 同時為真時，
 才由 `x-zero-when` 同層條件允許零，保留
@@ -138,7 +137,7 @@ Rust ledger 中沒有 `::symbol` 的引用刻意維持**檔案層級證據**：
 所有 11 支 `scripts/build_*.py` 都必須明確指定 `--write` 或 `--check`。`--check` 在記憶體渲染；Rust 使用 rustfmt 標準輸入／輸出，Python 使用 Ruff 標準輸入／輸出，檔案有差異時回傳非零但不寫入。執行 `python -B -m scripts.build_schema_tables --check` 也會檢查格式化後的 Rust 表格；CI 逐一執行全部產生器。簽章向量使用隔離的 `uv run --no-sync --with hyperliquid-python-sdk==0.24.0 python -B -m scripts.build_hyperliquid_action_vectors --check`。
 
 
-wire 名稱完整性已涵蓋全部 15 個交易所的既有端點封包測試；
+wire 名稱完整性已涵蓋全部 14 個交易所的既有端點封包測試；
 控制欄位以端點、完整路徑及已核對值限定，一般 description 不會免除 decimal 檢查。
 Backpack 百分比必須大於 0 且不超過 100，以精確十進位方式比較。
 Kraken 現貨數量 0 僅允許 reduce_only 或 ordertype=settle-position；

@@ -26,7 +26,6 @@ EXCHANGE_ORDER = [
     "bingx",
     "kraken",
     "mexc",
-    "kucoin",
     "hyperliquid",
     "lighter",
     "backpack",

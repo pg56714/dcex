@@ -2,9 +2,9 @@ use super::exchanges::{
     append_hyperliquid_spot_rows, arcus_market_info, backpack_rfq_market_info,
     binance_coin_futures_market_info, binance_equity_market_info, binance_option_market_info,
     bitget_uta_futures_market_info, bybit_option_expiry, bybit_option_market_info,
-    hyperliquid_perpetual_market_info, kucoin_futures_market_info, mexc_contract_market_info,
-    mexc_contract_pair, mexc_spot_market_info, okx_market_info, okx_option_market_info,
-    okx_unlisted_option_family, option_product_symbol, validate_bingx_products,
+    hyperliquid_perpetual_market_info, mexc_contract_market_info, mexc_contract_pair,
+    mexc_spot_market_info, okx_market_info, okx_option_market_info, okx_unlisted_option_family,
+    option_product_symbol, validate_bingx_products,
 };
 use super::*;
 use crate::product_table::MarketInfo;
@@ -119,7 +119,6 @@ fn skips_only_unlisted_okx_option_families() {
 
 #[test]
 fn normalizes_exchange_specific_currency_aliases() {
-    assert_eq!(normalize_kucoin_currency("XBT"), "BTC");
     assert_eq!(normalize_kraken_currency("XXBT"), "BTC");
     assert_eq!(normalize_kraken_currency("ZUSD"), "USD");
     assert_eq!(normalize_kraken_spot_currency("XOMx", true), "XOMx");
@@ -225,7 +224,6 @@ fn canonical_symbols_cover_exchange_specific_formats() {
     );
     assert!(bybit_product_symbol(&serde_json::json!({}), "BTC", "USD", "futures").is_err());
     assert_eq!(bybit_product_type("inverse", "InverseFutures"), "futures");
-    assert_eq!(normalize_kucoin_currency("XBT"), "BTC");
     assert_eq!(normalize_kraken_currency("XXBT"), "BTC");
 }
 
@@ -344,28 +342,6 @@ fn maps_bitget_uta_coin_and_usdc_futures() {
     });
     let row = bitget_uta_futures_market_info(&usdc, "USDC-FUTURES").unwrap();
     assert_eq!(row.product_symbol, "BTC-USDC-SWAP");
-}
-
-#[test]
-fn distinguishes_kucoin_delivery_months_from_perpetuals() {
-    let perpetual = serde_json::json!({
-        "symbol": "XBTUSDM", "baseCurrency": "XBT", "quoteCurrency": "USD",
-        "type": "FFWCSX", "expireDate": null
-    });
-    let dated = serde_json::json!({
-        "symbol": "XBTMU26", "baseCurrency": "XBT", "quoteCurrency": "USD",
-        "type": "FFICSX", "expireDate": 1790323200000_i64
-    });
-    assert_eq!(
-        kucoin_futures_market_info(&perpetual)
-            .unwrap()
-            .product_symbol,
-        "BTC-USD-SWAP"
-    );
-    let dated = kucoin_futures_market_info(&dated).unwrap();
-    // expireDate 2026-09-25 08:00 UTC.
-    assert_eq!(dated.product_symbol, "BTC-USD-260925-FUTURES");
-    assert_eq!(dated.product_type, "futures");
 }
 
 #[test]

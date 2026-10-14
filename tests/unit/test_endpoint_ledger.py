@@ -211,7 +211,6 @@ def test_official_inventory_has_a_ledger_disposition(exchange: str) -> None:
 @pytest.mark.parametrize(
     ("exchange", "method", "template", "literal"),
     [
-        ("kucoin", "GET", "/api/v1/accounts/{accountId}", "/api/v1/accounts/ledgers"),
         ("ondo", "GET", "/v1/perps/orders/{orderID}", "/v1/perps/orders/csv"),
         (
             "kraken",

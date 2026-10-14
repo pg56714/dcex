@@ -1606,30 +1606,6 @@ mod tests {
             ]
         );
 
-        let client =
-            crate::exchanges::kucoin::KucoinClient::public(std::time::Duration::from_secs(1))
-                .expect("client");
-        let spot = client.place_spot_order("BTC-USDT-SPOT", "buy", "market");
-        assert_eq!(
-            spot.params,
-            vec![
-                ("product_symbol".to_string(), "BTC-USDT-SPOT".to_string()),
-                ("side".to_string(), "buy".to_string()),
-                ("type".to_string(), "market".to_string())
-            ]
-        );
-
-        let futures = client.place_futures_order("BTC-USDT-SWAP", "sell", "limit", "1");
-        assert_eq!(
-            futures.params,
-            vec![
-                ("product_symbol".to_string(), "BTC-USDT-SWAP".to_string()),
-                ("side".to_string(), "sell".to_string()),
-                ("type".to_string(), "limit".to_string()),
-                ("size".to_string(), "1".to_string())
-            ]
-        );
-
         let client = crate::exchanges::mexc::MexcClient::public(std::time::Duration::from_secs(1))
             .expect("client");
         let spot = client.place_spot_order("MX-USDT-SPOT", "BUY", "MARKET");
@@ -1676,7 +1652,6 @@ pub mod bybit;
 pub mod extended;
 pub mod hyperliquid;
 pub mod kraken;
-pub mod kucoin;
 pub mod lighter;
 pub mod mexc;
 pub mod okx;
@@ -1703,13 +1678,12 @@ fn every_client_has_a_catalog_identity() {
         extended::ExtendedClient::INPUT_EXCHANGE,
         hyperliquid::HyperliquidClient::INPUT_EXCHANGE,
         kraken::KrakenClient::INPUT_EXCHANGE,
-        kucoin::KucoinClient::INPUT_EXCHANGE,
         lighter::LighterClient::INPUT_EXCHANGE,
         mexc::MexcClient::INPUT_EXCHANGE,
         okx::OkxClient::INPUT_EXCHANGE,
         ondo::OndoClient::INPUT_EXCHANGE,
     ];
-    assert_eq!(identities.len(), 16);
+    assert_eq!(identities.len(), 15);
     for identity in identities {
         assert!(catalog["exchanges"][identity].is_object(), "{identity}");
     }

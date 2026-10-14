@@ -16,7 +16,6 @@ pub(super) fn validate(
         ),
         "bingx" => matches!(method, "reverse_swap_position" | "set_swap_asset_mode"),
         "bybit" => matches!(method, "delete_api_key" | "modify_api_key"),
-        "kucoin" => method == "set_uta_account_mode",
         "aster" => matches!(method, "trigger_futures_asset_exchange"),
         _ => false,
     };
@@ -33,13 +32,6 @@ pub(super) fn validate(
             "close_coin_swap_all_positions" | "cancel_coin_swap_all_orders"
         ),
         "mexc" => method == "cancel_spot_all_orders",
-        "kucoin" => matches!(
-            method,
-            "cancel_spot_stop_orders"
-                | "cancel_futures_stop_orders"
-                | "cancel_spot_oco_orders"
-                | "cancel_margin_oco_orders"
-        ),
         "backpack" => method == "cancel_open_strategies",
         "ondo" => method == "cancel_spot_orders",
         _ => false,
@@ -57,26 +49,10 @@ pub(super) fn validate(
                     !values.is_empty() && values.iter().all(|v| !v.trim().is_empty())
                 })
             });
-        let ids = params.iter().any(|(k, v)| match k.as_str() {
-            "orderIds" => !v.trim().is_empty() && v.split(',').all(|id| !id.trim().is_empty()),
-            "orderIdList" => {
-                serde_json::from_str::<Vec<serde_json::Value>>(v).is_ok_and(|values| {
-                    !values.is_empty()
-                        && values.iter().all(|item| {
-                            ["orderId", "clientOid"].iter().any(|key| {
-                                item.get(key)
-                                    .and_then(serde_json::Value::as_str)
-                                    .is_some_and(|id| !id.trim().is_empty())
-                            })
-                        })
-                })
-            }
-            _ => false,
-        });
-        if all == (symbol || symbols || ids) {
+        if all == (symbol || symbols) {
             return Err(invalid(
                 method,
-                "provide a symbol, order IDs, or all_symbols=true, exclusively",
+                "provide a symbol or all_symbols=true, exclusively",
             ));
         }
     }
@@ -117,25 +93,6 @@ fn invalid(method: &str, message: &str) -> DcexError {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn order_ids_scope_cancellation_without_account_wide_permission() {
-        for (exchange, method, key, ids) in [
-            ("kucoin", "cancel_spot_stop_orders", "orderIds", "123,456"),
-            ("kucoin", "cancel_spot_oco_orders", "orderIds", "123,456"),
-            ("kucoin", "cancel_margin_oco_orders", "orderIds", "123,456"),
-        ] {
-            for scope in [
-                vec![(key.into(), ids.into())],
-                vec![("product_symbol".into(), "BTC-USDT-SWAP".into())],
-            ] {
-                assert_eq!(validate(exchange, method, scope.clone()).unwrap(), scope);
-                let mut conflicting = scope;
-                conflicting.push(("all_symbols".into(), "true".into()));
-                assert!(validate(exchange, method, conflicting).is_err());
-            }
-        }
-    }
 
     #[test]
     fn local_flags_cannot_be_omitted_duplicated_or_sent_to_exchange() {

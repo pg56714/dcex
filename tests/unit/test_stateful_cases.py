@@ -54,7 +54,7 @@ AMEND_METHODS = {
     "edit_futures_order",
 }
 # Cancel-replace venues give the amended order a new ID.
-REPLACING = {("binance", True), ("bingx", True), ("bingx", False), ("kucoin", True)}
+REPLACING = {("binance", True), ("bingx", True), ("bingx", False)}
 
 
 def walk(value, keys, change):
@@ -176,7 +176,7 @@ def tif_params(exchange, spot, tif):
         if spot:
             return {"type_": {"IOC": "IMMEDIATE_OR_CANCEL", "FOK": "FILL_OR_KILL"}[tif]}
         return {"type_": {"IOC": 3, "FOK": 4}[tif]}
-    if exchange in {"kucoin", "backpack"}:
+    if exchange == "backpack":
         return {"timeInForce": tif}
     if spot:
         return {"timeinforce": tif}
@@ -191,7 +191,6 @@ REDUCE_PARAMS = {
     "bitget": {"reduce_only": "yes", "time_in_force": "post_only"},
     "bingx": {"reduce_only": "true", "time_in_force": "PostOnly"},
     "mexc": {"side": 2, "type_": 2, "openType": 1},
-    "kucoin": {"reduceOnly": True, "postOnly": True},
     "backpack": {"reduceOnly": True, "postOnly": True},
     "kraken": {"reduceOnly": True, "orderType": "post"},
 }
@@ -214,7 +213,6 @@ AMEND_CALLS = {
         {"cancel_order_id": "123", "time_in_force": "PostOnly", "position_side": "BOTH"},
     ),
     ("mexc", False): ("amend_contract_limit_order", {"orderId": "123"}),
-    ("kucoin", True): ("alter_spot_order", {"orderId": "123"}),
     ("kraken", True): ("amend_spot_order", {"txid": "123", "post_only": True}),
     ("kraken", False): ("edit_futures_order", {"orderId": "123"}),
 }
@@ -427,7 +425,7 @@ async def test_cex_amend_moves_one_tick_and_tracks_ids(params):
     if (exchange, spot) in REPLACING:
         assert result["order_id"] == "123->456"
         assert "456" in {str(value) for value in cancels[0].values()}
-        assert adapter.client_order_id != first_client_id or exchange == "kucoin"
+        assert adapter.client_order_id != first_client_id
         assert result["prior_client_order_ids"].split(",")[-1] == adapter.client_order_id
     else:
         assert result["order_id"] == "123"
@@ -509,11 +507,11 @@ async def test_unconfirmed_amend_cleanup_fails_loudly_with_every_id():
 
 @pytest.mark.asyncio
 async def test_amend_replaced_old_order_still_open_fails():
-    client = CaseMock("kucoin", True, "sync", "amend")
+    client = CaseMock("binance", True, "sync", "amend")
     original = client.payload
 
     def payload(method, kw):
-        if method == "get_spot_order" and kw.get("order_id") == "123" and client.replaced:
+        if method == "get_order" and str(kw.get("orderId")) == "123" and client.replaced:
             client.replaced = False
             data = original(method, kw)  # The old ID still reported active.
             client.replaced = True
@@ -522,7 +520,7 @@ async def test_amend_replaced_old_order_still_open_fails():
 
     client.payload = payload
     with pytest.raises(LifecycleError, match="still open after amendment"):
-        await run_lifecycle(cex_adapter(client, "kucoin", True), {}, poll_delay=0, case="amend")
+        await run_lifecycle(cex_adapter(client, "binance", True), {}, poll_delay=0, case="amend")
 
 
 # DEX and Arcus fixtures ---------------------------------------------------------------
@@ -776,8 +774,8 @@ def test_support_matrix_marks_documented_gaps_na():
         for case in CASES
         if not_applicable(exchange, market_, case)
     }
-    assert ("hyperliquid", "swap", "fok") in na and ("kucoin", "swap", "fok") in na
-    assert ("kucoin", "spot", "fok") not in na and ("kraken", "swap", "fok") not in na
+    assert ("hyperliquid", "swap", "fok") in na and ("aster", "spot", "fok") in na
+    assert ("aster", "swap", "fok") not in na and ("kraken", "swap", "fok") not in na
     assert ("mexc", "spot", "amend") in na and ("mexc", "swap", "amend") not in na
     assert all(case != "lifecycle" and case != "ioc" for _, _, case in na)
     assert not_applicable("binance", "spot", "reduce_only") == (
@@ -932,7 +930,6 @@ def coded(message, code):
         ),
         ("bybit", coded("bybit place_order: code=110017 position is zero", "110017"), True),
         ("okx", coded("okx: code=51169 no position", "51169"), True),
-        ("kucoin", coded("kucoin: code=300009 No open positions to close.", "300009"), True),
         ("mexc", coded("mexc: code=2009 Position is nonexistent or closed", "2009"), True),
         ("mexc", coded('HTTP 200: {"success":false,"code":2009}', ""), True),
         ("mexc", coded('HTTP 200: {"success":false,"code":2008}', ""), False),
@@ -1187,8 +1184,7 @@ async def test_arcus_unqueryable_ioc_passes_on_zero_fill_acknowledgement():
     assert "not queryable; placement reported zero fill" in result["cleanup"]
 
 
-def test_library_gaps_are_named():
-    assert "library has no order amendment" in not_applicable("kucoin", "swap", "amend")
+def test_extended_perpetual_amendment_is_tested():
     assert not_applicable("extended", "swap", "amend") is None
 
 

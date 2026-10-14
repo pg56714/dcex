@@ -97,14 +97,6 @@ async fn request(
             url.clone(),
             url
         )),
-        "kucoin" => call!(kucoin::KucoinClient::with_base_urls(
-            None,
-            None,
-            None,
-            timeout,
-            url.clone(),
-            url
-        )),
         "lighter" => call!(lighter::LighterClient::with_base_url(timeout, url)),
         "mexc" => call!(mexc::MexcClient::with_base_urls(
             None,
@@ -134,7 +126,6 @@ fn server(exchange: &str) -> (String, std::thread::JoinHandle<String>) {
         "binance" => r#"{}"#,
         "okx" => r#"{"code":"0","data":[]}"#,
         "bitget" => r#"{"code":"00000","data":{}}"#,
-        "kucoin" => r#"{"code":"200000","data":{}}"#,
         _ => r#"{"code":0,"retCode":0,"success":true,"status":"OK","error":[],"data":{}}"#,
     };
     let handle = std::thread::spawn(move || {
@@ -347,24 +338,6 @@ fn cases() -> Vec<Case> {
             "flexible_futures",
         ),
         (
-            "kucoin",
-            "get_spot_orderbook",
-            "product_symbol",
-            None,
-            "BTC-USDT",
-            "spot",
-            "spot",
-        ),
-        (
-            "kucoin",
-            "get_futures_orderbook",
-            "product_symbol",
-            None,
-            "XBTUSDTM",
-            "swap",
-            "FFWCSX",
-        ),
-        (
             "lighter",
             "get_order_book_details",
             "product_symbol",
@@ -482,14 +455,6 @@ fn cases() -> Vec<Case> {
             "BTC-25DEC26-80000-C",
             "option",
             "option",
-        ),
-        (
-            "kucoin",
-            "get_futures_orderbook",
-            None,
-            "XBTMM26",
-            "futures",
-            "FFCCSX",
         ),
         (
             "kraken",

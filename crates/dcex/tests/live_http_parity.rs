@@ -34,7 +34,6 @@ mod live_http_parity {
     mod bybit;
     mod hyperliquid;
     mod kraken;
-    mod kucoin;
     mod lighter;
     mod mexc;
     mod okx;

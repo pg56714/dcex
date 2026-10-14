@@ -84,11 +84,6 @@ def hyperliquid() -> ProductTable:
     return _fetch("hyperliquid")
 
 
-def kucoin() -> ProductTable:
-    """Fetch KuCoin product metadata."""
-    return _fetch("kucoin")
-
-
 def kraken() -> ProductTable:
     """Fetch Kraken product metadata."""
     return _fetch("kraken")

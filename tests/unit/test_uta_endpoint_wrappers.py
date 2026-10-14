@@ -1,4 +1,4 @@
-"""Offline verification for newly added Bitget and KuCoin UTA endpoints."""
+"""Offline verification for newly added Bitget UTA endpoints."""
 
 # ruff: noqa: D103
 
@@ -144,24 +144,6 @@ UTA_CASES = (
         "modify_uta_strategy_order",
         {"qty": "1", "order_id": "123"},
         "NATIVE_PRIVATE",
-    ),
-    (
-        "kucoin",
-        "get_uta_fee_rates",
-        {"tradeType": "SPOT", "symbol": "BTC-USDT"},
-        "NATIVE_PRIVATE",
-    ),
-    (
-        "kucoin",
-        "get_uta_position_tiers",
-        {
-            "product_symbol": "BTC-USDT-SWAP",
-            "tradeType": "FUTURES",
-            "marginMode": "CROSS",
-            "data": "RISK_LIMIT",
-            "accountType": "UNIFIED",
-        },
-        "NATIVE_PUBLIC",
     ),
     (
         "bybit",

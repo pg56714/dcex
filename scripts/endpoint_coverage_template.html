@@ -155,7 +155,7 @@ input[type=search]{width:min(340px,86vw)}
 "use strict";
 const D = JSON.parse(document.getElementById("data").textContent);
 const EX = D.exchanges;
-const NAMES = {binance:"Binance",bybit:"Bybit",okx:"OKX",bitget:"Bitget",bingx:"BingX",kraken:"Kraken",mexc:"MEXC",kucoin:"KuCoin",hyperliquid:"Hyperliquid",lighter:"Lighter",backpack:"Backpack",aster:"Aster",extended:"Extended",ondo:"Ondo",arcus:"Arcus"};
+const NAMES = {binance:"Binance",bybit:"Bybit",okx:"OKX",bitget:"Bitget",bingx:"BingX",kraken:"Kraken",mexc:"MEXC",hyperliquid:"Hyperliquid",lighter:"Lighter",backpack:"Backpack",aster:"Aster",extended:"Extended",ondo:"Ondo",arcus:"Arcus"};
 const exName = e => NAMES[e] || e;
 const R = D.rows.map(r => ({row:r[0], ex:EX[r[1]], kind:r[2], cat:r[3], ep:r[4], st:r[5], methods:r[6], note:r[7], url:r[8], rust:r[9], sync:r[10], async:r[11]}));
 R.forEach(r => { const m = /^(GET|POST|PUT|DELETE|PATCH)\b/.exec(r.ep); r.verb = m ? m[1] : ""; r.hay = (r.ex+" "+r.cat+" "+r.ep+" "+r.methods.join(" ")+" "+r.note).toLowerCase(); });
