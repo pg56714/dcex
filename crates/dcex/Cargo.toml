@@ -1,14 +1,21 @@
 [package]
 name = "dcex"
-description = "Rust core library for low-latency cross-exchange crypto trading."
+description = "Async Rust crypto exchange API library for CEX and DEX market data, trading and WebSocket streams (Binance, Bybit, OKX, Hyperliquid and more)."
+homepage = "https://github.com/pg56714/dcex"
+documentation = "https://docs.rs/dcex"
 authors.workspace = true
 edition.workspace = true
 license.workspace = true
 readme = "README.md"
 repository.workspace = true
 version = "0.20.0"
-keywords = ["crypto", "trading", "exchange", "http"]
-categories = ["api-bindings", "web-programming::http-client"]
+keywords = ["crypto", "trading", "exchange", "websocket", "binance"]
+categories = [
+  "api-bindings",
+  "finance",
+  "web-programming::http-client",
+  "web-programming::websocket",
+]
 
 [dependencies]
 base64 = "0.22"

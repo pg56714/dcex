@@ -23,7 +23,33 @@ classifiers = [
   "Topic :: System :: Networking",
 ]
 dependencies = []
-description = "Rust-backed Python bindings for low-latency cross-exchange crypto trading."
+description = "Rust-backed Python crypto exchange API library for CEX and DEX market data, trading and WebSocket streams (Binance, Bybit, OKX, Hyperliquid and more)."
+keywords = [
+  "crypto",
+  "cryptocurrency",
+  "exchange",
+  "exchange-api",
+  "trading",
+  "algorithmic-trading",
+  "market-data",
+  "websocket",
+  "asyncio",
+  "dex",
+  "cex",
+  "perpetual-futures",
+  "ccxt",
+  "binance",
+  "bybit",
+  "okx",
+  "bitget",
+  "kraken",
+  "mexc",
+  "bingx",
+  "hyperliquid",
+  "lighter",
+  "backpack",
+  "aster",
+]
 license = "MIT"
 license-files = ["LICENSE", "LICENSES/Apache-2.0.txt", "THIRD_PARTY_NOTICES.md"]
 name = "dcex"
@@ -40,7 +66,11 @@ module-name = "dcex._native"
 python-source = "."
 
 [project.urls]
+Homepage = "https://github.com/pg56714/dcex"
 Repository = "https://github.com/pg56714/dcex"
+Documentation = "https://github.com/pg56714/dcex#readme"
+Issues = "https://github.com/pg56714/dcex/issues"
+Changelog = "https://github.com/pg56714/dcex/blob/main/CHANGELOG.md"
 
 [dependency-groups]
 dev = [

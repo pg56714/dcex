@@ -2,7 +2,7 @@
 
 [English](README.md) | **繁體中文**
 
-dcex 是以 Rust 為核心的交易所函式庫，提供 Python 同步／非同步介面及可直接使用的 Rust crate。它涵蓋市場資料、帳戶查詢、訂單 API 與公開／私人 WebSocket 資料流。
+dcex 是以 Rust 為核心的加密貨幣交易所 API 函式庫，提供 Python 同步／非同步介面及可直接使用的 Rust crate。它涵蓋市場資料、帳戶查詢、訂單 API 與公開／私人 WebSocket 資料流，支援中心化交易所（Binance、Bybit、OKX、Bitget、Kraken、MEXC、BingX）與去中心化永續合約交易所（Hyperliquid、Lighter、Backpack、Aster、Extended、Ondo、Arcus）。
 
 **Broker code：**dcex 不預設或自動附加 broker code、broker tag。若交易所 API 支援相關欄位，可由呼叫端明確指定。
 
@@ -36,6 +36,15 @@ cargo add dcex
 - 可直接用於 Rust 專案的 HTTP、WebSocket 與簽章實作。
 - Product Table Manager（PTM）統一交易所商品代號與交易規格。
 - 支援多個 CEX 與 DEX；實際可用的端點依交易所而異。
+
+### 與 ccxt 的差異
+
+[ccxt](https://github.com/ccxt/ccxt) 以單一統一 API 支援 100 多家交易所。dcex 支援的交易所較少，但保留各交易所原生端點：
+
+- 使用交易所原生方法與參數，並逐一對照官方文件追蹤端點覆蓋。
+- 簽章、序列化與回應驗證在 Rust 中執行，包含 Hyperliquid、Lighter 與 Extended 的 DEX 簽章。
+- 同一套核心可從 Python（同步與非同步）與 Rust 使用。
+- 透過 Product Table Manager 提供統一商品代號（`BTC-USDT-SWAP`）與交易規格。
 
 官方提款、做市商與合作夥伴端點均納入範圍；實作覆蓋與規格缺口以端點清冊為準。API 提款沒有第二次確認，送出即執行；建議交易用 API 金鑰不要開啟提款權限。PTM 包含 Binance、Bybit 與 OKX 已上市期權；期權交易仍使用各交易所專屬 API。
 

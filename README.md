@@ -2,7 +2,7 @@
 
 **English** | [繁體中文](README.zh_tw.md)
 
-dcex is a Rust-backed exchange library with synchronous and asynchronous Python clients and a standalone Rust crate. It covers market data, account queries, order APIs, and public and private WebSocket streams.
+dcex is a Rust-backed crypto exchange API library with synchronous and asynchronous Python clients and a standalone Rust crate. It covers market data, account queries, order APIs, and public and private WebSocket streams for centralized exchanges (Binance, Bybit, OKX, Bitget, Kraken, MEXC, BingX) and decentralized perpetual exchanges (Hyperliquid, Lighter, Backpack, Aster, Extended, Ondo, Arcus).
 
 **Broker codes:** dcex does not set or attach a broker code or broker tag by default. You can specify one explicitly when the exchange API supports it.
 
@@ -36,6 +36,15 @@ cargo add dcex
 - HTTP, WebSocket, and signing APIs for direct use from Rust.
 - A Product Table Manager (PTM) that normalizes exchange symbols and trading specifications.
 - Support for multiple CEX and DEX platforms; available endpoints vary by exchange.
+
+### Compared with ccxt
+
+[ccxt](https://github.com/ccxt/ccxt) offers one unified API across 100+ exchanges. dcex covers fewer exchanges and keeps each exchange's own endpoints instead:
+
+- Exchange-native methods and parameters, with coverage tracked endpoint by endpoint against the official docs.
+- Signing, serialization and response validation run in Rust, including DEX signing for Hyperliquid, Lighter and Extended.
+- The same core is available from Python (sync and async) and Rust.
+- Normalized symbols (`BTC-USDT-SWAP`) and trading specifications through the Product Table Manager.
 
 Documented withdrawal, market-maker and partner endpoints are in scope; current coverage and specification gaps are recorded in the endpoint ledger. API withdrawals have no second confirmation; they execute on submit. Trading API keys should not have withdrawal permission. PTM includes listed options from Binance, Bybit, and OKX; option trading remains exchange-specific.
 

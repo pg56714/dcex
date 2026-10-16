@@ -1,0 +1,29 @@
+# dcex
+
+> dcex is a Rust-backed crypto exchange API library for Python (sync and async) and Rust. It provides market data, account queries, order APIs, and public and private WebSocket streams for CEXs (Binance, Bybit, OKX, Bitget, Kraken, MEXC, BingX) and DEXs (Hyperliquid, Lighter, Backpack, Aster, Extended, Ondo, Arcus).
+
+- Install: `pip install dcex` (Python 3.12+) or `cargo add dcex`.
+- Methods and parameters follow each exchange's own API; available endpoints vary by exchange.
+- Symbols use the normalized `product_symbol` format: `BTC-USDT-SPOT`, `BTC-USDT-SWAP`, `BTC-USD-261225-FUTURES`. The Product Table Manager maps them to exchange-native symbols.
+- Sync client: `dcex.binance()`. Async client: `await dcex.async_support.binance()`, then `await client.close()`. WebSocket: `from dcex.ws import binance; async with binance.public() as ws: ...`.
+- dcex does not attach a broker code by default.
+
+## Docs
+
+- [README](https://github.com/pg56714/dcex/blob/main/README.md): installation, supported exchanges, Python quick start, Product Table Manager
+- [Rust crate README](https://github.com/pg56714/dcex/blob/main/crates/dcex/README.md): direct Rust usage
+- [Endpoint audit](https://github.com/pg56714/dcex/blob/main/docs/endpoint-audit.md): endpoint coverage, limitations and verification
+- [Schema conventions](https://github.com/pg56714/dcex/blob/main/docs/schema-conventions.md): request and response schema rules
+
+## Examples
+
+- [Python sync examples](https://github.com/pg56714/dcex/tree/main/examples/sync): public data and read-only account queries per exchange
+- [Python async and WebSocket examples](https://github.com/pg56714/dcex/tree/main/examples/async)
+- [Rust examples](https://github.com/pg56714/dcex/tree/main/crates/dcex/examples)
+
+## Optional
+
+- [Contributing guide](https://github.com/pg56714/dcex/blob/main/.github/CONTRIBUTING.md)
+- [Changelog](https://github.com/pg56714/dcex/blob/main/CHANGELOG.md)
+- [PyPI](https://pypi.org/project/dcex/)
+- [crates.io](https://crates.io/crates/dcex)
