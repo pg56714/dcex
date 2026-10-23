@@ -13,7 +13,7 @@ dcex 是以 Rust 為核心的加密貨幣交易所 API 函式庫，提供 Python
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![PyPI](https://img.shields.io/pypi/v/dcex)](https://badge.fury.io/py/dcex)
 [![Crates.io](https://img.shields.io/crates/v/dcex)](https://crates.io/crates/dcex)
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/pg56714/dcex)
+[![Ask DeepWiki](https://img.shields.io/badge/Ask-DeepWiki-blue)](https://deepwiki.com/pg56714/dcex)
 
 ## 安裝
 

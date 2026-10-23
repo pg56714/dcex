@@ -11,7 +11,7 @@
 [![Rust](https://img.shields.io/badge/rust-2024-orange.svg)](https://www.rust-lang.org/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Crates.io](https://img.shields.io/crates/v/dcex)](https://crates.io/crates/dcex)
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/pg56714/dcex)
+[![Ask DeepWiki](https://img.shields.io/badge/Ask-DeepWiki-blue)](https://deepwiki.com/pg56714/dcex)
 
 ## 安裝
 
