@@ -43,7 +43,7 @@ fn to_py_runtime_error(error: dcex::DcexError) -> PyErr {
             ..
         } => {
             let exception = PyRuntimeError::new_err(error.to_string());
-            Python::with_gil(|py| {
+            Python::attach(|py| {
                 let value = exception.value(py);
                 if let Ok(data) = json_value_to_py(py, data) {
                     let _ = value.setattr("response_data", data);
@@ -59,7 +59,7 @@ fn to_py_runtime_error(error: dcex::DcexError) -> PyErr {
             ..
         } => {
             let exception = PyRuntimeError::new_err(error.to_string());
-            Python::with_gil(|py| {
+            Python::attach(|py| {
                 let value = exception.value(py);
                 let _ = value.setattr("status_code", status);
                 let _ = value.setattr("resp_headers", headers.clone());
@@ -111,17 +111,17 @@ fn python_json_http_response(response: HttpResponse) -> PyResult<PythonJsonRespo
         body,
     } = response;
     let body = if body.is_empty() {
-        Python::with_gil(|py| py.None())
+        Python::attach(|py| py.None())
     } else {
         let data: Value = serde_json::from_slice(&body)
             .map_err(|error| PyRuntimeError::new_err(error.to_string()))?;
-        Python::with_gil(|py| json_value_to_py(py, &data))?
+        Python::attach(|py| json_value_to_py(py, &data))?
     };
     Ok((status, headers, body))
 }
 
 fn python_validated_json_response(response: ValidatedResponse) -> PyResult<PythonJsonResponse> {
-    let body = Python::with_gil(|py| json_value_to_py(py, &response.data))?;
+    let body = Python::attach(|py| json_value_to_py(py, &response.data))?;
     Ok((response.status, response.headers, body))
 }
 
@@ -176,7 +176,7 @@ where
     Fut: Future<Output = dcex::Result<ValidatedResponse>> + Send + 'static,
 {
     let params = params.unwrap_or_default();
-    py.allow_threads(|| block_on(request(method_name, params)))
+    py.detach(|| block_on(request(method_name, params)))
         .map_err(to_py_runtime_error)
         .and_then(python_validated_json_response)
 }
@@ -185,7 +185,7 @@ fn python_json_http_request<F>(py: Python<'_>, request: F) -> PyResult<PythonJso
 where
     F: FnOnce() -> dcex::Result<HttpResponse> + Send,
 {
-    py.allow_threads(request)
+    py.detach(request)
         .map_err(to_py_runtime_error)
         .and_then(python_json_http_response)
 }

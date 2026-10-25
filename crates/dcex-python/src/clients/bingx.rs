@@ -15,7 +15,7 @@ impl PythonBingxHttpClient {
     ) -> PyResult<Py<PyBytes>> {
         let client = self.client.clone();
         let bytes = py
-            .allow_threads(move || {
+            .detach(move || {
                 dcex::http::block_on(async move {
                     client.export_swap_income(params.unwrap_or_default()).await
                 })
@@ -35,7 +35,7 @@ impl PythonBingxHttpClient {
                 .export_swap_income(params.unwrap_or_default())
                 .await
                 .map_err(to_py_runtime_error)?;
-            Python::with_gil(|py| Ok(PyBytes::new(py, &bytes).unbind()))
+            Python::attach(|py| Ok(PyBytes::new(py, &bytes).unbind()))
         })
     }
     #[new]

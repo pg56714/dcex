@@ -10,7 +10,7 @@ impl PythonOkxHttpClient {
     fn get_sbe_orderbook(&self, py: Python<'_>, inst_id_code: u64) -> PyResult<Py<PyBytes>> {
         let client = self.client.clone();
         let bytes = py
-            .allow_threads(move || {
+            .detach(move || {
                 dcex::http::block_on(async move { client.get_sbe_orderbook(inst_id_code).await })
             })
             .map_err(to_py_runtime_error)?;
@@ -27,7 +27,7 @@ impl PythonOkxHttpClient {
                 .get_sbe_orderbook(inst_id_code)
                 .await
                 .map_err(to_py_runtime_error)?;
-            Python::with_gil(|py| Ok(PyBytes::new(py, &bytes).unbind()))
+            Python::attach(|py| Ok(PyBytes::new(py, &bytes).unbind()))
         })
     }
 

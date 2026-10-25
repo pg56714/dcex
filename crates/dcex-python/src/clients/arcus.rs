@@ -169,7 +169,7 @@ impl PythonArcusHttpClient {
         params: Vec<(String, String)>,
     ) -> PyResult<String> {
         let client = self.client.clone();
-        py.allow_threads(move || {
+        py.detach(move || {
             dcex::http::block_on(async move {
                 client
                     .sign_websocket_request(id, &method_name, params)

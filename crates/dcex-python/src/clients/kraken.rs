@@ -10,7 +10,7 @@ impl PythonKrakenHttpClient {
     fn retrieve_spot_export(&self, py: Python<'_>, id: String) -> PyResult<Py<PyBytes>> {
         let client = self.client.clone();
         let bytes = py
-            .allow_threads(move || {
+            .detach(move || {
                 dcex::http::block_on(async move { client.retrieve_spot_export(id).await })
             })
             .map_err(to_py_runtime_error)?;
@@ -27,7 +27,7 @@ impl PythonKrakenHttpClient {
                 .retrieve_spot_export(id)
                 .await
                 .map_err(to_py_runtime_error)?;
-            Python::with_gil(|py| Ok(PyBytes::new(py, &bytes).unbind()))
+            Python::attach(|py| Ok(PyBytes::new(py, &bytes).unbind()))
         })
     }
 

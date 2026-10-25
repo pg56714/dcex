@@ -226,7 +226,7 @@ impl PythonLighterHttpClient {
         params: Option<Vec<(String, String)>>,
     ) -> PyResult<(u64, String, String, Option<String>)> {
         let params = params.unwrap_or_default();
-        py.allow_threads(|| self.client.sign_request_blocking(method_name, params))
+        py.detach(|| self.client.sign_request_blocking(method_name, params))
             .map(|tx| (tx.tx_type, tx.tx_info, tx.tx_hash, None))
             .map_err(to_py_runtime_error)
     }
@@ -269,7 +269,7 @@ impl PythonLighterHttpClient {
     }
 
     fn check_client(&self, py: Python<'_>) -> PyResult<Option<String>> {
-        py.allow_threads(|| self.client.check_client_blocking())
+        py.detach(|| self.client.check_client_blocking())
             .map_err(to_py_runtime_error)
     }
 

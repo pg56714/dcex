@@ -43,7 +43,7 @@ fn lighter_sign_transaction(
         &nonce,
     )
     .map_err(to_py_value_error)?;
-    Python::with_gil(|py| {
+    Python::attach(|py| {
         Ok((
             PyBytes::new(py, &payload).unbind(),
             PyBytes::new(py, &message_hash).unbind(),

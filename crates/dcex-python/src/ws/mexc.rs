@@ -210,7 +210,7 @@ impl PythonMexcPublicWebSocketClient {
                 .recv()
                 .await
                 .map_err(to_py_runtime_error)?;
-            Python::with_gil(|py| Ok(PyBytes::new(py, &body).unbind()))
+            Python::attach(|py| Ok(PyBytes::new(py, &body).unbind()))
         })
     }
 }
@@ -387,7 +387,7 @@ impl PythonMexcPrivateWebSocketClient {
                 .recv()
                 .await
                 .map_err(to_py_runtime_error)?;
-            Python::with_gil(|py| Ok(PyBytes::new(py, &body).unbind()))
+            Python::attach(|py| Ok(PyBytes::new(py, &body).unbind()))
         })
     }
 }
@@ -545,7 +545,7 @@ impl PythonMexcFuturesWebSocketClient {
                 .recv()
                 .await
                 .map_err(to_py_runtime_error)?;
-            Python::with_gil(|py| Ok(PyBytes::new(py, &body).unbind()))
+            Python::attach(|py| Ok(PyBytes::new(py, &body).unbind()))
         })
     }
 }

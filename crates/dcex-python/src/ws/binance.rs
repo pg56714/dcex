@@ -107,7 +107,7 @@ impl PythonBinanceEquityWebSocketClient {
                 .recv_bytes()
                 .await
                 .map_err(to_py_runtime_error)?;
-            Python::with_gil(|py| Ok(PyBytes::new(py, &body).unbind()))
+            Python::attach(|py| Ok(PyBytes::new(py, &body).unbind()))
         })
     }
 }
@@ -283,7 +283,7 @@ impl PythonBinancePublicWebSocketClient {
                 .recv_bytes()
                 .await
                 .map_err(to_py_runtime_error)?;
-            Python::with_gil(|py| Ok(PyBytes::new(py, &body).unbind()))
+            Python::attach(|py| Ok(PyBytes::new(py, &body).unbind()))
         })
     }
 }
@@ -409,7 +409,7 @@ impl PythonBinancePrivateWebSocketClient {
                 .recv_bytes()
                 .await
                 .map_err(to_py_runtime_error)?;
-            Python::with_gil(|py| Ok(PyBytes::new(py, &body).unbind()))
+            Python::attach(|py| Ok(PyBytes::new(py, &body).unbind()))
         })
     }
 }
@@ -491,7 +491,7 @@ impl PythonBinanceWebSocketApiClient {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             let body = client.recv_bytes().await.map_err(to_py_runtime_error)?;
-            Python::with_gil(|py| Ok(PyBytes::new(py, &body).unbind()))
+            Python::attach(|py| Ok(PyBytes::new(py, &body).unbind()))
         })
     }
 }

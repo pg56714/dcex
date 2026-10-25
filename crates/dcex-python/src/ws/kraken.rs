@@ -196,7 +196,7 @@ impl PythonKrakenPublicWebSocketClient {
                 .recv_bytes()
                 .await
                 .map_err(to_py_runtime_error)?;
-            Python::with_gil(|py| Ok(PyBytes::new(py, &body).unbind()))
+            Python::attach(|py| Ok(PyBytes::new(py, &body).unbind()))
         })
     }
 }
@@ -432,7 +432,7 @@ impl PythonKrakenPrivateWebSocketClient {
                 .recv_bytes()
                 .await
                 .map_err(to_py_runtime_error)?;
-            Python::with_gil(|py| Ok(PyBytes::new(py, &body).unbind()))
+            Python::attach(|py| Ok(PyBytes::new(py, &body).unbind()))
         })
     }
 }
@@ -559,7 +559,7 @@ impl PythonKrakenFuturesWebSocketClient {
                 .recv()
                 .await
                 .map_err(to_py_runtime_error)?;
-            Python::with_gil(|py| Ok(PyBytes::new(py, &body).unbind()))
+            Python::attach(|py| Ok(PyBytes::new(py, &body).unbind()))
         })
     }
 }
@@ -633,7 +633,7 @@ impl PythonKrakenV1WebSocketClient {
                 .recv_bytes()
                 .await
                 .map_err(to_py_runtime_error)?;
-            Python::with_gil(|py| Ok(PyBytes::new(py, &bytes).unbind()))
+            Python::attach(|py| Ok(PyBytes::new(py, &bytes).unbind()))
         })
     }
     #[pyo3(signature = (message, all_symbols=false))]

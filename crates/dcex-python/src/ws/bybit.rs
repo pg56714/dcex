@@ -180,7 +180,7 @@ impl PythonBybitPublicWebSocketClient {
                 .recv_bytes()
                 .await
                 .map_err(to_py_runtime_error)?;
-            Python::with_gil(|py| Ok(PyBytes::new(py, &body).unbind()))
+            Python::attach(|py| Ok(PyBytes::new(py, &body).unbind()))
         })
     }
 }
@@ -368,7 +368,7 @@ impl PythonBybitPrivateWebSocketClient {
                 .recv_bytes()
                 .await
                 .map_err(to_py_runtime_error)?;
-            Python::with_gil(|py| Ok(PyBytes::new(py, &body).unbind()))
+            Python::attach(|py| Ok(PyBytes::new(py, &body).unbind()))
         })
     }
 }

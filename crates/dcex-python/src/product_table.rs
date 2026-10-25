@@ -407,7 +407,7 @@ fn fetch_product_table(
 ) -> PyResult<PythonProductTable> {
     let timeout = http_timeout(timeout)?;
     let (exchange, perp_dexs) = fetch_scope(exchange_name, perp_dexs)?;
-    py.allow_threads(|| block_on(fetch_table(exchange, perp_dexs, timeout)))
+    py.detach(|| block_on(fetch_table(exchange, perp_dexs, timeout)))
         .map(|table| PythonProductTable { table })
         .map_err(to_py_runtime_error)
 }
