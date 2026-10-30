@@ -1,5 +1,5 @@
 use base64::Engine;
-use hmac::{Hmac, Mac};
+use hmac::{Hmac, KeyInit, Mac};
 use sha2::{Digest, Sha256, Sha512};
 
 use crate::{DcexError, Result};
