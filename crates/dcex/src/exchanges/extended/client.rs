@@ -76,8 +76,8 @@ impl ExtendedClient {
             (Some(stark_private_key), Some(stark_public_key), Some(vault_number)) => {
                 let private_key = parse_felt_hex(&stark_private_key, "stark_private_key")?;
                 let public_key = parse_felt_hex(&stark_public_key, "stark_public_key")?;
-                if private_key == starknet_crypto::Felt::ZERO
-                    || public_key == starknet_crypto::Felt::ZERO
+                if private_key == crate::stark_crypto::Felt::ZERO
+                    || public_key == crate::stark_crypto::Felt::ZERO
                     || vault_number == 0
                 {
                     return Err(DcexError::InvalidInput(

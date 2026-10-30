@@ -7,6 +7,7 @@ pub mod http;
 pub mod lighter;
 pub mod lighter_crypto;
 pub mod product_table;
+pub mod stark_crypto;
 pub mod ws;
 
 use std::fmt::{Display, Formatter};

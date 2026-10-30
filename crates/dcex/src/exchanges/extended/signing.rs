@@ -5,8 +5,8 @@ use num_bigint::BigInt;
 use num_traits::{One, Signed, ToPrimitive, Zero};
 use serde::Deserialize;
 use serde_json::{Map, Value, json};
-use starknet_crypto::{Felt, PoseidonHasher, SignError, rfc6979_generate_k, sign};
 
+use crate::stark_crypto::{Felt, PoseidonHasher, SignError, rfc6979_generate_k, sign};
 use crate::{DcexError, Result};
 
 use super::params::ExtendedParams;
