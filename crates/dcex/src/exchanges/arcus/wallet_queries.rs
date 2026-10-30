@@ -4,9 +4,9 @@ use std::collections::{BTreeMap, HashSet};
 
 use num_bigint::BigUint;
 use serde_json::{Value, json};
-use sha3::{Digest, Keccak256};
 
 use super::ArcusSpotClient;
+use crate::ethereum::keccak256;
 use crate::exchange::ValidatedResponse;
 use crate::http::{HttpMethod, HttpRequest};
 use crate::{DcexError, Result};
@@ -362,7 +362,7 @@ impl ArcusSpotClient {
         }
         let topic0 = format!(
             "0x{}",
-            hex::encode(Keccak256::digest(SWAP_EXECUTED_SIGNATURE.as_bytes()))
+            hex::encode(keccak256(SWAP_EXECUTED_SIGNATURE.as_bytes()))
         );
         let filter = json!({
             "address": swap_shell,
