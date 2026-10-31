@@ -10,7 +10,8 @@ use crate::{DcexError, Result};
 use super::is_business_channel;
 
 /// Official base of the managed routes; each route appends its path segment.
-const ROUTE_BASE_URL: &str = "wss://ws.okx.com:8443/ws/v5";
+const ROUTE_BASE_URL: &str = "wss://ws.okx.com:443/ws/v5";
+const MAX_LOGIN_NOTICES: usize = 4;
 const LOGIN_METHOD: &str = "GET";
 const LOGIN_PATH: &str = "/users/self/verify";
 
@@ -225,7 +226,14 @@ impl OkxPrivateWebSocket {
             }],
         });
         self.connection.send_json(&payload).await?;
-        let event = self.connection.recv_json().await?;
+        // OKX may push `notice` events (such as maintenance or port migration) before the ack.
+        let mut event = self.connection.recv_json().await?;
+        for _ in 0..MAX_LOGIN_NOTICES {
+            if !is_notice(&event) {
+                break;
+            }
+            event = self.connection.recv_json().await?;
+        }
         validate_login_ack(&event)?;
         self.logged_in = true;
         Ok(())
@@ -625,6 +633,10 @@ fn validate_credential(label: &str, value: &str) -> Result<()> {
     Ok(())
 }
 
+fn is_notice(event: &Value) -> bool {
+    event.get("event").and_then(Value::as_str) == Some("notice")
+}
+
 fn validate_login_ack(event: &Value) -> Result<()> {
     let event_name = event.get("event").and_then(Value::as_str);
     let code = event.get("code").and_then(value_as_string);
@@ -689,6 +701,8 @@ mod tests {
         assert!(validate_login_ack(&json!({"event": "login", "code": "0"})).is_ok());
         assert!(validate_login_ack(&json!({"event": "login", "code": "60012"})).is_err());
         assert!(validate_login_ack(&json!({"event": "subscribe", "code": "0"})).is_err());
+        assert!(is_notice(&json!({"event": "notice", "code": "64010"})));
+        assert!(!is_notice(&json!({"event": "login", "code": "0"})));
     }
 
     #[test]

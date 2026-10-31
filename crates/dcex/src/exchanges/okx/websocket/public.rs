@@ -11,7 +11,7 @@ use super::super::params::exchange_symbol_fallback;
 use super::is_business_channel;
 
 /// Official base of the managed routes; each route appends its path segment.
-const ROUTE_BASE_URL: &str = "wss://ws.okx.com:8443/ws/v5";
+const ROUTE_BASE_URL: &str = "wss://ws.okx.com:443/ws/v5";
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum OkxWebSocketRoute {
