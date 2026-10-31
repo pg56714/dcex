@@ -1,3 +1,16 @@
+## 0.42.1 (2026-10-31)
+
+### Fix
+
+- connect WebSocket on port 443 and skip login notices
+- replace starknet-crypto with in-house Stark signing
+- upgrade hmac, sha2, ed25519-dalek and tokio-tungstenite
+- upgrade pyo3 to 0.30 and refresh Rust and Python locks
+
+### Refactor
+
+- use built-in keccak256 and drop sha3
+
 ## 0.42.0 (2026-10-14)
 
 ### BREAKING CHANGE
