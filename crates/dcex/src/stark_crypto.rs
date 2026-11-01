@@ -37,8 +37,6 @@ const CURVE_ORDER: U256 =
 /// Signature components and message hashes must stay below 2^251.
 const ELEMENT_UPPER_BOUND: U256 =
     U256::from_be_hex("0800000000000000000000000000000000000000000000000000000000000000");
-const CURVE_BETA: U256 =
-    U256::from_be_hex("06f21413efbe40de150e596d72f7a8c5609ad26c15c915c1f4cdfcb99cee9e89");
 /// 3 * beta mod p, used by the complete addition formulas.
 const CURVE_B3: Fp = Fp::new(&U256::from_be_hex(
     "04d63c3bcf3ac2783f2b0c4858e6fa5021d07744415b4145de69f62cd6cbdb99",
@@ -432,6 +430,9 @@ fn uint_to_bytes(value: &U256) -> [u8; 32] {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    const CURVE_BETA: U256 =
+        U256::from_be_hex("06f21413efbe40de150e596d72f7a8c5609ad26c15c915c1f4cdfcb99cee9e89");
 
     fn felt(value: &str) -> Felt {
         Felt::from_hex(value).unwrap()
