@@ -41,17 +41,25 @@ def bind_endpoint_validation(cls: type) -> None:
 
 
 def _validated(function: Any, schema: dict[str, Any]) -> Any:  # noqa: ANN401
-    signature = inspect.signature(function)
-    positional = [
-        parameter.name
-        for parameter in signature.parameters.values()
-        if parameter.kind in (parameter.POSITIONAL_ONLY, parameter.POSITIONAL_OR_KEYWORD)
-    ]
     properties = schema.get("properties", {})
+    names: list[str] | None = None
+
+    def positional_names() -> list[str]:
+        # Read on the first call: inspecting every endpoint of every exchange while the
+        # package is imported cost more than the rest of the wrapping put together.
+        nonlocal names
+        if names is None:
+            names = [
+                parameter.name
+                for parameter in inspect.signature(function).parameters.values()
+                if parameter.kind in (parameter.POSITIONAL_ONLY, parameter.POSITIONAL_OR_KEYWORD)
+            ]
+        return names
 
     def arguments(
         args: tuple[Any, ...], kwargs: dict[str, Any]
     ) -> tuple[tuple[Any, ...], dict[str, Any]]:
+        positional = positional_names()
         context = {**dict(zip(positional, args, strict=False)), **kwargs}
         normalized_args = tuple(
             normalize(

@@ -1,7 +1,9 @@
 """Helper functions for Jupyter Notebook compatibility."""
 
-import asyncio
 import sys
+
+# asyncio is imported where it is used: `import dcex` runs this module, and outside a
+# notebook nothing on the synchronous path needs the event loop machinery.
 
 
 def is_jupyter_environment() -> bool:
@@ -11,6 +13,11 @@ def is_jupyter_environment() -> bool:
     Returns:
         bool: True if running in Jupyter, False otherwise
     """
+    # A Jupyter kernel has already imported IPython; importing it here would only
+    # add its startup cost to every `import dcex` outside a notebook.
+    if "IPython" not in sys.modules:
+        return False
+
     try:
         # 檢查是否有 IPython 核心
         from IPython.core.getipython import get_ipython
@@ -41,6 +48,8 @@ def has_running_event_loop() -> bool:
     Returns:
         bool: True if there's a running event loop, False otherwise
     """
+    import asyncio
+
     try:
         loop = asyncio.get_running_loop()
         if loop is not None:
@@ -69,6 +78,8 @@ def ensure_nest_asyncio() -> str | None:
         return None
 
     try:
+        import asyncio
+
         import nest_asyncio
 
         # Check if nest_asyncio is already applied
@@ -99,7 +110,3 @@ def auto_apply_nest_asyncio(verbose: bool = False) -> None:
 
     if verbose and result:
         print(f"[dcex] {result}")
-
-
-# Automatically apply nest_asyncio if in Jupyter environment with active event loop
-auto_apply_nest_asyncio(verbose=False)
