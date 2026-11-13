@@ -4,7 +4,6 @@ mod trade_requests {
     use crate::Result;
     use crate::exchange::ValidatedResponse;
     use crate::exchanges::bingx::client::BingxClient;
-    use crate::exchanges::bingx::endpoints::*;
     use crate::exchanges::bingx::params::{
         BingxParams, batch_orders_query, comma_list, push_optional, python_list_string,
         require_one_identifier, validate_bool, validate_enum, validate_u64_range,

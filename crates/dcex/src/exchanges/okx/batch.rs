@@ -5,7 +5,6 @@ mod trade_requests {
     use crate::Result;
     use crate::exchange::ValidatedResponse;
     use crate::exchanges::okx::client::OkxClient;
-    use crate::exchanges::okx::endpoints::*;
     use crate::exchanges::okx::params::OkxParams;
     use crate::exchanges::okx::trade::*;
 

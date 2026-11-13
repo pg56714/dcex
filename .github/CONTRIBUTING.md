@@ -78,7 +78,7 @@ The CI workflow runs these checks:
 
 ```sh
 cargo fmt --all --check
-cargo check --workspace --all-features
+cargo clippy --workspace --all-targets --all-features
 cargo test --workspace --all-features
 uv run ruff check .
 uv run ruff format --check .

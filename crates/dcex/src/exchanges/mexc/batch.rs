@@ -3,7 +3,6 @@
 mod trade_operations {
     use crate::exchange::ValidatedResponse;
     use crate::exchanges::mexc::client::MexcClient;
-    use crate::exchanges::mexc::endpoints::*;
     use crate::exchanges::mexc::params::{MexcParams, validate_u64_range};
     use crate::exchanges::mexc::signing::json_value_string;
     use crate::exchanges::mexc::trade::*;

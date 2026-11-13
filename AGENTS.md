@@ -38,7 +38,7 @@ Run before committing (CI runs the same):
 
 ```sh
 cargo fmt --all --check
-cargo check --workspace --all-features
+cargo clippy --workspace --all-targets --all-features
 uv run ruff check .
 uv run ruff format --check .
 uv run pyright

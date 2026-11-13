@@ -418,7 +418,7 @@ fn validate_hash(hash: &str) -> Result<()> {
 }
 
 fn encode_address(address: &str) -> String {
-    format!("{:0>64}", &address[2..].to_ascii_lowercase())
+    format!("{:0>64}", address[2..].to_ascii_lowercase())
 }
 
 fn topic_address(address: &str) -> String {

@@ -2,7 +2,8 @@ name: Continuous Integration
 
 on:
   push:
-    branches: [main]
+    # dev is checked before it is fast-forwarded into main, where a push also releases.
+    branches: [main, dev]
   pull_request:
     branches: [main]
 
@@ -11,8 +12,39 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  quality-check:
-    name: Lint, Format, Type Check, Test
+  rust:
+    name: Rust Format, Lint, Test
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v6
+
+      # The PyO3 crate's build script looks for an interpreter.
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version-file: ".python-version"
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+
+      - name: Cache Rust builds
+        uses: Swatinem/rust-cache@v2
+
+      - name: Rust format
+        run: cargo fmt --all --check
+
+      # Clippy runs the compiler's checks too, so it replaces a separate `cargo check`.
+      - name: Rust lint (clippy)
+        run: cargo clippy --workspace --all-targets --all-features
+
+      - name: Rust tests
+        run: cargo test --workspace --all-features
+
+  python:
+    name: Python Lint, Type Check, Test
     runs-on: ubuntu-24.04
 
     steps:
@@ -46,15 +78,6 @@ jobs:
             fi
           done
 
-      - name: Rust format
-        run: cargo fmt --all --check
-
-      - name: Rust check
-        run: cargo check --workspace --all-features
-
-      - name: Rust tests
-        run: cargo test --workspace --all-features
-
       - name: Build native Python extension
         run: uv run maturin develop --release
 
@@ -69,3 +92,42 @@ jobs:
 
       - name: Run offline unit tests
         run: uv run pytest tests/unit
+
+  # The release builds wheels on these platforms too. Building them here finds a
+  # platform-specific failure (a native dependency, a linker) before a release does;
+  # Ubuntu is covered by the python job.
+  build:
+    name: Build Extension (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest]
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version-file: ".python-version"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v10.2.0
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust builds
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install dependencies
+        run: uv sync --locked
+
+      - name: Build wheel as the release does
+        run: uv run maturin build --release --out dist --compatibility pypi
+
+      - name: Load the extension
+        run: |
+          uv run maturin develop --release
+          uv run python -c "import dcex; print(dcex._native.exchange_names())"
