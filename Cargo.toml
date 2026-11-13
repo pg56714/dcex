@@ -7,3 +7,9 @@ authors = ["pg56714"]
 edition = "2024"
 license = "MIT"
 repository = "https://github.com/pg56714/dcex"
+
+# Applies to the Python wheel (and local release builds); crates.io consumers use their own profile.
+# LTO and codegen-units = 1 were measured and left out: thin LTO did not shrink the extension, and
+# a single codegen unit cut it by a fifth but made the build about three times slower.
+[profile.release]
+strip = true
