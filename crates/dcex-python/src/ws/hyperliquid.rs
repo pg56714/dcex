@@ -2,18 +2,17 @@ use std::sync::Arc;
 
 use dcex::ws::hyperliquid::{HyperliquidPrivateWebSocket, HyperliquidPublicWebSocket};
 use serde_json::Value;
-use tokio::sync::Mutex;
 
 use super::*;
 
 #[pyclass(name = "HyperliquidPublicWebSocketClient")]
 struct PythonHyperliquidPublicWebSocketClient {
-    client: Arc<Mutex<HyperliquidPublicWebSocket>>,
+    client: Arc<WsCell<HyperliquidPublicWebSocket>>,
 }
 
 #[pyclass(name = "HyperliquidPrivateWebSocketClient")]
 struct PythonHyperliquidPrivateWebSocketClient {
-    client: Arc<Mutex<HyperliquidPrivateWebSocket>>,
+    client: Arc<WsCell<HyperliquidPrivateWebSocket>>,
 }
 
 #[pymethods]
@@ -29,7 +28,7 @@ impl PythonHyperliquidPublicWebSocketClient {
         }
         .map_err(to_py_runtime_error)?;
         Ok(Self {
-            client: Arc::new(Mutex::new(client)),
+            client: Arc::new(WsCell::new(client, timeout)),
         })
     }
 
@@ -43,7 +42,7 @@ impl PythonHyperliquidPublicWebSocketClient {
 
     fn connect<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -62,7 +61,7 @@ impl PythonHyperliquidPublicWebSocketClient {
         let payload: serde_json::Value = serde_json::from_str(&payload)
             .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -74,7 +73,7 @@ impl PythonHyperliquidPublicWebSocketClient {
 
     fn close<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -91,7 +90,7 @@ impl PythonHyperliquidPublicWebSocketClient {
     ) -> PyResult<Bound<'py, PyAny>> {
         let subscription = parse_subscription(subscription_json)?;
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -108,7 +107,7 @@ impl PythonHyperliquidPublicWebSocketClient {
     ) -> PyResult<Bound<'py, PyAny>> {
         let subscription = parse_subscription(subscription_json)?;
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -125,7 +124,7 @@ impl PythonHyperliquidPublicWebSocketClient {
         dex: Option<String>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             let mut client = client.lock().await;
             if let Some(dex) = dex {
                 client.subscribe_all_mids_for_dex(&dex).await
@@ -142,7 +141,7 @@ impl PythonHyperliquidPublicWebSocketClient {
         product_symbol: String,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -158,7 +157,7 @@ impl PythonHyperliquidPublicWebSocketClient {
         product_symbol: String,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -177,7 +176,7 @@ impl PythonHyperliquidPublicWebSocketClient {
         mantissa: Option<u64>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             let mut client = client.lock().await;
             match (n_sig_figs, mantissa) {
                 (None, None) => client.subscribe_l2_book(&product_symbol).await,
@@ -207,7 +206,7 @@ impl PythonHyperliquidPublicWebSocketClient {
         product_symbol: String,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -224,7 +223,7 @@ impl PythonHyperliquidPublicWebSocketClient {
         interval: String,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -240,7 +239,7 @@ impl PythonHyperliquidPublicWebSocketClient {
         product_symbol: String,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -252,11 +251,9 @@ impl PythonHyperliquidPublicWebSocketClient {
 
     fn recv<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             let body = client
-                .lock()
-                .await
-                .recv_bytes()
+                .receive(|client| Box::pin(client.recv_bytes()))
                 .await
                 .map_err(to_py_runtime_error)?;
             Python::attach(|py| Ok(PyBytes::new(py, &body).unbind()))
@@ -277,7 +274,7 @@ impl PythonHyperliquidPrivateWebSocketClient {
         }
         .map_err(to_py_runtime_error)?;
         Ok(Self {
-            client: Arc::new(Mutex::new(client)),
+            client: Arc::new(WsCell::new(client, timeout)),
         })
     }
 
@@ -344,7 +341,7 @@ impl PythonHyperliquidPrivateWebSocketClient {
 
     fn connect<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -363,7 +360,7 @@ impl PythonHyperliquidPrivateWebSocketClient {
         let payload: serde_json::Value = serde_json::from_str(&payload)
             .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -382,7 +379,7 @@ impl PythonHyperliquidPrivateWebSocketClient {
         let payload: serde_json::Value = serde_json::from_str(&payload)
             .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -394,7 +391,7 @@ impl PythonHyperliquidPrivateWebSocketClient {
 
     fn close<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -411,7 +408,7 @@ impl PythonHyperliquidPrivateWebSocketClient {
     ) -> PyResult<Bound<'py, PyAny>> {
         let subscription = parse_subscription(subscription_json)?;
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -428,7 +425,7 @@ impl PythonHyperliquidPrivateWebSocketClient {
     ) -> PyResult<Bound<'py, PyAny>> {
         let subscription = parse_subscription(subscription_json)?;
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -446,7 +443,7 @@ impl PythonHyperliquidPrivateWebSocketClient {
         dex: Option<String>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             let mut client = client.lock().await;
             if let Some(dex) = dex {
                 client
@@ -467,7 +464,7 @@ impl PythonHyperliquidPrivateWebSocketClient {
         dex: Option<String>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             let mut client = client.lock().await;
             if let Some(dex) = dex {
                 client
@@ -484,7 +481,7 @@ impl PythonHyperliquidPrivateWebSocketClient {
 
     fn subscribe_notifications<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -496,7 +493,7 @@ impl PythonHyperliquidPrivateWebSocketClient {
 
     fn subscribe_web_data3<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -513,7 +510,7 @@ impl PythonHyperliquidPrivateWebSocketClient {
         dex: Option<String>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             let mut client = client.lock().await;
             if let Some(dex) = dex {
                 client.subscribe_clearinghouse_state_for_dex(&dex).await
@@ -531,7 +528,7 @@ impl PythonHyperliquidPrivateWebSocketClient {
         dex: Option<String>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             let mut client = client.lock().await;
             if let Some(dex) = dex {
                 client.subscribe_open_orders_for_dex(&dex).await
@@ -544,7 +541,7 @@ impl PythonHyperliquidPrivateWebSocketClient {
 
     fn subscribe_order_updates<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -556,7 +553,7 @@ impl PythonHyperliquidPrivateWebSocketClient {
 
     fn subscribe_user_events<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -573,7 +570,7 @@ impl PythonHyperliquidPrivateWebSocketClient {
         aggregate_by_time: Option<bool>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             let mut client = client.lock().await;
             if let Some(aggregate_by_time) = aggregate_by_time {
                 client
@@ -588,7 +585,7 @@ impl PythonHyperliquidPrivateWebSocketClient {
 
     fn subscribe_user_fundings<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -603,7 +600,7 @@ impl PythonHyperliquidPrivateWebSocketClient {
         py: Python<'py>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -620,7 +617,7 @@ impl PythonHyperliquidPrivateWebSocketClient {
         dex: Option<String>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             let mut client = client.lock().await;
             if let Some(dex) = dex {
                 client.subscribe_twap_states_for_dex(&dex).await
@@ -633,7 +630,7 @@ impl PythonHyperliquidPrivateWebSocketClient {
 
     fn subscribe_user_twap_slice_fills<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -645,7 +642,7 @@ impl PythonHyperliquidPrivateWebSocketClient {
 
     fn subscribe_user_twap_history<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -661,7 +658,7 @@ impl PythonHyperliquidPrivateWebSocketClient {
         product_symbol: String,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -673,11 +670,9 @@ impl PythonHyperliquidPrivateWebSocketClient {
 
     fn recv<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             let body = client
-                .lock()
-                .await
-                .recv_bytes()
+                .receive(|client| Box::pin(client.recv_bytes()))
                 .await
                 .map_err(to_py_runtime_error)?;
             Python::attach(|py| Ok(PyBytes::new(py, &body).unbind()))

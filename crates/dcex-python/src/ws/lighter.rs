@@ -1,18 +1,17 @@
 use std::sync::Arc;
 
 use dcex::ws::lighter::{LighterPrivateWebSocket, LighterPublicWebSocket};
-use tokio::sync::Mutex;
 
 use super::*;
 
 #[pyclass(name = "LighterPublicWebSocketClient")]
 struct PythonLighterPublicWebSocketClient {
-    client: Arc<Mutex<LighterPublicWebSocket>>,
+    client: Arc<WsCell<LighterPublicWebSocket>>,
 }
 
 #[pyclass(name = "LighterPrivateWebSocketClient")]
 struct PythonLighterPrivateWebSocketClient {
-    client: Arc<Mutex<LighterPrivateWebSocket>>,
+    client: Arc<WsCell<LighterPrivateWebSocket>>,
 }
 
 #[pymethods]
@@ -49,13 +48,13 @@ impl PythonLighterPublicWebSocketClient {
         }
         .map_err(to_py_runtime_error)?;
         Ok(Self {
-            client: Arc::new(Mutex::new(client)),
+            client: Arc::new(WsCell::new(client, timeout)),
         })
     }
 
     fn connect<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -67,7 +66,7 @@ impl PythonLighterPublicWebSocketClient {
 
     fn close<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -79,7 +78,7 @@ impl PythonLighterPublicWebSocketClient {
 
     fn ping<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -91,7 +90,7 @@ impl PythonLighterPublicWebSocketClient {
 
     fn subscribe<'py>(&self, py: Python<'py>, channel: String) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -103,7 +102,7 @@ impl PythonLighterPublicWebSocketClient {
 
     fn unsubscribe<'py>(&self, py: Python<'py>, channel: String) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -120,7 +119,7 @@ impl PythonLighterPublicWebSocketClient {
     ) -> PyResult<Bound<'py, PyAny>> {
         let market_id = market_id.str()?.to_str()?.to_string();
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -137,7 +136,7 @@ impl PythonLighterPublicWebSocketClient {
     ) -> PyResult<Bound<'py, PyAny>> {
         let market_id = market_id.str()?.to_str()?.to_string();
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -154,7 +153,7 @@ impl PythonLighterPublicWebSocketClient {
     ) -> PyResult<Bound<'py, PyAny>> {
         let market_id = market_id.str()?.to_str()?.to_string();
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -166,7 +165,7 @@ impl PythonLighterPublicWebSocketClient {
 
     fn subscribe_all_market_stats<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -183,7 +182,7 @@ impl PythonLighterPublicWebSocketClient {
     ) -> PyResult<Bound<'py, PyAny>> {
         let market_id = market_id.str()?.to_str()?.to_string();
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -201,7 +200,7 @@ impl PythonLighterPublicWebSocketClient {
     ) -> PyResult<Bound<'py, PyAny>> {
         let market_id = market_id.str()?.to_str()?.to_string();
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -219,7 +218,7 @@ impl PythonLighterPublicWebSocketClient {
     ) -> PyResult<Bound<'py, PyAny>> {
         let market_id = market_id.str()?.to_str()?.to_string();
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -236,7 +235,7 @@ impl PythonLighterPublicWebSocketClient {
     ) -> PyResult<Bound<'py, PyAny>> {
         let market_id = market_id.str()?.to_str()?.to_string();
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -248,7 +247,7 @@ impl PythonLighterPublicWebSocketClient {
 
     fn subscribe_all_spot_market_stats<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -260,7 +259,7 @@ impl PythonLighterPublicWebSocketClient {
 
     fn subscribe_height<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -272,11 +271,9 @@ impl PythonLighterPublicWebSocketClient {
 
     fn recv<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             let body = client
-                .lock()
-                .await
-                .recv_bytes()
+                .receive(|client| Box::pin(client.recv_bytes()))
                 .await
                 .map_err(to_py_runtime_error)?;
             Python::attach(|py| Ok(PyBytes::new(py, &body).unbind()))
@@ -330,20 +327,19 @@ impl PythonLighterPrivateWebSocketClient {
         }
         .map_err(to_py_runtime_error)?;
         Ok(Self {
-            client: Arc::new(Mutex::new(client)),
+            client: Arc::new(WsCell::new(client, timeout)),
         })
     }
 
     #[staticmethod]
     #[pyo3(signature = (network="mainnet", timeout=10.0))]
     fn from_env(network: &str, timeout: f64) -> PyResult<Self> {
-        let client = LighterPrivateWebSocket::with_env_credentials(
-            lighter_network(network)?,
-            websocket_timeout(timeout)?,
-        )
-        .map_err(to_py_runtime_error)?;
+        let timeout = websocket_timeout(timeout)?;
+        let client =
+            LighterPrivateWebSocket::with_env_credentials(lighter_network(network)?, timeout)
+                .map_err(to_py_runtime_error)?;
         Ok(Self {
-            client: Arc::new(Mutex::new(client)),
+            client: Arc::new(WsCell::new(client, timeout)),
         })
     }
 
@@ -378,7 +374,7 @@ impl PythonLighterPrivateWebSocketClient {
 
     fn connect<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -396,7 +392,7 @@ impl PythonLighterPrivateWebSocketClient {
         tx_info: String,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -413,7 +409,7 @@ impl PythonLighterPrivateWebSocketClient {
         tx_infos: Vec<String>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -425,7 +421,7 @@ impl PythonLighterPrivateWebSocketClient {
 
     fn close<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -437,7 +433,7 @@ impl PythonLighterPrivateWebSocketClient {
 
     fn ping<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -455,7 +451,7 @@ impl PythonLighterPrivateWebSocketClient {
         auth: Option<String>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             let mut client = client.lock().await;
             if let Some(auth) = auth {
                 client.subscribe_with_auth(&channel, auth).await
@@ -468,7 +464,7 @@ impl PythonLighterPrivateWebSocketClient {
 
     fn unsubscribe<'py>(&self, py: Python<'py>, channel: String) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -484,7 +480,7 @@ impl PythonLighterPrivateWebSocketClient {
         channel: String,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -496,7 +492,7 @@ impl PythonLighterPrivateWebSocketClient {
 
     fn subscribe_account_all<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -512,7 +508,7 @@ impl PythonLighterPrivateWebSocketClient {
         market_id: u64,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -524,7 +520,7 @@ impl PythonLighterPrivateWebSocketClient {
 
     fn subscribe_user_stats<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -536,7 +532,7 @@ impl PythonLighterPrivateWebSocketClient {
 
     fn subscribe_account_tx<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -548,7 +544,7 @@ impl PythonLighterPrivateWebSocketClient {
 
     fn subscribe_account_all_orders<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -560,7 +556,7 @@ impl PythonLighterPrivateWebSocketClient {
 
     fn subscribe_pool_data<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -572,7 +568,7 @@ impl PythonLighterPrivateWebSocketClient {
 
     fn subscribe_pool_info<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -584,7 +580,7 @@ impl PythonLighterPrivateWebSocketClient {
 
     fn subscribe_notifications<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -600,7 +596,7 @@ impl PythonLighterPrivateWebSocketClient {
         market_id: u64,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -612,7 +608,7 @@ impl PythonLighterPrivateWebSocketClient {
 
     fn subscribe_account_all_trades<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -624,7 +620,7 @@ impl PythonLighterPrivateWebSocketClient {
 
     fn subscribe_account_all_positions<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -636,7 +632,7 @@ impl PythonLighterPrivateWebSocketClient {
 
     fn subscribe_account_all_assets<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -651,7 +647,7 @@ impl PythonLighterPrivateWebSocketClient {
         py: Python<'py>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -663,7 +659,7 @@ impl PythonLighterPrivateWebSocketClient {
 
     fn subscribe_rfq<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -675,11 +671,9 @@ impl PythonLighterPrivateWebSocketClient {
 
     fn recv<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             let body = client
-                .lock()
-                .await
-                .recv_bytes()
+                .receive(|client| Box::pin(client.recv_bytes()))
                 .await
                 .map_err(to_py_runtime_error)?;
             Python::attach(|py| Ok(PyBytes::new(py, &body).unbind()))

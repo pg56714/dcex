@@ -190,6 +190,106 @@ where
         .and_then(python_json_http_response)
 }
 
+/// Async calls run on the runtime the blocking calls already use, so a process that mixes
+/// both keeps one worker pool. Bound on first use rather than at import: a runtime built
+/// before `fork()` has no worker threads in the child.
+fn future_into_py<'py, F, T>(py: Python<'py>, future: F) -> PyResult<Bound<'py, PyAny>>
+where
+    F: Future<Output = PyResult<T>> + Send + 'static,
+    T: for<'a> IntoPyObject<'a> + Send + 'static,
+{
+    static SHARED_RUNTIME: std::sync::Once = std::sync::Once::new();
+    SHARED_RUNTIME.call_once(|| {
+        // Err means the bridge already has a runtime; it keeps that one.
+        let _ = pyo3_async_runtimes::tokio::init_with_runtime(dcex::http::shared_runtime());
+    });
+    pyo3_async_runtimes::tokio::future_into_py(py, future)
+}
+
+type ReceiveFuture<'a> = std::pin::Pin<Box<dyn Future<Output = dcex::Result<Vec<u8>>> + Send + 'a>>;
+
+/// A WebSocket client shared by the Python-facing calls.
+///
+/// A receive holds the client while it waits for the next message, which on a quiet
+/// stream lasts the whole receive timeout. Every other call announces itself first, so a
+/// waiting receive lets go of the client, queues behind that call and then resumes: a
+/// ping or subscription is sent at once instead of after the next message.
+pub(crate) struct WsCell<T> {
+    client: tokio::sync::Mutex<T>,
+    /// Calls that want the client and do not hold it yet.
+    waiting: std::sync::atomic::AtomicUsize,
+    interrupt: tokio::sync::Notify,
+    /// The client's receive timeout, enforced here across interruptions.
+    timeout: Duration,
+}
+
+impl<T> WsCell<T> {
+    pub(crate) fn new(client: T, timeout: Duration) -> Self {
+        Self {
+            client: tokio::sync::Mutex::new(client),
+            waiting: std::sync::atomic::AtomicUsize::new(0),
+            interrupt: tokio::sync::Notify::new(),
+            timeout,
+        }
+    }
+
+    /// Take the client for any call but a receive, interrupting a waiting receive.
+    pub(crate) async fn lock(&self) -> tokio::sync::MutexGuard<'_, T> {
+        struct Waiting<'a>(&'a std::sync::atomic::AtomicUsize);
+        impl Drop for Waiting<'_> {
+            fn drop(&mut self) {
+                self.0.fetch_sub(1, std::sync::atomic::Ordering::AcqRel);
+            }
+        }
+        self.waiting
+            .fetch_add(1, std::sync::atomic::Ordering::AcqRel);
+        // Dropped once the client is held, or if the caller gives up waiting for it.
+        let _waiting = Waiting(&self.waiting);
+        self.interrupt.notify_one();
+        self.client.lock().await
+    }
+
+    pub(crate) fn try_lock(
+        &self,
+    ) -> Result<tokio::sync::MutexGuard<'_, T>, tokio::sync::TryLockError> {
+        self.client.try_lock()
+    }
+
+    /// Wait for the next message, stepping aside whenever another call needs the client.
+    /// `receive` restarts after each interruption, so it must lose nothing when dropped
+    /// while waiting; a message that is already there always wins over an interruption.
+    pub(crate) async fn receive(
+        &self,
+        mut receive: impl for<'a> FnMut(&'a mut T) -> ReceiveFuture<'a>,
+    ) -> dcex::Result<Vec<u8>> {
+        // The client's own timeout restarts with every interruption. This deadline keeps
+        // the call to one timeout however often it steps aside, so frequent pings cannot
+        // hide a connection that has gone silent.
+        let deadline = tokio::time::Instant::now() + self.timeout;
+        let mut interrupted = false;
+        loop {
+            let mut client = self.client.lock().await;
+            // A call that announced itself but is not queued on the mutex yet goes first.
+            if self.waiting.load(std::sync::atomic::Ordering::Acquire) > 0 {
+                drop(client);
+                tokio::task::yield_now().await;
+                continue;
+            }
+            tokio::select! {
+                biased;
+                received = receive(&mut client) => return received,
+                () = self.interrupt.notified() => interrupted = true,
+                // Until the first interruption the client's own timeout is the same one.
+                () = tokio::time::sleep_until(deadline), if interrupted => {
+                    return Err(dcex::DcexError::Transport(
+                        "WebSocket receive timed out.".to_string(),
+                    ));
+                }
+            }
+        }
+    }
+}
+
 fn python_validated_json_request_async<'py, F, Fut>(
     py: Python<'py>,
     method_name: String,
@@ -201,7 +301,7 @@ where
     Fut: Future<Output = dcex::Result<ValidatedResponse>> + Send + 'static,
 {
     let params = params.unwrap_or_default();
-    pyo3_async_runtimes::tokio::future_into_py(py, async move {
+    future_into_py(py, async move {
         request(method_name, params)
             .await
             .map_err(to_py_runtime_error)
@@ -216,7 +316,7 @@ fn python_json_http_request_async<'py, Fut>(
 where
     Fut: Future<Output = dcex::Result<HttpResponse>> + Send + 'static,
 {
-    pyo3_async_runtimes::tokio::future_into_py(py, async move {
+    future_into_py(py, async move {
         request
             .await
             .map_err(to_py_runtime_error)

@@ -2,18 +2,17 @@ use std::sync::Arc;
 
 use dcex::ws::okx::OkxPrivateWebSocket;
 use dcex::ws::okx::OkxPublicWebSocket;
-use tokio::sync::Mutex;
 
 use super::*;
 
 #[pyclass(name = "OkxPublicWebSocketClient")]
 struct PythonOkxPublicWebSocketClient {
-    client: Arc<Mutex<OkxPublicWebSocket>>,
+    client: Arc<WsCell<OkxPublicWebSocket>>,
 }
 
 #[pyclass(name = "OkxPrivateWebSocketClient")]
 struct PythonOkxPrivateWebSocketClient {
-    client: Arc<Mutex<OkxPrivateWebSocket>>,
+    client: Arc<WsCell<OkxPrivateWebSocket>>,
 }
 
 #[pymethods]
@@ -29,7 +28,7 @@ impl PythonOkxPublicWebSocketClient {
         }
         .map_err(to_py_runtime_error)?;
         Ok(Self {
-            client: Arc::new(Mutex::new(client)),
+            client: Arc::new(WsCell::new(client, timeout)),
         })
     }
 
@@ -43,7 +42,7 @@ impl PythonOkxPublicWebSocketClient {
 
     fn connect<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -55,7 +54,7 @@ impl PythonOkxPublicWebSocketClient {
 
     fn close<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -74,7 +73,7 @@ impl PythonOkxPublicWebSocketClient {
         let args = serde_json::from_str(&args_json)
             .map_err(|e| PyValueError::new_err(format!("invalid subscription JSON: {e}")))?;
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -95,7 +94,7 @@ impl PythonOkxPublicWebSocketClient {
         sprd_id: Option<String>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             let mut client = client.lock().await;
             if inst_type.is_some() || inst_family.is_some() || sprd_id.is_some() {
                 let arg = client
@@ -130,7 +129,7 @@ impl PythonOkxPublicWebSocketClient {
         sprd_id: Option<String>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             let mut client = client.lock().await;
             if inst_type.is_some() || inst_family.is_some() || sprd_id.is_some() {
                 let arg = client
@@ -160,7 +159,7 @@ impl PythonOkxPublicWebSocketClient {
         product_symbol: String,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -176,7 +175,7 @@ impl PythonOkxPublicWebSocketClient {
         product_symbol: String,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -192,7 +191,7 @@ impl PythonOkxPublicWebSocketClient {
         product_symbol: String,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -208,7 +207,7 @@ impl PythonOkxPublicWebSocketClient {
         product_symbol: String,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -225,7 +224,7 @@ impl PythonOkxPublicWebSocketClient {
         interval: String,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -237,11 +236,9 @@ impl PythonOkxPublicWebSocketClient {
 
     fn recv<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             let body = client
-                .lock()
-                .await
-                .recv_bytes()
+                .receive(|client| Box::pin(client.recv_bytes()))
                 .await
                 .map_err(to_py_runtime_error)?;
             Python::attach(|py| Ok(PyBytes::new(py, &body).unbind()))
@@ -268,13 +265,13 @@ impl PythonOkxPrivateWebSocketClient {
         }
         .map_err(to_py_runtime_error)?;
         Ok(Self {
-            client: Arc::new(Mutex::new(client)),
+            client: Arc::new(WsCell::new(client, timeout)),
         })
     }
 
     fn connect<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -286,7 +283,7 @@ impl PythonOkxPrivateWebSocketClient {
 
     fn login<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -298,7 +295,7 @@ impl PythonOkxPrivateWebSocketClient {
 
     fn close<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -317,7 +314,7 @@ impl PythonOkxPrivateWebSocketClient {
         let args = serde_json::from_str(&args_json)
             .map_err(|e| PyValueError::new_err(format!("invalid subscription JSON: {e}")))?;
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -340,7 +337,7 @@ impl PythonOkxPrivateWebSocketClient {
         let args = serde_json::from_str(&args_json)
             .map_err(|e| PyValueError::new_err(format!("invalid operation JSON: {e}")))?;
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -363,7 +360,7 @@ impl PythonOkxPrivateWebSocketClient {
         sprd_id: Option<String>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             let mut arg = okx_private_arg(channel, inst_type, inst_family, inst_id, ccy)?;
             if let Some(sprd_id) = sprd_id {
                 arg = arg.and_sprd_id(sprd_id).map_err(to_py_runtime_error)?;
@@ -390,7 +387,7 @@ impl PythonOkxPrivateWebSocketClient {
         sprd_id: Option<String>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             let mut arg = okx_private_arg(channel, inst_type, inst_family, inst_id, ccy)?;
             if let Some(sprd_id) = sprd_id {
                 arg = arg.and_sprd_id(sprd_id).map_err(to_py_runtime_error)?;
@@ -413,7 +410,7 @@ impl PythonOkxPrivateWebSocketClient {
         inst_family: Option<String>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             let mut client = client.lock().await;
             if inst_family.is_some() {
                 let arg = okx_private_arg(
@@ -458,7 +455,7 @@ impl PythonOkxPrivateWebSocketClient {
         ccy: Option<String>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             let mut client = client.lock().await;
             if let Some(ccy) = ccy {
                 client.subscribe_account_for_ccy(&ccy).await
@@ -476,7 +473,7 @@ impl PythonOkxPrivateWebSocketClient {
         inst_type: Option<String>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             let mut client = client.lock().await;
             if let Some(inst_type) = inst_type {
                 client.subscribe_positions_for_type(&inst_type).await
@@ -497,11 +494,9 @@ impl PythonOkxPrivateWebSocketClient {
 
     fn recv<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             let body = client
-                .lock()
-                .await
-                .recv_bytes()
+                .receive(|client| Box::pin(client.recv_bytes()))
                 .await
                 .map_err(to_py_runtime_error)?;
             Python::attach(|py| Ok(PyBytes::new(py, &body).unbind()))

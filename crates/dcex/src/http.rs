@@ -331,7 +331,10 @@ where
         .map_err(|error| DcexError::Runtime(error.to_string()))?
 }
 
-fn shared_runtime() -> &'static Runtime {
+/// The Tokio runtime behind the blocking calls, built on first use. The Python extension
+/// hands it to its async bridge so one worker pool serves both; not a supported API.
+#[doc(hidden)]
+pub fn shared_runtime() -> &'static Runtime {
     static RUNTIME: OnceLock<Runtime> = OnceLock::new();
     RUNTIME.get_or_init(|| {
         Builder::new_multi_thread()

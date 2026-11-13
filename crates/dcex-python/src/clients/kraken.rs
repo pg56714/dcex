@@ -22,7 +22,7 @@ impl PythonKrakenHttpClient {
         id: String,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             let bytes = client
                 .retrieve_spot_export(id)
                 .await

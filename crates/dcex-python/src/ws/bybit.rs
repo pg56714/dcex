@@ -1,18 +1,17 @@
 use std::sync::Arc;
 
 use dcex::ws::bybit::{BybitPrivateWebSocket, BybitPublicWebSocket};
-use tokio::sync::Mutex;
 
 use super::*;
 
 #[pyclass(name = "BybitPublicWebSocketClient")]
 struct PythonBybitPublicWebSocketClient {
-    client: Arc<Mutex<BybitPublicWebSocket>>,
+    client: Arc<WsCell<BybitPublicWebSocket>>,
 }
 
 #[pyclass(name = "BybitPrivateWebSocketClient")]
 struct PythonBybitPrivateWebSocketClient {
-    client: Arc<Mutex<BybitPrivateWebSocket>>,
+    client: Arc<WsCell<BybitPrivateWebSocket>>,
 }
 
 #[pymethods]
@@ -28,7 +27,7 @@ impl PythonBybitPublicWebSocketClient {
         }
         .map_err(to_py_runtime_error)?;
         Ok(Self {
-            client: Arc::new(Mutex::new(client)),
+            client: Arc::new(WsCell::new(client, timeout)),
         })
     }
 
@@ -42,7 +41,7 @@ impl PythonBybitPublicWebSocketClient {
 
     fn connect<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -54,7 +53,7 @@ impl PythonBybitPublicWebSocketClient {
 
     fn close<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -66,7 +65,7 @@ impl PythonBybitPublicWebSocketClient {
 
     fn subscribe<'py>(&self, py: Python<'py>, topics: Vec<String>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -82,7 +81,7 @@ impl PythonBybitPublicWebSocketClient {
         topics: Vec<String>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -94,7 +93,7 @@ impl PythonBybitPublicWebSocketClient {
 
     fn ping<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -110,7 +109,7 @@ impl PythonBybitPublicWebSocketClient {
         product_symbol: String,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -126,7 +125,7 @@ impl PythonBybitPublicWebSocketClient {
         product_symbol: String,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -144,7 +143,7 @@ impl PythonBybitPublicWebSocketClient {
         depth: u32,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -161,7 +160,7 @@ impl PythonBybitPublicWebSocketClient {
         interval: String,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -173,11 +172,9 @@ impl PythonBybitPublicWebSocketClient {
 
     fn recv<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             let body = client
-                .lock()
-                .await
-                .recv_bytes()
+                .receive(|client| Box::pin(client.recv_bytes()))
                 .await
                 .map_err(to_py_runtime_error)?;
             Python::attach(|py| Ok(PyBytes::new(py, &body).unbind()))
@@ -203,13 +200,13 @@ impl PythonBybitPrivateWebSocketClient {
         }
         .map_err(to_py_runtime_error)?;
         Ok(Self {
-            client: Arc::new(Mutex::new(client)),
+            client: Arc::new(WsCell::new(client, timeout)),
         })
     }
 
     fn connect<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -221,7 +218,7 @@ impl PythonBybitPrivateWebSocketClient {
 
     fn auth<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -233,7 +230,7 @@ impl PythonBybitPrivateWebSocketClient {
 
     fn close<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -245,7 +242,7 @@ impl PythonBybitPrivateWebSocketClient {
 
     fn ping<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -257,7 +254,7 @@ impl PythonBybitPrivateWebSocketClient {
 
     fn subscribe<'py>(&self, py: Python<'py>, topics: Vec<String>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -273,7 +270,7 @@ impl PythonBybitPrivateWebSocketClient {
         topics: Vec<String>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -285,7 +282,7 @@ impl PythonBybitPrivateWebSocketClient {
 
     fn subscribe_orders<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -297,7 +294,7 @@ impl PythonBybitPrivateWebSocketClient {
 
     fn subscribe_executions<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -309,7 +306,7 @@ impl PythonBybitPrivateWebSocketClient {
 
     fn subscribe_positions<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -321,7 +318,7 @@ impl PythonBybitPrivateWebSocketClient {
 
     fn subscribe_wallet<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -341,7 +338,7 @@ impl PythonBybitPrivateWebSocketClient {
             PyValueError::new_err(format!("invalid Bybit trade args JSON: {error}"))
         })?;
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -361,11 +358,9 @@ impl PythonBybitPrivateWebSocketClient {
 
     fn recv<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             let body = client
-                .lock()
-                .await
-                .recv_bytes()
+                .receive(|client| Box::pin(client.recv_bytes()))
                 .await
                 .map_err(to_py_runtime_error)?;
             Python::attach(|py| Ok(PyBytes::new(py, &body).unbind()))

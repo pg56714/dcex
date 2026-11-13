@@ -4,23 +4,22 @@ use dcex::ws::binance::{
     BinanceEquityWebSocket, BinancePrivateWebSocket, BinancePublicWebSocket, BinanceWebSocketApi,
     BinanceWebSocketApiMarket,
 };
-use tokio::sync::Mutex;
 
 use super::*;
 
 #[pyclass(name = "BinancePublicWebSocketClient")]
 struct PythonBinancePublicWebSocketClient {
-    client: Arc<Mutex<BinancePublicWebSocket>>,
+    client: Arc<WsCell<BinancePublicWebSocket>>,
 }
 
 #[pyclass(name = "BinancePrivateWebSocketClient")]
 struct PythonBinancePrivateWebSocketClient {
-    client: Arc<Mutex<BinancePrivateWebSocket>>,
+    client: Arc<WsCell<BinancePrivateWebSocket>>,
 }
 
 #[pyclass(name = "BinanceEquityWebSocketClient")]
 struct PythonBinanceEquityWebSocketClient {
-    client: Arc<Mutex<BinanceEquityWebSocket>>,
+    client: Arc<WsCell<BinanceEquityWebSocket>>,
 }
 
 #[pymethods]
@@ -63,7 +62,7 @@ impl PythonBinanceEquityWebSocketClient {
         }
         .map_err(to_py_runtime_error)?;
         Ok(Self {
-            client: Arc::new(Mutex::new(client)),
+            client: Arc::new(WsCell::new(client, timeout)),
         })
     }
 
@@ -76,7 +75,7 @@ impl PythonBinanceEquityWebSocketClient {
 
     fn connect<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -88,7 +87,7 @@ impl PythonBinanceEquityWebSocketClient {
 
     fn close<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -100,11 +99,9 @@ impl PythonBinanceEquityWebSocketClient {
 
     fn recv<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             let body = client
-                .lock()
-                .await
-                .recv_bytes()
+                .receive(|client| Box::pin(client.recv_bytes()))
                 .await
                 .map_err(to_py_runtime_error)?;
             Python::attach(|py| Ok(PyBytes::new(py, &body).unbind()))
@@ -121,7 +118,7 @@ impl PythonBinancePublicWebSocketClient {
         let client = BinancePublicWebSocket::with_profile_url(profile, base_url, timeout)
             .map_err(to_py_runtime_error)?;
         Ok(Self {
-            client: Arc::new(Mutex::new(client)),
+            client: Arc::new(WsCell::new(client, timeout)),
         })
     }
 
@@ -143,7 +140,7 @@ impl PythonBinancePublicWebSocketClient {
 
     fn connect<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -155,7 +152,7 @@ impl PythonBinancePublicWebSocketClient {
 
     fn close<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -167,7 +164,7 @@ impl PythonBinancePublicWebSocketClient {
 
     fn subscribe<'py>(&self, py: Python<'py>, streams: Vec<String>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -183,7 +180,7 @@ impl PythonBinancePublicWebSocketClient {
         streams: Vec<String>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -199,7 +196,7 @@ impl PythonBinancePublicWebSocketClient {
         product_symbol: String,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -215,7 +212,7 @@ impl PythonBinancePublicWebSocketClient {
         product_symbol: String,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -231,7 +228,7 @@ impl PythonBinancePublicWebSocketClient {
         product_symbol: String,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -247,7 +244,7 @@ impl PythonBinancePublicWebSocketClient {
         product_symbol: String,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -264,7 +261,7 @@ impl PythonBinancePublicWebSocketClient {
         interval: String,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -276,11 +273,9 @@ impl PythonBinancePublicWebSocketClient {
 
     fn recv<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             let body = client
-                .lock()
-                .await
-                .recv_bytes()
+                .receive(|client| Box::pin(client.recv_bytes()))
                 .await
                 .map_err(to_py_runtime_error)?;
             Python::attach(|py| Ok(PyBytes::new(py, &body).unbind()))
@@ -341,13 +336,13 @@ impl PythonBinancePrivateWebSocketClient {
             BinancePrivateWebSocket::with_profile(http_client, profile, timeout, ws_base_url)
                 .map_err(to_py_runtime_error)?;
         Ok(Self {
-            client: Arc::new(Mutex::new(client)),
+            client: Arc::new(WsCell::new(client, timeout)),
         })
     }
 
     fn connect<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -359,7 +354,7 @@ impl PythonBinancePrivateWebSocketClient {
 
     fn keep_alive<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -371,7 +366,7 @@ impl PythonBinancePrivateWebSocketClient {
 
     fn close_listen_key<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -383,7 +378,7 @@ impl PythonBinancePrivateWebSocketClient {
 
     fn close<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -402,11 +397,9 @@ impl PythonBinancePrivateWebSocketClient {
 
     fn recv<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             let body = client
-                .lock()
-                .await
-                .recv_bytes()
+                .receive(|client| Box::pin(client.recv_bytes()))
                 .await
                 .map_err(to_py_runtime_error)?;
             Python::attach(|py| Ok(PyBytes::new(py, &body).unbind()))
@@ -461,13 +454,13 @@ impl PythonBinanceWebSocketApiClient {
     }
     fn connect<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client.connect().await.map_err(to_py_runtime_error)
         })
     }
     fn close<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client.close().await.map_err(to_py_runtime_error)
         })
     }
@@ -480,7 +473,7 @@ impl PythonBinanceWebSocketApiClient {
         let client = self.client.clone();
         let params =
             serde_json::from_str(&params_json).map_err(|e| PyValueError::new_err(e.to_string()))?;
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .request(&method, params)
                 .await
@@ -489,7 +482,7 @@ impl PythonBinanceWebSocketApiClient {
     }
     fn recv<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             let body = client.recv_bytes().await.map_err(to_py_runtime_error)?;
             Python::attach(|py| Ok(PyBytes::new(py, &body).unbind()))
         })

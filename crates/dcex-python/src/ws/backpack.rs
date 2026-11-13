@@ -1,18 +1,17 @@
 use std::sync::Arc;
 
 use dcex::ws::backpack::{BackpackPrivateWebSocket, BackpackPublicWebSocket};
-use tokio::sync::Mutex;
 
 use super::*;
 
 #[pyclass(name = "BackpackPublicWebSocketClient")]
 struct PythonBackpackPublicWebSocketClient {
-    client: Arc<Mutex<BackpackPublicWebSocket>>,
+    client: Arc<WsCell<BackpackPublicWebSocket>>,
 }
 
 #[pyclass(name = "BackpackPrivateWebSocketClient")]
 struct PythonBackpackPrivateWebSocketClient {
-    client: Arc<Mutex<BackpackPrivateWebSocket>>,
+    client: Arc<WsCell<BackpackPrivateWebSocket>>,
 }
 
 #[pymethods]
@@ -28,7 +27,7 @@ impl PythonBackpackPublicWebSocketClient {
         }
         .map_err(to_py_runtime_error)?;
         Ok(Self {
-            client: Arc::new(Mutex::new(client)),
+            client: Arc::new(WsCell::new(client, timeout)),
         })
     }
 
@@ -42,7 +41,7 @@ impl PythonBackpackPublicWebSocketClient {
 
     fn connect<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -54,7 +53,7 @@ impl PythonBackpackPublicWebSocketClient {
 
     fn close<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -66,7 +65,7 @@ impl PythonBackpackPublicWebSocketClient {
 
     fn ping<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -78,7 +77,7 @@ impl PythonBackpackPublicWebSocketClient {
 
     fn subscribe<'py>(&self, py: Python<'py>, streams: Vec<String>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -94,7 +93,7 @@ impl PythonBackpackPublicWebSocketClient {
         streams: Vec<String>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -110,7 +109,7 @@ impl PythonBackpackPublicWebSocketClient {
         product_symbol: String,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -128,7 +127,7 @@ impl PythonBackpackPublicWebSocketClient {
         speed: Option<String>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             let mut client = client.lock().await;
             if let Some(speed) = speed {
                 client
@@ -149,7 +148,7 @@ impl PythonBackpackPublicWebSocketClient {
         speed: Option<String>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             let mut client = client.lock().await;
             if let Some(speed) = speed {
                 client
@@ -169,7 +168,7 @@ impl PythonBackpackPublicWebSocketClient {
         interval: String,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -185,7 +184,7 @@ impl PythonBackpackPublicWebSocketClient {
         product_symbol: String,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -201,7 +200,7 @@ impl PythonBackpackPublicWebSocketClient {
         product_symbol: String,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -217,7 +216,7 @@ impl PythonBackpackPublicWebSocketClient {
         product_symbol: String,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -233,7 +232,7 @@ impl PythonBackpackPublicWebSocketClient {
         product_symbol: String,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -249,7 +248,7 @@ impl PythonBackpackPublicWebSocketClient {
         product_symbol: String,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -261,11 +260,9 @@ impl PythonBackpackPublicWebSocketClient {
 
     fn recv<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             let body = client
-                .lock()
-                .await
-                .recv_bytes()
+                .receive(|client| Box::pin(client.recv_bytes()))
                 .await
                 .map_err(to_py_runtime_error)?;
             Python::attach(|py| Ok(PyBytes::new(py, &body).unbind()))
@@ -292,7 +289,7 @@ impl PythonBackpackPrivateWebSocketClient {
         }
         .map_err(to_py_runtime_error)?;
         Ok(Self {
-            client: Arc::new(Mutex::new(client)),
+            client: Arc::new(WsCell::new(client, timeout)),
         })
     }
 
@@ -306,7 +303,7 @@ impl PythonBackpackPrivateWebSocketClient {
 
     fn connect<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -318,7 +315,7 @@ impl PythonBackpackPrivateWebSocketClient {
 
     fn close<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -330,7 +327,7 @@ impl PythonBackpackPrivateWebSocketClient {
 
     fn ping<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -342,7 +339,7 @@ impl PythonBackpackPrivateWebSocketClient {
 
     fn subscribe<'py>(&self, py: Python<'py>, streams: Vec<String>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -358,7 +355,7 @@ impl PythonBackpackPrivateWebSocketClient {
         streams: Vec<String>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -375,7 +372,7 @@ impl PythonBackpackPrivateWebSocketClient {
         product_symbol: Option<String>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             let mut client = client.lock().await;
             if let Some(product_symbol) = product_symbol {
                 client.subscribe_orders_for_symbol(&product_symbol).await
@@ -393,7 +390,7 @@ impl PythonBackpackPrivateWebSocketClient {
         product_symbol: Option<String>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             let mut client = client.lock().await;
             if let Some(product_symbol) = product_symbol {
                 client.subscribe_positions_for_symbol(&product_symbol).await
@@ -411,7 +408,7 @@ impl PythonBackpackPrivateWebSocketClient {
         product_symbol: Option<String>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             let mut client = client.lock().await;
             if let Some(product_symbol) = product_symbol {
                 client.subscribe_rfq_for_symbol(&product_symbol).await
@@ -424,11 +421,9 @@ impl PythonBackpackPrivateWebSocketClient {
 
     fn recv<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             let body = client
-                .lock()
-                .await
-                .recv_bytes()
+                .receive(|client| Box::pin(client.recv_bytes()))
                 .await
                 .map_err(to_py_runtime_error)?;
             Python::attach(|py| Ok(PyBytes::new(py, &body).unbind()))

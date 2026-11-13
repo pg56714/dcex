@@ -187,7 +187,7 @@ impl PythonArcusHttpClient {
         params: Vec<(String, String)>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .sign_websocket_request(id, &method_name, params)
                 .await

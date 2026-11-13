@@ -240,7 +240,7 @@ impl PythonLighterHttpClient {
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         let params = params.unwrap_or_default();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .sign_request(&method_name, params)
                 .await
@@ -275,7 +275,7 @@ impl PythonLighterHttpClient {
 
     fn check_client_async<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client.check_client().await.map_err(to_py_runtime_error)
         })
     }

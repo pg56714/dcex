@@ -22,7 +22,7 @@ impl PythonOkxHttpClient {
         inst_id_code: u64,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             let bytes = client
                 .get_sbe_orderbook(inst_id_code)
                 .await

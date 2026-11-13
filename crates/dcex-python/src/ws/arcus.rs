@@ -1,13 +1,12 @@
 use std::sync::Arc;
 
 use dcex::ws::arcus::ArcusWebSocket;
-use tokio::sync::Mutex;
 
 use super::*;
 
 #[pyclass(name = "ArcusWebSocketClient")]
 struct PythonArcusWebSocketClient {
-    client: Arc<Mutex<ArcusWebSocket>>,
+    client: Arc<WsCell<ArcusWebSocket>>,
 }
 
 #[pymethods]
@@ -23,14 +22,16 @@ impl PythonArcusWebSocketClient {
     #[new]
     #[pyo3(signature = (testnet=false, timeout=10.0, base_url=None))]
     fn new(testnet: bool, timeout: f64, base_url: Option<String>) -> PyResult<Self> {
+        let timeout = websocket_timeout(timeout)?;
         Ok(Self {
-            client: Arc::new(Mutex::new(
+            client: Arc::new(WsCell::new(
                 if let Some(url) = base_url {
-                    ArcusWebSocket::with_url(url, websocket_timeout(timeout)?)
+                    ArcusWebSocket::with_url(url, timeout)
                 } else {
-                    ArcusWebSocket::new(testnet, websocket_timeout(timeout)?)
+                    ArcusWebSocket::new(testnet, timeout)
                 }
                 .map_err(to_py_runtime_error)?,
+                timeout,
             )),
         })
     }
@@ -45,7 +46,7 @@ impl PythonArcusWebSocketClient {
 
     fn connect<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -65,7 +66,7 @@ impl PythonArcusWebSocketClient {
         let payload: serde_json::Value = serde_json::from_str(&payload)
             .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -78,7 +79,7 @@ impl PythonArcusWebSocketClient {
         let frame: serde_json::Value = serde_json::from_str(&frame)
             .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -90,7 +91,7 @@ impl PythonArcusWebSocketClient {
 
     fn close<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -102,7 +103,7 @@ impl PythonArcusWebSocketClient {
 
     fn ping<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -120,7 +121,7 @@ impl PythonArcusWebSocketClient {
         id: Option<String>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -138,7 +139,7 @@ impl PythonArcusWebSocketClient {
         id: Option<String>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
                 .lock()
                 .await
@@ -150,11 +151,9 @@ impl PythonArcusWebSocketClient {
 
     fn recv<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        future_into_py(py, async move {
             client
-                .lock()
-                .await
-                .recv_bytes()
+                .receive(|client| Box::pin(client.recv_bytes()))
                 .await
                 .map_err(to_py_runtime_error)
         })

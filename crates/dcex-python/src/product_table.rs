@@ -144,7 +144,7 @@ impl PythonProductColumn {
 
 #[pyclass(name = "ProductTable")]
 pub(crate) struct PythonProductTable {
-    pub(crate) table: ProductTable,
+    pub(crate) table: std::sync::Arc<ProductTable>,
 }
 
 #[pymethods]
@@ -156,7 +156,7 @@ impl PythonProductTable {
             .map(market_info_from_map)
             .collect::<PyResult<Vec<_>>>()?;
         Ok(Self {
-            table: ProductTable::new(rows),
+            table: ProductTable::new(rows).into(),
         })
     }
 
@@ -408,7 +408,9 @@ fn fetch_product_table(
     let timeout = http_timeout(timeout)?;
     let (exchange, perp_dexs) = fetch_scope(exchange_name, perp_dexs)?;
     py.detach(|| block_on(fetch_table(exchange, perp_dexs, timeout)))
-        .map(|table| PythonProductTable { table })
+        .map(|table| PythonProductTable {
+            table: table.into(),
+        })
         .map_err(to_py_runtime_error)
 }
 
@@ -422,10 +424,12 @@ fn fetch_product_table_async<'py>(
 ) -> PyResult<Bound<'py, PyAny>> {
     let timeout = http_timeout(timeout)?;
     let (exchange, perp_dexs) = fetch_scope(exchange_name.as_deref(), perp_dexs)?;
-    pyo3_async_runtimes::tokio::future_into_py(py, async move {
+    future_into_py(py, async move {
         fetch_table(exchange, perp_dexs, timeout)
             .await
-            .map(|table| PythonProductTable { table })
+            .map(|table| PythonProductTable {
+                table: table.into(),
+            })
             .map_err(to_py_runtime_error)
     })
 }
