@@ -37,11 +37,17 @@ impl LighterPublicWebSocket {
         })
     }
 
-    pub fn set_product_table(&mut self, table: crate::product_table::ProductTable) {
-        self.product_table = Some(std::sync::Arc::new(table));
+    pub fn set_product_table(
+        &mut self,
+        table: impl Into<std::sync::Arc<crate::product_table::ProductTable>>,
+    ) {
+        self.product_table = Some(table.into());
     }
 
-    pub fn with_product_table(mut self, table: crate::product_table::ProductTable) -> Self {
+    pub fn with_product_table(
+        mut self,
+        table: impl Into<std::sync::Arc<crate::product_table::ProductTable>>,
+    ) -> Self {
         self.set_product_table(table);
         self
     }

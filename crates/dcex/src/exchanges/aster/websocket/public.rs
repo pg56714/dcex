@@ -39,12 +39,15 @@ impl AsterPublicWebSocket {
         })
     }
 
-    pub fn with_product_table(mut self, product_table: ProductTable) -> Self {
+    pub fn with_product_table(
+        mut self,
+        product_table: impl Into<std::sync::Arc<ProductTable>>,
+    ) -> Self {
         self.client = self.client.with_product_table(product_table);
         self
     }
 
-    pub fn set_product_table(&mut self, product_table: ProductTable) {
+    pub fn set_product_table(&mut self, product_table: impl Into<std::sync::Arc<ProductTable>>) {
         self.client.set_product_table(product_table);
     }
 

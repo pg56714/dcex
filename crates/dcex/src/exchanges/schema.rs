@@ -346,6 +346,24 @@ pub(crate) fn encode_shape(mut value: Value, schema: &Value, key: &str) -> Resul
 }
 
 /// Recursive JSON-schema constraints shared by catalog adapters.
+/// The compiled form of a schema `pattern`, built once per distinct pattern: the schemas
+/// are embedded, so the set is small and fixed. `None` marks a pattern that does not compile.
+fn embedded_pattern(pattern: &str) -> Option<std::sync::Arc<regex::Regex>> {
+    type Compiled = std::collections::HashMap<String, Option<std::sync::Arc<regex::Regex>>>;
+    static CACHE: std::sync::LazyLock<std::sync::Mutex<Compiled>> =
+        std::sync::LazyLock::new(Default::default);
+    let mut cache = CACHE.lock().unwrap_or_else(|poison| poison.into_inner());
+    if let Some(compiled) = cache.get(pattern) {
+        return compiled.clone();
+    }
+    // Nonzero cryptographic scalars are checked by the signing adapter.
+    let compiled = regex::Regex::new(&pattern.replace("(?=.*[1-9a-fA-F])", ""))
+        .ok()
+        .map(std::sync::Arc::new);
+    cache.insert(pattern.to_string(), compiled.clone());
+    compiled
+}
+
 pub(crate) fn validate(value: &Value, schema: &Value, key: &str) -> Result<()> {
     validate_with(value, schema, key, false, false)
 }
@@ -445,12 +463,9 @@ pub(crate) fn validate_with(
             return Err(invalid(key, "has an invalid string length"));
         }
         if let Some(pattern) = schema["pattern"].as_str() {
-            // Nonzero cryptographic scalars are checked by the signing adapter.
-            let pattern = pattern.replace("(?=.*[1-9a-fA-F])", "");
-            if !regex::Regex::new(&pattern)
-                .map_err(|_| invalid(key, "invalid embedded pattern"))?
-                .is_match(raw)
-            {
+            let compiled = embedded_pattern(pattern)
+                .ok_or_else(|| invalid(key, "invalid embedded pattern"))?;
+            if !compiled.is_match(raw) {
                 return Err(invalid(key, "has an invalid format"));
             }
         }

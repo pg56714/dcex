@@ -14,8 +14,11 @@ pub struct ArcusWebSocket {
 }
 
 impl ArcusWebSocket {
-    pub fn set_product_table(&mut self, table: crate::product_table::ProductTable) {
-        self.product_table = Some(std::sync::Arc::new(table));
+    pub fn set_product_table(
+        &mut self,
+        table: impl Into<std::sync::Arc<crate::product_table::ProductTable>>,
+    ) {
+        self.product_table = Some(table.into());
     }
 
     pub fn new(testnet: bool, timeout: Duration) -> Result<Self> {

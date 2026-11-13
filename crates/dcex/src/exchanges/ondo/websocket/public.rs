@@ -32,8 +32,11 @@ impl OndoPublicWebSocket {
         }
     }
 
-    pub fn set_product_table(&mut self, table: crate::product_table::ProductTable) {
-        self.product_table = Some(std::sync::Arc::new(table));
+    pub fn set_product_table(
+        &mut self,
+        table: impl Into<std::sync::Arc<crate::product_table::ProductTable>>,
+    ) {
+        self.product_table = Some(table.into());
     }
 
     pub fn new(timeout: Duration) -> Result<Self> {

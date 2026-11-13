@@ -236,13 +236,13 @@ impl LighterClient {
         })
     }
 
-    pub fn with_product_table(mut self, product_table: ProductTable) -> Self {
-        self.product_table = Some(Arc::new(product_table));
+    pub fn with_product_table(mut self, product_table: impl Into<Arc<ProductTable>>) -> Self {
+        self.product_table = Some(product_table.into());
         self
     }
 
-    pub fn set_product_table(&mut self, product_table: ProductTable) {
-        self.product_table = Some(Arc::new(product_table));
+    pub fn set_product_table(&mut self, product_table: impl Into<Arc<ProductTable>>) {
+        self.product_table = Some(product_table.into());
     }
 
     #[allow(clippy::too_many_arguments)]

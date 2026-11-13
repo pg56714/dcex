@@ -32,8 +32,8 @@ impl HyperliquidPrivateWebSocket {
     }
 
     /// Resolves canonical product symbols (for example `BTC-USDC-SWAP`) like the public client.
-    pub fn set_product_table(&mut self, product_table: ProductTable) {
-        self.product_table = Some(Arc::new(product_table));
+    pub fn set_product_table(&mut self, product_table: impl Into<Arc<ProductTable>>) {
+        self.product_table = Some(product_table.into());
     }
 
     pub fn user(&self) -> &str {

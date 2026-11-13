@@ -29,8 +29,8 @@ impl HyperliquidPublicWebSocket {
         })
     }
 
-    pub fn set_product_table(&mut self, product_table: ProductTable) {
-        self.product_table = Some(Arc::new(product_table));
+    pub fn set_product_table(&mut self, product_table: impl Into<Arc<ProductTable>>) {
+        self.product_table = Some(product_table.into());
     }
 
     pub fn is_connected(&self) -> bool {

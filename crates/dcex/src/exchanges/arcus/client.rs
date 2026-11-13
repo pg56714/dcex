@@ -97,13 +97,19 @@ impl ArcusClient {
         Self::new(None, None, None, 0, false, timeout)
     }
 
-    pub fn with_product_table(mut self, table: crate::product_table::ProductTable) -> Self {
+    pub fn with_product_table(
+        mut self,
+        table: impl Into<std::sync::Arc<crate::product_table::ProductTable>>,
+    ) -> Self {
         self.set_product_table(table);
         self
     }
 
-    pub fn set_product_table(&mut self, table: crate::product_table::ProductTable) {
-        self.product_table = Some(std::sync::Arc::new(table));
+    pub fn set_product_table(
+        &mut self,
+        table: impl Into<std::sync::Arc<crate::product_table::ProductTable>>,
+    ) {
+        self.product_table = Some(table.into());
     }
 
     pub(super) fn exchange_symbol(&self, symbol: &str) -> Result<String> {

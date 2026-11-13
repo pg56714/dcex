@@ -166,8 +166,8 @@ impl BinanceClient {
         })
     }
 
-    pub fn with_product_table(mut self, product_table: ProductTable) -> Self {
-        self.product_table = Some(Arc::new(product_table));
+    pub fn with_product_table(mut self, product_table: impl Into<Arc<ProductTable>>) -> Self {
+        self.product_table = Some(product_table.into());
         self
     }
 
@@ -242,8 +242,8 @@ impl BinanceClient {
         self
     }
 
-    pub fn set_product_table(&mut self, product_table: ProductTable) {
-        self.product_table = Some(Arc::new(product_table));
+    pub fn set_product_table(&mut self, product_table: impl Into<Arc<ProductTable>>) {
+        self.product_table = Some(product_table.into());
     }
 
     pub async fn request(

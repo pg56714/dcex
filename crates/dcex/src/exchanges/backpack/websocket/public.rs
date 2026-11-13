@@ -28,7 +28,7 @@ impl BackpackPublicWebSocket {
         })
     }
 
-    pub fn set_product_table(&mut self, product_table: ProductTable) {
+    pub fn set_product_table(&mut self, product_table: impl Into<std::sync::Arc<ProductTable>>) {
         self.client.set_product_table(product_table);
     }
 

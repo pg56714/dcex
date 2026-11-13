@@ -69,13 +69,13 @@ impl BybitClient {
         })
     }
 
-    pub fn with_product_table(mut self, product_table: ProductTable) -> Self {
-        self.product_table = Some(Arc::new(product_table));
+    pub fn with_product_table(mut self, product_table: impl Into<Arc<ProductTable>>) -> Self {
+        self.product_table = Some(product_table.into());
         self
     }
 
-    pub fn set_product_table(&mut self, product_table: ProductTable) {
-        self.product_table = Some(Arc::new(product_table));
+    pub fn set_product_table(&mut self, product_table: impl Into<Arc<ProductTable>>) {
+        self.product_table = Some(product_table.into());
     }
 
     pub async fn request(
@@ -214,10 +214,7 @@ impl BybitClient {
             _ => Ok(()),
         };
         if let Some(table) = &self.product_table {
-            let canonical = table
-                .rows()
-                .iter()
-                .any(|row| row.exchange == "bybit" && row.product_symbol == symbol);
+            let canonical = table.has_product_symbol(&["bybit"], symbol);
             // Canonical symbols determine the category; native symbols are narrowed only by
             // the category and otherwise must be unique across all Bybit markets.
             let row = if canonical {

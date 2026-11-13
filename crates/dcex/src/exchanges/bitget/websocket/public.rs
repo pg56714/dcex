@@ -152,13 +152,13 @@ impl BitgetPublicWebSocket {
         self.uta_v3
     }
 
-    pub fn with_product_table(mut self, product_table: ProductTable) -> Self {
-        self.product_table = Some(Arc::new(product_table));
+    pub fn with_product_table(mut self, product_table: impl Into<Arc<ProductTable>>) -> Self {
+        self.product_table = Some(product_table.into());
         self
     }
 
-    pub fn set_product_table(&mut self, product_table: ProductTable) {
-        self.product_table = Some(Arc::new(product_table));
+    pub fn set_product_table(&mut self, product_table: impl Into<Arc<ProductTable>>) {
+        self.product_table = Some(product_table.into());
     }
 
     pub fn default_inst_type(&self) -> &str {
@@ -255,10 +255,7 @@ impl BitgetPublicWebSocket {
 
     fn instrument(&self, product_symbol: &str) -> Result<(String, String)> {
         if let Some(table) = &self.product_table {
-            let canonical = table
-                .rows()
-                .iter()
-                .any(|row| row.exchange == "bitget" && row.product_symbol == product_symbol);
+            let canonical = table.has_product_symbol(&["bitget"], product_symbol);
             let row = table.resolve_symbol_in("bitget", product_symbol, |row| {
                 canonical
                     || row

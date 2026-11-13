@@ -55,6 +55,12 @@ pub struct ProductFilter<'a> {
 #[derive(Clone, Debug, Default)]
 pub struct ProductTable {
     rows: Vec<MarketInfo>,
+    /// Every row of a canonical product symbol, per exchange namespace.
+    by_exchange_product_rows: MultiIndex,
+    /// Other exact names a row answers to: its alias, and `BASE/QUOTE` for Kraken spot.
+    by_exchange_alternate_symbol: MultiIndex,
+    /// Hyperliquid rows by coin name, with the asset id of their `["COIN", id]` symbol.
+    hyperliquid_coins: HashMap<String, Vec<(usize, u64)>>,
     by_exchange_product: UniqueIndex,
     by_exchange_exchange_symbol: MultiIndex,
     by_exchange_exchange_symbol_product_type: TypedUniqueIndex,
@@ -170,32 +176,33 @@ impl ProductTable {
         symbol: &str,
         accepts: impl Fn(&MarketInfo) -> bool,
     ) -> Result<&MarketInfo> {
-        let canonical = self
-            .rows
+        let canonical = self.has_product_symbol(exchanges, symbol);
+        // Every name a row answers to is indexed, so no call scans the table.
+        let mut positions: Vec<usize> = Vec::new();
+        for exchange in exchanges {
+            if canonical {
+                positions.extend(
+                    lookup_multi_index(&self.by_exchange_product_rows, exchange, symbol)
+                        .unwrap_or_default(),
+                );
+                continue;
+            }
+            for index in [
+                &self.by_exchange_exchange_symbol,
+                &self.by_exchange_alternate_symbol,
+            ] {
+                positions.extend(lookup_multi_index(index, exchange, symbol).unwrap_or_default());
+            }
+            if *exchange == "hyperliquid" {
+                positions.extend(self.hyperliquid_positions(symbol));
+            }
+        }
+        // Table order, each row once: a row can be reached through more than one name.
+        positions.sort_unstable();
+        positions.dedup();
+        let candidates: Vec<_> = positions
             .iter()
-            .any(|row| exchanges.contains(&row.exchange.as_str()) && row.product_symbol == symbol);
-        let candidates: Vec<_> = self
-            .rows
-            .iter()
-            .filter(|row| {
-                let exchange = row.exchange.as_str();
-                exchanges.contains(&exchange)
-                    && if canonical {
-                        row.product_symbol == symbol
-                    } else {
-                        row.exchange_symbol == symbol
-                            || (!row.exchange_symbol_alias.is_empty()
-                                && row.exchange_symbol_alias == symbol)
-                            || (exchange == "kraken"
-                                && row.product_type == "spot"
-                                && !row.base_currency.is_empty()
-                                && !row.quote_currency.is_empty()
-                                && format!("{}/{}", row.base_currency, row.quote_currency)
-                                    == symbol)
-                            || (exchange == "hyperliquid"
-                                && hyperliquid_symbol_matches(&row.exchange_symbol, symbol))
-                    }
-            })
+            .map(|position| &self.rows[*position])
             .collect();
         let matches: Vec<_> = candidates
             .iter()
@@ -216,6 +223,28 @@ impl ProductTable {
                 )))
             }
         }
+    }
+
+    /// Hyperliquid rows named by `symbol`: the coin alone, or the exact `["COIN", id]` pair.
+    fn hyperliquid_positions(&self, symbol: &str) -> Vec<usize> {
+        let (coin, id) = match serde_json::from_str::<(String, u64)>(symbol) {
+            Ok((coin, id)) => (coin, Some(id)),
+            Err(_) => (symbol.to_string(), None),
+        };
+        self.hyperliquid_coins
+            .get(&coin)
+            .into_iter()
+            .flatten()
+            .filter(|(_, row_id)| id.is_none_or(|id| id == *row_id))
+            .map(|(position, _)| *position)
+            .collect()
+    }
+
+    /// Whether `symbol` is a canonical product symbol in any of the namespaces.
+    pub(crate) fn has_product_symbol(&self, exchanges: &[&str], symbol: &str) -> bool {
+        exchanges.iter().any(|exchange| {
+            lookup_unique_index(&self.by_exchange_product, exchange, symbol).is_some()
+        })
     }
 
     pub fn get_product_symbol(
@@ -314,6 +343,40 @@ impl ProductTable {
 
     fn build_indexes(&mut self) {
         for (index, row) in self.rows.iter().enumerate() {
+            insert_multi_index(
+                &mut self.by_exchange_product_rows,
+                &row.exchange,
+                &row.product_symbol,
+                index,
+            );
+            if !row.exchange_symbol_alias.is_empty() {
+                insert_multi_index(
+                    &mut self.by_exchange_alternate_symbol,
+                    &row.exchange,
+                    &row.exchange_symbol_alias,
+                    index,
+                );
+            }
+            if row.exchange == "kraken"
+                && row.product_type == "spot"
+                && !row.base_currency.is_empty()
+                && !row.quote_currency.is_empty()
+            {
+                insert_multi_index(
+                    &mut self.by_exchange_alternate_symbol,
+                    &row.exchange,
+                    &format!("{}/{}", row.base_currency, row.quote_currency),
+                    index,
+                );
+            }
+            if row.exchange == "hyperliquid"
+                && let Ok((coin, id)) = serde_json::from_str::<(String, u64)>(&row.exchange_symbol)
+            {
+                self.hyperliquid_coins
+                    .entry(coin)
+                    .or_default()
+                    .push((index, id));
+            }
             insert_unique_index(
                 &mut self.by_exchange_product,
                 &row.exchange,
@@ -552,16 +615,6 @@ fn row_value<'a>(row: &'a MarketInfo, key: &str) -> Option<&'a str> {
 }
 
 /// Hyperliquid rows store `[coin, asset_id]` JSON; compare parsed pairs, or the coin alone.
-fn hyperliquid_symbol_matches(exchange_symbol: &str, symbol: &str) -> bool {
-    let Ok(row) = serde_json::from_str::<(String, u64)>(exchange_symbol) else {
-        return false;
-    };
-    match serde_json::from_str::<(String, u64)>(symbol) {
-        Ok(input) => input == row,
-        Err(_) => row.0 == symbol,
-    }
-}
-
 fn display_option(value: Option<&str>) -> &str {
     value.unwrap_or("None")
 }
@@ -710,5 +763,251 @@ mod tests {
             table.get_product_symbols("binance", Some("spot"), None),
             vec!["BTC-USDT-SPOT"]
         );
+    }
+
+    #[test]
+    fn resolution_only_sees_the_requested_namespaces() {
+        let mut kraken = row("kraken", "BTC-USD-SPOT", "XXBTZUSD", "spot", "spot");
+        kraken.quote_currency = "USD".to_string();
+        let table = ProductTable::new(vec![
+            row("okx", "BTC-USDT-SWAP", "BTC-USDT-SWAP", "swap", "SWAP"),
+            row("binance", "BTC-USDT-SWAP", "BTCUSDT", "swap", "PERPETUAL"),
+            kraken,
+            row(
+                "binance_coinm",
+                "BTC-USD-SWAP",
+                "BTCUSD_PERP",
+                "swap",
+                "PERPETUAL",
+            ),
+            row("binance", "ETH-USDT-SWAP", "ETHUSDT", "swap", "PERPETUAL"),
+        ]);
+
+        assert!(table.has_product_symbol(&["binance"], "BTC-USDT-SWAP"));
+        assert!(!table.has_product_symbol(&["binance"], "BTC-USD-SWAP"));
+        assert!(table.has_product_symbol(&["binance", "binance_coinm"], "BTC-USD-SWAP"));
+        assert!(!table.has_product_symbol(&["binance"], "BTCUSDT"));
+
+        // The same canonical name on another exchange is not a candidate.
+        let swap = table
+            .resolve_symbol("binance", "BTC-USDT-SWAP", None, None)
+            .expect("binance swap");
+        assert_eq!(swap.exchange_symbol, "BTCUSDT");
+        for (symbol, native) in [("BTCUSD_PERP", "BTCUSD_PERP"), ("ETHUSDT", "ETHUSDT")] {
+            let row = table
+                .resolve_symbol_across(&["binance", "binance_coinm"], symbol, |_| true)
+                .expect("across namespaces");
+            assert_eq!(row.exchange_symbol, native);
+        }
+        assert!(table.resolve_symbol("okx", "BTCUSDT", None, None).is_err());
+        assert!(
+            table
+                .resolve_symbol("bybit", "BTC-USDT-SWAP", None, None)
+                .is_err()
+        );
+
+        // Kraken spot also answers to BASE/QUOTE, and only to that exact pair.
+        let spot = table
+            .resolve_symbol("kraken", "BTC/USD", None, None)
+            .expect("kraken pair");
+        assert_eq!(spot.exchange_symbol, "XXBTZUSD");
+        for symbol in ["BTC/USDT", "BTC/US", "BTCUSD", "BTC//USD", "/USD", "BTC/"] {
+            assert!(
+                table.resolve_symbol("kraken", symbol, None, None).is_err(),
+                "{symbol}"
+            );
+        }
+    }
+
+    /// The resolver's contract, written as the plain scan the indexes replace.
+    fn scanned<'a>(
+        table: &'a ProductTable,
+        exchanges: &[&str],
+        symbol: &str,
+    ) -> Vec<&'a MarketInfo> {
+        let named = |row: &MarketInfo| exchanges.contains(&row.exchange.as_str());
+        let canonical = table
+            .rows()
+            .iter()
+            .any(|row| named(row) && row.product_symbol == symbol);
+        let hyperliquid = |row: &MarketInfo| {
+            let Ok(native) = serde_json::from_str::<(String, u64)>(&row.exchange_symbol) else {
+                return false;
+            };
+            match serde_json::from_str::<(String, u64)>(symbol) {
+                Ok(input) => input == native,
+                Err(_) => native.0 == symbol,
+            }
+        };
+        table
+            .rows()
+            .iter()
+            .filter(|row| {
+                named(row)
+                    && if canonical {
+                        row.product_symbol == symbol
+                    } else {
+                        row.exchange_symbol == symbol
+                            || (!row.exchange_symbol_alias.is_empty()
+                                && row.exchange_symbol_alias == symbol)
+                            || (row.exchange == "kraken"
+                                && row.product_type == "spot"
+                                && !row.base_currency.is_empty()
+                                && !row.quote_currency.is_empty()
+                                && format!("{}/{}", row.base_currency, row.quote_currency)
+                                    == symbol)
+                            || (row.exchange == "hyperliquid" && hyperliquid(row))
+                    }
+            })
+            .collect()
+    }
+
+    #[test]
+    fn indexed_resolution_matches_a_full_scan() {
+        let with = |mut row: MarketInfo, alias: &str, base: &str, quote: &str| {
+            row.exchange_symbol_alias = alias.to_string();
+            row.base_currency = base.to_string();
+            row.quote_currency = quote.to_string();
+            row
+        };
+        let table = ProductTable::new(vec![
+            row("binance", "BTC-USDT-SPOT", "BTCUSDT", "spot", "spot"),
+            row("binance", "BTC-USDT-SWAP", "BTCUSDT", "swap", "PERPETUAL"),
+            row(
+                "binance_coinm",
+                "BTC-USD-SWAP",
+                "BTCUSD_PERP",
+                "swap",
+                "PERPETUAL",
+            ),
+            // The same canonical symbol twice, and an alias that is another row's native name.
+            row("binance", "ETH-USDT-SWAP", "ETHUSDT", "swap", "PERPETUAL"),
+            with(
+                row("binance", "ETH-USDT-SWAP", "ETHUSDT_2", "swap", "PERPETUAL"),
+                "ETHUSDT",
+                "ETH",
+                "USDT",
+            ),
+            row("okx", "BTC-USDT-SWAP", "BTC-USDT-SWAP", "swap", "SWAP"),
+            with(
+                row("kraken", "BTC-USD-SPOT", "XXBTZUSD", "spot", "spot"),
+                "XBTUSD",
+                "BTC",
+                "USD",
+            ),
+            // A pair name that is also this row's alias: one row, reached twice.
+            with(
+                row("kraken", "ETH-USD-SPOT", "XETHZUSD", "spot", "spot"),
+                "ETH/USD",
+                "ETH",
+                "USD",
+            ),
+            with(
+                row("kraken", "BTC-USD-SWAP", "PF_XBTUSD", "swap", "futures"),
+                "",
+                "BTC",
+                "USD",
+            ),
+            with(
+                row("kraken", "SOL-USD-SPOT", "SOLUSD", "spot", "spot"),
+                "",
+                "",
+                "USD",
+            ),
+            row(
+                "hyperliquid",
+                "BTC-USDC-SWAP",
+                r#"["BTC",0]"#,
+                "swap",
+                "perp",
+            ),
+            row(
+                "hyperliquid",
+                "BTC-USDC-SPOT",
+                r#"["BTC",10142]"#,
+                "spot",
+                "spot",
+            ),
+            row(
+                "hyperliquid",
+                "ETH-USDC-SWAP",
+                r#"["ETH",1]"#,
+                "swap",
+                "perp",
+            ),
+            row("hyperliquid", "RAW-USDC-SWAP", "RAW", "swap", "perp"),
+            // Not Hyperliquid: the pair form must not be read as one here.
+            row("okx", "ODD-USDT-SWAP", r#"["BTC",0]"#, "swap", "SWAP"),
+        ]);
+        let namespaces: [&[&str]; 9] = [
+            &["binance"],
+            &["binance_coinm"],
+            &["binance", "binance_coinm"],
+            &["binance", "binance"],
+            &["okx"],
+            &["kraken"],
+            &["hyperliquid"],
+            &["hyperliquid", "okx"],
+            &["bybit"],
+        ];
+        let mut symbols: Vec<String> = table
+            .rows()
+            .iter()
+            .flat_map(|row| {
+                [
+                    row.product_symbol.clone(),
+                    row.exchange_symbol.clone(),
+                    row.exchange_symbol_alias.clone(),
+                    format!("{}/{}", row.base_currency, row.quote_currency),
+                ]
+            })
+            .collect();
+        symbols.extend(
+            [
+                "",
+                "BTC",
+                "ETH",
+                "RAW",
+                "/USD",
+                "BTC/",
+                "BTC//USD",
+                "btcusdt",
+                "NOPE",
+                r#"["BTC", 0]"#,
+                r#"["BTC",1]"#,
+                r#"["ETH",1]"#,
+                r#"["BTC"]"#,
+                r#"["RAW",0]"#,
+            ]
+            .map(str::to_string),
+        );
+        let mut resolved = 0;
+        for exchanges in namespaces {
+            for symbol in &symbols {
+                let expected = scanned(&table, exchanges, symbol);
+                match table.resolve_symbol_across(exchanges, symbol, |_| true) {
+                    Ok(row) => {
+                        resolved += 1;
+                        assert_eq!(expected, vec![row], "{exchanges:?} {symbol:?}");
+                    }
+                    Err(error) => {
+                        assert_ne!(expected.len(), 1, "{exchanges:?} {symbol:?}: {error}");
+                        // The error lists every candidate, in table order.
+                        let names = expected
+                            .iter()
+                            .map(|row| row.product_symbol.as_str())
+                            .collect::<Vec<_>>()
+                            .join(", ");
+                        assert!(
+                            error
+                                .to_string()
+                                .contains(&format!("candidates: [{names}]")),
+                            "{exchanges:?} {symbol:?}: {error}"
+                        );
+                    }
+                }
+            }
+        }
+        assert!(resolved > 40, "only {resolved} lookups resolved");
     }
 }
