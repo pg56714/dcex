@@ -70,13 +70,12 @@ const GENERATOR_Y: U256 =
 
 pub fn keccak256(data: &[u8]) -> [u8; 32] {
     let mut state = [0u64; 25];
-    let mut chunks = data.chunks_exact(KECCAK_RATE);
-    for block in &mut chunks {
+    let (blocks, remainder) = data.as_chunks::<KECCAK_RATE>();
+    for block in blocks {
         absorb_block(&mut state, block);
         keccak_f1600(&mut state);
     }
 
-    let remainder = chunks.remainder();
     let mut block = [0u8; KECCAK_RATE];
     block[..remainder.len()].copy_from_slice(remainder);
     block[remainder.len()] = 0x01;
@@ -198,8 +197,8 @@ impl Rfc6979 {
 }
 
 fn absorb_block(state: &mut [u64; 25], block: &[u8]) {
-    for (index, lane) in block.chunks_exact(8).enumerate() {
-        state[index] ^= u64::from_le_bytes(lane.try_into().expect("8-byte lane"));
+    for (index, lane) in block.as_chunks::<8>().0.iter().enumerate() {
+        state[index] ^= u64::from_le_bytes(*lane);
     }
 }
 

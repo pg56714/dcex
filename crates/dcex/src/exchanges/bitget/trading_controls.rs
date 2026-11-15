@@ -426,10 +426,8 @@ pub(super) fn validate(name: &str, params: &BitgetParams) -> Result<()> {
                 return Err(invalid("category or symbol is required"));
             }
         }
-        "modify_uta_order" => {
-            if params.get("qty").is_none() && params.get("price").is_none() {
-                return Err(invalid("qty or price is required"));
-            }
+        "modify_uta_order" if params.get("qty").is_none() && params.get("price").is_none() => {
+            return Err(invalid("qty or price is required"));
         }
         _ => {}
     }

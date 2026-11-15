@@ -114,8 +114,10 @@ impl LighterClient {
                 .map_err(|_| DcexError::InvalidInput("invalid Lighter public key hex".into()))?;
             if pubkey_bytes.len() != 40
                 || pubkey_bytes
-                    .chunks_exact(8)
-                    .any(|b| u64::from_le_bytes(b.try_into().unwrap()) >= 0xffff_ffff_0000_0001)
+                    .as_chunks::<8>()
+                    .0
+                    .iter()
+                    .any(|b| u64::from_le_bytes(*b) >= 0xffff_ffff_0000_0001)
             {
                 return Err(DcexError::InvalidInput(
                     "Lighter public key must contain five canonical Goldilocks elements".into(),
@@ -158,8 +160,10 @@ impl LighterClient {
         if key_change {
             values.extend(
                 pubkey_bytes
-                    .chunks_exact(8)
-                    .map(|b| u64::from_le_bytes(b.try_into().unwrap()) as i128),
+                    .as_chunks::<8>()
+                    .0
+                    .iter()
+                    .map(|b| u64::from_le_bytes(*b) as i128),
             );
             payload["PubKey"] = base64::engine::general_purpose::STANDARD
                 .encode(pubkey_bytes)

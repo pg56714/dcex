@@ -337,16 +337,15 @@ pub(in crate::exchanges::kraken) fn validate_futures_instruction(value: &Value) 
                     ));
                 }
             }
-            "trailing_stop" => {
+            "trailing_stop"
                 if !object.contains_key("trailingStopMaxDeviation")
                     || !object.contains_key("trailingStopDeviationUnit")
                     || object.contains_key("limitPrice")
-                    || object.contains_key("stopPrice")
-                {
-                    return Err(invalid(
-                        "trailing_stop requires deviation fields and no explicit prices",
-                    ));
-                }
+                    || object.contains_key("stopPrice") =>
+            {
+                return Err(invalid(
+                    "trailing_stop requires deviation fields and no explicit prices",
+                ));
             }
             _ => {}
         }

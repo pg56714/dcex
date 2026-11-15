@@ -47,6 +47,10 @@ impl TestPeer {
         tokio::spawn(async move {
             while let Ok((stream, _)) = listener.accept().await {
                 let mut handshake = None;
+                #[allow(
+                    clippy::result_large_err,
+                    reason = "tungstenite fixes the callback's error type"
+                )]
                 let callback = |request: &Request, response: Response| {
                     handshake = Some(Handshake {
                         path: request.uri().to_string(),

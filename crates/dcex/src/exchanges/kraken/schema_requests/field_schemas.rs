@@ -277,10 +277,10 @@ fn validate_endpoint(name: &str, fields: &Map<String, Value>) -> Result<()> {
                 return Err(invalid("body.method_id is required"));
             }
         }
-        "update_funding_address" => {
-            if fields["body"]["name"].as_str().is_none_or(|s| s.is_empty()) {
-                return Err(invalid("body.name is required"));
-            }
+        "update_funding_address"
+            if fields["body"]["name"].as_str().is_none_or(|s| s.is_empty()) =>
+        {
+            return Err(invalid("body.name is required"));
         }
         _ => {}
     }

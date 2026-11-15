@@ -113,7 +113,7 @@ impl KrakenV1WebSocket {
                         }
                     }
                 }
-                "editOrder" | "amendOrder" => {
+                "editOrder" | "amendOrder"
                     if (if event == "editOrder" {
                         &["orderid"][..]
                     } else {
@@ -124,9 +124,9 @@ impl KrakenV1WebSocket {
                         obj.get(*key)
                             .and_then(Value::as_str)
                             .is_none_or(|v| v.trim().is_empty())
-                    }) {
-                        return Err(invalid("An order identifier is required."));
-                    }
+                    }) =>
+                {
+                    return Err(invalid("An order identifier is required."));
                 }
                 _ => {}
             }

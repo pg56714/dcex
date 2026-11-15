@@ -282,10 +282,7 @@ fn recording_server(
             let Ok(mut stream) = stream else { break };
             let mut request = Vec::new();
             let mut buffer = [0u8; 8192];
-            loop {
-                let Ok(size) = stream.read(&mut buffer) else {
-                    break;
-                };
+            while let Ok(size) = stream.read(&mut buffer) {
                 if size == 0 {
                     break;
                 }

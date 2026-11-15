@@ -580,9 +580,11 @@ pub fn transaction_hash(values: &[i128], attributes: &[(u64, u64)]) -> [u8; 40] 
     }
     let attributes_hash = poseidon_hash_bytes(&attribute_values);
     let combined = transaction_hash
-        .chunks_exact(8)
-        .chain(attributes_hash.chunks_exact(8))
-        .map(|chunk| u64::from_le_bytes(chunk.try_into().expect("8-byte chunk")))
+        .as_chunks::<8>()
+        .0
+        .iter()
+        .chain(attributes_hash.as_chunks::<8>().0)
+        .map(|chunk| u64::from_le_bytes(*chunk))
         .collect::<Vec<_>>();
     poseidon_hash_bytes(&combined)
 }
@@ -667,8 +669,8 @@ pub fn schnorr_sign_with_nonce(
     }
 
     let mut message = [0u64; 5];
-    for (index, chunk) in message_hash.chunks_exact(8).enumerate() {
-        message[index] = u64::from_le_bytes(chunk.try_into().expect("8-byte chunk"));
+    for (index, chunk) in message_hash.as_chunks::<8>().0.iter().enumerate() {
+        message[index] = u64::from_le_bytes(*chunk);
     }
 
     let encoded_r = generator_mul(nonce).encode();
@@ -714,8 +716,10 @@ mod tests {
 
     fn limbs(value: &[u8]) -> Vec<u64> {
         value
-            .chunks_exact(8)
-            .map(|chunk| u64::from_le_bytes(chunk.try_into().expect("8-byte chunk")))
+            .as_chunks::<8>()
+            .0
+            .iter()
+            .map(|chunk| u64::from_le_bytes(*chunk))
             .collect()
     }
 

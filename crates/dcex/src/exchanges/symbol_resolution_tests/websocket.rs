@@ -32,6 +32,10 @@ async fn extended_resolves_symbols_in_the_handshake_path() {
             );
             continue;
         }
+        #[allow(
+            clippy::result_large_err,
+            reason = "tungstenite fixes the callback's error type"
+        )]
         let capture = tokio::spawn(async move {
             let (stream, _) = listener.accept().await.unwrap();
             tokio_tungstenite::accept_hdr_async(

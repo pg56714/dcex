@@ -354,12 +354,12 @@ impl BinanceClient {
             "cancel_all_coin_futures_orders" => {
                 ensure_native_symbol(params)?;
             }
-            "get_coin_futures_open_orders" => {
-                if params.get("symbol").is_some() && params.get("pair").is_some() {
-                    return Err(DcexError::InvalidInput(
-                        "symbol and pair cannot be sent together".into(),
-                    ));
-                }
+            "get_coin_futures_open_orders"
+                if params.get("symbol").is_some() && params.get("pair").is_some() =>
+            {
+                return Err(DcexError::InvalidInput(
+                    "symbol and pair cannot be sent together".into(),
+                ));
             }
             _ => {}
         }
