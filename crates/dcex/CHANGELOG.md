@@ -1,3 +1,9 @@
+## 0.21.1 (2026-11-15)
+
+### Perf
+
+- look up an order's market and fee together and reuse the market
+
 ## 0.21.0 (2026-11-15)
 
 ### Feat

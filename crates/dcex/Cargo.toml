@@ -9,7 +9,7 @@ license.workspace = true
 rust-version.workspace = true
 readme = "README.md"
 repository.workspace = true
-version = "0.21.0"
+version = "0.21.1"
 keywords = ["crypto", "trading", "exchange", "websocket", "binance"]
 categories = [
   "api-bindings",
