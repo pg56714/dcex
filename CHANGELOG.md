@@ -1,3 +1,22 @@
+## 0.43.0 (2026-11-15)
+
+### Feat
+
+- publish abi3 wheels and add arm64 Linux and Intel macOS builds
+
+### Fix
+
+- send WebSocket pings and subscriptions while a receive waits
+
+### Perf
+
+- decode large responses faster
+- share the first server time sync between concurrent signed requests
+- request each exchange's product table endpoints concurrently
+- sign secp256k1 in constant time with projective arithmetic
+- share product tables, index symbol lookups and cache schema patterns
+- defer IPython, asyncio and signature inspection at import
+
 ## 0.42.1 (2026-10-31)
 
 ### Fix
