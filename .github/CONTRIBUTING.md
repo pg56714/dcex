@@ -126,6 +126,9 @@ pre-commit hook rejects such commits.
 
 ## Release Publishing
 
+A push to `main` starts the release workflow. It first runs the CI checks on the
+pushed commit, and nothing is tagged or published unless they pass.
+
 The release workflow detects Conventional Commit changes on `main` and plans
 Python and Rust releases independently. For a bumped Python release, GitHub
 Actions builds Python artifacts and publishes the package to PyPI using

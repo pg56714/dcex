@@ -2,14 +2,17 @@ name: Continuous Integration
 
 on:
   push:
-    # dev is checked before it is fast-forwarded into main, where a push also releases.
-    branches: [main, dev]
+    # main is not listed: a push there starts the release workflow, which calls these
+    # checks itself and releases only if they pass.
+    branches: [dev]
   pull_request:
     branches: [main]
+  workflow_call:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  # A newer push replaces a run of this workflow, never the checks of a release.
+  cancel-in-progress: ${{ github.workflow == 'Continuous Integration' }}
 
 jobs:
   rust:
@@ -93,16 +96,16 @@ jobs:
       - name: Run offline unit tests
         run: uv run pytest tests/unit
 
-  # The release builds wheels on these platforms too. Building them here finds a
-  # platform-specific failure (a native dependency, a linker) before a release does;
-  # Ubuntu is covered by the python job.
+  # The release builds wheels on these platforms too. Building them here the same way
+  # finds a platform-specific failure (a native dependency, a linker, a wheel tag)
+  # before a release does.
   build:
     name: Build Extension (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, macos-latest]
+        os: [ubuntu-24.04, windows-latest, macos-latest]
 
     steps:
       - uses: actions/checkout@v6
