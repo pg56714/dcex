@@ -52,12 +52,10 @@ pub(super) fn arcus_market_info(market: &Value) -> Result<MarketInfo> {
 }
 
 pub(super) async fn fetch_aster(client: &AsterClient) -> Result<Vec<MarketInfo>> {
-    let spot = client
-        .public_request("get_spot_exchange_info", vec![])
-        .await?;
-    let futures = client
-        .public_request("get_futures_exchange_info", vec![])
-        .await?;
+    let (spot, futures) = tokio::try_join!(
+        client.public_request("get_spot_exchange_info", vec![]),
+        client.public_request("get_futures_exchange_info", vec![]),
+    )?;
     let mut rows = Vec::new();
     for market in response_array(&spot, &["symbols"]) {
         if value_string(market, "status", "") == "TRADING" {
@@ -115,16 +113,16 @@ fn aster_market_info(market: &Value, product_type: &str) -> Result<MarketInfo> {
 }
 
 pub(super) async fn fetch_backpack(client: &BackpackClient) -> Result<Vec<MarketInfo>> {
-    let response = client
-        .public_request(
+    let (response, securities) = tokio::try_join!(
+        client.public_request(
             "get_markets",
             ["SPOT", "PERP", "IPERP", "DATED", "PREDICTION"]
                 .into_iter()
                 .map(|kind| ("marketType".into(), kind.into()))
                 .collect(),
-        )
-        .await?;
-    let securities = client.public_request("get_securities", vec![]).await?;
+        ),
+        client.public_request("get_securities", vec![]),
+    )?;
     let mut rows = Vec::new();
     for market in value_array(Some(&response.data)) {
         if market.get("visible").and_then(Value::as_bool) == Some(false)
@@ -220,12 +218,22 @@ pub(super) async fn fetch_binance(
     client: &BinanceClient,
     equity: Option<&BinanceClient>,
 ) -> Result<Vec<MarketInfo>> {
-    let spot = client
-        .public_request("get_spot_exchange_info", vec![])
-        .await?;
-    let futures = client
-        .public_request("get_futures_exchange_info", vec![])
-        .await?;
+    let (spot, futures, coin_futures, options, equity) = tokio::try_join!(
+        client.public_request("get_spot_exchange_info", vec![]),
+        client.public_request("get_futures_exchange_info", vec![]),
+        client.public_request("get_coin_futures_exchange_info", vec![]),
+        client.public_request("get_options_exchange_info", vec![]),
+        // Optional: without a usable API key the table simply has no equity rows.
+        async {
+            Ok::<_, DcexError>(match equity {
+                Some(equity) => equity
+                    .public_request("get_equity_exchange_info", vec![])
+                    .await
+                    .ok(),
+                None => None,
+            })
+        },
+    )?;
     let mut rows = Vec::new();
     for market in response_array(&spot, &["symbols"]) {
         let base = required_string(market, "baseAsset")?;
@@ -276,17 +284,11 @@ pub(super) async fn fetch_binance(
             ..MarketInfo::default()
         });
     }
-    let coin_futures = client
-        .public_request("get_coin_futures_exchange_info", vec![])
-        .await?;
     for market in response_array(&coin_futures, &["symbols"]) {
         if value_string(market, "contractStatus", "") == "TRADING" {
             rows.push(binance_coin_futures_market_info(market)?);
         }
     }
-    let options = client
-        .public_request("get_options_exchange_info", vec![])
-        .await?;
     for market in response_array(&options, &["optionSymbols"]) {
         if value_string(market, "status", "") == "TRADING"
             && let Some(row) = binance_option_market_info(market)
@@ -294,12 +296,8 @@ pub(super) async fn fetch_binance(
             rows.push(row);
         }
     }
-    if let Some(equity_client) = equity
-        && let Ok(equity) = equity_client
-            .public_request("get_equity_exchange_info", vec![])
-            .await
-    {
-        for market in response_array(&equity, &["symbols"]) {
+    if let Some(equity) = &equity {
+        for market in response_array(equity, &["symbols"]) {
             rows.push(binance_equity_market_info(market)?);
         }
     }
@@ -626,12 +624,17 @@ pub(super) fn validate_bingx_products(rows: &[MarketInfo]) -> Result<()> {
 }
 
 pub(super) async fn fetch_bitget(client: &BitgetClient) -> Result<Vec<MarketInfo>> {
-    let spot = client
-        .public_request(
+    const FUTURES_CATEGORIES: [&str; 3] = ["USDT-FUTURES", "COIN-FUTURES", "USDC-FUTURES"];
+    let instruments = move |category: &str| {
+        client.public_request(
             "get_uta_instruments",
-            vec![("category".to_string(), "SPOT".to_string())],
+            vec![("category".to_string(), category.to_string())],
         )
-        .await?;
+    };
+    let (spot, futures) = tokio::try_join!(
+        instruments("SPOT"),
+        try_join_all(FUTURES_CATEGORIES.map(instruments)),
+    )?;
     let mut rows = Vec::new();
     for market in response_array(&spot, &["data"]) {
         let status = value_string(market, "status", "").to_ascii_lowercase();
@@ -656,14 +659,8 @@ pub(super) async fn fetch_bitget(client: &BitgetClient) -> Result<Vec<MarketInfo
             ..MarketInfo::default()
         });
     }
-    for category in ["USDT-FUTURES", "COIN-FUTURES", "USDC-FUTURES"] {
-        let response = client
-            .public_request(
-                "get_uta_instruments",
-                vec![("category".to_string(), category.to_string())],
-            )
-            .await?;
-        for market in response_array(&response, &["data"]) {
+    for (category, response) in FUTURES_CATEGORIES.into_iter().zip(&futures) {
+        for market in response_array(response, &["data"]) {
             if value_string(market, "status", "").eq_ignore_ascii_case("online") {
                 rows.push(bitget_uta_futures_market_info(market, category)?);
             }
@@ -708,9 +705,11 @@ pub(super) fn bitget_uta_futures_market_info(market: &Value, category: &str) -> 
 }
 
 pub(super) async fn fetch_bybit(client: &BybitClient) -> Result<Vec<MarketInfo>> {
+    const CATEGORIES: [&str; 4] = ["linear", "inverse", "spot", "option"];
+    let instruments =
+        try_join_all(CATEGORIES.map(|category| bybit_instruments(client, category))).await?;
     let mut rows = Vec::new();
-    for category in ["linear", "inverse", "spot", "option"] {
-        let markets = bybit_instruments(client, category).await?;
+    for (category, markets) in CATEGORIES.into_iter().zip(instruments) {
         for market in markets {
             if category == "option" {
                 if value_string(&market, "status", "") == "Trading"
@@ -1004,25 +1003,21 @@ pub(super) fn append_hyperliquid_spot_rows(
 }
 
 pub(super) async fn fetch_kraken(client: &KrakenClient) -> Result<Vec<MarketInfo>> {
-    let spot = client
-        .public_request("get_spot_asset_pairs", vec![])
-        .await?;
-    let tokenized = client
-        .public_request(
+    let (spot, tokenized, futures) = tokio::try_join!(
+        client.public_request("get_spot_asset_pairs", vec![]),
+        client.public_request(
             "get_spot_asset_pairs",
             vec![("aclass_base".to_string(), "tokenized_asset".to_string())],
-        )
-        .await?;
-    let futures = client
-        .public_request(
+        ),
+        client.public_request(
             "get_futures_instruments",
             vec![
                 ("contractType".to_string(), "futures_inverse".to_string()),
                 ("contractType".to_string(), "futures_vanilla".to_string()),
                 ("contractType".to_string(), "flexible_futures".to_string()),
             ],
-        )
-        .await?;
+        ),
+    )?;
     let mut rows = kraken_spot_rows(&spot.data, &tokenized.data);
     for market in response_array(&futures, &["instruments"]) {
         let instrument_type = value_string(market, "type", "");
@@ -1180,11 +1175,14 @@ pub(super) fn ondo_market_rows(data: &Value) -> Result<Vec<MarketInfo>> {
 
 pub(super) async fn fetch_lighter(timeout: Duration) -> Result<Vec<MarketInfo>> {
     let mainnet = LighterClient::with_network(timeout, LighterNetwork::Mainnet)?;
-    let mut rows = fetch_lighter_network(&mainnet, LighterNetwork::Mainnet).await?;
     let robinhood = LighterClient::with_network(timeout, LighterNetwork::Robinhood)?;
-    if let Ok(mut robinhood_rows) =
-        fetch_lighter_network(&robinhood, LighterNetwork::Robinhood).await
-    {
+    let (rows, robinhood_rows) = tokio::join!(
+        fetch_lighter_network(&mainnet, LighterNetwork::Mainnet),
+        fetch_lighter_network(&robinhood, LighterNetwork::Robinhood),
+    );
+    let mut rows = rows?;
+    // Optional: a failure on the Robinhood chain only leaves its rows out.
+    if let Ok(mut robinhood_rows) = robinhood_rows {
         rows.append(&mut robinhood_rows);
     }
     Ok(rows)
@@ -1249,12 +1247,10 @@ fn lighter_market_info(market: &Value, product_type: &str) -> Result<MarketInfo>
 }
 
 pub(super) async fn fetch_mexc(client: &MexcClient) -> Result<Vec<MarketInfo>> {
-    let spot = client
-        .public_request("get_spot_exchange_info", vec![])
-        .await?;
-    let contracts = client
-        .public_request("get_contract_details", vec![])
-        .await?;
+    let (spot, contracts) = tokio::try_join!(
+        client.public_request("get_spot_exchange_info", vec![]),
+        client.public_request("get_contract_details", vec![]),
+    )?;
     let mut rows = Vec::new();
     for market in response_array(&spot, &["symbols"]) {
         let status = value_string(market, "status", "");
@@ -1356,17 +1352,23 @@ pub(super) fn mexc_contract_pair(market: &Value) -> Result<(String, String)> {
 }
 
 pub(super) async fn fetch_okx(client: &OkxClient) -> Result<Vec<MarketInfo>> {
-    let mut rows = Vec::new();
-    for (instrument_type, product_type) in
-        [("SWAP", "swap"), ("SPOT", "spot"), ("FUTURES", "futures")]
-    {
-        let response = client
-            .public_request(
+    const INSTRUMENT_TYPES: [(&str, &str); 3] =
+        [("SWAP", "swap"), ("SPOT", "spot"), ("FUTURES", "futures")];
+    let (instruments, families) = tokio::try_join!(
+        try_join_all(INSTRUMENT_TYPES.map(|(instrument_type, _)| {
+            client.public_request(
                 "get_public_instruments",
                 vec![("instType".to_string(), instrument_type.to_string())],
             )
-            .await?;
-        for market in response_array(&response, &["data"]) {
+        })),
+        client.public_request(
+            "get_public_underlying",
+            vec![("instType".to_string(), "OPTION".to_string())],
+        ),
+    )?;
+    let mut rows = Vec::new();
+    for ((_, product_type), response) in INSTRUMENT_TYPES.into_iter().zip(&instruments) {
+        for market in response_array(response, &["data"]) {
             let exchange_symbol = required_string(market, "instId")?;
             let parts = exchange_symbol.split('-').collect::<Vec<_>>();
             if parts.len() < 2 {
@@ -1375,35 +1377,32 @@ pub(super) async fn fetch_okx(client: &OkxClient) -> Result<Vec<MarketInfo>> {
             rows.push(okx_market_info(market, product_type)?);
         }
     }
-    let families = client
-        .public_request(
-            "get_public_underlying",
-            vec![("instType".to_string(), "OPTION".to_string())],
-        )
-        .await?;
-    for group in response_array(&families, &["data"]) {
-        for family in value_array(Some(group)).iter().filter_map(Value::as_str) {
-            let options = match client
-                .public_request(
-                    "get_public_instruments",
-                    vec![
-                        ("instType".to_string(), "OPTION".to_string()),
-                        ("instFamily".to_string(), family.to_string()),
-                    ],
-                )
-                .await
+    let option_families = response_array(&families, &["data"])
+        .iter()
+        .flat_map(|group| value_array(Some(group)))
+        .filter_map(Value::as_str);
+    let options = try_join_all(option_families.map(|family| async move {
+        let request = client.public_request(
+            "get_public_instruments",
+            vec![
+                ("instType".to_string(), "OPTION".to_string()),
+                ("instFamily".to_string(), family.to_string()),
+            ],
+        );
+        match request.await {
+            Ok(response) => Ok(Some(response)),
+            // OKX can list an underlying before it has queryable option contracts.
+            Err(error) if okx_unlisted_option_family(&error) => Ok(None),
+            Err(error) => Err(error),
+        }
+    }))
+    .await?;
+    for response in options.iter().flatten() {
+        for market in response_array(response, &["data"]) {
+            if value_string(market, "state", "") == "live"
+                && let Some(row) = okx_option_market_info(market)
             {
-                Ok(response) => response,
-                // OKX can list an underlying before it has queryable option contracts.
-                Err(error) if okx_unlisted_option_family(&error) => continue,
-                Err(error) => return Err(error),
-            };
-            for market in response_array(&options, &["data"]) {
-                if value_string(market, "state", "") == "live"
-                    && let Some(row) = okx_option_market_info(market)
-                {
-                    rows.push(row);
-                }
+                rows.push(row);
             }
         }
     }

@@ -2,8 +2,9 @@
 //! requests each fetcher makes and the rows it builds from them.
 
 use std::io::{Read, Write};
-use std::net::TcpListener;
-use std::sync::{Arc, Mutex};
+use std::net::{TcpListener, TcpStream};
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::{Arc, Condvar, Mutex};
 use std::time::Duration;
 
 use crate::exchanges::{
@@ -15,9 +16,66 @@ use crate::exchanges::{
 
 const TIMEOUT: Duration = Duration::from_secs(10);
 
+type Routes = Vec<(&'static str, String)>;
+
+/// Read one request as `"METHOD target\nbody"`.
+fn read_request(stream: &mut TcpStream) -> Option<String> {
+    let _ = stream.set_read_timeout(Some(Duration::from_secs(5)));
+    let mut raw = Vec::new();
+    let mut buffer = [0u8; 8192];
+    let (head, length) = loop {
+        let size = stream.read(&mut buffer).ok().filter(|size| *size > 0)?;
+        raw.extend_from_slice(&buffer[..size]);
+        let text = String::from_utf8_lossy(&raw).into_owned();
+        if let Some(end) = text.find("\r\n\r\n") {
+            let length = text[..end]
+                .lines()
+                .find_map(|line| {
+                    line.to_ascii_lowercase()
+                        .strip_prefix("content-length:")
+                        .and_then(|value| value.trim().parse::<usize>().ok())
+                })
+                .unwrap_or(0);
+            break (end + 4, length);
+        }
+    };
+    while raw.len() < head + length {
+        let Ok(size) = stream.read(&mut buffer) else {
+            break;
+        };
+        if size == 0 {
+            break;
+        }
+        raw.extend_from_slice(&buffer[..size]);
+    }
+    let text = String::from_utf8_lossy(&raw).into_owned();
+    let request_line = text.lines().next().unwrap_or_default();
+    let mut parts = request_line.split(' ');
+    Some(format!(
+        "{} {}\n{}",
+        parts.next().unwrap_or_default(),
+        parts.next().unwrap_or_default(),
+        &text[head..]
+    ))
+}
+
+/// Answer `key` with the body of the first route whose needle appears in it (`{}` when
+/// none does) and record the request.
+fn respond(stream: &mut TcpStream, routes: &Routes, key: String, log: &Mutex<Vec<String>>) {
+    let matched = routes.iter().find(|(needle, _)| key.contains(needle));
+    let body = matched.map_or_else(|| "{}".to_string(), |(_, body)| body.clone());
+    let prefix = if matched.is_some() { "" } else { "UNMATCHED " };
+    log.lock().expect("log").push(format!("{prefix}{key}"));
+    let response = format!(
+        "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}",
+        body.len()
+    );
+    let _ = stream.write_all(response.as_bytes());
+}
+
 /// Serve each request with the body of the first route whose needle appears in
 /// `"METHOD target\nbody"`; unmatched requests get `{}`. Every request is recorded.
-pub(super) fn serve(routes: Vec<(&'static str, String)>) -> (String, Arc<Mutex<Vec<String>>>) {
+pub(super) fn serve(routes: Routes) -> (String, Arc<Mutex<Vec<String>>>) {
     let listener = TcpListener::bind("127.0.0.1:0").expect("bind");
     let url = format!("http://{}", listener.local_addr().expect("address"));
     let seen = Arc::new(Mutex::new(Vec::new()));
@@ -25,63 +83,52 @@ pub(super) fn serve(routes: Vec<(&'static str, String)>) -> (String, Arc<Mutex<V
     std::thread::spawn(move || {
         for stream in listener.incoming() {
             let Ok(mut stream) = stream else { break };
-            let _ = stream.set_read_timeout(Some(Duration::from_secs(5)));
-            let mut raw = Vec::new();
-            let mut buffer = [0u8; 8192];
-            let (head, length) = loop {
-                let Ok(size) = stream.read(&mut buffer) else {
-                    break (0, 0);
-                };
-                if size == 0 {
-                    break (0, 0);
-                }
-                raw.extend_from_slice(&buffer[..size]);
-                let text = String::from_utf8_lossy(&raw).into_owned();
-                if let Some(end) = text.find("\r\n\r\n") {
-                    let length = text[..end]
-                        .lines()
-                        .find_map(|line| {
-                            line.to_ascii_lowercase()
-                                .strip_prefix("content-length:")
-                                .and_then(|value| value.trim().parse::<usize>().ok())
-                        })
-                        .unwrap_or(0);
-                    break (end + 4, length);
-                }
-            };
-            if head == 0 {
-                continue;
+            if let Some(key) = read_request(&mut stream) {
+                respond(&mut stream, &routes, key, &log);
             }
-            while raw.len() < head + length {
-                let Ok(size) = stream.read(&mut buffer) else {
-                    break;
-                };
-                if size == 0 {
-                    break;
-                }
-                raw.extend_from_slice(&buffer[..size]);
-            }
-            let text = String::from_utf8_lossy(&raw).into_owned();
-            let request_line = text.lines().next().unwrap_or_default();
-            let mut parts = request_line.split(' ');
-            let key = format!(
-                "{} {}\n{}",
-                parts.next().unwrap_or_default(),
-                parts.next().unwrap_or_default(),
-                &text[head..]
-            );
-            let matched = routes.iter().find(|(needle, _)| key.contains(needle));
-            let body = matched.map_or_else(|| "{}".to_string(), |(_, body)| body.clone());
-            let prefix = if matched.is_some() { "" } else { "UNMATCHED " };
-            log.lock().expect("log").push(format!("{prefix}{key}"));
-            let response = format!(
-                "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}",
-                body.len()
-            );
-            let _ = stream.write_all(response.as_bytes());
         }
     });
     (url, seen)
+}
+
+/// [`serve`], but no request is answered until `together` of them have arrived. The flag
+/// is set when one gives up waiting: its fetcher sent them one at a time.
+fn serve_together(
+    routes: Routes,
+    together: usize,
+) -> (String, Arc<Mutex<Vec<String>>>, Arc<AtomicBool>) {
+    let listener = TcpListener::bind("127.0.0.1:0").expect("bind");
+    let url = format!("http://{}", listener.local_addr().expect("address"));
+    let seen = Arc::new(Mutex::new(Vec::new()));
+    let stalled = Arc::new(AtomicBool::new(false));
+    let (log, gave_up) = (seen.clone(), stalled.clone());
+    let routes = Arc::new(routes);
+    let arrived = Arc::new((Mutex::new(0usize), Condvar::new()));
+    std::thread::spawn(move || {
+        for stream in listener.incoming() {
+            let Ok(mut stream) = stream else { break };
+            let (routes, log) = (routes.clone(), log.clone());
+            let (arrived, gave_up) = (arrived.clone(), gave_up.clone());
+            std::thread::spawn(move || {
+                let Some(key) = read_request(&mut stream) else {
+                    return;
+                };
+                let (count, wake) = &*arrived;
+                let mut count = count.lock().expect("count");
+                *count += 1;
+                wake.notify_all();
+                let (count, wait) = wake
+                    .wait_timeout_while(count, Duration::from_secs(3), |count| *count < together)
+                    .expect("count");
+                drop(count);
+                if wait.timed_out() {
+                    gave_up.store(true, Ordering::SeqCst);
+                }
+                respond(&mut stream, &routes, key, &log);
+            });
+        }
+    });
+    (url, seen, stalled)
 }
 
 /// Routes from `tests/fixtures/product_tables/<exchange>.json`, in file order.
@@ -238,6 +285,64 @@ fetch_case!(lighter_rows, "lighter", lighter, |c| {
 fetch_case!(mexc_rows, "mexc", mexc, |c| fetch::fetch_mexc(&c));
 fetch_case!(okx_rows, "okx", okx, |c| fetch::fetch_okx(&c));
 fetch_case!(ondo_rows, "ondo", ondo, |c| fetch::fetch_ondo(&c));
+
+/// A table that takes several requests sends the independent ones together, so loading
+/// it costs the slowest round trip rather than the sum of them.
+macro_rules! together_case {
+    ($test:ident, $exchange:literal, $build:ident, $together:literal, |$client:ident| $call:expr) => {
+        #[tokio::test]
+        async fn $test() {
+            let (url, seen, stalled) = serve_together(fixture($exchange), $together);
+            let $client = $build(&url);
+            let rows = tokio::time::timeout(Duration::from_secs(10), $call)
+                .await
+                .expect("fetch within 10s")
+                .expect("rows");
+            check($exchange, &rows, &seen);
+            assert!(
+                !stalled.load(Ordering::SeqCst),
+                "{}: fewer than {} requests were in flight together",
+                $exchange,
+                $together
+            );
+        }
+    };
+}
+
+together_case!(aster_requests_together, "aster", aster, 2, |c| {
+    fetch::fetch_aster(&c)
+});
+together_case!(backpack_requests_together, "backpack", backpack, 2, |c| {
+    fetch::fetch_backpack(&c)
+});
+together_case!(binance_requests_together, "binance", binance, 4, |c| {
+    fetch::fetch_binance(&c, None)
+});
+together_case!(bingx_requests_together, "bingx", bingx, 3, |c| {
+    fetch::fetch_bingx(&c)
+});
+together_case!(bitget_requests_together, "bitget", bitget, 4, |c| {
+    fetch::fetch_bitget(&c)
+});
+together_case!(bybit_requests_together, "bybit", bybit, 4, |c| {
+    fetch::fetch_bybit(&c)
+});
+together_case!(
+    hyperliquid_requests_together,
+    "hyperliquid",
+    hyperliquid,
+    3,
+    |c| fetch::fetch_hyperliquid(&c, None)
+);
+together_case!(kraken_requests_together, "kraken", kraken, 3, |c| {
+    fetch::fetch_kraken(&c)
+});
+together_case!(mexc_requests_together, "mexc", mexc, 2, |c| {
+    fetch::fetch_mexc(&c)
+});
+together_case!(okx_requests_together, "okx", okx, 4, |c| fetch::fetch_okx(
+    &c
+));
 
 #[tokio::test]
 async fn hyperliquid_perp_dexs_limits_builder_dexs_and_keeps_asset_ids() {
