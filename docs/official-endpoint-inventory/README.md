@@ -13,16 +13,16 @@ they do not establish live account eligibility or server availability.
 Run generators from the repository root, for example:
 
 ```sh
-python -m scripts.build_binance_wrappers --write
-python -m scripts.build_bingx_wrappers --write
-python -m scripts.build_bitget_wrappers --write
-python -m scripts.build_hyperliquid_wrappers --write
-ruff check --fix dcex
-ruff format dcex
+uv run python -B -m scripts.build_binance_wrappers --write
+uv run python -B -m scripts.build_bingx_wrappers --write
+uv run python -B -m scripts.build_bitget_wrappers --write
+uv run python -B -m scripts.build_hyperliquid_wrappers --write
+uv run ruff check --fix dcex
+uv run ruff format dcex
 cargo fmt --all
-python -m scripts.build_endpoint_markdown --write
-python -m scripts.build_endpoint_markdown --check
-python scripts/build_endpoint_docs.py --write
+uv run python -B -m scripts.build_endpoint_markdown --write
+uv run python -B -m scripts.build_endpoint_markdown --check
+uv run python -B -m scripts.build_endpoint_docs --write
 ```
 
 The wrapper generators use committed schemas and require no network access.

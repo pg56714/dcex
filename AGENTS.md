@@ -6,7 +6,8 @@ contributor guide.
 
 ## Scope
 
-- Do not wrap external withdrawal creation endpoints.
+- Documented withdrawal, market-maker and partner endpoints are in scope and wrapped like any
+  other endpoint. API withdrawals execute on submit with no second confirmation.
 - Keep `examples/` concise and read-only. Endpoint validation belongs in `tests/`.
 
 ## Generated files
