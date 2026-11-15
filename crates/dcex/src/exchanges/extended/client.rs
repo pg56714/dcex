@@ -1,6 +1,6 @@
-use std::collections::BTreeMap;
-use std::sync::Arc;
-use std::time::Duration;
+use std::collections::{BTreeMap, HashMap};
+use std::sync::{Arc, Mutex};
+use std::time::{Duration, Instant};
 
 use serde_json::Value;
 
@@ -10,7 +10,7 @@ use crate::product_table::ProductTable;
 use crate::{DcexError, Result};
 
 use super::endpoints::{BASE_URL, USER_AGENT};
-use super::signing::{ExtendedSigningCredentials, StarknetDomain, parse_felt_hex};
+use super::signing::{ExtendedMarket, ExtendedSigningCredentials, StarknetDomain, parse_felt_hex};
 
 #[derive(Clone)]
 pub struct ExtendedClient {
@@ -21,6 +21,8 @@ pub struct ExtendedClient {
     signing_domain: StarknetDomain,
     user_agent: String,
     product_table: Option<Arc<ProductTable>>,
+    /// Signing config of the markets orders were placed on, shared by clones.
+    markets: Arc<Mutex<HashMap<String, (Instant, ExtendedMarket)>>>,
 }
 
 impl ExtendedClient {
@@ -56,6 +58,7 @@ impl ExtendedClient {
             signing_domain,
             user_agent,
             product_table: None,
+            markets: Arc::default(),
         })
     }
 
@@ -105,6 +108,7 @@ impl ExtendedClient {
             signing_domain,
             user_agent,
             product_table: None,
+            markets: Arc::default(),
         })
     }
 
@@ -291,6 +295,20 @@ impl ExtendedClient {
             return Ok(product_symbol.to_string());
         }
         exchange_symbol_fallback(product_symbol)
+    }
+
+    /// The market's signing config if it was fetched within the last few minutes.
+    pub(super) fn cached_market(&self, market_name: &str) -> Option<ExtendedMarket> {
+        const MAX_AGE: Duration = Duration::from_secs(300);
+        let cache = self.markets.lock().ok()?;
+        let (fetched, market) = cache.get(market_name)?;
+        (fetched.elapsed() < MAX_AGE).then(|| market.clone())
+    }
+
+    pub(super) fn cache_market(&self, market_name: &str, market: &ExtendedMarket) {
+        if let Ok(mut cache) = self.markets.lock() {
+            cache.insert(market_name.to_string(), (Instant::now(), market.clone()));
+        }
     }
 
     pub(super) fn signing_credentials(&self) -> Result<&ExtendedSigningCredentials> {

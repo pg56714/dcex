@@ -247,7 +247,7 @@ fn pow10(exp: u32) -> BigInt {
     value
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(super) struct ExtendedMarket {
     name: String,
@@ -256,7 +256,7 @@ pub(super) struct ExtendedMarket {
     l2_config: ExtendedL2Config,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct ExtendedL2Config {
     collateral_id: String,

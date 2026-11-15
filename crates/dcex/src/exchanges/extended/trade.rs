@@ -9,8 +9,8 @@ use super::params::{
     path_with_id, validate_non_negative_decimal, validate_positive_decimal,
 };
 use super::signing::{
-    StarknetDomain, build_signed_order, extract_market_from_param, extract_market_from_response,
-    signed_order_response,
+    ExtendedMarket, StarknetDomain, build_signed_order, extract_market_from_param,
+    extract_market_from_response, signed_order_response,
 };
 
 impl ExtendedClient {
@@ -169,17 +169,37 @@ impl ExtendedClient {
     ) -> Result<super::signing::ExtendedSignedOrder> {
         let credentials = self.signing_credentials()?.clone();
         let market_name = self.signed_order_market(params)?;
-        let market = match extract_market_from_param(params, &market_name)? {
-            Some(market) => market,
-            None => {
-                let response = self
-                    .public_get(MARKETS, vec![("market".to_string(), market_name.clone())])
-                    .await?;
-                extract_market_from_response(&response.data, &market_name)?
-            }
-        };
-        let params = self.with_order_fee(params, &market_name).await?;
+        // Neither lookup needs the other, so an order waits for the slower one only.
+        let (market, params) = tokio::try_join!(
+            self.order_market(params, &market_name),
+            self.with_order_fee(params, &market_name),
+        )?;
         build_signed_order(&params, market, &credentials, self.signing_domain())
+    }
+
+    /// The market's signing config: the caller's `market_json`, else the copy fetched
+    /// within the last few minutes, else a fresh one. The asset ids and resolutions it
+    /// holds do not change from one order to the next; the fee can, so it is not kept.
+    async fn order_market(
+        &self,
+        params: &ExtendedParams,
+        market_name: &str,
+    ) -> Result<ExtendedMarket> {
+        if let Some(market) = extract_market_from_param(params, market_name)? {
+            return Ok(market);
+        }
+        if let Some(market) = self.cached_market(market_name) {
+            return Ok(market);
+        }
+        let response = self
+            .public_get(
+                MARKETS,
+                vec![("market".to_string(), market_name.to_string())],
+            )
+            .await?;
+        let market = extract_market_from_response(&response.data, market_name)?;
+        self.cache_market(market_name, &market);
+        Ok(market)
     }
 
     async fn with_order_fee(

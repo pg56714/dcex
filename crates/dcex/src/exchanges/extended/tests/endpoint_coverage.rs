@@ -596,14 +596,17 @@ fn auto_signed_limit_order_fetches_market_and_fee_then_posts() {
         .iter()
         .map(|request| request_line(request))
         .collect();
+    // The two lookups go out together, so either may reach the server first.
+    let mut lookups = lines[..2].to_vec();
+    lookups.sort_unstable();
     assert_eq!(
-        lines,
+        lookups,
         vec![
             "GET /api/v1/info/markets?market=BTC-USD HTTP/1.1",
             "GET /api/v1/user/fees?market=BTC-USD HTTP/1.1",
-            "POST /api/v1/user/order HTTP/1.1",
         ]
     );
+    assert_eq!(lines[2..], ["POST /api/v1/user/order HTTP/1.1"]);
     let sent: Value = serde_json::from_str(body(&requests[2])).expect("JSON body");
     assert_eq!(sent["market"], "BTC-USD");
     assert_eq!(sent["type"], "LIMIT");
@@ -617,6 +620,40 @@ fn auto_signed_limit_order_fetches_market_and_fee_then_posts() {
             .as_str()
             .is_some_and(|value| value.starts_with("0x"))
     );
+}
+
+#[test]
+fn market_config_is_fetched_once_for_orders_placed_close_together() {
+    let (base_url, stop, handle) = multi_request_server();
+    let client = client(&base_url);
+    let order = || {
+        pairs(&[
+            ("market", "BTC-USD"),
+            ("side", "BUY"),
+            ("qty", "0.001"),
+            ("price", "10000"),
+            ("postOnly", "true"),
+            ("nonce", "123"),
+        ])
+    };
+    let (first, second) = (order(), order());
+    block_on(async move {
+        client.private_request("place_limit_order", first).await?;
+        client.private_request("place_limit_order", second).await
+    })
+    .expect("orders");
+    stop.store(true, Ordering::SeqCst);
+    let requests = handle.join().expect("server thread");
+    let lines: Vec<&str> = requests
+        .iter()
+        .map(|request| request_line(request))
+        .collect();
+    let count = |prefix: &str| lines.iter().filter(|line| line.starts_with(prefix)).count();
+    assert_eq!(count("GET /api/v1/info/markets"), 1, "{lines:?}");
+    // The fee depends on the account, so it is looked up for every order.
+    assert_eq!(count("GET /api/v1/user/fees"), 2, "{lines:?}");
+    assert_eq!(count("POST /api/v1/user/order"), 2, "{lines:?}");
+    assert_eq!(lines.len(), 5, "{lines:?}");
 }
 
 #[test]
