@@ -1,4 +1,4 @@
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, HashMap};
 use std::future::Future;
 use std::time::Duration;
 
@@ -26,8 +26,14 @@ use dcex::product_table::{MarketInfo, ProductFilter, ProductTable};
 use pyo3::IntoPyObjectExt;
 use pyo3::exceptions::{PyRuntimeError, PyValueError};
 use pyo3::prelude::*;
-use pyo3::types::{PyBytes, PyDict, PyList};
+use pyo3::types::{PyBytes, PyDict, PyList, PyString};
 use serde_json::Value;
+
+/// Decoding a response is one allocation per JSON value, and the Windows system
+/// allocator made that most of the time spent on a large one. Python's own memory is
+/// not affected.
+#[global_allocator]
+static ALLOCATOR: mimalloc::MiMalloc = mimalloc::MiMalloc;
 
 fn to_py_value_error(error: dcex::DcexError) -> PyErr {
     PyValueError::new_err(error.to_string())
@@ -126,39 +132,58 @@ fn python_validated_json_response(response: ValidatedResponse) -> PyResult<Pytho
 }
 
 fn json_value_to_py(py: Python<'_>, value: &Value) -> PyResult<Py<PyAny>> {
+    let mut keys = HashMap::new();
+    json_to_py(py, value, &mut keys).map(Bound::unbind)
+}
+
+/// `keys` holds the `str` of every object key seen so far: the rows of a response repeat
+/// the same keys, and one shared `str` per key is built and hashed once, as `json.loads`
+/// does.
+fn json_to_py<'py, 'a>(
+    py: Python<'py>,
+    value: &'a Value,
+    keys: &mut HashMap<&'a str, Bound<'py, PyString>>,
+) -> PyResult<Bound<'py, PyAny>> {
     match value {
-        Value::Null => Ok(py.None()),
-        Value::Bool(value) => value.into_py_any(py),
+        Value::Null => Ok(py.None().into_bound(py)),
+        Value::Bool(value) => value.into_bound_py_any(py),
         Value::Number(value) => json_number_to_py(py, value),
-        Value::String(value) => value.into_py_any(py),
+        Value::String(value) => value.into_bound_py_any(py),
         Value::Array(values) => {
-            let list = PyList::empty(py);
+            let mut items = Vec::with_capacity(values.len());
             for value in values {
-                list.append(json_value_to_py(py, value)?)?;
+                items.push(json_to_py(py, value, keys)?);
             }
-            Ok(list.into_any().unbind())
+            Ok(PyList::new(py, items)?.into_any())
         }
         Value::Object(values) => {
             let dict = PyDict::new(py);
             for (key, value) in values {
-                dict.set_item(key, json_value_to_py(py, value)?)?;
+                let value = json_to_py(py, value, keys)?;
+                let key = keys
+                    .entry(key.as_str())
+                    .or_insert_with(|| PyString::new(py, key));
+                dict.set_item(&*key, value)?;
             }
-            Ok(dict.into_any().unbind())
+            Ok(dict.into_any())
         }
     }
 }
 
-fn json_number_to_py(py: Python<'_>, value: &serde_json::Number) -> PyResult<Py<PyAny>> {
+fn json_number_to_py<'py>(
+    py: Python<'py>,
+    value: &serde_json::Number,
+) -> PyResult<Bound<'py, PyAny>> {
     if let Some(value) = value.as_i64() {
-        return value.into_py_any(py);
+        return value.into_bound_py_any(py);
     }
     if let Some(value) = value.as_u64() {
-        return value.into_py_any(py);
+        return value.into_bound_py_any(py);
     }
     if let Some(value) = value.as_f64() {
-        return value.into_py_any(py);
+        return value.into_bound_py_any(py);
     }
-    value.to_string().into_py_any(py)
+    value.to_string().into_bound_py_any(py)
 }
 
 pub(crate) use product_table::PythonProductTable;
