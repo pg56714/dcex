@@ -475,7 +475,7 @@ impl AsterClient {
         let now = u64::try_from(now).unwrap_or(u64::MAX);
         let nonce = self
             .last_nonce
-            .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |previous| {
+            .try_update(Ordering::Relaxed, Ordering::Relaxed, |previous| {
                 Some(now.max(previous.saturating_add(1)))
             })
             .map(|previous| now.max(previous.saturating_add(1)))

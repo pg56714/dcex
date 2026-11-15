@@ -162,7 +162,7 @@ jobs:
         uses: astral-sh/setup-uv@v10.2.0
 
       - name: Set up Rust
-        uses: dtolnay/rust-toolchain@stable
+        uses: ./.github/actions/setup-rust
 
       - name: Cache Rust builds
         uses: Swatinem/rust-cache@v2
@@ -240,7 +240,7 @@ jobs:
           ref: ${{ needs.apply.outputs.rust_tag }}
 
       - name: Set up Rust
-        uses: dtolnay/rust-toolchain@stable
+        uses: ./.github/actions/setup-rust
 
       - name: Download release metadata
         uses: actions/download-artifact@v8.0.1

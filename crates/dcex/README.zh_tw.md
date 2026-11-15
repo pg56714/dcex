@@ -20,7 +20,7 @@ cargo add dcex
 cargo add tokio --features macros,rt-multi-thread
 ```
 
-以下範例使用 Tokio 的 `#[tokio::main]` 巨集。
+此套件需要 Rust 1.95 以上。以下範例使用 Tokio 的 `#[tokio::main]` 巨集。
 
 ## 主要功能
 

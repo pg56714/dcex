@@ -16,7 +16,8 @@ Current scope notes:
 
 ## Development Environment
 
-1. Install Rust stable and Cargo.
+1. Install Rust with [rustup](https://rustup.rs/). `rust-toolchain.toml` selects the
+   version, the same one CI uses, and rustup installs it on first use.
 2. Install `uv`: [official installation guide](https://docs.astral.sh/uv/getting-started/installation/).
 3. Create and sync the local Python environment:
 

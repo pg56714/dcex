@@ -239,7 +239,7 @@ impl BinanceWebSocketApi {
         }
         let id = self
             .next_id
-            .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+            .try_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
             .map_err(|_| invalid("request ID range exhausted"))?;
         Ok(json!({"id":id,"method":method,"params":params}))
     }

@@ -6,6 +6,7 @@ documentation = "https://docs.rs/dcex"
 authors.workspace = true
 edition.workspace = true
 license.workspace = true
+rust-version.workspace = true
 readme = "README.md"
 repository.workspace = true
 version = "0.21.0"

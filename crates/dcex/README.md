@@ -23,7 +23,7 @@ cargo add dcex
 cargo add tokio --features macros,rt-multi-thread
 ```
 
-The examples below use Tokio's `#[tokio::main]` macro.
+The crate needs Rust 1.95 or later. The examples below use Tokio's `#[tokio::main]` macro.
 
 ## Key features
 

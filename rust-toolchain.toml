@@ -1,0 +1,6 @@
+# The Rust version used by every developer and by CI, so the compiler and clippy report
+# the same things everywhere. Raise it on purpose and fix what the new version reports.
+# The oldest Rust that can build the crate is `rust-version` in Cargo.toml.
+[toolchain]
+channel = "1.99.1"
+components = ["clippy", "rustfmt"]

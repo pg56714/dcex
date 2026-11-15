@@ -6,6 +6,8 @@ resolver = "3"
 authors = ["pg56714"]
 edition = "2024"
 license = "MIT"
+# The oldest Rust that builds the crates; clippy flags an API newer than this.
+rust-version = "1.95"
 repository = "https://github.com/pg56714/dcex"
 
 # Applies to the Python wheel (and local release builds); crates.io consumers use their own profile.
