@@ -108,3 +108,56 @@ async fn signed_spot_request_uses_synchronized_server_time() {
     assert!(timestamp >= SERVER_TIME);
     assert!(timestamp - SERVER_TIME < 1_000);
 }
+
+#[tokio::test]
+async fn concurrent_first_signed_requests_share_one_time_sync() {
+    const CALLS: usize = 6;
+    let listener = TcpListener::bind("127.0.0.1:0").expect("bind");
+    let address = listener.local_addr().expect("address");
+    let handle = thread::spawn(move || {
+        let mut time_syncs = 0;
+        // One sync, then the calls: a sync per call would run out of connections.
+        for _ in 0..=CALLS {
+            let (mut stream, _) = listener.accept().expect("accept");
+            let mut buffer = [0u8; 4096];
+            let size = stream.read(&mut buffer).expect("read");
+            let body = if buffer[..size].starts_with(b"GET /api/v3/time ") {
+                time_syncs += 1;
+                r#"{"serverTime":1700000000000}"#
+            } else {
+                "{}"
+            };
+            let response = format!(
+                "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}",
+                body.len()
+            );
+            stream.write_all(response.as_bytes()).expect("write");
+        }
+        time_syncs
+    });
+    let base_url = format!("http://{address}");
+    let client = MexcClient::with_base_urls(
+        Some("api-key".to_string()),
+        Some("secret".to_string()),
+        Duration::from_secs(10),
+        base_url.clone(),
+        base_url,
+    )
+    .expect("client");
+
+    let calls = (0..CALLS).map(|_| {
+        client.request_raw(
+            HttpMethod::Get,
+            MexcApi::Spot,
+            "/api/v3/openOrders",
+            Vec::new(),
+            None,
+            true,
+        )
+    });
+    for result in futures_util::future::join_all(calls).await {
+        result.expect("request");
+    }
+
+    assert_eq!(handle.join().expect("server"), 1);
+}

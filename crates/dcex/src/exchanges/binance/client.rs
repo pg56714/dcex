@@ -89,6 +89,8 @@ pub struct BinanceClient {
     alpha_base_url: String,
     api_key: Option<String>,
     timestamp_offset_ms: Arc<Mutex<Option<i64>>>,
+    /// Held while the server time is fetched.
+    time_sync: Arc<tokio::sync::Mutex<()>>,
     pub(super) product_table: Option<Arc<ProductTable>>,
 }
 
@@ -162,6 +164,7 @@ impl BinanceClient {
             alpha_base_url: "https://www.binance.com".into(),
             api_key: api_key_header,
             timestamp_offset_ms,
+            time_sync: Arc::default(),
             product_table: None,
         })
     }
@@ -291,13 +294,21 @@ impl BinanceClient {
     }
 
     async fn sync_server_time(&self, market: BinanceMarket) -> Result<()> {
-        {
-            let offset = self.timestamp_offset_ms.lock().map_err(|error| {
-                DcexError::Runtime(format!("Binance timestamp offset lock poisoned: {error}"))
-            })?;
-            if offset.is_some() {
-                return Ok(());
-            }
+        let synced = || {
+            self.timestamp_offset_ms
+                .lock()
+                .map(|offset| offset.is_some())
+                .map_err(|error| {
+                    DcexError::Runtime(format!("Binance timestamp offset lock poisoned: {error}"))
+                })
+        };
+        if synced()? {
+            return Ok(());
+        }
+        // Concurrent first calls share one sync: the others find the offset on their turn.
+        let _syncing = self.time_sync.lock().await;
+        if synced()? {
+            return Ok(());
         }
 
         let local_start = unix_timestamp_ms()?;

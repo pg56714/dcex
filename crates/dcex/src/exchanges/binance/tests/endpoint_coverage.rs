@@ -4506,6 +4506,36 @@ fn disable_isolated_margin_account_route() {
 }
 
 #[test]
+fn concurrent_first_signed_requests_share_one_time_sync() {
+    let (base_url, stop, handle) = multi_request_server();
+    let client = BinanceClient::with_all_base_urls(
+        Some("api-key".to_string()),
+        Some("api-secret".to_string()),
+        Duration::from_secs(10),
+        base_url.clone(),
+        base_url.clone(),
+        base_url,
+    )
+    .expect("client");
+    let results = block_on(async move {
+        let calls = (0..6).map(|_| client.private_request("get_futures_account_info", Vec::new()));
+        Ok(futures_util::future::join_all(calls).await)
+    })
+    .expect("runtime");
+    stop.store(true, Ordering::SeqCst);
+    let lines = handle.join().expect("server thread");
+    for result in results {
+        result.expect("request");
+    }
+    assert_eq!(
+        lines.iter().filter(|line| is_time_sync(line)).count(),
+        1,
+        "{lines:?}"
+    );
+    assert_eq!(lines.len(), 7, "{lines:?}");
+}
+
+#[test]
 fn server_time_uses_each_market_host_and_route() {
     assert_cases(&[
         public(
